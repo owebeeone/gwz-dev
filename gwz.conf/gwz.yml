@@ -1,0 +1,40 @@
+schema: gwz.workspace/v0
+workspace:
+  id: ws_default
+members:
+- id: mem_gwz_cli
+  path: gwz-cli
+  type: git
+  source_id: src_gwz_cli
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/gwz-cli.git
+    fetch: true
+    push: true
+- id: mem_gwz_core
+  path: gwz-core
+  type: git
+  source_id: src_gwz_core
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/gwz-core.git
+    fetch: true
+    push: true
+- id: mem_taut
+  path: taut
+  type: git
+  source_id: src_taut
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/taut.git
+    fetch: true
+    push: true
