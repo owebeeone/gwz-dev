@@ -1,0 +1,37 @@
+# Bazel (bzlmod) + razel build for the gwz workspace. The crates' BUILD.bazel files use
+# @rules_rust//rust:defs.bzl, which razel resolves natively too, so they are shared by both
+# `bazel` and `razel`. External crates.io deps come from crate_universe (@crates//:<name>);
+# workspace-internal deps are plain // labels.
+#
+# REQUIRES a unified Cargo workspace so crate_universe has a single Cargo.lock:
+#   //:Cargo.toml  — a [workspace] manifest with members = ["gwz-core", "gwz-cli"]
+#   //:Cargo.lock  — its resolved lock (gwz-cli's gwz-core dep must be path, not git)
+# Then generate the @crates lockfile razel reads:  bazel mod deps --lockfile_mode=update
+module(name = "gwz", version = "0.1.0")
+
+bazel_dep(name = "rules_rust", version = "0.70.0")
+
+# Hermetic Rust toolchain pinned to the host (rustc/cargo 1.95.0), edition 2024.
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2024",
+    versions = ["1.95.0"],
+)
+use_repo(rust, "rust_toolchains")
+
+register_toolchains("@rust_toolchains//:all")
+
+# crates.io deps resolved from the workspace Cargo.toml / Cargo.lock (single source of truth,
+# so cargo and bazel/razel stay in lockstep). Generated targets are @crates//:<name>;
+# per-crate BUILD.bazel files pull them in via all_crate_deps()/aliases().
+crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//:Cargo.lock",
+    manifests = [
+        "//:Cargo.toml",
+        "//gwz-core:Cargo.toml",
+        "//gwz-cli:Cargo.toml",
+    ],
+)
+use_repo(crate, "crates")
