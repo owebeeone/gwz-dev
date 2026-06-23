@@ -1,0 +1,10 @@
+# Unified Cargo workspace for the gwz crates. Its single Cargo.lock is the one source of truth that
+# cargo AND bazel/razel (via crate_universe, see MODULE.bazel) resolve from, so they stay in lockstep.
+# The members are gwz-managed member repos checked out here (see .gitignore); gwz-cli depends on
+# gwz-core by path, so the workspace lock unifies them with a single resolved graph.
+[workspace]
+resolver = "2"
+members = [
+    "gwz-core",
+    "gwz-cli",
+]

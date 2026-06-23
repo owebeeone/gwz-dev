@@ -1,0 +1,8 @@
+# Root package. Its only job is to make `//` a Bazel package so the workspace Cargo manifest + lock
+# are addressable as labels: crate_universe (MODULE.bazel: crate.from_cargo) reads `//:Cargo.lock`
+# and `//:Cargo.toml`, and `module_ctx.watch(//:Cargo.lock)` needs this package to exist. Without a
+# BUILD file here, that watch fails with "BUILD file not found ... //:Cargo.lock".
+exports_files([
+    "Cargo.toml",
+    "Cargo.lock",
+])
