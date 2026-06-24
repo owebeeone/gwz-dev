@@ -1,18 +1,19 @@
 # GWZ Documentation Plan
 
 Status: recommendation review only. Updated after the tag redesign and
-`ls`/`forall` features landed. Do not implement the broad docs set until branch,
-stash, and any adjacent command-surface changes stabilize.
+`ls`/`forall` features landed. Implementation may proceed now against the
+current v0.3.0 command surface. Branch and stash are not part of this
+documentation wave.
 
 Date: 2026-06-25
 
 ## Purpose
 
-This document records the recommended GWZ documentation work after the current
-feature set stabilizes. It is intentionally a plan, not an implementation. Tag
-management and `ls`/`forall` are now implemented and should be documented as
-current behavior. Branch support, stash support, and any adjacent command-surface
-changes are still treated as documentation gates.
+This document records the recommended GWZ documentation work for the current
+implemented v0.3.0 surface. It is intentionally a plan, not an implementation.
+Tag management and `ls`/`forall` are now implemented and should be documented as
+current behavior. Branch support, stash support, and adjacent future command
+surface changes are out of scope for this documentation wave.
 
 The target outcome is a coherent documentation set for:
 
@@ -26,7 +27,8 @@ The target outcome is a coherent documentation set for:
 Root workspace:
 
 - There is no root `README.md`.
-- There is no root `AGENTS_GWZ.md`.
+- There is no `AGENTS_GWZ.md` bootstrap template or generated
+  `AGENTS_GWZ.md` file yet.
 - There is no root `AGENTS.md`, although `gwz-cli/AGENTS.md` and
   `gwz-core/AGENTS.md` both currently say to follow the root `AGENTS.md`.
 - The root `Cargo.toml` is a unified Cargo workspace for `gwz-core` and
@@ -41,9 +43,9 @@ Root workspace:
 - There is no `gwz-cli/docs/` directory yet.
 - The README states that Clap command definitions should be the source of truth
   for help and generated Markdown reference docs such as `docs/CLI.md`.
-- The command list now includes implemented `tag`, `ls`, and `forall` behavior,
-  but remains somewhat unstable while branch, stash, and related workflow
-  changes are still in flight.
+- The command list now includes implemented v0.3.0 `tag`, `ls`, and `forall`
+  behavior. Branch, stash, and related future workflow changes are not part of
+  this documentation pass.
 
 `gwz-core`:
 
@@ -90,76 +92,59 @@ Design and planning docs:
   GWZ catalog should be generated from `gwz-core/protocol/gwz.taut.py`, not
   copied manually from the generic taut docs.
 
-## Recommended Root Docs
+## Recommended Bootstrap Agent File
 
 ### `AGENTS_GWZ.md`
 
-Add a small root-level `AGENTS_GWZ.md` once the feature wave is stable. It should
-be short enough for agents to read quickly and should focus on operational
-guidance, not full product documentation.
+`AGENTS_GWZ.md` should be a GWZ-managed bootstrap file, not a root-specific
+operations guide. Its purpose is to give an LLM just enough information to get
+the `gwz` tool, clone a GWZ workspace, or materialize a workspace that has
+already been cloned.
+
+Recommended product behavior:
+
+- GWZ creation commands should add a tracked `AGENTS_GWZ.md` to every GWZ
+  repository they create. If the final surface is `gwz create`, that command
+  owns the behavior; if the final surface remains split across `init`, `clone`,
+  and `repo create`, document exactly which creation paths write the file.
+- Working CLI proposal: `gwz init --update` updates existing GWZ-managed
+  bootstrap files, including `AGENTS_GWZ.md`, to the latest bundled template.
+  This should be an idempotent existing-workspace operation, not a workspace
+  creation path.
+- The template should be versioned with `gwz-cli`, so docs can say which CLI
+  release generated or updated it.
+- The template contents should be sourced from the release-branch bootstrap doc
+  when available:
+  `https://raw.githubusercontent.com/owebeeone/gwz-cli/refs/heads/release/docs/agent_bootstrap.md`.
+  D0a must verify the exact reachable path before implementation.
+- The file should be safe to overwrite when it matches a known GWZ template, and
+  should refuse or require confirmation when users have edited it.
+- The file should point to the hosted docs:
+  `https://github.com/owebeeone/gwz-cli/tree/main/docs`.
 
 Recommended contents:
 
-- What GWZ is in this workspace: the root repo coordinates nested member repos
-  through tracked `gwz.conf/` metadata.
-- Root discovery: from inside a workspace, `gwz` should discover the workspace
-  root upward like Git. Use `--root <path>` only when running from outside the
-  workspace or when deliberately targeting a different workspace.
-- How to get the `gwz` tool:
+- One sentence: this repository is managed by GWZ, a multi-repository workspace
+  tool.
+- Install `gwz`:
   - release installer from `gwz-cli` GitHub releases;
-  - `cargo install --git https://github.com/owebeeone/gwz-cli`;
-  - local development fallback: `cargo run -p gwz -- ...` from the root
-    workspace.
-- How to inspect the root workspace:
-  - `gwz status`;
-  - `gwz status --combined`;
-  - `gwz status --json`;
-  - `gwz ls`;
-  - `gwz ls --local`.
-- How to manage root workspace changes:
-  - `gwz add <pathspec>...`;
-  - `gwz add -A`;
-  - `gwz commit -m "<message>"`;
-  - `gwz capture`;
-  - `gwz snapshot <name>`;
+  - `cargo install --git https://github.com/owebeeone/gwz-cli`.
+- If the workspace is not cloned yet:
+  - `gwz clone <workspace-git-url> [directory]`.
+- If this repository is already cloned:
   - `gwz materialize --lock`;
-  - `gwz pull --head`;
-  - `gwz push`;
-  - `gwz tag`;
-  - `gwz tag <name>`;
-  - `gwz tag --push <name>`;
-  - `gwz tag --push`;
-  - `gwz tag --fetch`;
-  - `gwz materialize --tag <name>`.
-- How to run a command across materialized members:
-  - `gwz forall -- git status --short`;
-  - `gwz forall -c "git rev-parse --abbrev-ref HEAD"`;
-  - `gwz --partial forall -- <cmd>`.
-- How to add or create members:
-  - `gwz repo add <repo-path>`;
-  - `gwz repo create <member-path>`.
-- Selection reminders:
-  - `--member <member-id>`;
-  - `--member-path <member-path>`;
-  - `--all`.
-- Agent cautions:
-  - prefer GWZ commands over ad-hoc cross-repo Git scripts for root workspace
-    operations;
-  - treat `gwz forall` as arbitrary local command execution; it streams child
-    process output and intentionally rejects `--json`/`--jsonl` in v0;
-  - do not hand-edit generated protocol output;
-  - do not document branch or stash as available until their implementations and
-    tests are stable;
-  - treat `gwz.conf/` as tracked workspace metadata.
+  - optionally `gwz status`.
+- Link to CLI docs and help:
+  - `gwz --help`;
+  - `https://github.com/owebeeone/gwz-cli/tree/main/docs`.
 
-Because the existing package-level `AGENTS.md` files point at a missing root
-`AGENTS.md`, the final implementation should also choose one of these fixes:
+Keep it deliberately brief. Do not include detailed workflow guidance, command
+catalogs, contribution policy, repo-specific build instructions, or full agent
+rules. Those belong in `README.md`, `AGENTS.md`, or package-specific docs.
 
-- add a tiny root `AGENTS.md` that points to `AGENTS_GWZ.md`; or
-- update package-level `AGENTS.md` files to name `AGENTS_GWZ.md` directly.
-
-The first option is more compatible with tooling that discovers `AGENTS.md`
-automatically.
+Decision: `AGENTS_GWZ.md` is tracked in GWZ-created repositories. This is
+intentional: an agent cloning a root branch should have a reasonable chance of
+finding the bootstrap file and then materializing the workspace correctly.
 
 ### Root `README.md`
 
@@ -190,17 +175,16 @@ Recommended contents:
   - run member-local maintenance commands with `gwz forall`;
   - add/create member repos.
 - Documentation map:
-  - root `AGENTS_GWZ.md` for agent operations;
+  - `AGENTS_GWZ.md` as the GWZ-managed LLM bootstrap file when present;
   - `gwz-cli/docs/` for user-facing CLI docs;
   - `gwz-core/docs/` for Rust API, artifacts, protocol, and message catalog;
   - `taut/docs/` for taut itself.
 - Feature status:
+  - v0.3.0 is the baseline for this documentation wave;
   - tag redefinition implemented as real Git tag management;
   - `gwz ls` and `gwz forall` implemented;
-  - branch support proposed/in progress;
-  - stash support specified but not implemented until landed;
-  - avoid relying on stale command docs for branch and stash while this wave is
-    active.
+  - branch and stash are future work and are not documented as available
+    commands.
 - Release and install pointers:
   - `gwz-cli/README.md` release installer commands;
   - local source install command.
@@ -215,12 +199,15 @@ Recommended files:
 - `gwz-cli/docs/README.md`: docs index and command-family map.
 - `gwz-cli/docs/Install.md`: release installers, source install, pinned version
   installs, checksum/attestation guidance, local dev usage.
+- `gwz-cli/docs/AgentBootstrap.md`: `AGENTS_GWZ.md` purpose, generated template
+  contents, creation behavior, `gwz init --update` behavior, overwrite rules,
+  and intended LLM bootstrap use.
 - `gwz-cli/docs/QuickStart.md`: create or clone a workspace, list members,
   inspect status, add/create members, stage, commit, snapshot, tag, materialize,
   run a member command with `forall`, pull, and push.
 - `gwz-cli/docs/Concepts.md`: workspace root, member repo, manifest, lock,
-  member listing, snapshot, Git tag, branch, stash bundle, selection, dry-run,
-  partial, force, remotes, progress events, and CLI-local `forall` execution.
+  member listing, snapshot, Git tag, selection, dry-run, partial, force,
+  remotes, progress events, and CLI-local `forall` execution.
 - `gwz-cli/docs/CLI.md`: generated or generated-assisted full command
   reference from Clap.
 - `gwz-cli/docs/commands/*.md`: one page per command family after the final
@@ -382,45 +369,45 @@ as the permanent approach.
 
 ## Parallel Work Packages
 
-These packages are designed so many agents can work independently after branch
-and stash stabilize. Tag and `ls`/`forall` should be treated as implemented
-source-of-truth inputs, not future work. Each package should keep edits within
-its listed ownership area unless a dependency explicitly calls for cross-links.
+These packages are designed so many agents can work independently now. Tag and
+`ls`/`forall` should be treated as implemented source-of-truth inputs, not
+future work. Branch and stash are outside the v0.3.0 documentation scope. Each
+package should keep edits within its listed ownership area unless a dependency
+explicitly calls for cross-links.
 
 | ID | Package | Depends On | Primary Outputs | Acceptance Criteria |
 | --- | --- | --- | --- | --- |
-| D0 | Source-of-truth freeze | Branch, stash, and adjacent command changes landed | Updated inventory notes in this file or a short successor note | Final command list, artifact paths, protocol schema, and feature status are confirmed against code and tests. Confirm tag, `ls`, and `forall` as implemented surfaces. |
-| D1 | Root agent guide | D0 | `AGENTS_GWZ.md`, optional root `AGENTS.md` pointer | Agents can install or run `gwz`, inspect the root workspace, stage/commit through GWZ, list members, run `forall`, manage tags, and avoid stale branch/stash guidance. |
-| D2 | Root README | D0 | root `README.md` | A new contributor can understand the repo map, bootstrap locally, run tests, and manage the root GWZ workspace. |
-| C1 | CLI docs skeleton | D0 | `gwz-cli/docs/README.md`, doc template, link map | Directory structure exists and all planned pages are linked without broken local links. |
-| C2 | CLI reference generator | D0, C1 | generator script or task, `gwz-cli/docs/CLI.md` | Generated reference matches `gwz --help` and command-level help; drift can be detected. Root help includes `https://github.com/owebeeone/gwz-cli/tree/main/docs` near the top and at the end. |
-| C3 | CLI command pages | D0, C1 | `gwz-cli/docs/commands/*.md` | Every stable command family has synopsis, mutation semantics, flags, examples, output, and failure notes. This can be split one agent per command family; `tag`, `ls`, and `forall` should be documented from the implemented code. |
-| C4 | CLI workflow docs | C1, C3 | `QuickStart.md`, `Workflows.md`, `RootWorkspace.md` | Workflows are executable against the final CLI, include member listing, real Git tags, and `forall`, and do not rely on deprecated tag artifacts. |
-| C5 | Machine output docs | D0, C1 | `MachineOutput.md` | JSON, JSONL, status porcelain, `ls` listings, response envelopes, event streams, `forall` machine-mode rejection, and exit behavior are documented with checked examples. |
-| K1 | Core docs skeleton | D0 | `gwz-core/docs/README.md`, revised `Reference.md` outline | Core docs have a stable index and existing reference gaps are identified. |
-| K2 | Rust embedding/API guide | D0, K1 | `Embedding.md`, `RustApi.md` | Public entrypoints, request construction, responses, errors, and events are documented with compiling examples or tested snippets. |
-| K3 | Workspace artifact docs | D0, K1 | `WorkspaceArtifacts.md` | Current artifact paths, schemas, examples, atomicity rules, and generated/local boundaries match code; `gwz.conf/tags` is documented only as removed history. |
-| K4 | Git backend docs | D0, K1 | `GitBackend.md` | Backend responsibilities, credential behavior, transfer progress, tag primitives, and Git command fallback rules are documented. |
-| K5 | Member listing and tag API docs | D0, K1 | `MemberListing.md`, `TagManagement.md` | `LsRequest`/`MemberEntry`, `TagRequest`/`TagOp`, `TagInfo`, local/remote tag behavior, and `materialize --tag` are documented from current core code. |
-| P1 | Protocol catalog generator | D0 | catalog generator, `MessageCatalog.md` | Catalog is generated from `protocol/gwz.taut.py`, includes methods/enums/messages/fields/tags, distinguishes service methods from CLI-local `Exec*` values, and has a drift check. |
-| P2 | Protocol guide | D0, P1 | `Protocol.md`, `Regeneration.md` | Service shape, request/response envelope, corpus generation, and schema evolution rules are documented. |
-| P3 | Error/event catalogs | D0, P1 | `ErrorCatalog.md`, `EventCatalog.md` | Error codes, aggregate/member statuses, event kinds, severity, and progress counters are documented from protocol/model sources. |
-| V1 | Example verification | C2-C5, K2-K4, P1-P3 | checked examples, doc-test notes, command transcript fixtures | Examples run against the final CLI/core where practical; non-executable examples are explicitly marked. |
+| D0a | Current source-of-truth freeze | None | Updated inventory notes in this file or a short successor note | Current v0.3.0 command list, artifact paths, protocol schema, feature status, and `AGENTS_GWZ.md` source URL are confirmed against code, tests, and reachable docs. Confirm tag, `ls`, `forall`, add, commit, snapshot, materialize, pull, push, capture, init, clone, and repo commands as current surfaces. |
+| D1 | GWZ bootstrap agent template | D0a | bundled tracked `AGENTS_GWZ.md` template, `gwz init --update` behavior spec, `AgentBootstrap.md` | GWZ-created repos receive a deliberately brief tracked `AGENTS_GWZ.md`; the template is based on the verified release bootstrap doc; `gwz init --update` can update it to the latest bundled version; overwrite behavior is documented and safe. |
+| D2 | Root README | D0a | root `README.md` | A new contributor can understand the repo map, bootstrap locally, run tests, and manage the root GWZ workspace using the v0.3.0 surface. |
+| C1 | CLI docs skeleton | D0a | `gwz-cli/docs/README.md`, doc template, link map | Directory structure exists and all planned v0.3.0 pages are linked without broken local links. |
+| C2 | CLI reference generator | D0a, C1 | generator script or task, `gwz-cli/docs/CLI.md` | Generated reference matches current `gwz --help` and command-level help; drift can be detected. Root help includes `https://github.com/owebeeone/gwz-cli/tree/main/docs` near the top and at the end. |
+| C3 | CLI command pages | D0a, C1 | `gwz-cli/docs/commands/*.md` | Every currently implemented v0.3.0 command family has synopsis, mutation semantics, flags, examples, output, and failure notes. This can be split one agent per command family; `tag`, `ls`, and `forall` should be documented from the implemented code. |
+| C4 | CLI workflow docs | C1, C3 | `QuickStart.md`, `Workflows.md`, `RootWorkspace.md` | Workflows are executable against the current v0.3.0 CLI, include member listing, real Git tags, and `forall`, and do not rely on deprecated tag artifacts. |
+| C5 | Machine output docs | D0a, C1 | `MachineOutput.md` | JSON, JSONL, status porcelain, `ls` listings, response envelopes, event streams, `forall` machine-mode rejection, and exit behavior are documented with checked examples. |
+| K1 | Core docs skeleton | D0a | `gwz-core/docs/README.md`, revised `Reference.md` outline | Core docs have a stable index and existing reference gaps are identified. |
+| K2 | Rust embedding/API guide | D0a, K1 | `Embedding.md`, `RustApi.md` | Public entrypoints, request construction, responses, errors, and events are documented with compiling examples or tested snippets. |
+| K3 | Workspace artifact docs | D0a, K1 | `WorkspaceArtifacts.md` | Current v0.3.0 artifact paths, schemas, examples, atomicity rules, and generated/local boundaries match code; `gwz.conf/tags` is documented only as removed history. |
+| K4 | Git backend docs | D0a, K1 | `GitBackend.md` | Backend responsibilities, credential behavior, transfer progress, tag primitives, and Git command fallback rules are documented. |
+| K5 | Member listing and tag API docs | D0a, K1 | `MemberListing.md`, `TagManagement.md` | `LsRequest`/`MemberEntry`, `TagRequest`/`TagOp`, `TagInfo`, local/remote tag behavior, and `materialize --tag` are documented from current core code. |
+| P1 | Protocol catalog generator | D0a | catalog generator, `MessageCatalog.md` | Catalog is generated from current `protocol/gwz.taut.py`, includes methods/enums/messages/fields/tags, distinguishes service methods from CLI-local `Exec*` values, and has a drift check. |
+| P2 | Protocol guide | D0a, P1 | `Protocol.md`, `Regeneration.md` | Service shape, request/response envelope, corpus generation, and schema evolution rules are documented. |
+| P3 | Error/event catalogs | D0a, P1 | `ErrorCatalog.md`, `EventCatalog.md` | Error codes, aggregate/member statuses, event kinds, severity, and progress counters are documented from protocol/model sources. |
+| V1 | Example verification | C2-C5, K2-K4, P1-P3 | checked examples, doc-test notes, command transcript fixtures | Examples run against the current v0.3.0 CLI/core where practical; non-executable examples are explicitly marked. |
 | V2 | Link and drift checks | all docs packages | CI or local verification commands | Local links pass, generated docs are current, and docs do not mention removed tag artifacts or `gwz.conf/tags` as live behavior. |
-| X1 | README consolidation | C1-C5, K1-K4, P1-P3 | trimmed `gwz-cli/README.md`, updated `gwz-core/README.md` | Package READMEs are concise entrypoints and point to the fuller docs without duplicating stale command tables. |
+| X1 | README consolidation | C1-C5, K1-K4, P1-P3 | trimmed `gwz-cli/README.md`, updated `gwz-core/README.md` | Package READMEs are concise entrypoints and point to the fuller v0.3.0 docs without duplicating stale command tables. |
 
 ## Suggested Sequencing
 
-1. Wait for branch, stash, and any other remaining command-surface changes to
-   land. Treat tag and `ls`/`forall` as already landed.
-2. Run D0 to confirm the final source of truth.
-3. Start D1, D2, C1, K1, and P1 in parallel.
-4. Start C2, K2, K3, K4, P2, and P3 once skeletons and catalog direction are
+1. Run D0a now to confirm the current implemented source of truth.
+2. Start D1, D2, C1, K1, and P1 in parallel.
+3. Start C2, K2, K3, K4, K5, P2, and P3 once skeletons and catalog direction are
    stable.
-5. Split C3 by command family and run those agents in parallel.
-6. Write workflow docs after command pages exist.
-7. Run V1 and V2 last.
-8. Consolidate existing READMEs after the deeper docs are stable.
+4. Split C3 by currently implemented v0.3.0 command family and run those agents
+   in parallel.
+5. Write workflow docs after current command pages exist.
+6. Run V1 and V2 for the current docs set.
+7. Consolidate existing READMEs after the deeper docs are stable.
 
 ## Documentation Rules For Implementation
 
@@ -435,13 +422,15 @@ its listed ownership area unless a dependency explicitly calls for cross-links.
 - Keep the taut catalog generated or generated-assisted.
 - Treat command examples as test assets where possible.
 - Document tag, `ls`, and `forall` as implemented behavior.
-- Avoid documenting planned branch or stash behavior as available until the
-  corresponding feature is merged and verified.
+- Do not include branch or stash command docs in the v0.3.0 documentation set.
 
 ## Open Decisions
 
-- Should the root file be only `AGENTS_GWZ.md`, or should a root `AGENTS.md`
-  point to it for automatic agent discovery?
+- Working proposal: use `gwz init --update` for template refresh. Should it
+  update one repo, all selected repos, or every GWZ-managed repository by
+  default?
+- How should the CLI detect a user-edited `AGENTS_GWZ.md` versus a known bundled
+  template that can be overwritten automatically?
 - Should `gwz-cli/docs/CLI.md` be fully generated, or should it be generated
   into command pages with hand-authored examples beneath each page?
 - Should the GWZ taut message catalog live only in `gwz-core/docs/`, or should a
@@ -452,9 +441,9 @@ its listed ownership area unless a dependency explicitly calls for cross-links.
   live in `gwz-core/protocol/gwz.taut.py` but are not core service methods?
 - Should `gwz forall` get captured machine-output mode later, or should v0's
   `--json`/`--jsonl` rejection remain the documented long-term behavior?
-- Should old `GWZDesign.md` artifact-layout sections be updated directly after
-  branch/stash land, or should user-facing docs simply supersede them and leave
-  design history untouched?
+- Should old `GWZDesign.md` artifact-layout sections be updated directly during
+  the v0.3.0 documentation pass, or should user-facing docs simply supersede
+  them and leave design history untouched?
 
 ## Not In Scope For This Planning Pass
 
@@ -464,3 +453,4 @@ its listed ownership area unless a dependency explicitly calls for cross-links.
 - Expanding `gwz-core/docs/`.
 - Generating the taut message catalog.
 - Changing CLI behavior, protocol schema, or workspace artifacts.
+- Documenting branch or stash commands.
