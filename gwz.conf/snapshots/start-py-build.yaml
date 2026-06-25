@@ -1,37 +1,47 @@
 schema: gwz.snapshot/v0
 workspace_id: ws_default
-snapshot_id: A
-created_at: unix-ms:1782121543560
+snapshot_id: start-py-build
+created_at: unix-ms:1782392507520
 created_by:
   actor_id: unknown
 selected_members:
 - mem_gwz_cli
 - mem_gwz_core
 - mem_taut
+- mem_gwz_py
 members:
   mem_gwz_cli:
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
-    commit: 2a5797550012230ed101f7b9b961671429da9a86
+    commit: 1a962e403653495ba0be6c906674a76a3786403b
     branch: main
     detached: false
-    dirty: true
+    dirty: false
     materialized: true
   mem_gwz_core:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 09efd94589a709d7fdeabae101cfe472f59cf7d1
+    commit: fc9b3a2d31e8ede55a0d8f584487f22382b917c1
     branch: main
     detached: false
-    dirty: true
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 4886e77333125958e9c65c85430b636bf48269dc
+    branch: main
+    detached: false
+    dirty: false
     materialized: true
   mem_taut:
     path: taut
     source_id: src_taut
     source_kind: git
-    commit: bd02571ebbfad682b22df6e334571da4ba730566
+    commit: 70e17b75b5b5bd05b8f769720454b142ffb6184e
     branch: main
     detached: false
     dirty: false
