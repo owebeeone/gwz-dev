@@ -38,3 +38,11 @@ members:
     url: git@github.com:owebeeone/taut.git
     fetch: true
     push: true
+- id: mem_gwz_py
+  path: gwz-py
+  type: git
+  source_id: src_gwz_py
+  active: true
+  desired:
+    local_only: true
+  remotes: []

@@ -177,13 +177,9 @@ cython_debug/
 
 /scratch/
 
-/bazel-bin/
-/bazel-genfiles/
-/bazel-out/
-/bazel-testlogs/
-/bazel-workspace/
-/bazel-workspace-*/
-/bazel-workspace-*/
-/.razel-*/
-/razel-*/
+# Bazel/Razel convenience symlinks and caches (no trailing slash — symlinks are not directories)
+bazel-*
+/.razel-*
+/razel-bin
+/razel-out
 /razel-testlogs
