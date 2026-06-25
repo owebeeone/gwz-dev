@@ -474,9 +474,9 @@
           "REPO_MAPPING:rules_rust+,bazel_tools bazel_tools",
           "REPO_MAPPING:rules_rust+,rules_cc rules_cc+",
           "REPO_MAPPING:rules_rust+,rules_rust rules_rust+",
-          "FILE:@@//Cargo.lock 003d5e3a5dc33bd3407aca5a398d2c4a3c7e9e721a0a4bd7df6b020ad09976e9",
+          "FILE:@@//Cargo.lock c99531f7445e1579c74a747fcb5c2fc2d845a355203e60884ee50f729a330b44",
           "FILE:@@//Cargo.toml bcbe50fd48acd404cfc73230667d9d57678a11e1896812186cf9aea67ac5e12a",
-          "FILE:@@//gwz-core/Cargo.toml a7462ce8410dcf010c7e4b8ca94f49eb98de249f605ab86c4571495b22327e7c",
+          "FILE:@@//gwz-core/Cargo.toml 86645be026b8dd5f2e5da3e958742955433bf1ffa9fdf33e5e6857adcda3b0f0",
           "FILE:@@//gwz-cli/Cargo.toml 80a46ff2e103264970a1ca271b2308102b7b6756e5c337c295a09e225fb03712"
         ],
         "generatedRepoSpecs": {

@@ -1,6 +1,6 @@
 # GWZ stash and branch implementation plan
 
-Status: active planning checkpoint, 2026-06-25.
+Status: implementation documentation revision checkpoint, 2026-06-25.
 
 This plan was reviewed against:
 
@@ -17,11 +17,12 @@ This plan was reviewed against:
   `/Users/owebeeone/limbo/gwz-dev/gwz-cli/src`.
 
 No source implementation is part of this document. `GWZDesign.md` remains
-authoritative and `GWZRequirements.md` remains the baseline. Because
-`GWZRequirements.md` still classifies selection-wide branch/merge and coordinated
-stash as deferred v0 operations, implementation cannot merge until Wave 0
-promotes the scope in the authoritative docs or explicitly records the work as a
-post-v0 track gated behind those documentation changes.
+authoritative and `GWZRequirements.md` remains the baseline. Wave 0 scope and
+layout promotion has landed in the authoritative docs. Branch list/create/delete,
+branch switch materialization, branch-sourced snapshots, and coordinated stash
+push/list/apply/pop/drop are now implemented. Branch merge B5a/B5b has landed:
+the protocol, core handler, CLI parser, renderer, docs, and focused tests now
+cover current-attached-branch merge and conflict reporting.
 
 ## Review response summary
 
@@ -62,17 +63,32 @@ Already implemented:
 - `GitBackend` in
   `/Users/owebeeone/limbo/gwz-dev/gwz-core/src/git/gitbackend.rs` has status,
   head, ref read, checkout, merge, rebase, reset, stage, commit, tag, fetch, and
-  push primitives. It has no stash primitives and no branch list/create/delete
-  primitive. It does have `checkout_branch`, which creates/checks out a branch
-  at a specified commit and is used by materialize; branch work must factor or
-  reuse that logic rather than duplicating its divergence checks.
+  push primitives, plus branch list/create/delete/switch and stash
+  push/list/apply/pop/drop primitives. `checkout_branch` remains the
+  materialize-restore primitive that can create/check out a branch at a
+  specified commit; command branch switching uses create-free `switch_branch`.
 - `handle_materialize` in
   `/Users/owebeeone/limbo/gwz-dev/gwz-core/src/workspace_ops/handle_materialize.rs`
   rewrites `gwz.conf/gwz.lock.yml` from observed post-mutation state and syncs
-  the workspace boundary. It supports lock, snapshot, tag, and exact commit
-  targets; it does not support branch targets.
-- `handle_snapshot` in the same file snapshots observed selected member state.
-  It has no branch-source option.
+  the workspace boundary. It supports lock, snapshot, tag, exact commit, and
+  branch switch targets.
+- `handle_snapshot` in the same file snapshots observed selected member state
+  and supports branch-sourced snapshots.
+- `handle_branch` in
+  `/Users/owebeeone/limbo/gwz-dev/gwz-core/src/workspace_ops/handle_branch.rs`
+  implements branch list/create/delete/merge for selected materialized members.
+  Create-and-switch rewrites the lock from observed post-switch state. Merge is
+  current-attached-branch only for v0; clean merges rewrite the lock from
+  observed state, and conflicts return `conflicted` with per-member conflict
+  paths while leaving the native Git merge state for the user to resolve.
+- `handle_stash` in
+  `/Users/owebeeone/limbo/gwz-dev/gwz-core/src/workspace_ops/handle_stash.rs`
+  implements coordinated stash push/list/apply/pop/drop for selected Git
+  members using local bundle metadata under `.gwz/stash/bundles/`.
+- `.gwz/` is written by core as local runtime state. The stash registry lives
+  under `.gwz/stash/bundles/`, the workspace mutator lock lives under
+  `.gwz/locks/workspace-mutator.lock`, and `.gwz/` is excluded from root
+  repository status by the workspace boundary.
 - `handle_tag` in
   `/Users/owebeeone/limbo/gwz-dev/gwz-core/src/workspace_ops/handle_tag.rs`
   shows the Git-native ref fan-out pattern and includes the root for local tag
@@ -91,16 +107,11 @@ Already implemented:
   `/Users/owebeeone/limbo/gwz-dev/gwz-cli/src/globalargs.rs`,
   `/Users/owebeeone/limbo/gwz-dev/gwz-cli/src/clirequest.rs`, and
   `/Users/owebeeone/limbo/gwz-dev/gwz-cli/src/main.rs`.
-- `.gwz/` exists as a reserved runtime directory in the workspace model but is
-  not currently written by core. Runtime writes under `.gwz/` therefore require
-  explicit root repository exclusion/boundary work before stash lands.
-
 Not implemented:
 
-- No `stash` command, stash protocol, stash registry, stash core handler, or
-  stash CLI renderer exists.
-- No `branch` command, branch protocol, branch core handler, branch CLI renderer,
-  `materialize --switch`, or `snapshot --branch` exists.
+- Root participation for branch and stash operations.
+- Remote branch tracking, branch push/delete, branch rename, stash repair/adopt,
+  merge continue/abort helpers, and `gwz branch --merge --into <target>`.
 
 ## Resolved stash decisions
 
@@ -397,7 +408,7 @@ Touchpoints:
 Work:
 
 - Add `gwz stash push [-u|-a] [-m <message>]`, `gwz stash list
-  [--no-combined]`, `gwz stash apply [stash-id]`, `gwz stash pop [stash-id]`,
+  [--expanded]`, `gwz stash apply [stash-id]`, `gwz stash pop [stash-id]`,
   and `gwz stash drop <stash-id>`.
 - CLI parses flags and renders human/JSON output only. It must not inspect
   `.gwz/stash/` or call Git directly.
@@ -890,7 +901,7 @@ Gate W5:
 
 | Feature | Risk | Mitigation | Required tests/gates |
 | --- | --- | --- | --- |
-| Scope gate | Requirements still say branch/stash must be hidden/rejected. | Wave 0 promotes the features in authoritative docs or blocks implementation merge. | Review of `GWZRequirements.md`/`GWZDesign.md`; rename tests. |
+| Scope gate | Requirements could drift back toward hiding branch/stash. | Wave 0 promoted the features in authoritative docs; future revisions must preserve the implemented scope or explicitly record deferrals. | Review of `GWZRequirements.md`/`GWZDesign.md`; rename tests. |
 | Stash registry | Bundle metadata drifts from native Git stash state or is lost with local runtime state. | Registry is local-only membership metadata; native payload existence is reconciled on list/restore; list shows manual remediation for orphans, including `.gwz/` wipe recovery. | Registry round trips, missing native payload drift, orphan native payload drift, local-only docs. |
 | Runtime boundary | Writing `.gwz/stash` dirties the root repo. | Add `.gwz/` to managed root exclude/runtime boundary. | Root remains clean after stash bundle write. |
 | Stash identity | `stash@{n}` shifts after any stash mutation. | Persist object id; treat `stash@{n}` as display-only; re-resolve index before each mutation. | Older-bundle pop after newer stash changes indices; non-GWZ stash untouched. |
@@ -1057,7 +1068,8 @@ Gate:
 Remain active after this update:
 
 - `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzStashBranchPlan.md` - active
-  implementation checkpoint for the combined work.
+  implementation/documentation checkpoint for the combined work, with B6 root
+  participation and post-v0 polish still deferred.
 - `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzStashBranch-Review48.md`,
   `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzStashBranch-Review55.md`, and
   `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzStashBranch-Review48-2.md` -
@@ -1066,14 +1078,14 @@ Remain active after this update:
   command behavior spec until its behavioral content is moved into core docs or
   this combined plan.
 - `/Users/owebeeone/limbo/gwz-dev/gwz-cli/dev-docs/GwzGaps.md` - active gap
-  tracker until stash and branch are implemented; D4 must update it before
-  moving old stash/branch plans to history.
+  tracker until D4 records the residual gaps: root stash, root branch
+  participation, remote branch tracking, branch rename, stash repair/adopt,
+  merge continue/abort helpers, and branch merge `--into`.
 - `/Users/owebeeone/limbo/gwz-dev/gwz-core/dev-docs/GWZDesign.md` - authoritative
-  architecture/design; D0 must reconcile scope and layout before implementation
-  can merge.
+  architecture/design; D0 scope/layout reconciliation has landed.
 - `/Users/owebeeone/limbo/gwz-dev/gwz-core/dev-docs/GWZRequirements.md` -
-  baseline requirements and deferred-operation record; D0 must promote or gate
-  the features before implementation can merge.
+  baseline requirements and deferred-operation record; D0 scope promotion has
+  landed.
 - `/Users/owebeeone/limbo/gwz-dev/gwz-core/docs/Reference.md` - active
   implemented API reference; update only when handlers/protocol actually land.
 
@@ -1084,16 +1096,14 @@ Move to history after the team accepts this combined plan:
 - `/Users/owebeeone/limbo/gwz-dev/gwz-core/dev-docs/GwzBranchPlan.md` - superseded
   by the branch phases and decisions in this document.
 
-Update during the documentation revision pass, not as part of this
-planning-only change:
+Updated during this documentation revision pass:
 
 - User-facing command docs under `/Users/owebeeone/limbo/gwz-dev/gwz-cli/docs/`
-  because stash and branch commands are not implemented yet; D2 owns those
-  updates when the commands land.
+  for implemented branch/stash/snapshot/materialize behavior, including
+  current-attached-branch merge and conflict reporting.
 - `/Users/owebeeone/limbo/gwz-dev/gwz-core/docs/MessageCatalog.md`,
-  `/Users/owebeeone/limbo/gwz-dev/gwz-core/docs/ErrorCatalog.md`, and
-  `/Users/owebeeone/limbo/gwz-dev/gwz-core/docs/Protocol.md` until taut schema
-  changes are made; D1 owns those updates after protocol slices land.
+  `/Users/owebeeone/limbo/gwz-dev/gwz-core/docs/ErrorCatalog.md`, and core
+  API/artifact docs for landed taut and handler shapes.
 
 ## Planning-change verification
 
