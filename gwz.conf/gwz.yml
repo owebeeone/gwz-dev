@@ -44,5 +44,9 @@ members:
   source_id: src_gwz_py
   active: true
   desired:
-    local_only: true
-  remotes: []
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/gwz-py.git
+    fetch: true
+    push: true
