@@ -1,19 +1,20 @@
 # GWZ Documentation Plan
 
-Status: recommendation review only. Updated after the tag redesign and
-`ls`/`forall` features landed. Implementation may proceed now against the
-current v0.3.0 command surface. Branch and stash are not part of this
-documentation wave.
+Status: historical planning note. The documentation wave described here has
+since landed, and the current surface also includes branch, stash,
+`AGENTS_GWZ.md` bootstrap management, and generated Clap-backed `CLI.md` drift
+checks. Use the active docs under `gwz-cli/docs/`, `gwz-core/docs/`, and the
+root `README.md` for current behavior.
 
 Date: 2026-06-25
 
 ## Purpose
 
-This document records the recommended GWZ documentation work for the current
-implemented v0.3.0 surface. It is intentionally a plan, not an implementation.
-Tag management and `ls`/`forall` are now implemented and should be documented as
-current behavior. Branch support, stash support, and adjacent future command
-surface changes are out of scope for this documentation wave.
+This document records the recommended GWZ documentation work for the earlier
+documentation wave. It is intentionally a plan, not the current source of truth.
+Tag management, `ls`/`forall`, branch, stash, `AGENTS_GWZ.md` bootstrap
+management, and the Clap-generated CLI reference are now implemented and should
+be documented as current behavior in active docs.
 
 The target outcome is a coherent documentation set for:
 
@@ -26,9 +27,9 @@ The target outcome is a coherent documentation set for:
 
 Root workspace:
 
-- There is no root `README.md`.
-- There is no `AGENTS_GWZ.md` bootstrap template or generated
-  `AGENTS_GWZ.md` file yet.
+- The root `README.md` exists and is the active root workspace entrypoint.
+- `AGENTS_GWZ.md` exists as a root-only tracked bootstrap file, backed by a
+  bundled template and `gwz init --update` refresh behavior.
 - There is no root `AGENTS.md`, although `gwz-cli/AGENTS.md` and
   `gwz-core/AGENTS.md` both currently say to follow the root `AGENTS.md`.
 - The root `Cargo.toml` is a unified Cargo workspace for `gwz-core` and
@@ -40,12 +41,12 @@ Root workspace:
 
 - `gwz-cli/README.md` has useful install instructions, a current command list,
   examples, and development commands.
-- There is no `gwz-cli/docs/` directory yet.
-- The README states that Clap command definitions should be the source of truth
-  for help and generated Markdown reference docs such as `docs/CLI.md`.
-- The command list now includes implemented v0.3.0 `tag`, `ls`, and `forall`
-  behavior. Branch, stash, and related future workflow changes are not part of
-  this documentation pass.
+- `gwz-cli/docs/` exists and contains user-facing command, workflow, machine
+  output, release, and agent bootstrap docs.
+- `gwz-cli/docs/CLI.md` is generated from Clap command definitions and checked
+  for drift.
+- The command list includes implemented `tag`, `ls`, `forall`, branch, and
+  stash behavior.
 
 `gwz-core`:
 
@@ -193,11 +194,10 @@ Recommended contents:
   - `gwz-core/docs/` for Rust API, artifacts, protocol, and message catalog;
   - `taut/docs/` for taut itself.
 - Feature status:
-  - v0.3.0 is the baseline for this documentation wave;
+  - the original wave used v0.3.0 as its baseline;
   - tag redefinition implemented as real Git tag management;
   - `gwz ls` and `gwz forall` implemented;
-  - branch and stash are future work and are not documented as available
-    commands.
+  - branch and stash are now implemented and documented in active CLI docs.
 - Release and install pointers:
   - `gwz-cli/README.md` release installer commands;
   - local source install command.
@@ -397,11 +397,9 @@ are published.
 
 ## Parallel Work Packages
 
-These packages are designed so many agents can work independently now. Tag and
-`ls`/`forall` should be treated as implemented source-of-truth inputs, not
-future work. Branch and stash are outside the v0.3.0 documentation scope. Each
-package should keep edits within its listed ownership area unless a dependency
-explicitly calls for cross-links.
+These packages were designed so many agents could work independently. Treat this
+table as implementation history; active docs now include the branch, stash, and
+bootstrap/doc-generation work that was deferred or planned here.
 
 | ID | Package | Depends On | Primary Outputs | Acceptance Criteria |
 | --- | --- | --- | --- | --- |
@@ -450,7 +448,7 @@ explicitly calls for cross-links.
 - Keep the taut catalog generated or generated-assisted.
 - Treat command examples as test assets where possible.
 - Document tag, `ls`, and `forall` as implemented behavior.
-- Do not include branch or stash command docs in the v0.3.0 documentation set.
+- Document branch and stash as implemented behavior in active docs.
 
 ## Open Decisions
 
@@ -458,7 +456,7 @@ explicitly calls for cross-links.
   should v0's `--json`/`--jsonl` rejection remain the documented long-term
   behavior? For v0.3.0 docs, document rejection only.
 
-## Not In Scope For This Planning Pass
+## Not In Scope For This Historical Planning Pass
 
 - Creating `AGENTS_GWZ.md`.
 - Creating or editing the root `README.md`.

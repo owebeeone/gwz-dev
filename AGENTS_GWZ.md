@@ -1,12 +1,15 @@
-<!-- gwz-managed-file: sha256=99b2d4844ca1e49417a1a5bfc9c6edb1668dcdd2e94ff883dde3beaebd637340 -->
+<!-- gwz-managed-file: sha256=f153fd3108df3a9b0cb04f8f2f93b9e1685df7e3247b1d9ec2bf0861cbae66aa -->
 
-# GWZ Agent Bootstrap
+# GWZ Workspace
 
 This repository is managed by GWZ, a multi-repository workspace tool.
 
-Install `gwz` from the GWZ CLI releases:
+Install `gwz` from the latest release:
 
-<https://github.com/owebeeone/gwz-cli/releases>
+```sh
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/owebeeone/gwz-cli/releases/latest/download/gwz-installer.sh | sh
+```
 
 Or install from source:
 
@@ -20,12 +23,14 @@ If the workspace is not cloned yet:
 gwz clone <workspace-git-url> [directory]
 ```
 
-If this repository is already cloned:
+If this root repository is already cloned:
 
 ```sh
 gwz materialize --lock
 gwz status
 ```
 
-Use `gwz --help` for command help. CLI docs live at
-<https://github.com/owebeeone/gwz-cli/tree/main/docs>.
+Docs:
+
+- `gwz --help`
+- https://github.com/owebeeone/gwz-cli/tree/main/docs

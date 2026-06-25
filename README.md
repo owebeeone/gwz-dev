@@ -105,8 +105,8 @@ gwz repo create <member-path>
 
 ## Documentation Map
 
-- `AGENTS_GWZ.md` is the brief GWZ-managed bootstrap hint for LLM agents when
-  present in a workspace root.
+- `AGENTS_GWZ.md` is the brief GWZ-managed bootstrap hint generated in
+  workspace roots for LLM agents.
 - `gwz-cli/README.md` is the concise CLI entrypoint; fuller user-facing pages
   live under `gwz-cli/docs/`.
 - `gwz-core/docs/` covers the Rust API, workspace artifacts, protocol, and
@@ -116,10 +116,6 @@ gwz repo create <member-path>
 
 ## Feature Status
 
-This documentation wave targets the implemented v0.3.0 command surface. Git tag
-management is implemented as real Git refs, `gwz ls` is implemented for member
-listing, and `gwz forall` is implemented for member-local command execution.
-
-Branch and stash workflows remain future work for this documentation wave. Do
-not treat branch or stash planning documents as available `gwz` commands unless
-the CLI help grows those commands.
+The current command surface includes real Git tag management, member listing
+with `gwz ls`, member-local execution with `gwz forall`, coordinated branch and
+stash workflows, and root bootstrap refresh with `gwz init --update`.

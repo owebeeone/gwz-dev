@@ -2,13 +2,15 @@
 
 Date: 2026-06-25
 
-This note records the source-of-truth freeze used to implement the v0.3.0
-documentation wave from `GwzDocPlan.md`.
+This note records the source-of-truth freeze used to implement the original
+documentation wave from `GwzDocPlan.md`. It has been revised with the current
+post-branch/stash and `AGENTS_GWZ.md` bootstrap delta so it no longer conflicts
+with the implemented CLI surface.
 
 ## Scope
 
-Document the current implemented surface only. Branch and stash command docs are
-out of scope for this wave.
+Document the current implemented surface only. Branch, stash, and
+`gwz init --update` are now part of that surface.
 
 ## CLI Surface
 
@@ -23,6 +25,8 @@ Confirmed from `cargo run -q -p gwz -- --help`:
 - `forall`: run a command in materialized members.
 - `snapshot`: record the current workspace selection.
 - `tag`: manage real Git tags across workspace repos.
+- `branch`: manage coordinated local branches across selected members.
+- `stash`: manage coordinated stash bundles across selected members.
 - `materialize`: materialize workspace members to lock, head, snapshot, tag, or
   commit target.
 - `pull`: update workspace members to an explicit target.
@@ -54,12 +58,12 @@ end.
 - `gwz forall` is CLI-local. It uses member listing to select materialized
   members, runs sequentially, sets `GWZ_MEMBER_ID`, `GWZ_MEMBER_PATH`,
   `GWZ_MEMBER_ABSPATH`, and `GWZ_ROOT`, and rejects `--json`/`--jsonl` in v0.
-- Branch and stash are not implemented command surfaces for this documentation
-  wave.
-- `gwz init --update` and automatic `AGENTS_GWZ.md` generation/update behavior
-  were not found in current help or repository search. D1 docs should describe
-  root-only refresh and managed-file digest overwrite behavior as planned/spec
-  behavior, not as an available v0.3.0 command.
+- `gwz branch` is implemented for coordinated branch list/create/delete/switch
+  and merge operations across selected members.
+- `gwz stash` is implemented for coordinated stash push/list/apply/pop/drop
+  operations across selected members.
+- `gwz init` creates root-only `AGENTS_GWZ.md` bootstrap files, and
+  `gwz init --update` refreshes them using the managed-file SHA-256 header.
 
 ## Artifacts
 
