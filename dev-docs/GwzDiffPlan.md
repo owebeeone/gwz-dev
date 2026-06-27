@@ -4,7 +4,8 @@ Status: design plan, 2026-06-27.
 
 This plan covers a `gwz diff` command that behaves like `git diff` over the
 GWZ unified workspace: the root repository plus materialized member Git
-repositories rendered as one workspace-relative change stream.
+repositories rendered as one workspace-relative manifest and assembled patch
+output.
 
 This document was reviewed against:
 
@@ -26,8 +27,11 @@ This document was reviewed against:
 - `/Users/owebeeone/limbo/gwz-dev/taut/docs/Reference.md`
 - `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzDiffPlan-Review48.md`
 - `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzDiffPlan-Review48-2.md`
+- `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzDiffPlan-Review48-3.md`
+- `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzDiffPlan-Review48-4.md`
 - `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzDiffPlan-Review55.md`
 - `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzDiffPlan-Review55-2.md`
+- `/Users/owebeeone/limbo/gwz-dev/dev-docs/GwzDiffPlan-Review55-5.md`
 - Rust `git2 0.21.0`, backed by libgit2 `1.9.4`, from the local Cargo lock.
 
 No implementation is part of this document. The concrete Taut snippets below
@@ -62,8 +66,8 @@ The implementation must preserve GWZ's soon-to-be client/server architecture.
 as launching `less`, detecting terminal color policy, or reading `PAGER`.
 Those belong in client surfaces. `gwz-cli` may share Rust client-side code, but
 `gwz-py` is a first-class Python client with its own CLI and PyO3 bridge, so it
-must receive equivalent protocol, streaming, parser, rendering, and exit-code
-work rather than relying on Rust crate reuse.
+must receive equivalent protocol, manifest/file-patch, parser, rendering, and
+exit-code work rather than relying on Rust crate reuse.
 
 ## Current state
 
@@ -83,29 +87,30 @@ work rather than relying on Rust crate reuse.
   overflow. That is acceptable for progress events, but not acceptable as the
   only transport for patch bytes.
 - Existing Taut protocol has request/response methods plus
-  `events.subscribe`. There is no generic operation-output log payload today.
+  `events.subscribe`. Current GWZ operations do not expose a generic
+  operation-output log payload.
 - `gwz forall` is intentionally CLI-local. `gwz diff` must not follow that
   model because repository object access and revision resolution belong in
   `gwz-core`; terminal presentation belongs in the client.
 - Taut's `log` shape is the intended append-only/read-from-offset/tail
-  abstraction for diff output. The current GWZ `events.subscribe`
-  implementation uses a bounded buffer and can emit `reset` after dropping
-  history, so that implementation must be matured or re-shaped before it can be
-  treated as the model for patch-byte transport.
+  abstraction for future whole-operation output feeds, but v0 `gwz diff` should
+  not depend on maturing that transport. It can fit existing request/response
+  mechanics by splitting diff into manifest discovery and bounded per-file
+  patch requests.
 - `gwz-py` links `gwz-core` through PyO3 and currently exposes `call`,
   `submit`, `subscribe_events`, `wait_events`, `operation_result`, and
-  `try_operation_result`. Its streaming path is the same lossy
-  operation-event path that `gwz diff` must avoid.
+  `try_operation_result`. Its event subscription path is bounded and can reset,
+  so v0 diff patch bytes should use ordinary request/response calls instead.
 
 ## Goals
 
 - Match `git diff` semantics where they map cleanly to a unified GWZ workspace.
 - Use libgit2 for the core diff engine whenever possible.
-- Render one deterministic workspace-relative stream across the root repository
+- Render one deterministic workspace-relative diff across the root repository
   and selected members.
 - Keep `gwz-core` headless and server-safe.
-- Add protocol support for streaming large responses without forcing the final
-  response to hold patch text.
+- Return changed-file manifests and bounded per-file patch bytes without
+  forcing the final response to hold a whole-workspace patch.
 - Provide client-side support that can consume GWZ core protocol, render diff
   output, apply color policy, launch a pager, and compute CLI exit codes in
   both `gwz-cli` and `gwz-py`.
@@ -131,18 +136,21 @@ work rather than relying on Rust crate reuse.
 `gwz diff` should be a `gwz-core` operation because revision resolution,
 repository object access, pathspec partitioning, and member selection are core
 workspace semantics. It should not mutate repositories, locks, manifests, or
-workspace artifacts. Ephemeral operation records and output spools are allowed
-runtime state, but they must not change Git state or tracked GWZ metadata.
+workspace artifacts. Short-lived manifest/file patch cache entries are allowed
+runtime state if a stateful optimization is later added, but v0 should not
+require persistent server-side diff state.
 
-### AD2 - Diff is computed per repository and rendered as one stream
+### AD2 - Diff is computed per repository and projected as one manifest
 
 The core operation runs the requested Git diff independently in:
 
 1. The root repository, when included.
 2. Each selected materialized Git member, in manifest order.
 
-Each repo produces a normal libgit2 `Diff`. GWZ rewrites or renders paths so
-every output path is relative to the workspace root.
+Each repo produces a normal libgit2 `Diff`. Phase 1 projects those per-repo
+diffs into a single workspace-relative changed-file manifest. Phase 2 renders
+patch bytes for one manifest file, or an explicit small batch of files, with
+paths rewritten relative to the workspace root.
 
 This avoids inventing a virtual Git repository while preserving the user model
 of one unified workspace.
@@ -155,43 +163,42 @@ summary metadata. Color and pager decisions are presentation concerns.
 The client library may colorize patch lines when the selected output mode is a
 terminal mode. It should not ask core to embed ANSI escapes by default.
 
-### AD4 - Patch bytes require a non-lossy Taut log
+### AD4 - v0 diff is two-phase and file-granular
 
-The existing `events.subscribe` stream is lifecycle/progress oriented. Its
-bounded buffer can reset and lose history. Patch data cannot use that as its
-only transport.
+Whole-workspace patch streaming is not the v0 backbone. The v0 protocol is:
 
-The protocol must provide a Taut `log` where diff chunks are delivered in
-order. A slow consumer must not silently lose bytes. The v0 transport design
-should mature Taut's `log` implementation before the diff schema is frozen.
+1. Phase 1, `diff`: discover the changed-file manifest and aggregate summary.
+   This returns file entries with workspace paths, status, rename pairing, copy
+   pairing only when copy detection is explicitly enabled/proven, binary flag,
+   per-file stat counts when available, repo scope, and per-repo operand
+   classification. It returns no patch bytes.
+2. Phase 2, `diff.file`: render the patch for one file from the manifest, or
+   for one explicit literal file path.
+3. Phase 2 batch, `diff.files`: optional bounded batching of several files to
+   reduce remote round trips.
 
-The preferred v0 mechanism is an operation output log, separate from
-`OperationRuntime` events:
+When the user explicitly supplies literal file pathspecs, the client may skip
+Phase 1 and call `diff.file`/`diff.files` directly after workspace path routing.
+Discovery still runs for bare `gwz diff`, directory pathspecs, globs, or any
+request where the changed set is unknown.
 
-- Core appends ordered byte chunks to an operation-scoped output log with a
-  monotonic byte offset and sequence.
-- Consumers read from offset and may tail until a final event is available.
-- The spool may be memory-backed for small output and spill to `.gwz/` or a
-  server-local temp area for large output. Root diffs must exclude the runtime
-  spool path in memory so spool files never appear in diff output even when
-  `.git/info/exclude` is stale.
-- If configured spool limits are reached, core must either block production
-  until consumers drain or fail the operation with a typed output-capacity
-  error. It must not drop already-acknowledged bytes.
-- The log has an explicit cancel path so a pager quit, broken pipe, or
-  remote client disconnect can stop diff generation and clean up the spool.
-- The same log contract must be available through the PyO3 bridge for
-  `gwz-py`; it cannot go through `subscribe_events`.
+This avoids requiring a new non-lossy whole-diff log before `gwz diff` can
+ship. The only offset-addressed byte path in v0 is for one oversized file patch
+at a time, using `DiffFileRequest.from_offset` and `max_bytes`.
 
-If implementation chooses a pure blocking sink instead of a spool, it must still
-provide an equivalent PyO3 and remote-client story and must document what
-happens on disconnect.
+Stateless Phase 2 widens the normal worktree race between discovery and
+rendering: a user can edit or revert a file after the manifest is returned and
+before the file patch is fetched. Core should treat "manifest entry no longer
+matches current diff" as a stale-entry condition, not as a fatal protocol error.
+Clients should omit that file's patch or show a concise stale notice according
+to output mode. A future stateful retained-diff mode can close this snapshot
+window for remote or review-UI clients.
 
 ### AD5 - Final operation results stay metadata-only
 
-`operation.result` should not carry patch text. It may carry final status,
-member outcomes, errors, and small summaries. Large output belongs to the diff
-output log.
+`operation.result` should not carry whole-workspace patch text. It may carry
+final status, member outcomes, errors, and small summaries. Patch bytes belong
+to bounded `diff.file`/`diff.files` responses.
 
 ### AD6 - Client behavior lives outside core, but Rust and Python clients both matter
 
@@ -204,7 +211,8 @@ Rust client responsibilities:
 - Parse Git-like CLI diff options into structured request options while leaving
   ambiguous positional operands for core.
 - Choose local in-process core or remote core transport.
-- Consume the non-lossy output log.
+- Call Phase 1 discovery when needed, fetch Phase 2 file patches in manifest
+  order, and assemble human patch output client-side.
 - Render stdout/stderr.
 - Apply terminal color policy.
 - Launch and feed `less` or another pager.
@@ -213,7 +221,7 @@ Rust client responsibilities:
 `gwz-py` should not be described as reusing this Rust crate unless a deliberate
 new PyO3 wrapper is added for it. Its v0 work is separate:
 
-- Add PyO3 bindings for the same non-lossy diff output log.
+- Use the existing PyO3 request/response bridge for Phase 1 and Phase 2 calls.
 - Add Python protocol-generated diff messages.
 - Add Python CLI parser support for `gwz diff`.
 - Reimplement pager, color, JSON/JSONL, and exit-code behavior in Python or
@@ -268,113 +276,77 @@ the protocol contract is workspace-relative.
 
 `gwz diff` remains read-only. It must not repair `.git/info/exclude` just to
 hide member directories or runtime files from the root diff. Root diff planning
-should either:
+should prefer a GWZ delta post-filter:
+
+- compute the root diff normally;
+- drop any root delta whose workspace path is under an active member path,
+  `.gwz/`, or `gwz.conf/.tmp/`;
+- build manifest entries, stats, and patch selection from the filtered delta
+  list.
+
+This is a correctness strategy, not only a fallback. It avoids relying on
+negative libgit2 pathspec support, which the current Rust wrapper does not
+expose directly. The tradeoff is performance: libgit2 may still walk excluded
+paths. A later lower-level skip is an optimization if large root worktrees make
+that expensive.
+
+Root diff planning may still choose one of these alternatives if the D2 spike
+proves it better:
 
 - apply in-memory pathspec exclusions for every active member path, `.gwz/`, and
   `gwz.conf/.tmp/` when diffing the root repository, or
 - validate the managed exclude boundary and fail with a clear diagnostic that
   asks the user to run a boundary-refreshing command.
 
-The preferred v0 path is in-memory exclusion so read-only diff works even if the
-local root boundary is stale. D-1/D2 must prove the concrete implementation
-strategy before this becomes a protocol promise: lower-level libgit2 filtering,
-a GWZ filtered renderer/stat path, or fail-fast validation of the managed
-exclude boundary. The current Rust `git2` wrapper's pathspec API is additive,
-so the plan must not assume "all except these paths" exists until the spike
-demonstrates it.
+For default `worktree_vs_index`, member directories and `.gwz/` are often
+untracked and therefore absent from plain Git diff output anyway. The exclusion
+rule remains required because staged root changes, tree comparisons, explicit
+pathspecs, and future options can otherwise surface managed workspace content.
 
 ## Taut protocol proposals
 
-The protocol should add metadata methods plus a log-shaped output method. The
-exact numbering must be assigned during implementation after checking the
-current generated schema and corpus.
-
-These snippets assume the transport phase below has already matured Taut `log`
-support for precise read-from-offset/tail behavior. Do not freeze the corpus
-until that log shape has Rust and PyO3 consumers.
+The v0 protocol should add ordinary request/response methods for a two-phase
+diff. The exact numbering must be assigned during implementation after checking
+the current generated schema and corpus.
 
 ### Service methods
-
-Recommended first shape:
 
 ```python
 service("GwzCore",
     # Existing methods omitted.
 
-    # Diff metadata and summary. This does not return patch bytes.
+    # Phase 1: changed-file manifest and summary. No patch bytes.
     method("diff", role="in",
            params=Params(request=Ref.DiffRequest),
-           out=Ref.DiffResponse),
+           out=Ref.DiffManifestResponse),
 
-    # Start diff output production and return operation/output log ids.
-    method("diff.open", role="in",
-           params=Params(request=Ref.DiffRequest),
-           out=Ref.DiffOpenResponse),
+    # Phase 2: patch for one manifest file or one explicit literal file.
+    method("diff.file", role="in",
+           params=Params(request=Ref.DiffFileRequest),
+           out=Ref.DiffFileResponse),
 
-    # Taut log of ordered patch/raw/name output. Taut log runtime supplies
-    # read-from-offset, bounded replay, and tail behavior for this shape.
-    method("diff.output", role="out", shape="log",
-           params=Params(output_id=STR, from_offset=INT, max_bytes=INT,
-                         tail=BOOL),
-           out=Ref.DiffStreamEvent),
-
-    # Cancel an in-flight diff/output log.
-    method("diff.cancel", role="ctl",
-           params=Params(request=Ref.DiffCancelRequest),
-           out=Ref.CancelOperationResponse))
+    # Phase 2 batch: optional bounded batch for remote round-trip amortization.
+    method("diff.files", role="in",
+           params=Params(request=Ref.DiffFilesRequest),
+           out=Ref.DiffFilesResponse))
 ```
+
+Removed from v0: `diff.open`, `diff.output`, `diff.cancel`, output spools,
+`DiffStreamKind`, `DiffOutputChunk` as a stream payload, `DiffStreamEvent`, and
+`DiffOpenResponse`.
 
 Rationale:
 
-- `diff.open` plus an offset-addressable output log avoids the race where a
-  client receives an `operation_id` and subscribes after output has already
-  been produced.
-- `diff` remains useful for `--quiet`, summary-only API callers, JSON metadata,
-  and tests.
-- The general `events.subscribe` method can still publish lifecycle events, but
-  patch bytes use the non-lossy output log.
-- `diff.cancel` gives pager quit, broken pipe, and remote disconnect a defined
-  cleanup path.
-
-If GWZ later wants generic stdout/stderr streaming for multiple operations,
-promote `DiffStreamEvent` into a generic `OperationOutputEvent` and make the
-diff output log a thin specialization.
-
-### Taut log extensions required by diff
-
-`gwz diff` should push Taut forward rather than work around it. The correct
-shape for diff bytes is `log`: append-only history with read-from-offset and
-tail. D-1 must therefore mature the Taut log implementation and generated
-clients, not invent a private GWZ read protocol.
-
-Required Taut behavior:
-
-- A `shape="log"` method must expose record-precise replay from a caller-supplied
-  offset and live tail from that same offset without a subscribe-after-open race.
-- The log reader must support bounded reads or bounded replay windows so a
-  client can cap memory. For diff, the bound should be expressible in bytes,
-  records, or both; `max_bytes` in the proposal is the GWZ-facing initial
-  requirement.
-- A log transport must not silently drop records. If retention or spool capacity
-  is exceeded, the source must block, backpressure, or fail with a typed
-  capacity/retention error.
-- Log cursors must be stable enough for reconnect/resume. Diff events carry
-  `byte_offset` and `sequence`; Taut log runtime may also maintain its own
-  cursor token if that is the better cross-language API.
-- Tailing a log must have teardown semantics. A client closing a subscription,
-  pager quit, broken pipe, or remote disconnect must release the reader, and it
-  must be possible to propagate cancellation to the producing operation when the
-  operation is no longer wanted.
-- Generated Rust, Python/PyO3, and TypeScript clients should expose log-shaped
-  APIs as log APIs: replay/read, tail, and cancel/close. They should not expose
-  every streaming shape as an undifferentiated subscribe callback.
-- Existing lossy `events.subscribe` behavior should be audited. If a method is
-  declared `shape="log"`, its implementation should satisfy log semantics or be
-  renamed/re-shaped so the schema does not overpromise.
-
-`diff.cancel` is a domain control method for stopping the producer. Generic log
-reader teardown should live in Taut runtime/codegen so every log-shaped method
-gets it.
+- Phase 1 gives programmatic consumers the data they naturally need first:
+  which files changed, how they changed, and aggregate summaries.
+- Phase 2 keeps patch responses bounded by file or explicit small batch.
+- `gwz diff | less` remains a client workflow: the client gets the manifest,
+  fetches patches in manifest order, applies color/pager policy, and writes a
+  single coherent document.
+- A client that quits the pager or hits a broken pipe stops issuing Phase 2
+  calls. No domain cancellation method is needed for v0.
+- Taut `log` maturation remains valuable for future generic operation output,
+  but it is not on the v0 critical path for `gwz diff`.
 
 ### Enum additions
 
@@ -398,7 +370,19 @@ DiffOutputFormat=Enum(
     raw=1,
     name_only=2,
     name_status=3,
-    no_patch=4)
+    stat=4,
+    numstat=5,
+    shortstat=6,
+    summary=7,
+    patch_with_raw=8,
+    patch_with_stat=9,
+    no_patch=10)
+
+DiffManifestMode=Enum(
+    # Build full file list and stats for output or machine consumers.
+    full=0,
+    # Return only enough information to answer --quiet/fast any-difference.
+    any_difference=1)
 
 DiffAlgorithm=Enum(
     default=0,
@@ -413,14 +397,14 @@ DiffWhitespaceMode=Enum(
     ignore_eol=3,
     ignore_blank_lines=4)
 
-DiffStreamKind=Enum(
-    started=0,
-    repo_started=1,
-    chunk=2,
-    repo_finished=3,
-    finished=4,
-    error=5,
-    cancelled=6)
+DiffStatus=Enum(
+    added=0,
+    modified=1,
+    deleted=2,
+    renamed=3,
+    copied=4,
+    type_changed=5,
+    unmerged=6)
 
 DiffChunkEncoding=Enum(
     utf8=0,
@@ -444,10 +428,18 @@ DiffComparison=Msg(
     merge_base=F(4, BOOL, optional=True))
 
 DiffParsedTarget=Msg(
-    # Resolved by core per repository from DiffRequest.operands/pathspecs.
-    comparison=F(1, Ref.DiffComparison),
+    # Stable within the manifest and scoped to exactly one root/member repo.
+    target_id=F(1, STR),
+    scope=F(2, Ref.DiffRepoScope),
+    # Resolved by core per repository from DiffRequest operands, request flags,
+    # and pathspecs.
+    comparison=F(3, Ref.DiffComparison),
     # Repo-relative pathspecs after workspace routing.
-    pathspecs=F(2, List(STR)))
+    pathspecs=F(4, List(STR)),
+    # Resolved object ids where available. Worktree sides may omit an oid.
+    left_oid=F(5, STR, optional=True),
+    right_oid=F(6, STR, optional=True),
+    merge_base_oid=F(7, STR, optional=True))
 
 DiffOptions=Msg(
     output_format=F(1, Ref.DiffOutputFormat, optional=True),
@@ -456,6 +448,7 @@ DiffOptions=Msg(
     algorithm=F(4, Ref.DiffAlgorithm, optional=True),
     whitespace=F(5, Ref.DiffWhitespaceMode, optional=True),
     find_renames=F(6, BOOL, optional=True),
+    # Tier 1 unless D-1 proves faithful Phase 2 copy rendering.
     find_copies=F(7, BOOL, optional=True),
     rename_threshold=F(8, INT, optional=True),
     rename_limit=F(9, INT, optional=True),
@@ -471,8 +464,7 @@ DiffOptions=Msg(
     line_prefix=F(19, STR, optional=True),
     ignore_submodules=F(20, STR, optional=True),
     diff_filter=F(21, STR, optional=True),
-    # Core-side output suppression for --quiet and metadata-only callers.
-    summary_only=F(22, BOOL, optional=True))
+    manifest_mode=F(22, Ref.DiffManifestMode, optional=True))
 
 DiffRequest=Msg(
     meta=F(1, Ref.RequestMeta),
@@ -483,15 +475,21 @@ DiffRequest=Msg(
     operands=F(3, List(STR)),
     # Pathspecs after an explicit "--"; resolved relative to workspace_cwd.
     explicit_pathspecs=F(4, List(STR)),
-    options=F(5, Ref.DiffOptions, optional=True))
+    options=F(5, Ref.DiffOptions, optional=True),
+    # True for --cached or --staged. Selects index-vs-tree forms.
+    cached=F(6, BOOL, optional=True),
+    # True for --merge-base. A...B syntax is still parsed from operands.
+    merge_base=F(7, BOOL, optional=True))
 ```
 
 The protocol should be structured. Do not make the core API a raw `git diff`
 argv tunnel. The client parser can be Git-compatible for options and the `--`
-boundary while the wire contract remains stable and language-neutral. Core owns
-classification of ambiguous positional operands.
+boundary while the wire contract remains stable and language-neutral. Parsed
+operation flags such as `--cached`/`--staged` and `--merge-base` must be
+explicit request fields, not hidden in `operands`. Core owns classification of
+ambiguous positional operands.
 
-### Log and summary messages
+### Manifest, file, and summary messages
 
 ```python
 DiffRepoScope=Msg(
@@ -501,14 +499,21 @@ DiffRepoScope=Msg(
     member_path=F(3, STR, optional=True),
     source_kind=F(4, Ref.SourceKind, optional=True))
 
-DiffOutputChunk=Msg(
-    format=F(1, Ref.DiffOutputFormat),
-    encoding=F(2, Ref.DiffChunkEncoding),
-    # Patch/raw/name bytes. UTF-8 text is still carried as bytes so the stream
-    # can preserve NUL-terminated records and binary patch data.
-    data=F(3, BYTES),
-    byte_offset=F(4, INT, optional=True),
-    line_count=F(5, INT, optional=True))
+DiffFileEntry=Msg(
+    # Stable within the manifest, opaque to clients, and not parsed by core in
+    # Phase 2. Scope/status/old_path/new_path are the structured selector.
+    file_id=F(1, STR),
+    scope=F(2, Ref.DiffRepoScope),
+    status=F(3, Ref.DiffStatus),
+    # Workspace-relative. new_path == old_path except for rename/copy.
+    old_path=F(4, STR, optional=True),
+    new_path=F(5, STR, optional=True),
+    old_mode=F(6, INT, optional=True),
+    new_mode=F(7, INT, optional=True),
+    similarity=F(8, INT, optional=True),
+    insertions=F(9, INT, optional=True),
+    deletions=F(10, INT, optional=True),
+    is_binary=F(11, BOOL, optional=True))
 
 DiffRepoSummary=Msg(
     scope=F(1, Ref.DiffRepoScope),
@@ -516,10 +521,7 @@ DiffRepoSummary=Msg(
     files_changed=F(3, INT),
     insertions=F(4, INT),
     deletions=F(5, INT),
-    bytes_streamed=F(6, INT),
-    # Echoes core's per-repo operand/pathspec classification for diagnostics
-    # and parity tests. Omitted only when no diff planning occurred.
-    parsed_target=F(7, Ref.DiffParsedTarget, optional=True))
+    files_manifested=F(6, INT))
 
 DiffSummary=Msg(
     has_differences=F(1, BOOL),
@@ -528,62 +530,136 @@ DiffSummary=Msg(
     files_changed=F(4, INT),
     insertions=F(5, INT),
     deletions=F(6, INT),
-    bytes_streamed=F(7, INT),
-    repo_summaries=F(8, List(Ref.DiffRepoSummary)))
+    repo_summaries=F(7, List(Ref.DiffRepoSummary)))
 
-DiffOpenResponse=Msg(
+DiffManifestResponse=Msg(
     response=F(1, Ref.ResponseEnvelope),
-    # Operation id is also present in response.meta.operation_id; output_id
-    # identifies the non-lossy Taut log for diff.output.
-    output_id=F(2, STR))
+    files=F(2, List(Ref.DiffFileEntry)),
+    summary=F(3, Ref.DiffSummary, optional=True),
+    # Scope-addressable per-repo operand classification resolved by core.
+    targets=F(4, List(Ref.DiffParsedTarget)))
 
-DiffCancelRequest=Msg(
+DiffFileRequest=Msg(
     meta=F(1, Ref.RequestMeta),
-    operation_id=F(2, STR),
-    output_id=F(3, STR, optional=True))
+    workspace_cwd=F(2, STR, optional=True),
+    scope=F(3, Ref.DiffRepoScope, optional=True),
+    # From Phase 1. Recommended for manifest-driven clients. Core validates
+    # this entry against the recomputed diff; it does not parse file_id.
+    entry=F(4, Ref.DiffFileEntry, optional=True),
+    # Optional opaque correlation id echoed in the response.
+    file_id=F(5, STR, optional=True),
+    # For explicit-file fast path. Workspace-relative after cwd resolution.
+    path=F(6, STR, optional=True),
+    # Preferred for manifest-driven Phase 2. Reuse the scoped target resolved
+    # by Phase 1 instead of reclassifying raw operands.
+    target=F(7, Ref.DiffParsedTarget, optional=True),
+    # Explicit-file fast path can skip Phase 1 and therefore may send the same
+    # unresolved comparison inputs as DiffRequest.
+    operands=F(8, List(STR), optional=True),
+    cached=F(9, BOOL, optional=True),
+    merge_base=F(10, BOOL, optional=True),
+    options=F(11, Ref.DiffOptions, optional=True),
+    # Oversized-file fallback: read a window of this one file patch.
+    from_offset=F(12, INT, optional=True),
+    max_bytes=F(13, INT, optional=True))
 
-DiffStreamEvent=Msg(
-    operation_id=F(1, STR),
-    request_id=F(2, STR),
-    sequence=F(3, INT),
-    timestamp_ms=F(4, INT),
-    kind=F(5, Ref.DiffStreamKind),
-    severity=F(6, Ref.Severity),
-    output_id=F(7, STR),
-    scope=F(8, Ref.DiffRepoScope, optional=True),
-    chunk=F(9, Ref.DiffOutputChunk, optional=True),
-    response=F(10, Ref.DiffResponse, optional=True),
-    error=F(11, Ref.GwzError, optional=True),
-    attribution=F(12, Ref.OperationAttribution, optional=True))
-
-DiffResponse=Msg(
+DiffFileResponse=Msg(
     response=F(1, Ref.ResponseEnvelope),
-    summary=F(2, Ref.DiffSummary, optional=True))
+    # Optional on failure; response carries the error envelope.
+    scope=F(2, Ref.DiffRepoScope, optional=True),
+    file_id=F(3, STR, optional=True),
+    format=F(4, Ref.DiffOutputFormat, optional=True),
+    encoding=F(5, Ref.DiffChunkEncoding, optional=True),
+    data=F(6, BYTES, optional=True),
+    truncated=F(7, BOOL, optional=True),
+    total_bytes=F(8, INT, optional=True),
+    next_offset=F(9, INT, optional=True),
+    # True when the manifest entry no longer matches the current worktree diff.
+    stale=F(10, BOOL, optional=True))
 
-CancelOperationResponse=Msg(
-    response=F(1, Ref.ResponseEnvelope))
+DiffFilesRequest=Msg(
+    meta=F(1, Ref.RequestMeta),
+    files=F(2, List(Ref.DiffFileRequest)),
+    max_total_bytes=F(3, INT, optional=True))
+
+DiffFilesResponse=Msg(
+    response=F(1, Ref.ResponseEnvelope),
+    files=F(2, List(Ref.DiffFileResponse)),
+    truncated=F(3, BOOL, optional=True))
 ```
 
-Log contract:
+Phase contracts:
 
-- `started`: first event; carries `DiffResponse.response` with accepted-style
-  metadata and the `operation_id`.
-- `repo_started`: emitted before a target repository is diffed.
-- `chunk`: carries ordered output bytes.
-- `repo_finished`: carries a per-repo summary.
-- `finished`: final event; carries `DiffResponse` with final summary and
-  aggregate status.
-- `error`: carries a typed `GwzError`; the stream then finishes with failed or
-  partial status.
-- `cancelled`: emitted after client cancellation when core stops producing
-  output and releases log resources.
+- Phase 1 runs the full per-repo `Diff`, including rename similarity, and
+  returns manifest entries in the final display order. Copy similarity is Tier 1:
+  v0 must reject `find_copies=true` unless D-1 proves a faithful Phase 2 copy
+  strategy before D0 freezes the schema.
+- `DiffRepoSummary.files_changed` counts changed files before GWZ root/member
+  filtering where libgit2 can report that cheaply; `files_manifested` counts
+  entries actually surfaced after pathspec, selection, and root-exclusion
+  filtering.
+- Phase 1 alone satisfies `--name-only`, `--name-status`, `--stat`,
+  `--numstat`, `--shortstat`, `--summary`, `--quiet`, JSON metadata modes, and
+  the exit-code decision. `--exit-code` without `--quiet` still fetches and
+  prints patches.
+- For `--quiet`, core may use `DiffManifestMode.any_difference`: stop at the
+  first detected difference, skip similarity detection, omit `files`, and return
+  only enough summary data for exit-code behavior. Do not use this mode for
+  JSON summaries, name/status/stat output, or patch assembly.
+- Phase 2 is stateless by default: the client sends the same comparison
+  target plus the `DiffFileEntry` from the manifest, or unresolved explicit-file
+  comparison inputs plus an explicit path. Core recomputes the relevant repo
+  diff and renders the requested bounded response. When a scoped
+  `DiffParsedTarget` contains resolved object ids, Phase 2 uses those ids
+  instead of re-resolving revision tokens.
+- `DiffFileRequest` must contain either `entry` for manifest-driven requests or
+  `path` for the explicit-file fast path. Manifest-driven requests should carry
+  the matching scoped `DiffParsedTarget`; explicit-file requests may carry
+  `operands`, `cached`, and `merge_base` because they intentionally skipped
+  Phase 1. `DiffOptions.manifest_mode` applies only to Phase 1; Phase 2 ignores
+  or rejects `any_difference`.
+- For ordinary add/modify/delete/type-change entries, Phase 2 may narrow the
+  recompute to the relevant path. For manifest-driven rename entries, Phase 2
+  must include both `old_path` and `new_path`, rerun similarity detection, and
+  extract the matching delta. Manifest-driven copy entries are allowed only
+  after the implementation can reproduce the Phase 1 source set, including
+  unmodified copy sources when copy detection allows them, or after a retained
+  diff/blob-id strategy exists; until then `find_copies=true` is rejected.
+- If a stateless Phase 2 recompute no longer finds the requested manifest entry
+  because the worktree changed, return a stale empty `DiffFileResponse` rather
+  than a fatal error.
+- `diff.files` batches several Phase 2 calls with a total byte cap. If a batch
+  exceeds the cap, the client falls back to smaller batches or single-file
+  calls.
+- `diff.files` may contain per-file successes and failures because each
+  `DiffFileResponse` has its own `ResponseEnvelope`; on failure, patch payload
+  fields such as `scope`, `format`, `encoding`, and `data` may be absent.
+  Clients must handle partial batch results.
+- For a pathologically large file patch, `DiffFileResponse.truncated` plus
+  `from_offset`/`max_bytes` provides one-file windowing. This is an edge case,
+  not the whole-diff transport.
+- Literal explicit files may skip Phase 1. Directory pathspecs, globs, and bare
+  `gwz diff` must run Phase 1 because the changed set is unknown.
+- Rename/copy detection for explicit single-file requests is scoped to that
+  filtered path set, matching `git diff -- <path>` behavior. Full rename/copy
+  pairing is a Phase 1 discovery feature.
 
-The stream sequence is per diff log and must be strictly increasing. The
-transport must not drop `chunk` events. `diff.output` is a Taut log: clients can
-read bounded history from `from_offset` and tail from the same cursor. Clients
-can resume from the last observed byte offset after reconnect. If the spool
-cannot accept more data and no blocking/backpressure path exists, core must
-fail the operation instead of discarding chunks.
+### Taut extension notes
+
+The two-phase v0 protocol should not grow diff-specific substitutes for generic
+Taut concerns. If later GWZ operations need long-running output feeds, Taut
+should mature a generic `log`-shaped facility with precise byte or record
+offsets, explicit tailing semantics, and clear cancellation/close behavior.
+
+For `gwz diff` v0:
+
+- Do not add a diff-only cancellation method. Stopping consumption means the
+  client stops issuing Phase 2 requests.
+- Do not add a diff-only whole-operation output log. File-granular patch
+  responses keep diff shippable without blocking on generic Taut output work.
+- Keep any future `log` semantics byte- or record-precise enough for patch
+  bytes, binary hunks, and JSONL records. Patch bytes must not flow through the
+  bounded operation-event buffer.
 
 ## Diff semantics
 
@@ -605,13 +681,14 @@ repo:
 | `gwz diff --cached <commit>` | `index_vs_tree` | `diff_tree_to_index(commit_tree, None, opts)` |
 | `gwz diff --cached --merge-base <commit>` | `index_vs_tree` with merge base old side | `merge_base(commit, HEAD)` then `diff_tree_to_index` |
 
-The client sends option flags, `operands` before `--`, and
-`explicit_pathspecs` after `--`. Revision strings are resolved independently
-inside each target repository. A branch name such as `main` means `main` in
-each member. A missing ref in one member is a member-scoped error; global
-`--partial` decides whether other members continue. If a token before `--` is
-ambiguous, core follows Git's disambiguation rules per repo and returns a
-member-scoped diagnostic when the token cannot be classified safely.
+The client sends parsed comparison flags (`cached` for `--cached`/`--staged`,
+`merge_base` for `--merge-base`), rendering/filter options, `operands` before
+`--`, and `explicit_pathspecs` after `--`. Revision strings are resolved
+independently inside each target repository. A branch name such as `main` means
+`main` in each member. A missing ref in one member is a member-scoped error;
+global `--partial` decides whether other members continue. If a token before
+`--` is ambiguous, core follows Git's disambiguation rules per repo and returns
+a member-scoped diagnostic when the token cannot be classified safely.
 
 ### Unborn repositories
 
@@ -638,13 +715,13 @@ Output order:
 2. Member diffs in manifest order.
 
 Within each repo, preserve libgit2/Git diff ordering. Across repos, do not sort
-paths globally because that would require buffering all output and would weaken
-streaming.
+paths globally because that would reorder the manifest, complicate client-side
+patch assembly, and require extra buffering.
 
 The root repo must exclude active member directories, `.gwz/`, and
 `gwz.conf/.tmp/` in memory when computing root diffs. This protects read-only
-diff from stale `.git/info/exclude` state and prevents operation spool files
-from surfacing in root output.
+diff from stale `.git/info/exclude` state and prevents runtime/temp files from
+surfacing in root output.
 
 ### Workspace path rendering
 
@@ -721,8 +798,8 @@ Direct support available through Rust `git2 0.21`:
 - Prefix customization.
 - Reverse diff.
 - Rename/copy detection via `DiffFindOptions` and `Diff::find_similar`.
-- Per-repo diff stats via `Diff::stats`. Formatted `DiffStats::to_buf` output
-  is repo-local, so it is not enough by itself for workspace-correct `--stat`.
+- Per-repo diff stats via `Diff::stats`; per-file counts likely need a GWZ pass
+  over deltas/patch lines so Phase 1 can render workspace-correct stats.
 
 Likely needs GWZ/client rendering or deferred support:
 
@@ -737,8 +814,7 @@ Likely needs GWZ/client rendering or deferred support:
 - Order files, skip/rotate, and advanced diffcore transforms.
 - Combined merge diffs.
 - `--no-index`, unless implemented as client-local filesystem diff.
-- Workspace-correct `--stat`, `--numstat`, `--shortstat`, and
-  `--patch-with-stat` until a GWZ stats renderer exists.
+- `--patch-with-stat` until a GWZ patch+stat combiner exists.
 
 ## CLI and client library plan
 
@@ -751,10 +827,11 @@ Suggested modules:
 - `transport`: trait for local in-process core and future remote core clients.
 - `diff_args`: Git-compatible parser for options and `--`; ambiguous operands
   remain raw for core.
-- `diff_stream`: consumes the non-lossy output log and exposes bytes plus
-  summary.
+- `diff_manifest`: obtains and formats Phase 1 manifests and summaries.
+- `diff_patch`: fetches Phase 2 per-file/batch patches and assembles them in
+  manifest order.
 - `diff_render`: applies color, line prefix, and machine output formatting.
-- `pager`: launches `less` or configured pager and writes streamed bytes.
+- `pager`: launches `less` or configured pager and writes assembled bytes.
 - `exit_code`: maps `DiffSummary` and options to process status.
 
 `gwz-cli` should become a thin shell:
@@ -762,18 +839,23 @@ Suggested modules:
 1. Parse global GWZ options.
 2. Delegate diff argument parsing to `gwz-client`.
 3. Open local or remote GWZ core transport.
-4. Start `diff.open` and read or tail the `diff.output` log.
-5. Pipe output to stdout or pager.
-6. Wait for final summary and exit according to `--exit-code`/`--quiet`.
+4. Run `diff` discovery unless all requested pathspecs are explicit literal
+   files.
+   - For human `--quiet` without JSON/JSONL metadata, request
+     `DiffManifestMode.any_difference`.
+5. Fetch `diff.file`/`diff.files` patch responses in manifest or requested path
+   order.
+6. Pipe assembled output to stdout or pager.
+7. Exit according to `--exit-code`/`--quiet` from the manifest summary.
 
 `gwz-py` should add equivalent Python-side pieces:
 
-1. Add generated protocol classes for `DiffRequest`, output log events, and
-   summaries.
-2. Add PyO3 bindings for opening, reading, waiting on, and cancelling diff
-   output logs.
+1. Add generated protocol classes for `DiffRequest`, `DiffManifestResponse`,
+   `DiffFileRequest`, `DiffFileResponse`, and summaries.
+2. Use the existing PyO3 `call` bridge for discovery and per-file patch calls.
 3. Add a Python argparse command for `gwz diff`.
-4. Implement Python rendering, pager, JSON/JSONL, and exit-code behavior.
+4. Implement Python manifest formatting, patch assembly, pager, JSON/JSONL, and
+   exit-code behavior.
 5. Keep Python CLI parity tests alongside existing `gwz-py` CLI parity tests.
 
 Pager policy:
@@ -783,65 +865,65 @@ Pager policy:
 - Honor `--no-pager`, `GIT_PAGER`, `PAGER`, and a future GWZ config key.
 - Pager failure is a client-side `external_tool_missing` or I/O error, not a
   core diff failure.
-- Pager quit or stdout broken pipe must call the cancel path when the transport
-  is remote or spooled.
+- Pager quit or stdout broken pipe stops issuing Phase 2 requests. No server
+  cancellation call is required for stateless v0.
 
 Color policy:
 
 - Default `auto`: color only when writing human patch output to a terminal or
   a pager that expects ANSI.
 - `--color=always` and `--color=never` are client rendering decisions.
-- The core stream remains canonical uncolored bytes.
+- The core patch responses remain canonical uncolored bytes.
 
 ## Implementation phases
 
-### D-1 - Taut log transport and PyO3 bridge spike
+### D-1 - Two-phase request/response spike
 
 Touchpoints:
 
-- `/Users/owebeeone/limbo/gwz-dev/taut/src/taut/ir/shapes.py`
-- `/Users/owebeeone/limbo/gwz-dev/taut/src/taut/gen/`
-- `/Users/owebeeone/limbo/gwz-dev/taut/src/taut/gen/runtime/`
-- `/Users/owebeeone/limbo/gwz-dev/taut/docs/Reference.md`
-- `/Users/owebeeone/limbo/gwz-dev/gwz-core/src/operation/`
 - `/Users/owebeeone/limbo/gwz-dev/gwz-core/protocol/gwz.taut.py`
 - `/Users/owebeeone/limbo/gwz-dev/gwz-py/native/src/lib.rs`
 - `/Users/owebeeone/limbo/gwz-dev/gwz-py/native/src/dispatch/mod.rs`
-- `/Users/owebeeone/limbo/gwz-dev/gwz-py/native/src/operations.rs`
 - `/Users/owebeeone/limbo/gwz-dev/gwz-py/src/gwz/bridge.py`
 - `/Users/owebeeone/limbo/gwz-dev/gwz-py/src/gwz/client.py`
 
 Work:
 
-- Mature Taut `log` before freezing diff schema. The target is an
-  operation-scoped append-only log with read-from-offset, bounded replay,
-  tailing, explicit final event, and cancellation/teardown.
-- Update generated client surfaces so `shape="log"` is not exposed as a generic
-  subscribe-only stream. It should have log-specific read/replay, tail, and
-  cancel/close affordances.
-- Prove the log is independent from bounded `OperationRuntime` events and
-  never emits `reset` for patch bytes.
-- Define spool limits, cleanup, disconnect behavior, and cancellation semantics.
-- Add or sketch Rust APIs for opening, reading, tailing, waiting on, and
-  cancelling an output log.
-- Add or sketch PyO3 bindings and bridge methods that expose the same ordered
-  chunks to Python without routing through `subscribe_events`.
-- Decide whether this is a diff-specific log or a generic operation-output log
-  reusable by later commands.
+- Confirm ordinary request/response can carry `BYTES`, including NUL bytes,
+  through Rust and the PyO3 bridge.
+- Choose the Phase 2 state model. Recommended v0: stateless recompute for
+  `diff.file`, using the scoped resolved `DiffParsedTarget` plus the manifest
+  `DiffFileEntry`, or explicit-file comparison inputs plus an explicit path.
+  Defer stateful retained `Diff` caches until profiling demands them.
+- Prove `cached`/`merge_base` request fields cover `--cached`, `--staged`,
+  `--merge-base`, and `A...B` without tunneling parsed flags through operands.
+- Prove the rename Phase 2 strategy: manifest-driven renames must include both
+  old and new paths during recompute. Copy detection remains rejected unless D-1
+  proves Phase 2 can reproduce the Phase 1 source set or can use a
+  retained-diff/blob-id strategy.
+- Define `diff.files` batch limits: maximum files per batch and maximum total
+  response bytes.
+- Define oversized-file behavior: default byte cap, `truncated` response, and
+  whether human clients transparently continue with offset windows or show a
+  truncation marker.
+- Define literal-file fast-path detection: files can skip Phase 1; directories,
+  globs, pathspec magic, and ambiguous operands must run Phase 1.
+- Define `DiffManifestMode.any_difference` behavior for `--quiet` and stale
+  `DiffFileResponse` behavior for worktree races.
 
 Acceptance:
 
-- A local Rust test can produce more chunks than the event buffer capacity and
-  read every byte back through the Taut log cursor.
-- A PyO3/Python test can read/tail ordered chunks and cancel early.
-- Generated TypeScript and Python client stubs expose log-specific operations,
-  not only a subscribe callback.
-- A disconnected or slow consumer either resumes by offset, blocks production,
-  or receives a typed capacity failure; bytes are not silently dropped.
-- Blocking production on a full spool cannot deadlock the read path; producer
-  and reader service must not require the same blocked execution slot.
-- The final diff protocol proposal can be written against a proven transport
-  log shape.
+- Rust and PyO3 tests can round-trip `DiffFileResponse.data` containing binary
+  bytes and NULs.
+- A stateless `diff.file` sketch can recompute a single-file patch from
+  scoped `DiffParsedTarget` plus `DiffFileEntry`, or from explicit-file request
+  fields.
+- `--cached`, `--staged`, `--merge-base`, and `A...B` have concrete request and
+  corpus examples before D0 freezes schema.
+- Rename manifest entries do not degrade into add/delete patches during Phase 2.
+  Copy detection is either proven faithful or rejected before D0.
+- Batch overflow and oversized-file window behavior are specified before D0
+  freezes schema.
 
 ### D0 - Protocol design and corpus
 
@@ -853,13 +935,17 @@ Touchpoints:
 
 Work:
 
-- Add Taut enums and messages for diff request, options, output log events,
-  open/log/cancel responses, and summary, using the D-1 Taut log result.
+- Add Taut enums and messages for diff request/options, manifest entries,
+  manifest responses, file patch requests/responses, batch patch
+  requests/responses, and summaries.
 - Add `ActionKind.diff`.
-- Add service entries for `diff`, `diff.open`, log-shaped `diff.output`, and
-  cancel.
+- Add service entries for `diff`, `diff.file`, and optional `diff.files`.
 - Regenerate Rust and Python protocol outputs and golden corpus.
 - Add compatibility tests for default values and unknown optional fields.
+- Add corpus examples for manifest-driven `DiffFileRequest.entry`,
+  scoped `DiffParsedTarget`, `DiffManifestMode.any_difference`, stale
+  `DiffFileResponse`, partial `DiffFilesResponse`, and comparison forms using
+  `cached`, `merge_base`, and `A...B`.
 - Keep client-only process status out of the core request; do not include
   unsupported algorithm values such as histogram in v0.
 
@@ -868,7 +954,11 @@ Acceptance:
 - Protocol generation is deterministic.
 - Existing protocol corpus still passes.
 - A minimal `DiffRequest` round trips through Taut.
-- Diff output events can carry arbitrary bytes, including NUL bytes.
+- `DiffFileResponse` can carry arbitrary bytes, including NUL bytes.
+- Manifest entries can be echoed through `DiffFileRequest.entry` without
+  forcing clients to parse `file_id`.
+- `DiffParsedTarget` is scope-addressable and can be reused by Phase 2 without
+  reclassifying raw operands.
 - Python generated protocol classes round trip the same diff messages.
 
 ### D1 - Core diff model and Git backend primitive
@@ -882,10 +972,11 @@ Touchpoints:
 Work:
 
 - Add core internal structs for `DiffComparison`, `DiffOptions`,
-  `DiffRepoScope`, `DiffSummary`, and stream sink callbacks if generated types
-  are too wire-oriented for internal use.
-- Add `GitBackend::diff` or narrower primitives that produce a stream of
-  chunks plus stats.
+  `DiffRepoScope`, `DiffParsedTarget`, `DiffFileEntry`, `DiffSummary`, and
+  patch render requests if generated types are too wire-oriented for internal
+  use.
+- Add `GitBackend::diff_manifest` and `GitBackend::diff_file_patch` or narrower
+  primitives that produce manifest entries, stats, and one-file patch bytes.
 - Implement `Git2Backend` with libgit2 calls mapped from comparison kind.
 - Resolve commits/trees/blobs and ambiguous operands per target repo.
 - Map libgit2 errors to typed `GwzErrorCode` values. Add a new code such as
@@ -921,10 +1012,10 @@ Work:
   member pathspecs.
 - Reject unsupported source kinds unless policy says to skip.
 - Produce root-first, manifest-order target list.
-- Prove and implement the root exclusion strategy. Preferred: in-memory
-  exclusions for active member paths, `.gwz/`, and `gwz.conf/.tmp/` when diffing
-  the root repository. Fallback: fail fast when the managed exclude boundary is
-  stale or cannot be validated safely.
+- Implement root exclusion with the preferred delta post-filter: after root
+  diff generation, drop deltas under active member paths, `.gwz/`, and
+  `gwz.conf/.tmp/` before manifest/stat/patch selection. Treat libgit2-level
+  pruning as a performance optimization only if D2 proves it.
 
 Acceptance:
 
@@ -937,37 +1028,62 @@ Acceptance:
 - Explicit member `A` plus pathspec `B/file` returns a clean empty result when
   both names are valid but non-overlapping.
 - Root diff output does not include active member paths, `.gwz/`, or
-  `gwz.conf/.tmp/` even when `.git/info/exclude` is stale, or else returns the
-  documented boundary validation error.
+  `gwz.conf/.tmp/` even when `.git/info/exclude` is stale.
 
-### D3 - Core streaming handler
+### D3 - Core manifest and file patch handlers
 
 Touchpoints:
 
-- `/Users/owebeeone/limbo/gwz-dev/gwz-core/src/operation/`
 - New diff handler module.
 
 Work:
 
-- Use the D-1 non-lossy Taut log; do not write patch bytes to
-  `events.subscribe`.
-- Implement `handle_diff_summary` for `diff`.
-- Implement `diff.open`, `diff.output` log replay/tail, and `diff.cancel`
-  handlers according to the Taut log contract.
-- Emit `started`, `repo_started`, `chunk`, `repo_finished`, and `finished`
-  events.
-- Count streamed bytes and aggregate `DiffStats` across repos.
-- For `summary_only`, compute summaries without emitting patch chunks.
-- For `--name-only`, `--name-status`, and `--raw`, stream only the requested
-  format. Keep stats formats out of Tier 0 until D4 proves a workspace-correct
-  stats renderer.
+- Implement `handle_diff_manifest` for `diff`.
+- Implement `handle_diff_file` for `diff.file`.
+- Implement optional `handle_diff_files` for bounded batch patch responses.
+- Phase 1 computes manifest entries, per-file stats, rename pairing, binary
+  flags, per-repo summaries, and aggregate summary. Copy pairing is computed
+  only after the Phase 2 copy strategy is proven and `find_copies` is enabled.
+- Phase 2 recomputes or filters the relevant repo diff and renders only the
+  requested file patch.
+- Phase 2 validates manifest-driven selectors using `DiffFileEntry`
+  scope/status/old_path/new_path plus the scoped `DiffParsedTarget`. `file_id`
+  is opaque and is never parsed as a path container.
+- Phase 2 preserves manifest rename/copy semantics. Rename patches are
+  recomputed with both paths and similarity enabled. Copy patches are enabled
+  only when the recompute strategy can include the Phase 1 copy source set;
+  otherwise copy rendering remains deferred with a clear unsupported-option
+  error.
+- Implement `--name-only`, `--name-status`, `--stat`, `--numstat`,
+  `--shortstat`, `--summary`, and `--quiet` from the manifest and summary
+  without Phase 2 patch calls. Implement the `--exit-code` process decision
+  from the manifest summary while still fetching patches when output is not
+  quiet.
+- Implement `DiffManifestMode.any_difference` for `--quiet` so core can
+  short-circuit without full manifest construction or similarity detection.
+- Implement oversized-file caps and `from_offset`/`max_bytes` windowing for one
+  file patch.
+- Return stale empty file responses when a worktree race makes a manifest entry
+  disappear before Phase 2.
+- For `diff.files`, allow failed per-file responses to omit patch payload fields
+  while preserving successful file responses in the same batch.
 
 Acceptance:
 
-- A slow log consumer cannot lose patch chunks.
-- Cancelling a log tail or producer stops diff generation and releases spool
-  resources.
-- Final summary is correct when the stream contains multiple repos.
+- Manifest file order is root first, then members in manifest order.
+- Per-file manifest metadata is correct for add, modify, delete, rename, type
+  change, binary, and mode change cases; copy cases are covered only if copy
+  detection is enabled after the D-1 proof.
+- `diff.file` returns a workspace-relative patch for exactly one file.
+- `diff.file` returns rename headers that agree with the manifest entry. Copy
+  headers are required only after copy support is proven and enabled.
+- `diff.files` respects the batch byte cap and reports truncation/fallback
+  cleanly.
+- `diff.files` partial failures do not require dummy `data` bytes or dummy
+  patch metadata.
+- Oversized single-file patches are resumable by offset.
+- Stale manifest entries are reported as non-fatal stale file responses.
+- Final summary is correct when the manifest contains multiple repos.
 - Errors in one member are member-scoped and respect partial policy.
 - `operation.result` remains small and metadata-only.
 
@@ -982,6 +1098,9 @@ Work:
 
 - First attempt: use libgit2 prefix options for patch, raw, name-only, and
   name-status.
+- Build `--stat`, `--numstat`, `--shortstat`, `--summary`, `--name-only`, and
+  `--name-status` from Phase 1 manifest entries rather than forwarding
+  repo-local formatted stats.
 - Spike and document whether libgit2 prefix options cover extended headers for
   rename/copy/mode changes.
 - If extended headers are not workspace-relative, split a GWZ patch renderer
@@ -995,6 +1114,7 @@ Acceptance:
 
 - Patch output paths are workspace-relative in `diff --git`, `---`, `+++`,
   rename/copy headers, raw output, name-only, and name-status.
+- Stat and summary output paths are workspace-relative and match manifest order.
 - `--src-prefix`, `--dst-prefix`, and `--no-prefix` keep unified paths.
 - Binary patch output remains byte-correct.
 
@@ -1018,30 +1138,38 @@ Work:
 
 - Add `CommandArgs::Diff`.
 - Parse Git-like diff options and revision/pathspec separator `--`; send raw
-  ambiguous operands to core.
+  ambiguous operands to core while setting structured request fields for parsed
+  comparison flags such as `cached` and `merge_base`.
 - Keep unsupported Git options as clear `invalid_request` errors.
-- Implement stdout/pager streaming through the non-lossy output log.
+- Implement manifest discovery, per-file/batch patch fetching, and client-side
+  patch assembly.
+- Treat stale `DiffFileResponse` values as a non-fatal worktree race: omit the
+  stale file in normal human output, and expose the stale marker in machine
+  output.
+- Handle partial `diff.files` results by preserving successful file responses
+  and retrying or reporting failed file responses individually.
 - Implement client-side color.
 - Implement `--exit-code` and `--quiet`.
-- Update the PyO3 native dispatch registry, native operation/output-log
-  storage, and Python bridge protocol so `diff.open`, `diff.output`, and
-  cancellation are callable from Python.
+- Ensure the PyO3 native dispatch registry and Python bridge can call `diff`,
+  `diff.file`, and optional `diff.files` through ordinary request/response.
 - Add JSON/JSONL behavior:
-  - `--json`: emit final `DiffResponse` metadata and summary, not patch bytes.
-  - `--jsonl`: emit stream events as JSONL only after verifying how Taut JSON
-    serializes `BYTES`; document base64 expansion if that is the encoding.
+  - `--json`: emit `DiffManifestResponse` metadata and summary, not patch bytes.
+  - `--jsonl`: emit manifest entries and optional file patch records only after
+    verifying how Taut JSON serializes `BYTES`; document base64 expansion if
+    that is the encoding.
 - Add equivalent `gwz-py` client and CLI support instead of assuming Rust
   client crate reuse.
 
 Acceptance:
 
-- `gwz diff` streams patch text to stdout.
+- `gwz diff` writes assembled patch text to stdout.
 - `gwz diff | cat` does not launch a pager.
 - `gwz diff` on a TTY uses pager unless disabled.
 - `gwz diff --quiet --exit-code` emits no patch and exits 1 on differences.
 - `gwz --json diff --quiet` returns summary metadata.
-- Python `gwz diff` can stream, cancel, render JSON/JSONL, and return the same
-  exit status as the Rust CLI for covered cases.
+- Python `gwz diff` can discover manifests, fetch/assemble patches, render
+  JSON/JSONL, and return the same exit status as the Rust CLI for covered
+  cases.
 
 ### D6 - Documentation
 
@@ -1058,7 +1186,7 @@ Work:
 
 - Document supported `git diff` forms and option tiers.
 - Document path rewriting and root/member selection behavior.
-- Document streaming protocol and JSON/JSONL behavior.
+- Document manifest/file-patch protocol and JSON/JSONL behavior.
 - Document unsupported/deferred Git options.
 - Document Python CLI/API parity and any intentional differences.
 - Add troubleshooting entries for missing refs in some members and
@@ -1067,10 +1195,10 @@ Work:
 Acceptance:
 
 - Generated CLI reference includes `diff`.
-- Machine output docs include `DiffRequest`, `DiffResponse`, and stream event
-  examples.
-- Protocol docs explain that patch bytes are streamed and final results are
-  metadata-only.
+- Machine output docs include `DiffRequest`, `DiffManifestResponse`,
+  `DiffFileRequest`, `DiffFileResponse`, and `DiffFilesResponse` examples.
+- Protocol docs explain that Phase 1 is metadata-only and patch bytes are
+  returned by bounded Phase 2 file responses.
 
 ## Option parity tiers
 
@@ -1088,6 +1216,8 @@ Acceptance:
 - `--name-only`.
 - `--name-status`.
 - `--raw`.
+- `--stat`, `--numstat`, `--shortstat`, and `--summary` from the Phase 1
+  manifest.
 - `--binary`.
 - `--text`.
 - `--find-renames`, `--no-renames`, and a rename threshold.
@@ -1099,9 +1229,6 @@ Acceptance:
 ### Tier 1 - near follow-up
 
 - `--diff-filter`.
-- `--stat`, `--numstat`, and `--shortstat` after a GWZ stats renderer or proven
-  path-rewrite strategy exists.
-- `--summary`.
 - `--patch-with-raw`.
 - `--patch-with-stat`.
 - `--full-index` and `--abbrev`.
@@ -1131,6 +1258,8 @@ Core backend parity tests:
 - Cover modification, add, delete, rename, type change, executable bit change,
   binary file, and pathspec filtering.
 - Cover `--cached`, `HEAD`, two-tree, and unborn staged changes.
+- Cover request schema mapping for `--cached`, `--staged`, `--merge-base`, and
+  `A...B`.
 
 Workspace integration tests:
 
@@ -1140,17 +1269,39 @@ Workspace integration tests:
 - Selection by member id and member path.
 - Cwd-relative pathspecs from root, member, and nested subdirectory.
 - Missing ref in one member with and without partial policy.
+- Two members resolving the same operand differently, with scoped
+  `DiffParsedTarget` entries for each member.
 - Unmaterialized fan-out member skipped; explicit unmaterialized member errors.
+- Literal explicit file pathspecs skip Phase 1 and route directly to
+  `diff.file`.
+- Directory pathspecs, globs, and ambiguous operands use Phase 1 discovery.
 
-Log/streaming tests:
+Manifest and patch tests:
 
-- Large patch emits multiple ordered chunks.
-- Chunk bytes survive NUL records.
-- Slow consumer does not lose chunks.
-- Consumer can resume from a byte offset after reconnect.
-- Cancellation stops production and cleans up log resources.
-- Final `DiffSummary` matches accumulated repo summaries.
-- `--quiet` emits no chunk events but still returns correct summary.
+- Phase 1 manifest reports status, old/new paths, modes, rename similarity,
+  binary flag, per-file stats, repo scope, and aggregate summary. Copy
+  similarity is covered only if copy detection is proven and enabled.
+- `DiffRepoSummary.files_changed` and `files_manifested` are stable and
+  documented when root/member filtering removes deltas.
+- Manifest order is root first, then members in manifest order.
+- `--name-only`, `--name-status`, `--stat`, `--numstat`, `--shortstat`,
+  `--summary`, and `--quiet` need no Phase 2 patch calls.
+- `--quiet` uses an early-exit any-difference manifest mode and does not run
+  rename/copy similarity.
+- `diff.file` returns exactly one workspace-relative patch.
+- Manifest-driven rename `diff.file` output preserves `similarity index`,
+  `rename from`, and `rename to` headers.
+- Copy detection is either faithfully reproduced in Phase 2 or rejected as an
+  unsupported Tier 1 option; it is never silently rendered as an add.
+- `diff.files` preserves requested order and respects batch byte limits.
+- `diff.files` partial failures are visible per file and do not discard
+  successful file responses.
+- Oversized file patch returns `truncated`, `total_bytes`, and `next_offset`;
+  follow-up offset reads reconstruct the full one-file patch.
+- A worktree edit between manifest and file fetch returns a stale file response
+  rather than a fatal error.
+- Patch bytes survive NUL records and binary patch data.
+- Final `DiffSummary` matches accumulated manifest entries.
 
 CLI/client tests:
 
@@ -1159,16 +1310,19 @@ CLI/client tests:
 - Color auto/always/never is client-side.
 - `--exit-code` returns 1 on differences and 0 when clean.
 - Plain `gwz diff` returns 0 with differences.
-- Broken pipe or pager quit cancels a remote/spooled log.
+- Broken pipe or pager quit stops further Phase 2 requests.
+- Stale file responses are omitted or surfaced consistently according to
+  output mode.
+- Rust and Python clients assemble manifest-ordered patches identically.
 
 Python client tests:
 
-- PyO3 diff log binding returns ordered chunks without using
-  `subscribe_events`.
+- PyO3 `call` path returns `DiffManifestResponse` and `DiffFileResponse`
+  including BYTES payloads without using `subscribe_events`.
 - Python `gwz diff` handles the same Tier 0 parser cases as Rust for covered
   options.
 - Python and Rust clients agree on `--exit-code`, `--quiet`, JSON summary, and
-  JSONL stream behavior.
+  JSONL manifest/file behavior.
 
 Golden output tests:
 
@@ -1180,15 +1334,18 @@ Golden output tests:
 
 ## Open decisions
 
-- Should the final implemented log be diff-specific (`diff.output`) or a
-  generic operation output log? This must be decided in D-1 before D0 freezes
-  schema and corpus.
-- Should root exclusion be implemented through lower-level libgit2 filtering, a
-  filtered GWZ renderer/stat path, or fail-fast validation of the managed
-  exclude boundary? D2 must prove one safe strategy.
-- For Tier 1, should `gwz diff --stat` use libgit2's stat renderer plus path
-  prefixing, or a GWZ stat renderer over per-file stats? This depends on
-  whether libgit2 exposes enough path detail for correct workspace path output.
+- Should Phase 2 remain stateless recompute forever, or should a later release
+  retain Phase 1 `Diff` objects behind operation ids for high-latency remote
+  clients? This plan says stateless recompute for v0.
+- What exact byte caps should govern `diff.file` truncation and `diff.files`
+  batching?
+- Should human clients transparently fetch oversized-file windows, or show a
+  truncation marker unless the user asks for the full patch?
+- Should copy rendering use stateless repo-scope recompute, retained Phase 1
+  diffs, or blob-id based rendering? Until this is proven, copy detection stays
+  Tier 1 and must fail clearly rather than degrading to add output.
+- Should root exclusion later add lower-level libgit2 pruning for performance?
+  Correctness uses the GWZ delta post-filter in v0.
 - Should unsupported Git options be hard errors or warnings? For Git parity,
   they should be hard errors until implemented.
 - Should `gwz-client` be a new workspace crate or a module inside `gwz-cli`
@@ -1204,13 +1361,14 @@ Golden output tests:
 
 - It handles the Tier 0 forms above across root and member repositories.
 - Output paths are workspace-relative and deterministic.
-- Patch bytes use the Taut log shape without lossy buffering.
-- The log has cancellation and a PyO3/Python consumer path that does not use
-  lossy operation events.
+- Phase 1 returns a complete changed-file manifest and summary without patch
+  bytes.
+- Phase 2 returns bounded per-file or batch patch bytes, including oversized
+  file windowing.
 - Core contains no pager or terminal presentation logic.
 - `gwz-cli` consumes the client-side API for pager, color, and exit status.
-- `gwz-py` has equivalent protocol, stream, parser, rendering, and exit-code
+- `gwz-py` has equivalent protocol, parser, rendering, assembly, and exit-code
   behavior for the supported surface.
 - JSON/JSONL behavior is documented and tested.
-- The protocol corpus includes diff request, stream event, and final response
-  examples.
+- The protocol corpus includes diff manifest, file patch, batch patch, and
+  summary examples.
