@@ -1,0 +1,48 @@
+schema: gwz.snapshot/v0
+workspace_id: ws_default
+snapshot_id: target-selection-start
+created_at: unix-ms:1782568756224
+created_by:
+  actor_id: unknown
+selected_members:
+- mem_gwz_cli
+- mem_gwz_core
+- mem_taut
+- mem_gwz_py
+members:
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: a11657ce7f54f58ecc564f21a54d6ec4a46cbd2c
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: 5e919d5d8f46d298f020a5a9c57d75b7b0ab9731
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 720db682335a88081eb4dc267b3743251aca2254
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 70e17b75b5b5bd05b8f769720454b142ffb6184e
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
