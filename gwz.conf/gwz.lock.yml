@@ -1,7 +1,7 @@
 schema: gwz.lock/v0
 workspace_id: ws_default
 manifest_schema: gwz.workspace/v0
-created_at: unix-ms:1782523303468
+created_at: unix-ms:1782525563850
 members:
   mem_gwz_cli:
     path: gwz-cli
@@ -16,7 +16,7 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 421895f2576aec94f3e559c41420b907d94a2142
+    commit: 05ee27349b40ab230485e3153d95658387343048
     branch: main
     detached: false
     dirty: false
@@ -25,7 +25,7 @@ members:
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
-    commit: 954e80fd2fc951f88076ca0e78d8d2cf61a8f22b
+    commit: 720db682335a88081eb4dc267b3743251aca2254
     branch: main
     detached: false
     dirty: false
