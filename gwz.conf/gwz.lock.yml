@@ -1,7 +1,7 @@
 schema: gwz.lock/v0
 workspace_id: ws_default
 manifest_schema: gwz.workspace/v0
-created_at: unix-ms:1782587077934
+created_at: unix-ms:1783100758133
 members:
   mem_gwz_cli:
     path: gwz-cli
@@ -16,7 +16,7 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 39cc60237fffad1f2853a9e05d7f5c1c7b48bd0f
+    commit: 14dfe5fe20ec578ad31d0bab86e63489ff9b2b1b
     branch: main
     detached: false
     dirty: false
@@ -25,7 +25,7 @@ members:
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
-    commit: 072377d8e43ce21984447df24d7615451af4730e
+    commit: d4493f64389db77822dcdfd28d14ee49a187861a
     branch: main
     detached: false
     dirty: false
@@ -35,6 +35,33 @@ members:
     source_id: src_taut
     source_kind: git
     commit: 70e17b75b5b5bd05b8f769720454b142ffb6184e
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 84ad028135e6602ff98751770b84e33dd1982a71
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: 7e7d5a7fc27635b152e10815503f1b456ae6a960
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: 9f65e95387befb0b8231ff77c5dbcb91ff2d91a3
     branch: main
     detached: false
     dirty: false

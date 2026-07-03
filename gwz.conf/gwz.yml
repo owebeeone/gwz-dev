@@ -50,3 +50,39 @@ members:
     url: git@github.com:owebeeone/gwz-py.git
     fetch: true
     push: true
+- id: mem_taut_shape
+  path: taut-shape
+  type: git
+  source_id: src_taut_shape
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/taut-shape.git
+    fetch: true
+    push: true
+- id: mem_taut_shape_rs
+  path: taut-shape-rs
+  type: git
+  source_id: src_taut_shape_rs
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/taut-shape-rs.git
+    fetch: true
+    push: true
+- id: mem_taut_shape_py
+  path: taut-shape-py
+  type: git
+  source_id: src_taut_shape_py
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/taut-shape-py.git
+    fetch: true
+    push: true
