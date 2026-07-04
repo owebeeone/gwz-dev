@@ -277,6 +277,7 @@ dependencies = [
  "serde",
  "serde_yaml",
  "sha2",
+ "taut-shape",
  "url",
 ]
 
@@ -697,6 +698,10 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "taut-shape"
+version = "0.0.0"
 
 [[package]]
 name = "terminal_size"

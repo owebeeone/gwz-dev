@@ -1,7 +1,8 @@
 # GWZ diff D0 protocol proposal
 
-Status: **DRAFT — rulings applied, ready to freeze. D0 NOT YET FROZEN.**
-Maintainer rulings recorded in §12. 2026-07-04.
+Status: **FROZEN — D0 committed 2026-07-04 ("Prep for gwz diff impl").**
+Maintainer rulings recorded in §12. Schema changes from here follow the
+append-only / reserved-tag discipline.
 
 This document is the concrete D0 protocol proposal for `gwz diff`: the full
 message/enum sketches (every field, tag, optionality, comment) in

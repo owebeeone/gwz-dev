@@ -8,3 +8,10 @@ members = [
     "gwz-core",
     "gwz-cli",
 ]
+# taut-shape-rs is its own Cargo workspace (own workspace.package inheritance).
+# gwz-core depends on the `taut-shape` crate inside it by path; exclude it here so
+# the outer workspace does not try to absorb the nested workspace's members and
+# resolve their `*.workspace = true` inheritance against this root.
+exclude = [
+    "taut-shape-rs",
+]
