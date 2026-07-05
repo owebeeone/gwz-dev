@@ -8,10 +8,13 @@ members = [
     "gwz-core",
     "gwz-cli",
 ]
-# taut-shape-rs is its own Cargo workspace (own workspace.package inheritance).
-# gwz-core depends on the `taut-shape` crate inside it by path; exclude it here so
-# the outer workspace does not try to absorb the nested workspace's members and
-# resolve their `*.workspace = true` inheritance against this root.
+# taut-shape-rs is its own Cargo workspace (own workspace.package inheritance);
+# exclude it so this outer workspace does not absorb its members. The patch below
+# keeps local gwz-dev builds on the sibling checkout while gwz-core's released
+# manifest stays consumable as a Git dependency.
 exclude = [
     "taut-shape-rs",
 ]
+
+[patch."https://github.com/owebeeone/taut-shape-rs"]
+taut-shape = { path = "taut-shape-rs/crates/taut-shape" }
