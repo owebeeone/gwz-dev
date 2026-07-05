@@ -273,6 +273,7 @@ dependencies = [
 name = "gwz-core"
 version = "0.7.5"
 dependencies = [
+ "getrandom",
  "git2",
  "serde",
  "serde_yaml",
