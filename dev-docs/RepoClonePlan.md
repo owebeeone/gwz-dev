@@ -227,8 +227,12 @@ Rules:
   Any missing hash rejects the source-id claim.
 - An empty evidence set cannot drive automatic add→attach inference. Explicit
   attach/source-id reuse may proceed because the user named the identity and
-  there is no contradictory recorded hash; return a warning that no historical
-  commit evidence was available.
+  there is no contradictory recorded hash. Return success with the warning:
+  `attached <member_id>; no snapshot or marker commit evidence was available
+  to verify repository identity`. Emit the same text as a Warn operation event
+  when the execution surface records events. For explicit source-id reuse that
+  creates a new designation, replace `attached <member_id>` with
+  `accepted source identity <source_id>`.
 - Do not fetch automatically. A shallow or incomplete checkout fails when a
   recorded object is missing; the error lists missing hashes/artifacts and
   tells the user to fetch the history before retrying.
@@ -896,7 +900,8 @@ Handler/CLI/`gwz-py` work can proceed in parallel after protocol lands.
 6. Explicit old id selects the historical row; commit evidence verifies it.
    Remote URL differences alone do not silently select or reject a row.
 7. Empty evidence is allowed only for explicit attach, with a warning; it never
-   drives automatic add→attach inference.
+   drives automatic add→attach inference. Assert the frozen response warning
+   and Warn event text.
 
 ### Core — historical identity evidence
 
