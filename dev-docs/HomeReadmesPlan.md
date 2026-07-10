@@ -31,12 +31,19 @@ language:
 > inspectable workspace. The workspace root records composition and exact
 > state; the member repositories remain normal Git repositories.
 
+Every README must also preserve the architectural half of the product story:
+
+> GWZ was designed as a message-driven system with an embeddable core. The
+> client and `gwz-core` can run together or separately; a local or remote
+> adapter can drive the same typed operations with deterministic CBOR or
+> schema-driven JSON.
+
 The repositories then identify their role:
 
 | Repository | Role | Primary visitor |
 |------------|------|-----------------|
 | `gwz-cli` | Primary, recommended, most thoroughly tested terminal interface | Someone who wants to install and use GWZ |
-| `gwz-core` | Embeddable Rust engine and typed operation/protocol contract | Tool, UI, agent, bridge, or library author |
+| `gwz-core` | Embeddable, transport-neutral Rust engine and typed message service for local or remote clients | Tool, UI, agent, bridge, service, or library author |
 | `gwz-py` | Python bindings to `gwz-core` plus an equivalent Python CLI that exercises and supports the bindings | Python application author or Python-only integrator |
 | `gwz-dev` | Complete development super-workspace containing the coordinated GWZ repositories | Contributor who wants to build or change GWZ itself |
 
@@ -66,6 +73,7 @@ The exact headings may vary, but use this order:
 2. Two or three plain-language paragraphs:
    - outcome/problem;
    - this repository's role;
+   - the embeddable/message-driven architecture where relevant;
    - recommended next action or important product-positioning distinction.
 3. A small next-step block: install, QuickStart, embed, or clone for
    development.
@@ -111,6 +119,10 @@ The current explanation of the embeddable engine is useful, but it starts one
 level below the product motivation. Add, near the top:
 
 - one sentence describing the multi-repository problem;
+- a direct statement that core owns most workspace behavior behind typed Taut
+  service messages rather than CLI parsing;
+- the intended local/remote client separation and schema-driven JSON/CBOR
+  options, while being clear that the crate does not itself start a server;
 - a link to `docs/WhyGwz.md`;
 - a direct link to the user QuickStart for readers who actually want the CLI;
 - an explicit choice: “use `gwz-cli` for terminal workflows; embed this crate
@@ -126,7 +138,8 @@ Replace the current implementation-status opening with this message:
 > `gwz-py` provides Python bindings to `gwz-core` and a Python implementation
 > of the GWZ CLI. The CLI keeps the Python bindings exercised across real
 > user-facing workflows, so Python applications can rely on the same workspace
-> operations exposed by the core engine.
+> operations exposed by the message-driven core engine. The same message
+> boundary can support an in-process native bridge or a separately hosted core.
 >
 > The `gwz-py` CLI is intended to be functional and compatible with the GWZ
 > command model. For general terminal use, the Rust `gwz` CLI is the primary
@@ -194,6 +207,12 @@ soon-divergent tutorial.
 ## Tone And Editorial Rules
 
 - Lead with user outcome, not internal architecture.
+- Treat embeddability, message contracts, and remote client/core separation as
+  product capabilities, not low-level implementation trivia.
+- Say “transport-neutral” or “remote-capable”; do not imply that `gwz-core`
+  itself ships an HTTP server or daemon.
+- When mentioning JSON, mean Taut's schema-driven message representation, not
+  arbitrary serialization of CLI output.
 - Prefer concrete nouns: workspace root, member repository, manifest, lock.
 - Say which implementation is primary where that affects a user decision.
 - Do not claim absolute parity when “same command model” is sufficient.
@@ -250,6 +269,10 @@ by side.
 - `gwz-dev`, `gwz-core`, `gwz-cli`, and `gwz-py` all route beginners to the
   same QuickStart.
 - Product motivation has one canonical explanation in `WhyGwz.md`.
+- `WhyGwz.md` explains how GWZ differs from lightweight repository fan-out
+  tools without dismissing the use cases those tools serve.
+- A first-time reader understands that `gwz-core` can be embedded or hosted
+  separately and driven through typed JSON/CBOR messages.
 - No README duplicates the full repository lifecycle or command reference.
 - All local and cross-repository documentation links pass verification.
 
@@ -263,4 +286,3 @@ by side.
   story.
 - Changing package maturity or claiming the Python CLI has the same test depth
   as the Rust CLI.
-
