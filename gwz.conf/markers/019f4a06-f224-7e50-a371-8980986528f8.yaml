@@ -1,0 +1,86 @@
+schema: gwz.marker/v0
+gwz_commit_id: 019f4a06-f224-7e50-a371-8980986528f8
+workspace_id: ws_default
+origin_url_hash: sha256:e35341f4b797aa8e57a066bf78413f40c277b3985e757118ca9aea8d390fbb9c
+created_at: unix-ms:1783653397036
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: ba235d8521583d61ef0eaad19c14f8ae7e37218c
+  branch: main
+selected_targets:
+- '@root'
+- mem_gwz_cli
+- mem_gwz_core
+- mem_taut
+- mem_gwz_py
+- mem_taut_shape
+- mem_taut_shape_rs
+- mem_taut_shape_py
+committed_targets:
+- '@root'
+members:
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: 5f94405dce7747f4d4929bea62cff39ffe37480f
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: 667ea7b31ec3ee4855b2c0da27abdd359f4ab3a9
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 170d8ed7782efc222e47077e7b5bbb1316a1a1eb
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 70e17b75b5b5bd05b8f769720454b142ffb6184e
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 44a53cc4947e765115923f0aa019e1b97c3045b2
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: 7e7d5a7fc27635b152e10815503f1b456ae6a960
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: 7fd171b737f25cb6c356845eb68164d35326ffb0
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
