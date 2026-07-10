@@ -1,7 +1,6 @@
 # GWZ Repository Home README Alignment Plan
 
-Status: planning; `gwz-core/docs/WhyGwz.md` is the one content anchor added
-while establishing this plan.
+Status: implemented across `gwz-dev`, `gwz-cli`, `gwz-core`, and `gwz-py`.
 
 Date: 2026-07-10
 
@@ -227,14 +226,17 @@ soon-divergent tutorial.
 
 - Add `gwz-core/docs/WhyGwz.md`. **Complete.**
 - Retain `gwz-cli/docs/QuickStart.md` as the canonical beginner path.
-- Agree on stable cross-repository URLs before publishing README changes.
+  **Complete.**
+- Use the released `https://owebeeone.github.io/gwz-cli/` site for user docs
+  and stable GitHub links for cross-repository source docs. **Complete.**
 
 ### Phase 1 — First-screen rewrites
 
-- Rewrite the opening and next-step block in `gwz-cli/README.md`.
-- Rewrite the opening and content order in `gwz-py/README.md`.
+- Rewrite the opening and next-step block in `gwz-cli/README.md`. **Complete.**
+- Rewrite the opening and content order in `gwz-py/README.md`. **Complete.**
 - Rewrite `gwz-dev/README.md` around the clone/build contributor outcome.
-- Add Why GWZ / QuickStart routing to `gwz-core/README.md`.
+  **Complete.**
+- Add Why GWZ / QuickStart routing to `gwz-core/README.md`. **Complete.**
 
 Do this as one coordinated change so the role statements can be reviewed side
 by side.
@@ -242,18 +244,18 @@ by side.
 ### Phase 2 — Content ordering
 
 - Move implementation inventories, platform prerequisites, release mechanics,
-  and status sections below the usage path.
-- Deduplicate tutorials in favor of QuickStart.
-- Keep repository-specific API and contributor examples.
+  and status sections below the usage path. **Complete.**
+- Deduplicate tutorials in favor of QuickStart. **Complete.**
+- Keep repository-specific API and contributor examples. **Complete.**
 
 ### Phase 3 — Link and rendering verification
 
-- Check every relative link from each repository root.
-- Check cross-repository links in standalone GitHub rendering.
-- When Pages exists, replace raw GitHub user-doc links with the released Pages
-  destinations.
-- Render the first screen at common desktop and narrow widths; the purpose and
-  next action must appear before a long code sample or contents list.
+- Check every relative link from each repository root. **Complete.**
+- Use standalone-safe URLs for cross-repository links. **Complete.**
+- Replace raw GitHub user-doc links with released Pages destinations.
+  **Complete.**
+- Keep the purpose, repository role, and next action before long examples or
+  implementation details. **Complete by source review.**
 
 ## Acceptance Criteria
 

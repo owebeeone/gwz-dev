@@ -1,24 +1,25 @@
 # GWZ User Documentation Plan
 
-Status: planning only. No implementation in this change.
+Status: implemented locally. The only remaining step is enabling GitHub Pages
+with GitHub Actions as its source after these repository changes are pushed.
 
 Date: 2026-07-10
 
 ## Verdict
 
-Yes — the current docs are usable once you already know GWZ, but they are a poor
-first contact. We need a single **QuickStart** path for humans, a clear pointer
-from `gwz-cli` into the full **`gwz-dev`** development workspace via
-`gwz clone`, and a real **GitHub Pages** site (astichi-style MkDocs) published
-from release, not a raw GitHub tree link.
+The documentation now has a single **QuickStart** path for humans, a clear
+pointer from `gwz-cli` into the full **`gwz-dev`** development workspace via
+`gwz clone`, and an astichi-style **GitHub Pages** site configuration that
+publishes released documentation instead of exposing a raw GitHub tree link.
 
 This plan supersedes the *user-facing* portion of the historical
 `dev-docs/history/GwzDocPlan.md` wave. Keep that history for inventory and
 generation/drift ideas; do not treat it as the current onboarding design.
 
-## Problem
+## Original Problem
 
-What exists today (mostly under `gwz-cli/docs/`):
+Before this implementation, the following existed mostly under
+`gwz-cli/docs/`:
 
 - A docs index that already says "Start Here", then fans out into Install,
   QuickStart, Concepts, CLI.md, Workflows, RootWorkspace, Troubleshooting, etc.
@@ -54,7 +55,7 @@ Result: a new user sees many doors and no obvious first room.
 Non-goals for this wave:
 
 - Rewriting `gwz-core` / taut API docs.
-- Redesigning Clap help or regenerating `CLI.md` (keep existing drift checks).
+- Redesigning the broader Clap help model.
 - Building a separate marketing site; Pages is the product docs site.
 
 ## Proposed Information Architecture
@@ -178,6 +179,40 @@ Explain only the essentials here:
 - detailed source/member identity, `SourceIdentityMismatch`, empty-evidence
   warnings, and replacement flows live in `RepoLifecycle.md` and
   `Troubleshooting.md`.
+
+### 2b. Publish a locally created member later
+
+Make the `repo create` lifecycle explicit. A created member is a local Git
+repository; GWZ does not create a repository on a hosting service. When an
+empty remote is created later, the normal flow is:
+
+```sh
+gwz repo create services/api --member-id mem_api
+# Create the empty org/api repository on the chosen host.
+git -C services/api remote add origin git@github.com:org/api.git
+gwz repo sync services/api
+
+printf '# API service\n' > services/api/README.md
+gwz add services/api/README.md gwz.conf
+gwz commit -m "Create API service"
+gwz --member mem_api push
+```
+
+Explain the boundary between the commands:
+
+- `repo create` creates and registers the local repository;
+- the hosting service or its own CLI creates the empty remote repository;
+- `git remote add origin` changes the member's local Git configuration;
+- `repo sync` records the observed remote and desired branch in the manifest;
+- `repo sync` does not create/fetch/push the remote or rewrite the lock;
+- a member branch needs a commit before `gwz push` can publish it;
+- if the remote already has history, use `repo clone` instead of this flow.
+
+Resolved implementation detail: unlike create/add/clone/detach/attach,
+`repo sync` currently writes manifest metadata without staging it. The
+implemented documentation therefore retains the explicit `gwz add gwz.conf`
+step in every publish-later example. Making core stage this metadata remains a
+separate behavior change, not a documentation prerequisite.
 
 ### 3. Path B — Clone an existing workspace
 
@@ -319,14 +354,18 @@ differ: **release-coupled docs** fit a versioned CLI better. If we later want
 main-branch preview docs, add a separate Pages environment or a `docs-dev`
 workflow; do not conflate with the release site.
 
-Implementation sketch (do not land in this plan change):
+Implemented release publishing:
 
-- Add `gwz-cli/mkdocs.yml`, `gwz-cli/docs-requirements.txt`.
-- Add `.github/workflows/docs.yml` with `pages: write` / `id-token: write`,
+- `gwz-cli/mkdocs.yml` and `gwz-cli/docs-requirements.txt` define a strict
+  MkDocs Material build.
+- `.github/workflows/docs.yml` has `pages: write` / `id-token: write`, a
   build job → `upload-pages-artifact`, deploy job → `deploy-pages`.
-- Checkout the **release tag** (same discipline as `release.yml`), not
+- The workflow checks out the **release tag** (same discipline as
+  `release.yml`), not
   floating `main`, when the trigger is a published release.
-- Enable GitHub Pages (GitHub Actions source) on `gwz-cli`.
+- GitHub Pages must be enabled with GitHub Actions as its source after the
+  workflow lands; this is repository configuration rather than a source-file
+  change.
 
 ### Versioning note
 
@@ -339,41 +378,54 @@ we later need it.
 
 ### Phase 0 — Decisions (short)
 
-- Confirm Pages lives on `gwz-cli` (recommended) vs a docs-only repo.
-- Confirm release-only deploy vs also-on-main.
+- **Complete:** Pages lives on `gwz-cli`.
+- **Complete:** release-only deploy plus tagged manual repair; there is no
+  production deploy from `main` pushes.
 - **Resolved:** retain `QuickStart.md` as the canonical onboarding filename and
   rewrite it in place.
 
 ### Phase 1 — QuickStart + entrypoint rewrites
 
-- Rewrite `QuickStart.md` with the outline above.
-- Retarget `docs/README.md`, `gwz-cli/README.md`, and AgentBootstrap links.
-- Link QuickStart directly from the `gwz-dev` and `gwz-core` root READMEs.
-- Integrate `RepoLifecycle.md` into the nav and show the short
+- **Complete:** rewrote `QuickStart.md` with the outline above.
+- **Complete:** retargeted `docs/README.md`, `gwz-cli/README.md`, generated
+  terminal help, and AgentBootstrap links.
+- **Complete:** linked QuickStart directly from all four GWZ root READMEs.
+- **Complete:** integrated `RepoLifecycle.md` into the nav and showed the short
   create/clone/add/detach/attach flow in QuickStart.
-- Add the `gwz clone` vs `gwz repo clone` and `gwz add` vs `gwz repo add`
-  distinction boxes.
-- Add the `gwz-dev` clone block everywhere a human would look for "how do I
-  develop this."
-- Trim QuickStart/Workflows duplication.
+- **Complete:** documented the publish-later lifecycle for `repo create`:
+  create remote, add
+  `origin`, `repo sync`, initial commit, and selected member push.
+- **Resolved:** the current implementation leaves `repo sync` metadata
+  unstaged, and every documented publish-later workflow explicitly stages
+  `gwz.conf`.
+- **Complete:** added the `gwz clone` vs `gwz repo clone` and `gwz add` vs
+  `gwz repo add` distinction boxes.
+- **Complete:** added the `gwz-dev` clone block everywhere a human would look
+  for "how do I develop this."
+- **Complete:** removed beginner create/clone/lifecycle duplication from
+  `Workflows.md`.
 
 ### Phase 2 — MkDocs site skeleton
 
-- `mkdocs.yml` nav matching the IA above.
-- Local `mkdocs serve` / `mkdocs build --strict`.
-- Fix relative links that break under MkDocs (command pages ↔ CLI.md).
+- **Complete:** `mkdocs.yml` nav matches the implemented IA.
+- **Complete:** local `mkdocs build --strict` succeeds.
+- **Complete:** command-page and generated-reference links resolve.
 
 ### Phase 3 — Release publish workflow
 
-- `docs.yml` on `release: published` (+ `workflow_dispatch`).
-- Wire Pages; verify one dry-run via workflow_dispatch.
-- Update Install / Releases / README hosted-docs URLs to
+- **Complete:** `docs.yml` runs on `release: published` and tagged
+  `workflow_dispatch`, and passes `actionlint`.
+- **External:** enable Pages with GitHub Actions as the publishing source, then
+  verify the first deployment after the workflow is pushed.
+- **Complete:** updated Install / Releases / README hosted-docs URLs to
   `https://owebeeone.github.io/gwz-cli/` (and QuickStart deep link).
 
-### Phase 4 — Polish (optional follow-ons)
+### Phase 4 — Polish
 
-- Diff command page + QuickStart examples aligned with current behavior.
-- Homepage one-liner in `gwz --help`.
+- **Complete:** added the diff command page and aligned QuickStart examples
+  with current behavior.
+- **Complete:** root help points to the hosted documentation and the generated
+  `CLI.md` was refreshed.
 - Consider publishing a docs tarball or Pages URL in release notes.
 - Later: versioned docs if multiple major lines must stay online.
 
@@ -389,8 +441,10 @@ A new user can:
    registration.
 5. Detach and reattach a historical member designation without losing its
    identity.
-6. Run `status`, `diff`, `commit`, and a simple `forall`.
-7. Clone `gwz-dev` with `gwz clone` and recognize they have a full devel env.
+6. Associate a locally created member with a later-created remote, synchronize
+   its manifest metadata, and push its first commit.
+7. Run `status`, `diff`, `commit`, and a simple `forall`.
+8. Clone `gwz-dev` with `gwz clone` and recognize they have a full devel env.
 
 Maintainers can:
 
@@ -398,27 +452,23 @@ Maintainers can:
    docs push ritual.
 2. Keep editing markdown in-repo; reference/`CLI.md` generation stays as-is.
 
-## Explicit Non-Actions In This Change
+## Resolved Decisions And Remaining External Step
 
-This user-documentation plan revision still does not implement the site or
-onboarding rewrite:
+- Documentation uses HTTPS clone URLs for copy-paste friendliness.
+- `diff` is part of the QuickStart daily loop and has a dedicated command page.
+- The `gwz-dev` root README leads with the complete-workspace clone path.
+- The Pages site is release-coupled and represents the newest published CLI.
+- After these changes land on the default branch, enable **Settings → Pages →
+  Source: GitHub Actions** in `owebeeone/gwz-cli`. Publish the next release to
+  perform the first deployment. Manual dispatch can rebuild a release tag that
+  already contains the documentation site files.
 
-- No `QuickStart.md` rewrite yet; its existing filename is retained.
-- No MkDocs / workflow files.
-- No README edits.
-- No commits or releases.
+## Local Validation
 
-Cross-repository README work is specified separately in
-`dev-docs/HomeReadmesPlan.md`; `gwz-core/docs/WhyGwz.md` is already established
-as its motivation anchor.
-
-## Open Questions
-
-1. Exact `gwz-dev` clone URL form in docs: SSH (`git@github.com:…`) vs HTTPS
-   for copy-paste friendliness on Pages.
-2. Whether `diff` should be in the QuickStart daily loop before the diff feature
-   docs are fully settled — recommendation: **yes**, with a link to the command
-   page and honest "see `gwz help diff`" if flags are still moving.
-3. Whether root `gwz-dev/README.md` should mirror the "clone me with gwz"
-   blurb for people who land on the super-workspace repo first (recommended:
-   yes, small pointer, still owned by a later edit pass).
+- `mkdocs build --strict` succeeds with the dedicated docs requirements.
+- `python scripts/generate_cli_reference.py --check` confirms `CLI.md` matches
+  the current Clap surface.
+- `actionlint` accepts the release-coupled Pages workflow.
+- Every relative Markdown link target in the active CLI and core docs and the
+  four home entrypoints exists.
+- CLI tests, managed-bootstrap tests, and the complete `gwz-py` test runner pass.

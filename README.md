@@ -1,121 +1,91 @@
 # gwz-dev
 
-`gwz-dev` is the development super-workspace for GWZ. It contains the primary
-CLI, the embeddable core library, the taut protocol tooling used by GWZ, and
-the tracked `gwz.conf/` metadata that lets GWZ dogfood its own multi-repository
-workspace model.
+`gwz-dev` is the complete checkout for building, testing, and changing GWZ.
+Clone this workspace when you want the Rust CLI, core engine, Python bindings,
+Taut tooling, and their coordinated revisions together.
+
+GWZ itself manages the checkout: the root records the member repositories and
+their exact revisions while each member remains an ordinary Git repository.
+
+## Get The Development Workspace
+
+Install [`gwz`](https://github.com/owebeeone/gwz-cli#install-and-start), then:
+
+```sh
+gwz clone https://github.com/owebeeone/gwz-dev.git gwz-dev
+cd gwz-dev
+gwz status
+cargo test --workspace
+```
+
+New to the product? Read the
+[Quick Start](https://owebeeone.github.io/gwz-cli/QuickStart/). For the problem
+GWZ solves, its fit alongside tools such as vcstool, and its embeddable remote-
+capable architecture, read
+[Why GWZ](https://github.com/owebeeone/gwz-core/blob/main/docs/WhyGwz.md).
 
 ## Repository Map
 
-- `gwz-cli/`: primary `gwz` binary and user command surface.
-- `gwz-core/`: embeddable Rust engine, workspace artifacts, Git backend, and
-  protocol types.
-- `taut/`: schema, compiler, and protocol tooling used by GWZ.
-- `gwz.conf/`: tracked GWZ root workspace metadata, including the manifest,
-  lock, and snapshots.
-- `dev-docs/`: root-level planning documents.
+- `gwz-cli/`: the primary, most thoroughly tested `gwz` terminal interface and
+  user documentation.
+- `gwz-core/`: the embeddable, message-driven Rust engine used by local or
+  remote-capable clients.
+- `gwz-py/`: Python bindings to `gwz-core` and a functional Python GWZ CLI.
+- `taut/`: schema compiler and protocol tooling used by GWZ.
+- `taut-shape/`, `taut-shape-rs/`, and `taut-shape-py/`: shared schema-shape
+  implementations.
+- `gwz.conf/`: the tracked manifest, lock, snapshots, and markers for this root.
+- `dev-docs/`: cross-repository design and planning records.
 
-## Bootstrap
+## Contributor Workflow
 
-Install `gwz` from the release installers described in
-`gwz-cli/README.md`, or install from source:
-
-```sh
-cargo install --git https://github.com/owebeeone/gwz-cli
-```
-
-When hacking in this checkout, run the local CLI through Cargo:
+Run the local Rust CLI from the workspace:
 
 ```sh
 cargo run -q -p gwz -- --help
 cargo run -q -p gwz -- ls --local
 ```
 
-Use the normal Rust checks before sharing changes:
-
-```sh
-cargo fmt
-cargo test
-```
-
-Package-specific tests may also live under `gwz-cli/`, `gwz-core/`, or `taut/`.
-
-## Root Workspace Workflow
-
-List the materialized members:
-
-```sh
-gwz ls --local
-```
-
-Inspect workspace state before mutating repositories:
+Inspect before changing repositories, then stage and commit cross-repository
+work through GWZ:
 
 ```sh
 gwz status
-gwz status --porcelain
-```
-
-Stage and commit through GWZ when a change crosses repository boundaries:
-
-```sh
+gwz diff
 gwz add <pathspec>...
-gwz add -A
 gwz commit -m "message"
 ```
 
-Record and restore coordinated workspace states:
-
-```sh
-gwz capture
-gwz snapshot <name>
-gwz materialize --lock
-gwz materialize --snapshot <name>
-gwz materialize --tag <name>
-```
-
-Move members forward or publish member refs:
-
-```sh
-gwz pull --head
-gwz push
-```
-
-Manage release markers with real Git tags across the selected members:
-
-```sh
-gwz tag <name>
-gwz tag --list
-gwz tag --push <name>
-gwz tag --fetch
-```
-
-Run member-local maintenance commands from the root:
+Run checks in selected members or all members:
 
 ```sh
 gwz forall gwz-cli gwz-core -- cargo test
-gwz forall --no-banner -c "git status --short"
+gwz forall -- git status --short
 ```
 
-Add existing repositories or create new members:
+Use snapshots and dry runs around broad changes:
 
 ```sh
-gwz repo add <repo-path>
-gwz repo create <member-path>
+gwz snapshot before-change
+gwz --dry-run pull --head
+gwz pull --head
 ```
 
-## Documentation Map
+The [root-workspace guide](https://owebeeone.github.io/gwz-cli/RootWorkspace/)
+covers coordinated state, tags, selections, and release-oriented workflows.
 
-- `AGENTS_GWZ.md` is the brief GWZ-managed bootstrap hint generated in
-  workspace roots for LLM agents.
-- `gwz-cli/README.md` is the concise CLI entrypoint; fuller user-facing pages
-  live under `gwz-cli/docs/`.
-- `gwz-core/docs/` covers the Rust API, workspace artifacts, protocol, and
-  message catalog work for the core crate.
-- `taut/docs/` documents taut itself.
-- `dev-docs/` records planning context and historical design notes.
+## Documentation
 
-## Feature Status
+- [GWZ user documentation](https://owebeeone.github.io/gwz-cli/)
+- [`gwz-core` embedding documentation](gwz-core/docs/README.md)
+- [`gwz-py` README](gwz-py/README.md)
+- [`AGENTS_GWZ.md`](AGENTS_GWZ.md), the generated agent bootstrap for this
+  managed root
 
-The current command surface includes real Git tag management, member listing
-with `gwz ls`, member-local execution with `gwz forall`, coordinated branch and
-stash workflows, and root bootstrap refresh with `gwz init --update`.
+## Verification
+
+```sh
+cargo fmt --check
+cargo test --workspace
+python gwz-py/run_tests.py
+```

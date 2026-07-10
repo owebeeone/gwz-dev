@@ -1,4 +1,4 @@
-<!-- gwz-managed-file: sha256=f153fd3108df3a9b0cb04f8f2f93b9e1685df7e3247b1d9ec2bf0861cbae66aa -->
+<!-- gwz-managed-file: sha256=960408f6a9d938f3912a4e3dc453bd5c527ce4144bc1b71183fd690aafbc0779 -->
 
 # GWZ Workspace
 
@@ -33,4 +33,5 @@ gwz status
 Docs:
 
 - `gwz --help`
-- https://github.com/owebeeone/gwz-cli/tree/main/docs
+- Quick Start: https://owebeeone.github.io/gwz-cli/QuickStart/
+- Full documentation: https://owebeeone.github.io/gwz-cli/
