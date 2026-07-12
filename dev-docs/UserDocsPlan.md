@@ -1,7 +1,7 @@
 # GWZ User Documentation Plan
 
-Status: implemented locally. The only remaining step is enabling GitHub Pages
-with GitHub Actions as its source after these repository changes are pushed.
+Status: implemented and deployed. GitHub Pages was enabled with GitHub Actions
+as its source, and the v0.9.1 documentation was deployed successfully.
 
 Date: 2026-07-10
 
@@ -415,8 +415,9 @@ we later need it.
 
 - **Complete:** `docs.yml` runs on `release: published` and tagged
   `workflow_dispatch`, and passes `actionlint`.
-- **External:** enable Pages with GitHub Actions as the publishing source, then
-  verify the first deployment after the workflow is pushed.
+- **Complete:** Pages uses GitHub Actions as the publishing source, the
+  `github-pages` environment permits `v*` release tags, and v0.9.1 completed the
+  first deployment.
 - **Complete:** updated Install / Releases / README hosted-docs URLs to
   `https://owebeeone.github.io/gwz-cli/` (and QuickStart deep link).
 
@@ -452,16 +453,16 @@ Maintainers can:
    docs push ritual.
 2. Keep editing markdown in-repo; reference/`CLI.md` generation stays as-is.
 
-## Resolved Decisions And Remaining External Step
+## Resolved Decisions And Deployment State
 
 - Documentation uses HTTPS clone URLs for copy-paste friendliness.
 - `diff` is part of the QuickStart daily loop and has a dedicated command page.
 - The `gwz-dev` root README leads with the complete-workspace clone path.
 - The Pages site is release-coupled and represents the newest published CLI.
-- After these changes land on the default branch, enable **Settings → Pages →
-  Source: GitHub Actions** in `owebeeone/gwz-cli`. Publish the next release to
-  perform the first deployment. Manual dispatch can rebuild a release tag that
-  already contains the documentation site files.
+- GitHub Pages is enabled with workflow builds. The `github-pages` environment
+  permits `main` and `v*` tags, allowing release-triggered deployments.
+- The v0.9.1 workflow successfully deployed the first site. Manual dispatch can
+  rebuild any release tag that contains the documentation site files.
 
 ## Local Validation
 

@@ -1,8 +1,8 @@
 # gwz-dev
 
-`gwz-dev` is the complete checkout for building, testing, and changing GWZ.
-Clone this workspace when you want the Rust CLI, core engine, Python bindings,
-Taut tooling, and their coordinated revisions together.
+`gwz-dev` is the complete checkout for building, testing, and changing GWZ
+(Git Workspace Zone). Clone this workspace when you want the Rust CLI, core
+engine, Python bindings, Taut tooling, and their coordinated revisions together.
 
 GWZ itself manages the checkout: the root records the member repositories and
 their exact revisions while each member remains an ordinary Git repository.
