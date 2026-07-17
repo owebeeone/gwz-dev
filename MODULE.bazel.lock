@@ -474,9 +474,9 @@
           "REPO_MAPPING:rules_rust+,bazel_tools bazel_tools",
           "REPO_MAPPING:rules_rust+,rules_cc rules_cc+",
           "REPO_MAPPING:rules_rust+,rules_rust rules_rust+",
-          "FILE:@@//Cargo.lock 1de308d5f894b8cea578dfd76f5993b70adf7ad6d1773b60b46555c55194218d",
+          "FILE:@@//Cargo.lock 4c8b0bddd749e5f162b153c8c0e2af28265f91c7ce148e6b40d71b3040bd8f2f",
           "FILE:@@//Cargo.toml 359610729d50fe5624d2370ba9af8d803d484d131c03940fbd890a6840963897",
-          "FILE:@@//gwz-core/Cargo.toml 7a016a33ad34f280b8ff59e3b0ebb2bbeeb522118987a734c96b225de3915b1c",
+          "FILE:@@//gwz-core/Cargo.toml 1940ce1ca11dec6c8306ddc62b8743d42b4f5c63e78695747a526657002536d8",
           "FILE:@@//gwz-cli/Cargo.toml 80a46ff2e103264970a1ca271b2308102b7b6756e5c337c295a09e225fb03712",
           "FILE:@@//taut-shape-rs/crates/taut-shape/Cargo.toml 00e44224e33cfe9e875fe17c9d5fa4a5df9b5656088c2d8a84d9bf23a90999a1"
         ],
