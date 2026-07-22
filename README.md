@@ -79,6 +79,7 @@ covers coordinated state, tags, selections, and release-oriented workflows.
 - [GWZ user documentation](https://owebeeone.github.io/gwz-cli/)
 - [`gwz-core` embedding documentation](gwz-core/docs/README.md)
 - [`gwz-py` README](gwz-py/README.md)
+- [`AGENTS.md`](AGENTS.md), the standard agent entry point for this workspace
 - [`AGENTS_GWZ.md`](AGENTS_GWZ.md), the generated agent bootstrap for this
   managed root
 
