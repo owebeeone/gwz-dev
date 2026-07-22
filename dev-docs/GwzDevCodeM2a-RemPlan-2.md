@@ -2,9 +2,11 @@
 
 Date: 2026-07-19
 
-Execution status: **planned; implementation not started**. M2b-A2 finalization,
-M2b-C driver/event completion, and shared M2b integration remain blocked until
-the exit criteria in section 9 pass.
+Execution status: **implementation and local verification complete; independent
+re-review pending** (2026-07-19). R2A through R2E are integrated against the
+frozen interfaces. M2b-A2 finalization, M2b-C driver/event completion, and
+shared M2b integration remain blocked until the final independent-review exit
+criterion in section 9 passes.
 
 Inputs:
 
@@ -203,8 +205,8 @@ Do not extend the generated `OperationResult` protocol solely to carry the
 merge-specific response. Retain the typed final response in the native
 operation store and expose a narrow response lookup through the bridge.
 
-Expose a Python client handle, or an equivalently explicit pair of methods,
-with these semantics:
+Expose `MergeOperationHandle` from
+`Client.merge_stream(...) -> MergeOperationHandle` with these semantics:
 
 ```text
 handle = await client.merge_stream(...)
@@ -213,9 +215,12 @@ async for event in handle.events():
 response = await handle.result()
 ```
 
-`result()` returns the complete successful `MergeResponse`; on failure it
-raises from the structured terminal `OperationResult`. Cancellation of a
-subscriber does not cancel or corrupt the merge operation.
+The handle exposes its `operation_id`; `events()` returns the existing
+sequence-aware async event iterator; and `result()` returns the complete
+successful `MergeResponse`. On failure, `result()` raises from the structured
+terminal `OperationResult`. The native bridge exposes the successful response
+as `merge_operation_response(operation_id)`. Cancellation of a subscriber does
+not cancel or corrupt the merge operation.
 
 Python CLI `merge --jsonl` must use this surface and write records to stdout as
 they become available:
@@ -497,6 +502,33 @@ git -C gwz-py diff --check
 
 Record exact Rust and Python test counts. Passing only the pre-existing suite
 is insufficient; every focused matrix row in section 7 must be named and green.
+
+### 8.1 Local execution evidence
+
+The integrated 2026-07-19 snapshot passes the complete section 8 gate:
+
+- Rust workspace: **648 passed, 1 ignored**;
+- Python: **286 passed**;
+- Rust and native Python formatting and strict clippy: passed;
+- protocol regeneration and CLI reference checks: passed;
+- strict MkDocs build: passed;
+- Bazel `gwz_core` and `gwz` targets: passed; and
+- root, core, CLI, and Python `git diff --check`: passed.
+
+The focused/adversarial rows are pinned by these named tests:
+
+| Matrix | Named evidence |
+| --- | --- |
+| Exact prepared content and zero-mutation preparation | `prepared_clean_merge_freezes_exact_content_without_observable_mutation`; `prepared_conflict_prediction_does_not_enter_native_merge_state`; `checked_resolution_binds_parents_and_rejects_unsafe_index_states` |
+| Exact/negative reconciliation and legacy records | `pending_true_merge_completion_is_exact_and_read_only`; `different_tree_or_signature_commit_is_ambiguous_and_status_is_read_only`; `resolution_candidate_with_different_tree_is_never_adopted_or_rollback_eligible`; `exact_merge_commit_matcher_checks_ordered_parents_and_message`; `old_commit_producing_pending_record_is_ambiguous_but_old_fast_forward_is_classifiable` |
+| Open-operation gate states and driver surfaces | `open_awaiting_resolution_blocks_dry_run_and_real_starts_from_an_explicit_root`; `open_halted_blocks_dry_run_and_real_starts_from_an_explicit_root`; `open_recovery_required_blocks_dry_run_and_real_starts_from_an_explicit_root`; `open_finalizing_blocks_dry_run_and_real_starts_from_an_explicit_root`; Rust `merge_dry_run_alias_and_first_class_start_work_end_to_end`; Python `test_native_gate_uses_explicit_root_outside_cwd_and_stage_is_conditional` |
+| Exactly-once native completion and structured failure | `test_submitted_merge_retains_response_before_completion_is_visible`; `test_failed_merge_completes_once_with_the_original_structured_error`; `test_duplicate_merge_operation_id_is_rejected_without_overwriting_result`; `test_submitted_preflight_failure_retains_member_context` |
+| Actual Rust/Python JSONL parity | `test_actual_rust_and_python_merge_jsonl_are_semantically_equivalent`, parameterized for dry-run start, clean start, conflict, status, continue, recovery rejection, abort, and preflight failure |
+| Live Python delivery and terminal ordering | `test_native_merge_jsonl_subprocess_flushes_before_completion`; `test_merge_jsonl_failure_ends_with_structured_terminal_error`; `test_merge_jsonl_streams_events_then_one_final_response` |
+
+The local implementation and verification conditions below are satisfied. The
+fresh independent re-review remains deliberately outstanding, so M2b shared
+integration is still blocked.
 
 ## 9. Exit criteria and M2b unblock
 
