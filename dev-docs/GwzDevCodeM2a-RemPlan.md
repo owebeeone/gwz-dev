@@ -1,12 +1,11 @@
 # GWZ Merge M1/M2a Code Review Remediation Plan
 
 Date: 2026-07-19  
-Execution status: **implementation and verification complete; independent
-re-review pending** (2026-07-19). The integrated gate passes 638 Rust tests
-(plus 1 ignored platform/process test), 268 Python tests, strict Rust Clippy,
-protocol regeneration checks, strict documentation build, and both Bazel
-targets. This plan remains formally open only for the independent P0-P2
-re-review required by section 9.
+Execution status: **superseded by the second and third remediation plans**
+(2026-07-23). Its implementation and verification gate completed, but later
+independent reviews found additional recovery and lifecycle defects. Current
+work and the M2b unblock criteria are owned by
+`GwzDevCodeM2a-RemPlan-3.md`.
 
 Inputs:
 

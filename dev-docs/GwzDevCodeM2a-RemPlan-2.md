@@ -2,11 +2,11 @@
 
 Date: 2026-07-19
 
-Execution status: **implementation and local verification complete; independent
-re-review pending** (2026-07-19). R2A through R2E are integrated against the
-frozen interfaces. M2b-A2 finalization, M2b-C driver/event completion, and
-shared M2b integration remain blocked until the final independent-review exit
-criterion in section 9 passes.
+Execution status: **superseded by third remediation after independent
+re-review** (2026-07-23). R2A through R2E were implemented and locally verified,
+but `GwzDevCodeM2a-ReviewF5-3.md` reproduced one P1 and one P2 defect outside
+the green matrix. Their accepted corrections and current M2b unblock gate are
+defined in `GwzDevCodeM2a-RemPlan-3.md`.
 
 Inputs:
 
