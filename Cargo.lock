@@ -267,6 +267,7 @@ dependencies = [
  "git2",
  "gwz-core",
  "serde_json",
+ "sha2",
 ]
 
 [[package]]

@@ -2,8 +2,7 @@
 
 Date: 2026-07-24
 
-Status: **implemented; complete exit gate passed; awaiting the coordinated
-`gwz` commit required before M2c implementation**
+Status: **complete and committed; M2c implementation unblocked**
 
 ## 1. Objective
 
@@ -325,5 +324,12 @@ its four stable exports.
   preserved split-source test inventories and `#[cfg(test)]` gates, all 50
   Python renderer function bodies, and the absence of M2c behavior.
 
-The structural changes remain unstaged and uncommitted. M2c-A becomes
-actionable after they are committed through the installed `gwz`.
+The structural changes were committed through the installed `gwz` on
+2026-07-24:
+
+- workspace root: `970640a8ca995331b11fac446fe6c1e0dfdd15f8`;
+- `gwz-core`: `cd049c0c6d8fbdff9516f19ea66735aca8d2aff1`;
+- `gwz-cli`: `d434053e1ff07872fb2e89b0131ec9c60647d244`; and
+- `gwz-py`: `f2903512a9f8384267601c0741e8b43d85c159bd`.
+
+M2c-A is actionable.
