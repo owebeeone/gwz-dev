@@ -281,6 +281,7 @@ dependencies = [
  "sha2",
  "taut-shape",
  "url",
+ "windows-sys",
 ]
 
 [[package]]
