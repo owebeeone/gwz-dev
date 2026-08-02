@@ -359,7 +359,7 @@ all run through actual pinned executables.
 The independent R0 interface reviews found false-positive paths in tuple
 completeness, input validation, fixture/provenance identity, JSON projection
 checks, mutation bounds, durable-content identity, exact result-set checking,
-and derived runtime reuse. Their remediation is represented by 79 passing
+and derived runtime reuse. Their remediation is represented by 80 passing
 unit/adversarial tests. The 13 cases now contain 59 explicit postconditions,
 including 17 content-semantic checks for lock/member data, publication state,
 Git indexes, markers, and complete archived records. A fresh local macOS arm64
@@ -372,6 +372,21 @@ workflow-run identity.
 This is the local implementation checkpoint, not R0 acceptance. The committed
 workflow must still produce passing attested evidence on Linux x86_64, Windows
 x86_64, Linux arm64, macOS x86_64, and macOS arm64 before R1 dispatch.
+
+### 7.3 R0 acceptance
+
+R0 was accepted on 2026-08-03 after retained-reader workflow
+[`30765936845`](https://github.com/owebeeone/gwz-core/actions/runs/30765936845)
+passed against exact core commit
+`b7b49b4d05009e71a3606d2566febacd88d3a767`. Both Linux and Windows harness
+jobs passed, followed by all five required behavioral lanes: Linux x86_64,
+Linux arm64, Windows x86_64, macOS x86_64, and macOS arm64.
+
+Each uploaded evidence artifact contains exactly 26 passing rows and no failed
+or unsupported row. Each execution attestation binds the artifact digest to
+the exact commit, workflow run, and platform; all five bindings were verified
+against the downloaded artifact bytes. This completes the platform gate left
+open by §7.2 and unblocks R1 under `GwzM5-8R1Ownership.md`.
 
 ## 8. Reproduction commands
 

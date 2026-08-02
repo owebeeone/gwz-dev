@@ -400,7 +400,7 @@ authoritative-file symlinks.
 
 ## Scope and budget
 
-The retained-reader package is **7,095 physical lines across 23 files**, below
+The retained-reader package is **6,968 physical lines across 23 files**, below
 the reviewed **7,100-line/23-file** ceiling. The largest Python module is 497
 lines; all implementation and test modules remain below 500 lines.
 

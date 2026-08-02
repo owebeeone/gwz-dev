@@ -1,7 +1,8 @@
 # GWZ M5–M8 R1 Ownership Table
 
-Status: prepared from the R0 inventory; execution remains blocked until the R0
-characterization and retained-reader gates are accepted.
+Status: ready for execution. R0 was accepted by exact-SHA retained-reader run
+`30765936845` against core commit
+`b7b49b4d05009e71a3606d2566febacd88d3a767`.
 
 R1 has no intentional runtime, wire, record, event, error, or mutation-order
 delta. Every Rust move uses the installed `rust-split` workflow from
