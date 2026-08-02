@@ -70,7 +70,7 @@ Wire/protocol delta: **none**.
 
 | Ownership slice | Production LOC add/delete | Moved LOC | Test/tool/doc LOC | Files touched/created |
 | --- | ---: | ---: | ---: | ---: |
-| retained-reader manifest/harness | 0 | 0 | ≤6,600 | ≤23 |
+| retained-reader manifest/harness | 0 | 0 | ≤7,100 | ≤23 |
 | document-consistency manifest/checker | 0 | 0 | ≤600 | ≤4 |
 | v0 characterization fixtures | 0 runtime | 0 | ≤2,500 | ≤8 |
 | baseline/state/mutation inventory and this ledger | 0 | 0 | ≤600 | ≤2 |
@@ -103,11 +103,18 @@ remaining false-positive paths: checked evidence did not prove an exact result
 set and complete evaluator-source freshness, and mutation evidence pinned
 paths without pinning critical durable contents. Closing those paths required
 three bounded modules for semantic YAML/Git observations and evidence-integrity
-tests. The reviewed R0 closeout ceiling is therefore 6,600 lines/23 files; it
+tests. The reviewed R0 closeout ceiling was therefore 6,600 lines/23 files; it
 does not authorize production, wire, record, or merge-behavior changes. The
-implemented directory is 6,600 physical lines across 23 files, including 647
-lines of generated checked evidence, and every Python implementation/test
-module remains below 500 lines.
+first exact-SHA five-platform run then exposed two additional portability
+boundaries: platform-local Git administration bytes in fixture identity and a
+Linux-only physical rewrite of the exact workspace boundary. Two independent
+interface reviews required repository-semantic identity, object-integrity and
+Git-admin fail-closed tests, and an asserted final boundary. Post-implementation
+review then found that top-level classification still admitted active hooks,
+legacy branch authority, ref locks, and filesystem indirection below `.git`.
+The narrow post-CI allowance is therefore 7,100 lines/23 files. It remains
+test/tool/doc only. The implemented retained-reader package is 7,071 lines/23
+files, and every Python implementation/test module remains below 500 lines.
 
 The document checker includes its reviewed assertion manifest in the ceiling
 instead of treating those assertions as generated output.
