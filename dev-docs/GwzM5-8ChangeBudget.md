@@ -113,7 +113,7 @@ Git-admin fail-closed tests, and an asserted final boundary. Post-implementation
 review then found that top-level classification still admitted active hooks,
 legacy branch authority, ref locks, and filesystem indirection below `.git`.
 The narrow post-CI allowance is therefore 7,100 lines/23 files. It remains
-test/tool/doc only. The implemented retained-reader package is 7,071 lines/23
+test/tool/doc only. The implemented retained-reader package is 7,084 lines/23
 files, and every Python implementation/test module remains below 500 lines.
 
 The document checker includes its reviewed assertion manifest in the ceiling

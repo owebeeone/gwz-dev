@@ -122,6 +122,64 @@ same-OID regression separately proves that HEAD mode cannot collapse.
 
 Compat-5 P3-1 and the broader index-flag invariant are closed.
 
+## First exact-SHA CI run and Windows portability corrections
+
+Exact-SHA run `30752346550` executed commit
+`77fd8d8e93fa20e3c9d8f47f68f09681d08d33ed`. The Ubuntu harness unit job
+passed. The Actions UI marked the Windows harness unit job successful, but its
+log actually ended `FAILED (failures=1, errors=18)`. Linux x86_64, Linux arm64,
+macOS x86_64, and macOS arm64 all executed the applicable retained readers
+successfully; the macOS arm64 lane also passed the checked portable-evidence
+comparison.
+
+The Windows false success was a P2 CI-gate defect. The workflow ran unittest,
+manifest validation, and gate-ready validation in one default PowerShell
+block. PowerShell continued after unittest returned nonzero; the two later
+commands succeeded, so the step inherited the final zero exit status and hid
+the test failure. The harness step now explicitly uses Bash, whose Actions
+invocation is fail-fast (`-e -o pipefail`), and a workflow regression pins that
+shell on the exact multi-command step.
+
+The Windows behavioral lane failed before any retained reader executed. Its
+fixture-generation step returned success, but the matrix's pre-execution
+identity check rejected repository `.` because `.git/index` was absent. The
+failure is a generator portability boundary, not released-reader behavior or
+record compatibility.
+
+`_canonicalize_git_dir` previously sent the line-oriented
+`git update-index --index-info` payload through Python text-mode stdin. On the
+Windows subprocess path that permits newline translation before Git receives
+the payload. The correction routes the exact same payload through the existing
+binary `_git_input` helper, which explicitly UTF-8 encodes once and passes
+bytes to `subprocess.run` without text mode.
+
+The regression pins the real canonicalization call path to `_git_input`; the
+existing helper regression independently asserts byte input and absence of
+text mode.
+
+The unmasked Windows log also exposed two platform-dependent tests. The
+boundary test had written its supposedly byte-exact initial and negative
+values through text mode, so Windows CRLF translation made the initial
+boundary check false and prevented the later corruption from changing the
+semantic digest. It now writes exact bytes throughout. The non-UTF-8 snapshot
+test had asked Windows to decode a POSIX byte filename that its Unicode path
+model cannot represent; it now injects the raw `os.fsencode` result and tests
+the same base64 fallback without depending on host path decoding. These
+changes preserve the assertions and remove no coverage.
+
+Fresh generation still matches all reviewed fixture identities. An independent
+pre-fix/post-fix comparison on macOS found both the complete physical snapshot
+and logical fixture-set identity unchanged. Therefore no case or
+fixture-contract rebaseline is warranted; checked evidence was regenerated
+only because its complete evaluator-source provenance correctly became stale.
+
+The generator and CI/test corrections are approved; the P2 gate finding is
+closed in source, with no remaining P0–P3 finding. Because they change the
+generator, workflow, and tests after run `30752346550`, both harness jobs and
+all five behavioral lanes must rerun at the new exact commit. The passing
+old-commit jobs cannot be combined with later Windows results for R0
+acceptance.
+
 ## Evidence and exact-result-set review
 
 The regenerated checked evidence is bound to:
@@ -138,7 +196,7 @@ A fresh independent macOS arm64 run against the checksum-pinned artifact cache
 produced exactly 38 rows: 37 passed, one was declared unsupported, and zero
 failed. Its portable semantic projection compared equal to the checked
 evidence. The checked evidence SHA-256 is
-`fb777940f0d14fda3a2125b763bebd7e79d6b8bea9463c001c73bee2a5cd65a3`.
+`80330cc6fb6879c54c1e9b255b5d6880d3583155a88db2d0948a1886a0e93b9e`.
 
 The portable comparison excludes only the reviewed Git-version and Python
 runtime-version/executable identity fields. Fixture identity, result rows,
@@ -147,7 +205,7 @@ durable semantic observations remain compared.
 
 ## Verification performed
 
-- Complete retained-reader unit/adversarial suite: **76 passed, 0 failed**.
+- Complete retained-reader unit/adversarial suite: **78 passed, 0 failed**.
 - Focused final compatibility regression set: **10 passed, 0 failed**, then
   **4 passed, 0 failed** after the final intent-to-add refinement, and **6
   passed, 0 failed** after the generalized no-symlink refinement.
@@ -158,13 +216,19 @@ durable semantic observations remain compared.
   0 failed**.
 - Fresh-to-checked portable evidence comparison: `equal`.
 - Diff whitespace check: passed.
-- Retained-reader change budget: **7,071 lines / 23 files**, within the
+- Post-CI Windows call-path regression and pre-fix/post-fix fixture comparison:
+  passed; physical and logical fixture identities are unchanged.
+- Windows fail-fast workflow, exact-boundary-byte, and portable non-UTF path
+  regression set: **7 passed, 0 failed**.
+- Retained-reader change budget: **7,084 lines / 23 files**, within the
   approved **7,100 / 23** allowance; every Python implementation/test module
   remains below 500 lines (maximum 497).
 
 ## Approval decision
 
 - **Compat-5 remediation complete:** approved.
+- **Post-CI Windows P2 gate remediation complete:** approved in source;
+  replacement exact-SHA evidence required.
 - **Commit and push the coherent retained-reader change set:** approved.
 - **Run the required exact-commit five-platform CI matrix:** required next.
 - **Accept R0 or dispatch R1 before that CI evidence is green:** not approved.

@@ -4,20 +4,29 @@ Date: 2026-08-03
 
 ## Verdict
 
-**Approved for commit and the exact-SHA cross-platform evidence run.**
+**Approved for commit and a replacement exact-SHA cross-platform evidence
+run.**
 
 No P0, P1, P2, or P3 source finding remains in the retained-reader portability
 remedy. The final code closes the false-positive paths identified in
 `GwzM5-8R0Review-Harness-5.md`, including the additional nested Git-admin,
 index-flag, and authoritative-output symlink cases found during this
-post-implementation review. Checked evidence was regenerated after the last
-source correction and compares equal under the reviewed portable projection.
+post-implementation review. It also closes the Windows fixture-generation
+failure and the subsequent Windows harness false-green risk exposed by the
+committed-SHA platform runs. Checked evidence is regenerated after the final
+evidence-bound generator correction and a separate fresh matrix run compares
+equal under the reviewed portable projection.
 
-This is not yet final R0 platform acceptance. A committed-SHA rerun must still
-pass both harness-unit jobs and all five required Linux, Windows, and macOS
-behavioral lanes. In particular, Windows must execute the applicable readers,
-and both Linux architectures must exercise the optional physical
-`.git/info/exclude` rewrite while passing the exact live-boundary assertion.
+This is not yet final R0 platform acceptance. Run `30752346550` passed the
+Ubuntu harness job and the Linux and macOS behavioral lanes. GitHub marked the
+Windows harness job successful, but its unit command actually reported one
+failure and 18 errors that later successful validation commands masked. The
+Windows behavioral lane then failed before reader execution. A replacement
+committed-SHA run must pass both harness-unit jobs and all five required Linux,
+Windows, and macOS behavioral lanes. In particular, Windows must execute the
+applicable readers, and both Linux architectures must exercise the optional
+physical `.git/info/exclude` rewrite while passing the exact live-boundary
+assertion.
 
 ## Outstanding findings
 
@@ -26,10 +35,54 @@ and both Linux architectures must exercise the optional physical
 - **P2:** none.
 - **P3:** none.
 
-The only remaining gate is the committed-SHA cross-platform run, not an
-implementation finding.
+The only remaining gate is a replacement committed-SHA cross-platform run,
+not an outstanding implementation finding.
 
 ## Findings discovered and closed during this review
+
+### The Windows harness step initially could mask a failed test command
+
+The harness job grouped the unit suite, manifest validation, and gate-ready
+check into one multi-command step without selecting a shell. GitHub Actions
+therefore used PowerShell on Windows, where a nonzero exit from an external
+test command did not stop the script before later successful validation
+commands. The step could consequently report success after a failed unit
+suite. This was a release-blocking R0 evidence-integrity defect.
+
+The workflow now explicitly selects `bash` for that step, giving all harness
+platforms the GitHub Actions fail-fast Bash invocation used by the behavioral
+steps. A regression isolates the named workflow step, requires `shell: bash`,
+and requires it to precede the multi-command `run` block.
+
+The two unit failures exposed on Windows were test portability defects rather
+than retained-reader defects. The live-boundary regression now writes exact
+UTF-8 bytes instead of allowing host newline translation through text mode.
+The non-UTF-8 path-key regression now mocks `os.fsencode` to supply the same
+invalid byte sequence on every host instead of asking the host filesystem
+codec to construct such a path. Both retain the original assertions while
+removing platform-dependent setup. These workflow and test-only changes are
+outside the checked evidence source set; current evidence freshness still
+passes.
+
+### Windows index canonicalization initially used text-mode stdin
+
+The first exact-SHA run failed in the Windows behavioral lane before any
+retained reader executed because the generated root repository had no
+`.git/index`. Fixture generation rebuilt canonical indexes with
+`git update-index --index-info` through Python text-mode standard input. On
+Windows that path could translate the LF-delimited index-info payload, so Git
+rejected the input after the generator had removed the original index. This
+was a release-blocking R0 portability defect, not evidence of a retained-reader
+behavioral incompatibility.
+
+The correction routes index-info through the generator's existing binary
+`_git_input` helper. That helper UTF-8 encodes the exact payload and invokes
+Git without text mode or newline translation. The new regression pins the
+canonicalizer to the binary helper; the existing helper-level regression pins
+the exact input bytes and absence of text mode. Generated fixture identities
+still match the reviewed fixture contract on macOS. The checked evidence binds
+the generator source hash, so its freshness failure after this correction is
+expected and correctly fail-closed.
 
 ### Nested Git administration was initially too broad
 
@@ -145,10 +198,11 @@ normalization and non-UTF-8 index path bytes are covered explicitly.
 
 ### Evidence integrity and behavioral preservation
 
-Checked macOS arm64 evidence was regenerated after the final
-authoritative-symlink correction. A fresh matrix run compares equal under the
-reviewed portable projection, and the checked evidence SHA-256 is
-`fb777940f0d14fda3a2125b763bebd7e79d6b8bea9463c001c73bee2a5cd65a3`.
+Checked macOS arm64 evidence was regenerated after the Windows generator
+correction. Its SHA-256 is
+`80330cc6fb6879c54c1e9b255b5d6880d3583155a88db2d0948a1886a0e93b9e`.
+A separate fresh matrix run contains all 38 expected rows and compares equal
+under the reviewed portable projection.
 
 The final matrix contains exactly 38 expected result keys:
 
@@ -160,9 +214,11 @@ Compared with the pre-remedy checked evidence, the result-key set is identical.
 Only the six continuation rows changed `after_invariant_sha256`: two cases
 across the three durable-v0 readers. Exit codes, typed outcomes,
 postcondition counts, artifact identities, and every unrelated invariant are
-unchanged. The fixture generator itself is unchanged; fixture and archive
-semantic digests changed because the identity/evaluator contract became more
-complete, not because v0 fixture record bytes changed.
+unchanged. Fixture and archive semantic digests changed earlier because the
+identity/evaluator contract became more complete, not because v0 fixture
+record bytes changed. The later Windows generator correction only transports
+the already-defined canonical index payload to Git without text translation;
+generated logical fixture identities remain unchanged.
 
 ## Verification performed
 
@@ -188,11 +244,12 @@ git diff --check
 passed
 ```
 
-Final compatibility closure after evidence regeneration:
+Final compatibility closure after the Windows generator and CI/test
+portability corrections:
 
 ```text
 python3 -m unittest discover -s scripts/retained_readers -p 'test_*.py'
-Ran 76 tests in 78.695s — OK
+Ran 78 tests in 72.652s — OK
 
 retained_reader_harness.py validate
 status=valid, tuple_count=36
@@ -207,13 +264,48 @@ retained_reader_evidence.py compare
 status=equal
 
 checked evidence SHA-256
-fb777940f0d14fda3a2125b763bebd7e79d6b8bea9463c001c73bee2a5cd65a3
+80330cc6fb6879c54c1e9b255b5d6880d3583155a88db2d0948a1886a0e93b9e
 
 python3 -m compileall -q scripts/retained_readers
 passed
 
 git diff --check
 passed
+```
+
+Focused verification of the Windows correction:
+
+```text
+index canonicalization routes through binary _git_input
+passed
+
+_git_input preserves exact bytes and does not enable text mode
+passed
+
+generated fixtures match the reviewed logical contract
+passed
+
+checked macOS evidence freshness before regeneration
+failed closed with evidence source provenance is stale
+
+checked macOS evidence freshness after regeneration
+passed as part of the full 78-test suite
+```
+
+Focused verification of the CI/test portability correction:
+
+```text
+workflow harness step requires fail-fast bash
+passed
+
+live-boundary regression uses exact bytes
+passed
+
+non-UTF-8 path identity uses a portable fsencode observation
+passed
+
+focused suite
+3 tests in 0.138s — OK
 ```
 
 Additional independent probes covered repacking, packed refs, commit-graph and
@@ -224,20 +316,23 @@ authoritative-file symlinks.
 
 ## Scope and budget
 
-The retained-reader package is **7,071 physical lines across 23 files**, below
+The retained-reader package is **7,084 physical lines across 23 files**, below
 the reviewed **7,100-line/23-file** ceiling. The largest Python module is 497
 lines; all implementation and test modules remain below 500 lines.
 
-The implementation diff is confined to existing
-`gwz-core/scripts/retained_readers/**` test/tool/documentation files. The
-workspace-level changes outside that directory are the R0 inventory, budget,
-and review documents. There is no merge production-code, public protocol,
-wire-value, record-schema, record-byte, or released-feature delta.
+The implementation and harness diff is confined to the retained-reader
+workflow and existing `gwz-core/scripts/retained_readers/**`
+test/tool/documentation files. The workspace-level changes outside those
+paths are the R0 inventory, budget, and review documents. There is no merge
+production-code, public protocol, wire-value, record-schema, record-byte, or
+released-feature delta.
 
 ## Decision
 
-The retained-reader portability remedy is ready to commit. The full 76-test
-suite, a fresh macOS arm64 matrix, and portable evidence equality all pass
-against the regenerated checked file. R0 may be accepted and R1 dispatched
-only after the committed exact SHA passes both harness-unit jobs and all five
-required behavioral platform lanes with complete evidence and attestations.
+The narrow Windows generator correction and the complete retained-reader
+portability remedy are ready to commit, with no remaining P0, P1, P2, or P3
+finding. Regenerated checked macOS arm64 evidence, the 78-test full suite, and
+portable evidence equality all pass. R0 may be accepted and R1 dispatched
+only after the replacement committed exact SHA passes both harness-unit jobs
+and all five required behavioral platform lanes with complete evidence and
+attestations.
