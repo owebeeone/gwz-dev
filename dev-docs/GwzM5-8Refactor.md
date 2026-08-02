@@ -1048,9 +1048,10 @@ type was predeclared in an older binary.
 A same-version change is eligible only when previous-reader behavior is
 proven:
 
-1. The release gate names every supported reader binary and every materially
-   different decode generation, including binaries where a field is unknown
-   and binaries where the field/variant decodes but its semantics are dormant.
+1. The release gate names the selected baseline for each distributed reader
+   surface and any older reader explicitly retained for a distinct downgrade
+   boundary. Within that supported window, it labels every materially different
+   decode behavior relevant to the newly writable shape.
 2. For every new open-record shape, each named binary either rejects the record
    before any Git/record mutation or selects exactly the mutations, transitions,
    recovery result, and projection required by the newly writable semantics.
@@ -1073,18 +1074,18 @@ The M5 split is explicit:
   `participant.commit_message` is the recovery authority used by pending
   action reconciliation and execution;
 - `mode: no_ff` is not v0-safe even though `MergeExecutionMode::NoFf` is
-  predeclared: v0.10.0–v0.10.2 decode it but recovery can re-derive a
-  fast-forward action. V0.9.2 and earlier predate the durable merge record
-  entirely and may ignore an open v0 operation; they are a separate downgrade
-  safety boundary, not a v0 decode generation; and
+  predeclared: the selected durable-v0 baseline decodes it but recovery can
+  re-derive a fast-forward action. V0.9.2 and earlier predate the durable merge
+  record entirely and may ignore an open v0 operation; they are a separate
+  downgrade safety boundary, not a v0 decode generation; and
 - therefore M5 ships custom messages only in v0, while `--no-ff` first becomes
   writable under v1/A1.
 
 The dormant v0 `NoFf` variant is a compatibility liability, not grandfathered
 proof. The gate includes a v0 record with `mode: no_ff`, one fast-forwardable
-participant, and no pending action, run through actual v0.10.0 and v0.10.2
-status, continue, and abort. V0.9.2 is tested separately by invoking its
-available one-shot commands in a workspace containing an open v0 record.
+participant, and no pending action. It runs status, continue, and abort with the
+actual retained durable-v0 baseline. V0.9.2 is tested separately by invoking
+its available one-shot commands in a workspace containing an open v0 record.
 Typed rejection or exact no-ff behavior is required; current released behavior
 fails, which is why v0 activation is forbidden.
 
@@ -1676,10 +1677,18 @@ Actual-reader proofs are release gates, not ad hoc local experiments. R0
 establishes the harness before the custom-message M5a release; I2 freezes its
 long-term manifest and A1–A4 extend it.
 
-The supported downgrade contract includes both distributed reader surfaces:
-the Rust `gwz` CLI and every released `gwz-py` wheel/native package. The
-repository owns a machine-readable compatibility manifest containing, for
-each surface/release/platform tuple:
+Milestone documents specify the reader-selection rule, not a permanent release
+tag. At each checkpoint, the retained durable-record baseline is the latest
+successfully published pre-change release that supports that record. The
+machine-readable manifest alone pins the exact tag, artifacts, and digests for
+reproducibility. A superseded release with failed required builds does not
+become a permanent compatibility requirement merely because an earlier plan
+named it.
+
+For every selected retained release, the supported downgrade contract includes
+both distributed reader surfaces: the Rust `gwz` CLI and the released `gwz-py`
+wheel/native package. The repository owns a machine-readable compatibility
+manifest containing, for each surface/release/platform tuple:
 
 - exact release tag and decode-generation label;
 - reader surface and invocation entry point;
@@ -1710,12 +1719,12 @@ run artifact-integrity, launch/import, generated-protocol, and focused smoke
 checks; they need not duplicate every semantic fixture unless their decode or
 filesystem behavior differs.
 
-The initial v0 decode matrix includes at least v0.10.0 (later additive
-baseline fields unknown) and v0.10.2 (later fields known; `NoFf` recovery
-semantics still dormant). V0.9.2 remains a pre-record downgrade lane that must
-prove how an older command surface behaves when an open v0 record exists; it
-must not be described as decoding that record. M5a, A1, A2, and A3 Rust and
-distributed Python artifacts join the manifest when published.
+For this checkpoint the manifest pins v0.10.2 as the selected durable-v0
+baseline; its `NoFf` recovery semantics remain dormant. V0.9.2 remains a
+separate pre-record downgrade lane that must prove how an older command surface
+behaves when an open v0 record exists; it must not be described as decoding
+that record. M5a, A1, A2, and A3 Rust and distributed Python artifacts join the
+manifest when published.
 
 The harness:
 
@@ -1885,7 +1894,7 @@ cohesive code.
 - Characterize born/unborn root evidence creation/rollback and the existing
   all-up-to-date no-publication completion path.
 - Establish §15.8's retained-binary manifest/harness on Linux and Windows,
-  including v0.10.0 and v0.10.2 decode generations plus the v0.9.2 pre-record
+  including the selected durable-v0 baseline plus the v0.9.2 pre-record
   downgrade lane.
 - Prove custom-message v0 recovery equivalence and capture the failing
   `mode: no_ff`/fast-forwardable/no-pending-action status/continue/abort
@@ -2456,10 +2465,11 @@ A1. The second run is a release blocker, not permission for R3 to enable the
 writer early.
 
 Add the predeclared-mode liability fixture separately: an open v0 record with
-`mode: no_ff`, a fast-forwardable participant, and no pending action. Actual
-v0.10.0 and v0.10.2 status/continue/abort runs document their unsafe behavior;
-v0.9.2 separately proves the pre-record open-operation downgrade behavior. The
-A1 adapter must return `UnsupportedLegacyMode` before migration or mutation.
+`mode: no_ff`, a fast-forwardable participant, and no pending action. Status,
+continue, and abort runs with the actual retained durable-v0 baseline document
+its unsafe behavior; v0.9.2 separately proves the pre-record open-operation
+downgrade behavior. The A1 adapter must return `UnsupportedLegacyMode` before
+migration or mutation.
 
 Run A1 migration separately against a `RecoveryRequired` overlay on every
 applicable source row and against operation-level drift. Assert an atomic
@@ -2721,7 +2731,7 @@ mutable assumptions are worse than one cohesive module.
 | V0 partial publication is adapted to the wrong restart action | Closed progress mapping, exact candidate bytes/evidence/prefix checks, born/unborn fixtures, and v0-versus-adapted next-action equivalence |
 | A released reader silently reinterprets v0 `mode: no_ff` | Ship only custom messages in v0; reject legacy v0 no-ff; activate deterministic no-ff under v1/A1 |
 | Executable plan reintroduces v0 no-ff | Keep proposal, plan, design, and public capability text under the R0 document-consistency gate |
-| Gate checks fields but misses new values/predeclared variants | Define newly writable shapes broadly and test v0.10.0 additive-field-unknown plus v0.10.2 field-known generations; retain v0.9.2 as a separate pre-record downgrade lane |
+| Gate checks fields but misses new values/predeclared variants | Define newly writable shapes broadly and test the selected durable-record baseline's field-known and dormant-variant behavior; retain v0.9.2 as a separate pre-record downgrade lane |
 | A1 recognizes but cannot execute later M6–M8 states | Cumulative v1–v4 semantic-wave versions, floor-aware selection, retained actual-binary downgrade matrices, and A2/A3/A4 activation gates |
 | A1 predeclares unresolved archive projection types | Compile/publish only V1 at A1; append V2/V3/V4 at I6/I7/I8 |
 | `RecoveryRequired` migration behavior is guessed | Closed §15.6 eligibility; representation-only migration preserves recovery/drift and next action |
@@ -2873,10 +2883,9 @@ R0–R1 may proceed now and are complete when:
    coverage;
 3. every legal terminal archived-v0 shape has evidence-only characterization
    coverage independent of live workspace state;
-4. §15.8 runs retained v0.10.0/v0.10.2 Rust readers and every actually
-   distributed durable-v0 Python reader on the required Linux/Windows
-   behavioral lanes, records the undistributed v0.10.0 Python tuple as
-   unsupported, retains full supported-platform release evidence, freezes the
+4. §15.8 runs the selected retained durable-v0 Rust and Python readers on the
+   required Linux/Windows behavioral lanes, retains full supported-platform
+   release evidence, freezes the
    custom-message success plus v0 no-ff failure fixtures, and runs v0.9.2 only
    as the explicit pre-record downgrade lane;
 5. every mutation has an inventoried durable progress owner;
@@ -2895,9 +2904,9 @@ R2a/M5a are complete when:
 1. existing merge pending actions run through the minimal integration seam;
 2. M4 v0 serialization and recovery remain compatible;
 3. R2a is the single owner of exact final custom-message bytes and their tests;
-4. retained v0.10.0/v0.10.2 Rust readers and every actually distributed
-   durable-v0 Python reader prove custom-message recovery equivalence, with
-   undistributed tuples explicit rather than substituted;
+4. the selected retained durable-v0 Rust and Python readers prove
+   custom-message recovery equivalence, with undistributed platform tuples
+   explicit rather than substituted;
 5. M5a rejects `--no-ff` before record creation and no v0 path writes
    `mode: no_ff`; and
 6. M5a lands without speculative checkout/skip/composition fields or
@@ -2944,8 +2953,8 @@ Record-changing work remains blocked until:
     lock-byte/root/prefix evidence, typed contradictions, and v0-equivalent
     next actions;
 13. open v0 `mode: no_ff` is rejected before adaptation/migration, the actual
-    v0.10.0/v0.10.2 failing fixture is frozen, the v0.9.2 pre-record downgrade
-    behavior is frozen separately, and every other legal v0 row's migration
+    retained durable-v0 baseline failing fixture is frozen, the v0.9.2
+    pre-record downgrade behavior is frozen separately, and every other legal v0 row's migration
     eligibility—including `RecoveryRequired` and operation drift—is explicit
     and fixture-proven;
 14. archive decoding freezes the general per-supported-version rule plus only

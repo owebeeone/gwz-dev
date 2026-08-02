@@ -2,6 +2,24 @@
 
 Date: 2026-08-03
 
+## Baseline-selection correction
+
+This notice supersedes every release tag, tuple/result count, evidence digest,
+test count, and package-size value in the historical review narrative below.
+The reviewed policy now selects the latest successful pre-change
+durable-record release and leaves its exact pin to the executable manifest. For
+this checkpoint that pin is v0.10.2; v0.9.2 remains only the separate
+pre-record downgrade lane.
+
+The corrected contract has 24 reader/platform tuples and checked macOS arm64
+evidence with 26 passing rows and no unsupported-release placeholder. The
+evidence SHA-256 is
+`5873033e684cd2d05d236417c3b791d8629c3add1c697a3196b01fda84d1fa53`.
+The suite has 80 passing tests. The package is 6,968 lines across 23 files,
+with a largest Python module of 497 lines. The frozen reader/command contract
+is now enforced unconditionally by public validation and has a rename-all plus
+drop-command regression.
+
 ## Verdict
 
 **Approved for commit and a replacement exact-SHA cross-platform evidence

@@ -347,12 +347,12 @@ recorded. Metadata readiness or a local-only run is not a substitute.
 
 ### 7.2 Retained-reader local checkpoint
 
-The retained-reader inventory declares the exact 36-reader/platform cross
+The retained-reader inventory declares the exact 24-reader/platform cross
 product and freezes each tuple as required or explicitly unsupported. Its six
 canonical fixtures and 13 command cases cover v0.9.2's pre-record downgrade
-boundary, v0.10.0's unknown additive-field rewrite behavior, and v0.10.2's
-field-known reader behavior. Status, continue, abort, post-mutation
-reconciliation/rollback, fail-closed wrong-message handling, preserve,
+boundary and the selected durable-v0 baseline's field-known reader behavior.
+For this checkpoint the reproducible manifest pins v0.10.2. Status, continue,
+abort, post-mutation reconciliation/rollback, fail-closed wrong-message handling, preserve,
 archive-only status, explicit GC, and the dormant v0 `no_ff` incompatibility
 all run through actual pinned executables.
 
@@ -363,10 +363,9 @@ and derived runtime reuse. Their remediation is represented by 79 passing
 unit/adversarial tests. The 13 cases now contain 59 explicit postconditions,
 including 17 content-semantic checks for lock/member data, publication state,
 Git indexes, markers, and complete archived records. A fresh local macOS arm64
-run produced 37 passing executable/case results, one explicit undistributed
-`gwz-py` v0.10.0 tuple, and zero failures; a second run matched the checked
-portable semantic projection. Checked evidence contains 38 exact result rows
-and 14 complete evaluator-source digests. It remains self-reference-free,
+run produced 26 passing executable/case results and zero failures; a second run
+matched the checked portable semantic projection. Checked evidence contains 26
+exact result rows and 14 complete evaluator-source digests. It remains self-reference-free,
 while CI emits a separate evidence-digest attestation carrying its commit and
 workflow-run identity.
 
