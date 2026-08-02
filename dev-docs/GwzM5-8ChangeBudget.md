@@ -105,7 +105,7 @@ paths without pinning critical durable contents. Closing those paths required
 three bounded modules for semantic YAML/Git observations and evidence-integrity
 tests. The reviewed R0 closeout ceiling is therefore 6,600 lines/23 files; it
 does not authorize production, wire, record, or merge-behavior changes. The
-implemented directory is 6,512 physical lines across 23 files, including 647
+implemented directory is 6,600 physical lines across 23 files, including 647
 lines of generated checked evidence, and every Python implementation/test
 module remains below 500 lines.
 
