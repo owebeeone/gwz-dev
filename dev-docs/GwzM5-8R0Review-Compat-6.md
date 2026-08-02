@@ -122,7 +122,9 @@ same-OID regression separately proves that HEAD mode cannot collapse.
 
 Compat-5 P3-1 and the broader index-flag invariant are closed.
 
-## First exact-SHA CI run and Windows portability corrections
+## Exact-SHA CI attempts and Windows portability corrections
+
+### Run 30752346550: generator and masked harness failures
 
 Exact-SHA run `30752346550` executed commit
 `77fd8d8e93fa20e3c9d8f47f68f09681d08d33ed`. The Ubuntu harness unit job
@@ -180,6 +182,53 @@ all five behavioral lanes must rerun at the new exact commit. The passing
 old-commit jobs cannot be combined with later Windows results for R0
 acceptance.
 
+### Run 30753147192: fail-fast gate and two remaining test boundaries
+
+Replacement run `30753147192` executed commit
+`2677b398bd883040f70e2a0b18da2feda9d7d27c`. The Ubuntu harness unit job
+passed. The corrected Bash step caused the Windows harness job to fail
+accurately at unittest with exactly two errors; manifest validation and
+gate-ready validation did not run afterward. Because the matrix depends on
+both harness jobs, all behavioral lanes were correctly skipped. This proves
+the P2 false-success remedy is effective.
+
+The first remaining error was confined to the adversarial missing-object
+test. Generated loose objects are deliberately read-only. The corrupt-object
+branch already restored owner write permission before replacing the object,
+but the missing-object branch attempted to unlink the read-only file directly,
+which Windows rejects. Restoring write permission before the shared branch
+preserves the intended assertion: identity calculation must fail because a
+required object is actually absent, not because test setup could not remove
+it.
+
+The second error was checked-evidence input freshness. Git's Windows checkout
+had converted retained-reader JSON inputs to CRLF, so byte-exact manifest/case
+digests differed from the LF checked evidence even though the committed data
+was unchanged. The root `.gitattributes` now declares
+`scripts/retained_readers/** text eol=lf`. `git check-attr` confirms that the
+manifest, cases, checked evidence, generator sources, schemas, and other files
+under that evidence-bound tree are all checked out as LF text. A regression
+now asks `git check-attr text eol` for every current retained-reader file and
+requires the effective result to be `text: set` and `eol: lf`; it therefore
+catches comments, later overrides, and newly added files rather than merely
+matching one policy line.
+
+A late independent harness re-review found one P3 completeness gap in the
+first form of this correction: `.gitattributes` was not included in the
+workflow's push/pull-request path filters, and the first regression only
+searched for the literal policy line. The workflow now includes
+`.gitattributes` in both filters, and the same workflow regression pins both
+entries. This closes the gap: a change to the checkout policy triggers the
+gate, and the gate validates the effective attributes rather than the source
+text of the policy.
+
+Both corrections are test/infrastructure portability changes. They do not
+alter fixture bytes, logical identities, cases, released-reader inputs, record
+schemas, or merge behavior. The checked evidence digest therefore remains
+unchanged. The second-run corrections are approved with no remaining P0–P3
+finding, but a new exact-commit run of both harness jobs and all five
+behavioral lanes is still required.
+
 ## Evidence and exact-result-set review
 
 The regenerated checked evidence is bound to:
@@ -205,7 +254,7 @@ durable semantic observations remain compared.
 
 ## Verification performed
 
-- Complete retained-reader unit/adversarial suite: **78 passed, 0 failed**.
+- Complete retained-reader unit/adversarial suite: **79 passed, 0 failed**.
 - Focused final compatibility regression set: **10 passed, 0 failed**, then
   **4 passed, 0 failed** after the final intent-to-add refinement, and **6
   passed, 0 failed** after the generalized no-symlink refinement.
@@ -220,7 +269,11 @@ durable semantic observations remain compared.
   passed; physical and logical fixture identities are unchanged.
 - Windows fail-fast workflow, exact-boundary-byte, and portable non-UTF path
   regression set: **7 passed, 0 failed**.
-- Retained-reader change budget: **7,084 lines / 23 files**, within the
+- Read-only missing-object and LF checkout-policy focused regression set:
+  **4 passed, 0 failed**.
+- Final effective-attribute/workflow regression class: **2 passed, 0 failed**;
+  the missing-object adversarial class also passed independently.
+- Retained-reader change budget: **7,095 lines / 23 files**, within the
   approved **7,100 / 23** allowance; every Python implementation/test module
   remains below 500 lines (maximum 497).
 
@@ -229,6 +282,10 @@ durable semantic observations remain compared.
 - **Compat-5 remediation complete:** approved.
 - **Post-CI Windows P2 gate remediation complete:** approved in source;
   replacement exact-SHA evidence required.
+- **Second-run Windows test/checkout portability remediation:** approved in
+  source; replacement exact-SHA evidence required.
+- **Late P3 attribute-gate completeness remediation:** approved and closed in
+  source; replacement exact-SHA evidence required.
 - **Commit and push the coherent retained-reader change set:** approved.
 - **Run the required exact-commit five-platform CI matrix:** required next.
 - **Accept R0 or dispatch R1 before that CI evidence is green:** not approved.

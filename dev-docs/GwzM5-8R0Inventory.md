@@ -359,7 +359,7 @@ all run through actual pinned executables.
 The independent R0 interface reviews found false-positive paths in tuple
 completeness, input validation, fixture/provenance identity, JSON projection
 checks, mutation bounds, durable-content identity, exact result-set checking,
-and derived runtime reuse. Their remediation is represented by 78 passing
+and derived runtime reuse. Their remediation is represented by 79 passing
 unit/adversarial tests. The 13 cases now contain 59 explicit postconditions,
 including 17 content-semantic checks for lock/member data, publication state,
 Git indexes, markers, and complete archived records. A fresh local macOS arm64

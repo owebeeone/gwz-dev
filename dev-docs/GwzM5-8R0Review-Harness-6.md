@@ -28,6 +28,13 @@ applicable readers, and both Linux architectures must exercise the optional
 physical `.git/info/exclude` rewrite while passing the exact live-boundary
 assertion.
 
+Replacement attempt `30753147192` confirmed that the corrected Windows
+harness step now fails fast. It exposed exactly two remaining host-dependent
+test/input errors: an intentional missing-object unlink against a read-only
+loose Git object, and evidence source digests changed by CRLF checkout
+translation. Both are corrected in the current source. Because those
+corrections postdate the run, another committed-SHA run remains required.
+
 ## Outstanding findings
 
 - **P0:** none.
@@ -39,6 +46,40 @@ The only remaining gate is a replacement committed-SHA cross-platform run,
 not an outstanding implementation finding.
 
 ## Findings discovered and closed during this review
+
+### Read-only Git objects and CRLF checkout still affected Windows tests
+
+After fail-fast behavior was restored, run `30753147192` reported exactly two
+Windows harness errors. First, the missing-object adversarial test attempted
+to unlink a generated loose object whose Windows file attributes were
+read-only. The test failed during setup instead of reaching the intended
+missing-object identity assertion. The shared corrupt/missing-object setup now
+restores owner write permission before either mutation. This is the same
+preparation the corrupt-object branch already required and does not relax the
+fixture evaluator.
+
+Second, Windows checkout translated retained-reader JSON inputs from LF to
+CRLF. Evidence provenance deliberately hashes exact input bytes, so the
+checked macOS evidence correctly rejected those translated sources as stale.
+The new root `.gitattributes` policy declares
+`scripts/retained_readers/** text eol=lf`, covering the complete retained-reader
+source and evidence-input tree. All tracked files under that path are text or
+JSON; no tracked binary is forced through text normalization. Independent
+`git check-attr` probes report `text: set` and `eol: lf` for every current file
+in the retained-reader package.
+
+The first form of the regression only substring-matched the declaration, and
+the retained-reader workflow path filters did not include `.gitattributes`.
+That was a P3 CI-contract gap: a comment or later overriding attribute could
+leave the test green, while an attributes-only change could bypass the
+workflow entirely. The closed regression now invokes `git check-attr text eol`
+for every current retained-reader file and asserts the complete effective
+result. Both the pull-request and push filters explicitly include
+`.gitattributes`, and the workflow regression pins both trigger entries.
+
+These are test and checkout-policy corrections, not production reader
+changes. The full current suite passes on macOS, checked evidence freshness
+passes, and the checked evidence SHA-256 remains unchanged.
 
 ### The Windows harness step initially could mask a failed test command
 
@@ -244,12 +285,12 @@ git diff --check
 passed
 ```
 
-Final compatibility closure after the Windows generator and CI/test
-portability corrections:
+Final compatibility closure after the Windows generator, checkout, and
+CI/test portability corrections:
 
 ```text
 python3 -m unittest discover -s scripts/retained_readers -p 'test_*.py'
-Ran 78 tests in 72.652s — OK
+Ran 79 tests in 72.431s — OK
 
 retained_reader_harness.py validate
 status=valid, tuple_count=36
@@ -289,7 +330,7 @@ checked macOS evidence freshness before regeneration
 failed closed with evidence source provenance is stale
 
 checked macOS evidence freshness after regeneration
-passed as part of the full 78-test suite
+passed as part of the full 79-test suite
 ```
 
 Focused verification of the CI/test portability correction:
@@ -308,6 +349,31 @@ focused suite
 3 tests in 0.138s — OK
 ```
 
+Focused verification of the post-run `30753147192` corrections:
+
+```text
+missing/corrupt Git-object adversarial identity
+passed
+
+retained-reader LF checkout policy
+passed
+
+checked evidence source freshness
+passed
+
+generated fixtures match the reviewed logical contract
+passed
+
+focused suite
+4 tests in 18.632s — OK
+
+all current retained-reader git check-attr observations
+text=set, eol=lf
+
+retained-reader pull-request and push path filters
+.gitattributes included in both
+```
+
 Additional independent probes covered repacking, packed refs, commit-graph and
 MIDX layout, object corruption, missing objects, normal ref and ORIG_HEAD
 changes, valid unmerged stages, all reviewed index flags, active hooks,
@@ -316,23 +382,23 @@ authoritative-file symlinks.
 
 ## Scope and budget
 
-The retained-reader package is **7,084 physical lines across 23 files**, below
+The retained-reader package is **7,095 physical lines across 23 files**, below
 the reviewed **7,100-line/23-file** ceiling. The largest Python module is 497
 lines; all implementation and test modules remain below 500 lines.
 
-The implementation and harness diff is confined to the retained-reader
-workflow and existing `gwz-core/scripts/retained_readers/**`
-test/tool/documentation files. The workspace-level changes outside those
-paths are the R0 inventory, budget, and review documents. There is no merge
-production-code, public protocol, wire-value, record-schema, record-byte, or
-released-feature delta.
+The implementation and harness diff is confined to the root checkout
+attributes, retained-reader workflow, and existing
+`gwz-core/scripts/retained_readers/**` test/tool/documentation files. The
+workspace-level changes outside those paths are the R0 inventory, budget, and
+review documents. There is no merge production-code, public protocol,
+wire-value, record-schema, record-byte, or released-feature delta.
 
 ## Decision
 
-The narrow Windows generator correction and the complete retained-reader
-portability remedy are ready to commit, with no remaining P0, P1, P2, or P3
-finding. Regenerated checked macOS arm64 evidence, the 78-test full suite, and
-portable evidence equality all pass. R0 may be accepted and R1 dispatched
-only after the replacement committed exact SHA passes both harness-unit jobs
-and all five required behavioral platform lanes with complete evidence and
-attestations.
+The Windows generator, checkout-policy, and test corrections and the complete
+retained-reader portability remedy are ready to commit, with no remaining P0,
+P1, P2, or P3 finding. Regenerated checked macOS arm64 evidence, the 79-test
+full suite, and portable evidence equality all pass. R0 may be accepted and R1
+dispatched only after the replacement committed exact SHA passes both
+harness-unit jobs and all five required behavioral platform lanes with
+complete evidence and attestations.
