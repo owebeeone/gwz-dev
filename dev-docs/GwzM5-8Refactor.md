@@ -4,7 +4,7 @@ Date: 2026-07-30
 
 Status: **Review 8 and independent F5-2 incorporated; R0, R1, and R2a
 approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
-I1/I2 accepted after independent re-review; broader durable state gated by R4a/R3/R4b, v1 activation by A1, and later
+I1/I2 and R4a accepted after independent re-review; broader durable state gated by R3/R4b, v1 activation by A1, and later
 wave writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
@@ -2128,6 +2128,16 @@ persisted acceptance, no-publication archival, and v1 no-ff safety from waiting
 on the hardest future product policies.
 
 ### R4a — behavior-preserving acceptance extraction
+
+Status: **complete and independently accepted** (2026-08-04). The first
+architecture review required the next-action policy to become the actual
+production dispatcher and the aggregate implementation to be split into
+bounded owners. Both re-reviews then found a write-before-mutation regression
+on direct evidence/publication resume. The corrected dispatcher restores both
+the invocation-prefix participant verification and the durable
+`CommittingEvidence`/`PublishingCandidate` boundaries. Nested mutation faults,
+root metadata drift, and participant drift now pin those exact restart windows;
+both independent reviewers returned GO with no remaining P0–P3 finding.
 
 - Extract complete-lock construction and accepted-root-checkout derivation,
   publication-required classification, candidate-prefix reconciliation, and

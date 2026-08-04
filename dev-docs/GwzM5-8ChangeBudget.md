@@ -2,7 +2,7 @@
 
 Date: 2026-07-31
 
-Status: **R0, R1, R2a, and M5a complete; M5a independently accepted**
+Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R4a independently accepted**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -312,6 +312,49 @@ The nine touched/created Rust paths are the binder, two modified
 characterization owners, fixture and registration changes, and four test-only
 merge seams. The latter four are outside the characterization LOC aggregate and
 none is present in a non-test build.
+
+### R4a — behavior-preserving acceptance extraction
+
+Intentional production behavior delta: **none**.
+
+Wire/protocol delta: **none**. R4a adds no writer, migration, schema,
+discriminant, or accepted-workspace persistence.
+
+The first implementation review stopped the aggregate change because it bound
+the new next-action policy only as an assertion and left a 923-addition
+finalizer-shaped review unit. The reviewed remediation made the action policy
+the production dispatcher and split policy, orchestration, and support into
+independently reviewable owners. A second review found two resume paths that
+advanced their durable phase after mutation; the corrected dispatcher restores
+the released preflight and write-before-mutation order and has nested-fault and
+participant-drift regression coverage.
+
+Physical production accounting is **994 lines added and 485 deleted** across
+nine touched or created production paths. Of the deletions, 485 lines are
+conservatively counted as moved or centralized rather than semantic removal;
+the physical net is **+509 production lines**. Focused tests add **637 lines**
+and delete 9 across the acceptance owners, shared fixtures, compatibility
+binder, and recovery-order assertions. The independently testable slices
+remain within the 500-line ceiling:
+
+| R4a slice | Review size | Evidence |
+| --- | ---: | --- |
+| complete-lock and accepted-root policy | ≤430 production/test changed lines | 235-line pure owner, 133-line focused test owner, narrow root/finalizer adapters |
+| publication-prefix and next-action policy | ≤355 production/test changed lines | 180-line pure owner, 155-line focused test owner, narrow publication adapter |
+| production dispatcher binding | ≤480 changed lines | 278-line dispatcher plus compatibility binding and recovery-order assertions |
+| mechanical finalization support split | ≤220 changed lines | 191-line support owner plus narrow imports/visibility wiring |
+| shared fixture and module wiring | ≤165 changed lines | 145-line fixture, 3-line test root, and module registration |
+
+No affected production file exceeds 500 lines: `finalize.rs` is 398,
+`finalize_dispatch.rs` 278, `finalize_support.rs` 191, and the pure acceptance
+owners are 235 and 180 lines. The focused finalization and drift test owners are
+also below 500 lines. The pre-existing 594-line compatibility binder remains
+within its separately approved 650-line I2 exception.
+
+The final gate has 7 focused acceptance tests, 107 g23 merge/recovery tests,
+688 full core tests (687 passed, 1 ignored), 329 Python/native tests, strict
+all-target Clippy, formatting, and diff hygiene green. Two independent
+interface re-reviews returned **GO** with no P0–P3 finding.
 
 ## Package reporting template
 
