@@ -5,8 +5,8 @@ Date: 2026-07-30
 Status: **Review 8 and independent F5-2 incorporated; R0, R1, and R2a
 approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
 I1/I2 and R4a accepted after independent re-review; the R3 strict-envelope,
-validated-model, unknown-field, and open-v0 adapter checkpoints are implemented
-with v1 still disabled; broader durable state is gated by the remaining
+validated-model, unknown-field, open-v0 adapter, and archive-projection
+checkpoints are implemented with v1 still disabled; broader durable state is gated by the remaining
 R3/R4b work, v1 activation by A1, and later wave writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
@@ -2186,6 +2186,19 @@ extension rebinding, every surviving overlay is compared with its exact
 expected manifest, and all four v0 top-level v1 collisions fail closed.
 Production still compiles no v1 body, writer, or migration path.
 
+The archive-projection checkpoint is now implemented behind `cfg(test)` and
+independently accepted. It strictly projects terminal v0 AV0-B–G history and
+persisted v1 acceptance from archive bytes alone, keeps terminal outcome
+separate from acceptance availability, reports every closed legacy gap, and
+rejects contradictory participant, root, marker, candidate, publication, and
+preservation evidence. Its separate immutable cleanup worklist validates exact
+merge-owned backup refs and canonical stash evidence but authorizes no
+deletion. Exact v2–v4 and unknown envelopes still fail before body decoding;
+no v2–v4 projection bodies exist. The focused archive suite passed 17 tests,
+the full core library passed 801 with 1 ignored plus every integration suite,
+and two independent settled-tree reviews returned **GO** with no P0–P3
+finding. Only the test-only atomic upgrade remains outstanding within R3.
+
 The open-v0 adapter checkpoint is now implemented behind `cfg(test)` and
 independently accepted. It performs true v0 structural validation, orders
 envelope and legacy no-ff rejection before matching, recovers omitted baseline
@@ -2205,9 +2218,10 @@ atomic upgrade remain outstanding.
   classification to R4a.
 - Reject open v0 `mode: no_ff` as `UnsupportedLegacyMode` before adaptation,
   migration, or mutation.
-- Implement the legacy-v0 and persisted-v1 archive decoders plus read-only
-  `ArchivedMergeProjection` seam from §15.3.3 without live dependencies;
-  later waves add only their own decoder.
+- The legacy-v0 and persisted-v1 archive decoders plus read-only
+  `ArchivedMergeProjection` seam from §15.3.3 are implemented behind
+  `cfg(test)` without live dependencies; later waves add only their own
+  decoder.
 - Implement the atomic upgrade algorithm behind `cfg(test)` or an equivalent
   non-production harness; do not add a production runtime flag.
 - Preserve or reject unknown nested fields exactly as specified.

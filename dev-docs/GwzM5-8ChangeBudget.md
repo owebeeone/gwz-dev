@@ -3,8 +3,8 @@
 Date: 2026-07-31
 
 Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R3 envelope,
-wire-shape, validated-model, unknown-field, and open-v0 adapter checkpoints
-independently accepted**
+wire-shape, validated-model, unknown-field, open-v0 adapter, and
+archive-projection checkpoints independently accepted**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -434,8 +434,20 @@ migration path. G23 passed 107 tests, the full core library passed 782 with 1
 ignored plus every integration suite, strict Clippy/format/diff gates passed,
 and independent re-review returned GO with no P0–P3 finding.
 
-Archive projection and test-only atomic upgrade remain separate reviewed R3
-slices.
+The archive-projection slice is also implemented and independently accepted.
+It adds only test-compiled model/projection, v0/v1 archive validation, and an
+immutable cleanup-worklist seam. The responsibility owners are 290 lines for
+the projection model, 211 for archive dispatch, 263 for v0 classification, 278
+for member audit, 420 for candidate/root evidence, 161 for v1 projection, and
+126 for cleanup ownership; every owner remains below 500 lines. Focused archive
+tests passed 17/17. The final full core gate passed 801 tests with 1 ignored,
+plus integration groups 10/10, 27/27, 4/4, and 2/2; strict Clippy, formatting,
+diff hygiene, and the production-only check passed. Two independent
+settled-tree reviews returned **GO** with no P0–P3 finding. Production store,
+status, retention, GC, protocol, CLI, Python/native, v1 writing, and migration
+remain unchanged and unreachable from this seam.
+
+The test-only atomic upgrade remains the final separate reviewed R3 slice.
 
 ## Package reporting template
 
