@@ -272,7 +272,7 @@ dependencies = [
 
 [[package]]
 name = "gwz-core"
-version = "0.10.2"
+version = "0.10.3"
 dependencies = [
  "getrandom",
  "git2",

@@ -234,7 +234,9 @@ dense and append-only.
          # Snapshot contains this member but records no Git commit for it.
          snapshot_missing_commit=1,
          # v0 snapshots do not record a workspace-root commit.
-         root_not_in_snapshot=2),
+         root_not_in_snapshot=2,
+         # --tagged candidate does not contain every requested local tag.
+         tag_missing=3),
 ```
 
 No `less`/`pager`/color enums are added to core (AD3/AD6).
@@ -316,7 +318,10 @@ No `less`/`pager`/color enums are added to core (AD3/AD6).
         cached=F(6, BOOL, optional=True),
         # --merge-base. First-class. The A...B syntax is still parsed from
         # operands and lowered to DiffComparison.merge_base per repo.
-        merge_base=F(7, BOOL, optional=True)),
+        merge_base=F(7, BOOL, optional=True),
+        # --tagged. Interpret every comparison endpoint as an exact local tag
+        # and narrow candidates to repositories that contain all of them.
+        tagged=F(8, BOOL, optional=True)),
 ```
 
 Rationale echoes the plan: the core API is structured, not a `git diff` argv
@@ -723,6 +728,8 @@ Generation must be deterministic and the **existing corpus must still pass**.
 | C19 | `compat_defaults` | `DiffRequest`/`DiffOptions` | All-defaults instances decode to defaults (default-value compat). |
 | C20 | `compat_unknown_optional_field` | `DiffOptions` | An instance with a higher unknown optional tag still decodes (forward compat). |
 | C21 | `DiffOutputRecord_entry_echo` | `DiffOutputRecord` + `DiffFileEntry` | Opt-in echo (ruling #3): when `DiffOptions.echo_manifest_entries` is requested, `DiffOutputRecord.entry` carries the full manifest entry and round-trips. |
+| C22 | `DiffRequest_tagged` | `DiffRequest` | `tagged=true` is a first-class candidate-narrowing mode, not an operand convention. |
+| C23 | `DiffExcludedTarget_tag_missing` | `DiffExcludedTarget` | A repository omitted by exact-local-tag intersection reports `tag_missing` rather than disappearing silently. |
 
 Plus, per plan D0 acceptance: a **minimal `DiffRequest` round-trips through Taut**
 (C1); **Python generated classes round-trip** the same diff messages (each C-row

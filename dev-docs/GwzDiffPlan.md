@@ -450,7 +450,9 @@ DiffTargetExclusionReason=Enum(
     # The snapshot contains this member but has no Git commit for it.
     snapshot_missing_commit=1,
     # v0 snapshots do not record a workspace-root commit.
-    root_not_in_snapshot=2)
+    root_not_in_snapshot=2,
+    # --tagged candidate does not contain every requested local tag.
+    tag_missing=3)
 ```
 
 Do not add `less`, `pager`, or terminal color enums to `gwz-core` protocol.
@@ -525,7 +527,10 @@ DiffRequest=Msg(
     # True for --cached or --staged. Selects index-vs-tree forms.
     cached=F(6, BOOL, optional=True),
     # True for --merge-base. A...B syntax is still parsed from operands.
-    merge_base=F(7, BOOL, optional=True))
+    merge_base=F(7, BOOL, optional=True),
+    # --tagged. Treat comparison endpoints as exact local tag names and narrow
+    # the selected candidate set to repositories containing every tag.
+    tagged=F(8, BOOL, optional=True))
 ```
 
 The protocol should be structured. Do not make the core API a raw `git diff`
@@ -1181,6 +1186,11 @@ Work:
   `excluded_targets` with `snapshot_missing`, `snapshot_missing_commit`, or
   `root_not_in_snapshot` as appropriate. If selection is explicit, missing
   snapshot records are member-scoped errors that respect partial policy.
+- When `DiffRequest.tagged=true`, treat comparison endpoints as exact local tag
+  names and narrow the selected, routed candidates to repositories containing
+  every tag. Record omitted candidates as `tag_missing`; return `TagNotFound`
+  when a requested tag is absent from the candidate set or the intersection is
+  empty. Do not change ordinary revision-resolution behavior.
 - Skip unmaterialized fan-out members, but error on explicit unmaterialized
   member pathspecs.
 - Reject unsupported source kinds unless policy says to skip.
@@ -1198,6 +1208,9 @@ Acceptance:
   root.
 - `gwz diff +snap` omits root, diffs only members recorded in `snap`, and
   reports root plus any members missing from the snapshot in `excluded_targets`.
+- `gwz diff --tagged v1 v2` includes only root/members containing both exact
+  local tags, reports other candidates as `tag_missing`, and does not accept a
+  same-named branch as a tag.
 - `gwz --target @root diff +snap` is a typed error because v0 snapshots do not
   record a root commit.
 - `gwz diff -- gwz-core/src/lib.rs` targets only `gwz-core` with
