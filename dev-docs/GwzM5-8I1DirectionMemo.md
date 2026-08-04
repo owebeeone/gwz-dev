@@ -2,8 +2,8 @@
 
 Date: 2026-08-04
 
-Status: **accepted; I2 unblocked after two independent reviews found no
-P0–P3 issue**
+Status: **accepted; selected-root metadata-base correction independently
+re-reviewed with no remaining P0–P3 finding**
 
 This memo freezes only the M6 checkout-evidence and M8 accepted-lock
 directions that v1 must respect. It does not freeze a durable schema, protocol
@@ -32,7 +32,7 @@ concept is not permission to serialize a placeholder for it.
 | Dimension | V1/A1 boundary | Later owner |
 | --- | --- | --- |
 | integration checkout | existing checkout only | I6/v2 branch lifecycle |
-| branch mutations | none beyond integration ref movement | I6/v2 |
+| branch mutations | integration ref movement plus checked reset of that same existing ref during released preservation/rollback | I6/v2 for checkout/ownership lifecycle |
 | source provenance | direct ref resolved to an exact commit | I7/v3 |
 | participant authorization | required | I8/v4 |
 | participant outcome | participated | I8/v4 |
@@ -55,16 +55,19 @@ For every v1 selected repository participant:
   result; and
 - selected-detached integration is unsupported before record creation.
 
-V1 must not encode, execute, or claim ownership of a create, switch, restore,
-delete, or branch-cleanup action. It has no operation-created branch, branch
-ownership token, ABA proof, rollback cursor for checkout restoration, or
-policy for leaving a target branch checked out. A request requiring any such
-behavior is unsupported before record creation.
+V1 must not encode, execute, or claim ownership of branch creation, checkout
+switch/restoration, deletion, or branch cleanup. The released preservation and
+rollback behavior may journal a checked reset of the same existing attached
+integration ref and exact restoration of root publication files/index after
+that reset; this is ref rollback, not M6 checkout lifecycle. V1 has no
+operation-created branch, branch ownership token, ABA proof, checkout cursor,
+or policy for leaving a different branch checked out. A request requiring any
+such behavior is unsupported before record creation.
 
-For an unselected baseline-present member, acceptance carries the authoritative
+For an unselected metadata-base-present member, acceptance carries the authoritative
 unchanged complete lock row, whether materialized or not, including only the
 checkout evidence actually present in that row. An audit-domain member with no
-baseline lock row receives no invented checkout or lock row. Neither case is
+metadata-base lock row receives no invented checkout or lock row. Neither case is
 treated as a selected no-op or given integration evidence.
 
 V2 may add explicit original checkout, integration checkout, final checkout,
@@ -75,11 +78,17 @@ root `--into` policy remains open until I6.
 
 ## 3. M8 accepted-lock direction
 
-V1 acceptance is complete-workspace evidence, not a selected-result map. Its
-audit domain accounts deterministically for the union of:
+V1 acceptance is complete-workspace evidence, not a selected-result map. It
+separates the operation baseline used for rollback from the accepted metadata
+base used for composition. When `@root` participates, that metadata base is
+the exact manifest and lock read from its verified result commit; otherwise it
+is the exact frozen baseline manifest and lock. Publication output is never a
+metadata-base source.
 
-- members represented by the frozen baseline lock;
-- active members in the operation's frozen workspace definition;
+Its audit domain accounts deterministically for the union of:
+
+- members represented by the accepted metadata-base lock;
+- active members in the accepted metadata-base manifest;
 - selected members; and
 - members deliberately absent from the accepted lock.
 
@@ -89,8 +98,8 @@ must preserve these directional rules:
 - every selected v1 participant is required and has a participated outcome;
 - a successful selected member is always `Present` with its one verified final
   checkout and complete accepted lock row;
-- unselected baseline-present members remain `Present` with their authoritative
-  unchanged baseline rows and remain distinguishable from selected
+- unselected metadata-base-present members remain `Present` with their
+  authoritative unchanged metadata-base rows and remain distinguishable from selected
   participants;
 - every member present in the accepted audit has an explicit `Present` or
   `Absent` lock-membership decision;
@@ -130,6 +139,13 @@ verified integration result. Selected-root integration cannot be detached or
 unborn. Otherwise the input preserves the frozen baseline root checkout,
 including the already legal born-detached case.
 
+The exact accepted metadata-base manifest and lock are immutable acceptance
+inputs alongside the root checkout. For selected `@root` they come from the
+verified root result commit, not the initial operation baseline or the later
+composition commit. This lets restart reconstruct the audit, candidate, and
+boundary without reading live Git while rollback authority remains in the
+separate operation baseline.
+
 Publication is permitted only from an attached accepted root. Its publication
 branch is required and equals that accepted branch. `BornDetached` is legal
 only when the complete accepted workspace deterministically requires no
@@ -156,6 +172,10 @@ V1 preservation owns only evidence for mutations executable under v1:
 - root evidence and composition output; and
 - candidate publication progress and its reverse restoration.
 
+I2 supplies the typed pending rollback/preservation journals and recovery
+origin required to own those current-lifecycle mutations; they are v1 safety
+mechanisms, not dormant M6–M8 policy.
+
 V1 publication owns applying and verifying the exact accepted workspace. Its
 progress remains distinct from acceptance. A successful no-publication result,
 including all-up-to-date work, still persists and archives the same complete
@@ -175,8 +195,9 @@ I2 may begin only if interface review confirms all of the following:
    closed to their existing-checkout case.
 2. No v1 request, record, action, response, or archive shape can express M6,
    M7, or M8 executable semantics.
-3. V1 acceptance covers the complete baseline/audit/lock domain and is closed
-   to required/participated selected members.
+3. V1 acceptance covers the complete metadata-base/audit/lock domain while
+   preserving the separate operation baseline, and is closed to
+   required/participated selected members.
 4. Selected, unselected, present, and intentionally absent members cannot be
    conflated.
 5. Root attached-born, detached-born, and attached-unborn input is distinct

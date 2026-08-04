@@ -4,7 +4,7 @@ Date: 2026-07-30
 
 Status: **Review 8 and independent F5-2 incorporated; R0, R1, and R2a
 approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
-I1 approved; broader durable state gated by I2, v1 activation by A1, and later
+I1/I2 accepted after independent re-review; broader durable state gated by R4a/R3/R4b, v1 activation by A1, and later
 wave writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
@@ -438,12 +438,30 @@ observations. `DeleteOwnedBranch` is a separate checked ref mutation; neither
 Preservation does not use `PendingParticipantAction`. It needs a separate,
 typed `PendingPreservationAction`/progress owner because it spans participant
 backup refs, stashes, and root-publication material. Its mutation inventory
-must cover at least backup-ref creation, stash creation, checked ref restore,
-publication-prefix restoration, and artifact cleanup. Existing
+must cover at least backup-ref creation, stash creation, checked ref reset,
+and publication-prefix restoration. Preservation does not delete its native
+stashes or bundles; candidate/evidence cleanup remains rollback/publication
+owned. Existing
 `PublicationProgress` remains the owner of candidate/evidence publication.
 The record checkpoint must prove that these separate journals cover every
 mutation; a broad “all Git mutations use `PendingParticipantAction`” claim is
 not correct.
+
+I2 specializes that direction for v1 rather than leaving the known v0 gaps in
+place. V1 adds one top-level `pending_rollback` for participant reverse
+actions, evidence rollback, and selected-root metadata restoration; one
+top-level `pending_preservation` for backup ref, canonical preimage-verified
+stash, root normalization/restoration, bundle, and checked branch restoration;
+and `recovery_context` carrying the exact pre-recovery operation state. Each
+pending action is written before mutation and survives ambiguous recovery.
+The exact types, steps, legality matrix, and observation rules are frozen in
+`GwzM5-8I2ActionJournalContract.md`.
+
+Post-archive multi-ref cleanup uses the immutable validated archive as a
+worklist instead of rewriting terminal history: absent/exact refs are
+idempotent completion/deletion states, mismatch or unavailable repository
+retains the archive, and archive deletion waits until every recorded backup
+ref is absent. Native stashes and bundles are not GC-owned.
 
 ### 7.2 Branch creation action
 
@@ -662,10 +680,24 @@ complete accepted workspace. Once persisted it is immutable for the operation:
 
 ```rust
 struct AcceptedWorkspace {
-    baseline_lock_sha256: String,
+    operation_baseline_lock_sha256: String,
+    metadata_base: AcceptedMetadataBase,
     lock: AcceptedLock,
     member_audit: BTreeMap<String, MemberAcceptance>,
     root: RootPublicationInput,
+}
+
+struct AcceptedMetadataBase {
+    source: AcceptedMetadataSource,
+    manifest_exact_yaml: String,
+    manifest_sha256: String,
+    lock_exact_yaml: String,
+    lock_sha256: String,
+}
+
+enum AcceptedMetadataSource {
+    OperationBaseline,
+    SelectedRootResult { commit: String },
 }
 
 struct AcceptedLock {
@@ -715,11 +747,20 @@ dormant M6–M8 enum variants. Later adapters lift v1 acceptance into their
 richer installed model without rewriting the original record version.
 
 In v1 every selected member is `Present` with its verified complete result row,
-and every unselected baseline-present member remains `Present` with its
-unchanged authoritative baseline row, whether materialized or not. An audit
-member with no baseline lock row and no selected result is `Absent` without
-invented checkout or lock evidence. The complete lock's member keys equal
-exactly the `Present` audit keys; `Absent` is not a v1 skip or partial outcome.
+and every unselected metadata-base-present member remains `Present` with its
+unchanged authoritative metadata-base row, whether materialized or not. An
+audit member with no metadata-base lock row and no selected result is `Absent`
+without invented checkout or lock evidence. The complete lock's member keys
+equal exactly the `Present` audit keys; `Absent` is not a v1 skip or partial
+outcome.
+
+The operation baseline and accepted metadata base are separate. If `@root`
+participates, `AcceptedMetadataBase` contains the exact manifest and lock read
+from its verified result commit and names that commit as its source. Otherwise
+it contains the exact frozen baseline manifest and lock. Finalization builds
+the accepted lock and audit from this persisted metadata base; it never rereads
+the live root result after acceptance and never treats a composition commit as
+metadata input.
 
 `LockArtifact` is not stored a second time inside `AcceptedLock`. It is the
 validated in-memory parse of `exact_yaml`. This removes one redundant durable
@@ -735,9 +776,10 @@ The durability contract and semantic requirements do not:
   commit, branch, detached state, upstream, dirty state, and materialization
   state.
 - `sha256(exact_yaml)` must equal the recorded `sha256`.
-- `member_audit` accounts for the union of baseline, active, selected, and
-  intentionally absent members, including unselected members retained from the
-  baseline.
+- `member_audit` accounts for the union of metadata-base lock members,
+  metadata-base active manifest members, selected members, and intentionally
+  absent members, including unselected members retained from the metadata
+  base.
 - A selected member records the integration result/ref separately from its
   accepted final checkout. M6 may integrate a target branch and later restore
   a different original checkout.
@@ -1120,7 +1162,7 @@ Versions are cumulative:
 | Version | Required executable semantics | First writer |
 | --- | --- | --- |
 | v0 | Released M4 integration plus M5 custom messages using existing commit-message recovery authority | M4/M5a custom-message slice |
-| v1 | v0 semantics plus executable `--no-ff`, persisted `AcceptedWorkspace`, born/unborn acceptance, and publication/no-publication consumption | A1 after R4b |
+| v1 | v0 semantics plus executable `--no-ff`, persisted `AcceptedWorkspace`, born/unborn acceptance, publication/no-publication consumption, typed reverse/preservation journals, and recovery origin | A1 after R4b |
 | v2 | v1 plus M6 create/switch/integrate/restore/delete branch lifecycle and ownership-aware rollback | M6 activation |
 | v3 | v2 plus M7 snapshot-source provenance, resolution, and reporting | M7 activation |
 | v4 | v3 plus M8 required/optional participation, skipped outcomes, partial composition, and its recovery/reporting semantics | M8 activation |
@@ -1171,8 +1213,9 @@ This creation rule does not rewrite existing records:
 - supported v1–v4 records retain their original version and semantics when a
   newer binary continues, preserves, aborts, rolls back, finalizes, reports, or
   archives them;
-- open v0 records use only the separately approved atomic v0-to-v1 A1
-  migration before their next mutation;
+- open v0 records matching the separately approved A1 whitelist migrate
+  atomically before their next mutation; structurally valid unlisted v0 stays
+  on the existing v0 lifecycle and may continue writing v0;
 - an open v0 record carrying `mode: no_ff` is rejected as
   `UnsupportedLegacyMode` before migration or mutation because the envelope
   cannot prove whether dormant-v0 or executable-v1 semantics created it;
@@ -1228,8 +1271,9 @@ The decoder sequence is:
 6. adapt to one canonical internal model; and
 7. retain the raw/unknown-field representation needed for lossless rewrite.
 
-Every binary contains a header-only allocation registry independent of its
-compiled body decoders:
+Every A1-or-later binary contains a header-only allocation registry independent
+of its compiled body decoders; retained pre-A1 readers keep their released
+behavior:
 
 | Exact allocated pair | Required wave |
 | --- | --- |
@@ -1257,16 +1301,23 @@ their bodies. Unallocated future pairs report their raw values without
 inventing a supporting wave.
 
 The redundant string/number pair is never interpreted independently and no
-best-effort body decoding is allowed.
+best-effort body decoding is allowed. Duplicate keys at any mapping depth,
+YAML aliases/anchors, and `<<` merge keys reject before body decoding because
+the unknown-field manifest cannot preserve them unambiguously. Open malformed
+records use `MergeRecordUnreadable`; malformed archives use
+`ArchivedRecordUnreadable`; exact unsupported pairs at either location use
+`UnsupportedRecordVersion`.
 
-I2 owns the machine-error allocation for this boundary. The internal
-`UnsupportedRecordVersion`, `UnsupportedLegacyMode`, and
-`ArchivedRecordUnreadable` results map to append-only taut `GwzErrorCode`
-values `unsupported_record_version`, `unsupported_legacy_mode`, and
-`archived_record_unreadable`. I2 pins their numeric values and exact
-human/JSON/JSONL projection; generated Rust and Python enums, corpus fixtures,
-and driver parity must agree. No path may expose one of these as an
-unregistered string code or reuse the broader `record_unreadable` code.
+I2 owns the machine-error allocation for this boundary. It pins codes 46–61:
+unsupported record version, unsupported legacy mode, archived-record
+unreadability, and the thirteen compatibility contradiction classes named by
+§15.3.2. `GwzError` gains structured merge-id/schema/version/required-wave or
+legacy-mode context; clients never parse these facts from the message.
+`GwzM5-8I2CompatibilityContract.md` is the numeric, field, discriminant,
+message, and nullability authority. Generated Rust/Python enums, corpus
+fixtures, human/JSON/JSONL projections, and driver parity must agree. No path
+may expose one as an unregistered string code or reuse the broader
+`record_unreadable` code.
 
 ### 15.3 Version adapter
 
@@ -1326,28 +1377,29 @@ duplicate those rules.
 
 #### 15.3.2 Closed v0 publication-progress mapping
 
-I2 freezes a closed mapping for every legal v0 operation/publication state.
-The minimum mapping is:
+I2 freezes a closed migration whitelist, not a validity classifier for every
+legal v0 operation/publication state.
+The old A–M labels are descriptive fixture names, not a disjoint classifier:
+preservation, rollback, recovery, and terminal state are overlays on a durable
+publication phase. The normative classifier in
+`GwzM5-8I2CompatibilityContract.md` therefore returns exactly one base phase
+and one lifecycle overlay.
 
-| Row | Legal v0 state/evidence | `AcceptedWorkspace` and lock-byte source | Accepted root input | Exact allowed observation | Next action | Typed contradiction |
-| --- | --- | --- | --- | --- | --- | --- |
-| A | `Executing`, `AwaitingResolution`, or `Halted`; pre-acceptance `Preserving`/`RollingBack`; no candidate/evidence | Absent | Not yet derived | Existing v0 participant, preservation, and rollback observation | Resume the same v0 lifecycle; construct no acceptance yet | `UnexpectedAcceptanceEvidence` |
-| B | `Finalizing`; publication absent or `NotStarted`/`ValidatingResults`/`PreparingCandidate`; candidate absent | Construct now through R4a from the recorded baseline and verified participant results | Derive `BornAttached` from the selected-root result/attached baseline, `BornDetached` from the exact detached born baseline, or `UnbornAttached` from the exact attached unborn baseline; detached is legal only if publication is not required | Live participants/root exactly match the pre-evidence accepted checkout | Persist acceptance, then derive publication-required; reject detached if publication is required | `AcceptanceInputDrift` |
-| C | Candidate persisted; no evidence commit attempted | Recover from exact `candidate.lock_yaml`; verify its recorded digest; never reserialize | Same immutable R4a base as B, cross-checked with candidate publication branch and root-participation result | Candidate metadata valid; live root exactly matches accepted pre-evidence base; no candidate prefix published | Persist recovered acceptance, then create evidence | `CandidateIntegrityMismatch` |
-| D | Candidate persisted; `composition_commit` absent; live root may contain an interrupted first/evidence commit | Recover from exact candidate bytes/hash | Same immutable accepted base as C; any evidence commit is publication output, not a replacement input | Adopt a born live root only when the exact scoped evidence commit verifies against the accepted parent (`None` for unborn), branch, message, files, tree, and candidate hashes | Persist recovered acceptance and exact evidence output | `AmbiguousEvidenceCommit` |
-| E | `composition_commit`/`composition_tree` recorded; publication not started | Recover from exact candidate bytes/hash | Same immutable accepted base as C; recorded composition remains separate output | Recorded evidence commit verifies exactly and live root is that commit | Publish or reconcile the first candidate prefix | `RecordedEvidenceDrift` |
-| F | `PublishingCandidate` with any legal observed partial candidate-publication prefix | Recover from exact candidate bytes/hash | Same immutable accepted base as C; recorded composition remains separate output | Root evidence is exact; the live marker/lock/boundary/staging state equals one prefix of the M4 write order using the recorded candidate bytes/hashes | Reconcile the observed prefix and resume publication | `PublicationPrefixMismatch` |
-| G | Candidate fully published; `VerifyingPublication` or publication `Complete` before archive | Recover from exact candidate bytes/hash | Same immutable accepted base as C; recorded composition remains separate output | Root evidence and every candidate file/hash verify exactly | Verify/complete, then archive | `PublishedCandidateMismatch` |
-| H | `Preserving` with candidate, evidence, root-preservation, or publication-prefix state | Recover from exact candidate when present; otherwise remain pre-acceptance as row A | Same accepted base as its source row, or absent for pre-acceptance A | Backup/stash evidence, root evidence, and preserved prefix match the recorded preservation state | Resume preservation or guarded abort | `PreservationEvidenceMismatch` |
-| I | `RollingBack` or evidence-rollback state | Retain recovered acceptance when it had been frozen/recoverable; otherwise remain pre-acceptance | Same accepted base as its source row; rollback never rewrites it | Each reversed prefix is exact; recorded evidence rollback returns root to the original accepted checkout | Resume checked reverse rollback, then abort/archive | `RollbackEvidenceMismatch` |
-| J | All-up-to-date no-publication `Complete`; candidate/evidence absent | Construct through R4a from the recorded baseline and complete verified unchanged audit | Derive the same exact attached-born, detached-born, or attached-unborn baseline input as B; no publication output exists | Root matches its accepted checkout; no candidate prefix exists | Persist acceptance, record publication-not-required, then archive | `UnexpectedPublicationEvidence` |
-| K | Terminal `Completed` record still open before archive | Recover by C–G when candidate-bearing, or J when no-publication | Same immutable accepted base as the source row | Corresponding candidate/no-publication evidence is exact | Archive without Git mutation | `TerminalEvidenceMismatch` |
-| L | `RecoveryRequired` with any publication state | Classify by the exact source row A–J; do not invent missing acceptance | Same accepted base as the source row, if one exists | Source-row evidence plus the durable drift/recovery reason are mutually consistent | Remain recovery-required and report the typed recovery action; make no automatic mutation | `RecoveryEvidenceMismatch` |
-| M | Terminal `Aborted` record still open before archive | Retain recovered acceptance only if its source row had one | Same immutable accepted base as the source row | Publication/evidence rollback is complete and the live root is the original accepted checkout | Archive without Git mutation | `TerminalRollbackMismatch` |
+The base phases are `PreAcceptance`, `PreCandidate`, `CandidatePersisted`,
+`EvidenceUnrecorded`, `EvidenceRecorded`, `PublishingPrefix`, `Published`, and
+`NoPublicationComplete`. They are selected solely from durable participant,
+pending-action, candidate, composition, publication-step, rollback, and hash
+signatures. Live Git never selects an earlier phase; it is a separate exact,
+mismatch, or ambiguous observation. The overlays are `Direct`, `Preserving`,
+`RollingBack`, `RecoveryRequired`, `Completed`, and `Aborted`.
 
-The exact enum combinations for each row are frozen from the R0 legal-state
-inventory. Unknown or contradictory combinations are not coerced into the
-nearest row.
+The I2 contract and
+`../gwz-core/dev-docs/GwzM5-8I2CompatibilityPredicates.json` pin seven exact
+one-member-workspace finalizing migration descriptors, their accepted-workspace source,
+root observation, and R4a-owned next action. A structurally valid unregistered
+tuple stays v0; multiple whitelist matches are a build defect. Recovery,
+preservation, rollback, drift, multi-member, born/selected-root, prefix-partial,
+and terminal rows do not migrate at A1. Migration performs no lifecycle action.
 
 The authoritative accepted lock source is:
 
@@ -1379,10 +1431,11 @@ baseline. Its allowed live observation then depends on publication progress:
 - after evidence rollback, live root must again equal the original accepted
   attached-born or attached-unborn base.
 
-For every row, the compatibility result freezes:
+For every registered tuple, the compatibility result freezes:
 
 - acceptance absent/construct/recover classification;
 - authoritative lock bytes/hash;
+- accepted metadata-base source and exact manifest/lock bytes/hash;
 - accepted root base;
 - exact allowed live root/ref and candidate prefix;
 - publication outputs justifying any changed live state;
@@ -1499,6 +1552,13 @@ selected-root result, candidate publication branch, and recorded composition
 fields. A later live born HEAD never upgrades an archived unborn input, and a
 missing repository never removes valid historical evidence.
 
+Legacy completeness is gap-first, not inferred from candidate presence. A
+selected-root v0 candidate does not itself retain the exact result-commit
+manifest needed to prove the audit domain; unless archive bytes independently
+prove that domain, projection includes `CompleteMemberAudit` and is
+`LegacyUnavailable`. The operation-baseline manifest is never substituted for
+selected-root result metadata.
+
 The v0 adapter validates its schema/version, terminal state, identity,
 participant terminal invariants, and whatever baseline/candidate/publication
 evidence is present. Missing optional legacy evidence produces
@@ -1512,11 +1572,15 @@ fields. Supported persisted archives always expose their complete
 version-specific acceptance. Only v0 evidence gaps render as legacy
 unavailable, with machine-stable gap values.
 
-An explicit retention/GC command may delete a structurally valid terminal v0
-legacy or supported v1–v4 archive after its archive-only decoder succeeds; it
-does not need historical repositories or live workspace state. An unsupported
-future archive cannot be deleted or rewritten by the older binary's status,
-retention, or targeted GC path.
+Archive decoding and projection never need historical repositories or live
+workspace state. Deletion has a separate ownership gate. A validated archive
+without backup refs may be deleted directly. If it owns backup refs, targeted
+GC observes each repository: absent is complete, an exact recorded target is
+checked-deleted, and a mismatch or unavailable repository retains the archive.
+The archive is deleted only after all recorded refs are absent. Native stashes
+and bundles are retained. Ordinary retention exempts archives owning backup
+refs. An unsupported future archive cannot be deleted or rewritten by the
+older binary's status, retention, or targeted GC path.
 
 This projection is read-only. `LegacyUnavailable`, `NotAccepted`, and every
 versioned persisted archive projection can never be converted to the mutable
@@ -1573,17 +1637,22 @@ exception.
 
 ### 15.6 Upgrade publication and verification
 
-Migration eligibility is closed rather than inferred. Any structurally valid
-open v0 record that maps to one legal §15.3.2 row A–M is eligible, including a
-`RecoveryRequired` row or operation-level drift, provided it does not contain
-`mode: no_ff` and every unknown field has a lossless v1 destination. The
+Migration eligibility is closed rather than inferred. A structurally valid
+open v0 record is eligible only when its normalized record/live descriptor
+equals one of the seven checked §15.3.2 whitelist rules, has every
+phase-required exact input, does not contain `mode: no_ff`, and every unknown
+field has a lossless v1 destination. Recovery, preservation, rollback, drift,
+multi-member, born/selected-root, partial-prefix, and terminal rows are valid
+but deliberately unlisted and stay v0. The
 atomic migration is a representation change, not an automatic lifecycle
 action: it preserves the exact state, drift/recovery result, evidence, and next
 action and performs no Git, ref, index, worktree, candidate, publication,
-preservation, or archive mutation. An unreadable/contradictory record, a v0
-no-ff record, or a record whose extensions cannot be preserved is ineligible
-and returns its existing typed error without staging an upgrade. Read-only
-status never migrates.
+preservation, or archive mutation. Zero whitelist matches is not an error:
+read-only status projects v0 source/version without migration, and an existing
+mutating v0 command remains on the existing v0 lifecycle. An
+unreadable/contradictory record, a v0 no-ff resume, or an exact whitelist row
+whose extensions cannot be preserved returns its typed error without staging
+an upgrade. Read-only status never migrates.
 
 For an approved v1 migration:
 
@@ -1632,10 +1701,10 @@ files are never treated as open operations. The explicit post-rename fault must
 resume from the new record without requiring the lost in-memory hash/model
 comparison.
 
-The A1 fixture set includes `RecoveryRequired` and operation-drift v0 records.
-Migration must leave each in the identical recovery/drift classification with
-the identical next action and no non-record mutation; status alone leaves the
-original v0 bytes untouched.
+The A1 fixture set includes `RecoveryRequired`, operation-drift, preservation,
+and rollback v0 records. All are valid-unlisted at A1: none enters the migration
+staging path, each retains the existing v0 recovery/drift classification and
+resume behavior, and status leaves the original v0 bytes untouched.
 
 ### 15.7 Older binaries and downgrade behavior
 
@@ -1658,7 +1727,9 @@ the actual v3/M7 binary must reject v4. Newer binaries must continue to decode,
 recover, and preserve older supported versions under those versions' exact
 semantics.
 
-`writer_version` remains diagnostic metadata, not a compatibility gate. An
+`writer_version` records the last binary that successfully wrote the record:
+mutating migration/rewrite updates it atomically, read-only projection leaves
+it byte-exact, and it remains diagnostic metadata rather than a compatibility gate. An
 older maintenance binary that fully supports a record's semantic version must
 continue to read it when a newer maintenance build rewrote it without changing
 required lifecycle semantics. Conversely, recognizing fields or enum
@@ -1972,9 +2043,11 @@ M5a proves only the v0-safe message/integration gate.
 
 ### I1 — v1 directional interface memo
 
-Status: **accepted; I2 unblocked** (2026-08-04). Two independent interface
-reviews found no remaining P0–P3 issue after the root-checkout and
-lock-membership clarifications.
+Status: **accepted after independent I2 re-review** (2026-08-04). The initial
+reviews found no P0–P3 issue after the root-checkout and lock-membership
+clarifications. I2 inventory then exposed the selected-root metadata-base case;
+that correction and the complete I1/I2 boundary now have two independent GO
+verdicts with no remaining P0–P3 finding.
 
 - Freeze the M6 direction needed by v1: member audit separates integration ref
   from final checkout, but v1 permits only the existing checkout and contains
@@ -1993,6 +2066,12 @@ policy freezes at I8 before v4. No durable schema is frozen during I1.
 
 ### I2 — v1 durable record checkpoint
 
+The exact record, action-journal, compatibility, and protocol slices are
+`GwzM5-8I2RecordContract.md`, `GwzM5-8I2ActionJournalContract.md`,
+`GwzM5-8I2CompatibilityContract.md`, and `GwzM5-8I2ProtocolContract.md`;
+`../gwz-core/dev-docs/GwzM5-8I2CompatibilityPredicates.json` is their checked
+v0 migration-whitelist registry.
+
 - Freeze §15.8's actual-reader manifest/support window, Rust CLI and
   distributed `gwz-py` reader surfaces, behavioral lanes, full
   release-platform evidence, and explicit unsupported tuples. Keep v0 limited
@@ -2005,8 +2084,9 @@ policy freezes at I8 before v4. No durable schema is frozen during I1.
   every later release create at least v1; requested M6/M7/M8 semantics raise a
   new operation to v2/v3/v4; combined features use the maximum; existing
   records never use this creation calculation.
-- Freeze only the v1 integration/no-ff action inventory, accepted lock, root
-  publication input, current preservation ownership, and rollback evidence.
+- Freeze only the v1 integration/no-ff action inventory, accepted lock,
+  accepted metadata base, root publication input, typed reverse/preservation
+  journals, recovery origin, and archive-worklist cleanup ownership.
 - Exclude M6 branch ownership/actions, M7 snapshot source, and M8
   optional/skipped outcomes from the v1 wire/canonical model.
 - Freeze the attached-born/detached-born/attached-unborn accepted-root model,
@@ -2017,23 +2097,25 @@ policy freezes at I8 before v4. No durable schema is frozen during I1.
   lock/audit/root cross-field invariants.
 - Freeze the disjoint schema/version registry/classifier and v0/v1 body
   decoders.
-- Allocate and pin the append-only taut `GwzErrorCode` values and exact
-  machine projections for unsupported record version, unsupported legacy mode,
-  and archived-record unreadability.
-- Freeze the closed v0 publication-progress mapping, exact candidate-lock byte
-  authority, stage-dependent accepted-root-checkout rules, typed contradiction
-  results, and the requirement that adaptation preserve the v0 next action.
+- Allocate and pin the append-only taut `GwzErrorCode` values 46–61 and exact
+  machine projections for unsupported version/mode, archived unreadability,
+  and every compatibility contradiction.
+- Freeze the disjoint v0 base-phase/lifecycle-overlay mapping, exact
+  candidate-lock byte authority, stage-dependent accepted-root-checkout rules,
+  typed contradiction results, and the requirement that adaptation preserve
+  the v0 next action.
 - Freeze the general per-supported-version archive rule plus only the concrete
   legacy-v0 and persisted-v1 projection bodies: sibling terminal
   outcome/acceptance, archive-only structural validation, cross-driver parity,
-  no-read-rewrite, and live-independent GC. V2–V4 projection bodies and
+  no-read-rewrite, live-independent projection, and checked archive-worklist
+  GC. V2–V4 projection bodies and
   discriminants remain absent until I6/I7/I8.
 - Freeze unknown-field migration and subsequent-rewrite preservation, the
   container-retirement table, atomic upgrade verification, and old-binary
   behavior.
-- Freeze the closed migration-eligibility set from §15.6, including
-  representation-only migration of `RecoveryRequired` and operation-drift
-  rows with identical next-action classification.
+- Freeze the seven-rule migration-eligibility whitelist from §15.6 and the
+  valid-unlisted legacy-v0 fallback; recovery, operation-drift, preservation,
+  rollback, terminal, and other unlisted rows do not migrate at A1.
 - Freeze the writer/migration activation policy: R3 production writes remain
   disabled until R4b is installed and A1 passes as one reviewed gate.
 - Approve the directional memos and independent future proof-gate structure for
@@ -2152,7 +2234,8 @@ v0 release.
 - Activate `--no-ff` only through v1 and verify no start path can serialize it
   under v0.
 - Assert that every ordinary direct-ref operation created by A1 starts as v1
-  and never v0; open-v0 migration is the only mutable v0 exception.
+  and never v0. Whitelisted open-v0 migration is the only new v1 rewrite of v0;
+  valid-unlisted records may still be mutated only by the existing v0 lifecycle.
 - Confirm the last v0-only binary fails closed on the new version and that no
   older package in the supported upgrade path can publish it.
 - Retain the exact A1 release executable for the M6–M8 downgrade matrices, and
@@ -2466,7 +2549,8 @@ Build named legal fixtures, not a generated enum cross-product, for:
 7. verified/publication-complete records before archive;
 8. evidence and publication state being preserved or rolled back;
 9. all-up-to-date no-publication completion;
-10. `RecoveryRequired` over every otherwise legal source row;
+10. valid-unlisted `RecoveryRequired` over representative base phases, proving
+    zero whitelist matches and unchanged v0 status/restart behavior;
 11. terminal `Completed` and `Aborted` records interrupted before archive; and
 12. every legal born and attached-unborn variant of those states.
 
@@ -2497,11 +2581,11 @@ its unsafe behavior; v0.9.2 separately proves the pre-record open-operation
 downgrade behavior. The A1 adapter must return `UnsupportedLegacyMode` before
 migration or mutation.
 
-Run A1 migration separately against a `RecoveryRequired` overlay on every
-applicable source row and against operation-level drift. Assert an atomic
-v0-to-v1 representation change, identical typed recovery/drift and next-action
-projection, and no Git/artifact mutation. The same fixtures through status
-alone must remain byte-identical v0.
+Run A1 eligibility separately against `RecoveryRequired` overlays,
+operation-level drift, and preservation and rollback mutation windows. Assert
+zero whitelist matches, no staged v1 representation, and identical v0
+recovery/drift and resume behavior with no extra Git/artifact mutation. The
+same fixtures through status alone must remain byte-identical v0.
 
 ### 18.7 Archived record projection
 
@@ -2542,12 +2626,14 @@ Contradictory durable evidence in any supported version produces
 pre-acceptance v0 archive produces `NotAccepted`. No historical projection can
 enter mutable lifecycle code.
 
-Run explicit retention/GC over every structurally valid terminal fixture after
-removing or advancing all live repositories. GC must identify/delete the
-archive using its bytes alone. Read-only fixtures remain intact; GC deletion is
-the only authorized mutation and does not first upgrade or rewrite the record.
-An older binary returns `UnsupportedRecordVersion` for an unsupported future
-archive and does not delete or rewrite it through status, retention, or
+Run explicit retention/GC over every structurally valid terminal fixture.
+Archives without backup refs identify/delete from archive bytes alone even
+after repositories disappear. Ref-owning archives exercise exact, already
+absent, mismatched, partially deleted, and unavailable-repository cases;
+unavailable or mismatched refs retain the archive, and deletion occurs only
+after all are absent. No path deletes native stashes/bundles or upgrades the
+record. An older binary returns `UnsupportedRecordVersion` for an unsupported
+future archive and does not delete or rewrite it through status, retention, or
 targeted GC.
 
 Activation matrices additionally require:
@@ -2760,7 +2846,7 @@ mutable assumptions are worse than one cohesive module.
 | Gate checks fields but misses new values/predeclared variants | Define newly writable shapes broadly and test the selected durable-record baseline's field-known and dormant-variant behavior; retain v0.9.2 as a separate pre-record downgrade lane |
 | A1 recognizes but cannot execute later M6–M8 states | Cumulative v1–v4 semantic-wave versions, floor-aware selection, retained actual-binary downgrade matrices, and A2/A3/A4 activation gates |
 | A1 predeclares unresolved archive projection types | Compile/publish only V1 at A1; append V2/V3/V4 at I6/I7/I8 |
-| `RecoveryRequired` migration behavior is guessed | Closed §15.6 eligibility; representation-only migration preserves recovery/drift and next action |
+| `RecoveryRequired` migration behavior is guessed | A1 never migrates recovery/preservation/rollback rows; structurally valid unlisted records remain on the existing v0 lifecycle |
 | Typed compatibility errors drift across drivers | Pin append-only taut codes and human/JSON/JSONL projections at I2 |
 | Feature-free operations remain on legacy v0 after A1 | Freeze `max(active_writer_floor, requested_semantics)`; A1 and all later writers have a v1 floor; test the complete creation matrix |
 | `writer_version` is mistaken for lifecycle compatibility | Gate on the closed semantic record version; prove same-version maintenance rewrites remain readable |
@@ -2865,12 +2951,12 @@ Stop the current package for design review if:
   acceptance detail is unavailable;
 - an unavailable/not-accepted historical projection can authorize a mutable
   lifecycle path;
-- GC requires historical live repositories in order to delete a structurally
-  valid terminal archive;
+- archive projection or no-ref deletion consults historical live repositories,
+  or ref-owning GC deletes the archive before every checked ref is absent;
 - a compatibility adapter duplicates acceptance, root, publication-prefix, or
   next-action policy instead of calling R4a;
-- the legal v0 publication inventory cannot be expressed as a closed
-  progress-aware §15.3.2 row;
+- a claimed A1-migration fixture cannot normalize to exactly one checked
+  §15.3.2 descriptor/hash and live Rust binding;
 - a persisted candidate's accepted lock is reconstructed or reserialized
   instead of adopting its exact `lock_yaml` bytes;
 - an accepted unborn root with a born live HEAD is accepted without verifying
@@ -2944,8 +3030,9 @@ Record-changing work remains blocked until:
 
 1. I1 freezes the M6 direction that v1 separates integration ref from final
    checkout while permitting only the existing checkout and no branch action;
-2. I1 freezes the M8 direction that v1 acceptance covers the complete
-   baseline/audit domain while permitting only required/participated outcomes;
+2. I1 freezes the M8 direction that v1 acceptance covers the complete accepted
+   metadata-base/audit domain while permitting only required/participated
+   outcomes;
 3. the schedule explicitly defers full M6 and M8 policy to I6/I8 because v1
    serializes none of those variants, with mandatory re-review before v2/v4;
 4. the complete v1 post-operation `LockArtifact` and member audit rules are
@@ -2962,32 +3049,34 @@ Record-changing work remains blocked until:
 8. every successful v1 no-publication result archives that same accepted
    workspace, including all-up-to-date results;
 9. v0 remains limited to M4/custom-message-compatible semantics, v1 adds
-   no-ff/acceptance, and the cumulative
+   no-ff/acceptance plus typed reverse/preservation/recovery ownership, and the cumulative
    v1-acceptance/v2-branch/v3-snapshot/v4-partial version allocation,
    `max(active_writer_floor, highest_requested_semantic_version)` creation
    rule, M5a-v0/A1-and-later-v1 floor, exact creation matrix, pre-intent freeze,
    and existing-record non-upgrade rule are approved;
-10. v1 contains only integration/no-ff/acceptance semantics executable by A1
-    and no dormant M6–M8 lifecycle variants;
+10. v1 contains only integration/no-ff/acceptance and current-lifecycle
+    durability semantics executable by A1, with no dormant M6–M8 variants;
 11. the ordered disjoint envelope registry/classifier, pinned append-only
    `GwzErrorCode` allocations/projections, adapters, unknown-field migration
    and subsequent
    current-version rewrite rules, container-retirement table, atomic-rename
    boundary, restart semantics, and old-binary behavior are frozen;
-12. the closed open-v0 publication-progress mapping covers every legal
+12. the disjoint open-v0 base-phase/lifecycle-overlay mapping covers every legal
     pre-acceptance, candidate, evidence, partial-publication, preservation,
     rollback, no-publication, and terminal-before-archive state, with exact
     lock-byte/root/prefix evidence, typed contradictions, and v0-equivalent
     next actions;
 13. open v0 `mode: no_ff` is rejected before adaptation/migration, the actual
     retained durable-v0 baseline failing fixture is frozen, the v0.9.2
-    pre-record downgrade behavior is frozen separately, and every other legal v0 row's migration
-    eligibility—including `RecoveryRequired` and operation drift—is explicit
-    and fixture-proven;
+    pre-record downgrade behavior is frozen separately, and migration
+    non-eligibility—including `RecoveryRequired`, operation drift,
+    preservation, and rollback—is explicit and fixture-proven as
+    valid-unlisted v0 behavior;
 14. archive decoding freezes the general per-supported-version rule plus only
     concrete v0/v1 projection bodies at I2; sibling terminal
     outcome/acceptance, unsupported-future non-deletion, cross-driver parity,
-    byte-stable reads, and live-independent GC are complete, while V2–V4
+    byte-stable reads, live-independent projection, and checked
+    archive-worklist GC are complete, while V2–V4
     bodies/discriminants remain owned by I6/I7/I8;
 15. §15.8 freezes tagged Rust/Python artifact sources, runtimes, digests,
     behavioral Linux/Windows lanes, full supported-platform release evidence,
@@ -3028,9 +3117,9 @@ A1 remains blocked until:
    contains no executable v2–v4 state or V2–V4 archive-projection
    body/discriminant;
 9. A1 creates ordinary/custom-message and no-ff operations as v1, never v0,
-   while §15.6-eligible open v0 uses only the approved atomic migration,
-   `RecoveryRequired`/operation-drift migration remains representation-only,
-   and v0 no-ff is rejected;
+   while §15.6-whitelisted open v0 uses only the approved atomic migration,
+   valid-unlisted v0 remains on its existing lifecycle, and v0 no-ff resume is
+   rejected;
 10. retained v0 readers fail closed on v1 while the A1 binary rejects
     representative v2/v3/v4 envelopes before body adaptation or mutation
     eligibility; and
@@ -3170,9 +3259,10 @@ reviewed A1 activation. No release may create a new-version open record until
 its installed finalizer understands and can resume every invariant and
 publication state that record can express.
 
-A1 activates only v1 integration/no-ff/acceptance semantics. I6/M6, I7/M7,
-and I8/M8 add and activate cumulative v2, v3, and v4 records through A2, A3,
-and A4 after actual checksum-pinned older Rust/Python readers prove typed
+A1 activates only v1 integration/no-ff/acceptance and the typed durability
+owners required to execute the current lifecycle safely. I6/M6, I7/M7, and
+I8/M8 add and activate cumulative v2, v3, and v4 records through A2, A3, and
+A4 after actual checksum-pinned older Rust/Python readers prove typed
 pre-mutation rejection. `writer_version` is diagnostic, not the compatibility
 contract.
 
@@ -3180,9 +3270,10 @@ For new operations, M5a has a v0 writer floor and A1 plus every later release
 has a v1 floor. No-ff requires v1; requested M6/M7/M8 semantics raise that
 floor to v2/v3/v4 via
 `max(active_writer_floor, highest_requested_semantic_version)`. Existing
-records keep their version; only the closed §15.6 open-v0 eligibility set is
-upgraded, including representation-only `RecoveryRequired`/operation-drift
-migration, and v0 no-ff is rejected.
+records keep their version; only the seven-rule §15.6 open-v0 whitelist is
+upgraded. Valid-unlisted recovery/drift/preservation/rollback/terminal rows
+stay v0, and v0 no-ff resume is rejected. A2–A4 still migrate eligible v0 only to v1, never
+directly to their current maximum.
 
 Archived v0 records use the evidence-only legacy projection; every supported
 v1–v4 archive uses its own persisted-acceptance decoder/projection. Terminal

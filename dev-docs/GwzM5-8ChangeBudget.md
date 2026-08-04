@@ -275,6 +275,44 @@ checks, and the Bazel build are green. Two independent post-implementation
 reviews report no remaining P0–P3 finding, including after the early-validation
 and reviewed file-ceiling remediations.
 
+### I1/I2 — v1 durability interface freeze
+
+Intentional production behavior delta: **none**. I1/I2 freeze interfaces and
+bind released v0 observations; executable v1 behavior remains in R4a/A1.
+
+Wire/protocol delta: **allocations and projection contracts only**. No generated
+protocol or runtime writer is activated in this package.
+
+The I2 reviews required exact retained-reader coverage for six future envelope
+pairs across eight lifecycle paths, three projections, and both retained
+v0.10.2 drivers. The resulting 301-case/314-result matrix cannot fit the R0
+closeout ceiling without making checked data unreviewable. This reviewed
+amendment replaces the affected R0 ceilings only for the I2 interface proof:
+
+| Ownership slice | Test/tool/doc LOC | Files | Additional boundary |
+| --- | ---: | ---: | --- |
+| retained-reader manifest/harness/evidence | ≤9,000 | ≤23 | readable templates; one checked result per line; every Python module <500 |
+| I2 compatibility registry/checker | ≤850 | ≤3 | separate from the R0 document-consistency checker |
+| v0 characterization plus I2 live binder | ≤2,750 aggregate | ≤9 touched/created | named owner ceilings below; all merge-path seams `#[cfg(test)]`; zero runtime delta |
+| I1/I2 contracts, direction memo, and plan integration | ≤2,500 | ≤7 | design/contract text and checked registry references only |
+
+The retained-reader expansion must remain a reviewed matrix/template, not a
+generated list or a minified giant line. For this named I2 characterization
+package, the amendment supersedes R0's 500-line-per-slice rule with exact owner
+ceilings: `characterization_preservation_v0.rs` ≤525,
+`characterization_v0.rs` ≤650, `compatibility_v0.rs` ≤650, and every other
+characterization owner ≤500. The ≤2,750 aggregate is the six files
+`characterization_{archive,preservation,publication_prefix,publication,v0}.rs`
+plus `compatibility_v0.rs`; it excludes registration, fixture, and test-only
+production seams. The compatibility binder exception keeps descriptor
+normalization, live observation, canonical hashing, and bidirectional registry
+inventory together; further growth reopens the split review.
+
+The nine touched/created Rust paths are the binder, two modified
+characterization owners, fixture and registration changes, and four test-only
+merge seams. The latter four are outside the characterization LOC aggregate and
+none is present in a non-test build.
+
 ## Package reporting template
 
 Every package handoff records:
