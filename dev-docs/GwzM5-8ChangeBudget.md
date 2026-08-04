@@ -2,7 +2,7 @@
 
 Date: 2026-07-31
 
-Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R4a independently accepted**
+Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R3 envelope foundation implemented and independently accepted**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -355,6 +355,49 @@ The final gate has 7 focused acceptance tests, 107 g23 merge/recovery tests,
 688 full core tests (687 passed, 1 ignored), 329 Python/native tests, strict
 all-target Clippy, formatting, and diff hygiene green. Two independent
 interface re-reviews returned **GO** with no P0–P3 finding.
+
+### R3 envelope and protocol foundation checkpoint
+
+Intentional production behavior delta: **strict fail-closed durable-record
+classification only**. Released v0 records retain their model, writer, rewrite,
+and lifecycle behavior. Malformed envelopes, allocated-but-unsupported pairs,
+and unknown valid pairs now follow the frozen I2 typed error contract before
+body adaptation or mutation.
+
+Wire/protocol delta: **the accepted I2 error slice**. Codes 46–61,
+`MergeRecordRequiredWave`, and optional `GwzError.record_context` are generated
+from taut and projected identically by core, Rust CLI, and Python/native
+human/JSON/JSONL paths. The production writer remains v0 and no v1 record,
+archive projection, or migration is published.
+
+The checkpoint stays within the frozen per-owner ceilings:
+
+| R3 slice | Review size | Evidence |
+| --- | ---: | --- |
+| mechanical v0 model split | 805 moved lines plus 25 net split/test wiring lines | lifecycle 163, plan 23, status 57, v0 wire 259, focused tests 315; no wire or behavior change |
+| strict envelope decoder | 623 production lines across four responsibility owners plus wiring | decode 48, header 167, raw YAML 261, scalar 136, module 11; 331 focused test lines |
+| store integration | 364-line store owner plus 157-line compatibility-error owner | one-read production-v0 dispatch, location-aware errors, fail-closed archive/retention/targeted GC; 393-line store test owner |
+| protocol and driver projection | bounded generated schema plus narrow adapters | taut-owned codes/context, boxed internal context, Rust and Python/native machine parity |
+
+`yaml-rust2` 0.11 is the one new direct dependency. It supplies the event
+stream needed to reject duplicate keys at every depth, anchors, aliases,
+semantic `<<` merge keys, multiple documents, and non-mapping roots in one
+parse. Cargo and Bazel locks contain the same resolved parser dependency. No
+affected handwritten implementation or test owner exceeds 500 lines; the
+strict decoder is deliberately split by parser, scalar resolution, header
+classification, and body dispatch responsibility.
+
+The production installed-version set is v0-only. The v1 dispatch arm exists
+only for header/unit tests; production exact-v1 input returns code 46 with A1
+context before body decoding. V1 writing, open-v0 migration, and atomic upgrade
+publication remain absent from the production call graph.
+
+The settled-tree closeout passed 710 core library tests with 1 ignored, every
+Rust integration suite, 329 Python/native tests and protocol regeneration,
+strict all-target/all-feature Clippy, formatting, diff hygiene, and the Bazel
+core/CLI build. Independent review returned **GO** with no P0–P3 finding. This
+accepts only the bounded envelope/protocol foundation; the remaining R3 work
+listed in the implementation plan is still required.
 
 ## Package reporting template
 

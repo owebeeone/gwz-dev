@@ -4,8 +4,10 @@ Date: 2026-07-30
 
 Status: **Review 8 and independent F5-2 incorporated; R0, R1, and R2a
 approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
-I1/I2 and R4a accepted after independent re-review; broader durable state gated by R3/R4b, v1 activation by A1, and later
-wave writers by A2–A4**
+I1/I2 and R4a accepted after independent re-review; the R3 strict-envelope
+foundation is implemented with v1 still disabled; broader durable state is
+gated by the remaining R3/R4b work, v1 activation by A1, and later wave writers
+by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
 `dev-docs/GwzM5-8Refactor-Review-2.md`,
@@ -2156,6 +2158,17 @@ R4a is a semantic extraction, not durable-state work. It introduces no new
 writer, migration, or accepted-workspace persistence.
 
 ### R3 — record and adapter implementation, writer disabled
+
+Checkpoint status (2026-08-04): the mechanical v0 model split, strict
+single-parse YAML envelope, ordered v0–v4 header allocation registry,
+production-v0 dispatcher, location-aware store errors, fail-closed archived
+GC, codes 46–61, and structured Rust/Python/JSON/JSONL record context are
+implemented. Production installs only the v0 body decoder; exact v1 returns
+`UnsupportedRecordVersion` with A1 context before body decoding. No v1 writer,
+open-v0 migration entry point, or production upgrade harness is reachable.
+Independent closeout review returned **GO** with no P0–P3 finding. This is the
+envelope/protocol foundation checkpoint, not completion of R3's v1 adapter,
+archive projection, unknown-field manifest, or test-only atomic upgrade work.
 
 - Implement the approved v0/v1 wire strategy and envelope dispatcher; do not
   compile dormant v2–v4 lifecycle variants into the A1 canonical model.
