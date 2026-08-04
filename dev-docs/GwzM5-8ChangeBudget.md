@@ -2,9 +2,8 @@
 
 Date: 2026-07-31
 
-Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R3 envelope,
-wire-shape, validated-model, unknown-field, open-v0 adapter, and
-archive-projection checkpoints independently accepted**
+Status: **R0, R1, R2a, M5a, I1/I2, R4a, and production-disabled R3
+complete; R4b is next**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -447,7 +446,24 @@ settled-tree reviews returned **GO** with no P0–P3 finding. Production store,
 status, retention, GC, protocol, CLI, Python/native, v1 writing, and migration
 remain unchanged and unreachable from this seam.
 
-The test-only atomic upgrade remains the final separate reviewed R3 slice.
+The final test-only atomic-upgrade slice is implemented and independently
+accepted. Its separate owners are 106 lines for pure v0-to-v1 preparation, 187
+for atomic store publication, and 411 for the real-Git/fault test package. The
+compatibility binder is 644/650 lines. The harness requires one sole named open
+v0 record, preserves every valid-unlisted or rejected source byte-exactly,
+stages all seven eligible rules through semantic and unknown-manifest
+verification, fsyncs before atomic replacement, and re-reads the published
+hash and model. Four fault points prove pre-rename v0 survival, stale-temp
+discovery exclusion, and post-rename v1 restart. A focused accepted-lock
+extension case proves exact authoritative lock bytes and the derived audit-row
+extension survive together.
+
+G23 passed 107/107. The final full core gate passed 801 tests with 1 ignored,
+plus integration groups 10/10, 27/27, 4/4, and 2/2; strict all-target/all-
+feature Clippy, formatting, and diff hygiene passed. Both independent
+settled-tree re-reviews returned **GO** with no P0–P3 finding. No v1 decoder,
+serializer, writer, upgrade entry point, or migration dispatch enters a normal
+production build. R3 is complete at its disabled-writer boundary; R4b is next.
 
 ## Package reporting template
 

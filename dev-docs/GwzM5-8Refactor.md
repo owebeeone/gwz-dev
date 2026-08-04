@@ -2197,7 +2197,7 @@ deletion. Exact v2–v4 and unknown envelopes still fail before body decoding;
 no v2–v4 projection bodies exist. The focused archive suite passed 17 tests,
 the full core library passed 801 with 1 ignored plus every integration suite,
 and two independent settled-tree reviews returned **GO** with no P0–P3
-finding. Only the test-only atomic upgrade remains outstanding within R3.
+finding.
 
 The open-v0 adapter checkpoint is now implemented behind `cfg(test)` and
 independently accepted. It performs true v0 structural validation, orders
@@ -2210,7 +2210,30 @@ candidate, acceptance, evidence, and publication-prefix contradictions retain
 their typed errors. G23 passed 107 tests, the full core library passed 782 with
 1 ignored plus every integration suite, and independent settled-tree re-review
 returned **GO** with no P0–P3 finding. Archive projection and the test-only
-atomic upgrade remain outstanding.
+atomic upgrade were completed in the subsequent R3 checkpoints.
+
+The final R3 atomic-upgrade checkpoint is now implemented behind `cfg(test)`
+and independently accepted. It requires the named record to be the sole valid
+open operation, leaves valid-unlisted, legacy no-ff, collision, and
+multi-record inputs byte-exact without staging, and prepares all seven eligible
+I2 rules through the validated v1 model. Publication uses a unique temporary,
+file fsync, staged byte/model/unknown-manifest verification, source contention
+check, atomic replacement, directory fsync, and published hash/model
+verification. Its four fault boundaries prove exact v0 survival before rename,
+stale-temporary exclusion from open-operation discovery, and restart from the
+published v1 record after rename. Exact accepted-lock member extensions are
+authorized only at their derived v1 audit-row destination and remain present
+in both authoritative lock bytes and the typed audit row. The 106-line
+preparer, 187-line store harness, and 411-line test owner remain below 500
+lines; the compatibility binder is 644/650. G23 passed 107 tests, the full core
+library passed 801 with 1 ignored plus integration groups 10/10, 27/27, 4/4,
+and 2/2, strict Clippy/format/diff gates passed, and both independent
+settled-tree re-reviews returned **GO** with no P0–P3 finding.
+
+R3 is therefore complete as a production-disabled machinery package. Normal
+builds still install only the v0 decoder and expose no v1 writer, serializer,
+upgrade entry point, runtime flag, or migration dispatch. R4b is the next
+package; A1 remains the only production activation point.
 
 - Implement the approved v0/v1 wire strategy and envelope dispatcher; do not
   compile dormant v2–v4 lifecycle variants into the A1 canonical model.
@@ -2222,8 +2245,8 @@ atomic upgrade remain outstanding.
   `ArchivedMergeProjection` seam from §15.3.3 are implemented behind
   `cfg(test)` without live dependencies; later waves add only their own
   decoder.
-- Implement the atomic upgrade algorithm behind `cfg(test)` or an equivalent
-  non-production harness; do not add a production runtime flag.
+- The atomic upgrade algorithm is implemented behind `cfg(test)` with no
+  production runtime flag.
 - Preserve or reject unknown nested fields exactly as specified.
 - Verify/project v1 and legacy-v0 archives without rewriting or upgrading them;
   reject v2–v4/unknown archives before targeted GC.
