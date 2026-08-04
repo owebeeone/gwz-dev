@@ -2,10 +2,10 @@
 
 Date: 2026-07-30
 
-Status: **Review 8 and independent F5-2 incorporated; R0, R1, R2a, and the
-M5a custom-message slice approved; `--no-ff` deferred to v1/A1; broader
-durable state gated by I1/I2, v1 activation by A1, and later wave writers by
-A2–A4**
+Status: **Review 8 and independent F5-2 incorporated; R0, R1, and R2a
+approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
+I1 approved; broader durable state gated by I2, v1 activation by A1, and later
+wave writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
 `dev-docs/GwzM5-8Refactor-Review-2.md`,
@@ -695,22 +695,31 @@ enum LockMembership {
 
 struct RootPublicationInput {
     base: AcceptedRootBase,
-    publication_branch: String,
+    publication_branch: Option<String>,
     baseline_artifact_hashes: RootArtifactHashes,
 }
 
 enum AcceptedRootBase {
-    Born { commit: String },
-    Unborn { symbolic_branch: String },
+    BornAttached { commit: String, symbolic_branch: String },
+    BornDetached { commit: String },
+    UnbornAttached { symbolic_branch: String },
 }
 ```
 
 This is the cumulative target. The v1 wire/canonical acceptance type is a
 closed M4/M5 specialization: every selected member is required, no member is
-skipped, integration occurs on the existing target checkout, and source
-provenance is direct-ref. It does not serialize dormant M6–M8 enum variants.
-Later adapters lift v1 acceptance into their richer installed model without
-rewriting the original record version.
+skipped, integration occurs on the same existing attached, born local branch
+and finishes attached to that exact ref, and source provenance is direct-ref.
+Selected-detached integration remains unsupported. It does not serialize
+dormant M6–M8 enum variants. Later adapters lift v1 acceptance into their
+richer installed model without rewriting the original record version.
+
+In v1 every selected member is `Present` with its verified complete result row,
+and every unselected baseline-present member remains `Present` with its
+unchanged authoritative baseline row, whether materialized or not. An audit
+member with no baseline lock row and no selected result is `Absent` without
+invented checkout or lock evidence. The complete lock's member keys equal
+exactly the `Present` audit keys; `Absent` is not a v1 skip or partial outcome.
 
 `LockArtifact` is not stored a second time inside `AcceptedLock`. It is the
 validated in-memory parse of `exact_yaml`. This removes one redundant durable
@@ -746,22 +755,28 @@ The I8 M8/v4 checkpoint must decide which participation outcomes produce
 `KeepBaseline` versus `Excluded` before that decision.
 
 The root is not a `LockArtifact` member. `RootPublicationInput` records the
-accepted born/unborn root base and metadata authority used to decide and, when
-needed, begin publication.
+accepted checkout and metadata authority used to decide and, when possible,
+begin publication.
 
 `AcceptedRootBase` has no empty, sentinel, or synthetic object ID:
 
-- `Born.commit` equals the durable accepted root result when `@root`
-  participated, or the frozen baseline root head when it did not.
-- `Unborn.symbolic_branch` is legal only when the frozen baseline and accepted
-  live precondition both identify that exact attached unborn branch.
-- an explicitly selected `@root` cannot produce an unborn base after successful
-  integration; current root integration requires a real resulting commit.
-- `publication_branch` must equal the accepted attached symbolic branch in both
-  born and unborn cases.
-- evidence creation uses `Some(commit)` for `Born` and `None` for `Unborn`,
-  preserving the checked first-commit and rollback behavior already released
-  in M4.
+- `BornAttached.commit` equals the durable accepted root result when `@root`
+  participated, or the frozen attached baseline root head when it did not;
+  `symbolic_branch` is the exact attached local branch.
+- `BornDetached.commit` preserves the already legal all-up-to-date,
+  no-publication baseline case without inventing a branch. It is invalid when
+  `@root` participated or when the accepted workspace requires publication.
+- `UnbornAttached.symbolic_branch` is legal only when the frozen baseline and
+  accepted live precondition both identify that exact attached unborn branch.
+- an explicitly selected `@root` produces `BornAttached` after successful
+  integration; current root integration requires a real commit and an existing
+  attached local branch.
+- `publication_branch` is `Some` with the exact accepted symbolic branch for
+  attached inputs and `None` for `BornDetached`. Publication-required
+  acceptance rejects unless that value is present.
+- evidence creation uses `Some(commit)` for `BornAttached` and `None` for
+  `UnbornAttached`, preserving the checked first-commit and rollback behavior
+  already released in M4. `BornDetached` never creates evidence.
 
 The composition/evidence commit created by publication remains an output in
 `PublicationProgress`. This avoids treating the publication-created root
@@ -1278,8 +1293,10 @@ The v0 adapter may synthesize only facts guaranteed by M4:
 - outcome derived only from legal M4 lifecycle state, never skipped;
 - existing pending merge action mapped to typed integration action; and
 - the exact complete M4 lock/root publication semantics, mapping a selected
-  root result or `baseline.root_head = Some(...)` to `Born` and an attached
-  `baseline.root_head = None` plus exact `root_branch` to `Unborn`.
+  root result to `BornAttached`, an unselected born baseline to
+  `BornAttached` or `BornDetached` according to its exact checkout, and an
+  attached `baseline.root_head = None` plus exact `root_branch` to
+  `UnbornAttached`.
 
 It rejects a v0 record when those facts cannot be established safely.
 In particular, unborn adaptation requires the frozen accepted symbolic branch;
@@ -1300,8 +1317,8 @@ live observation ─────────────────────
 ```
 
 Those functions are extracted behavior-preservingly in R4a before the adapter
-or any new writer. They own complete-lock construction, accepted born/unborn
-root derivation, publication-required classification, candidate/prefix
+or any new writer. They own complete-lock construction, accepted root-checkout
+derivation, publication-required classification, candidate/prefix
 reconciliation, and the next legal lifecycle action.
 
 The adapter may select a version-specific wire representation, but it may not
@@ -1315,18 +1332,18 @@ The minimum mapping is:
 | Row | Legal v0 state/evidence | `AcceptedWorkspace` and lock-byte source | Accepted root input | Exact allowed observation | Next action | Typed contradiction |
 | --- | --- | --- | --- | --- | --- | --- |
 | A | `Executing`, `AwaitingResolution`, or `Halted`; pre-acceptance `Preserving`/`RollingBack`; no candidate/evidence | Absent | Not yet derived | Existing v0 participant, preservation, and rollback observation | Resume the same v0 lifecycle; construct no acceptance yet | `UnexpectedAcceptanceEvidence` |
-| B | `Finalizing`; publication absent or `NotStarted`/`ValidatingResults`/`PreparingCandidate`; candidate absent | Construct now through R4a from the recorded baseline and verified participant results | Derive `Born(commit)` from the selected-root result/baseline commit or `Unborn(symbolic_branch)` from the exact attached baseline | Live participants/root exactly match the pre-evidence accepted base | Persist acceptance, then derive publication-required | `AcceptanceInputDrift` |
+| B | `Finalizing`; publication absent or `NotStarted`/`ValidatingResults`/`PreparingCandidate`; candidate absent | Construct now through R4a from the recorded baseline and verified participant results | Derive `BornAttached` from the selected-root result/attached baseline, `BornDetached` from the exact detached born baseline, or `UnbornAttached` from the exact attached unborn baseline; detached is legal only if publication is not required | Live participants/root exactly match the pre-evidence accepted checkout | Persist acceptance, then derive publication-required; reject detached if publication is required | `AcceptanceInputDrift` |
 | C | Candidate persisted; no evidence commit attempted | Recover from exact `candidate.lock_yaml`; verify its recorded digest; never reserialize | Same immutable R4a base as B, cross-checked with candidate publication branch and root-participation result | Candidate metadata valid; live root exactly matches accepted pre-evidence base; no candidate prefix published | Persist recovered acceptance, then create evidence | `CandidateIntegrityMismatch` |
 | D | Candidate persisted; `composition_commit` absent; live root may contain an interrupted first/evidence commit | Recover from exact candidate bytes/hash | Same immutable accepted base as C; any evidence commit is publication output, not a replacement input | Adopt a born live root only when the exact scoped evidence commit verifies against the accepted parent (`None` for unborn), branch, message, files, tree, and candidate hashes | Persist recovered acceptance and exact evidence output | `AmbiguousEvidenceCommit` |
 | E | `composition_commit`/`composition_tree` recorded; publication not started | Recover from exact candidate bytes/hash | Same immutable accepted base as C; recorded composition remains separate output | Recorded evidence commit verifies exactly and live root is that commit | Publish or reconcile the first candidate prefix | `RecordedEvidenceDrift` |
 | F | `PublishingCandidate` with any legal observed partial candidate-publication prefix | Recover from exact candidate bytes/hash | Same immutable accepted base as C; recorded composition remains separate output | Root evidence is exact; the live marker/lock/boundary/staging state equals one prefix of the M4 write order using the recorded candidate bytes/hashes | Reconcile the observed prefix and resume publication | `PublicationPrefixMismatch` |
 | G | Candidate fully published; `VerifyingPublication` or publication `Complete` before archive | Recover from exact candidate bytes/hash | Same immutable accepted base as C; recorded composition remains separate output | Root evidence and every candidate file/hash verify exactly | Verify/complete, then archive | `PublishedCandidateMismatch` |
 | H | `Preserving` with candidate, evidence, root-preservation, or publication-prefix state | Recover from exact candidate when present; otherwise remain pre-acceptance as row A | Same accepted base as its source row, or absent for pre-acceptance A | Backup/stash evidence, root evidence, and preserved prefix match the recorded preservation state | Resume preservation or guarded abort | `PreservationEvidenceMismatch` |
-| I | `RollingBack` or evidence-rollback state | Retain recovered acceptance when it had been frozen/recoverable; otherwise remain pre-acceptance | Same accepted base as its source row; rollback never rewrites it | Each reversed prefix is exact; recorded evidence rollback returns root to the original born/unborn base | Resume checked reverse rollback, then abort/archive | `RollbackEvidenceMismatch` |
-| J | All-up-to-date no-publication `Complete`; candidate/evidence absent | Construct through R4a from the recorded baseline and complete verified unchanged audit | Derive the same exact born/unborn baseline input as B; no publication output exists | Root matches its accepted born/unborn base; no candidate prefix exists | Persist acceptance, record publication-not-required, then archive | `UnexpectedPublicationEvidence` |
+| I | `RollingBack` or evidence-rollback state | Retain recovered acceptance when it had been frozen/recoverable; otherwise remain pre-acceptance | Same accepted base as its source row; rollback never rewrites it | Each reversed prefix is exact; recorded evidence rollback returns root to the original accepted checkout | Resume checked reverse rollback, then abort/archive | `RollbackEvidenceMismatch` |
+| J | All-up-to-date no-publication `Complete`; candidate/evidence absent | Construct through R4a from the recorded baseline and complete verified unchanged audit | Derive the same exact attached-born, detached-born, or attached-unborn baseline input as B; no publication output exists | Root matches its accepted checkout; no candidate prefix exists | Persist acceptance, record publication-not-required, then archive | `UnexpectedPublicationEvidence` |
 | K | Terminal `Completed` record still open before archive | Recover by C–G when candidate-bearing, or J when no-publication | Same immutable accepted base as the source row | Corresponding candidate/no-publication evidence is exact | Archive without Git mutation | `TerminalEvidenceMismatch` |
 | L | `RecoveryRequired` with any publication state | Classify by the exact source row A–J; do not invent missing acceptance | Same accepted base as the source row, if one exists | Source-row evidence plus the durable drift/recovery reason are mutually consistent | Remain recovery-required and report the typed recovery action; make no automatic mutation | `RecoveryEvidenceMismatch` |
-| M | Terminal `Aborted` record still open before archive | Retain recovered acceptance only if its source row had one | Same immutable accepted base as the source row | Publication/evidence rollback is complete and the live root is the original born/unborn base | Archive without Git mutation | `TerminalRollbackMismatch` |
+| M | Terminal `Aborted` record still open before archive | Retain recovered acceptance only if its source row had one | Same immutable accepted base as the source row | Publication/evidence rollback is complete and the live root is the original accepted checkout | Archive without Git mutation | `TerminalRollbackMismatch` |
 
 The exact enum combinations for each row are frozen from the R0 legal-state
 inventory. Unknown or contradictory combinations are not coerced into the
@@ -1347,8 +1364,11 @@ relationships before it can supply acceptance.
 The accepted root base is derived once from the selected root result or frozen
 baseline. Its allowed live observation then depends on publication progress:
 
-- before evidence creation, live root must equal `Born.commit` or the exact
-  attached `Unborn.symbolic_branch`;
+- before evidence creation, live root must equal the exact `BornAttached`
+  commit/branch, exact detached `BornDetached` commit, or exact attached
+  `UnbornAttached.symbolic_branch`;
+- a `BornDetached` input is legal only for deterministic no-publication and is
+  never eligible for an evidence or candidate-publication step;
 - an unrecorded born live HEAD for an accepted unborn base is adopted only when
   it verifies as the exact first scoped evidence commit with `parent = None`;
 - after `composition_commit` is recorded, the born live root is valid only when
@@ -1356,8 +1376,8 @@ baseline. Its allowed live observation then depends on publication progress:
 - during partial publication, filesystem/index state must match exactly one
   legal M4 write-order prefix justified by the durable step and recorded
   candidate bytes/hashes; and
-- after evidence rollback, live root must again equal the original born/unborn
-  base.
+- after evidence rollback, live root must again equal the original accepted
+  attached-born or attached-unborn base.
 
 For every row, the compatibility result freezes:
 
@@ -1952,6 +1972,10 @@ M5a proves only the v0-safe message/integration gate.
 
 ### I1 — v1 directional interface memo
 
+Status: **accepted; I2 unblocked** (2026-08-04). Two independent interface
+reviews found no remaining P0–P3 issue after the root-checkout and
+lock-membership clarifications.
+
 - Freeze the M6 direction needed by v1: member audit separates integration ref
   from final checkout, but v1 permits only the existing checkout and contains
   no create/switch/restore/delete action or ownership claim.
@@ -1959,7 +1983,7 @@ M5a proves only the v0-safe message/integration gate.
   lock/audit domain, but every selected v1 participant is
   required/participated and no skip/partial variant exists.
 - Keep root integration input separate from publication output and retain the
-  born/unborn model.
+  attached-born/detached-born/attached-unborn checkout matrix.
 - Confirm the v1 preservation/publication ownership seams can be extended by
   later versions without predeclaring their policies.
 
@@ -1985,8 +2009,9 @@ policy freezes at I8 before v4. No durable schema is frozen during I1.
   publication input, current preservation ownership, and rollback evidence.
 - Exclude M6 branch ownership/actions, M7 snapshot source, and M8
   optional/skipped outcomes from the v1 wire/canonical model.
-- Freeze the born/unborn accepted-root model and its checked first-evidence
-  commit/rollback invariants.
+- Freeze the attached-born/detached-born/attached-unborn accepted-root model,
+  detached no-publication rule, and checked first-evidence commit/rollback
+  invariants.
 - Freeze `AcceptedWorkspace` as immutable persisted evidence before the
   publication-required decision, including its record location and all
   lock/audit/root cross-field invariants.
@@ -1996,7 +2021,7 @@ policy freezes at I8 before v4. No durable schema is frozen during I1.
   machine projections for unsupported record version, unsupported legacy mode,
   and archived-record unreadability.
 - Freeze the closed v0 publication-progress mapping, exact candidate-lock byte
-  authority, stage-dependent born/unborn live-root rules, typed contradiction
+  authority, stage-dependent accepted-root-checkout rules, typed contradiction
   results, and the requirement that adaptation preserve the v0 next action.
 - Freeze the general per-supported-version archive rule plus only the concrete
   legacy-v0 and persisted-v1 projection bodies: sibling terminal
@@ -2022,7 +2047,7 @@ on the hardest future product policies.
 
 ### R4a — behavior-preserving acceptance extraction
 
-- Extract complete-lock construction, born/unborn accepted-root derivation,
+- Extract complete-lock construction and accepted-root-checkout derivation,
   publication-required classification, candidate-prefix reconciliation, and
   next-action selection as pure functions with exact M4 behavior.
 - Characterize every legal v0 publication state through the closed §15.3.2
@@ -2304,7 +2329,8 @@ Use exhaustive tables for:
 - attached-unborn legality only when baseline/live branch evidence agrees;
 - rejection of unborn accepted roots after successful explicit-root
   integration;
-- publication-branch agreement with the accepted born/unborn branch;
+- publication-branch agreement with the accepted attached branch whenever
+  publication is required, and explicit rejection of detached publication;
 - publication-required versus no-publication derivation only from a frozen
   accepted workspace;
 - separate root publication input/output legality; and
@@ -2924,8 +2950,9 @@ Record-changing work remains blocked until:
    serializes none of those variants, with mandatory re-review before v2/v4;
 4. the complete v1 post-operation `LockArtifact` and member audit rules are
    deterministic for selected and unselected members;
-5. accepted root input distinguishes born commits from exact attached-unborn
-   symbolic branches without sentinels and retains M4 checked first-commit and
+5. accepted root input distinguishes attached-born, detached-born, and exact
+   attached-unborn checkouts without sentinels; detached-born is legal only
+   for no-publication, while attached inputs retain M4 checked first-commit and
    rollback behavior;
 6. root integration input is distinct from publication-created output;
 7. `AcceptedWorkspace` is frozen as immutable persisted evidence before the
@@ -2983,7 +3010,7 @@ Record-changing work remains blocked until:
 A1 remains blocked until:
 
 1. R4a is the single semantic owner for complete-lock construction, accepted
-   born/unborn roots, publication-required classification, candidate-prefix
+   root checkouts, publication-required classification, candidate-prefix
    reconciliation, and next-action selection;
 2. R3's production writer and migration paths are demonstrably unreachable;
 3. R4b makes every finalization, continuation, preservation, abort, rollback,
@@ -3130,7 +3157,8 @@ Do not approve v1 work until I1 records the M6 checkout-evidence and M8
 lock-domain directions and I2 passes the newly-writable-shape reader gate,
 retained-binary harness, disjoint envelope classification, semantic-wave/
 writer-floor versioning, open-v0 and all-version archive adaptation,
-born/unborn root, no-publication acceptance, and rewrite-preservation gates.
+accepted-root-checkout, no-publication acceptance, and rewrite-preservation
+gates.
 Full M6/M8 product policy intentionally waits for I6/I8 because v1 serializes
 none of those executable variants.
 
