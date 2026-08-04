@@ -2,7 +2,7 @@
 
 Date: 2026-07-31
 
-Status: **R0, R1, and R2a complete; freezes the M5a review ceilings**
+Status: **R0, R1, R2a, and M5a complete; M5a independently accepted**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -234,7 +234,7 @@ activated; the durable v0 record shape and enum values do not change.
 
 | Ownership slice | Production LOC | Test/doc LOC | Files touched/created |
 | --- | ---: | ---: | ---: |
-| core lifecycle/message construction | ≤180 | ≤350 | ≤6 |
+| core lifecycle/message construction | ≤180 | ≤350 | ≤9 unique (≤5 production; ≤5 test-bearing) |
 | Rust CLI request/help/rendering | ≤100 | ≤250 | ≤5 |
 | Python client/CLI/parity | ≤120 | ≤300 | ≤6 |
 | public capability/generated-doc source updates | 0 runtime | ≤200 | ≤5 |
@@ -242,6 +242,38 @@ activated; the durable v0 record shape and enum values do not change.
 M5a must reject `--no-ff` before record creation. No path may serialize
 `mode: no_ff`, advertise no-ff as available, introduce a v1 writer, or alter
 the v0 record schema.
+
+The original six-file core ceiling was stopped and reviewed when the complete
+release-gate evidence reached nine unique files: five narrow production owners
+and five test-bearing files, with `validate.rs` counted in both groups. The
+reviewed nine-file ceiling keeps the production surface at five and permits
+the distinct start/restart, validation, preservation/abort, and root
+finalization proof domains without combining unrelated tests into a god file.
+
+The implemented M5a slice is within every frozen ceiling:
+
+| Ownership slice | Measured production net | Measured test/doc net | Files |
+| --- | ---: | ---: | ---: |
+| core lifecycle/message construction | +17 | +132 focused test | 9 unique: 5 production; 5 test-bearing |
+| Rust CLI request/help | +5 | +5 test | 1 production; 1 test |
+| Python client/CLI/parity | +2 | +155 test | 1 production; 2 test |
+| public capability/generated-doc sources | 0 | +28 doc/tool | 5 |
+
+No production line moved and no protocol, durable-record, event, response, or
+enum shape changed. `MergeRequest.message` was already present on both driver
+surfaces; M5a exposes it only for start, validates it through the R2a owner,
+and continues to reject `no_ff` before record creation. The exact custom bytes
+are proven across immediate true merge, persisted restart, conflict resolution,
+interrupted preserve-abort recovery, and a root-participant true merge. Actual
+Rust/Python executions match in human, JSON, and JSONL modes. Root composition
+publication retains its separate message. Every touched handwritten
+implementation or test file remains below the 500-line review trigger.
+
+Formatting, full Rust tests, strict Clippy, full Python/native tests, generated
+protocol/reference freshness, document consistency, retained-reader offline
+checks, and the Bazel build are green. Two independent post-implementation
+reviews report no remaining P0–P3 finding, including after the early-validation
+and reviewed file-ceiling remediations.
 
 ## Package reporting template
 
