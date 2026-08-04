@@ -2,7 +2,7 @@
 
 Date: 2026-07-31
 
-Status: **R0 baseline; freezes R0, R1, R2a, and M5a review ceilings**
+Status: **R0, R1, and R2a complete; freezes the M5a review ceilings**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -191,6 +191,37 @@ Allowed scope is exact source, current target branch, before/source commits,
 custom-message bytes, and current prepared-commit recovery. Checkout intent,
 branch ownership, optional participation, snapshot provenance, accepted
 workspace persistence, and composition policy are forbidden.
+
+The implemented R2a seam measures **+141 net production lines**, no more than
+**180 moved production lines**, and approximately **221 test lines**. It
+touches four test-bearing paths. Production accounting is eight physical paths:
+the six semantic live paths frozen by the checkpoint, an import-only cleanup in
+the `continue_op.rs` parent, and the deleted `pending.rs` path replaced by
+`integration.rs`. Seven production paths remain after the change. The
+post-implementation review therefore considers an explicit eight-path ceiling;
+the extra live path adds no ownership, behavior, wire value, or recovery
+decision. The deleted and replacement paths are counted separately rather than
+hidden as a similarity-based rename.
+
+An independent interface review found one pre-implementation P1: contradictory
+pending-action and participant resolution parents could be trusted by separate
+recovery paths. The corrected seam fails closed when a present
+`expected_merge_head` differs from the frozen source commit, while preserving
+the released v0 absent-field fallback. Both interface reviewers approved the
+amendment before implementation. Full Rust, strict Clippy, formatting,
+protocol, Python parity, document-consistency, retained-reader, and Bazel build
+gates are green.
+
+The Bazel gate also refreshed the generated root `MODULE.bazel.lock` for the
+already-landed Windows-only `windows-sys` dependency. This is build metadata
+catch-up from the current committed Cargo manifests, not R2a production or a
+new dependency introduced by R2a; it is included in the R2a scope review so it
+cannot pass unnoticed.
+
+Two independent post-implementation reviews returned **PASS** with no P0–P3
+finding. They accepted the eight-physical/seven-live-path exception and the
+generated Bazel-lock catch-up. R2a is therefore closed at the measured values
+above.
 
 ### M5a — v0-safe custom messages
 
