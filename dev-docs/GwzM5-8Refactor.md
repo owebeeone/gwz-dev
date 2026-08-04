@@ -2170,12 +2170,18 @@ Independent closeout review returned **GO** with no P0–P3 finding. This is the
 envelope/protocol foundation checkpoint, not completion of R3's v1 adapter,
 archive projection, unknown-field manifest, or test-only atomic upgrade work.
 
-Next R3 wire slice (2026-08-04): the exact v1 accepted-workspace, recovery,
-rollback, preservation, and complete record shapes are implemented behind
-`cfg(test)`, including test-only serialization and strict same-tree body
-decoding. Production still compiles no v1 body, serializer, writer, or
-migration path. Byte-only validation, the opaque canonical adapter, archive
-projection, unknown-field manifest, and atomic upgrade remain outstanding.
+Next R3 model checkpoint (2026-08-04): the exact v1 accepted-workspace,
+recovery, rollback, preservation, and complete record shapes now have strict
+byte-only validation and an opaque canonical adapter behind `cfg(test)`.
+Validation closes baseline authority, selected target/root identity and order,
+participant/action/lifecycle state, acceptance, publication, terminal,
+rollback, and preservation cross-fields before canonicalization. Production
+still compiles no v1 body, serializer, writer, or migration path. Focused v1
+validation passed 39 tests, record-wire passed 17, the full core library passed
+760 with 1 ignored plus every integration suite, and the independent settled-
+tree review returned **GO** with no P0–P3 finding. The identity-aware unknown-
+field manifest, open-v0 adapter, archive projection, and test-only atomic
+upgrade remain outstanding.
 
 - Implement the approved v0/v1 wire strategy and envelope dispatcher; do not
   compile dormant v2–v4 lifecycle variants into the A1 canonical model.

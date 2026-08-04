@@ -2,7 +2,7 @@
 
 Date: 2026-07-31
 
-Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R3 envelope foundation implemented and independently accepted**
+Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R3 envelope, wire-shape, and validated-model foundations independently accepted**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -399,12 +399,21 @@ core/CLI build. Independent review returned **GO** with no P0–P3 finding. This
 accepts only the bounded envelope/protocol foundation; the remaining R3 work
 listed in the implementation plan is still required.
 
-The next R3 wire-shape slice adds 327 test-only production-shaped lines across
+The next R3 wire-shape slice added 327 test-only production-shaped lines across
 four owners (accepted workspace 120, action journals 149, complete record 48,
 module wiring 10), plus a sub-500-line golden test owner and a narrow test-only
-strict decoder entry point. It compiles no v1 body or serializer into a normal
-library build and introduces no writer or migration call path. Full byte-only
-validation and canonical adaptation remain a separate reviewed slice.
+strict decoder entry point. The following validated-model checkpoint adds
+strict baseline, participant/action/lifecycle, acceptance, publication,
+rollback, and preservation cross-field validation plus an opaque canonical
+adapter. Responsibilities are split across sub-500-line source and test
+owners. Focused v1 validation passed 39 tests, record-wire passed 17, the full
+core library passed 760 with 1 ignored plus every integration suite, and the
+settled-tree independent review returned **GO** with no P0–P3 finding.
+
+Both checkpoints compile no v1 body or serializer into a normal library build
+and introduce no production writer or migration call path. The identity-aware
+unknown-field manifest, open-v0 adapter, archive projection, and test-only
+atomic upgrade remain separate reviewed R3 slices.
 
 ## Package reporting template
 
