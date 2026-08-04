@@ -131,6 +131,34 @@ Wire/protocol delta: **none**.
 | store seam/persistence extraction | ≤100 | ≤400 | ≤200 | ≤4 | ≤3 |
 | participant semantic policy extraction | ≤250 | ≤500 | ≤400 | ≤6 | ≤5 |
 
+The table above is the pre-implementation budget. The mandatory R1 scope
+review was triggered after the frozen interface reviews required exhaustive
+state, aggregate-precedence, rollback, missing-repository, conflict-validation,
+drift-order, and root-override matrices. Two independent post-implementation
+reviews found no P0/P1/P2 defect and accepted this measured adjustment:
+
+| R1 execution slice | Reviewed production net | Reviewed moved production | Reviewed test LOC | Reviewed files |
+| --- | ---: | ---: | ---: | --- |
+| runtime extraction | ≤120 | ≤900 | 666 moved; ≤250 new | ≤6 production; ≤4 test |
+| store extraction | ≤100 | ≤400 | 182 moved; ≤200 new | ≤4 production; ≤3 test |
+| participant semantic policy | ≤500 | ≤650 | ≤1,550 | ≤6 semantic production; 14 named lifecycle call sites; ≤8 test |
+
+The measured participant slice has 968 lines in its five semantic production
+files, while the named lifecycle call sites add 139 and remove 647 lines. Its
+physical net is therefore **+460 production lines**. The moved/centralized
+figure is conservatively bounded by all 647 removed call-site lines rather than
+using similarity heuristics to hide semantic growth. The eight focused test
+files contain **1,489 lines**. No production, wire, record, event, error, or
+mutation-order scope was added.
+
+`participant_semantics/status.rs` has 518 production lines. The independent
+reviews accepted a 550-line reviewed ceiling because its expected-head,
+ordered-drift, normalized-fact, missing-repository, validation-overlay, and
+root-override policy is one cohesive projection. Its tests live in separate
+files, and every other new R1 implementation or test file remains below 500
+lines. Further growth reopens the split review; the exception is not a general
+increase to the 500-line target.
+
 Allowed production ownership:
 
 - `gwz-core/src/workspace_ops/merge/mod.rs`;
