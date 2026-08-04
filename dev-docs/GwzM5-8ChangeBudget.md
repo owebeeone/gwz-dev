@@ -411,9 +411,15 @@ core library passed 760 with 1 ignored plus every integration suite, and the
 settled-tree independent review returned **GO** with no P0–P3 finding.
 
 Both checkpoints compile no v1 body or serializer into a normal library build
-and introduce no production writer or migration call path. The identity-aware
-unknown-field manifest, open-v0 adapter, archive projection, and test-only
-atomic upgrade remain separate reviewed R3 slices.
+and introduce no production writer or migration call path. The next reviewed
+slice adds the identity-aware v0/v1 unknown-field manifest, semantic
+sequence/action/error identities, collision-checked survivor overlay, all four
+v0 top-level collision rejects, and location-correct archived contradiction
+projection. It is split across sub-500-line source and test owners; record-wire
+passed 38 tests, the full core library passed 783, strict Clippy/format/diff
+hygiene passed, and independent re-review returned GO with no P0–P3 finding.
+The open-v0 adapter, archive projection, and test-only atomic upgrade remain
+separate reviewed R3 slices.
 
 ## Package reporting template
 

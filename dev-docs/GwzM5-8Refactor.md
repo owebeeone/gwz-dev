@@ -2179,9 +2179,13 @@ rollback, and preservation cross-fields before canonicalization. Production
 still compiles no v1 body, serializer, writer, or migration path. Focused v1
 validation passed 39 tests, record-wire passed 17, the full core library passed
 760 with 1 ignored plus every integration suite, and the independent settled-
-tree review returned **GO** with no P0–P3 finding. The identity-aware unknown-
-field manifest, open-v0 adapter, archive projection, and test-only atomic
-upgrade remain outstanding.
+tree review returned **GO** with no P0–P3 finding. The subsequent
+identity-aware v0/v1 unknown-field checkpoint is also implemented and
+independently accepted: stable sequence/action/error identities prevent
+extension rebinding, every surviving overlay is compared with its exact
+expected manifest, and all four v0 top-level v1 collisions fail closed.
+Production still compiles no v1 body, writer, or migration path. The open-v0
+adapter, archive projection, and test-only atomic upgrade remain outstanding.
 
 - Implement the approved v0/v1 wire strategy and envelope dispatcher; do not
   compile dormant v2–v4 lifecycle variants into the A1 canonical model.
