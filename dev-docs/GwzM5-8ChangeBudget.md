@@ -399,6 +399,13 @@ core/CLI build. Independent review returned **GO** with no P0–P3 finding. This
 accepts only the bounded envelope/protocol foundation; the remaining R3 work
 listed in the implementation plan is still required.
 
+The next R3 wire-shape slice adds 327 test-only production-shaped lines across
+four owners (accepted workspace 120, action journals 149, complete record 48,
+module wiring 10), plus a sub-500-line golden test owner and a narrow test-only
+strict decoder entry point. It compiles no v1 body or serializer into a normal
+library build and introduces no writer or migration call path. Full byte-only
+validation and canonical adaptation remain a separate reviewed slice.
+
 ## Package reporting template
 
 Every package handoff records:
