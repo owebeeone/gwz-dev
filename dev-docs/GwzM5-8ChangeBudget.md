@@ -2,7 +2,9 @@
 
 Date: 2026-07-31
 
-Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R3 envelope, wire-shape, and validated-model foundations independently accepted**
+Status: **R0, R1, R2a, M5a, I1/I2, and R4a complete; R3 envelope,
+wire-shape, validated-model, unknown-field, and open-v0 adapter checkpoints
+independently accepted**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -418,8 +420,22 @@ v0 top-level collision rejects, and location-correct archived contradiction
 projection. It is split across sub-500-line source and test owners; record-wire
 passed 38 tests, the full core library passed 783, strict Clippy/format/diff
 hygiene passed, and independent re-review returned GO with no P0–P3 finding.
-The open-v0 adapter, archive projection, and test-only atomic upgrade remain
-separate reviewed R3 slices.
+The following open-v0 adapter checkpoint is also implemented and independently
+accepted. Its test-only owners are 349 adapter, 165 baseline-recovery, 474
+descriptor, and 352 structural-validation lines, each below the 500-line R3
+ceiling. The 641-line compatibility binder remains inside its reviewed
+650-line exception; a separate 193-line edge owner covers legacy action,
+baseline recovery, valid-unlisted, and no-ff precedence cases. The adapter
+binds typed and raw v0 evidence, recovers missing baseline bytes only from the
+closed I2 sources, verifies live evidence and invariant-specific errors, maps
+unknown fields losslessly, and produces a fully validated canonical v1 model.
+All code remains behind `cfg(test)`; production still has no v1 writer or
+migration path. G23 passed 107 tests, the full core library passed 782 with 1
+ignored plus every integration suite, strict Clippy/format/diff gates passed,
+and independent re-review returned GO with no P0–P3 finding.
+
+Archive projection and test-only atomic upgrade remain separate reviewed R3
+slices.
 
 ## Package reporting template
 

@@ -4,10 +4,10 @@ Date: 2026-07-30
 
 Status: **Review 8 and independent F5-2 incorporated; R0, R1, and R2a
 approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
-I1/I2 and R4a accepted after independent re-review; the R3 strict-envelope
-foundation is implemented with v1 still disabled; broader durable state is
-gated by the remaining R3/R4b work, v1 activation by A1, and later wave writers
-by A2–A4**
+I1/I2 and R4a accepted after independent re-review; the R3 strict-envelope,
+validated-model, unknown-field, and open-v0 adapter checkpoints are implemented
+with v1 still disabled; broader durable state is gated by the remaining
+R3/R4b work, v1 activation by A1, and later wave writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
 `dev-docs/GwzM5-8Refactor-Review-2.md`,
@@ -2184,8 +2184,20 @@ identity-aware v0/v1 unknown-field checkpoint is also implemented and
 independently accepted: stable sequence/action/error identities prevent
 extension rebinding, every surviving overlay is compared with its exact
 expected manifest, and all four v0 top-level v1 collisions fail closed.
-Production still compiles no v1 body, writer, or migration path. The open-v0
-adapter, archive projection, and test-only atomic upgrade remain outstanding.
+Production still compiles no v1 body, writer, or migration path.
+
+The open-v0 adapter checkpoint is now implemented behind `cfg(test)` and
+independently accepted. It performs true v0 structural validation, orders
+envelope and legacy no-ff rejection before matching, recovers omitted baseline
+bytes only from the closed I2 sources, binds raw unknown fields to the decoded
+record, verifies the exact seven-rule record/live descriptors, and validates
+the resulting canonical v1 model. Structurally valid unlisted modes, lifecycle
+states, participant outcomes, and multi-member workspaces stay on v0; genuine
+candidate, acceptance, evidence, and publication-prefix contradictions retain
+their typed errors. G23 passed 107 tests, the full core library passed 782 with
+1 ignored plus every integration suite, and independent settled-tree re-review
+returned **GO** with no P0–P3 finding. Archive projection and the test-only
+atomic upgrade remain outstanding.
 
 - Implement the approved v0/v1 wire strategy and envelope dispatcher; do not
   compile dormant v2–v4 lifecycle variants into the A1 canonical model.
