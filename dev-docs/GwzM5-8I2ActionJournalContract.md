@@ -4,6 +4,12 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-09 during the R4b architecture review: selected-root metadata
+rollback is explicitly legal before acceptance when the selected participant
+and exact operation-baseline bytes provide the frozen authority. Exact
+rollback and preservation cursor ownership is also clarified below. These are
+validator/observation corrections with no v1 wire change.
+
 This slice freezes v1 recovery origin, rollback, preservation, and archived
 backup-ref cleanup ownership. The v1 record contains optional
 `recovery_context`, `pending_rollback`, and `pending_preservation` fields.
@@ -94,6 +100,14 @@ duplicated. A1 does not migrate v0 `RecoveryRequired` rows; they remain
 valid-unlisted v0 and use the existing v0 lifecycle. A v1 recovery row is valid
 only when exactly one origin, base, and resume action are proven.
 
+“Prior” is literal durable history, not a state inferred only from participant
+facts. If `BeginExecution` produces `Executing` while a retained failed/error
+halt cause and pending owner remain, an ambiguous observation first persists
+the ordinary `Halted` transition. The owner is then reobserved against those
+new bytes before recovery may record `origin_state: halted`. A direct durable
+edge from `Executing` to `RecoveryRequired` with a derived `Halted` origin is
+invalid.
+
 Only one pending rollback and one pending preservation action may exist, and
 they are mutually exclusive:
 
@@ -110,6 +124,19 @@ An owner/kind must agree with participant, publication, acceptance, and
 operation-baseline evidence. Ambiguous observation changes only operation
 state/context; it never clears or advances a pending action. Retirement occurs
 only with the verified result/progress write.
+
+For rollback, owner/kind agreement includes the exact deterministic current
+cursor derived from durable participant terminal states, publication evidence,
+selected-root membership, and pending phase; a wrong or later owner is invalid
+at decode. Preservation has an additional live condition because this wire
+format intentionally persists neither no-op owner skips nor a separate reset
+completion bit. Record validation rejects owner/phase/pass contradictions.
+Before a pending preservation action is classified, advanced, or executed, an
+exact bound observation must also prove that every earlier position in the
+two-pass cursor is complete or currently unnecessary. A later pending owner
+with any earlier incomplete or ambiguous position authorizes no rewrite or
+physical mutation. This clarifies the existing deterministic order; it adds no
+field or journal variant.
 
 All free-looking wire strings are validated derivations, never ambient
 authority:
@@ -155,6 +182,15 @@ evidence_commit -> boundary -> lock -> marker -> index -> complete
 Selected-root metadata rollback consumes exact operation-baseline bytes and
 advances only `manifest -> lock -> complete`. Skipping, reversing, changing
 payload, or mutating from operation state alone is forbidden.
+
+This rollback is legal before accepted workspace exists. Its authority is the
+selected `@root` participant, exact persisted operation-baseline manifest/lock
+bytes and hashes, and completion of any prior publication-evidence rollback.
+When acceptance is present, its selected-root metadata source must agree and
+is an additional cross-check; acceptance is not the source of the baseline
+rollback bytes. Requiring acceptance unconditionally would strand a selected
+root when abort begins after participant integration but before
+`FreezeAcceptance`.
 
 Each participant variant has a closed repository observation. For
 `ResetIntegrated`, not-started is the exact attached target ref/HEAD at the

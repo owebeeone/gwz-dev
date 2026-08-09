@@ -2272,26 +2272,67 @@ open-record shape.
 
 ### R4b — acceptance persistence and finalizer consumption
 
-- Add member audit entries separating integration ref, final checkout, and
-  exact lock membership/row.
-- Separate accepted root integration input from publication-created root
-  output.
-- Represent born and attached-unborn accepted roots without sentinels and
-  retain M4 checked first-commit/rollback behavior.
-- Validate and persist the complete immutable accepted workspace before
-  deciding whether candidate publication is required.
-- Derive the no-publication result from that frozen workspace and archive it
-  for all-up-to-date and future all-skipped successful operations.
-- Consume only its exact lock YAML bytes after restart; never regenerate them
-  from live Git, snapshots, or a later serializer.
-- Make continue, finalization, preservation, abort, evidence rollback, and
-  archival consume the persisted acceptance and the same R4a semantics.
-- Split candidate, evidence, publish, and verification responsibilities.
-- Prove byte-equivalent lock/candidate/root output and exact restart actions
-  for every M4 and adapted-v0 scenario.
+R4b is governed by `GwzM5-8R4bTransitionDesign.md`. It is a typed v1 lifecycle,
+not a set of persistence patches to the mutable v0 lifecycle. The checked v1
+store accepts only an opaque rewrite created by a closed transition reducer;
+lifecycle callers never receive mutable v1 records or a generic v1 writer.
+
+The package is split into reviewed checkpoints:
+
+1. **R4b-T** first corrects the no-wire I2 validator gaps for
+   pre-acceptance selected-root rollback, exact non-ordinal phases, one
+   forward pending action record-wide, and no forward pending action in
+   effective preservation. It also pins the pure rollback cursor and the
+   record-local preservation cursor constraints; preservation execution adds
+   a bound live proof for earlier no-op/reset positions that I2 does not
+   persist. It then installs opaque checked-record/rewrite types, the closed
+   transition vocabulary, exact predecessor reducers, transition footprints,
+   proof-token interfaces, and exhaustive pure matrices. No v1 writer is
+   added.
+2. **R4b-S** installs the checked store: byte-lineage/contention checks,
+   transition-specific unknown-field survival and retirement, atomic rewrite,
+   reread verification, and exact terminal archive movement.
+3. **R4b-A** installs the single shared acceptance builder and freezes the
+   persisted publication/no-publication decision inputs. It may proceed beside
+   R4b-S only after the R4b-T interface is independently accepted.
+4. **R4b-F** implements acceptance-consuming candidate, evidence,
+   publication-prefix, verification, completion, and restart behavior.
+5. **R4b-X** implements participant execution/continue and exact
+   recovery-origin dispatch. It may proceed beside R4b-F only after the
+   transition, store, and proof-token interfaces settle.
+6. **R4b-P** implements preservation, rollback, read-only status, and archive
+   consumers using the frozen I2 journals and exact phase successors.
+7. **R4b-G** runs aggregate fault, compatibility, byte-equivalence,
+   unknown-field, privacy, call-graph, and settled-tree review gates.
+
+Across those checkpoints R4b must:
+
+- add member audit entries separating integration ref, final checkout, and
+  exact lock membership/row;
+- represent born and attached-unborn accepted roots without sentinels while
+  retaining M4 checked first-commit/rollback behavior;
+- persist the complete immutable accepted workspace before classifying
+  publication need and consume only its exact lock YAML after restart;
+- represent deterministic no-publication as complete publication progress
+  with no candidate or output evidence;
+- persist a typed owner before every participant, publication, preservation,
+  or rollback mutation and accept a result only through the matching opaque
+  exact-observation proof;
+- use exact phase edges rather than ordinal publication progress or generic
+  old/new record validation;
+- keep v0 and v1 mutation services separate; remove the owned serializable
+  `v0_common_view` conversion and replace shared semantics with borrowed,
+  non-serializable inputs; and
+- prove byte-equivalent lock/candidate/root/archive output and identical
+  restart actions for every M4 and all seven adapted-v0 scenarios.
 
 No skip behavior is introduced in R4b; selected and unselected M4 handling must
 remain exact.
+
+Every checkpoint receives interface review before dependent work begins. Any
+need for a generic v1 rewrite, an unowned physical mutation, a new durable
+phase, or mutation of frozen acceptance/candidate/evidence returns to design.
+Production v1 writing and migration dispatch remain disabled until A1.
 
 ### M5b — v1 no-ff implementation, activation disabled
 

@@ -4,6 +4,11 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-09 during the R4b architecture review: bound exact-not-started
+abort/preserve abandonment and the single legal forward-action owner are
+clarified below. The amendment changes no v1 wire shape and introduces no
+skip/partial-success semantics.
+
 This document freezes the durable v1 body and the canonical acceptance model
 authorized by I1. `GwzM5-8Refactor.md` remains the behavioral authority. This
 contract resolves its remaining wire-shape choices without adding M6 branch
@@ -331,6 +336,25 @@ not reclassify it as a fast-forward.
 V0 `mode: no_ff` remains invalid and is rejected before adaptation, migration,
 record rewrite, or Git mutation.
 
+V1 execution is sequential: at most one participant may contain a non-null
+forward `pending_action` across the entire record. A forward pending action is
+legal only in effective `Executing` or `Halted`; it is forbidden in effective
+`Preserving`, including `RecoveryRequired` with `origin_state: preserving`.
+This is a no-wire validity correction that closes shapes the released
+sequential executor never intentionally creates and that abort/preserve cannot
+reconcile without inventing multi-owner abandonment semantics.
+
+A durable forward action may also retire without an integration outcome only
+when an abort or preserve-abort request consumes the matching bound exact
+`NotStarted` observation. That same atomic rewrite records deliberate
+abandonment by clearing the action, leaving the participant's pre-action
+state/evidence unchanged, and entering `RollingBack` or `Preserving` under the
+matching checked entry proof. It never reports success, conflict, or failure
+for an action that did not run. There is no intermediate action-free
+`Executing`/`Halted` abandonment row. Continue never uses this path.
+Completed, expected-conflict, or ambiguous observations cannot be treated as
+abandonment.
+
 ## 8. Unknown fields and container retirement
 
 Migration first records every v0 unknown YAML path and raw value. The v1 body
@@ -347,7 +371,7 @@ Current-version rewrites use this closed retirement table:
 | record, baseline, participant | survive for the record lifetime; unknown descendants survive |
 | accepted workspace and descendants | immutable once present; unknown descendants survive |
 | recovery context | exists only with `RecoveryRequired`; retires on the checked transition out of recovery |
-| pending action and commit spec | survive while the same action is pending; retire only when its exact result is durably reconciled |
+| pending action and commit spec | survive while the same action is pending; retire when its exact result is durably reconciled, or when abort/preserve consumes a bound exact-not-started observation and atomically records deliberate abandonment plus entry to rolling-back/preserving without fabricating an integration result |
 | pending rollback/preservation action | survives while its exact mutation is pending; retires only with the verified result/progress write |
 | conflict paths/snapshot | survive while conflict evidence remains authoritative; retire when resolution or checked abort completes |
 | participant/publication-root preservation evidence | one stable row per owner; the same row survives as ref/stash fields fill and survives archival |

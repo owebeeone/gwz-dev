@@ -465,6 +465,66 @@ settled-tree re-reviews returned **GO** with no P0–P3 finding. No v1 decoder,
 serializer, writer, upgrade entry point, or migration dispatch enters a normal
 production build. R3 is complete at its disabled-writer boundary; R4b is next.
 
+### R4b — typed v1 lifecycle and persisted-acceptance consumption
+
+Intentional production behavior delta: **none in a normal build**. R4b adds a
+test-reachable v1 lifecycle behind the existing production-disabled boundary.
+It consumes persisted v1 acceptance and the I2 action journals without
+activating v1 creation, migration, or CLI behavior.
+
+Wire/protocol delta: **none**. Any need for a new durable phase, field, action,
+or observation returns to I2 design review and is not covered by this budget.
+
+`GwzM5-8R4bTransitionDesign.md` is the normative architecture. These are stop
+ceilings, not implementation targets:
+
+| Checkpoint | Net production-bearing Rust | Moved production Rust | Test/tool/doc LOC | Production files | Test/tool/doc files |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| R4b-T — no-wire validator corrections (root rollback, exact phases/cursors, one legal forward owner), checked types, reducers, footprints, proof-token interfaces | ≤900 | ≤150 | ≤1,400 | ≤12 | ≤10 |
+| R4b-S — checked store, unknown overlay, lineage, exact archive | ≤700 | ≤250 | ≤1,000 | ≤10 | ≤8 |
+| R4b-A — shared acceptance builder and publication classification input | ≤650 | ≤400 | ≤900 | ≤10 | ≤8 |
+| R4b-F — acceptance-consuming finalization | ≤950 | ≤1,100 | ≤1,500 | ≤14 | ≤12 |
+| R4b-X — participant/continue/recovery service | ≤900 | ≤1,100 | ≤1,500 | ≤14 | ≤12 |
+| R4b-P — preservation/rollback/status/archive consumers | ≤1,450 | ≤1,600 | ≤2,600 | ≤22 | ≤18 |
+| R4b-G — aggregate gates and wiring only | ≤150 | 0 | ≤1,500 | ≤3 | ≤12 |
+
+The aggregate unique-file ceiling is 55 production-bearing paths and 50
+test/tool/doc paths. The aggregate semantic-addition ceiling is 5,000
+production-bearing lines and 10,400 test/tool/doc lines; the per-checkpoint
+ceilings remain controlling even when the aggregate has room. Shared files are
+counted in every checkpoint that changes them and once in the aggregate.
+
+Every new responsibility owner stays below 500 lines. An existing owner above
+500 lines may shrink or receive import/wiring-only edits, but may not gain
+lifecycle policy. Crossing 500 lines triggers an ownership split review before
+dependent work. Moving v0 code into a v1 module does not count as semantic
+deletion and may not weaken the version-isolation boundary.
+
+Allowed ownership is limited to:
+
+- new `merge/v1_lifecycle/` checked-record, transition, store, observer,
+  service, and focused test modules;
+- the existing `model/v1`, `record_wire`, `acceptance`, and R4a pure semantic
+  modules for narrow interface extraction or shared-builder delegation;
+- minimal dispatch/module declarations required for a test-only v1 harness;
+- existing participant, finalization, preservation, rollback, status, and
+  archive modules only for extraction to typed adapters or wiring, not for a
+  second v1 policy implementation; and
+- this plan, its checker/manifest, and focused compatibility/fault fixtures.
+
+The lead owns the `V1Transition` vocabulary, `PreparedV1Rewrite` visibility,
+checked-store entry point, proof-token constructors, and acceptance-builder
+interface. Parallel checkpoint owners cannot widen those interfaces, add a
+transition variant, introduce a raw v1 writer, or change a phase graph without
+a lead-owned interface checkpoint and independent review.
+
+R4b-T receives two independent architecture/interface reviews before R4b-S or
+R4b-A implementation begins. R4b-S and R4b-A each receive interface review
+before R4b-F/R4b-X consumers start. R4b-G includes two independent settled-tree
+reviews with no open P0/P1/P2 finding. A failed review or a requirement for an
+unowned mutation stops the package; it is not covered by the ledger's ordinary
+20% numeric tolerance.
+
 ## Package reporting template
 
 Every package handoff records:
