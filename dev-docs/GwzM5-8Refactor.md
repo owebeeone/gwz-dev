@@ -6,8 +6,10 @@ Status: **Review 8 and independent F5-2 incorporated; R0, R1, and R2a
 approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
 I1/I2 and R4a accepted after independent re-review; the R3 strict-envelope,
 validated-model, unknown-field, open-v0 adapter, and archive-projection
-checkpoints are implemented with v1 still disabled; broader durable state is gated by the remaining
-R3/R4b work, v1 activation by A1, and later wave writers by A2–A4**
+checkpoints are implemented with v1 still disabled; R4b-TI/R4b-TR and
+R4b-S/R4b-A/R4b-F/R4b-X are independently accepted; R4b-P is the next
+implementation checkpoint; broader durable state remains gated by
+R4b-P/R4b-G, v1 activation by A1, and later wave writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
 `dev-docs/GwzM5-8Refactor-Review-2.md`,
@@ -995,9 +997,14 @@ Rules for the split:
   no-publication short circuit; and
 - retain the existing durable `PublicationProgress` checkpoints.
 
-A practical target is no production module over 500 lines and orchestration
-under approximately 300 lines. These are review limits, not reasons to split a
-cohesive function mechanically.
+A practical target is orchestration under approximately 300 lines. A source
+file reaching roughly 1,000 lines triggers a cohesion review; if that review
+calls for a split, the resulting responsibility owners should each be below
+500 lines. These are review limits, not reasons to split cohesive code
+mechanically. Conversely, a smaller module that is collecting unrelated
+concepts is split before either numeric threshold; ownership and dependency
+direction should be decided in the package plan rather than discovered through
+organic cleanup churn.
 
 `merge/mod.rs` is the larger cross-cutting concentration point (approximately
 1,158 lines at the reviewed baseline) and receives an equally explicit
@@ -2279,30 +2286,36 @@ lifecycle callers never receive mutable v1 records or a generic v1 writer.
 
 The package is split into reviewed checkpoints:
 
-1. **R4b-T** first corrects the no-wire I2 validator gaps for
+1. **R4b-TI** first corrects the no-wire I2 validator gaps for
    pre-acceptance selected-root rollback, exact non-ordinal phases, one
    forward pending action record-wide, and no forward pending action in
    effective preservation. It also pins the pure rollback cursor and the
    record-local preservation cursor constraints; preservation execution adds
    a bound live proof for earlier no-op/reset positions that I2 does not
-   persist. It then installs opaque checked-record/rewrite types, the closed
-   transition vocabulary, exact predecessor reducers, transition footprints,
-   proof-token interfaces, and exhaustive pure matrices. No v1 writer is
-   added.
-2. **R4b-S** installs the checked store: byte-lineage/contention checks,
+   persist. It also removes the owned v1-to-v0 projection and installs opaque
+   checked-record/rewrite types, sealed proof composition, the closed
+   transition/effect vocabulary, and executable exact-effect verification.
+   No v1 writer is added. Two independent interface reviews must accept TI.
+2. **R4b-TR** then installs exact predecessor reducers, next-action and
+   observation dispatch, bound execution attempts, exact retirement, and the
+   exhaustive pure predecessor/phase/cursor/footprint matrices. Two
+   independent reducer/state-machine reviews must accept TR before S or A.
+3. **R4b-S** installs the checked store: byte-lineage/contention checks,
    transition-specific unknown-field survival and retirement, atomic rewrite,
    reread verification, and exact terminal archive movement.
-3. **R4b-A** installs the single shared acceptance builder and freezes the
+4. **R4b-A** installs the single shared acceptance builder and freezes the
    persisted publication/no-publication decision inputs. It may proceed beside
-   R4b-S only after the R4b-T interface is independently accepted.
-4. **R4b-F** implements acceptance-consuming candidate, evidence,
+   R4b-S only after both R4b-TI and R4b-TR are independently accepted.
+5. **R4b-F** implements acceptance-consuming candidate, evidence,
    publication-prefix, verification, completion, and restart behavior.
-5. **R4b-X** implements participant execution/continue and exact
+6. **R4b-X** implements participant execution/continue and exact
    recovery-origin dispatch. It may proceed beside R4b-F only after the
-   transition, store, and proof-token interfaces settle.
-6. **R4b-P** implements preservation, rollback, read-only status, and archive
+   transition, store, and proof-token interfaces settle. It is implemented
+   behind the disabled production boundary and independently accepted with no
+   P0-P3 finding; its reviewed production ceiling is 1,050 lines.
+7. **R4b-P** implements preservation, rollback, read-only status, and archive
    consumers using the frozen I2 journals and exact phase successors.
-7. **R4b-G** runs aggregate fault, compatibility, byte-equivalence,
+8. **R4b-G** runs aggregate fault, compatibility, byte-equivalence,
    unknown-field, privacy, call-graph, and settled-tree review gates.
 
 Across those checkpoints R4b must:
@@ -2953,7 +2966,10 @@ To avoid recreating the same issues:
   own it;
 - no new dispatch, gate, guard, store, or persistence policy accumulates in
   `merge/mod.rs` outside the §13–§14 owner;
-- no module exceeds 500 production lines without a written cohesion reason;
+- a module reaching roughly 1,000 production lines receives a written cohesion
+  review, and any resulting split targets owners below 500 lines;
+- a smaller module that becomes a dumping ground for unrelated concepts is
+  split along plan-owned responsibility boundaries before that threshold;
 - orchestration functions should read as lifecycle steps, not contain Git
   mechanics;
 - record compatibility code remains isolated from current lifecycle policy;

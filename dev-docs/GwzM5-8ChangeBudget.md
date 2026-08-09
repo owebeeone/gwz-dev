@@ -3,7 +3,10 @@
 Date: 2026-07-31
 
 Status: **R0, R1, R2a, M5a, I1/I2, R4a, and production-disabled R3
-complete; R4b is next**
+complete; R4b-TI/R4b-TR and production-disabled R4b-S/R4b-A are
+independently accepted; the R4b-F implementation and its revised scope ceiling
+are independently accepted; R4b-X and its revised scope ceiling are
+independently accepted; R4b-P is the next implementation checkpoint**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -43,7 +46,7 @@ proposal/design/plan commit.
 | merge-local dedicated test modules, including `tests.rs` | 19 | 4,169 |
 | `workspace_ops/tests/g23` integration tests | 19 | 5,617 |
 
-Current production review triggers:
+Current production concentrations at the measured baseline:
 
 | Module | LOC |
 | --- | ---: |
@@ -57,9 +60,15 @@ Current production review triggers:
 | `merge/response.rs` | 377 |
 | `merge/status/classify.rs` | 337 |
 
-The 500-line threshold is a review trigger. R1 may reduce these concentrations
-through behavior-preserving moves, but must not manufacture small files with
-shared policy or count moved lines as semantic deletion.
+The general god-file review threshold is 1,000 lines. Reaching or modestly
+crossing it prompts a cohesion review rather than an automatic split. When a
+split is warranted, the resulting responsibility owners should each be below
+500 lines. Size is only a backstop: a smaller file that is accumulating
+unrelated concepts or becoming a policy dumping ground is split earlier. The
+package plan should define those ownership boundaries before implementation so
+the split is architectural rather than cleanup churn. R1 may reduce these
+concentrations through behavior-preserving moves, but must not manufacture
+small files with shared policy or count moved lines as semantic deletion.
 
 ## Frozen package ceilings
 
@@ -480,25 +489,29 @@ ceilings, not implementation targets:
 
 | Checkpoint | Net production-bearing Rust | Moved production Rust | Test/tool/doc LOC | Production files | Test/tool/doc files |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| R4b-T — no-wire validator corrections (root rollback, exact phases/cursors, one legal forward owner), checked types, reducers, footprints, proof-token interfaces | ≤900 | ≤150 | ≤1,400 | ≤12 | ≤10 |
-| R4b-S — checked store, unknown overlay, lineage, exact archive | ≤700 | ≤250 | ≤1,000 | ≤10 | ≤8 |
+| R4b-TI — no-wire validator corrections, v1/v0 isolation, checked types, sealed proof composition, closed transition/effect vocabulary and executable exact-effect verification | ≤2,100 | ≤150 | ≤1,100 | ≤22 | ≤14 |
+| R4b-TR — reducers, next-action/observation dispatch, bound execution attempts, exact retirement and exhaustive predecessor/phase/cursor/footprint matrices | ≤2,750 | 0 | ≤4,400 | ≤12 | ≤16 |
+| R4b-S — checked store, unknown overlay, lineage, exact archive | ≤1,050 | ≤250 | ≤1,000 | ≤15 | ≤8 |
 | R4b-A — shared acceptance builder and publication classification input | ≤650 | ≤400 | ≤900 | ≤10 | ≤8 |
-| R4b-F — acceptance-consuming finalization | ≤950 | ≤1,100 | ≤1,500 | ≤14 | ≤12 |
-| R4b-X — participant/continue/recovery service | ≤900 | ≤1,100 | ≤1,500 | ≤14 | ≤12 |
+| R4b-F — acceptance-consuming finalization | ≤2,100 | ≤1,100 | ≤1,800 | ≤18 | ≤16 |
+| R4b-X — participant/continue/recovery service | ≤1,050 | ≤1,100 | ≤1,500 | ≤14 | ≤12 |
 | R4b-P — preservation/rollback/status/archive consumers | ≤1,450 | ≤1,600 | ≤2,600 | ≤22 | ≤18 |
 | R4b-G — aggregate gates and wiring only | ≤150 | 0 | ≤1,500 | ≤3 | ≤12 |
 
-The aggregate unique-file ceiling is 55 production-bearing paths and 50
-test/tool/doc paths. The aggregate semantic-addition ceiling is 5,000
-production-bearing lines and 10,400 test/tool/doc lines; the per-checkpoint
+The aggregate unique-file ceiling is 74 production-bearing paths and 74
+test/tool/doc paths. The aggregate semantic-addition ceiling is 9,350
+production-bearing lines and 14,300 test/tool/doc lines; the per-checkpoint
 ceilings remain controlling even when the aggregate has room. Shared files are
 counted in every checkpoint that changes them and once in the aggregate.
 
-Every new responsibility owner stays below 500 lines. An existing owner above
-500 lines may shrink or receive import/wiring-only edits, but may not gain
-lifecycle policy. Crossing 500 lines triggers an ownership split review before
-dependent work. Moving v0 code into a v1 module does not count as semantic
-deletion and may not weaken the version-isolation boundary.
+The general source-file threshold is 1,000 lines. Reaching or modestly crossing
+it triggers a cohesion review, not an automatic split; when splitting is the
+right architectural choice, the resulting responsibility owners should each
+be below 500 lines. Explicit lower per-owner ceilings frozen for an individual
+checkpoint remain controlling for that checkpoint. Moving v0 code into a v1
+module does not count as semantic deletion and may not weaken the
+version-isolation boundary. Independent concepts are separated earlier when
+the planned ownership or dependency direction calls for it, regardless of LOC.
 
 Allowed ownership is limited to:
 
@@ -518,12 +531,147 @@ interface. Parallel checkpoint owners cannot widen those interfaces, add a
 transition variant, introduce a raw v1 writer, or change a phase graph without
 a lead-owned interface checkpoint and independent review.
 
-R4b-T receives two independent architecture/interface reviews before R4b-S or
-R4b-A implementation begins. R4b-S and R4b-A each receive interface review
+R4b-TI receives two independent architecture/interface reviews before R4b-TR
+implementation begins. R4b-TR then receives two independent reducer/state-
+machine reviews before R4b-S or R4b-A implementation begins. R4b-S and R4b-A each receive interface review
 before R4b-F/R4b-X consumers start. R4b-G includes two independent settled-tree
 reviews with no open P0/P1/P2 finding. A failed review or a requirement for an
 unowned mutation stops the package; it is not covered by the ledger's ordinary
 20% numeric tolerance.
+
+The R4b-TR ceilings were revised after both required TR reviews independently
+rejected the first implementation: its open resolver let observers supply a
+transition, omitted the request from the proof binding, and lacked the required
+cross-product matrices. Closing that authority requires separate observation,
+resolution, and exact-execution owners, plus readable request/state, exact-
+action/attempt, and prefixed-cursor matrices, rather than dense packing in one file.
+The revised ceilings add no behavior, wire shape, transition, or production
+dispatch; they cover only that reviewed authority split and its matrices. Both
+TR re-reviews must accept the revised accounting before R4b-S or R4b-A starts.
+
+The second TR reviews found that the first revision still omitted proof-bearing
+publication and preservation action observations, request-sensitive handoff
+and abandonment cases, exact post-attempt action binding, and the review memos
+the gate itself requires. The final TR ceiling records those closed-boundary
+and executable-matrix costs explicitly; it does not authorize another durable
+field, phase, transition, runtime writer, or production dispatch path.
+The settled implementation measures 2,723 production-bearing lines on the same
+12 paths and 4,277 focused Rust test lines before the final review memos. The
+2,750/4,400 scope-reviewed ceilings preserve readable proof types and the
+mandatory operation-predecessor, publication-action, attempt, rollback, stash,
+and reset matrices. The final evidence increment is test-only apart from a
+two-line `#[cfg(test)]` effect-capture hook: it executes all 53 declared
+footprints, crosses ambiguous observations with both executor outcomes for
+every physical owner, rejects every wrong recovery origin, and rejects every
+unlisted no-prefix stash/reset successor. The ceilings are not a tolerance for
+further feature work.
+
+R4b-A is implemented at the production-disabled boundary and independently
+accepted. It adds 730 lines across two new sub-500-line builder owners,
+removes 118 net lines from the duplicated R3 adapter builder, and adds eight
+lines of module wiring, for **+620 net production-bearing lines**. Its focused
+acceptance suite contains 202 lines. A therefore remains within 650 production
+lines, 400 moved lines, and 900 test lines.
+
+The first R4b-S interface review rejected the original ceiling as incomplete:
+the checked-store boundary had not carried I2's full duplicate-aware
+participant-drift identity, the mandatory 53-effect unknown-manifest matrix
+was absent, and exact archive publication used a hard-link/unlink interval
+instead of an atomic no-replace rename. Closing those frozen-contract defects
+requires typed occurrence authority and survivor rebasing across transition,
+record-wire, and store owners, plus a release-platform atomic rename primitive;
+it adds no transition, wire field, runtime reachability, or user behavior.
+The revised ceiling is a scope correction requiring re-review, not numeric
+tolerance for feature work. The four dedicated store owners now contain 598
+lines; the focused store suite contains 979 lines across four sub-500-line
+owners and executes every one of the 53 effects through
+`CheckedV1Store::commit`. Cross-boundary identity and archive support brings S
+to approximately +970 net production-bearing lines with about 145 moved
+lines, within the revised 1,050/250 ceilings. Independent remediation
+re-review accepted R4b-S with no P0-P3 finding. Its 15 production paths are
+the nine paths
+from the first review plus the atomic no-replace helper, record-wire unknown
+manifest owner, drift authority owner and wiring, reducer wiring, and
+test-only prepared-rewrite seam; the prior 14-path entry omitted that last
+shared path. Both S and A keep the wire/protocol delta at none and do not make
+a v1 writer, upgrader, or lifecycle dispatch reachable in a normal build.
+
+The first concrete R4b-F implementation exposed that the original 950-line
+semantic ceiling counted the finalizer as a thin candidate consumer but did
+not allocate the exact live observer required by the accepted transition
+architecture. F must separately own participant/root acceptance observation,
+evidence reconciliation, filesystem-prefix classification, raw-index
+classification, physical execution, and the service adapter. Combining those
+responsibilities would violate the sub-500-line owner rule; routing them
+through the v0 mutable finalizer would violate version isolation.
+
+Post-remediation review found that the 1,700/14/1,500 entry still described the
+first candidate rather than the exact reviewed package. It omitted the
+accepted-root byte/index verifier, complete marker semantic reconstruction,
+all candidate-equality rows, operational-error classification, owned-parent
+symlink rejection, and the third focused real-Git test owner. Keeping those
+requirements in the five original owners would either cross 500 lines or
+conflate filesystem, Git, and durable-state authority.
+
+The settled review ceiling is therefore **2,100 production-bearing lines,
+1,800 focused test/tool/doc lines, and 18 production paths**. The current
+conservative F charge is **1,989 production-bearing lines across 17 paths**:
+1,425 exact current lines in the six dedicated owners
+(`65 + 64 + 463 + 457 + 170 + 206`), the previously charged 395-line shared
+adapter surface, and 169 lines of candidate semantic validation added by the
+review remediation. The 17-path count deliberately charges all shared wiring:
+the six dedicated owners, marker, publication classifier/validator and its
+module, three Git backend paths, the boundary helper, lifecycle module,
+authority observer module, authority re-export, and merge-module wiring.
+This is conservative where earlier checkpoints also touched a shared file.
+Two independent R4b-F reviews reconciled this accounting and accepted the
+finalization interface, state machine, recovery behavior, and scope with no
+P0-P3 findings.
+
+The focused F test charge is **1,681 lines**: 1,254 lines in the three
+sub-500-line real-Git owners; 239 local candidate/live/observer test lines; 65
+raw-index regression lines; 77 publication-validator regression lines; and 46
+acceptance-fixture lines. It covers born-attached, born-detached, and
+attached-unborn roots; the exact released parentless two-file unborn evidence
+shape; selected-root evidence parentage; no-publication preservation; exact
+restart suffixes; all candidate-equality rows; mixed and staged/tampered index
+forms; noncanonical index flags; owned-parent symlinks; operational-error
+propagation; and fail-closed drift/recovery without overwrite. Every owner is
+below 500 lines. This reviewed scope correction adds no field, phase,
+transition, wire shape, normal-build reachability, or user-visible behavior.
+The required independent F interface and scope re-acceptance is complete.
+Dependent packages may consume it only in the declared R4b DAG.
+
+The concrete R4b-X implementation exposed that the original 900-line ceiling
+did not include the complete exact-recovery verifier, the version-neutral
+prepared-merge Git seam needed for deterministic no-ff, symlink-safe durable
+participant path validation, or the repeated-failure footprint correction.
+Those are required parts of the accepted transition architecture rather than
+new wire shape or activation scope.
+
+Two independent settled-tree reviews accepted a revised **1,050 net
+production-bearing line ceiling** while retaining the original **1,100 moved,
+1,500 test/tool/doc, 14 production-path, and 12 test/tool/doc-path ceilings**.
+Their accounting methods produced 987 lines/13 production paths and 958
+lines/14 production paths respectively; the ledger records the conservative
+union of **987 production-bearing lines across 14 paths**. The conservative
+focused Rust test charge is **976 lines across four paths**. The two review
+memos add 370 lines, and the closeout plus general ownership-policy document
+deltas add at most 80 lines, for a conservative **1,426 test/tool/doc lines
+across nine paths**. Both reviews found no P0-P3 issue.
+
+X freezes mode only during read-only preparation; the resulting durable
+prepared variant is the sole authority for validation and execution. It
+provides write-ahead participant execution, exact conflict path/hash evidence,
+pre-owner continue classification, direct up-to-date adoption, checked
+fast-forward and deterministic two-parent no-ff execution, and origin-specific
+recovery that verifies every selected participant. Finalizing recovery
+delegates to F; preservation and rollback recovery remain P-owned and are
+rejected by X. The 610-line exact observer and 826-line focused forward test
+owner are cohesive and below the general 1,000-line judgment trigger; the
+reviews found no concept-driven reason to split them. X adds no field, durable
+phase, transition variant, v0 mutation route, normal-build reachability, or
+user-visible behavior.
 
 ## Package reporting template
 

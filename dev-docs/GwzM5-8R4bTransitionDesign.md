@@ -2,8 +2,12 @@
 
 Date: 2026-08-09
 
-Status: **accepted redesign; two independent interface reviews returned GO
-with no open P0-P3 finding; R4b-T is authorized under the gates below**
+Status: **accepted redesign; corrected R4b-TI/R4b-TR are implemented and
+independently accepted; R4b-S and R4b-A are implemented behind the disabled
+production boundary and independently accepted; the concrete R4b-F finalizer
+and R4b-X participant/continue/recovery service are implemented behind that
+boundary and independently accepted; R4b-P is the next implementation
+checkpoint**
 
 ## 1. Decision
 
@@ -43,9 +47,9 @@ No-wire I2 validation corrections are required before reducer work:
 - rollback/publication phase validators use exact named sets and successors,
   never the existing ordinal `PublicationStep >= ...` shortcut.
 
-R4b-T must correct and exhaustively pin these existing M4/I2 shapes before
-installing reducers. They add no field, phase, skip/partial-success semantic,
-or v1 wire change.
+R4b-TI must correct and exhaustively pin these existing M4/I2 shapes before
+R4b-TR installs reducers. They add no field, phase, skip/partial-success
+semantic, or v1 wire change.
 
 ## 2. Why the prior direction was rejected
 
@@ -137,10 +141,13 @@ The expected ownership tree is:
 merge/v1_lifecycle/
   mod.rs                         wiring and visibility only
   checked.rs                     StoredV1Record projections
+  authority.rs                   opaque action-specific proof vocabulary
+  authority/binding.rs           canonical replay binding and sealed issuer
   next_action.rs                 one pure request/state dispatcher
   transition/
     mod.rs                       closed vocabulary and prepare entry point
-    effect.rs                    frozen footprints/retirement effects
+    effect.rs                    closed typed effect/retirement vocabulary
+    footprint.rs                 exact known-diff and conditional footprint verifier
     operation.rs                 operation/recovery/drift reducers
     participant.rs               forward participant reducers
     acceptance_publication.rs    acceptance/publication reducers
@@ -157,9 +164,13 @@ merge/v1_lifecycle/
 ```
 
 This is an ownership map, not a requirement to create empty files. Wiring
-modules carry no lifecycle policy. Every responsibility owner stays below the
-change ledger's 500-line review trigger; growth is split by the ownership
-shown here rather than by arbitrary line chunks.
+modules carry no lifecycle policy. The change ledger's general god-file review
+trigger is 1,000 lines and allows a small cohesion-justified overrun; when a
+split is warranted, the resulting responsibility owners should each be below
+500 lines and follow the ownership shown here rather than arbitrary line
+chunks. LOC is only a backstop: a smaller file that starts collecting unrelated
+concepts is split earlier, and checkpoint planning should establish those
+responsibility boundaries before implementation to avoid cleanup churn.
 
 ## 5. Opaque checked types
 
@@ -422,8 +433,8 @@ the table is rejected.
 | Variant | Exact predecessor | Result and owned fields |
 | --- | --- | --- |
 | `PrepareParticipantAction` | operation `Executing`; no forward `pending_action` exists anywhere in the record; `Conflicted` only for exact `ResolveConflict`, otherwise `Planned`, `Failed`, or `Unattempted` for its frozen retry action | installs the exact existing `PendingMergeAction` and changes nothing else in the participant |
-| `RecordParticipantOutcome` | operation `Executing`, or `Halted` only when the post-outcome aggregate still has another exact halt cause; the same pending action is present | consumes a matching bound outcome proof, clears the pending action, and writes exactly one of `UpToDate`, `FastForwarded`, `Merged`, `Conflicted`, or `Continued` plus its derived result fields |
-| `RecordHaltedOutcomeAndResumeExecution` | request `Continue`; operation `Halted`; same pending action; outcome would remove the final halt cause | atomically records the exact outcome, clears the action, and changes state to `Executing` |
+| `RecordParticipantOutcome` | operation `Executing`, or `Halted` only when the post-outcome aggregate still has another exact halt cause; the same pending action is present | consumes a matching bound outcome proof, clears the pending action and any prior retry error, and writes exactly one of `UpToDate`, `FastForwarded`, `Merged`, `Conflicted`, or `Continued` plus its derived result fields |
+| `RecordHaltedOutcomeAndResumeExecution` | request `ResumeStart` or `Continue`; operation `Halted`; same pending action; outcome would remove the final halt cause | atomically records the exact outcome, clears the action, and changes state to `Executing`; this lets restart reconciliation consume a completed retained owner without requiring an otherwise impossible stopped state with no halt cause |
 | `RecordHaltedOutcomeAndBeginRollback` | request `Abort`; operation `Halted`; same pending action; bound `PreparedRollbackEntry` covers exact global preflight, publication handoff, and the anticipated post-outcome model | atomically records the exact outcome, clears the action, and changes state to `RollingBack` |
 | `RecordHaltedOutcomeAndBeginPreservation` | request `Preserve`; operation `Halted`; same pending action; bound `PreparedPreservationEntry` covers exact global preflight, publication handoff, and the anticipated post-outcome model | atomically records the exact outcome, clears the action, and changes state to `Preserving` |
 | `AbandonNotStartedAndBeginRollback` | request `Abort`; operation `Executing` or `Halted`; matching bound `NotStarted` proof; `PreparedRollbackEntry` covers the anticipated action-free model | atomically clears only the never-started pending action, retires that container, and enters `RollingBack`; no integration result is fabricated |
@@ -762,7 +773,7 @@ read-only: its opaque pure-builder result becomes durable only through
 ## 7. Closed next-action dispatcher
 
 Typed writes do not by themselves prevent orchestration policy from becoming
-scattered. V1 therefore has one pure dispatcher:
+scattered. V1 therefore has one pure durable-state dispatcher:
 
 ```rust
 fn next_action(
@@ -796,6 +807,11 @@ fn resolve_observation(
     observation: BoundExactObservation,
     attempt: Option<BoundExecutionAttempt>,
 ) -> ModelResult<ResolvedV1Action>;
+
+struct V1Invocation {
+    prepared_participant_owners: OrderedSet<MemberId>,
+    attempted_physical_actions: OrderedMap<ActionIdentity, ExecutionDiagnostic>,
+}
 ```
 
 Neither enum contains a function pointer or arbitrary callback. The dispatcher
@@ -806,6 +822,29 @@ or an error. Read-only preparation/preflight success or failure is also a bound
 observation payload resolved here; a caller does not branch on it. Thin
 lifecycle consumers contain no state, phase, observation, preparation, or
 request-result branching.
+
+`V1Invocation` is an authority-owned, non-durable guard around the pure
+dispatcher; it is not consumer policy and it never supplies completion
+authority. Its history is discarded at the end of one service call. It may
+refine a pure next action only in these closed cases:
+
+- reject a second preparation or physical execution of the same owner/action
+  within one invocation;
+- after a `Continue` retry produces `Conflicted`, skip that newly stopped
+  owner for the remainder of the invocation, continue later frozen targets in
+  order, and synthesize `AwaitResolution` only after no later eligible target
+  remains;
+- return the newly committed stopped disposition after an invocation-owned
+  failure, after the preceding conflict sequence commits
+  `AwaitingResolution`, or immediately after `EnterRecovery`; and
+- allow `ResumeStart` to consume a completed retained participant owner with
+  the same halted-outcome compound used by `Continue`, so a crash between the
+  failed physical attempt and response cannot strand a valid halted record.
+
+The guard cannot skip an owner on a later invocation, create proof tokens,
+classify live state, change immutable target order, or authorize a physical or
+durable mutation. A restart therefore forgets invocation history and resumes
+solely from the checked record and fresh exact observations.
 
 The dispatcher applies this precedence exhaustively:
 
@@ -839,20 +878,22 @@ The service loop restarts after every step:
 
 ```text
 open checked record under the retained mutation lease
-next_action(current, request)
+invocation.next_action(current, request)
   Observe -> observe -> resolve_observation
-  Apply   -> prepare -> checked commit -> loop with returned checked record
+  Apply   -> prepare -> checked commit -> invocation stop check -> loop
   Execute -> execute exactly once -> retain bound attempt diagnostic,
-             reopen/observe/resolve; never treat executor output as outcome
+             reopen the same source bytes/observe/resolve;
+             never treat executor output as outcome
   Respond/Reject -> finish
 ```
 
 After an owner-creating transition, the loop must use the checked record
 returned by the store before observation. After a physical action, it retains
-only a `BoundExecutionAttempt`, reopens the same record under the lease, and
-observes again. The attempt records the exact action binding and whether the
-executor returned success or a diagnostic error, but is not completion
-authority. The resolver combines it with the fresh matching observation:
+only a `BoundExecutionAttempt`, reopens the same record under the lease,
+rejects any different source bytes before another dispatch, and observes
+again. The attempt records the exact action binding and whether the executor
+returned success or a diagnostic error, but is not completion authority. The
+resolver combines it with the fresh matching observation:
 
 - `Completed` records the observed outcome/progress, regardless of a late
   executor diagnostic;
@@ -860,9 +901,12 @@ authority. The resolver combines it with the fresh matching observation:
   as a result;
 - `NotStarted` plus a participant executor error constructs the bound owned
   failure/halt batch; and
-- any other post-attempt `NotStarted` returns a typed no-progress/error result
-  with the persisted owner unchanged, and never executes again in the same
-  invocation.
+- `NotStarted` with the same exact physical action returns a typed
+  no-progress/error result with the persisted owner unchanged, while a
+  different action under the same record-bound owner may execute only when
+  the sealed observer proves the intervening exact physical prefix. This
+  exception is required by the marker/lock/boundary/index publication owner;
+  callers and executor diagnostics cannot select the successor action.
 
 The executor cannot create an outcome proof or result transition. After every
 result/progress write, the loop dispatches from the new persisted bytes. This
@@ -1058,7 +1102,7 @@ call-graph/source gate across the entire merge implementation—not only the new
 v1 directory—must prove that no v1-to-v0 owned-record conversion exists, no v1
 value reaches a v0 serializer/mutator, and the normal build still has no
 reachable v1 writer or upgrade path. `v0_common_view` itself is a forbidden
-source symbol after R4b-T.
+  source symbol after R4b-TI.
 
 ## 12. Implementation packages
 
@@ -1067,7 +1111,8 @@ ordered checkpoints:
 
 | Checkpoint | Deliverable | May proceed in parallel |
 | --- | --- | --- |
-| R4b-T | opaque checked types, transition enums, reducers, footprints, exhaustive pure matrices | nothing that writes v1 starts before its interface review |
+| R4b-TI | validator/isolation corrections, opaque checked types, sealed proof composition, transition/effect enums and executable exact-effect verification | R4b-TR starts only after two independent TI interface reviews |
+| R4b-TR | reducers, next-action and observation dispatch, bound execution attempts, retirement, and exhaustive pure matrices | nothing that writes v1 starts before two independent TR reviews |
 | R4b-S | strict checked store, lineage checks, unknown overlay/retirement, exact terminal-byte archive primitive | R4b-A after T interface acceptance |
 | R4b-A | shared acceptance builder and frozen publication classification inputs | R4b-S |
 | R4b-F | acceptance-consuming candidate/evidence/publication finalizer | R4b-X after T/S/A interfaces settle |
@@ -1076,18 +1121,51 @@ ordered checkpoints:
 | R4b-G | aggregate fault, equivalence, compatibility, call-graph, and settled-tree gates | no feature work |
 
 Each checkpoint receives an independent interface review before dependants use
-its API. The lead owns the transition vocabulary, checked-store API, proof
+its API. R4b-TI and R4b-TR each require two independent reviews because they
+jointly form the transition authority boundary. The lead owns the transition vocabulary, checked-store API, proof
 token visibility, and acceptance-builder interface. Parallel agents may own
 separate consumers only after those interfaces are accepted; they may not add
 transition variants or widen store/proof constructors independently.
 
+The concrete R4b-F candidate consumes only checked v1 records and frozen
+acceptance. Its exact observer verifies selected participant outcomes and the
+accepted root base before issuing proofs. Publication persists candidate and
+phase ownership before creating the scoped evidence commit or crossing the
+marker, lock, workspace-boundary, and index prefixes. The physical executor
+rechecks the exact action under the retained lease immediately before each
+mutation. Restart classifies every owned prefix from exact filesystem bytes,
+raw stage-0 index entries, and recorded evidence; mixed or tampered forms enter
+the representable `Finalizing` recovery origin without overwrite. The raw-index
+classifier deliberately does not inspect worktree bytes, because marker and
+lock publication precede the final index update; filesystem digests and file
+types are verified independently.
+
+F does not activate the v1 writer or migration path. Two independent reviews
+accepted its finalization, selected-root, restart, and package-budget
+boundaries with no P0-P3 findings. It is therefore an accepted dependency in
+the exact DAG below; R4b-P and R4b-G remain blocked on their other declared
+predecessors.
+
+The concrete R4b-X service persists an exact participant owner before every
+Git mutation and treats the durable prepared variant as the sole
+validation/execution authority. It directly adopts exact up-to-date results,
+records exact conflict path/hash evidence, classifies unresolved continue
+before changing operation state, executes checked fast-forward and
+deterministic two-parent no-ff actions, and reconciles completed actions after
+restart without re-execution. Recovery verifies a pending owner and every
+other selected participant, delegates `Finalizing` exactness to F, and rejects
+the P-owned preservation/rollback origins. Two independent reviews accepted X
+with no P0-P3 findings and approved its reviewed 1,050-line production
+ceiling. X does not activate the v1 writer, migration, or production dispatch.
+
 The dependency DAG is exact:
 
 ```text
-R4b-T -> R4b-S
-R4b-T -> R4b-A
-R4b-T + R4b-S + R4b-A -> R4b-F
-R4b-T + R4b-S + R4b-A -> R4b-X
+R4b-TI -> R4b-TR
+R4b-TI + R4b-TR -> R4b-S
+R4b-TI + R4b-TR -> R4b-A
+R4b-TI + R4b-TR + R4b-S + R4b-A -> R4b-F
+R4b-TI + R4b-TR + R4b-S + R4b-A -> R4b-X
 R4b-S + R4b-F + R4b-X -> R4b-P
 R4b-F + R4b-X + R4b-P -> R4b-G
 ```
@@ -1099,7 +1177,7 @@ adds an archive reserializer or rewrites terminal history.
 
 ## 13. Required matrices and tests
 
-R4b-T must contain an executable predecessor matrix covering every operation
+R4b-TR must contain an executable predecessor matrix covering every operation
 state, participant state, publication shape, pending action kind, rollback
 phase, preservation phase, and recovery origin against every applicable
 transition. It must prove both listed successes and every unlisted rejection.
@@ -1130,6 +1208,15 @@ The complete gate includes:
 - executor-error crosses fresh `NotStarted`/`Completed`/`Ambiguous` tests for
   ordinary retry, resolve-conflict, publication, preservation, and rollback,
   proving an error alone never rewrites and no same-invocation retry loops;
+- an invocation-history matrix crosses `ResumeStart` and `Continue` with
+  preparation failure, physical-action failure, a newly conflicted retry,
+  retained halted owners, and recovery entry; it proves one preparation and
+  one execution per owner/action, later frozen targets continue after the new
+  conflict, `AwaitingResolution` and `RecoveryRequired` return without
+  redispatch, and a new invocation forgets every local visit fence;
+- a service restart test for `ResumeStart` over `Halted` with a retained
+  completed participant owner proves the halted-outcome compound records the
+  outcome and resumes `Executing` without an invalid intermediate state;
 - a fault/restart matrix immediately after `BeginExecution` with a retained
   failed/error row and pending owner proves ambiguous observation writes
   `Halted` first, reobserves under the new digest, and only then enters recovery
@@ -1142,7 +1229,9 @@ The complete gate includes:
   can construct a result transition;
 - source-lineage/contention tests at every checked-store boundary, including
   acceptance that an intervening same-byte replacement has identical durable
-  authority while any different-byte replacement rejects;
+  authority while any different-byte replacement rejects; this includes the
+  reopen immediately after every physical execution and before the bound
+  attempt reaches another dispatch;
 - unknown survivor and retirement-manifest checks after every transition;
 - fault injection immediately before and after every durable owner, physical
   mutation, result, publication-prefix, terminal, and archive boundary;
