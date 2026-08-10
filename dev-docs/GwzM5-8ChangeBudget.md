@@ -6,7 +6,11 @@ Status: **R0, R1, R2a, M5a, I1/I2, R4a, and production-disabled R3
 complete; R4b-TI/R4b-TR and production-disabled R4b-S/R4b-A are
 independently accepted; the R4b-F implementation and its revised scope ceiling
 are independently accepted; R4b-X and its revised scope ceiling are
-independently accepted; R4b-P is the next implementation checkpoint**
+independently accepted; R4b-P P0/P0.1 are independently accepted and P2-P4 are
+implemented; both amendment 2 interface reviews are GO through §13 and the
+production-disabled P0.2 implementation and bounded settled-code remediation
+are accepted by both corrected-code reviews with no open P0-P3 finding; P1
+remains paused solely on the native release-platform gate**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -476,13 +480,26 @@ production build. R3 is complete at its disabled-writer boundary; R4b is next.
 
 ### R4b — typed v1 lifecycle and persisted-acceptance consumption
 
-Intentional production behavior delta: **none in a normal build**. R4b adds a
-test-reachable v1 lifecycle behind the existing production-disabled boundary.
-It consumes persisted v1 acceptance and the I2 action journals without
-activating v1 creation, migration, or CLI behavior.
+Intentional production behavior delta: **the already frozen I2 durable-record
+projection and archive-worklist semantics**. R4b keeps v1 lifecycle mutation
+test-reachable behind the existing production-disabled boundary, but P appends
+optional field 10 `MergeResponse.record` for existing durable-v0 successes,
+changes existing v0 archive acquisition/retention/targeted-GC to the canonical
+no-follow immutable-worklist rules, and adds the frozen SHA-256 and
+stash/bundle-only rows. Archived-v1 decode/projection/GC is compiled and tested
+but cannot be reached from a production-created v1 record before A1. P does not
+activate v1 creation, migration, or lifecycle dispatch.
 
-Wire/protocol delta: **none**. Any need for a new durable phase, field, action,
-or observation returns to I2 design review and is not covered by this budget.
+Wire/protocol delta: **the accepted I2 field-10 append and its frozen nested
+projection/discriminants**. P0.1 adds one production-disabled v1-only durable
+`preservation_publication_handoff` field and its journal binding; v0 bytes and
+the user-facing protocol remain unchanged. P0.2's reviewed amendment replaces
+the two compound root phases with exact per-object phases, including parent
+phases before clean-marker creation and before handoff-marker restoration,
+without adding a field, action, protocol shape, or production reachability. No
+other durable
+field, phase, action, or observation is authorized without another design
+review.
 
 `GwzM5-8R4bTransitionDesign.md` is the normative architecture. These are stop
 ceilings, not implementation targets:
@@ -495,12 +512,12 @@ ceilings, not implementation targets:
 | R4b-A — shared acceptance builder and publication classification input | ≤650 | ≤400 | ≤900 | ≤10 | ≤8 |
 | R4b-F — acceptance-consuming finalization | ≤2,100 | ≤1,100 | ≤1,800 | ≤18 | ≤16 |
 | R4b-X — participant/continue/recovery service | ≤1,050 | ≤1,100 | ≤1,500 | ≤14 | ≤12 |
-| R4b-P — preservation/rollback/status/archive consumers | ≤1,450 | ≤1,600 | ≤2,600 | ≤22 | ≤18 |
+| R4b-P — lead reverse-entry closure; exact root-preservation correction; preservation/rollback/recovery/status/archive/GC consumers; frozen I2 field-10 projection | ≤14,000 | ≤2,950 | ≤31,400 | ≤174 charged / ≤104 unique | ≤158 charged / ≤106 unique |
 | R4b-G — aggregate gates and wiring only | ≤150 | 0 | ≤1,500 | ≤3 | ≤12 |
 
-The aggregate unique-file ceiling is 74 production-bearing paths and 74
-test/tool/doc paths. The aggregate semantic-addition ceiling is 9,350
-production-bearing lines and 14,300 test/tool/doc lines; the per-checkpoint
+The aggregate unique-file ceiling is conservatively 145 production-bearing
+paths and 149 test/tool/doc paths. The aggregate semantic-addition ceiling is
+19,250 production-bearing lines and 38,300 test/tool/doc lines; the per-checkpoint
 ceilings remain controlling even when the aggregate has room. Shared files are
 counted in every checkpoint that changes them and once in the aggregate.
 
@@ -672,6 +689,138 @@ owner are cohesive and below the general 1,000-line judgment trigger; the
 reviews found no concept-driven reason to split them. X adds no field, durable
 phase, transition variant, v0 mutation route, normal-build reachability, or
 user-visible behavior.
+
+The first R4b-P ceiling was withdrawn after both independent interface reviews
+returned NO-GO. It omitted every production reverse-entry issuer, left the
+transition-owned anticipated-model preview and F-owned publication handoff
+undefined, assigned all reverse recovery to one lane despite preservation
+classifier dependency, and treated I2 field 10 as an optional A1 sequencing
+choice. It also lacked canonical no-follow archive deletion authority,
+optimistic status lineage, and restart-complete decoded stash-image evidence.
+
+The revised P ceiling is based on the enumerated path manifest in
+`GwzM5-8R4bReverseLifecycleInterface.md`: 76 charged/63 unique production paths
+and 70 charged/69 unique test-tool-doc paths. It allocates 1,200/4,200
+production/test lines for the lead prerequisite, 950/1,800 for preservation,
+900/1,800 for rollback, 900/2,500 for status/protocol, 750/1,500 for archive/GC,
+and 100/1,500 for integration and documents. Movement is capped separately at
+2,050 lines. Generated Rust/Python LOC is excluded while its three output paths
+and the Taut source are counted.
+
+The first P0 code reviews found that the 900/3,000 ceiling could not contain the
+required exact-request authority, closed publication-prefix handoff, R3 archive
+provenance, negative matrices, and retained review evidence. The corrected P0
+manifest adds F's existing publication classifier plus R3's existing archive
+decoder/cleanup owner and parent module; the P4 archive paths remain shared and
+charged to both owners. The earlier two-path reducer correction remains
+visibility-only and duplicates no policy. P0 must pass the same two reviewers'
+code re-review before P1-P4 start. Both re-reviews now report GO with no open
+P0-P3 finding, so that gate is satisfied. This is a scope correction for frozen
+I2 behavior, not permission for a new durable phase, transition, record field,
+or production v1 mutation route.
+
+The remediated P0 evidence reuses F's focused finalization owner for the exact
+publication-prefix/evidence-first matrix and R3's archive test module plus v0/v1
+fixture for same-byte decoder provenance. Those three paths are charged to P0;
+the archive fixture remains shared with P4. This raises only the P checkpoint's
+charged/unique path accounting: all three paths already belong to earlier F/R3
+work in the aggregate program union, so the aggregate 117-path ceiling is
+unchanged.
+
+The first P1-P4 consumption then exposed a missing durable publication index
+handoff, closed authority observer entry points, a normal-build canonical
+archived-v0 acquisition path, complete borrowed status inputs, and exact
+named-ref observation for GC. The reviewed proposal is frozen in
+`GwzM5-8R4bInterfaceAmendment-1.md`; it is a P0.1 interface correction, not a
+new lifecycle phase or production v1 activation.
+
+P0.1 reserves 1,400 production and 2,200 test/tool/doc lines across exactly 60
+and 46 charged paths. Measured lane work also requires P1 950→1,350, P2
+900→2,200, and P3 900→1,250 production corrections; P4 remains 750. P3 gains
+four exact constructor/parity test paths but remains within 2,500 test lines.
+The revised R4b-P package ceilings are therefore 8,250 production, 2,050 moved,
+15,500 test/tool/doc, 136 charged production paths, and 120 charged
+test/tool/doc paths. Conservative unique ceilings are 93 and 92. The prior
+4,800/2,050/13,300 and 76/70 R4b-P row is superseded only for this package;
+earlier aggregate packages and their accepted evidence are unchanged. The
+two added common-view constructor paths raise only the P package union because
+accepted R3 already charges both in the 137-path program union. The
+`acceptance/mod.rs` parent re-export likewise raises only the P package union
+because accepted R4b-A already charges it. The
+`authority/binding.rs` location binding and existing authority test likewise
+raise only the P package unions because accepted R4b-TI/P0 already charge them.
+The
+new P0.1 charges for `record_wire/unknown_fields/tests/{v0,nulls}.rs` and
+`model/v1/validate/common_tests.rs` raise the P package union but not the
+136-path program union because accepted R3/TI already charge those physical
+paths.
+
+At the current P0.1 start point, P1 is 508/1,350 production and 100/1,800 tests;
+the 36/40 direct-ref increment is conservatively also charged to the shared
+P0.1 slice. P2's
+conservative HEAD delta is 1,941/2,200 and 842/1,800; P3 is 1,096/1,250 and
+801/2,500; P4 is 508/750 and 532/1,500. P0.1 has 36/1,400 implementation lines
+and 1,818/2,200 test/tool/doc lines: 1,778 final pre-implementation document
+lines plus the shared 40-line direct-ref test increment.
+Both independent interface re-reviews returned GO with no open P0-P3 finding,
+so implementation may resume within the corrected manifests.
+
+### R4b-P0.2 exact root-preservation correction
+
+P1 implementation then proved that the accepted compound `NormalizeRoot` and
+`RestoreRoot` phases could not represent separate marker, lock, and raw-index
+durability boundaries. `GwzM5-8R4bInterfaceAmendment-2.md` replaces them with
+the reviewed physical phase graphs, exact commit-derived `C0`/`C1` forms,
+authority-derived handoff `H`, invariant-boundary classification, durable
+marker-parent preparation/restoration, checked preimage/stash/reset execution, and a
+closed fault/restart matrix.
+
+The exact P0.2 allocation is:
+
+| Component | Net production | Moved production | Test/tool/doc | Production paths | Evidence paths |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| shared Git implementation/testing | 2,200 | 450 | 3,800 | 11 | 9 |
+| model/transition integration | 450 | 0 | 1,100 | 3 | 7 |
+| lifecycle causal seam | 450 | 0 | 1,000 | 9 | 3 |
+| documents/reviews/control | 0 | 0 | 5,200 | 0 | 7 |
+| **P0.2 total** | **3,100** | **450** | **11,100** | **23** | **26** |
+
+The shared Git and lifecycle rows are also charged to P1. They revise P1 to
+4,000 net production, 1,500 moved, 6,600 test/tool/doc, and 24/19 charged
+production/evidence paths.
+
+The complete revised R4b-P charged ceiling is 14,000 production, 2,950 moved,
+31,400 test/tool/doc, and 174/158 production/evidence path charges.
+Conservative unique P-package ceilings are 104/106. At the program level the
+shared P1 charge is counted once, producing 19,250 production lines, 38,300
+test/tool/doc lines, and 145/149 paths because the resolver and lifecycle
+evidence owners already belong to earlier checkpoints while the focused parent
+and unknown-field owners are new.
+
+The settled-code recount charges the causal seam's four existing parent export
+paths to both P0.2 and P1. Those eight charged appearances add no unique path
+because P0 already owns all four. The full Python parity gate also exposed the
+one-line `MergeResponse.record` fixture omission in
+`gwz-py/src/tests/test_client.py`; P3 evidence therefore rises from 17 to 18
+charged paths and the P/program evidence unions each rise by one. No line
+ceiling changes.
+
+All twenty-three production and twenty-six evidence owners are frozen in
+amendment 2. New cohesion owners remain below 500 lines; `contract.rs` remains below 950 and the
+post-extraction `preservation.rs` below 850. Both protocol and owner-manifest
+interface reviews are GO through §13. The first settled-code architecture
+review found index-only provenance, manifest, evidence, and stale-control
+defects; their bounded remediation is accepted by both corrected-code
+re-reviews. The accepted actual is 2,738/3,100 semantic production lines,
+450/450 moved production lines, and 9,570/11,100 evidence lines across 23/26
+paths. P0.2 is accepted locally; P1 remains paused until the native
+release-platform gate is GO. This does not activate production v1 writing or
+dispatch.
+
+The document/review/control component measured 1,753 lines at its first
+interface GO. Its 5,200-line ceiling reserves the §13 correction, retained
+code-review, and bounded remediation/re-review appendices in the same two memo
+paths; it cannot fund test or code scope and adds no path.
 
 ## Package reporting template
 

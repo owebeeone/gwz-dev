@@ -6,8 +6,13 @@ Status: **accepted redesign; corrected R4b-TI/R4b-TR are implemented and
 independently accepted; R4b-S and R4b-A are implemented behind the disabled
 production boundary and independently accepted; the concrete R4b-F finalizer
 and R4b-X participant/continue/recovery service are implemented behind that
-boundary and independently accepted; R4b-P is the next implementation
-checkpoint**
+boundary and independently accepted; R4b-P P0/P0.1 are independently
+accepted and P2-P4 are implemented; P1 consumption exposed the compound
+root-preservation gap corrected in `GwzM5-8R4bInterfaceAmendment-2.md`; both
+independent reviewers accepted the interface through §13; the
+production-disabled P0.2 implementation and bounded settled-code remediation
+are accepted by both corrected-code reviews with no open P0-P3 finding; P1
+remains paused solely on native release-platform evidence**
 
 ## 1. Decision
 
@@ -665,20 +670,40 @@ stable evidence row exists per owner and survives as fields fill.
 | --- | --- | --- |
 | `BeginBackupRef` | `Preserving`; no pending preservation; owner is current | installs exact `BackupRef` before ref creation |
 | `FinishBackupRef` | same action; exact-ref proof | clears action and fills only the owner's backup ref/commit evidence |
-| `BeginStash` | `Preserving`; no pending preservation; owner current | installs exact `Stash`; initial phase is `NormalizeRoot` with a root prefix, otherwise `CreateStash`; for a root prefix, the same write also records the matching immutable `publication.preservation_prefix` before mutation |
+| `BeginStash` | `Preserving`; no pending preservation; owner current | installs exact `Stash`; initial phase is `NormalizeParent` with a root handoff, otherwise `CreateStash`; for a root handoff, the same write also records the matching immutable publication handoff before mutation |
 | `AdvanceStash` | exact stash phase; matching proof | advances only the frozen I2 edge and fills stash ids exactly when `CreateStash` completes |
 | `FinishStash` | stash at `Complete`; exact proof | clears action; retained evidence row is complete |
-| `BeginResetAttachedRef` | `Preserving`; no pending preservation; owner current | installs exact `ResetAttachedRef { phase: ResetRef }` before reset; for a root prefix, the same write installs or verifies the matching immutable `publication.preservation_prefix`, including when no stash ran |
-| `AdvanceResetAttachedRef` | exact reset phase; matching proof | advances only `ResetRef -> RestoreRoot -> Complete`, omitting `RestoreRoot` only when no root prefix exists |
+| `BeginResetAttachedRef` | `Preserving`; no pending preservation; owner current | installs exact `ResetAttachedRef { phase: PrepareParent }` before root preparation, or `ResetRef` without a root handoff; a root row installs or verifies the same immutable publication handoff even when no stash ran |
+| `AdvanceResetAttachedRef` | exact reset phase; matching proof | advances only the amendment-2 graph and changes one physical phase; the no-root graph remains `ResetRef -> Complete` |
 | `FinishResetAttachedRef` | reset at `Complete`; exact proof | clears action; retained evidence remains immutable |
 
 The stash phase graph is exactly:
 
 ```text
-with root prefix: normalize_root -> create_stash -> restore_root
-                  -> write_bundle -> complete
-without prefix:   create_stash -> write_bundle -> complete
+with root handoff: normalize_parent -> normalize_marker -> normalize_lock -> normalize_index
+                   -> create_stash -> restore_index -> restore_lock
+                   -> restore_parent -> restore_marker -> write_bundle
+                   -> complete
+without handoff:   create_stash -> write_bundle -> complete
 ```
+
+The root reset graph is exactly:
+
+```text
+with root handoff: prepare_parent -> prepare_marker -> prepare_lock -> prepare_index
+                   -> reset_ref -> restore_index -> restore_lock
+                   -> restore_parent -> restore_marker -> complete
+without handoff:   reset_ref -> complete
+```
+
+`GwzM5-8R4bInterfaceAmendment-2.md` §3.4 owns the complete before/after table,
+disjoint no-op classification, and explicit `C0`/`C1`/`H` physical forms.
+Its §8 also owns the causal exception for a required empty marker parent:
+structural completion is `PreservationDurabilityPending` on every platform and
+advances only when a fresh exact goal is paired with the matching successful
+attempt. Unix executes an idempotent parent sync; Windows executes a pinned,
+handle-bound, write-through final-to-staging-to-final rename barrier. Optional
+and already-established parent no-ops remain ordinary completed observations.
 
 Stash ids and the stable evidence row are written in the same transition that
 records successful `CreateStash`. A bundle write consumes the already-recorded
@@ -751,12 +776,13 @@ closed:
 | composition/evidence commit | publication progress at `CommittingEvidence` plus exact candidate |
 | marker, lock, boundary, or root index publication | publication progress at `PublishingCandidate` plus exact candidate/evidence; the R4a prefix classifier selects only the next write |
 | backup-ref creation | matching `PendingPreservationActionV1::BackupRef` |
-| root normalization before stash | matching `Stash { phase: NormalizeRoot }` and recorded matching publication prefix |
+| root marker-parent, marker, lock, or index normalization before stash | matching `Stash` at the exact `NormalizeParent`, `NormalizeMarker`, `NormalizeLock`, or `NormalizeIndex` phase and recorded matching publication handoff |
 | native stash creation | matching `Stash { phase: CreateStash }` |
-| post-stash root restoration | matching `Stash { phase: RestoreRoot }` |
+| post-stash root index, lock, marker-parent, or marker restoration | matching `Stash` at the exact `RestoreIndex`, `RestoreLock`, `RestoreParent`, or `RestoreMarker` phase |
 | preservation-bundle write | matching `Stash { phase: WriteBundle }` with durable exact stash ids |
+| pre-reset root marker-parent, marker, lock, or index preparation | matching `ResetAttachedRef` at the exact `PrepareParent`, `PrepareMarker`, `PrepareLock`, or `PrepareIndex` phase |
 | preservation attached-ref reset | matching `ResetAttachedRef { phase: ResetRef }` |
-| post-reset root restoration | matching `ResetAttachedRef { phase: RestoreRoot }` |
+| post-reset root index, lock, marker-parent, or marker restoration | matching `ResetAttachedRef` at the exact `RestoreIndex`, `RestoreLock`, `RestoreParent`, or `RestoreMarker` phase |
 | participant native merge abort or integrated-ref reset | matching `PendingRollbackActionV1::Participant` |
 | publication evidence, boundary, lock, marker, or index rollback | matching `PublicationEvidence` at the exact named step |
 | selected-root manifest or lock rollback | matching `SelectedRootMetadata` at the exact named step |
@@ -926,6 +952,7 @@ enum ExactObservation<P> {
 
 struct ProofBinding {
     source_digest: Sha256Digest,
+    location: OpenRecordLocation,
     workspace_id: WorkspaceId,
     merge_id: MergeId,
     operation_id: OperationId,
@@ -940,6 +967,12 @@ struct BoundExecutionAttempt {
     diagnostic: ExecutionDiagnostic,
 }
 ```
+
+That generic sketch remains the vocabulary for ordinary actions. Amendment 2
+adds the closed preservation-only
+`ExactObservationFact::PreservationDurabilityPending` case for the required
+empty marker parent; it is neither ordinary `Completed` nor ambiguity and is
+resolved only by the causal attempt rule in §6.7.
 
 The payload types are opaque and action-specific, for example:
 
@@ -967,8 +1000,11 @@ Every observation request, observation payload, prepared intent,
 canonical binary framing, including raw non-UTF-8 path bytes where applicable.
 The resolver, reducer, and executor each require exact equality with the
 current checked record digest, workspace/merge/operation identity, stable
-owner, action kind, phase, and derived payload. A proof from another member,
-phase, record rewrite, operation, workspace, or earlier digest is unusable.
+owner, action kind, phase, derived payload, and exact checked
+`OpenRecordLocation` (canonical workspace root plus canonical open-record
+path). Identical bytes and IDs cloned beneath another root do not match. A
+proof from another member, phase, record rewrite, operation, workspace,
+location, or earlier digest is unusable.
 The binding is reissued only by a fresh observer/builder after each checked
 write. Opaque type names without this replay binding are insufficient and are
 forbidden.
@@ -1117,7 +1153,10 @@ ordered checkpoints:
 | R4b-A | shared acceptance builder and frozen publication classification inputs | R4b-S |
 | R4b-F | acceptance-consuming candidate/evidence/publication finalizer | R4b-X after T/S/A interfaces settle |
 | R4b-X | participant execution/continue and exact recovery-origin service | R4b-F after T/S/A interfaces settle |
-| R4b-P | preservation, rollback, status, archive service, and archive-worklist GC consumers | internal independent owners only after S/F/X complete and their interfaces settle |
+| R4b-P0 | transition-owned reverse-entry preview, F-owned publication handoff, production entry issuers, stable reverse/archive routing, protocol-neutral archived result | lead-owned prerequisite after S/F/X; two re-reviews before consumer lanes |
+| R4b-P0.1/P0.2 | shared physical/authority closure discovered by consumer implementation | affected consumer lanes pause until two independent amendment re-reviews return GO |
+| R4b-P1/P2 | preservation plus preserving recovery; rollback plus rolling-back recovery | parallel after P0 acceptance |
+| R4b-P3/P4 | read-only status plus frozen I2 field-10 projection; terminal archive plus archive-worklist GC | parallel after P0 acceptance; P4 returns only the frozen handoff consumed by P3 |
 | R4b-G | aggregate fault, equivalence, compatibility, call-graph, and settled-tree gates | no feature work |
 
 Each checkpoint receives an independent interface review before dependants use
@@ -1143,8 +1182,17 @@ types are verified independently.
 F does not activate the v1 writer or migration path. Two independent reviews
 accepted its finalization, selected-root, restart, and package-budget
 boundaries with no P0-P3 findings. It is therefore an accepted dependency in
-the exact DAG below; R4b-P and R4b-G remain blocked on their other declared
-predecessors.
+the exact DAG below. The P0 prerequisite has also passed both independent code
+re-reviews. Their first P1-P4 consumption exposed the bounded P0.1 omissions,
+which were corrected and accepted. P1 then exposed the compound
+root-preservation gap addressed by P0.2. Both corrective-interface reviews
+accepted its durable restoration-parent step and bounded owner manifest through
+§12, then independently accepted §13's two pre-clean parent phases. The
+production-disabled P0.2 implementation is present; its first settled-code
+architecture review found bounded provenance, manifest, evidence, and control
+defects whose remediation is accepted by both corrected-code reviews. P0.2 is
+accepted locally; P1 remains paused on native release-platform evidence. P2-P4
+retain completed work, and R4b-G awaits accepted P1.
 
 The concrete R4b-X service persists an exact participant owner before every
 Git mutation and treats the durable prepared variant as the sole
@@ -1166,14 +1214,22 @@ R4b-TI + R4b-TR -> R4b-S
 R4b-TI + R4b-TR -> R4b-A
 R4b-TI + R4b-TR + R4b-S + R4b-A -> R4b-F
 R4b-TI + R4b-TR + R4b-S + R4b-A -> R4b-X
-R4b-S + R4b-F + R4b-X -> R4b-P
-R4b-F + R4b-X + R4b-P -> R4b-G
+R4b-S + R4b-F + R4b-X -> R4b-P0
+R4b-P0 -> R4b-P0.1
+R4b-P0.1 -> R4b-P0.2 -> R4b-P1
+R4b-P0.1 -> R4b-P2
+R4b-P0.1 -> R4b-P3
+R4b-P0.1 -> R4b-P4
+R4b-P1 + R4b-P2 + R4b-P3 + R4b-P4 -> R4b-G
 ```
 
 R4b-S owns only the checked atomic terminal-byte move/reconciliation primitive.
-R4b-P owns request/state dispatch into that primitive and GC consumption of
-R3's immutable `ArchivedMergeProjection` cleanup worklist. Neither package
-adds an archive reserializer or rewrites terminal history.
+R4b-P0 freezes request/state dispatch into that primitive and the immutable
+validated-archive handoff. P4 owns dispatch/reopen and GC consumption of R3's
+immutable `ArchivedMergeProjection` cleanup worklist; P3 alone maps the
+handoff into the already allocated field 10. Neither package adds an archive
+reserializer or rewrites terminal history. The complete P interface and path
+budget are frozen in `GwzM5-8R4bReverseLifecycleInterface.md`.
 
 ## 13. Required matrices and tests
 

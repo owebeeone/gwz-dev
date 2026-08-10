@@ -7,9 +7,15 @@ approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
 I1/I2 and R4a accepted after independent re-review; the R3 strict-envelope,
 validated-model, unknown-field, open-v0 adapter, and archive-projection
 checkpoints are implemented with v1 still disabled; R4b-TI/R4b-TR and
-R4b-S/R4b-A/R4b-F/R4b-X are independently accepted; R4b-P is the next
-implementation checkpoint; broader durable state remains gated by
-R4b-P/R4b-G, v1 activation by A1, and later wave writers by A2–A4**
+R4b-S/R4b-A/R4b-F/R4b-X are independently accepted; R4b-P P0/P0.1 are
+independently accepted and P2-P4 are implemented; P1 consumption exposed the
+compound root-preservation gap corrected by
+`GwzM5-8R4bInterfaceAmendment-2.md`; both independent reviewers accepted its
+interface through §13 and the production-disabled P0.2 implementation plus
+bounded settled-code remediation are accepted by both corrected-code reviews
+with no open P0-P3 finding; P1 remains paused solely on native
+release-platform evidence; broader durable state remains gated by R4b-G/A1
+and later writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
 `dev-docs/GwzM5-8Refactor-Review-2.md`,
@@ -2313,8 +2319,28 @@ The package is split into reviewed checkpoints:
    transition, store, and proof-token interfaces settle. It is implemented
    behind the disabled production boundary and independently accepted with no
    P0-P3 finding; its reviewed production ceiling is 1,050 lines.
-7. **R4b-P** implements preservation, rollback, read-only status, and archive
-   consumers using the frozen I2 journals and exact phase successors.
+7. **R4b-P** first lands the lead-owned reverse-entry preview, F publication
+   handoff, production entry issuers, stable reverse router, and protocol-
+   neutral archive result. Its four reviewed lanes then implement preservation
+   plus preserving recovery, rollback plus rolling-back recovery, read-only
+   status plus the already frozen I2 field-10 cross-driver projection, and
+   terminal archive/archive-worklist GC. The v1 mutation route remains
+   production-disabled; existing durable-v0 successes gain the append-only
+   projection before A1. P0 passed both independent code re-reviews; the four
+   consumer lanes started and exposed the bounded P0.1 shared-interface
+   omissions, which were corrected and accepted. P1 then exposed that compound
+   root normalization/restoration could not represent separate marker, lock,
+   and raw-index durability boundaries. P0.2 replaces those phases with the
+   exact flattened graph and physical Git contract. It includes a restoration
+   parent phase because native stash can remove that empty directory and, after
+   the four-way physical matrix, explicit pre-clean parent phases for the valid
+   absent-source-parent/present-clean-marker direction. Both corrective-
+   interface reviews accepted the protocol through §13 and the
+   production-disabled P0.2 implementation is present. Its first settled-code
+   architecture review found bounded provenance, manifest, evidence, and
+   control defects; their remediation is accepted by both corrected-code
+   reviews. P0.2 is accepted locally, while P1 remains paused on native
+   release-platform evidence. P2-P4 stand.
 8. **R4b-G** runs aggregate fault, compatibility, byte-equivalence,
    unknown-field, privacy, call-graph, and settled-tree review gates.
 
@@ -2368,6 +2394,9 @@ v0 release.
 - Verify that the installed finalizer understands every accepted-workspace,
   born/unborn root, candidate, evidence, publication-prefix, preservation,
   rollback, no-publication, and archival invariant emitted by the new record.
+- Treat the I2 field-10 schema, open/archived v0/v1 semantic projector,
+  presence matrix, and Rust/Python/JSON/JSONL/human parity as installed R4b-P
+  prerequisites. A1 does not add or finish protocol projection.
 - Run the full §15.3.2 mapping and fault matrix through the production dispatch
   path, proving adaptation and restart choose the same next action as v0.
 - Enable the new-version writer and validated open-v0 migration together in one
@@ -3258,18 +3287,21 @@ A1 remains blocked until:
 6. every §15.3.3 v0/v1 archive fixture projects identically across core, CLI,
    Python/native, JSON, JSONL, retention, and GC without live observation or
    read rewrite;
-7. the complete §15.2 envelope cross-product is identical across drivers;
-8. the installed binary can resume every v1 open-record state it can write and
+7. R4b-P's optional field 10 is present for every I2 durable-record success,
+   absent for every frozen omission case, and identical across the Rust and
+   Python/native human, JSON, and JSONL drivers for open and archived v0/v1;
+8. the complete §15.2 envelope cross-product is identical across drivers;
+9. the installed binary can resume every v1 open-record state it can write and
    contains no executable v2–v4 state or V2–V4 archive-projection
    body/discriminant;
-9. A1 creates ordinary/custom-message and no-ff operations as v1, never v0,
+10. A1 creates ordinary/custom-message and no-ff operations as v1, never v0,
    while §15.6-whitelisted open v0 uses only the approved atomic migration,
    valid-unlisted v0 remains on its existing lifecycle, and v0 no-ff resume is
    rejected;
-10. retained v0 readers fail closed on v1 while the A1 binary rejects
+11. retained v0 readers fail closed on v1 while the A1 binary rejects
     representative v2/v3/v4 envelopes before body adaptation or mutation
     eligibility; and
-11. the small activation change enabling the v1 writer, migration, and no-ff
+12. the small activation change enabling the v1 writer, migration, and no-ff
     start path together receives explicit review.
 
 ### 22.5 Later semantic-wave activation acceptance
