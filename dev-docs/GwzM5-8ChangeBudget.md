@@ -816,7 +816,7 @@ review found index-only provenance, manifest, evidence, and stale-control
 defects; their bounded remediation is accepted by both corrected-code
 re-reviews. With the allocated workflow implementation present, the measured actual
 is 2,738/3,100 semantic production lines, 450/450 moved production lines, and
-10,497/11,100 evidence lines across 23/27 implemented paths within the 23/27
+10,490/11,100 evidence lines across 23/27 implemented paths within the 23/27
 manifest. Both §14 interface reviews are GO. P0.2 is accepted locally; P1
 remains paused until the non-publishing native release-platform workflow passes
 focused review and is GO on the exact pushed commits. This does not activate

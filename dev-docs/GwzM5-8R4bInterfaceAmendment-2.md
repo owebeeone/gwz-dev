@@ -1204,7 +1204,7 @@ These remain stop ceilings. Both pre-implementation §13 interface reviews and
 both corrected-tree settled-code reviews returned GO. With §14's allocated
 workflow implementation present, the measured actual is
 2,738/3,100 semantic production lines, 450/450 moved production lines, and
-10,497/11,100 evidence lines across 23/27 implemented paths within the frozen
+10,490/11,100 evidence lines across 23/27 implemented paths within the frozen
 23/27 manifest. P0.2 is accepted locally; both §14 interface reviews are GO.
 P1 remains paused until the workflow passes implementation review and succeeds
 on the exact committed and pushed corrected tree.
