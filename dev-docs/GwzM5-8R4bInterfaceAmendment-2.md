@@ -8,8 +8,8 @@ incomplete evidence rows, and stale control text. The bounded remediation is
 implemented and both corrected-code re-reviews are GO with no open P0-P3
 finding. P0.2 is accepted locally. The Windows portability remediation is
 code-GO. Both independent reviewers accepted §14's non-publishing native
-release-platform interface with no open P0-P3 finding; P1 remains paused while
-that workflow is implemented, reviewed, and run on the exact pushed commits.
+release-platform interface with no open P0-P3 finding. Its implementation is
+present; P1 remains paused through focused review and the exact-SHA run.
 
 This amendment is additive to `GwzM5-8R4bInterfaceAmendment-1.md` and is
 controlling where the earlier documents describe root preservation as one
@@ -1201,10 +1201,10 @@ Python gate exposed its missing required-optional `MergeResponse.record`
 fixture. It is not a P0.2 evidence owner and changes no line ceiling.
 
 These remain stop ceilings. Both pre-implementation §13 interface reviews and
-both corrected-tree settled-code reviews returned GO. Before §14's allocated
-workflow exists, the accepted actual is
+both corrected-tree settled-code reviews returned GO. With §14's allocated
+workflow implementation present, the measured actual is
 2,738/3,100 semantic production lines, 450/450 moved production lines, and
-10,124/11,100 evidence lines across 23/26 implemented paths within the frozen
+10,497/11,100 evidence lines across 23/27 implemented paths within the frozen
 23/27 manifest. P0.2 is accepted locally; both §14 interface reviews are GO.
 P1 remains paused until the workflow passes implementation review and succeeds
 on the exact committed and pushed corrected tree.

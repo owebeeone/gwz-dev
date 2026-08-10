@@ -11,8 +11,8 @@ implemented; both amendment 2 interface reviews are GO through §13 and the
 production-disabled P0.2 implementation and bounded settled-code remediation
 are accepted by both corrected-code reviews with no open P0-P3 finding; the
 Windows portability remediation is code-GO; both §14 interface reviews are GO;
-P1 remains paused while the non-publishing native release-platform workflow is
-implemented, reviewed, and run on the exact pushed commits**
+the non-publishing native release-platform workflow is implemented; P1 remains
+paused through its focused review and exact-SHA run**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -814,13 +814,13 @@ post-extraction `preservation.rs` below 850. Both protocol and owner-manifest
 interface reviews are GO through §13. The first settled-code architecture
 review found index-only provenance, manifest, evidence, and stale-control
 defects; their bounded remediation is accepted by both corrected-code
-re-reviews. Before the allocated workflow is implemented, the accepted actual
+re-reviews. With the allocated workflow implementation present, the measured actual
 is 2,738/3,100 semantic production lines, 450/450 moved production lines, and
-10,124/11,100 evidence lines across 23/26 implemented paths within the 23/27
+10,497/11,100 evidence lines across 23/27 implemented paths within the 23/27
 manifest. Both §14 interface reviews are GO. P0.2 is accepted locally; P1
-remains paused until the non-publishing native release-platform workflow is
-implemented and reviewed, and is GO on the exact pushed commits. This does not
-activate production v1 writing or dispatch.
+remains paused until the non-publishing native release-platform workflow passes
+focused review and is GO on the exact pushed commits. This does not activate
+production v1 writing or dispatch.
 
 The document/review/control component measured 1,753 lines at its first
 interface GO. Its 5,200-line ceiling reserves the §13 correction, retained

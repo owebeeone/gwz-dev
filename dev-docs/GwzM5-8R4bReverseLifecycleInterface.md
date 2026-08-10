@@ -815,9 +815,9 @@ counts shared physical paths once. Both interface reviews are GO through §13.
 The first settled-code architecture review found index-only provenance,
 manifest, evidence, and stale-control defects. Their bounded remediation is
 accepted by both corrected-code re-reviews. P0.2 is accepted locally; P1
-remains paused after both amendment 2 §14 interface reviews returned GO, until
-the non-publishing native release-platform workflow is implemented and
-reviewed, and is GO on the exact pushed commits.
+remains paused after both amendment 2 §14 interface reviews returned GO. The
+non-publishing native release-platform workflow is implemented but must pass
+focused review and be GO on the exact pushed commits.
 P2-P4 retain
 completed work but cannot authorize aggregate R4b-G integration while this
 gate is open.
