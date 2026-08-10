@@ -1761,3 +1761,87 @@ asset operations. The one physical path is charged twice but counted once per
 union: P0.2 remains **23/27**, P1 **24/20**, R4b-P charged **174/160**, R4b-P
 unique **104/107**, and program-unique **145/150**, with no production or line-
 ceiling change.
+
+## §14 settled-implementation architecture/security review — 2026-08-11
+
+### Verdict
+
+**GO for unpausing P1.** The exact pushed implementation and its successful
+native evidence satisfy the complete accepted §14 contract. P0 findings: none.
+P1 findings: none. P2 findings: none. P3 findings: none. This verdict does not
+grant publishing authority or weaken any later R4b integration/release gate.
+
+### Exact source and authority
+
+The reviewed heads and both `origin/main` refs are exactly `gwz-cli`
+`038fa68e6bd537d9d89249dbf24620fc48e5fd87` and `gwz-core`
+`064f06e571334c3935233a7d253effc73fcc4b75`. The 366-line
+`platform-gate.yml` is `workflow_dispatch` only, has one top-level
+`contents: read` permission block and no job override, persists no checkout
+credentials, and contains no release/tag creation, host, upload, release,
+announce, attestation, package, or release-asset operation. Diagnostic Actions
+artifact upload is its only external write.
+
+Before any checkout, the contract and target jobs require lowercase 40-hex
+inputs and bind the executing repository, exact workflow path, and
+`github.workflow_sha` to the supplied CLI SHA. Both fixed repositories are then
+checked out as siblings and their observed `HEAD` values must equal the inputs.
+The exact CLI manifest depends on `../gwz-core`, so the verified sibling is the
+core source Cargo Dist builds.
+
+One contract job owns the only matrix and checks it for duplicates and exact
+set equality with `dist-workspace.toml`. Its native mapping is Windows x86-64
+to `windows-2022`, Apple ARM64 to `macos-14`, Apple x86-64 to
+`macos-15-intel`, Linux ARM64 to `ubuntu-22.04-arm`, and Linux x86-64 to
+`ubuntu-22.04`. `fail-fast: false` preserves all row diagnostics, while any
+contract/row failure or cancellation prevents a successful gate.
+
+### Command, containment, and evidence
+
+Every row installs and verifies Rust 1.95.0 and Cargo Dist 0.31.0, then runs
+the exact local-artifact command with its single target,
+`--tag=v0.2.0-dev`, linkage printing, and JSON output. Validation requires
+manifest version 0.31.0, the explicit non-implicit announcement selector,
+exactly the target archive/checksum upload set, exact target metadata, checksum
+association, and both files to exist.
+
+Failed run 31442318333 proved the fail-closed path: all five native builds
+succeeded, all five validators rejected Cargo Dist's absolute upload paths,
+identity/artifact upload steps were skipped, the run failed, and it retained
+zero artifacts. Commit `038fa68e` changes only that validator. It resolves the
+reported paths and requires each resolved parent to equal the resolved
+`target/distrib` directory before checking the two exact names and file
+existence. Absolute paths are accepted without allowing a sibling, ancestor,
+`..`, or symlink escape; passing the already-validated original paths to
+upload-artifact does not weaken containment.
+
+Successful `workflow_dispatch` run 31442644461 has head/workflow SHA
+`038fa68e`, one successful contract job, and exactly five successful build jobs
+on the runner labels above. Logs show native runner images/toolchains, Cargo
+Dist 0.31.0, and the frozen command on each platform. Its five retained
+diagnostic artifacts each contain exactly one row archive, its checksum,
+`gate-dist-manifest.json`, and `gate-identity-<target>.json`. All five checksum
+files verify. The packaged binaries identify as the declared ARM64/x86-64
+Mach-O and ELF architectures and PE32+ x86-64 on Windows.
+
+Every identity record binds workflow repository/path/ref/SHA, supplied and
+observed CLI/core SHAs, target, and runner; all values are exact across the five
+rows. The job-summary writer iterates that same retained identity object, and
+the contract summary binds the same workflow/CLI commit, core commit, and five
+targets. Each manifest records 0.31.0, `v0.2.0-dev`, non-implicit selection,
+and only its exact archive/checksum output.
+
+### Ownership, cohesion, and accounting
+
+The single workflow remains a cohesive contract/matrix/build/validation/
+identity evidence owner at 366 lines, below the focused 500-line threshold; no
+second test or production path exists. Its duplicated charge and single union
+appearance reconcile to P0.2 **23/27**, P1 **24/20**, R4b-P charged
+**174/160**, R4b-P unique **104/107**, and program-unique **145/150**. The
+measured pre-review actual of **10,490/11,100** evidence lines across all 27
+implemented paths remains below the stop ceiling, and this review adds no path
+or production authority.
+
+`check_merge_docs.py` passed all 87 assertions, the remediation range and memo
+pass `diff --check`, and the pushed member worktrees are clean. The §14
+implementation review and exact-SHA platform gate are therefore closed.

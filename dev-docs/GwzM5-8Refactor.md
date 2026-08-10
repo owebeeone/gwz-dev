@@ -14,9 +14,9 @@ compound root-preservation gap corrected by
 interface through §13 and the production-disabled P0.2 implementation plus
 bounded settled-code remediation are accepted by both corrected-code reviews
 with no open P0-P3 finding; the Windows portability remediation is code-GO;
-both §14 interface reviews are GO and its non-publishing native release-
-platform workflow is implemented; P1 remains paused through focused review and
-the exact-SHA run; broader durable state remains gated by R4b-G/A1
+both §14 settled-implementation reviews and the exact-SHA native release-
+platform run are GO; P1-WR1 is closed and P1 is unpaused; broader durable state
+remains gated by R4b-G/A1
 and later writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
@@ -2342,9 +2342,8 @@ The package is split into reviewed checkpoints:
    architecture review found bounded provenance, manifest, evidence, and
    control defects; their remediation is accepted by both corrected-code
    reviews. The Windows portability remediation is code-GO. P0.2 is accepted
-   locally, both amendment 2 §14 interface reviews are GO, and the non-
-   publishing native release-platform workflow is implemented. P1 remains
-   paused through focused review and the exact-SHA run. P2-P4 stand.
+   locally, both amendment 2 §14 settled-implementation reviews and the exact-
+   SHA native release-platform run are GO, and P1 is unpaused. P2-P4 stand.
 8. **R4b-G** runs aggregate fault, compatibility, byte-equivalence,
    unknown-field, privacy, call-graph, and settled-tree review gates.
 

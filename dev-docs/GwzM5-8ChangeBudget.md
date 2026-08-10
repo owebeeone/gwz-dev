@@ -10,9 +10,9 @@ independently accepted; R4b-P P0/P0.1 are independently accepted and P2-P4 are
 implemented; both amendment 2 interface reviews are GO through §13 and the
 production-disabled P0.2 implementation and bounded settled-code remediation
 are accepted by both corrected-code reviews with no open P0-P3 finding; the
-Windows portability remediation is code-GO; both §14 interface reviews are GO;
-the non-publishing native release-platform workflow is implemented; P1 remains
-paused through its focused review and exact-SHA run**
+Windows portability remediation is code-GO; both §14 settled-implementation
+reviews and the exact-SHA native release-platform run are GO; P1-WR1 is closed
+and P1 is unpaused**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -816,10 +816,10 @@ review found index-only provenance, manifest, evidence, and stale-control
 defects; their bounded remediation is accepted by both corrected-code
 re-reviews. With the allocated workflow implementation present, the measured actual
 is 2,738/3,100 semantic production lines, 450/450 moved production lines, and
-10,490/11,100 evidence lines across 23/27 implemented paths within the 23/27
-manifest. Both §14 interface reviews are GO. P0.2 is accepted locally; P1
-remains paused until the non-publishing native release-platform workflow passes
-focused review and is GO on the exact pushed commits. This does not activate
+10,648/11,100 evidence lines across 23/27 implemented paths within the 23/27
+manifest. Both §14 settled-implementation reviews and the exact-SHA run are GO.
+P0.2 is accepted locally; P1-WR1 is closed and P1 is unpaused against the
+frozen seam. This does not activate
 production v1 writing or dispatch.
 
 The document/review/control component measured 1,753 lines at its first

@@ -6,7 +6,7 @@ Status: **P0 and P0.1 accepted after independent re-review; P2-P4 are
 implemented; both independent reviewers accepted amendment 2 through §13 and
 the production-disabled P0.2 implementation and bounded settled-code
 remediation are accepted by both corrected-code reviews with no open P0-P3
-finding; P1 remains paused solely on the native release-platform gate**
+finding; the native release-platform gate is GO and P1 is unpaused**
 
 This checkpoint freezes the ownership and consumer interfaces for R4b-P. It
 implements preservation, rollback, reverse-origin recovery, read-only open and
@@ -576,7 +576,7 @@ Both corrective-interface reviews accepted the durable restoration-parent step
 and bounded parent/test owner amendment through §12, then accepted §13's
 pre-clean parent edges. The production-disabled P0.2 implementation and bounded
 remediation are accepted by both corrected-code reviews with no open P0-P3
-finding. P1 remains paused until the native release-platform gate passes.
+finding. The native release-platform gate is GO and P1 is unpaused.
 Integration lands the shared router only after accepted P1 and P2, then P3/P4's
 archive handoff, then the aggregate service/restart and cross-driver matrices.
 A lane that needs to widen a shared interface pauses while independent lanes
@@ -814,10 +814,9 @@ code-review/remediation appendices in the same memos. The aggregate program
 counts shared physical paths once. Both interface reviews are GO through §13.
 The first settled-code architecture review found index-only provenance,
 manifest, evidence, and stale-control defects. Their bounded remediation is
-accepted by both corrected-code re-reviews. P0.2 is accepted locally; P1
-remains paused after both amendment 2 §14 interface reviews returned GO. The
-non-publishing native release-platform workflow is implemented but must pass
-focused review and be GO on the exact pushed commits.
+accepted by both corrected-code re-reviews. P0.2 is accepted locally. Both
+amendment 2 §14 settled-implementation reviews and the exact-SHA run are GO;
+P1-WR1 is closed and P1 is unpaused against the frozen seam.
 P2-P4 retain
 completed work but cannot authorize aggregate R4b-G integration while this
 gate is open.

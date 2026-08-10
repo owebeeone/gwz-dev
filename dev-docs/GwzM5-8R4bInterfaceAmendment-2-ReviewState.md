@@ -1604,3 +1604,79 @@ The accepted one-path accounting is unchanged: P0.2 remains **23/27**, P1
 **24/20**, R4b-P charged **174/160**, R4b-P unique **104/107**, and
 program-unique **145/150**. No production path or numeric line ceiling changes,
 and no workflow implementation is claimed by this review.
+
+## §14 settled workflow and exact-run state/evidence review — 2026-08-11
+
+### Verdict
+
+**GO to unpause P1.** P1-WR1 is closed. P0 findings: none. P1 findings: none.
+P2 findings: none. P3 findings: none. The pushed one-path workflow implements
+the accepted §14 interface, and successful run `31442644461` supplies complete
+non-publishing native Cargo Dist evidence for exact `gwz-cli` commit
+`038fa68e6bd537d9d89249dbf24620fc48e5fd87` and exact `gwz-core` commit
+`064f06e571334c3935233a7d253effc73fcc4b75`.
+
+### Executing identity and matrix
+
+The completed run is attempt 1 of `.github/workflows/platform-gate.yml`, was
+manually dispatched from `main`, and has `head_sha` equal to the supplied CLI
+SHA. Its contract job passed the pre-check binding `github.repository`,
+`github.workflow_ref`, and `github.workflow_sha`, checked that exact CLI tree,
+and emitted the only matrix. The implementation rejects duplicate or drifting
+rows and compares the target set exactly with the checked
+`dist-workspace.toml`.
+
+GitHub's job records and all five retained identities agree on the complete
+native mapping: Windows x86-64 / `windows-2022`, Apple ARM64 / `macos-14`,
+Apple x86-64 / `macos-15-intel`, GNU Linux ARM64 / `ubuntu-22.04-arm`, and GNU
+Linux x86-64 / `ubuntu-22.04`. Each identity records the expected repository
+and workflow path, workflow/CLI SHA, supplied and observed CLI SHA, supplied
+and observed core SHA, target, and runner. Each row's successful identity step
+writes that same dictionary to its job summary, so the retained JSON and
+summary source have one state owner rather than parallel identity logic.
+
+The exact CLI manifest depends on `gwz-core` only through sibling path
+`../gwz-core`; every row's pre-build `HEAD` checks passed. Contract and all five
+rows completed successfully with `fail-fast: false`; no target was cancelled,
+skipped, or inferred.
+
+### Cargo Dist evidence and the absolute-path correction
+
+Every row ran Cargo Dist `0.31.0` on Rust `1.95.0` with exactly
+`dist build --artifacts=local --target="$TARGET" --tag=v0.2.0-dev
+--print=linkage --output-format=json`. All five downloaded manifests report
+`dist_version: 0.31.0`, `announcement_tag: v0.2.0-dev`, and
+`announcement_tag_is_implicit: false`. Each names only its exact executable
+archive and checksum, and both artifact records carry only that row's target;
+the archive metadata names its checksum. The five downloaded checksum files
+verify. Archive inspection finds the corresponding ARM64/x86-64 Mach-O, ELF,
+or PE executable in every package.
+
+Failed run `31442318333` used preceding CLI/workflow commit `ec906511...`.
+All five builds completed but all five rows failed closed before identity or
+artifact upload because Cargo Dist 0.31.0 returned absolute paths. Commit
+`038fa68...` changes only the path acceptance/output handling: it resolves
+`target/distrib` and each reported path and requires every resolved file's
+parent to equal that exact directory. Nested and sibling paths still reject;
+a wrong-target direct child still fails the unchanged exact two-name upload
+set, manifest upload set, `[target]` metadata, checksum linkage, and existence
+checks. Thus the correction accepts absolute or relative spellings of direct
+row files without weakening target-exact validation.
+
+### Authority, accounting, and closure
+
+The workflow is `workflow_dispatch` only with top-level `contents: read`,
+credential persistence disabled, and no publishing job or step. Its only
+retained output is five ordinary diagnostic Actions artifacts. Run and source
+inspection found no host/create/upload/release/announce Cargo Dist operation,
+GitHub Release, tag creation, attestation, package publication, or release-
+asset upload; GitHub has no `v0.2.0-dev` tag or release.
+
+The workflow is one cohesive 366-line evidence owner, below the 500-line new-
+owner boundary. It adds no production path. The reconciled control baseline is
+2,738/3,100 semantic production, 450/450 moved, and 10,490/11,100 evidence
+lines across the fully implemented 23/27 manifest. The accepted charges remain
+P0.2 **23/27**, P1 **24/20**, R4b-P **174/160** charged and **104/107** unique,
+and program **145/150**. The exact pre-publication native platform gate that
+P1-WR1 required is now implemented, reviewed here, and successful on the exact
+pushed CLI/core pair; no state/evidence condition remains to keep P1 paused.

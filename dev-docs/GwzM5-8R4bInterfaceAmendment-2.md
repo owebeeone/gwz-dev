@@ -8,8 +8,8 @@ incomplete evidence rows, and stale control text. The bounded remediation is
 implemented and both corrected-code re-reviews are GO with no open P0-P3
 finding. P0.2 is accepted locally. The Windows portability remediation is
 code-GO. Both independent reviewers accepted §14's non-publishing native
-release-platform interface with no open P0-P3 finding. Its implementation is
-present; P1 remains paused through focused review and the exact-SHA run.
+release-platform implementation and exact-SHA run with no open P0-P3 finding.
+P1-WR1 is closed and P1 is unpaused against the frozen seam.
 
 This amendment is additive to `GwzM5-8R4bInterfaceAmendment-1.md` and is
 controlling where the earlier documents describe root preservation as one
@@ -833,7 +833,7 @@ not available to Git or model tests and does not enlarge production scope.
 
 ## 11. Exit gate
 
-P1 remains paused until:
+P1 was paused until:
 
 1. architecture/ownership and state/restart reviewers independently return
    GO on this exact design;
@@ -1204,10 +1204,10 @@ These remain stop ceilings. Both pre-implementation §13 interface reviews and
 both corrected-tree settled-code reviews returned GO. With §14's allocated
 workflow implementation present, the measured actual is
 2,738/3,100 semantic production lines, 450/450 moved production lines, and
-10,490/11,100 evidence lines across 23/27 implemented paths within the frozen
+10,648/11,100 evidence lines across 23/27 implemented paths within the frozen
 23/27 manifest. P0.2 is accepted locally; both §14 interface reviews are GO.
-P1 remains paused until the workflow passes implementation review and succeeds
-on the exact committed and pushed corrected tree.
+Both §14 settled-implementation reviews and the exact pushed-tree run are GO;
+P1-WR1 is closed and P1 may resume against the frozen seam.
 
 ## 14. Non-publishing native platform gate
 
@@ -1273,7 +1273,7 @@ This path is charged once to P0.2 and once again to P1. It raises P0.2 evidence
 paths from 26 to 27, P1 charged evidence paths from 19 to 20, and R4b-P charged
 evidence paths from 158 to 160. Because it is new to both unions, R4b-P unique
 evidence paths rise from 106 to 107 and program-unique evidence paths from 149
-to 150. Numeric line ceilings do not change. The workflow may not be authored
-until both independent interface reviewers accept this section, and P1 remains
-paused until the implemented workflow receives a focused settled-code review
-and its exact-SHA five-target run succeeds.
+to 150. Numeric line ceilings do not change. The workflow was not authored
+until both independent interface reviewers accepted this section, and P1 was
+paused until the implemented workflow received focused settled-code reviews
+and its exact-SHA five-target run succeeded; all of those gates are now GO.
