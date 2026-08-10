@@ -9,8 +9,10 @@ are independently accepted; R4b-X and its revised scope ceiling are
 independently accepted; R4b-P P0/P0.1 are independently accepted and P2-P4 are
 implemented; both amendment 2 interface reviews are GO through §13 and the
 production-disabled P0.2 implementation and bounded settled-code remediation
-are accepted by both corrected-code reviews with no open P0-P3 finding; P1
-remains paused solely on the native release-platform gate**
+are accepted by both corrected-code reviews with no open P0-P3 finding; the
+Windows portability remediation is code-GO; both §14 interface reviews are GO;
+P1 remains paused while the non-publishing native release-platform workflow is
+implemented, reviewed, and run on the exact pushed commits**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -782,18 +784,18 @@ The exact P0.2 allocation is:
 | shared Git implementation/testing | 2,200 | 450 | 3,800 | 11 | 9 |
 | model/transition integration | 450 | 0 | 1,100 | 3 | 7 |
 | lifecycle causal seam | 450 | 0 | 1,000 | 9 | 3 |
-| documents/reviews/control | 0 | 0 | 5,200 | 0 | 7 |
-| **P0.2 total** | **3,100** | **450** | **11,100** | **23** | **26** |
+| documents/reviews/control/platform gate | 0 | 0 | 5,200 | 0 | 8 |
+| **P0.2 total** | **3,100** | **450** | **11,100** | **23** | **27** |
 
 The shared Git and lifecycle rows are also charged to P1. They revise P1 to
-4,000 net production, 1,500 moved, 6,600 test/tool/doc, and 24/19 charged
+4,000 net production, 1,500 moved, 6,600 test/tool/doc, and 24/20 charged
 production/evidence paths.
 
 The complete revised R4b-P charged ceiling is 14,000 production, 2,950 moved,
-31,400 test/tool/doc, and 174/158 production/evidence path charges.
-Conservative unique P-package ceilings are 104/106. At the program level the
+31,400 test/tool/doc, and 174/160 production/evidence path charges.
+Conservative unique P-package ceilings are 104/107. At the program level the
 shared P1 charge is counted once, producing 19,250 production lines, 38,300
-test/tool/doc lines, and 145/149 paths because the resolver and lifecycle
+test/tool/doc lines, and 145/150 paths because the resolver and lifecycle
 evidence owners already belong to earlier checkpoints while the focused parent
 and unknown-field owners are new.
 
@@ -805,17 +807,20 @@ one-line `MergeResponse.record` fixture omission in
 charged paths and the P/program evidence unions each rise by one. No line
 ceiling changes.
 
-All twenty-three production and twenty-six evidence owners are frozen in
-amendment 2. New cohesion owners remain below 500 lines; `contract.rs` remains below 950 and the
+All twenty-three production and twenty-seven evidence owners are frozen in
+amendment 2, including the one-path non-publishing Cargo Dist platform gate
+allocated by §14. New cohesion owners remain below 500 lines; `contract.rs` remains below 950 and the
 post-extraction `preservation.rs` below 850. Both protocol and owner-manifest
 interface reviews are GO through §13. The first settled-code architecture
 review found index-only provenance, manifest, evidence, and stale-control
 defects; their bounded remediation is accepted by both corrected-code
-re-reviews. The accepted actual is 2,738/3,100 semantic production lines,
-450/450 moved production lines, and 9,570/11,100 evidence lines across 23/26
-paths. P0.2 is accepted locally; P1 remains paused until the native
-release-platform gate is GO. This does not activate production v1 writing or
-dispatch.
+re-reviews. Before the allocated workflow is implemented, the accepted actual
+is 2,738/3,100 semantic production lines, 450/450 moved production lines, and
+10,124/11,100 evidence lines across 23/26 implemented paths within the 23/27
+manifest. Both §14 interface reviews are GO. P0.2 is accepted locally; P1
+remains paused until the non-publishing native release-platform workflow is
+implemented and reviewed, and is GO on the exact pushed commits. This does not
+activate production v1 writing or dispatch.
 
 The document/review/control component measured 1,753 lines at its first
 interface GO. Its 5,200-line ceiling reserves the §13 correction, retained

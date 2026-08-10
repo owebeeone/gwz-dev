@@ -1376,3 +1376,231 @@ code defect, but P1 consumption and release remain blocked until it passes.
 Final conservative evidence growth including this 139-line appendix is
 **9,570/11,100 lines across 26/26 paths**, leaving 1,530 evidence lines of
 reserve. No new evidence owner was introduced.
+
+## Windows platform-remediation review — 2026-08-11
+
+### Verdict
+
+**GO for code; platform evidence pending.** Independent review of committed
+`gwz-core` range `71ffb641..064f06e571334c3935233a7d253effc73fcc4b75`
+found no P0, P1, P2, or P3 code defect. The reviewed head is exactly
+`origin/main` at `064f06e`; the workspace was clean before this review memo
+append. This verdict is separate from the still-running native release gate.
+
+### Windows identity and containment
+
+`record_wire/location.rs` now obtains Windows identity from each opened handle
+with the stable `windows-sys` `GetFileInformationByHandle` API. Identity is a
+non-optional volume serial plus 64-bit file index, eliminating the previous
+`None == None` false-equivalence risk. These are the same non-UWP identity
+fields that Rust derives for ordinary Windows file metadata, without relying
+on the unstable optional `MetadataExt` accessors.
+
+Every Windows named open uses read access, delete sharing,
+`FILE_FLAG_BACKUP_SEMANTICS`, and `FILE_FLAG_OPEN_REPARSE_POINT`. It can open
+directories, observes rename/delete races rather than masking them with a
+share violation, and obtains identity for the named reparse object instead of
+following a symlink or junction. The preceding and following
+`symlink_metadata` type checks reject non-real parents and nonregular leaves.
+
+For each record leaf, the pre-open named identity, the byte-reading handle
+identity, and the post-read named identity must all match. The bytes, length,
+SHA-256 digest, opaque path, and returned identity therefore belong to the
+same checked file handle; byte-identical replacement is still contention, not
+adoption. Root, `.gwz`, merge, and optional archive-parent identities are
+reacquired and compared, so real-directory replacement or archive-parent
+appearance/disappearance rejects. The second complete leaf read must equal
+the first, closing leaf appearance, replacement, and content races before any
+authority is returned. Acquisition remains read-only and fail-closed.
+
+### State, ownership, and accounting
+
+No model, durable record, lifecycle phase, reducer, observer, executor,
+transition, error code, or production-v1 activation changed. Callers retain
+the same `CanonicalMergeLocations` state and optimistic retry/recovery rules;
+the remediation strengthens only physical location identity.
+
+`record_wire/location.rs` is the already accepted version-neutral canonical
+record-location owner from the broader R4b/P0.1 interface, not a P0.2 owner.
+The commit adds 92 and removes 40 lines there, for +52 net; the owner remains
+cohesive at 478 lines under its focused 500-line threshold and adds no path.
+`preservation_root/files.rs` is a frozen P0.2 owner, but its three-add/three-
+delete change only places `OsMetadataExt` behind `cfg(unix)`. It is behavior-
+neutral, remains 297 lines, and changes neither P0.2 semantic LOC, movement,
+path counts, authority, nor physical mutation behavior.
+
+### Verification and exact remaining gate
+
+Local macOS verification passed the four canonical-location contention tests,
+the byte-identical status retry, the complete core suite (1,078 passed, one
+ignored), formatting, strict all-target/all-feature clippy, and range
+whitespace checks. The Windows implementation was also checked against the
+stable Rust/windows-sys signatures and flag semantics; native CI results are
+not claimed by this code verdict.
+
+The gate is not satisfied merely by the current `gwz-py` Windows/macOS/Linux
+source-build matrix plus the retained-reader five-platform runs. The remaining
+condition is the exact committed-and-pushed-tree `gwz-cli` Cargo Dist build for
+all five declared targets: `x86_64-pc-windows-msvc`,
+`aarch64-apple-darwin`, `x86_64-apple-darwin`,
+`aarch64-unknown-linux-gnu`, and `x86_64-unknown-linux-gnu`. P1 consumption
+and release remain blocked until that exact matrix succeeds.
+
+This 73-line review raises conservative P0.2 document evidence to
+**9,643/11,100 lines across 26/26 paths**, leaving 1,457 lines of reserve; it
+introduces no production or evidence path.
+
+## §14 native platform-gate interface review — 2026-08-11
+
+### Verdict
+
+**NON-GO.** P0 findings: none. P1 findings: one. P2 findings: none. P3
+findings: none. The proposed gate is otherwise a bounded, non-publishing
+evidence owner, but its successful run is not yet cryptographically bound to
+the reviewed workflow definition that produced the evidence.
+
+### P1-G1 — the dispatch workflow revision is not bound to the CLI input SHA
+
+Section 14 requires exact 40-hex `gwz-cli` and `gwz-core` inputs, checks out
+both commits into sibling directories, verifies their checked-out `HEAD`
+values, and writes both inputs into job summaries. It does not require the
+GitHub Actions workflow-definition SHA (`github.workflow_sha`, together with
+the expected workflow repository/path) to equal the reviewed `gwz-cli` input
+SHA or otherwise bind that third execution identity into the retained
+evidence.
+
+`workflow_dispatch` may select a ref whose workflow body differs from the
+checked-out CLI commit. Without this binding, an older or unreviewed workflow
+definition could omit a target, weaken the self-check, or gain publishing
+behavior while still checking out and reporting the requested product SHAs.
+The two product `HEAD` checks therefore do not by themselves prove that the
+reviewed gate implementation generated the run.
+
+Required correction: the interface must require an early fail-closed check
+that the executing workflow repository/path and `github.workflow_sha` are the
+reviewed `gwz-cli` repository/path and exact `gwz_cli_sha` input. The workflow
+SHA must also appear in every target summary and retained evidence. This uses
+the already allocated workflow path and needs no new state, target, owner, or
+line ceiling. Return the corrected §14 text for re-review before authoring the
+workflow.
+
+### Accepted interface boundaries
+
+The remaining contract is accepted. The matrix contains exactly the five
+Cargo Dist targets frozen in `dist-workspace.toml`: Windows MSVC x86-64, both
+macOS architectures, and GNU Linux ARM64/x86-64. Each target runs natively on
+Rust 1.95 with Cargo Dist 0.31; failure or cancellation of any row fails the
+gate.
+
+The workflow is `workflow_dispatch` only with `contents: read` and no release
+event, tag inference/creation, hosting, announcement, attestation, GitHub
+Release, package publication, or release-asset upload authority. Local Cargo
+Dist output may be retained only as diagnostic Actions artifacts. The static
+self-check and the ordinary workflow failure semantics are appropriately
+fail-closed, and each target must retain its Cargo Dist manifest/artifacts and
+exact commit summaries.
+
+The single new path `gwz-cli/.github/workflows/platform-gate.yml` is correctly
+charged once to P0.2 and once to P1: P0.2 evidence becomes 27 paths, P1 becomes
+20, R4b-P becomes 174/160 charged and 104/107 unique, and program union becomes
+145/150. It introduces no production path and leaves the 11,100-line evidence
+ceiling unchanged. Before implementation, the reconciled actual remains
+2,738/3,100 semantic production, 450/450 moved, and 9,782/11,100 evidence
+lines across 23/26 implemented paths within the frozen 23/27 manifest.
+
+The separate `gwz-py` source-build matrix and five-platform retained-reader
+runs remain useful supplemental evidence but cannot satisfy this exact
+`gwz-cli` Cargo Dist gate. No workflow or control document is authorized for
+implementation until P1-G1 is corrected and both interface reviews are GO.
+
+This 67-line review raises conservative document evidence to
+**9,849/11,100 lines across 26 implemented paths**, leaving 1,251 lines for
+the allocated workflow and bounded re-review without adding another path.
+
+## §14 workflow-identity corrective re-review — 2026-08-11
+
+### Verdict
+
+**GO.** P1-G1 is closed. P0 findings: none. P1 findings: none. P2 findings:
+none. P3 findings: none. This verdict accepts the corrected interface only; it
+does not authorize P1 before workflow implementation, focused settled-code
+review, and a successful exact-SHA five-target run.
+
+### P1-G1 closure
+
+The workflow must now fail before checkout unless all three execution-source
+facts are exact: `github.repository` is `owebeeone/gwz-cli`, the path in
+`github.workflow_ref` is
+`.github/workflows/platform-gate.yml`, and `github.workflow_sha` equals the
+supplied 40-hex `gwz_cli` commit. The executing workflow body is therefore the
+reviewed gate definition contained in the same CLI commit whose product source
+is built; selecting another dispatch ref cannot manufacture accepted evidence.
+
+After that pre-check, both supplied commits are checked out as siblings and
+their observed `HEAD` values must match. Every target's job summary and
+gate-identity artifact binds the workflow repository/path/SHA, both supplied
+and observed checkout SHAs, and the target. The retained Cargo Dist manifest
+and artifacts are consequently attributable to one exact workflow definition,
+one exact CLI/core pair, and one exact matrix row.
+
+The previously accepted boundaries remain unchanged: manual dispatch only,
+`contents: read`, no tag/release/hosting/announcement/attestation/package or
+release-asset publication path, exact static five-target native matrix, and
+failure or cancellation of any target failing the gate. The existing single
+workflow path and 23/27 P0.2, 24/20 P1, 174/160 charged, 104/107 unique, and
+145/150 program path ledgers need no change.
+
+This 37-line re-review raises conservative document evidence to
+**9,886/11,100 lines across 26 implemented paths**, leaving 1,214 lines for
+the allocated workflow and settled-code review without adding another path.
+
+## §14 Cargo Dist contract corrective re-review — 2026-08-11
+
+### Verdict
+
+**GO.** Architecture findings P1-14A and P2-14B are closed. P0 findings:
+none. P1 findings: none. P2 findings: none. P3 findings: none. Section 14 now
+defines a complete pre-implementation interface for the single non-publishing
+native platform-gate workflow. This verdict accepts the interface only; P1
+remains paused through workflow implementation, focused settled-code review,
+and a successful exact-SHA five-target run.
+
+### P1-14A closure
+
+The contract job owns one JSON matrix, rejects duplicate, missing, or extra
+targets and target-to-runner drift, and supplies that same exact matrix to the
+build jobs. Its required set is exactly equal to the five targets frozen in
+the checked `gwz-cli/dist-workspace.toml`; no build row may introduce an
+implicit sixth target or substitute a runner.
+
+Every row now executes the exact CI-safe command
+`dist build --artifacts=local --target=<row-target> --tag=v0.2.0-dev
+--print=linkage --output-format=json`. The explicit selector matches the
+checked CLI package's exact `0.2.0-dev` version and is neither an inferred
+selector nor a Git-ref creation or release operation. Post-build acceptance
+requires Cargo Dist `0.31.0`, `announcement_tag: v0.2.0-dev`,
+`announcement_tag_is_implicit: false`, and exactly that row target's
+executable archive plus checksum as reported by
+`dist print-upload-files-from-manifest`; output for any other target fails the
+row. These requirements close implicit-version, tag, fuzzy-host, matrix-drift,
+and cross-target-output cases.
+
+The earlier accepted identity and authority boundaries remain intact: the
+workflow repository/path/SHA is bound to the exact CLI input before checkout,
+both sibling checkout `HEAD` values are verified, every row retains complete
+identity and Cargo Dist evidence, permissions are `contents: read`, and no
+release, publishing, hosting, announcement, attestation, tag-creation, or
+release-asset operation is permitted.
+
+### P2-14B closure and accounting
+
+`GwzM5-8R4bTransitionDesign.md` and `GwzM5-8Refactor.md` now describe §14 as
+proposed evidence pending interface review instead of claiming that review is
+already complete. The remaining controls consistently retain the pause
+through implementation, settled-code review, and the exact committed and
+pushed run.
+
+The accepted one-path accounting is unchanged: P0.2 remains **23/27**, P1
+**24/20**, R4b-P charged **174/160**, R4b-P unique **104/107**, and
+program-unique **145/150**. No production path or numeric line ceiling changes,
+and no workflow implementation is claimed by this review.

@@ -798,15 +798,15 @@ The reconciled stop ceilings supersede §§15-16 for R4b-P:
 | --- | ---: | ---: | ---: | ---: | ---: |
 | P0 closed prerequisite | 1,200 | 0 | 4,200 | 29 | 21 |
 | P0.1 shared correction | 1,400 | 0 | 2,200 | 60 | 46 |
-| P0.2 root-preservation correction | 3,100 | 450 | 11,100 | 23 | 26 |
-| P1 preservation/recovery | 4,000 | 1,500 | 6,600 | 24 | 19 |
+| P0.2 root-preservation correction | 3,100 | 450 | 11,100 | 23 | 27 |
+| P1 preservation/recovery | 4,000 | 1,500 | 6,600 | 24 | 20 |
 | P2 rollback/recovery | 2,200 | 650 | 1,800 | 9 | 8 |
 | P3 status/protocol | 1,250 | 250 | 2,500 | 18 | 18 |
 | P4 archive/GC | 750 | 100 | 1,500 | 8 | 8 |
 | aggregate wiring, fault matrix, and checkpoint docs | 100 | 0 | 1,500 | 3 | 12 |
-| **Charged ceiling** | **14,000** | **2,950** | **31,400** | **174** | **158** |
+| **Charged ceiling** | **14,000** | **2,950** | **31,400** | **174** | **160** |
 
-The conservative unique ceilings are 104 production and 106 test/tool/doc
+The conservative unique ceilings are 104 production and 107 test/tool/doc
 paths. P0.2's 2,200/450/3,800 shared Git and 450/0/1,000 lifecycle portions
 are charged again to P1;
 P0.2 reserves 5,200 document lines for the accepted interface set plus bounded
@@ -815,6 +815,9 @@ counts shared physical paths once. Both interface reviews are GO through §13.
 The first settled-code architecture review found index-only provenance,
 manifest, evidence, and stale-control defects. Their bounded remediation is
 accepted by both corrected-code re-reviews. P0.2 is accepted locally; P1
-remains paused until the native release-platform gate is GO. P2-P4 retain
+remains paused after both amendment 2 §14 interface reviews returned GO, until
+the non-publishing native release-platform workflow is implemented and
+reviewed, and is GO on the exact pushed commits.
+P2-P4 retain
 completed work but cannot authorize aggregate R4b-G integration while this
 gate is open.

@@ -1524,3 +1524,240 @@ automatic defect.
 P0.2 is accepted by this architecture/ownership re-review. P1 remains paused
 until the other independent corrected-code review is GO and the committed-tree
 native release-platform gate passes.
+
+## Windows platform-remediation review — 2026-08-11
+
+### Verdict
+
+**NON-GO for P1 unblocking; GO for the two-file remediation itself.** Independent
+review of committed `gwz-core` range
+`71ffb641..064f06e571334c3935233a7d253effc73fcc4b75` finds no P0, P1, P2, or
+P3 defect in `record_wire/location.rs` or the `cfg(unix)` import correction in
+`preservation_root/files.rs`. P1-WR1 below is a gate-operability finding, not a
+defect in those owners: the required native Cargo Dist matrix cannot currently
+be run against the untagged corrected commit without entering the publishing
+workflow.
+
+### Remediation judgment
+
+`location.rs` lines 302-350 uses stable Rust 1.95 Windows APIs and matching
+`windows-sys` 0.61 types. `OpenOptionsExt` applies read access, delete-capable
+sharing, `FILE_FLAG_BACKUP_SEMANTICS`, and
+`FILE_FLAG_OPEN_REPARSE_POINT`; the final named component is therefore opened
+without following a reparse-point target. `symlink_metadata` type checks reject
+non-regular leaves and non-real directories, while each intermediate directory
+is observed and identity-checked separately. The remaining check/open intervals
+have the same fail-closed path-plus-identity contract as Unix; the code does not
+claim atomic namespace pinning.
+
+`GetFileInformationByHandle` is called with a live `AsRawHandle`, propagates
+`last_os_error` on failure, and combines the volume serial number with the high
+and low file-index halves in the documented order. That is also the identity
+tuple used by Rust 1.95's non-UWP Windows `File::metadata` implementation.
+Parent identities are rechecked after both leaf observations. Each leaf is
+compared before open, on the reading handle, and after read, including identity,
+file type, and length; the second complete observation also detects byte-identical
+replacement and absent/present races. Windows consequently has replacement and
+race-detection parity with the Unix implementation's identity model. Native
+matrix execution remains necessary to validate the supported Windows runner and
+filesystem in practice.
+
+Unreadable open-record paths map to `MergeRecordUnreadable`, unreadable archive
+paths map to `ArchivedRecordUnreadable`, and identity/contention changes map to
+`MergeRecoveryRequired`. These distinctions are preserved through directory,
+leaf, and Win32-call failures. The `files.rs` change only places
+`cap_fs_ext::OsMetadataExt` behind `cfg(unix)`; it removes an unavailable Windows
+trait import without changing the non-Unix executable-file policy or any
+preservation mutation behavior.
+
+Both owners remain cohesive: `location.rs` is 478 lines with one canonical
+location/identity acquisition responsibility, and `files.rs` is 297 lines with
+one capability-relative managed-file responsibility. No split finding is
+warranted.
+
+### P1-WR1 — native platform gate is not operable pre-publication
+
+`gwz-cli/.github/workflows/release.yml` accepts only a published release or a
+manual existing semver tag, verifies that tag, fixes `publishing` to `true`, and
+conditions its Cargo Dist build matrix on that value. The corrected tree has no
+release tag. Thus it cannot supply the declared pre-P1 committed-tree platform
+gate without first creating release state and taking publishing/upload paths.
+
+The preferred remedy is a separate, non-publishing `workflow_dispatch`
+platform-gate workflow. It should require and verify an exact commit/ref, check
+out that revision (and the exact matching `gwz-core` revision), run Cargo Dist
+plan/build across the frozen five targets, retain diagnostic artifacts only,
+and have no release creation, hosting, attestation, or release-asset upload
+authority. A clearly separated `publish: false` dispatch mode in the existing
+workflow is also architecturally acceptable, but only if every host, announce,
+attestation, and release-upload step is positively gated; sharing the release
+workflow makes that alternative more condition-sensitive. Merely relaxing the
+tag check while leaving `publishing: "true"` is not acceptable.
+
+No workflow edit is authorized by this review. Before either remedy is edited,
+its selected path must be added explicitly to the P0.2/P1 evidence ownership
+manifests and the charged and unique unions mechanically recounted. If one new
+workflow path is charged to both packages, the minimum charged deltas are P0.2
+evidence **26 to 27**, P1 evidence **19 to 20**, and R4b-P charged evidence
+**158 to 160**. R4b-P unique and program-unique evidence increase by one only
+if that selected path is not already present in the respective union. The
+workflow change then requires its own focused settled-code re-review. The
+committed Windows remediation itself changes none of the frozen counts:
+`files.rs` is already a P0.2 path, while `location.rs` was introduced as a
+broader R4b location owner and is not added retroactively to the P0.2 physical
+manifest.
+
+### Verification and evidence state
+
+- Rust 1.95 isolated `x86_64-pc-windows-msvc` type checks passed for the exact
+  Win32 identity call and the no-follow/share-mode `OpenOptions` construction;
+- `cargo +1.95.0 test -p gwz-core canonical_location --lib`: 4 passed;
+- `cargo +1.95.0 test -p gwz-core
+  open_status_retries_after_byte_identical_leaf_replacement --lib`: 1 passed;
+- `cargo +1.95.0 fmt --all -- --check`: passed;
+- `cargo +1.95.0 clippy -p gwz-core --all-targets --all-features -- -D
+  warnings`: passed;
+- `python3 gwz-core/scripts/checks/check_merge_docs.py`: passed, 87 assertions;
+  and
+- the full local MSVC-target check reached Windows Rust dependencies but could
+  not pass `libz-sys` on the macOS host because the Windows C SDK headers/tooling
+  were unavailable.
+
+The pushed `gwz-core` retained-reader run 31440069226 completed successfully on
+Windows x86-64, both macOS architectures, Linux x86-64, and Linux ARM64 during
+this review. It is useful CI evidence, but it is not the required Cargo Dist
+current-code release-platform build. That native platform-gate evidence has not
+started and remains the sole blocker recorded by this review.
+
+## §14 non-publishing native platform-gate interface review — 2026-08-11
+
+### Verdict
+
+**NON-GO.** The separate one-path, read-only workflow is the correct architecture,
+and its SHA, target, and accounting boundaries reconcile. Its exact Cargo Dist
+invocation is not yet executable as written. There are no P0 or P3 findings,
+one P1 finding, and one P2 control finding. No workflow implementation is
+authorized by this review.
+
+### Accepted boundary
+
+The proposed `gwz-cli/.github/workflows/platform-gate.yml` is correctly isolated
+from the publishing workflow. Manual dispatch only, top-level `contents: read`,
+no release trigger, and the express prohibition on host, announce, attestation,
+package publication, GitHub Release, and release-asset upload authority leave
+only ordinary diagnostic Actions artifacts. The static matrix is exactly the
+five-target set in `dist-workspace.toml`: Windows x86-64, both macOS
+architectures, and Linux x86-64/ARM64. Rust 1.95, Cargo Dist 0.31, native runners,
+all-target success, and retained per-target manifests are appropriate gates.
+
+The embedded self-check is acceptable as evidence in the same workflow path;
+it is a regression alarm, not a substitute for the required settled-code
+review. No second test owner is needed.
+
+The corrected SHA contract is accepted. Before checkout it binds
+`github.repository`, the path in `github.workflow_ref`, and
+`github.workflow_sha` to the exact supplied `gwz-cli` SHA. It then verifies both
+fixed-repository sibling checkout `HEAD` values. Every target's retained identity
+artifact and summary binds the executing workflow repository/path/SHA, both
+supplied and observed checkout SHAs, and its target. Because the exact reviewed
+CLI manifest selects `gwz-core` only through `../gwz-core`, this closes the
+workflow-definition and sibling-source substitution cases.
+
+### P1-14A — Cargo Dist's exact non-publishing invocation is underspecified
+
+Cargo Dist 0.31 requires an announcement selector for build planning and, when
+`--tag` is absent, attempts to infer one from package versions. Section 14 both
+forbids tag inference and omits the alternative, so a conforming command is not
+defined. It also says only “local artifacts” without freezing the CI-safe flags
+that distinguish those artifacts from Cargo Dist's deliberately fuzzy host
+mode.
+
+The interface must either freeze an explicit non-release Cargo Dist
+announcement selector derived from the exact CLI package version, while
+stating that it is not and must not create or resolve a Git ref, or narrow the
+prohibition to Git release-tag inference and explicitly permit Cargo Dist's
+package-version selector. Each row must run the equivalent of
+`dist build --artifacts=local --target=<exact-row-target>
+--output-format=json`, verify Cargo Dist 0.31.0 and Rust 1.95 before building,
+and reject unless the emitted manifest names that one exact target. The early
+self-check must compare the unique static matrix set for exact equality with
+the checked CLI SHA's `dist-workspace.toml`, not merely search for five known
+strings. This closes drift, duplicate-row, fuzzy-host, and accidental
+sixth-target cases.
+
+### P2-14B — two controls claim review before it is complete
+
+`GwzM5-8R4bTransitionDesign.md` and `GwzM5-8Refactor.md` describe §14 evidence
+as “independently reviewed” while both §14 interface reviews are still in
+progress and this review is NON-GO. They must say that independent interface
+review is pending/required until both reviews return GO. Amendment 2, the
+change budget, and the reverse-lifecycle interface correctly retain the pause
+through interface acceptance, implementation, focused settled-code review, and
+the successful exact-SHA run.
+
+### Ownership, accounting, and verification
+
+The one-path accounting is correct. Charging the new evidence path once to
+P0.2 and once to P1 changes P0.2 **23/26 to 23/27**, P1 **24/19 to 24/20**, and
+R4b-P charged paths **174/158 to 174/160**. Because the physical path is new to
+both unions, R4b-P unique evidence changes **106 to 107** and program-unique
+evidence **149 to 150**; production counts and all numeric line ceilings remain
+unchanged. Reporting 23/26 implemented paths within the frozen 23/27 manifest
+before workflow implementation is also correct.
+
+`python3 gwz-core/scripts/checks/check_merge_docs.py` passed all 87 assertions,
+and the changed control documents pass `git diff --check`. Closing P1-14A and
+P2-14B in the interface and controls requires another independent §14 interface
+re-review before the workflow is authored.
+
+## §14 corrected-interface architecture re-review — 2026-08-11
+
+### Verdict
+
+**GO.** P1-14A and P2-14B are closed. The corrected §14 is a complete
+pre-implementation contract for the one-path non-publishing native platform
+gate. No P0, P1, P2, or P3 finding remains. This verdict authorizes only the
+bounded workflow implementation; P1 remains paused through its focused
+settled-code review and successful exact-SHA five-target run.
+
+### Closure of P1-14A
+
+One contract job now owns the single JSON matrix, rejects duplicate, missing,
+or extra targets and runner drift, and passes that same matrix to all build
+jobs. Every row freezes the CI-safe Cargo Dist invocation to
+`--artifacts=local`, its one exact `--target`, explicit
+`--tag=v0.2.0-dev`, `--print=linkage`, and JSON output. The selector matches the
+frozen CLI package version, is explicitly non-implicit, and neither resolves
+nor creates a Git tag or release.
+
+The post-build contract pins Cargo Dist 0.31.0, the explicit announcement
+selector, and the row's exact executable archive and checksum through
+`dist print-upload-files-from-manifest`; output for any other target rejects.
+Together with the already-accepted workflow repository/path/SHA binding,
+sibling checkout `HEAD` checks, per-row identity records, native runners, and
+all-row success rule, this is exact five-target Cargo Dist parity rather than
+fuzzy host evidence.
+
+The locally installed Cargo Dist 0.31.0 `plan` output confirmed the specified
+`dist_version`, `announcement_tag`, and `announcement_tag_is_implicit` fields
+and the target-specific archive/checksum schema. A direct local `dist build`
+attempt stopped before compilation because this development checkout is nested
+in the outer `gwz-dev` Cargo workspace, whose root does not define the member's
+`dist` profile. That host-layout limitation does not apply to §14's specified
+clean sibling checkouts and is not claimed as platform evidence.
+
+### Closure of P2-14B and retained boundary
+
+`GwzM5-8R4bTransitionDesign.md` and `GwzM5-8Refactor.md` now call §14 proposed
+evidence pending interface review rather than claiming completed review. The
+amendment, change budget, and reverse-lifecycle interface consistently retain
+the pause through both reviews, implementation, settled-code review, and the
+exact pushed-commit run.
+
+The security and ownership judgments are unchanged: the manual workflow has
+only `contents: read`, diagnostic Actions-artifact authority, and explicit
+prohibitions on release, host, announce, attestation, publication, and release-
+asset operations. The one physical path is charged twice but counted once per
+union: P0.2 remains **23/27**, P1 **24/20**, R4b-P charged **174/160**, R4b-P
+unique **104/107**, and program-unique **145/150**, with no production or line-
+ceiling change.

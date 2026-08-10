@@ -11,8 +11,10 @@ accepted and P2-P4 are implemented; P1 consumption exposed the compound
 root-preservation gap corrected in `GwzM5-8R4bInterfaceAmendment-2.md`; both
 independent reviewers accepted the interface through §13; the
 production-disabled P0.2 implementation and bounded settled-code remediation
-are accepted by both corrected-code reviews with no open P0-P3 finding; P1
-remains paused solely on native release-platform evidence**
+are accepted by both corrected-code reviews with no open P0-P3 finding; the
+Windows portability remediation is code-GO; both §14 interface reviews are GO;
+P1 remains paused while its non-publishing native release-platform workflow is
+implemented, reviewed, and run on the exact pushed commits**
 
 ## 1. Decision
 
@@ -1191,8 +1193,10 @@ accepted its durable restoration-parent step and bounded owner manifest through
 production-disabled P0.2 implementation is present; its first settled-code
 architecture review found bounded provenance, manifest, evidence, and control
 defects whose remediation is accepted by both corrected-code reviews. P0.2 is
-accepted locally; P1 remains paused on native release-platform evidence. P2-P4
-retain completed work, and R4b-G awaits accepted P1.
+accepted locally, and both amendment 2 §14 interface reviews are GO. P1 remains
+paused while the non-publishing native release-platform workflow is
+implemented, reviewed, and run on the exact pushed commits. P2-P4 retain
+completed work, and R4b-G awaits accepted P1.
 
 The concrete R4b-X service persists an exact participant owner before every
 Git mutation and treats the durable prepared variant as the sole

@@ -6,8 +6,10 @@ disabled. The first settled-code architecture review then found an index-only
 foreign-marker provenance defect, four uncounted causal-seam export paths,
 incomplete evidence rows, and stale control text. The bounded remediation is
 implemented and both corrected-code re-reviews are GO with no open P0-P3
-finding. P0.2 is accepted locally; P1 remains paused solely on the native
-release-platform evidence gate.
+finding. P0.2 is accepted locally. The Windows portability remediation is
+code-GO. Both independent reviewers accepted §14's non-publishing native
+release-platform interface with no open P0-P3 finding; P1 remains paused while
+that workflow is implemented, reviewed, and run on the exact pushed commits.
 
 This amendment is additive to `GwzM5-8R4bInterfaceAmendment-1.md` and is
 controlling where the earlier documents describe root preservation as one
@@ -1182,15 +1184,15 @@ rows and the now-measured evidence expansion replace §12.5's numeric ceilings:
 | shared Git implementation/testing | 2,200 | 450 | 3,800 | 11 | 9 |
 | model/transition integration | 450 | 0 | 1,100 | 3 | 7 |
 | lifecycle causal seam | 450 | 0 | 1,000 | 9 | 3 |
-| documents/reviews/control | 0 | 0 | 5,200 | 0 | 7 |
-| **P0.2 total** | **3,100** | **450** | **11,100** | **23** | **26** |
+| documents/reviews/control/platform gate | 0 | 0 | 5,200 | 0 | 8 |
+| **P0.2 total** | **3,100** | **450** | **11,100** | **23** | **27** |
 
 Shared Git and lifecycle work is also charged to P1, whose ceiling becomes
 4,000 net production, 1,500 moved production, and 6,600 test/tool/doc with
-24/19 charged path counts. R4b-P becomes
-14,000/2,950/31,400 lines with 174/158 charged paths. Program
+24/20 charged path counts. R4b-P becomes
+14,000/2,950/31,400 lines with 174/160 charged paths. Program
 unique-once ceilings become 19,250 production and 38,300 evidence lines with
-145/149 paths.
+145/150 paths. The conservative R4b-P unique path ceiling becomes 104/107.
 
 The four export surfaces are already P0-owned and therefore add eight charged
 P0.2/P1 appearances without increasing either production union. The one-path
@@ -1199,8 +1201,79 @@ Python gate exposed its missing required-optional `MergeResponse.record`
 fixture. It is not a P0.2 evidence owner and changes no line ceiling.
 
 These remain stop ceilings. Both pre-implementation §13 interface reviews and
-both corrected-tree settled-code reviews returned GO. The accepted actual is
+both corrected-tree settled-code reviews returned GO. Before §14's allocated
+workflow exists, the accepted actual is
 2,738/3,100 semantic production lines, 450/450 moved production lines, and
-9,570/11,100 evidence lines across the frozen 23/26 paths. P0.2 is accepted
-locally; P1 remains paused until the native release-platform evidence gate
-passes on the committed and pushed corrected tree.
+10,124/11,100 evidence lines across 23/26 implemented paths within the frozen
+23/27 manifest. P0.2 is accepted locally; both §14 interface reviews are GO.
+P1 remains paused until the workflow passes implementation review and succeeds
+on the exact committed and pushed corrected tree.
+
+## 14. Non-publishing native platform gate
+
+P1-WR1 found that `gwz-cli/.github/workflows/release.yml` can run the Cargo
+Dist matrix only for an existing release tag and retains publishing authority.
+Creating a tag or release merely to test a prerelease checkpoint is not an
+acceptable gate. This section allocates exactly one new evidence/control path:
+
+```text
+gwz-cli/.github/workflows/platform-gate.yml
+```
+
+The workflow is manual `workflow_dispatch` only. It requires exact 40-hex
+`gwz-cli` and `gwz-core` commit inputs and fails before checkout unless
+`github.repository`, the path in `github.workflow_ref`, and
+`github.workflow_sha` identify
+`owebeeone/gwz-cli/.github/workflows/platform-gate.yml` at exactly the supplied
+`gwz-cli` commit. It then checks out the two supplied commits as sibling
+directories, verifies both checked-out `HEAD` values, and builds the CLI's
+local Cargo Dist artifacts for the five targets already frozen in
+`gwz-cli/dist-workspace.toml`:
+
+```text
+x86_64-pc-windows-msvc
+aarch64-apple-darwin
+x86_64-apple-darwin
+aarch64-unknown-linux-gnu
+x86_64-unknown-linux-gnu
+```
+
+It uses Rust 1.95 and Cargo Dist 0.31, runs each target on its native GitHub
+runner, and may upload diagnostic workflow artifacts only. A contract job owns
+one JSON matrix, rejects duplicate/missing/extra targets or runner drift, and
+passes that exact matrix to the build jobs. Every row executes exactly:
+
+```text
+dist build --artifacts=local --target=<row-target> \
+  --tag=v0.2.0-dev --print=linkage --output-format=json
+```
+
+The explicit `v0.2.0-dev` value is Cargo Dist's non-implicit announcement
+selector matching the frozen CLI package version; it is not created as a Git
+tag or release. The post-build check requires `dist_version: 0.31.0`,
+`announcement_tag: v0.2.0-dev`, `announcement_tag_is_implicit: false`, and
+exactly the row target's executable archive plus checksum from
+`dist print-upload-files-from-manifest`; any other target output fails the row.
+
+The workflow's permissions are `contents: read`; it has no release event, tag
+creation, host/create/upload/release/announce invocation, attestation, GitHub
+Release, package publication, or release-asset upload step. Failure or
+cancellation of the contract job or any target fails the gate.
+
+The workflow source owns its static five-row matrix and an early self-check
+that rejects loss of the exact inputs, workflow repository/path/SHA binding,
+read-only permissions, five targets, or the presence of release/publishing
+commands. No second test path is allocated. Every target writes a gate-identity
+artifact and job summary containing the workflow repository, workflow path,
+`github.workflow_sha`, both supplied and observed checkout SHAs, and target.
+The actual successful run retains those identities plus each target's Cargo
+Dist manifest/artifacts.
+
+This path is charged once to P0.2 and once again to P1. It raises P0.2 evidence
+paths from 26 to 27, P1 charged evidence paths from 19 to 20, and R4b-P charged
+evidence paths from 158 to 160. Because it is new to both unions, R4b-P unique
+evidence paths rise from 106 to 107 and program-unique evidence paths from 149
+to 150. Numeric line ceilings do not change. The workflow may not be authored
+until both independent interface reviewers accept this section, and P1 remains
+paused until the implemented workflow receives a focused settled-code review
+and its exact-SHA five-target run succeeds.
