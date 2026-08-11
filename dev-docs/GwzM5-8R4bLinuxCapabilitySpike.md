@@ -2,8 +2,8 @@
 
 Date: 2026-08-12
 
-Status: **interface decision accepted; execution workflow authored; native
-evidence required before R1**.
+Status: **R0-L evidence remediation implemented; authoritative native rerun
+and independent acceptance are pending**.
 
 ## Decision
 
@@ -109,8 +109,52 @@ The executable gate lives in `gwz-core/scripts/linux_identity_probe/` and
 contract first, then performs privileged fail-not-skip native probes on
 `ubuntu-24.04` (`linux-x86_64`) and `ubuntu-24.04-arm` (`linux-aarch64`). Its
 aggregate job accepts exactly those two rows with one commit/run/source/table
-binding and publishes `linux-durable-identity-evidence`. Record the successful
-run and downloaded aggregate digest here before assigning R1.
+binding and publishes `linux-durable-identity-evidence`. The successful run and
+downloaded aggregate digest are recorded below.
+
+## Superseded first execution
+
+GitHub Actions run
+[`31536272593`](https://github.com/owebeeone/gwz-core/actions/runs/31536272593)
+completed successfully against core commit
+`808e64a21a36d5e0bbe5b4400cd5975eef5cff97`.
+
+The downloaded aggregate is retained byte-for-byte as
+`GwzM5-8R4bLinuxIdentityEvidence-Run31536272593.json` with SHA-256
+`46357d09608205eac0b0868181d0bc9c6d643c2e5dbd0d7c8fedd51648184b57`.
+It binds:
+
+- probe source SHA-256
+  `04a5cc39cf6437783a350fdff19375cafe045c346ebabddd045397c01b40a9f7`;
+- provider-table SHA-256
+  `5eb3679744e641b4f718cb86b7ea92f71238ed4a69802d1f058d7496d8017aaa`;
+- `linux-x86_64` and `linux-aarch64` on kernel `6.17.0-1020-azure`;
+- the fixed external UUID `718c918e3cc343c9ae9e27f5cecc8a17`;
+- positive handle type `1` and eight-byte persistent handles on both
+  architectures;
+- identical UUID, handle type/bytes, and sensitive/casefold modes across each
+  unmount/remount cycle;
+- descriptor-bound substitution, missing-`AT_EMPTY_PATH`, and forbidden
+  flag/path-fallback checks; and
+- exact `UnsupportedOperation` results for all eight negative support rows,
+  including real overlay and tmpfs mounts.
+
+Mount IDs happened to remain stable within both runs, but the artifact records
+them only as non-authoritative diagnostics and the equality gate excludes them.
+An independent review found that the native positive observations were
+credible, but the aggregate validator did not reject deleted or falsified
+tuple, query, substitution, and mount-authority facts. It also found that the
+executed negative table omitted permission denial, unsupported empty-path
+lookup, and a malformed nonzero UUID length. This run is therefore useful
+positive evidence but is not the R0-L gate and does not permit R1 to begin.
+
+The remediated gate binds both rows to the aggregate job's exact commit and run,
+recomputes source and provider-table digests, checks the native machine for each
+declared architecture, validates every field in a closed schema, and rejects
+missing, unknown, or false evidence. Its exact 15-row negative table now
+executes the omitted typed query outcomes and malformed UUID case. The two
+native architectures must be rerun and the resulting artifact independently
+accepted before this status changes to complete.
 
 The same-invocation provider test retains object `A`, renames/replaces its old
 pathname with object `B`, and then performs the empty-path descriptor query. It
