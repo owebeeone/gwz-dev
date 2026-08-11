@@ -156,6 +156,32 @@ executes the omitted typed query outcomes and malformed UUID case. The two
 native architectures must be rerun and the resulting artifact independently
 accepted before this status changes to complete.
 
+## Remediated execution awaiting independent acceptance
+
+GitHub Actions run
+[`31537368340`](https://github.com/owebeeone/gwz-core/actions/runs/31537368340)
+completed successfully against the hardened gate at core commit
+`11d0817657939cdc995a3696b6606b7f3e7e6614`. The contract, native x86-64,
+native AArch64, and aggregate jobs all passed.
+
+The downloaded canonical artifact is retained byte-for-byte as
+`GwzM5-8R4bLinuxIdentityEvidence.json` with SHA-256
+`5ebddb1141576816609c2fe1e8e65b163d75ba9a3e4001852e0a6ed7baff313c`.
+It binds probe-source SHA-256
+`fbf2de6426dc728af8db8c6444eeeff7c1bbc4bde61b0ee4d576a43492a2311d`
+and provider-table SHA-256
+`5eb3679744e641b4f718cb86b7ea92f71238ed4a69802d1f058d7496d8017aaa`
+to the exact commit, workflow run, and declared/native architecture pairs.
+
+Both native rows record the fixed external UUID, positive type-1 eight-byte
+handles, complete sensitive/casefold path modes, descriptor-bound substitution,
+and equal durable tuples across remount. They also record the exact closed query
+contract and all 15 negative outcomes, including `IoError` for injected
+permission denial and `UnsupportedOperation` for injected unsupported empty-path
+lookup. Mount IDs remain diagnostic and non-authoritative. Independent review
+must confirm that this remediated run closes P1-1 and P2-1 before R0-L is marked
+complete or R1 begins.
+
 The same-invocation provider test retains object `A`, renames/replaces its old
 pathname with object `B`, and then performs the empty-path descriptor query. It
 must still return `A`'s handle. Negative rows cover missing `AT_EMPTY_PATH`,
