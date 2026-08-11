@@ -2,8 +2,8 @@
 
 Date: 2026-08-12
 
-Status: **R0-L evidence remediation implemented; authoritative native rerun
-and independent acceptance are pending**.
+Status: **R0-L accepted; the remediated native evidence is complete on both
+Linux release architectures**.
 
 ## Decision
 
@@ -156,7 +156,7 @@ executes the omitted typed query outcomes and malformed UUID case. The two
 native architectures must be rerun and the resulting artifact independently
 accepted before this status changes to complete.
 
-## Remediated execution awaiting independent acceptance
+## Accepted remediated execution
 
 GitHub Actions run
 [`31537368340`](https://github.com/owebeeone/gwz-core/actions/runs/31537368340)
@@ -179,8 +179,14 @@ and equal durable tuples across remount. They also record the exact closed query
 contract and all 15 negative outcomes, including `IoError` for injected
 permission denial and `UnsupportedOperation` for injected unsupported empty-path
 lookup. Mount IDs remain diagnostic and non-authoritative. Independent review
-must confirm that this remediated run closes P1-1 and P2-1 before R0-L is marked
-complete or R1 begins.
+`GwzM5-8R4bLinuxIdentityEvidence-Review-2.md` confirmed that P1-1 and P2-1 are
+closed, found no new P0/P1/P2 defect, and issued GO for R0-L and R1.
+
+That review records one non-blocking P3 strict-JSON-type hardening item: Python
+equality accepts numeric `1` as an alias for a few required `true` values. The
+retained producer artifact uses the exact intended scalar types, and this does
+not permit false evidence, so it remains explicit backlog rather than reopening
+the accepted native gate.
 
 The same-invocation provider test retains object `A`, renames/replaces its old
 pathname with object `B`, and then performs the empty-path descriptor query. It
