@@ -1189,10 +1189,15 @@ rows and the now-measured evidence expansion replace §12.5's numeric ceilings:
 
 Shared Git and lifecycle work is also charged to P1, whose ceiling becomes
 4,000 net production, 1,500 moved production, and 6,600 test/tool/doc with
-24/20 charged path counts. R4b-P becomes
-14,000/2,950/31,400 lines with 174/160 charged paths. Program
+29/20 charged path counts. The five additional production paths are the
+lead-approved cohesion split of the existing preservation observer into
+`cursor`, `entry`, `phase`, `phase/evidence`, and `phase/steps` owners; the
+parent remains a router and every resulting owner is below 500 lines. The six
+dedicated preservation test owners were already reserved, so evidence counts
+do not change. R4b-P becomes
+14,000/2,950/31,400 lines with 179/160 charged paths. Program
 unique-once ceilings become 19,250 production and 38,300 evidence lines with
-145/150 paths. The conservative R4b-P unique path ceiling becomes 104/107.
+150/150 paths. The conservative R4b-P unique path ceiling becomes 109/107.
 
 The four export surfaces are already P0-owned and therefore add eight charged
 P0.2/P1 appearances without increasing either production union. The one-path

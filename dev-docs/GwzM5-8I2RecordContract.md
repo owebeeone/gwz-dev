@@ -4,6 +4,12 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-11 by
+`GwzM5-8R4bInterfaceAmendment-1.md` and
+`GwzM5-8R4bInterfaceAmendment-2.md`: the fifth top-level v1 field and its
+flattened preservation journal are part of the frozen wire below. This
+document is wire-authoritative only as amended by those accepted interfaces.
+
 Amended 2026-08-09 during the R4b architecture review: bound exact-not-started
 abort/preserve abandonment and the single legal forward-action owner are
 clarified below. The amendment changes no v1 wire shape and introduces no
@@ -24,7 +30,7 @@ record_schema_version: 1
 ```
 
 `MergeOperationRecordV1` retains every v0 field, field name, enum spelling,
-and nested container at the same YAML path. It adds four top-level fields:
+and nested container at the same YAML path. It adds five top-level fields:
 
 ```rust
 struct MergeOperationRecordV1 {
@@ -34,6 +40,7 @@ struct MergeOperationRecordV1 {
     recovery_context: Option<RecoveryContextV1>,
     pending_rollback: Option<PendingRollbackActionV1>,
     pending_preservation: Option<PendingPreservationActionV1>,
+    preservation_publication_handoff: Option<PreservationPublicationHandoffV1>,
 }
 ```
 
@@ -360,9 +367,10 @@ abandonment.
 Migration first records every v0 unknown YAML path and raw value. The v1 body
 keeps all surviving v0 containers at the same path, so their unknown fields
 remain at that exact path and value. A v0 unknown top-level field named
-`accepted_workspace`, `recovery_context`, `pending_rollback`, or
-`pending_preservation` collides with a v1 known field and makes migration
-ineligible; it is never adopted, overwritten, or moved.
+`accepted_workspace`, `recovery_context`, `pending_rollback`,
+`pending_preservation`, or `preservation_publication_handoff` collides with a
+v1 known field and makes migration ineligible; it is never adopted,
+overwritten, or moved.
 
 Current-version rewrites use this closed retirement table:
 
@@ -416,6 +424,6 @@ implementation plan names tests for:
 - partial multi-ref cleanup proving the immutable archive worklist is an
   idempotent owner and the archive remains until every ref is absent;
 - unknown fields in every surviving and retiring container, including all
-  four top-level v1 collisions; and
+  five top-level v1 collisions; and
 - atomic rewrite verification proving either complete old bytes or complete
   verified new bytes after every injected fault.

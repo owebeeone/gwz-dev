@@ -12,7 +12,8 @@ production-disabled P0.2 implementation and bounded settled-code remediation
 are accepted by both corrected-code reviews with no open P0-P3 finding; the
 Windows portability remediation is code-GO; both §14 settled-implementation
 reviews and the exact-SHA native release-platform run are GO; P1-WR1 is closed
-and P1 is unpaused**
+and P1 is implemented with local tests and static analysis green, pending
+settled-tree review**
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -514,11 +515,11 @@ ceilings, not implementation targets:
 | R4b-A — shared acceptance builder and publication classification input | ≤650 | ≤400 | ≤900 | ≤10 | ≤8 |
 | R4b-F — acceptance-consuming finalization | ≤2,100 | ≤1,100 | ≤1,800 | ≤18 | ≤16 |
 | R4b-X — participant/continue/recovery service | ≤1,050 | ≤1,100 | ≤1,500 | ≤14 | ≤12 |
-| R4b-P — lead reverse-entry closure; exact root-preservation correction; preservation/rollback/recovery/status/archive/GC consumers; frozen I2 field-10 projection | ≤14,000 | ≤2,950 | ≤31,400 | ≤174 charged / ≤104 unique | ≤158 charged / ≤106 unique |
+| R4b-P — lead reverse-entry closure; exact root-preservation correction; preservation/rollback/recovery/status/archive/GC consumers; frozen I2 field-10 projection | ≤14,000 | ≤2,950 | ≤31,400 | ≤179 charged / ≤109 unique | ≤160 charged / ≤107 unique |
 | R4b-G — aggregate gates and wiring only | ≤150 | 0 | ≤1,500 | ≤3 | ≤12 |
 
-The aggregate unique-file ceiling is conservatively 145 production-bearing
-paths and 149 test/tool/doc paths. The aggregate semantic-addition ceiling is
+The aggregate unique-file ceiling is conservatively 150 production-bearing
+paths and 150 test/tool/doc paths. The aggregate semantic-addition ceiling is
 19,250 production-bearing lines and 38,300 test/tool/doc lines; the per-checkpoint
 ceilings remain controlling even when the aggregate has room. Shared files are
 counted in every checkpoint that changes them and once in the aggregate.
@@ -788,16 +789,22 @@ The exact P0.2 allocation is:
 | **P0.2 total** | **3,100** | **450** | **11,100** | **23** | **27** |
 
 The shared Git and lifecycle rows are also charged to P1. They revise P1 to
-4,000 net production, 1,500 moved, 6,600 test/tool/doc, and 24/20 charged
+4,000 net production, 1,500 moved, 6,600 test/tool/doc, and 29/20 charged
 production/evidence paths.
 
 The complete revised R4b-P charged ceiling is 14,000 production, 2,950 moved,
-31,400 test/tool/doc, and 174/160 production/evidence path charges.
-Conservative unique P-package ceilings are 104/107. At the program level the
+31,400 test/tool/doc, and 179/160 production/evidence path charges.
+Conservative unique P-package ceilings are 109/107. At the program level the
 shared P1 charge is counted once, producing 19,250 production lines, 38,300
-test/tool/doc lines, and 145/150 paths because the resolver and lifecycle
+test/tool/doc lines, and 150/150 paths because the resolver and lifecycle
 evidence owners already belong to earlier checkpoints while the focused parent
 and unknown-field owners are new.
+
+The five additional P1 production paths are the lead-approved cohesion split
+of the retained preservation observer into `cursor`, `entry`, `phase`,
+`phase/evidence`, and `phase/steps` owners. Every resulting owner is below 500
+lines. The six dedicated `reverse_preservation` evidence owners were already
+reserved in the P1 manifest, so evidence path and line ceilings do not change.
 
 The settled-code recount charges the causal seam's four existing parent export
 paths to both P0.2 and P1. Those eight charged appearances add no unique path
@@ -818,8 +825,9 @@ re-reviews. With the allocated workflow implementation present, the measured act
 is 2,738/3,100 semantic production lines, 450/450 moved production lines, and
 10,648/11,100 evidence lines across 23/27 implemented paths within the 23/27
 manifest. Both §14 settled-implementation reviews and the exact-SHA run are GO.
-P0.2 is accepted locally; P1-WR1 is closed and P1 is unpaused against the
-frozen seam. This does not activate
+P0.2 is accepted locally; P1-WR1 is closed. P1 is implemented against the
+frozen seam with local tests and static analysis green and awaits settled-tree
+review. This does not activate
 production v1 writing or dispatch.
 
 The document/review/control component measured 1,753 lines at its first

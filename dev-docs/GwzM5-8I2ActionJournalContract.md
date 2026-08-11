@@ -4,6 +4,13 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-11 by
+`GwzM5-8R4bInterfaceAmendment-1.md` and
+`GwzM5-8R4bInterfaceAmendment-2.md`: the durable publication handoff and the
+flattened 11-phase stash/10-phase reset graphs below supersede the original
+compound root phases. This document is wire-authoritative only as amended by
+those two accepted interfaces.
+
 Amended 2026-08-09 during the R4b architecture review: selected-root metadata
 rollback is explicitly legal before acceptance when the selected participant
 and exact operation-baseline bytes provide the frozen authority. Exact
@@ -60,7 +67,7 @@ enum PendingPreservationActionV1 {
         message: String,
         head_commit: String,
         preimage_sha256: String,
-        root_publication_prefix: Option<PublicationPrefixV1>,
+        root_publication_handoff: Option<PreservationPublicationCandidateV1>,
     },
     ResetAttachedRef {
         owner: PreservationOwnerV1,
@@ -68,7 +75,7 @@ enum PendingPreservationActionV1 {
         expected_commit: String,
         restore_commit: String,
         phase: PreservationRefResetPhaseV1,
-        root_publication_prefix: Option<PublicationPrefixV1>,
+        root_publication_handoff: Option<PreservationPublicationCandidateV1>,
     },
 }
 
@@ -79,15 +86,26 @@ enum PreservationOwnerV1 {
 }
 #[serde(rename_all = "snake_case")]
 enum PreservationStashPhaseV1 {
-    NormalizeRoot, CreateStash, RestoreRoot, WriteBundle, Complete,
+    NormalizeParent, NormalizeMarker, NormalizeLock, NormalizeIndex,
+    CreateStash, RestoreIndex, RestoreLock, RestoreParent, RestoreMarker,
+    WriteBundle, Complete,
 }
 #[serde(rename_all = "snake_case")]
-enum PreservationRefResetPhaseV1 { ResetRef, RestoreRoot, Complete }
+enum PreservationRefResetPhaseV1 {
+    PrepareParent, PrepareMarker, PrepareLock, PrepareIndex, ResetRef,
+    RestoreIndex, RestoreLock, RestoreParent, RestoreMarker, Complete,
+}
 struct GitObjectIdV1 { algorithm: GitObjectAlgorithmV1, digest_hex: String }
 #[serde(rename_all = "snake_case")]
 enum GitObjectAlgorithmV1 { Sha1, Sha256 }
 #[serde(rename_all = "snake_case")]
 enum PublicationPrefixV1 { Baseline, Marker, Lock, Boundary }
+#[serde(rename_all = "snake_case")]
+enum PublicationIndexFormV1 { Pre, Staged }
+struct PreservationPublicationCandidateV1 {
+    prefix: PublicationPrefixV1,
+    index: PublicationIndexFormV1,
+}
 ```
 
 ## 2. Recovery and legality
@@ -210,19 +228,26 @@ not-started, exact target means completed, and any other ref is ambiguous.
 Checked reset of the same existing attached integration ref advances only:
 
 ```text
-reset_ref -> restore_root -> complete
+with a root handoff:
+prepare_parent -> prepare_marker -> prepare_lock -> prepare_index
+-> reset_ref -> restore_index -> restore_lock -> restore_parent
+-> restore_marker -> complete
+
+without a root handoff:
+reset_ref -> complete
 ```
 
-`RestoreRoot` is skipped only when `root_publication_prefix` is absent. Before
-reset, the exact ref must equal `expected_commit`; after reset it must equal
-`restore_commit`. Any root-repository action with a prefix, including
+The extended graph is used only when `root_publication_handoff` is present.
+Before reset, the exact ref must equal `expected_commit`; after reset it must
+equal `restore_commit`. Any root-repository action with a handoff, including
 `Participant { member_id: "@root" }` and `PublicationRoot`, may have reset the
 root index/worktree, so the recorded prefix and immutable candidate/baseline
-data own exact restoration before completion. A crash after checked ref reset
-but before its phase write is recognized by the exact restored ref plus the
-exact reset root state and resumes at `RestoreRoot`; a foreign ref or any root
-state other than the exact reset/restored forms is ambiguous. The action clears
-only in the same write that records complete checked root restoration.
+data own exact restoration before completion. Each marker-parent, marker,
+lock, and raw-index step is an independent durable phase. A crash after checked
+ref reset but before its phase write is recognized only by the exact restored
+ref plus the exact phase-local root form; a foreign ref or any mixed root state
+is ambiguous. The action clears only in the same write that records complete
+checked root restoration.
 
 For every repository, `ResetRef` not-started additionally requires exact
 attached HEAD/ref at `expected_commit` and the clean post-stash index/worktree;
@@ -234,18 +259,24 @@ index/worktree is ambiguous even when the ref target happens to match.
 Stash phases advance only:
 
 ```text
-normalize_root -> create_stash -> restore_root -> write_bundle -> complete
+with a root handoff:
+normalize_parent -> normalize_marker -> normalize_lock -> normalize_index
+-> create_stash -> restore_index -> restore_lock -> restore_parent
+-> restore_marker -> write_bundle -> complete
+
+without a root handoff:
+create_stash -> write_bundle -> complete
 ```
 
-The root-only phases are omitted only when no root prefix exists. The exact
+The root-only phases are omitted only when no root handoff exists. The exact
 owned stash id/object id, message, and decoded stash trees must agree with HEAD
 and the preimage fingerprint; missing, duplicate, foreign, or disagreeing
 stashes are ambiguous, never adopted. Before a `Stash` action is written,
 preflight rejects any index entry with assume-valid, skip-worktree, or
 intent-to-add set: native stash objects do not retain those flags, so they
 cannot be losslessly adopted after a crash. `CreateStash` is persisted with
-absent stash ids before mutation. Its result, including both ids, is persisted and
-reread atomically with advancement to `RestoreRoot` or `WriteBundle`. A crash
+absent stash ids before mutation. Its result, including both ids, is persisted
+and reread atomically with advancement to `RestoreIndex` or `WriteBundle`. A crash
 between creation and that write may adopt only one exact message/HEAD/preimage
 match. Not-started also requires the current index/worktree still equal the
 recorded preimage. Completed-exactly requires unchanged attached HEAD/ref plus
@@ -255,16 +286,18 @@ is illegal until both ids are persisted and verified; the
 bundle is generated only from that recorded object id. `Complete` retains both
 ids. SHA-1 ids contain 40 lowercase hex characters and SHA-256 ids contain 64.
 
-Phase cross-fields are exact. `NormalizeRoot` is legal only with a prefix and
-both stash ids absent. `CreateStash` has both ids absent. `RestoreRoot`,
-`WriteBundle`, and `Complete` require both ids present and equal to verified
-native evidence; `RestoreRoot` is legal only with a prefix. During
-`NormalizeRoot`, the only before form is the recorded publication prefix and
-the only after form is the exact normalized root state derived from immutable
-candidate/baseline bytes and index entries. During `RestoreRoot`, those forms
-reverse after the stash result is durable. Exact before means not started,
-exact after means completed, and every mixed/third index-worktree form is
-ambiguous and authorizes no mutation.
+Phase cross-fields are exact. Every normalize phase is legal only with a root
+handoff and both stash ids absent. `CreateStash` has both ids absent. Every
+restore phase, `WriteBundle`, and `Complete` requires both ids present and
+equal to verified native evidence; restore phases are legal only with a root
+handoff. Normalize steps move one managed object at a time from the exact
+handoff form to the exact attached-clean form; restore steps reverse one
+managed object at a time after the stash result is durable. Reset preparation
+uses the same handoff-to-attached-clean direction, and post-reset restoration
+moves from the exact restore-clean form back to the handoff. Exact before means
+not started, exact after means completed, the required empty-parent causal case
+is `AfterNeedsDurability`, and every mixed/third form is ambiguous and
+authorizes no mutation.
 
 `WriteBundle` also has a closed crash classifier. Before is either no bundle or
 the exact canonical bundle containing only already completed owner rows. After

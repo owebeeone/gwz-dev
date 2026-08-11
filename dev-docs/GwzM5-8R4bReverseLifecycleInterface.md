@@ -6,7 +6,8 @@ Status: **P0 and P0.1 accepted after independent re-review; P2-P4 are
 implemented; both independent reviewers accepted amendment 2 through §13 and
 the production-disabled P0.2 implementation and bounded settled-code
 remediation are accepted by both corrected-code reviews with no open P0-P3
-finding; the native release-platform gate is GO and P1 is unpaused**
+finding; the native release-platform gate is GO; P1 is implemented with local
+tests and static analysis green and awaits settled-tree review**
 
 This checkpoint freezes the ownership and consumer interfaces for R4b-P. It
 implements preservation, rollback, reverse-origin recovery, read-only open and
@@ -541,7 +542,7 @@ path or edit another lane's path without lead review:
 | --- | --- | --- |
 | P0 lead prerequisite (29) | `v1_lifecycle/{mod,reverse,archive_result,status,archive}.rs`; `v1_lifecycle/reverse/{preservation,rollback,execute}.rs`; `v1_lifecycle/reverse/execute/{preservation,rollback}.rs`; `transition/{mod,reverse_entry}.rs`; `transition/reduce/{mod,participant}.rs`; `authority.rs`; `authority/{dispatcher,observe}.rs`; `authority/observe/{finalization,reverse}.rs`; `authority/observe/finalization/{handoff,publication}.rs`; `authority/observe/reverse/{entry,preservation,preserving_recovery,rollback,rolling_back_recovery}.rs`; `record_wire/mod.rs`; `record_wire/archive/{mod,cleanup}.rs` | request/preview/handoff/tokens, closed publication fact, concrete router delegates, compiling lane skeletons, R3-backed archive result; reducer paths expose existing predecessor helpers without policy duplication |
 | P0.2 root preservation (23) | `Cargo.toml`; `git/gitbackend.rs`; `git/gitbackend/{contract,preservation,preservation_image,preservation_root,repository_support}.rs`; `git/gitbackend/preservation_root/{files,index,index_format,parent}.rs`; `merge/model/v1/journal.rs`; `merge/model/v1/validate/preservation.rs`; `merge/v1_lifecycle/transition/reduce/preservation.rs`; `v1_lifecycle/{authority,reverse}.rs`; `v1_lifecycle/authority/{observe,resolver,resolver/observation,resolver/execution}.rs`; `v1_lifecycle/authority/observe/reverse.rs`; `v1_lifecycle/authority/observe/reverse/preservation.rs`; `v1_lifecycle/reverse/execute/preservation.rs` | exact physical forms, checked root steps, flattened durable phases, validation, adjacency, capability filesystem dependencies, cohesive parent namespace owner, repository-format support, and causal post-barrier resolution; the four parent export surfaces are charged even though P0 already owns them |
-| P1 preservation (24) | `Cargo.toml`; `git/gitbackend.rs`; `git/gitbackend/{contract,preservation,preservation_image,preservation_root,repository_support}.rs`; `git/gitbackend/preservation_root/{files,index,index_format,parent}.rs`; `merge/preserve/{plan,artifacts}.rs`; `v1_lifecycle/{authority,reverse}.rs`; `authority/{observe,resolver,resolver/observation,resolver/execution}.rs`; `authority/observe/reverse.rs`; `authority/observe/reverse/{preservation,preserving_recovery}.rs`; `v1_lifecycle/reverse/preservation.rs`; `v1_lifecycle/reverse/execute/preservation.rs` | raw facts, sealed entry preflight, causal durability resolution and its parent export surfaces, two-pass observer/executor, preserving verifier |
+| P1 preservation (29) | `Cargo.toml`; `git/gitbackend.rs`; `git/gitbackend/{contract,preservation,preservation_image,preservation_root,repository_support}.rs`; `git/gitbackend/preservation_root/{files,index,index_format,parent}.rs`; `merge/preserve/{plan,artifacts}.rs`; `v1_lifecycle/{authority,reverse}.rs`; `authority/{observe,resolver,resolver/observation,resolver/execution}.rs`; `authority/observe/reverse.rs`; `authority/observe/reverse/{preservation,preserving_recovery}.rs`; `authority/observe/reverse/preservation/{cursor,entry,phase}.rs`; `authority/observe/reverse/preservation/phase/{evidence,steps}.rs`; `v1_lifecycle/reverse/preservation.rs`; `v1_lifecycle/reverse/execute/preservation.rs` | raw facts, sealed entry preflight, causal durability resolution and its parent export surfaces, two-pass observer/executor, preserving verifier; the five child owners are the lead-approved cohesion split of the retained preservation router |
 | P2 rollback (9) | `merge/abort/{preflight,evidence,participants}.rs`; `merge/root/{abort,artifact_facts}.rs`; `authority/observe/reverse/{rollback,rolling_back_recovery}.rs`; `v1_lifecycle/reverse/rollback.rs`; `v1_lifecycle/reverse/execute/rollback.rs` | pure cursor, no-follow root facts, sealed entry preflight, observer/executor, rolling-back verifier |
 | P3 status/protocol (18) | `protocol/gwz.taut.py`; generated `src/protocol/generated.rs`, `gwz-py/src/gwz/protocol/generated/{api.py,gwz.ir.json}`; `src/protocol/convert.rs`; `merge/model/{mod,record_projection}.rs`; `merge/{response,status/snapshot}.rs`; `merge/start/response.rs`; `v1_lifecycle/status.rs`; `gwz-cli/src/{git_status_json,merge_render}.rs`; `gwz-py/src/gwz/{cli_render.py,cli_merge.py,cli_render_parts/{machine,merge}.py}`; `gwz-py/native/src/dispatch/merge.rs` | one v0/v1 semantic projector, optimistic status, field 10 and renderers |
 | P4 archive/GC (8) | `v1_lifecycle/archive.rs`; `v1_lifecycle/store/{mod,rewrite}.rs`; `record_wire/archive/{mod,cleanup}.rs`; `merge/gc.rs`; `merge/store/{gc,retention}.rs` | canonical archived result, source/destination arbitration, immutable-worklist retention and GC |
@@ -799,15 +800,25 @@ The reconciled stop ceilings supersede §§15-16 for R4b-P:
 | P0 closed prerequisite | 1,200 | 0 | 4,200 | 29 | 21 |
 | P0.1 shared correction | 1,400 | 0 | 2,200 | 60 | 46 |
 | P0.2 root-preservation correction | 3,100 | 450 | 11,100 | 23 | 27 |
-| P1 preservation/recovery | 4,000 | 1,500 | 6,600 | 24 | 20 |
+| P1 preservation/recovery | 4,000 | 1,500 | 6,600 | 29 | 20 |
 | P2 rollback/recovery | 2,200 | 650 | 1,800 | 9 | 8 |
 | P3 status/protocol | 1,250 | 250 | 2,500 | 18 | 18 |
 | P4 archive/GC | 750 | 100 | 1,500 | 8 | 8 |
 | aggregate wiring, fault matrix, and checkpoint docs | 100 | 0 | 1,500 | 3 | 12 |
-| **Charged ceiling** | **14,000** | **2,950** | **31,400** | **174** | **160** |
+| **Charged ceiling** | **14,000** | **2,950** | **31,400** | **179** | **160** |
 
-The conservative unique ceilings are 104 production and 107 test/tool/doc
-paths. P0.2's 2,200/450/3,800 shared Git and 450/0/1,000 lifecycle portions
+The conservative unique ceilings are 109 production and 107 test/tool/doc
+paths. The program-wide unique production-path ceiling is 150. The five-path
+increase is solely the cohesion split of
+`authority/observe/reverse/preservation.rs` into the `cursor`, `entry`,
+`phase`, `phase/evidence`, and `phase/steps` owners listed in §12. The parent
+router remains, and every resulting owner is below 500 lines. The six
+`reverse_preservation` evidence owners were already reserved in the P1
+manifest, so the evidence path and all line ceilings are unchanged. This
+lead-reviewed recount supersedes amendment 2's provisional 24-path P1 figure
+without changing its wire, phase, action, or authority contracts.
+
+P0.2's 2,200/450/3,800 shared Git and 450/0/1,000 lifecycle portions
 are charged again to P1;
 P0.2 reserves 5,200 document lines for the accepted interface set plus bounded
 code-review/remediation appendices in the same memos. The aggregate program
@@ -816,7 +827,9 @@ The first settled-code architecture review found index-only provenance,
 manifest, evidence, and stale-control defects. Their bounded remediation is
 accepted by both corrected-code re-reviews. P0.2 is accepted locally. Both
 amendment 2 §14 settled-implementation reviews and the exact-SHA run are GO;
-P1-WR1 is closed and P1 is unpaused against the frozen seam.
+P1-WR1 is closed. P1 is implemented against the frozen seam, its local test
+and static-analysis gates are green, and settled-tree review remains required
+before acceptance.
 P2-P4 retain
 completed work but cannot authorize aggregate R4b-G integration while this
 gate is open.

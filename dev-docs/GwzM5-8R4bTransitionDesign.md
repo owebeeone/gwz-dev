@@ -28,7 +28,9 @@ attempt introduced no committed code and is not an implementation substrate.
 R4b is redesigned from the frozen I2 record and action-journal contracts.
 
 This document is normative for R4b. It narrows the R4b package described in
-`GwzM5-8Refactor.md`; the I2 contracts remain authoritative for wire shapes,
+`GwzM5-8Refactor.md`; the I2 contracts, as amended by
+`GwzM5-8R4bInterfaceAmendment-1.md` and
+`GwzM5-8R4bInterfaceAmendment-2.md`, remain authoritative for wire shapes,
 field derivations, phase ordering, observation classifiers, and unknown-field
 retirement.
 
