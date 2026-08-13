@@ -2,8 +2,8 @@
 
 Date: 2026-08-13
 
-Status: **implemented and locally verified; R2 and R4b-G remain blocked until
-the remediated tuple passes two independent settled-tree reviews**.
+Status: **second remediation locally verified; an exact settled commit and two
+fresh independent reviews are pending, so R2 and R4b-G remain blocked**.
 
 This plan consolidates the findings in:
 
@@ -216,3 +216,184 @@ R1 is accepted only when all of the following are true:
 - public merge-v1 protocol and disabled dispatcher behavior are unchanged;
 - all local verification gates pass; and
 - both independent settled-tree re-reviews report no P0/P1/P2.
+
+## 9. First-remediation review result
+
+The first implementation was committed at this exact settled tuple:
+
+- workspace root `07d3bc5ed9ce746fbedbe25ff48b217968ec6bf3`;
+- `gwz-core` `1bc07c4b35d6d158aa8daf25f924acf438f20698`; and
+- `gwz-cli` `3cca145c0b32410f250f640730ed7ca18f1da59f`.
+
+The two independent reviews are recorded in:
+
+- `GwzM5-8R4bR1Interface-ReviewFS-2.md`; and
+- `GwzM5-8R4bR1Interface-ReviewState-2.md`.
+
+Both returned **NO-GO**. They confirmed that the plan/schedule binding, closed
+record family, catalog grammar, bounded decoding, admission privacy, raw
+namespace-backend privacy, occupancy accounting, and exact fault vocabulary
+were materially corrected. The remaining findings expose six related holes in
+the ownership and recovery architecture rather than isolated implementation
+mistakes.
+
+## 10. Second-remediation architecture
+
+### 10.1 One sealed pre-catalog transaction
+
+The raw filesystem/collision provider becomes a sealed capability-owner
+implementation detail. A checked-artifact sibling cannot implement it and
+cannot call a permit-producing method.
+
+The public-internal catalog entry point performs one indivisible logical
+sequence:
+
+1. observe capability, retained path, collision domain, root kind, and lease;
+2. construct the opaque `PreCatalogPermitV1` inside the owner;
+3. immediately revalidate the retained root and every path component; and
+4. pass a non-constructible, lifetime-bound `RevalidatedPreCatalogPermitV1`
+   directly to catalog bootstrap.
+
+`CatalogBootstrapV1::recover_or_create` accepts only the revalidated value.
+There is no API on which a caller can omit revalidation or insert an unrelated
+operation between revalidation and the bootstrap call. A production-shaped
+provider compile test proves future platform providers can implement the raw
+seam without exposing it.
+
+### 10.2 Authority issued from one opaque observation
+
+`CheckedAuthorityRecordV1` no longer accepts a path, parent identity, source
+fingerprint, expected digest, and goal digest as independently supplied
+arguments. The authority owner obtains those facts from one sealed retained
+observation/request transaction and returns an opaque
+`CheckedAuthorityObservationV1`.
+
+Record creation accepts only that observation plus the resident reservation.
+Recovery binds the decoded record to both the reservation and the exact
+observation, not merely to a common support profile. Synthetic observation
+construction is test-only. This makes cross-root, cross-parent, cross-source,
+and cross-request composition unavailable to production siblings.
+
+### 10.3 Non-circular first-catalog ownership
+
+The initial catalog-bootstrap record carries a nonzero, randomly issued
+bootstrap ownership token. Every staging infrastructure record carries the
+same token and bootstrap record ID. The exact staging/final classification is
+therefore rooted in the already durable active bootstrap record, rather than
+in a post-hoc tuple derived from whatever directory was observed.
+
+Infrastructure construction is owner-controlled. The owner issues an opaque
+observation only after verifying the ownership marker/token and the exact
+staging directory identity, infrastructure identities, fixed names, profile,
+and retained-parent binding. Recovery accepts `Exact` only for that bound
+observation. A foreign or self-consistent but unowned directory is `Other` and
+cannot become the expected value merely because it was observed after restart.
+
+### 10.4 Complete role-typed namespace operations
+
+`ActionNamespace` remains the sole consumer-facing namespace seam and gains
+operations for every derived role:
+
+- publish and retire a barrier intent;
+- retire the exact roaming-anchor target alias;
+- publish bootstrap scratch and active generations;
+- retire the prior bootstrap generation;
+- publish a managed staging directory to its final component; and
+- retire the exact ownership marker to its scheduled marker slot.
+
+Every method accepts the corresponding opaque `BarrierSlots`,
+`BootstrapGenerationSlots`, or `BootstrapComponentSlots`, revalidates the
+admitted action directory and resident reservation, validates source parent,
+leaf, kind, provider, action, and ordinal bindings, and only then forwards to
+the private backend. No indexed transition accepts a raw slot or leaf.
+
+### 10.5 Exact managed-successor evidence
+
+Each managed component row retains the installed directory identity, mode,
+canonical path, and ownership-marker object identity once installation
+completes. Installation evidence is issued only when:
+
+- the prior retained path is an exact prefix;
+- the appended component names the scheduled final leaf;
+- the appended component's parent identity and mode equal the intent's exact
+  retained parent identity and mode; and
+- the ownership marker content and retained marker-object identity match the
+  current intent/component.
+
+Marker-retirement evidence carries and checks the retired marker identity plus
+the exact installed parent identity, mode, and path stored for that component.
+Successor creation rejects any same-profile substitution, changed case mode,
+wrong parent, wrong marker identity, or merely suffix-matching path.
+
+### 10.6 Independent semantic byte vectors
+
+Add a hand-authored semantic-vector fixture that is outside Taut's generated
+corpus and is never regenerated by `protocol/regen.py`. Literal canonical bytes
+must decode through the bounded semantic adapters and re-encode byte-for-byte.
+The fixture covers every durable record family, all closed enum variants, all
+three durable-identity variants, both path modes, both root kinds, all managed
+phases and purposes, every cleanup alias, and the `K=1,N=8` and `K=8,N=8`
+maximum schedule layouts.
+
+The test also proves the generated shape corpus is not being used as the
+semantic fixture. Changing a semantic tag, binding, canonical encoding, closed
+variant, or maximum layout requires an explicit reviewed fixture edit.
+
+### 10.7 Literal ownership cleanup
+
+Protocol limits and fixed catalog names are derived from their enum/grammar
+owners. The remaining hard-coded cleanup row limit and duplicated bootstrap,
+admission, and anchor names are removed while the affected modules are open.
+
+## 11. Second-remediation test-first sequence
+
+1. Commit the two `-2` review reports with the eventual remediation; do not
+   mistake the reports themselves for an accepted checkpoint.
+2. Add failing tests proving a caller cannot bootstrap from an unrevalidated
+   permit, cannot construct an authority from raw unrelated facts, cannot
+   adopt an unowned first-catalog directory, and can execute every scheduled
+   namespace role only through `ActionNamespace`.
+3. Add failing substitution tests for installed-parent identity/mode/path and
+   retired marker/parent identity/mode/path.
+4. Extend the Taut schema for bootstrap ownership and complete stored managed
+   component evidence, regenerate, then update semantic adapters.
+5. Implement the sealed owners, complete namespace forwarding seam, and exact
+   transition checks; remove superseded constructors and conventions.
+6. Add and exact-pin the independent semantic vectors and derive duplicated
+   literals from their owners.
+7. Run focused interface/protocol tests, the full core suite, clippy, fmt,
+   regeneration, public-protocol/dispatcher quarantine, privacy/call-graph
+   searches, and LOC/cohesion checks.
+8. Commit one new exact tuple with installed `gwz` and run two fresh
+   independent settled-tree reviews. R2 and R4b-G remain blocked until both
+   report no P0/P1/P2.
+
+## 12. Second-remediation local result
+
+The implementation now provides:
+
+- an owner-private pre-catalog provider with structurally adjacent immediate
+  revalidation and a lifetime-bound bootstrap handoff;
+- checked authority issued and recovered only from one opaque retained
+  observation;
+- non-circular first-catalog ownership through an active-record token and a
+  later infrastructure record whose stored identities are checked against the
+  physical marker and directory before an opaque exact observation is issued;
+- all seven missing role-specific namespace forwarding operations;
+- durable exact component identity, mode, path, and marker-object evidence for
+  managed installation and retirement; and
+- a non-regenerated 26-vector semantic-byte fixture covering every record
+  family and closed variant required by section 10.6.
+
+The lead-owned gates pass on the settled worktree:
+
+- 1,247 full-core tests passed, one ignored, zero failed;
+- 72 checked-artifact interface tests passed;
+- 29 public protocol tests passed;
+- strict all-target clippy, formatting, regeneration, and diff checks passed;
+- the production v1 decoder remains disabled; and
+- public `gwz` protocol/schema/conversion and merge-dispatch files are
+  byte-identical to the first-remediation base tuple.
+
+This is local evidence only. The exact commit tuple and both required review
+verdicts must be recorded before the status can advance to accepted.

@@ -2,9 +2,8 @@
 
 Date: 2026-08-13
 
-Status: **review findings remediated and locally verified; two critical
-settled-tree re-reviews are required before platform or catalog implementation
-begins**.
+Status: **second-review findings remediated and locally verified; two fresh
+critical settled-tree re-reviews are required before R2 or R4b-G begins**.
 
 This checkpoint turns the accepted replacement architecture in
 `GwzM5-8R4bP1P2-RemPlan-4.md` into Rust ownership boundaries. It does not
@@ -277,11 +276,25 @@ advisory-lock convergence. It cannot call durable providers, catalog, namespace
 barriers, or checked authority. The public `WorkspaceMutatorLock` remains a
 compatibility wrapper in R2.
 
-`CatalogBootstrapV1` requires a `PreCatalogPermitV1` and owns only the fixed
-scratch/active/staging/final grammar and retained catalog/anchor result. Its
-closed recovery table accepts only missing or exact-prefix scratch, exact
-active record, exact staging/final infrastructure, and exact retired-record
-progress; every unlisted combination is ambiguous.
+The pre-catalog owner performs retained-root observation, permit issuance, and
+immediate revalidation as one structurally ordered operation. It passes a
+lifetime-bound `RevalidatedPreCatalogPermitV1` directly to
+`CatalogBootstrapV1`; no consumer can issue or retain a revalidated permit or
+interpose work between revalidation and bootstrap.
+
+`CatalogBootstrapV1` owns only the fixed scratch/active/staging/final grammar
+and retained catalog/anchor result. Its active record carries a nonzero random
+ownership token but does not claim the identity of a staging directory that
+has not yet been created. The later infrastructure record carries that token,
+the active bootstrap record ID, and the observed staging identity. A private
+owner compares the physical marker, retained parent/path, fixed staging name,
+physical identity tuple, support profile, and any stored record before issuing
+the opaque exact observation accepted by recovery. The recovery classifier
+does not accept a caller-supplied expected infrastructure value.
+
+The closed recovery table accepts only missing or exact-prefix scratch, exact
+active record, owner-bound exact staging/final infrastructure, and exact
+retired-record progress; every unlisted combination is ambiguous.
 
 `ManagedParentBootstrap` requires a `BoundManagedParentPlanV1` issued only after
 the immutable plan exactly matches the resident admitted reservation. Execution
@@ -293,10 +306,13 @@ caller-token seam.
 ## 8. Private recovery-record model
 
 `protocol/checked_artifact.taut.py` is the sole field/tag definition for the
-new internal v1 records. Generated Rust and an independent canonical corpus are
-committed and checked by `protocol/regen.py --check`. Semantic adapters enforce
-closed variants, literal sizes, derived digests, reservation binding, and
-canonical re-encoding; they do not define a second wire format.
+new internal v1 records. Generated Rust and the generated shape corpus are
+committed and checked by `protocol/regen.py --check`. A separate, hand-authored
+26-vector semantic fixture is outside regeneration and is compiled into the
+test suite. Its literal canonical bytes must bounded-decode and re-encode
+byte-for-byte. Semantic adapters enforce closed variants, literal sizes,
+derived digests, reservation binding, and canonical re-encoding; they do not
+define a second wire format.
 
 The schema owns canonical path and durable-object identities, physical action
 schedules, capacity reservations, admission, checked authority, catalog
@@ -325,6 +341,15 @@ Independent equality tests must pin:
 - every record limit, unknown/trailing/noncanonical bytes, and exact-prefix
   scratch classification;
 - every binding field in barrier intent identity;
+- coherent checked-authority issue and recovery binding, with raw observation
+  and provider construction sealed behind its owner;
+- every role-specific barrier and managed-bootstrap namespace operation,
+  including provider/action/reservation, source parent/leaf/kind, and ordinal
+  substitution;
+- exact installed component identity/mode/path and marker-object identity
+  across installation and retirement successors;
+- all durable semantic record families and closed variants through the
+  independent literal-byte fixture;
 - the independently declared fault-key set; and
 - capability/path/collision/leaf/namespace/bootstrap privacy and typed-error
   boundaries.
@@ -333,11 +358,11 @@ Critical interface reviewers must report no P0/P1/P2 defect before Linux,
 Windows, or platform-independent catalog implementation is assigned. Consumer
 conversion remains R2 and is not part of this checkpoint.
 
-Local remediation evidence on 2026-08-13:
+Local second-remediation evidence on 2026-08-14:
 
-- `cargo test -p gwz-core`: 1,235 passed, one ignored (1,190 unit plus 45
+- `cargo test -p gwz-core`: 1,247 passed, one ignored (1,202 unit plus 45
   integration tests) on the final tree;
-- `cargo test -p gwz-core checked_artifact::interface_tests`: 61 passed;
+- `cargo test -p gwz-core checked_artifact::interface_tests`: 72 passed;
 - `cargo test -p gwz-core --test protocol`: 29 passed;
 - `cargo clippy -p gwz-core --all-targets -- -D warnings`: passed;
 - `cargo fmt --all -- --check`: passed; and
