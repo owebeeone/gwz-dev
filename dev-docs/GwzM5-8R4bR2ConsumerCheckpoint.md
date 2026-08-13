@@ -4,8 +4,8 @@ Date: 2026-08-14
 
 Status: **superseded where corrected by
 `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan.md`; the combined interface remains
-closed to R2 production conversion until both critical re-reviews accept an
-exact settled tuple**.
+closed to R2 production conversion until both second re-reviews accept an exact
+settled tuple**.
 
 ## 1. Purpose and sequencing
 

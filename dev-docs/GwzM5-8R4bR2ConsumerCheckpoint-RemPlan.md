@@ -2,9 +2,12 @@
 
 Date: 2026-08-14
 
-Status: **R2-I1 through R2-I4 implemented and locally green; no R2 production
-conversion may begin until the corrected interfaces and this amendment receive
-two independent GO re-reviews on the committed settled tuple**.
+Status: **the first settled re-reviews closed the original filesystem findings
+but found three overlapping P2 interface gaps. The second correction seals
+owner/request/action/plan construction, adds an exact durable-record issuer,
+and replaces the shallow source inventory with a mandatory fail-closed entry
+gate. No R2 production conversion may begin until this correction receives two
+independent GO re-reviews on a committed settled tuple**.
 
 ## 1. Scope and disposition
 
@@ -17,6 +20,33 @@ This amendment controls where it differs from
 The correction makes no public GWZ protocol change, does not enable merge-v1,
 and does not add a durability phase. It narrows the checked boundary and
 strengthens private R1/R2 interfaces before production implementation begins.
+
+The controlling re-review reports are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState.md`.
+
+Their overlapping P2 findings are corrected as one architectural change:
+
+- `CheckedManagedActionV1` seals the owner class, exact managed request,
+  purpose bitset, action digest, and owner binding;
+- production managed preflight accepts only that sealed value and derives its
+  plan bindings internally;
+- reservation derivation defensively compares the plan purpose mask with the
+  action purpose mask;
+- v0/v1 record owners consume one bounded, exact canonical record observation
+  whose IDs and hashed bytes cannot be supplied independently;
+- raw `CheckedArtifact` acquisition is module-private behind the complete
+  `checked_artifact::entry` symbol inventory; and
+- the entry/caller gate is run by release CI and has negative fixtures for an
+  ordinary submodule call, unknown facade, missing required merge reachability,
+  and raw-entry escape.
+
+The two P3 gaps were corrected in the same checkpoint: prefixed `.`/`..`
+suffixes reject, and literal managed schedule/reservation fixtures cover
+one-, two-, and four-purpose declarations, first-merge, partial-bootstrap, and
+combined parent-plus-leaf work with exact ordinals, ranges, masks, capacities,
+and digests.
 
 | Finding | Disposition |
 | --- | --- |
