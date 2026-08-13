@@ -2,8 +2,10 @@
 
 Date: 2026-08-14
 
-Status: **lead-owned interface freeze proposed for independent review; no R2
-production conversion begins until both critical reviews accept it**.
+Status: **superseded where corrected by
+`GwzM5-8R4bR2ConsumerCheckpoint-RemPlan.md`; the combined interface remains
+closed to R2 production conversion until both critical re-reviews accept an
+exact settled tuple**.
 
 ## 1. Purpose and sequencing
 
@@ -29,6 +31,12 @@ R2 does not:
 - auto-create a Git/user-owned parent such as `.git/info`; or
 - expose a raw provider, filesystem identity, reservation, namespace backend,
   proof constructor, or checked protocol record to a consumer.
+
+The two first-pass reviews found no P0/P1 defect and six P2 interface defects.
+Their complete disposition is the lead-owned amendment
+`GwzM5-8R4bR2ConsumerCheckpoint-RemPlan.md`. Where this checkpoint and that
+amendment differ, the amendment controls. This file is not silently rewritten
+to hide the reviewed baseline.
 
 ## 2. Current implementation boundary
 
