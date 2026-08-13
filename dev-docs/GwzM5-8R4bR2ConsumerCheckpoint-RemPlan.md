@@ -2,14 +2,14 @@
 
 Date: 2026-08-14
 
-Status: **the third settled re-reviews closed the location, owner, capability,
-and publication-gate defects but found two remaining P2 gaps. The fourth
-correction makes archive authority consume the same complete terminal semantic
-validator as production archive recovery. It also physically contains the
-checked bundle helper graph and combines a fail-closed source inventory with
-compiler-resolved writer denial across every checked adapter. No R2 production
-conversion may begin until this correction receives two independent GO
-re-reviews on a committed settled tuple**.
+Status: **the fourth settled re-reviews closed archive semantics and the named
+writer aliases but found that a writer denylist and open trait callback cannot
+prove a closed boundary. The fifth correction replaces that claim with a
+complete positive source allowlist over the guarded modules, terminates the
+production stash-observation call in a frozen read-only leaf, and makes the
+local compiler gate non-skippable on the exact commit before tagging. No R2
+production conversion may begin until this correction receives two independent
+GO re-reviews on a committed settled tuple**.
 
 ## 1. Scope and disposition
 
@@ -38,6 +38,11 @@ The third re-review reports controlling the fourth correction are:
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-3.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-3.md`.
 
+The fourth re-review reports controlling the fifth correction are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-4.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-4.md`.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -58,12 +63,16 @@ Their overlapping P2 findings are corrected as one architectural change:
 - checked bundle evidence and owner derivation are contained in the guarded
   adapter rather than delegated to an unguarded helper layer;
 - the entry/caller gate inventories every visible entry plus every adapter
-  import and call, ignores comments/strings, and rejects re-exports and
-  capability escapes; compiler-resolved `disallowed_methods` protection then
-  rejects direct, aliased, function-pointer, standard-library, crate-local, and
-  nested-helper writers in every guarded module; and
-- both protections run in PR/push, release CI, and the local release script
-  against the exact tree being checked.
+  import and call, rejects re-exports and capability escapes, and positively
+  pins the complete bytes of every guarded source module; a new alias, wrapper,
+  call, import, string, or commented-out guard therefore changes the allowlist
+  rather than depending on discovery in a writer denylist;
+- production `preservation_stashes` dispatch terminates in the guarded
+  preservation-image leaf, whose selected path enumerates Git stash objects
+  directly and uses only local decoding helpers; and
+- source and compiler protections run in PR/push and release CI, while the
+  local release script cannot skip them and reruns them on the exact
+  version-bump commit before tag creation or push.
 
 The two P3 gaps were corrected in the same checkpoint: prefixed `.`/`..`
 suffixes reject, and literal managed schedule/reservation fixtures cover
@@ -363,14 +372,26 @@ their guarded adapter, so an unguarded intermediate helper cannot be inserted
 without changing that inventory.
 
 Each checked entry or adapter module has a non-overridable compiler lint
-boundary. The project Clippy configuration denies the complete raw-writer set,
-including standard filesystem writers and GWZ's crate-local atomic and bundle
-writers. Compiler name resolution, rather than source spelling, therefore
-rejects direct calls, imported aliases, function-pointer aliases that reuse an
-allowed local call name, and writers introduced into nested local helpers. The
-source gate also pins the lint boundary itself. PR/push CI, release CI, and the
-local release script run both gates and point Clippy at the exact checkout or
-release worktree under test.
+boundary, but the lint's writer list is defense in depth rather than the
+completeness proof. The proof is a positive, byte-exact allowlist of every
+guarded source module. Any direct call, imported alias, same-name function
+pointer, crate-local wrapper, nested helper, changed literal, or commented-out
+guard changes the protected module digest and fails closed. The source checker
+also pins the sole production `GitBackend` delegate for
+`preservation_stashes` to `preservation_image`; that leaf directly enumerates
+and decodes native stash objects without calling the open backend trait again,
+the shared stash API, a shared repository opener, or an external OID parser.
+The delegate macro source is itself in the positive allowlist, and the checker
+rejects any production `GitBackend` implementation other than the single
+frozen `Git2Backend` implementation. Test backends remain test-only.
+
+PR/push CI and release CI run the source and compiler gates on their exact
+checkout. The local release script has no compiler-skip option. It runs the
+gates on its initial detached worktree and, after any version/lock commit,
+resets that worktree to the exact new SHA and reruns the source checker, its
+executable counterexamples, and all-target/all-feature Clippy before creating
+or pushing the tag. Retrying an already-created tag likewise gates its exact
+target before push.
 
 ## 8. TDD implementation sequence
 
@@ -389,9 +410,14 @@ The interface correction precedes all original R2 packages:
    with genuine terminal fixtures plus contradictory terminal negatives;
    contain the checked helper graph; add adversarial compiler probes for raw,
    nested, same-name function-pointer, and crate-local writer aliases.
-6. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
+6. **R2-I6 positive boundary closure:** freeze complete guarded source, close
+   the production read-only trait delegate at its concrete leaf, retain the
+   compiler lint as defense in depth, and make exact tagged-commit gating
+   mandatory. Pin the fourth-review `copy`, crate writer, backend writer,
+   commented guard, skip flag, and post-version-commit counterexamples.
+7. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
    document checks; commit one exact workspace/core/CLI tuple.
-7. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
+8. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
@@ -413,10 +439,12 @@ This remediation is complete only when:
 6. owner/action and schedule literal vectors pass independently;
 7. ordinary command call graphs remain outside checked-provider gating;
 8. selected merge checked paths have no raw successful bypass, including an
-   alias or function pointer whose source-level name is otherwise allowed;
+   unlisted writer alias, function pointer whose source-level name is otherwise
+   allowed, crate-local wrapper, or accepted production observer delegate;
 9. archive authority rejects any syntactically valid terminal-labelled record
    that the production archived-record validator rejects;
-10. PR/push, release CI, and local release use the exact same source and
-    compiler gates against the exact tree being checked;
+10. PR/push, release CI, and local release use the same source and compiler
+    gates against the exact tree being checked; local tag creation/push cannot
+    skip the compiler gate and a version-bump commit is re-gated by exact SHA;
 11. all focused/full/static checks pass on a settled tree; and
 12. both independent re-reviews report no open P0/P1/P2 defect.
