@@ -1,9 +1,10 @@
 # R4b remediation R1 interface checkpoint
 
-Date: 2026-08-12
+Date: 2026-08-13
 
-Status: **implemented and locally verified; critical settled-tree interface
-review required before platform or catalog implementation begins**.
+Status: **review findings remediated and locally verified; two critical
+settled-tree re-reviews are required before platform or catalog implementation
+begins**.
 
 This checkpoint turns the accepted replacement architecture in
 `GwzM5-8R4bP1P2-RemPlan-4.md` into Rust ownership boundaries. It does not
@@ -65,6 +66,9 @@ CanonicalComponent {
     original_ascii,
     parent_mode,
     canonical_ascii,
+    parent_durable_identity,
+    parent_invocation_identity,
+    rename_domain,
 }
 ```
 
@@ -104,10 +108,11 @@ worktree collisions reject before catalog or managed mutation. Git-directory
 artifacts require a separately issued non-worktree proof rather than a fake
 empty scan.
 
-Only a `CatalogBootstrapPermit` containing the opaque capability proof plus
-either a workspace-collision proof or a non-worktree Git-directory proof may
-enter catalog bootstrap. Provider-owned preflight methods issue those proofs;
-consumers cannot assemble them from unrelated observations.
+Only one opaque `PreCatalogPermitV1` issued by a provider-owned transaction may
+enter catalog bootstrap. It binds one retained root, support profile, durable
+and invocation identities, rename domain, path walk, collision domain,
+workspace or Git-directory classification, freshness lease, and root kind.
+Consumers cannot assemble it from unrelated observations.
 
 ## 3. Exhaustive namespace grammar
 
@@ -145,7 +150,8 @@ from a foreign name; neither is silently inert.
 
 ## 4. Schedule, reservation, and admission
 
-One canonical `ActionScheduleV1` carries stable barrier ordinals, canonically
+One canonical `ActionScheduleV1` is derived from an immutable
+`ManagedParentPlanV1` and carries its complete digest, stable barrier ordinals,
 ordered managed-parent specs, contiguous global bootstrap-generation and
 component-ordinal ranges, and the cleanup alias set. Managed bootstrap
 invocation rejects empty input, duplicate purposes, `K > 8`, `N > 8`, or a
@@ -204,7 +210,9 @@ matching resident reservation but is charged against the complete action
 budget. Both directories present, wrong identity/kind/reservation, extra child,
 or an orphan staging/final directory is ambiguity. Authority is unavailable
 until the observed admission is `Idle` and the exact final resident record owns
-the action directory.
+the action directory. Observation and issuance are private to the catalog
+admission owner; a checked-artifact sibling cannot construct the opaque
+`AdmittedActionV1`.
 
 ## 5. Bounded records and payload separation
 
@@ -251,7 +259,10 @@ action reservation. `ActionNamespace` is the only consumer-facing namespace
 capability: it is constructed from an opaque admitted action, derives slots
 from the exhaustive grammar, binds them to the resident reservation digest,
 and validates barrier ordinals against the resident schedule. Platform
-implementations remain private implementation values inside this wrapper.
+implementations and their raw issuer remain private implementation values
+inside this wrapper. Successful component installation and marker retirement
+produce opaque provider-issued evidence; managed-intent successors accept only
+that evidence.
 
 `BarrierIntentV1` binds caller/action, schedule, ordinal, anchor identity,
 private home parent/name, target durable parent/path profile, and the derived
@@ -266,13 +277,17 @@ advisory-lock convergence. It cannot call durable providers, catalog, namespace
 barriers, or checked authority. The public `WorkspaceMutatorLock` remains a
 compatibility wrapper in R2.
 
-`CatalogBootstrapV1` requires a `CatalogBootstrapPermit` and owns only the
-fixed scratch/active/staging/final grammar and retained catalog/anchor result.
+`CatalogBootstrapV1` requires a `PreCatalogPermitV1` and owns only the fixed
+scratch/active/staging/final grammar and retained catalog/anchor result. Its
+closed recovery table accepts only missing or exact-prefix scratch, exact
+active record, exact staging/final infrastructure, and exact retired-record
+progress; every unlisted combination is ambiguous.
 
-`ManagedParentBootstrap` requires an admitted action and a provider-issued plan
-for one nonempty, duplicate-free request of declared purposes. The only initial
-purposes are merge store, merge archive, preservation bundles, and root-
-preservation markers. There is no raw arbitrary-path request or arbitrary
+`ManagedParentBootstrap` requires a `BoundManagedParentPlanV1` issued only after
+the immutable plan exactly matches the resident admitted reservation. Execution
+accepts that bound value, not an independently supplied plan and action. The
+only initial purposes are merge store, merge archive, preservation bundles, and
+root-preservation markers. There is no raw arbitrary-path request or arbitrary
 caller-token seam.
 
 ## 8. Private recovery-record model
@@ -283,12 +298,13 @@ committed and checked by `protocol/regen.py --check`. Semantic adapters enforce
 closed variants, literal sizes, derived digests, reservation binding, and
 canonical re-encoding; they do not define a second wire format.
 
-The schema currently owns canonical path and durable-object identities,
-physical action schedules, capacity reservations, admission, barrier intent,
-and cleanup worklists. Barrier intent and cleanup constructors derive action,
-request/owner, and schedule fields from the same capacity reservation.
-Barrier ordinals and cleanup aliases must exist in that reservation. Decode
-accepts only a canonical Taut value whose derived binding matches exactly.
+The schema owns canonical path and durable-object identities, physical action
+schedules, capacity reservations, admission, checked authority, catalog
+bootstrap, infrastructure, barrier intent, managed-parent bootstrap intent,
+ownership markers, and cleanup worklists. Every record has a bounded canonical
+adapter. Recovery first performs the `limit + 1` read and then binds the decoded
+record to its resident permit, reservation, plan, expected ordinal, predecessor,
+identity, or slot before it can drive work. Raw decoders remain owner-private.
 
 ## 9. Fault and proof gates
 
@@ -317,12 +333,16 @@ Critical interface reviewers must report no P0/P1/P2 defect before Linux,
 Windows, or platform-independent catalog implementation is assigned. Consumer
 conversion remains R2 and is not part of this checkpoint.
 
-Local pre-review evidence on 2026-08-12:
+Local remediation evidence on 2026-08-13:
 
-- `cargo test -p gwz-core`: 1,201 passed, one ignored (1,156 unit plus 45
+- `cargo test -p gwz-core`: 1,235 passed, one ignored (1,190 unit plus 45
   integration tests) on the final tree;
-- `cargo test -p gwz-core --lib checked_artifact::interface_tests`: 28 passed;
+- `cargo test -p gwz-core checked_artifact::interface_tests`: 61 passed;
 - `cargo test -p gwz-core --test protocol`: 29 passed;
 - `cargo clippy -p gwz-core --all-targets -- -D warnings`: passed;
 - `cargo fmt --all -- --check`: passed; and
 - `python protocol/regen.py --check`: passed with `taut-proto 0.8.1`.
+
+Public `protocol/gwz.taut.py`, generated public protocol, conversion code, and
+merge dispatcher are byte-unchanged. New production modules are below 500 LOC;
+the generated Taut adapter is the only new-file exception.
