@@ -2,9 +2,8 @@
 
 Date: 2026-08-13
 
-Status: **the third owner-boundary remediation is implemented and locally
-verified; its exact settled tuple and two independent re-reviews are still
-required before R2 or R4b-G begins**.
+Status: **accepted at the exact settled tuple after two independent re-reviews
+reported GO with no P0-P3 finding; R2/R4b-G may proceed**.
 
 This checkpoint turns the accepted replacement architecture in
 `GwzM5-8R4bP1P2-RemPlan-4.md` into Rust ownership boundaries. It does not
@@ -427,6 +426,19 @@ Local third-remediation evidence on 2026-08-14:
   preceding reviewed core tuple; and
 - all changed production modules remain below 500 LOC.
 
-This evidence does not accept R1 by itself. The implementation must be
-committed as one exact settled tuple and both independent re-reviews must
-report no P0/P1/P2.
+## 12. Accepted exact-tree gate
+
+The third remediation was committed and reviewed at this exact tuple:
+
+- workspace root: `7e4ccdf80c808367171b1df1a5210c89ac36ec68`;
+- `gwz-core`: `c239df33ddf567d4eaca182ca8231ed575e95769`; and
+- `gwz-cli`: `3cca145c0b32410f250f640730ed7ca18f1da59f`.
+
+`GwzM5-8R4bR1Interface-ReviewFS-4.md` and
+`GwzM5-8R4bR1Interface-ReviewState-4.md` independently reported **GO** with no
+P0, P1, P2, or P3 finding. Together they accept the aggregate catalog,
+managed forward/restart evidence, authority-request binding, catalog-name
+ownership, bounded decoding, privacy, quarantine, and cohesion boundaries.
+
+The R1 interface gate is therefore closed. R2 consumer integration and R4b-G
+may proceed. Production merge-v1 dispatch remains disabled until A1.

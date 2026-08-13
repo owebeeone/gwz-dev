@@ -15,9 +15,9 @@ interface through §13 and the production-disabled P0.2 implementation plus
 bounded settled-code remediation are accepted by both corrected-code reviews
 with no open P0-P3 finding; the Windows portability remediation is code-GO;
 both §14 settled-implementation reviews and the exact-SHA native release-
-platform run are GO; P1-WR1 is closed and P1 is implemented with local tests
-and static analysis green, pending settled-tree review; broader durable state
-remains gated by R4b-G/A1
+platform run are GO; P1-WR1 is closed and P1 plus its checked-artifact R1
+boundary are independently accepted at the exact settled tuple; R4b-G is now
+the active gate before A1
 and later writers by A2–A4**
 
 Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
@@ -2344,8 +2344,9 @@ The package is split into reviewed checkpoints:
    control defects; their remediation is accepted by both corrected-code
    reviews. The Windows portability remediation is code-GO. P0.2 is accepted
    locally, both amendment 2 §14 settled-implementation reviews and the exact-
-   SHA native release-platform run are GO. P1 is implemented with local tests
-   and static analysis green and awaits settled-tree review. P2-P4 stand.
+   SHA native release-platform run are GO. P1 and the checked-artifact R1
+   boundary are independently accepted at their exact settled tuple. P2-P4
+   stand and R4b-G is unblocked.
 8. **R4b-G** runs aggregate fault, compatibility, byte-equivalence,
    unknown-field, privacy, call-graph, and settled-tree review gates.
 

@@ -2,13 +2,15 @@
 
 Date: 2026-08-12
 
-Status: **design accepted; R0-L complete; R1 interface checkpoint implemented
-and awaiting two critical settled-tree reviews; R4b-G remains blocked**. The
+Status: **design accepted; R0-L complete; R1 interface checkpoint independently
+accepted at its exact settled tuple; R4b-G is unblocked and next**. The
 architecture at SHA-256
 `9112674ba3a3b2b10576b8e633fcbbaafd391ca8baaca76c21881e0110dcba0f` is
 accepted by `ReviewState-5` and `ReviewFS-5` with no open P0/P1/P2. R0-L native
 Linux evidence was accepted by `GwzM5-8R4bLinuxIdentityEvidence-Review-2.md`;
-production R1 may now begin at its lead-owned interface checkpoint. This
+production R1 implementation and its three remediation cycles are accepted by
+`GwzM5-8R4bR1Interface-ReviewFS-4.md` and
+`GwzM5-8R4bR1Interface-ReviewState-4.md`, both with no P0-P3 finding. This
 status-only disposition postdates the reviewed content hash.
 
 ## 1. Scope and controlling evidence

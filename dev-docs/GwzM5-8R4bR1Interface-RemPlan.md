@@ -2,9 +2,8 @@
 
 Date: 2026-08-13
 
-Status: **third remediation implemented and locally verified; its exact
-settled tuple and two independent re-reviews are still required before R2 or
-R4b-G begins**.
+Status: **complete and independently accepted at the exact settled tuple;
+R2/R4b-G may proceed**.
 
 This plan consolidates the findings in:
 
@@ -541,6 +540,17 @@ Lead-owned validation on the combined tree passed:
   byte-equivalence quarantine; and
 - privacy/call-graph, catalog-literal ownership, and LOC/cohesion audits.
 
-All changed production modules are below 500 LOC. This is local evidence only:
-the exact settled tuple and both independent review verdicts remain the
-acceptance gate.
+All changed production modules are below 500 LOC.
+
+## 17. Acceptance result
+
+The implementation was committed at workspace/core/CLI tuple
+`7e4ccdf80c808367171b1df1a5210c89ac36ec68` /
+`c239df33ddf567d4eaca182ca8231ed575e95769` /
+`3cca145c0b32410f250f640730ed7ca18f1da59f`.
+
+The independent filesystem/interface and state/protocol re-reviews are
+recorded in `GwzM5-8R4bR1Interface-ReviewFS-4.md` and
+`GwzM5-8R4bR1Interface-ReviewState-4.md`. Both report **GO** with no P0-P3
+finding. The plan's R1 acceptance gate is closed, and R2/R4b-G is unblocked.
+The production merge-v1 decoder and dispatcher remain disabled.
