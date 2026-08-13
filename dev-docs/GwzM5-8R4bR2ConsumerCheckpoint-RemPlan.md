@@ -2,12 +2,12 @@
 
 Date: 2026-08-14
 
-Status: **the second settled re-reviews closed the owner/request/action/plan,
-ID, and schedule defects but found two remaining P2 gaps. The third correction
-requires archive authority to come from one stable terminal-open/source-only
-record arbitration, makes the general checked filesystem capability private,
-exposes only complete purpose-specific operations, and runs the structural
-boundary gate before merge and local release publication. No R2 production
+Status: **the third settled re-reviews closed the location, owner, capability,
+and publication-gate defects but found two remaining P2 gaps. The fourth
+correction makes archive authority consume the same complete terminal semantic
+validator as production archive recovery. It also physically contains the
+checked bundle helper graph and combines a fail-closed source inventory with
+compiler-resolved writer denial across every checked adapter. No R2 production
 conversion may begin until this correction receives two independent GO
 re-reviews on a committed settled tuple**.
 
@@ -33,6 +33,11 @@ The second re-review reports controlling this final correction are:
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-2.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-2.md`.
 
+The third re-review reports controlling the fourth correction are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-3.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-3.md`.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -45,14 +50,20 @@ Their overlapping P2 findings are corrected as one architectural change:
   whose IDs and hashed bytes cannot be supplied independently;
 - archive authority can only be issued from one stable canonical location pair
   with an exact terminal open source, absent destination, matching record/path
-  identity, and owner/digest derived from those exact source bytes;
+  identity, owner/digest derived from those exact source bytes, and successful
+  validation by the complete archive decoder for that version;
 - the general `CheckedArtifact`, fact, transition, and policy capabilities are
   private to `checked_artifact`; callers receive only purpose-specific facts or
-  completed operations from `checked_artifact::entry`; and
-- the entry/caller gate inventories every visible entry and complete adapter
-  call graph, ignores comments/strings, rejects executable imports, aliases,
-  re-exports, transitive writers and capability escapes, and runs in PR/push,
-  release CI, and the local release script.
+  completed operations from `checked_artifact::entry`;
+- checked bundle evidence and owner derivation are contained in the guarded
+  adapter rather than delegated to an unguarded helper layer;
+- the entry/caller gate inventories every visible entry plus every adapter
+  import and call, ignores comments/strings, and rejects re-exports and
+  capability escapes; compiler-resolved `disallowed_methods` protection then
+  rejects direct, aliased, function-pointer, standard-library, crate-local, and
+  nested-helper writers in every guarded module; and
+- both protections run in PR/push, release CI, and the local release script
+  against the exact tree being checked.
 
 The two P3 gaps were corrected in the same checkpoint: prefixed `.`/`..`
 suffixes reject, and literal managed schedule/reservation fixtures cover
@@ -300,7 +311,12 @@ and is omitted from a new bootstrap plan.
 `MergeArchive` can be requested only through a constructor that consumes an
 opaque prerequisite issued by merge-store arbitration after proving exactly
 one valid terminal source, absent destination, matching workspace/merge owner,
-and exact source bytes. A boolean or path string cannot stand in for it.
+and exact source bytes. Syntactic decode and a terminal state label are not
+sufficient: the exact bytes must also pass the complete version-specific
+archived-record validator used by production v0 archive recovery or the
+test-gated v1 equivalent. This rejects, for example, a `completed` envelope
+that still contains pending continuation or other contradictory open-state
+material. A boolean or path string cannot stand in for this prerequisite.
 
 Before schedule derivation, the owner expands every missing suffix into
 canonical physical component edges. Duplicate or ancestor/descendant overlap
@@ -340,9 +356,21 @@ and cannot fall through to those raw paths after conversion.
 
 Call-graph gates enumerate every ordinary command and assert it cannot reach
 checked capability, catalog, admission, namespace, or managed bootstrap code.
-The complementary gate enumerates every selected merge preservation,
-publication, rollback, and recovery path and asserts it reaches the exact owner
-constructor above. Source inventory fails on a new unclassified call site.
+The complementary source inventory enumerates every selected merge
+preservation, publication, rollback, and recovery entry, visible item, import,
+and call. Checked bundle owner/evidence helpers are physically contained in
+their guarded adapter, so an unguarded intermediate helper cannot be inserted
+without changing that inventory.
+
+Each checked entry or adapter module has a non-overridable compiler lint
+boundary. The project Clippy configuration denies the complete raw-writer set,
+including standard filesystem writers and GWZ's crate-local atomic and bundle
+writers. Compiler name resolution, rather than source spelling, therefore
+rejects direct calls, imported aliases, function-pointer aliases that reuse an
+allowed local call name, and writers introduced into nested local helpers. The
+source gate also pins the lint boundary itself. PR/push CI, release CI, and the
+local release script run both gates and point Clippy at the exact checkout or
+release worktree under test.
 
 ## 8. TDD implementation sequence
 
@@ -357,13 +385,18 @@ The interface correction precedes all original R2 packages:
    schedule construction outside protocol tests/coordinator.
 4. **R2-I4 boundary inventory:** pin the exhaustive checked/ordinary call map
    before a consumer conversion can compile.
-5. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
+5. **R2-I5 semantic/archive and compiler closure:** prove archive authority
+   with genuine terminal fixtures plus contradictory terminal negatives;
+   contain the checked helper graph; add adversarial compiler probes for raw,
+   nested, same-name function-pointer, and crate-local writer aliases.
+6. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
    document checks; commit one exact workspace/core/CLI tuple.
-6. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
+7. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
-both final R4b reviews still precede R4b-G; M5b and A1 remain later.
+R4b-G shared-router/cross-driver integration follow, then the two final
+full-tree R4b reviews. M5b and A1 remain later.
 
 ## 9. Exit gate
 
@@ -379,6 +412,11 @@ This remediation is complete only when:
    bytes; no caller can provide the source digest or a second opaque step hash;
 6. owner/action and schedule literal vectors pass independently;
 7. ordinary command call graphs remain outside checked-provider gating;
-8. selected merge checked paths have no raw successful bypass;
-9. all focused/full/static checks pass on a settled tree; and
-10. both independent re-reviews report no open P0/P1/P2 defect.
+8. selected merge checked paths have no raw successful bypass, including an
+   alias or function pointer whose source-level name is otherwise allowed;
+9. archive authority rejects any syntactically valid terminal-labelled record
+   that the production archived-record validator rejects;
+10. PR/push, release CI, and local release use the exact same source and
+    compiler gates against the exact tree being checked;
+11. all focused/full/static checks pass on a settled tree; and
+12. both independent re-reviews report no open P0/P1/P2 defect.
