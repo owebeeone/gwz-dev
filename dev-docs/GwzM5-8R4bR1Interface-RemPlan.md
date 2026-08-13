@@ -2,8 +2,9 @@
 
 Date: 2026-08-13
 
-Status: **second remediation locally verified; an exact settled commit and two
-fresh independent reviews are pending, so R2 and R4b-G remain blocked**.
+Status: **third remediation implemented and locally verified; its exact
+settled tuple and two independent re-reviews are still required before R2 or
+R4b-G begins**.
 
 This plan consolidates the findings in:
 
@@ -397,3 +398,149 @@ The lead-owned gates pass on the settled worktree:
 
 This is local evidence only. The exact commit tuple and both required review
 verdicts must be recorded before the status can advance to accepted.
+
+## 13. Second-remediation settled-tree review result
+
+The second remediation was committed and reviewed at this exact tuple:
+
+- workspace root `c51cae969a6549a6986750447b8a648e444aa709`;
+- `gwz-core` `a2a7125fe6b69f09ca76d83caeb28b0684c3c295`; and
+- `gwz-cli` `3cca145c0b32410f250f640730ed7ca18f1da59f`.
+
+The independent reviews are recorded in:
+
+- `GwzM5-8R4bR1Interface-ReviewFS-3.md`; and
+- `GwzM5-8R4bR1Interface-ReviewState-3.md`.
+
+Both returned **NO-GO** with no P0/P1 and the same three P2 conclusions. They
+also agree that the pre-catalog transaction, seven indexed namespace roles,
+exact managed-successor comparisons, independent semantic vectors, bounded
+record codecs, public-wire quarantine, and prior literal cleanup are closed.
+The remaining defects are all ownership-boundary defects:
+
+1. catalog infrastructure evidence is not bound to staging versus final, and
+   record creation can precede aggregate two-location classification;
+2. managed install/marker-retirement mutations are disconnected from the
+   opaque evidence their durable successors require; and
+3. authority expected/goal hashes remain bare consumer inputs rather than
+   facts from the sealed request/retained observation.
+
+Both reviews also retain one nonblocking P3: the catalog/private-domain names
+still have three independent literal owners.
+
+## 14. Third-remediation architecture
+
+### 14.1 Catalog owner returns one closed two-location observation
+
+Replace the single caller-selected infrastructure observation with one
+owner-private provider operation that observes both fixed catalog directory
+names in the same transaction. The provider reports each name as missing,
+partial expected content, an owned physical candidate, or other; a candidate
+includes its actually observed leaf, retained parent/path, durable directory
+identity, marker/token, infrastructure identities, and optional stored
+infrastructure record.
+
+The catalog owner validates both names and returns one opaque
+`CatalogBootstrapRecoveryObservationV1`. Its staging and final exact values are
+role-bound and non-interchangeable. The public-in-`checked_artifact` consumer
+obtains only the closed recovery decision and any role-specific capability
+needed by the selected action; it cannot arrange generic exact evidence into
+separate staging/final parameters.
+
+The owner classifies the complete scratch/active/staging/final/retired shape
+before any write. A missing infrastructure record may be created only when the
+closed classification has selected the exact staging prepare/rewrite state.
+After the write, the owner reobserves both names and reclassifies; a write does
+not itself fabricate exact evidence. Both-present, substituted-name,
+wrong-role, final-partial, or otherwise unlisted states return ambiguity with
+zero mutation.
+
+### 14.2 Managed namespace operations own success and restart evidence
+
+`ActionNamespace` remains the only consumer-facing physical seam. Its managed
+component install and marker-retirement operations consume the exact bound
+intent/slots and return `InstalledManagedComponentV1` and
+`RetiredManagedMarkerV1` respectively, only after the private provider has
+performed no-follow post-operation observation of the final directory,
+ownership marker, canonical path, mode, and durable object identities.
+
+The same owner exposes role-specific recovery observations for restart when
+the physical mutation completed before its result was durably recorded. Those
+operations consume the exact prior intent and scheduled slots; they do not
+accept caller-supplied identity, mode, path, marker, action, or ordinal facts.
+The backend issuer may assemble evidence only inside the private provider
+subtree, and its constructors bind the provider, intent, reservation, and
+scheduled role before returning the opaque result.
+
+The production-shaped compile fixture must drive both forward mutation and
+restart observation through these evidence-returning operations. Test helpers
+may seed physical observations, but managed-record tests must consume the same
+`ActionNamespace` result rather than manufacture successor evidence directly.
+
+### 14.3 Authority provider owns the request binding and both hashes
+
+The one private authority observation fact set gains the request-owner binding,
+expected SHA-256, and goal SHA-256. `CheckedAuthorityObservationOwnerV1` accepts
+only the resident reservation; it accepts no bare hashes. It rejects when the
+sealed fact set's request-owner binding differs from the reservation before it
+issues the opaque observation.
+
+A production provider is constructed for one retained artifact and one
+request, so root/path/source facts and request hashes are observed as one
+transaction. Cross-request tests use two otherwise-compatible reservations and
+prove that an owner for one request cannot issue against the other.
+
+### 14.4 One catalog/private-domain name owner
+
+Define the fixed catalog bootstrap scratch, active, staging, and final names in
+the catalog grammar owner. Derive the bootstrap record fields, collision-domain
+paths, and workspace/Git-directory policy paths from that owner. No consumer
+retains a byte or path literal for those names.
+
+## 15. Third-remediation execution and gate
+
+1. Add failing role-substitution and zero-mutation catalog tests, then replace
+   the single-directory owner with the aggregate owner and post-write
+   reobservation.
+2. Add failing managed-operation and restart evidence tests, then couple both
+   managed mutations and both recovery observations to `ActionNamespace`.
+3. Add the cross-request authority substitution test, then move request
+   binding and hashes into the sealed provider fact set.
+4. Replace the remaining catalog-name literals with the one grammar owner.
+5. Run focused checked-artifact and protocol tests, full core tests, strict
+   clippy, formatting, regeneration, public-protocol/dispatcher quarantine,
+   privacy/call-graph searches, diff checks, and LOC/cohesion checks.
+6. Commit one new exact tuple with installed `gwz` and repeat both independent
+   settled-tree reviews. R2 and R4b-G remain blocked until both report no
+   P0/P1/P2.
+
+## 16. Third-remediation local result
+
+The implementation now provides:
+
+- one aggregate catalog owner that observes scratch, active, staging, final,
+  and retired roles before mutation, returns distinct exact staging/final
+  evidence, permits a missing staging infrastructure-record write only from
+  the accepted prepare state, and reobserves the aggregate after that write;
+- managed install and marker-retirement operations, plus their restart forms,
+  that return only provider-, intent-, reservation-, schedule-, root-, and
+  physical-observation-bound successor evidence through `ActionNamespace`;
+- one authority observation transaction that owns the request binding and both
+  hashes as well as the retained root/path/source facts; and
+- one catalog/private-domain name owner used by the bootstrap record,
+  collision domain, and workspace/Git-directory policy.
+
+Lead-owned validation on the combined tree passed:
+
+- `cargo test -p gwz-core`: 1,252 passed, one ignored, zero failed (1,207 unit
+  plus 45 integration tests);
+- `cargo test -p gwz-core checked_artifact::interface_tests`: 77 passed;
+- `cargo test -p gwz-core --test protocol`: 29 passed;
+- strict all-target Clippy, formatting, protocol regeneration, and diff checks;
+- the production merge-v1 decoder rejection and public protocol/dispatcher
+  byte-equivalence quarantine; and
+- privacy/call-graph, catalog-literal ownership, and LOC/cohesion audits.
+
+All changed production modules are below 500 LOC. This is local evidence only:
+the exact settled tuple and both independent review verdicts remain the
+acceptance gate.

@@ -2,8 +2,9 @@
 
 Date: 2026-08-13
 
-Status: **second-review findings remediated and locally verified; two fresh
-critical settled-tree re-reviews are required before R2 or R4b-G begins**.
+Status: **the third owner-boundary remediation is implemented and locally
+verified; its exact settled tuple and two independent re-reviews are still
+required before R2 or R4b-G begins**.
 
 This checkpoint turns the accepted replacement architecture in
 `GwzM5-8R4bP1P2-RemPlan-4.md` into Rust ownership boundaries. It does not
@@ -371,3 +372,61 @@ Local second-remediation evidence on 2026-08-14:
 Public `protocol/gwz.taut.py`, generated public protocol, conversion code, and
 merge dispatcher are byte-unchanged. New production modules are below 500 LOC;
 the generated Taut adapter is the only new-file exception.
+
+## 10. Exact-tree review disposition
+
+The second remediation was reviewed at workspace/core/CLI tuple
+`c51cae969a6549a6986750447b8a648e444aa709` /
+`a2a7125fe6b69f09ca76d83caeb28b0684c3c295` /
+`3cca145c0b32410f250f640730ed7ca18f1da59f`.
+
+`GwzM5-8R4bR1Interface-ReviewFS-3.md` and
+`GwzM5-8R4bR1Interface-ReviewState-3.md` independently found no P0/P1 but the
+same three P2 defects:
+
+- catalog occupancy evidence is not location-bound and may mutate before the
+  complete staging/final shape is accepted;
+- managed namespace mutations do not return or recover the opaque exact
+  evidence required by their durable successors; and
+- authority request hashes are still composable with an unrelated retained
+  observation.
+
+The reports also retain the nonblocking duplicated catalog-name P3. The
+third-remediation architecture and execution gate are frozen in RemPlan
+sections 14-15. This checkpoint is not accepted until that implementation is
+committed and two fresh exact-tree reviews report no P0/P1/P2.
+
+## 11. Third-remediation implementation checkpoint
+
+The three P2 boundaries and the remaining catalog-name P3 are structurally
+corrected on the local tree:
+
+- catalog recovery is one owner-controlled five-role observation and
+  classification before mutation, with non-interchangeable staging/final
+  evidence and mandatory aggregate reobservation after an allowed staging
+  record write;
+- managed install, managed marker retirement, and both restart observations
+  return the exact opaque evidence required by their durable successors
+  through `ActionNamespace`; and
+- the authority provider owns the request binding and both request hashes in
+  the same fact set as the retained root/path/source observation.
+
+The bootstrap record, collision scan, and workspace/Git-directory policy now
+derive their fixed catalog paths from one closed name owner.
+
+Local third-remediation evidence on 2026-08-14:
+
+- `cargo test -p gwz-core`: 1,252 passed, one ignored (1,207 unit plus 45
+  integration tests), zero failed;
+- `cargo test -p gwz-core checked_artifact::interface_tests`: 77 passed;
+- `cargo test -p gwz-core --test protocol`: 29 passed;
+- strict all-target Clippy, formatting, protocol regeneration, and diff checks
+  passed;
+- the production merge-v1 decoder remains disabled and public
+  protocol/generated/conversion/dispatcher files are byte-unchanged from the
+  preceding reviewed core tuple; and
+- all changed production modules remain below 500 LOC.
+
+This evidence does not accept R1 by itself. The implementation must be
+committed as one exact settled tuple and both independent re-reviews must
+report no P0/P1/P2.
