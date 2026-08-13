@@ -2,12 +2,14 @@
 
 Date: 2026-08-14
 
-Status: **the first settled re-reviews closed the original filesystem findings
-but found three overlapping P2 interface gaps. The second correction seals
-owner/request/action/plan construction, adds an exact durable-record issuer,
-and replaces the shallow source inventory with a mandatory fail-closed entry
-gate. No R2 production conversion may begin until this correction receives two
-independent GO re-reviews on a committed settled tuple**.
+Status: **the second settled re-reviews closed the owner/request/action/plan,
+ID, and schedule defects but found two remaining P2 gaps. The third correction
+requires archive authority to come from one stable terminal-open/source-only
+record arbitration, makes the general checked filesystem capability private,
+exposes only complete purpose-specific operations, and runs the structural
+boundary gate before merge and local release publication. No R2 production
+conversion may begin until this correction receives two independent GO
+re-reviews on a committed settled tuple**.
 
 ## 1. Scope and disposition
 
@@ -26,6 +28,11 @@ The controlling re-review reports are:
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState.md`.
 
+The second re-review reports controlling this final correction are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-2.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-2.md`.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -36,11 +43,16 @@ Their overlapping P2 findings are corrected as one architectural change:
   action purpose mask;
 - v0/v1 record owners consume one bounded, exact canonical record observation
   whose IDs and hashed bytes cannot be supplied independently;
-- raw `CheckedArtifact` acquisition is module-private behind the complete
-  `checked_artifact::entry` symbol inventory; and
-- the entry/caller gate is run by release CI and has negative fixtures for an
-  ordinary submodule call, unknown facade, missing required merge reachability,
-  and raw-entry escape.
+- archive authority can only be issued from one stable canonical location pair
+  with an exact terminal open source, absent destination, matching record/path
+  identity, and owner/digest derived from those exact source bytes;
+- the general `CheckedArtifact`, fact, transition, and policy capabilities are
+  private to `checked_artifact`; callers receive only purpose-specific facts or
+  completed operations from `checked_artifact::entry`; and
+- the entry/caller gate inventories every visible entry and complete adapter
+  call graph, ignores comments/strings, rejects executable imports, aliases,
+  re-exports, transitive writers and capability escapes, and runs in PR/push,
+  release CI, and the local release script.
 
 The two P3 gaps were corrected in the same checkpoint: prefixed `.`/`..`
 suffixes reject, and literal managed schedule/reservation fixtures cover
