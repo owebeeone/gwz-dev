@@ -2,8 +2,8 @@
 
 Date: 2026-08-13
 
-Status: **complete and independently accepted at the exact settled tuple;
-R2/R4b-G may proceed**.
+Status: **complete and independently accepted at the exact settled tuple; R2
+may proceed, while R4b-G remains gated by RemPlan-4 R2-R6**.
 
 This plan consolidates the findings in:
 
@@ -552,5 +552,6 @@ The implementation was committed at workspace/core/CLI tuple
 The independent filesystem/interface and state/protocol re-reviews are
 recorded in `GwzM5-8R4bR1Interface-ReviewFS-4.md` and
 `GwzM5-8R4bR1Interface-ReviewState-4.md`. Both report **GO** with no P0-P3
-finding. The plan's R1 acceptance gate is closed, and R2/R4b-G is unblocked.
-The production merge-v1 decoder and dispatcher remain disabled.
+finding. The plan's R1 acceptance gate is closed, and R2 is unblocked.
+RemPlan-4 R3-R6 still precede R4b-G. The production merge-v1 decoder and
+dispatcher remain disabled.

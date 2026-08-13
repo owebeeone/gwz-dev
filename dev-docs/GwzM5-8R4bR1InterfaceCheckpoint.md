@@ -3,7 +3,8 @@
 Date: 2026-08-13
 
 Status: **accepted at the exact settled tuple after two independent re-reviews
-reported GO with no P0-P3 finding; R2/R4b-G may proceed**.
+reported GO with no P0-P3 finding; R2 may proceed, while R4b-G remains gated
+by RemPlan-4 R2-R6**.
 
 This checkpoint turns the accepted replacement architecture in
 `GwzM5-8R4bP1P2-RemPlan-4.md` into Rust ownership boundaries. It does not
@@ -440,5 +441,6 @@ P0, P1, P2, or P3 finding. Together they accept the aggregate catalog,
 managed forward/restart evidence, authority-request binding, catalog-name
 ownership, bounded decoding, privacy, quarantine, and cohesion boundaries.
 
-The R1 interface gate is therefore closed. R2 consumer integration and R4b-G
-may proceed. Production merge-v1 dispatch remains disabled until A1.
+The R1 interface gate is therefore closed and R2 consumer integration may
+proceed. RemPlan-4 R3-R6 still follow R2 before R4b-G. Production merge-v1
+dispatch remains disabled until A1.
