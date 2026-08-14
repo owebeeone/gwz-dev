@@ -2,15 +2,16 @@
 
 Date: 2026-08-14
 
-Status: **the eighth filesystem re-review accepted the sealed v1 backend but
-proved that a non-`.rs` Rust source loaded through `#[path]` or `include!`
-escaped the concrete-observer inventory. The corresponding state review did
-not produce a verdict and must be rerun. The ninth correction freezes every
-approved `#[path]` edge, rejects `include!`, requires each approved target to
-remain a regular in-crate `.rs` file, and includes every descendant file in
-protected tree digests. No R2 production conversion may begin until this
-correction receives two independent GO re-reviews on a committed settled
-tuple**.
+Status: **the ninth filesystem re-review proved that loader aliases and an
+outside-`src` approved target escaped the spelling scan, while an open-backend
+alias could form a new complete `V1Runtime`. The tenth correction stops using
+spelling scans as the completeness proof: the production service accepts only
+a private-sealed runtime, test runtimes use a separate test-only entry, the
+complete v1 tree and mixed preservation-artifact adapter are byte-pinned, and
+the v1 artifact observers retain function-level compiler enforcement. The
+path-edge scanner remains defense in depth. No R2 production conversion may
+begin until this correction receives two independent GO re-reviews on a
+committed settled tuple**.
 
 ## 1. Scope and disposition
 
@@ -66,6 +67,13 @@ The eighth filesystem re-review controlling the ninth correction is:
 The attempted eighth state review produced no report or verdict, so it does
 not count toward the independent-review gate.
 
+The ninth filesystem re-review controlling the tenth correction is:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-9.md`.
+
+The attempted ninth state review likewise produced no report or verdict and
+does not count toward the independent-review gate.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -109,7 +117,16 @@ Their overlapping P2 findings are corrected as one architectural change:
 - every Rust `#[path]` source-loading edge is positively inventoried, must
   resolve to a regular in-crate `.rs` file, `include!` is rejected, and
   protected source-tree digests include every descendant file regardless of
-  suffix; and
+  suffix;
+- the production `V1Runtime` has a private sealed supertrait implemented only
+  for `ForwardRuntime`, `ReverseRuntime`, and `FinalizationRuntime`, each of
+  which already requires `MergeAuthorityBackend`; arbitrary observation and
+  execution doubles enter only through the separately named test runner;
+- the complete v1 lifecycle tree and the mixed preservation-artifact adapter
+  have exact byte manifests, while the v1 artifact-observation functions keep
+  local compiler writer bans; therefore a loader alias, outside-`src` helper,
+  new runtime, or changed service adapter requires an explicit reviewed
+  manifest update regardless of source spelling; and
 - source and compiler protections run in PR/push and release CI, while the
   local release script cannot skip them and every new-tag branch converges on
   one exact-target gate immediately before tag creation or push.
@@ -423,16 +440,16 @@ literal, or commented-out guard. The separate preservation-plan caller is
 protected as a complete source module. The source checker pins the concrete
 crate-private preservation observer, rejects restoration of the observer to
 the open `GitBackend` trait, freezes every crate-wide reference to that
-observer, and rejects any test-gated production v1 source that names the open
-backend rather than the sealed authority backend. The concrete observer
+observer. The compiler-sealed production runtime—not a backend-name scan—keeps
+the open trait out of the production v1 service. The concrete observer
 directly enumerates and decodes native stash objects without calling the
 backend trait, shared stash API, shared repository opener, or external OID
 parser. Its entry, implementation, and checked bundle consumer are all in the
-positive source allowlist. The checker also freezes every approved `#[path]`
-edge, rejects `include!` and macro-produced nonliteral path edges, validates
-that each target remains a regular in-crate `.rs` file, and includes every
-descendant suffix in protected tree digests. `Git2Backend` retains an inherent
-observation method for ordinary
+positive source allowlist. The path-edge scanner rejects direct unapproved
+loaders as defense in depth. Completeness comes from the exact bytes of the
+mixed artifact adapter and complete v1 tree, plus the compiler-sealed service
+runtime and local compiler bans on the v1 observer functions. `Git2Backend`
+retains an inherent observation method for ordinary
 and test use. Alternative backends remain available for ordinary dependency
 injection, but cannot implement or substitute this checked observation.
 
@@ -489,9 +506,15 @@ The interface correction precedes all original R2 packages:
     edges and their regular in-crate `.rs` targets, reject `include!` and
     macro-produced nonliteral edges, include every descendant suffix in
     protected tree digests, and pin both eighth-review `.inc` counterexamples.
-11. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
+11. **R2-I11 sealed service and exact consumer modules:** private-seal the
+    production `V1Runtime` to the three `MergeAuthorityBackend` runtimes,
+    separate the generic test runner, byte-pin the complete v1 tree and mixed
+    preservation-artifact adapter, and retain function-local compiler bans on
+    v1 artifact observation. Pin the ninth-review `cfg_attr`, imported
+    `include`, outside-`src` target, and split-runtime examples.
+12. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
    document checks; commit one exact workspace/core/CLI tuple.
-12. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
+13. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
@@ -514,8 +537,9 @@ This remediation is complete only when:
 7. ordinary command call graphs remain outside checked-provider gating;
 8. selected merge checked paths have no raw successful bypass, including an
    unlisted writer alias, function pointer whose source-level name is otherwise
-   allowed, crate-local wrapper, alternative backend observer override, or
-   compiler-loaded source file outside the positive source-edge inventory;
+   allowed, crate-local wrapper, alternative backend observer override,
+   unsealed production runtime, or loader indirection outside the exact v1 and
+   artifact-adapter byte manifests;
 9. archive authority rejects any syntactically valid terminal-labelled record
    that the production archived-record validator rejects;
 10. PR/push, release CI, and local release use the same source and compiler
