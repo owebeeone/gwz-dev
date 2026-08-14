@@ -77,12 +77,17 @@ dual, cross-model where available (mandated tier).
 
 ## Next ordered actions
 
-1. Verify the §4.1 sealed-primitive implementation covers all four
-   publication edges (scratch→active, staging→final, active→retired, anchor
-   moves) with no remaining verify/drop/path-rename seam — read-level audit
-   of `checked_artifact/`, report before mutating.
+1. ~~Verify the §4.1 sealed-primitive implementation~~ **Done 2026-08-15**:
+   `GwzM5-8R2C2PublicationAudit.md` — §4.1 satisfied, no P0-P2, four P3
+   dispositions recorded (reserved fault families rescope; sealing
+   perimeter extension as bounded package; legacy coexistence to R2-D
+   scope; three strict-window tests).
 2. Execute the complete per-fault interruption/recovery matrix; record
-   per-key executed evidence (not inventory).
+   per-key executed evidence (not inventory). Concrete scope per the audit
+   remainder: run the 21-key `catalog_bootstrap.*` matrix green; add the
+   three P3-4 strict-window tests; extend the matrix to Git-directory
+   targets; key or rescope the §6 parent-creation edge; file the
+   reserved-families rescope note.
 3. Launch the two settled-tree R2-C2 re-reviews (dual, cross-model) once 1-2
    are green on a committed checkpoint.
 4. Port/supersede the two Windows compile corrections; classify the Windows
