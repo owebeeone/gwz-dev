@@ -2,13 +2,14 @@
 
 Date: 2026-08-14
 
-Status: **the R2 interface correction gate is closed. R2-A is implemented and
-locally verified: the capability-neutral runtime bootstrap, retained runtime
-handles, exact workspace/Git-directory revalidation, convergent guard/final
-lease acquisition, substitution and wrong-kind rejection, and the
-`WorkspaceMutatorLock` compatibility wrapper are in place. Dry runs remain
-bootstrap-free. R2-B is next. Native-platform release evidence remains part of
-the R2-F closure gate rather than a claim made by this local checkpoint**.
+Status: **the R2 interface correction gate is closed. R2-A and R2-B are
+implemented and locally verified. Runtime bootstrap remains capability-neutral
+and dry runs remain bootstrap-free. The retained pre-catalog provider now owns
+workspace/Git-directory proof, platform identity and component equivalence,
+the complete Git index/tracked-worktree snapshot, physical private-namespace
+observation, and immediate retained-handle revalidation. R2-C is next.
+Native-platform release evidence remains part of the R2-F closure gate rather
+than a claim made by this local checkpoint**.
 
 The eleventh independent state and code reviews were GO/GO with no P0/P1/P2.
 They accepted the complete compiler route from `Cargo.toml` through `lib.rs`,
@@ -359,6 +360,8 @@ The observation returns a 32-byte collision snapshot binding calculated from:
 
 - root kind and fixed domain-version digest;
 - retained repository/common-directory identity;
+- fixed private-container absence or its retained identity, lookup mode, and
+  rename domain;
 - retained index identity and exact index content digest for workspace roots;
 - every complete, sorted lossless index fact;
 - every complete, sorted tracked-worktree kind fact; and
@@ -567,6 +570,39 @@ rejection, final-file replacement, parent substitution, changed linked-
 worktree indirection, post-drop reacquisition, and dry-run non-creation.
 Platform-native release runs remain required by R2-F before R2 as a whole is
 closed.
+
+### R2-B implementation checkpoint — 2026-08-14
+
+R2-B is complete locally. The sealed provider now has real macOS, Linux ext4,
+and Windows NTFS implementations for the accepted durable-identity,
+per-directory equivalence, and rename-domain profiles. It retains the selected
+root, actual Git directory, common Git directory, fixed private container when
+present, and index file when present. The collision snapshot binds those
+objects plus exact index bytes, complete sorted index metadata (including
+object identity and stat fields), tracked-worktree kinds, and the physical
+private namespace, then freshly reobserves the same facts immediately before
+catalog bootstrap.
+
+Production-shaped tests cover ordinary and linked worktrees, the actual
+Git-directory entry, all four index stages, exact/ancestor/descendant and
+ASCII-equivalent collisions, extended flags, gitlinks, regular/directory/
+symlink worktree-kind drift, same-path object replacement, private-leaf drift,
+optional Git-directory container appearance, symlink/wrong-kind rejection,
+and zero pre-catalog mutation on every rejected row. The native macOS provider
+also executes locally and issues the accepted persistent-object profile.
+
+The exact-tree structural source gate inventories all four platform module
+edges, and its 52-case adversarial suite passes. Linux x86-64/AArch64 and
+Windows native execution remain mandatory R2-F evidence; a macOS cross-check
+does not substitute for those runtime rows.
+
+The settled local checkpoint passed 1,253 `gwz-core` library tests with zero
+failures and one ignored test; the 10 diff-render, 29 protocol, 7 publish, and
+2 rename integration tests; 16 focused retained-provider/collision tests; the
+six release-boundary and 52 adversarial source-boundary tests; 86 retained-
+reader tests with the 24-tuple manifest ready; seven compatibility rules and
+14 checker tests; 133 merge-document assertions; Rust 1.95 formatting; and
+all-target/all-feature Clippy with warnings denied.
 
 ## 9. Exit gate
 
