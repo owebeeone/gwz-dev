@@ -750,6 +750,50 @@ The corrected pre-review tree passed:
 This evidence freezes the correction for re-review; it does not itself change
 the pending verdict to accepted.
 
+### R2-C0 second independent correction — 2026-08-14
+
+The first correction was also not accepted. The second code re-review reported
+one P2 and the second state/lease re-review reported one P1 plus the same P2;
+their controlling reports are `GwzM5-8R2C0Interface-ReviewCode-2.md` and
+`GwzM5-8R2C0Interface-ReviewState-2.md`. Rust's stable slice sort allocated
+hidden scratch outside the typed fallible reserve path. More importantly,
+deriving a common Git target discarded the original repository/worktree
+membership, and deduplicating linked worktrees could discard all evidence for
+one selected request.
+
+The second correction uses exactly two allocation-free in-place unstable
+sorts, with source and interface guards forbidding a return to allocating
+stable sort. A maximum 4,096-entry batch now exercises both order passes and
+deduplicates successfully. Every Git request retains its canonical request,
+optional worktree, actual Git directory, and common Git directory with the
+complete durable/live/mode/domain association. Requests sharing a common
+target share its one lock while all membership witnesses survive grouping and
+are revalidated before/after preparation, after final acquisition, at
+`begin_preflight`, and at every future permit edge.
+
+Focused negative tests cover membership substitution after initial retention
+in both input orders, after phase-one preparation, after successful return for
+one request, and after successful common-target deduplication in both orders.
+All reject before catalog mutation while the common target and named lock
+remain intact. The second corrected pre-review tree passed:
+
+- 1,286 `gwz-core` library tests, with zero failures and one ignored test;
+- the four integration binaries: 10 diff-render, 29 protocol, 7 publish, and
+  2 rename tests;
+- 98 checked-artifact interface tests, 19 production pre-catalog provider
+  tests, and 27 catalog-lease tests;
+- the six-case release-boundary suite and the 57-case adversarial source-
+  boundary suite;
+- protocol regeneration/currentness, the 133-assertion merge-document gate,
+  17 document/compatibility checker tests, Rust 1.95 formatting,
+  `git diff --check`, the checked-artifact source checker, and all-target/all-
+  feature Clippy with warnings denied.
+
+This evidence freezes the second correction for re-review; it does not itself
+change the pending verdict to accepted. C0 remains pending until both
+independent reviewers accept the new immutable checkpoint, and C1 remains
+blocked.
+
 ## 9. Exit gate
 
 This remediation is complete only when:

@@ -167,11 +167,17 @@ checked command releases its lease set.
 Git-directory target on which its advisory lock was acquired. A Git-target
 request names a repository or worktree, and the sealed lease owner derives its
 common Git directory; callers cannot choose between linked-worktree actual and
-common Git directories. `CatalogOwnerV1` consumes the lease through a sealed
-`begin_preflight` transition, revalidates the retained target and still-named
-final lock inode, and derives the target path and retained provider handles
-from that opaque witness. It never accepts an independent path or provider
-root beside a valid lease:
+common Git directories. Each request also retains a separate membership
+witness for its canonical request directory, optional worktree, actual Git
+directory, and common Git directory, including their durable identity, live
+invocation identity, rename domain, and lookup mode. Requests that share one
+common target share one final lock but retain every contributing membership
+witness; canonical-target deduplication never discards one. `CatalogOwnerV1`
+consumes the lease through a sealed `begin_preflight` transition, revalidates
+every membership witness, the retained target, and the still-named final lock
+inode, and derives the target path and retained provider handles from that
+opaque witness. It never accepts an independent path or provider root beside a
+valid lease:
 
 ```text
 recover_or_create(catalog_target_lease)
@@ -193,7 +199,9 @@ catalog mutation. The owner first groups by canonical target location: exact
 full bindings deduplicate, while one location observed with different target
 identity or repository membership rejects before phase-one preparation. It
 then sorts the distinct targets by the canonical bytes of `(support_profile,
-target_durable_identity, root_kind)`.
+target_durable_identity, root_kind)`. Both canonical-location grouping and
+final target ordering use in-place allocation-free unstable sorts with total
+comparators; allocating stable sort is forbidden by the structural gate.
 
 Equivalent-final-lock alias proof is finite and lossless. A sensitive parent
 requires no distinct-alias enumeration. An ASCII-case-fold parent charges each
@@ -218,11 +226,14 @@ physical catalog edge; the ready and missing-parent permit constructors accept
 only the resulting bound observation.
 
 Contention, duplicate path with different identity, membership drift, or
-reacquisition mismatch releases the whole set read-only. A checked
-multi-target path may not acquire `WorkspaceMutatorLock` first and append
-out-of-order leases. `CatalogLeaseSetV1` alone exposes target-specific borrowed
-`CatalogMutationLeaseV1` values and retains every final lock until command
-completion.
+reacquisition mismatch releases the whole set without catalog mutation. A
+failure detected before preparation is fully read-only. A race detected after
+phase-one preparation may leave only the already-authorized fixed, capability-
+neutral runtime lock grammar; it cannot reach a catalog/private role. A
+checked multi-target path may not acquire `WorkspaceMutatorLock` first and
+append out-of-order leases. `CatalogLeaseSetV1` alone exposes target-specific
+borrowed `CatalogMutationLeaseV1` values and retains every final lock until
+command completion.
 
 No public constructor exposes a live epoch, target substitution, token, or
 production synthetic lease witness. Contention or target-association failure
