@@ -6,10 +6,9 @@ Status: **the eleventh independent state and code reviews are GO/GO with no
 P0/P1/P2. They accepted the complete compiler route from `Cargo.toml` through
 `lib.rs`, `workspace_ops/mod.rs`, and `merge/mod.rs` into the v1 tree, its
 positive parent/root sentinel, the sealed production runtime, and the exact
-consumer manifests. The sole code-review P3 was a version-change regression
-that would become vacuous after a future release bump; it now derives a
-guaranteed-distinct version and proves the fixture changed. That maintenance
-delta requires focused exact-tuple confirmation before R2-A begins**.
+consumer manifests. The sole code-review P3 was corrected and both independent
+focused follow-ups are GO with P0-P3 all zero. The R2 interface correction gate
+is closed and R2-A may begin**.
 
 ## 1. Scope and disposition
 
@@ -82,6 +81,11 @@ The eleventh independent GO re-reviews are:
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewCode-11.md` (one P3 test
   maintenance finding); and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-11.md` (no findings).
+
+The focused confirmations of the P3 maintenance correction are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewCode-11-P3.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-11-P3.md`.
 
 Their overlapping P2 findings are corrected as one architectural change:
 
