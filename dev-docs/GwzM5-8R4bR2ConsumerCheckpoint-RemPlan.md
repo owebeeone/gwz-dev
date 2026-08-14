@@ -3,14 +3,17 @@
 Date: 2026-08-14
 
 Status: **the R2 interface correction gate is closed. R2-A and R2-B are
-implemented and locally verified. Runtime bootstrap remains capability-neutral
-and dry runs remain bootstrap-free. The retained pre-catalog provider now owns
-workspace/Git-directory proof, platform identity and component equivalence,
-the complete Git index/tracked-worktree snapshot, physical private-namespace
-observation, and immediate retained-handle revalidation. The lead-owned R2-C
-first-catalog correction in `GwzM5-8R2CCatalogBootstrapAmendment.md` is settled
-and independently accepted GO/GO with no P0-P3 findings. Physical R2-C proceeds
-in the C0-C3 sequence frozen below.
+implemented and locally verified. R2-C0 is implemented and locally verified,
+with its required independent critical-interface review pending. Runtime
+bootstrap remains capability-neutral, dry runs remain bootstrap-free, and C0
+enables no catalog namespace mutation. The retained pre-catalog provider now
+owns workspace/Git-directory proof, platform identity and component
+equivalence, the complete Git index/tracked-worktree snapshot, physical
+private-namespace observation, and immediate retained-handle revalidation.
+The lead-owned R2-C first-catalog correction in
+`GwzM5-8R2CCatalogBootstrapAmendment.md` is settled and independently accepted
+GO/GO with no P0-P3 findings. Physical R2-C proceeds in the C0-C3 sequence
+frozen below.
 Native-platform release evidence remains part of the R2-F closure gate rather
 than a claim made by this local checkpoint**.
 
@@ -647,6 +650,55 @@ six release-boundary and 52 adversarial source-boundary tests; 86 retained-
 reader tests with the 24-tuple manifest ready; seven compatibility rules and
 14 checker tests; 133 merge-document assertions; Rust 1.95 formatting; and
 all-target/all-feature Clippy with warnings denied.
+
+### R2-C0 implementation checkpoint — 2026-08-14
+
+R2-C0 is complete locally and is frozen for its required independent
+critical-interface review. Every recovery-critical durable record now uses
+the bounded, canonical `CheckedDurablePathV1` wire shape; live retained paths
+remain a separate process-local capability. The durable adapter rejects empty,
+oversized, noncanonical, and mixed-filesystem-profile component sequences.
+Generated bindings, the generated corpus, and independent semantic vectors are
+current.
+
+The pre-catalog transaction now returns only the boxed closed states
+`MissingGitPrivateParent` and `Ready`. Their live-only permits have disjoint
+authority: the missing-parent permit can authorize only the fixed Git private-
+parent creation and carries no ready-catalog material; the ready permit retains
+the exact target lease, platform root, support and path profiles, durable and
+invocation identities, rename domain, raw catalog-role observation, and three
+distinct typed digests. The provisional generic callback, path-plus-lease
+entry, and durable lease binding are absent.
+
+`CatalogMutationLeaseV1` is bound to one revalidated workspace or actual Git
+target. `CatalogLeaseSetV1` prepares every target under transient guards,
+deduplicates and orders stable target keys, releases preparation guards before
+the final phase, acquires the fixed final lock files in canonical order, and
+releases them in reverse on contention or failure. Tests prove workspace-lock
+compatibility, linked worktrees contending on their shared Git target, wrong-
+kind and symlink rejection, lock and target substitution rejection,
+reacquisition mismatch, canonical batch order, and release of earlier targets
+when a later target contends. All C0 rejection paths leave the catalog roles
+absent.
+
+The source boundary now freezes the complete path-schema, catalog-lease, and
+pre-catalog trees, exact lease reference sets, and the absence of the removed
+provisional names. The settled local checkpoint passed:
+
+- 1,265 `gwz-core` library tests, with zero failures and one ignored test;
+- the four integration binaries: 10 diff-render, 29 protocol, 7 publish, and
+  2 rename tests;
+- 97 checked-artifact interface tests, 15 production pre-catalog provider
+  tests, and 11 catalog-lease tests;
+- the six-case release-boundary suite and the 56-case adversarial source-
+  boundary suite;
+- protocol regeneration/currentness, Rust 1.95 formatting, `git diff --check`,
+  the checked-artifact source checker, and all-target/all-feature Clippy with
+  warnings denied.
+
+No catalog directory, record, scratch object, staging object, or final object
+can be created by C0. R2-C1 remains a pure aggregate grammar/classifier package;
+R2-C2 is still the first package authorized to mutate the catalog namespace.
 
 ## 9. Exit gate
 
