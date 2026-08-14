@@ -2,13 +2,15 @@
 
 Date: 2026-08-14
 
-Status: **the sixth settled re-reviews accepted the concrete read-only observer
-and release finalizer but proved that three authority-sensitive callers were
-outside the protected boundary. The seventh correction protects the separate
-preservation-plan caller and treats the complete v1 authority-observer module
-tree as one compiler-guarded, path-and-byte-pinned unit. No R2 production
-conversion may begin until this correction receives two independent GO
-re-reviews on a committed settled tuple**.
+Status: **the seventh settled re-reviews accepted caller-local containment but
+the state review proved that an already-approved open backend callback, or a
+new unprotected concrete-observer consumer, could still mutate inside the same
+authority decision. The eighth correction introduces a compiler-sealed v1
+merge backend implemented only by `Git2Backend`, removes the unused backend
+parameter from the checked bundle adapter, and inventories every concrete
+observer reference across the crate. No R2 production conversion may begin
+until this correction receives two independent GO re-reviews on a committed
+settled tuple**.
 
 ## 1. Scope and disposition
 
@@ -52,6 +54,11 @@ The sixth re-review reports controlling the seventh correction are:
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-6.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-6.md`.
 
+The seventh re-review reports controlling the eighth correction are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-7.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-7.md`.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -84,7 +91,14 @@ Their overlapping P2 findings are corrected as one architectural change:
 - the separate preservation-plan caller is byte-pinned and compiler-guarded,
   while the complete v1 authority-observer root, descendant source set, and
   descendant bytes are covered by one deterministic tree digest and one
-  inherited non-overridable compiler lint; and
+  inherited non-overridable compiler lint;
+- every test-gated production v1 lifecycle source requires the
+  private-supertrait-sealed `MergeAuthorityBackend`; only the reviewed
+  `Git2Backend` implements that interface, while ordinary `GitBackend` remains
+  open outside v1;
+- the checked bundle adapter accepts no backend parameter, and the source gate
+  freezes the complete crate-wide reference set for the concrete stash
+  observer so a new wrapper or consumer fails closed; and
 - source and compiler protections run in PR/push and release CI, while the
   local release script cannot skip them and every new-tag branch converges on
   one exact-target gate immediately before tag creation or push.
@@ -397,11 +411,13 @@ imported alias, same-name function pointer, crate-local wrapper, changed
 literal, or commented-out guard. The separate preservation-plan caller is
 protected as a complete source module. The source checker pins the concrete
 crate-private preservation observer, rejects restoration of the observer to
-the open `GitBackend` trait, and rejects any authority-sensitive merge source
-that names an open observer callback. The concrete observer directly
-enumerates and decodes native stash objects without calling the backend trait,
-shared stash API, shared repository opener, or external OID parser. Its entry,
-implementation, and checked bundle consumer are all in the positive source
+the open `GitBackend` trait, freezes every crate-wide reference to that
+observer, and rejects any test-gated production v1 source that names the open
+backend rather than the sealed authority backend. The concrete observer
+directly enumerates and decodes native stash objects without calling the
+backend trait, shared stash API, shared repository opener, or external OID
+parser. Its entry, implementation, and checked bundle consumer are all in the
+positive source
 allowlist. `Git2Backend` retains an inherent observation method for ordinary
 and test use. Alternative backends remain available for ordinary dependency
 injection, but cannot implement or substitute this checked observation.
@@ -450,9 +466,14 @@ The interface correction precedes all original R2 packages:
    compiler enforcement and a deterministic path-and-byte manifest. Pin the
    sixth-review direct-writer, nested-helper, same-name function-pointer, and
    new-helper-file counterexamples.
-9. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
+9. **R2-I9 sealed implementation and consumer closure:** admit only the
+   compiler-sealed `Git2Backend` to v1 authority and physical execution,
+   eliminate the checked bundle adapter's unused backend injection, freeze the
+   complete concrete-observer reference set, and pin the seventh-review
+   import-aliased alternative backend and unprotected-consumer counterexamples.
+10. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
    document checks; commit one exact workspace/core/CLI tuple.
-10. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
+11. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
