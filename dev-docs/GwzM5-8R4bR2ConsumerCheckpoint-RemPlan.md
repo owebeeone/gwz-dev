@@ -968,6 +968,31 @@ The corrected settled pre-review tree passed:
 This evidence freezes the corrected tree for review; it does not accept C2.
 Both independent settled-tree re-reviews must report no P0, P1, or P2 finding.
 
+### R2-C2 second-review publication correction — 2026-08-15
+
+`GwzM5-8R2C2OwnerInterface-ReviewCode-2.md` found that the implementation
+dropped a verified source handle before each pathname rename and then claimed
+read-only rejection even for a same-user replacement injected in that
+interval. The catalog amendment now resolves the underlying platform contract
+rather than adding another check-before-rename patch.
+
+All scratch, final-directory, retirement, and anchor publication must route
+through one sealed source-associated primitive. It opens no-follow and checks
+the expected source identity immediately before the edge and keeps that source
+capability live through publication. Windows must rename that exact checked
+handle. Linux and macOS retain the checked handle and use the relative
+no-replace path operation under the amendment's explicit cooperating-GWZ and
+same-user-private-namespace boundary; no portable atomic conditional-by-object
+rename is claimed there. Pre-capability substitutions remain typed read-only
+ambiguity on every platform. The structural gate must reject direct raw rename
+calls from the catalog provider outside the primitive.
+
+The re-review's P3 also remains binding: the 21 fault-key inventory becomes a
+real parameterized interruption/re-entry matrix. Each key must trigger its
+physical point, drop live process/lease state, reacquire the full lease, and
+prove convergence to the retained catalog or a typed read-only ambiguity.
+String labels and enum equality remain only coverage guards.
+
 ## 9. Exit gate
 
 This remediation is complete only when:

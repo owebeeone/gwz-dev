@@ -262,6 +262,39 @@ is read-only. The owner requests randomness only after it has a ready catalog
 permit; random-source failure therefore rejects before scratch mutation but
 does not make a separately completed private-parent edge invalid.
 
+### 4.1 Source association and same-user namespace boundary
+
+The final source check and namespace edge use one sealed publication primitive
+for scratch-to-active, staging-to-final, active-to-retired, and all three
+anchor moves. That primitive accepts the owner-observed source identity,
+reopens the source no-follow through the retained parent immediately before
+the edge, compares the opened identity, retains that handle until the edge is
+complete, and publishes no-replace into the already-proved rename domain.
+Callers cannot perform a separate check followed by a raw rename.
+
+On Windows the primitive renames the exact identity-checked source handle with
+`SetFileInformationByHandle`; pathname replacement after the handle is opened
+cannot select a different object. Linux and macOS have no admitted portable
+kernel operation that atomically means “rename this pathname only if it still
+names this already-open object.” On those platforms the primitive retains the
+checked handle while performing the relative no-replace pathname rename. This
+is safe under the following explicit trust boundary: the catalog lease
+serializes cooperating GWZ processes, and a non-cooperating process owned by
+the same OS user must not mutate GWZ's private catalog namespace after the
+primitive has acquired its source capability. That process can already forge
+canonical private protocol bytes and is outside the authentication boundary
+stated in Section 3.
+
+Drift present before source-capability acquisition, including a substituted
+name, object, kind, identity, bytes, directory interior, destination, target,
+or lock slot, still rejects before publication and leaves the observed foreign
+fact untouched. The implementation does not claim that Unix can keep a
+deliberate same-user pathname replacement read-only when it is injected after
+the last identity check. Tests therefore exercise every observable pre-edge
+substitution and, on Windows, exact-handle association; they do not encode an
+unimplementable Unix compare-and-rename guarantee. Power-loss interruption at
+every actual namespace edge remains in scope.
+
 ## 5. Live freshness and historical collision evidence
 
 The platform provider continues to observe and retain every physical fact
@@ -599,7 +632,11 @@ Interface tests precede physical implementation and must prove:
    never re-enters a transient bootstrap guard, the complete deduplicated set
    is locked and revalidated in canonical order before the first catalog
    mutation, and contention or later-target failure releases the whole set in
-   reverse order without mutation.
+   reverse order without mutation; and
+13. all four publication families route through the sealed source-associated
+   primitive, Windows renames the exact identity-checked handle, direct raw
+   provider renames are structurally rejected, and the Unix same-user boundary
+   is neither widened nor misrepresented as an atomic compare-and-rename.
 
 The schema gate additionally proves no durable message references
 `CheckedCanonicalPathIdentityV1`, and no invocation identity or rename-domain

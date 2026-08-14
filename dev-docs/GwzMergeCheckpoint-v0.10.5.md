@@ -89,6 +89,15 @@ publication primitive, use it for every edge, then run interruption/recovery
 tests for every declared fault key. The existing fault-key inventory alone is
 not an executed fault matrix.
 
+The resumed design resolved the cross-platform boundary in
+`GwzM5-8R2CCatalogBootstrapAmendment.md` Section 4.1. One sealed primitive now
+owns source acquisition, identity comparison, and publication. Windows must
+rename the exact checked handle. Unix retains the checked handle across the
+relative rename under an explicit cooperating-GWZ/same-user namespace trust
+boundary because Linux and macOS expose no admitted portable atomic
+compare-object-and-rename operation. This is the selected architectural
+correction; it is not permission to add another unbound path check.
+
 ## Windows backlog for the v1 line
 
 The accepted C1 tree was intentionally not released. Windows validation first
