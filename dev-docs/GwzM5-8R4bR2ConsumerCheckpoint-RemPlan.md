@@ -2,14 +2,13 @@
 
 Date: 2026-08-14
 
-Status: **the fourth settled re-reviews closed archive semantics and the named
-writer aliases but found that a writer denylist and open trait callback cannot
-prove a closed boundary. The fifth correction replaces that claim with a
-complete positive source allowlist over the guarded modules, terminates the
-production stash-observation call in a frozen read-only leaf, and makes the
-local compiler gate non-skippable on the exact commit before tagging. No R2
-production conversion may begin until this correction receives two independent
-GO re-reviews on a committed settled tuple**.
+Status: **the fifth settled re-reviews accepted the byte-pinned read-only leaf
+but proved that its open `GitBackend` entry and one release branch were not
+closed. The sixth correction removes trait dispatch from authority-sensitive
+stash observation, routes every new tag through one final exact-SHA gate, and
+aligns PR/push CI with the release script's Python runtime. No R2 production
+conversion may begin until this correction receives two independent GO
+re-reviews on a committed settled tuple**.
 
 ## 1. Scope and disposition
 
@@ -43,6 +42,11 @@ The fourth re-review reports controlling the fifth correction are:
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-4.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-4.md`.
 
+The fifth re-review reports controlling the sixth correction are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-5.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-5.md`.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -67,12 +71,14 @@ Their overlapping P2 findings are corrected as one architectural change:
   pins the complete bytes of every guarded source module; a new alias, wrapper,
   call, import, string, or commented-out guard therefore changes the allowlist
   rather than depending on discovery in a writer denylist;
-- production `preservation_stashes` dispatch terminates in the guarded
-  preservation-image leaf, whose selected path enumerates Git stash objects
-  directly and uses only local decoding helpers; and
+- `preservation_stashes` is removed from the open `GitBackend` trait;
+  authority-sensitive merge code uses a concrete crate-private observer that
+  terminates in the guarded preservation-image leaf, whose
+  selected path enumerates Git stash objects directly and uses only local
+  decoding helpers; and
 - source and compiler protections run in PR/push and release CI, while the
-  local release script cannot skip them and reruns them on the exact
-  version-bump commit before tag creation or push.
+  local release script cannot skip them and every new-tag branch converges on
+  one exact-target gate immediately before tag creation or push.
 
 The two P3 gaps were corrected in the same checkpoint: prefixed `.`/`..`
 suffixes reject, and literal managed schedule/reservation fixtures cover
@@ -377,21 +383,29 @@ completeness proof. The proof is a positive, byte-exact allowlist of every
 guarded source module. Any direct call, imported alias, same-name function
 pointer, crate-local wrapper, nested helper, changed literal, or commented-out
 guard changes the protected module digest and fails closed. The source checker
-also pins the sole production `GitBackend` delegate for
-`preservation_stashes` to `preservation_image`; that leaf directly enumerates
-and decodes native stash objects without calling the open backend trait again,
-the shared stash API, a shared repository opener, or an external OID parser.
-The delegate macro source is itself in the positive allowlist, and the checker
-rejects any production `GitBackend` implementation other than the single
-frozen `Git2Backend` implementation. Test backends remain test-only.
+pins the concrete crate-private preservation observer, rejects restoration of
+the observer to the open `GitBackend` trait, and rejects any
+authority-sensitive merge source that names an open observer callback. The
+concrete observer directly
+enumerates and decodes native stash objects without calling the backend trait,
+shared stash API, shared repository opener, or external OID parser. Its entry,
+implementation, and checked bundle consumer are all in the positive source
+allowlist. `Git2Backend` retains an inherent observation method for ordinary
+and test use. Alternative backends remain available for ordinary dependency
+injection, but cannot implement or substitute this checked observation.
 
 PR/push CI and release CI run the source and compiler gates on their exact
 checkout. The local release script has no compiler-skip option. It runs the
-gates on its initial detached worktree and, after any version/lock commit,
-resets that worktree to the exact new SHA and reruns the source checker, its
-executable counterexamples, and all-target/all-feature Clippy before creating
-or pushing the tag. Retrying an already-created tag likewise gates its exact
-target before push.
+gates on its initial detached worktree and routes every new tag—whether or not
+a version commit was required—through one finalizer that resets to and verifies
+the exact target SHA, then reruns the source checker, executable
+counterexamples, and all-target/all-feature Clippy before tag creation or push.
+Retrying an already-created tag likewise gates its exact target before push.
+Atomic push uses the verified SHA as the source for both the remote branch and
+tag refspec, so local branch movement cannot substitute a different commit
+after the gate.
+The PR/push workflow uses Python 3.11, the minimum standard-library runtime
+needed to import and execute the release-boundary tests.
 
 ## 8. TDD implementation sequence
 
@@ -415,9 +429,13 @@ The interface correction precedes all original R2 packages:
    compiler lint as defense in depth, and make exact tagged-commit gating
    mandatory. Pin the fourth-review `copy`, crate writer, backend writer,
    commented guard, skip flag, and post-version-commit counterexamples.
-7. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
+7. **R2-I7 concrete observer and tag convergence:** remove the open backend
+   callback from the trait and checked observation, route all new tags through
+   one exact-SHA finalizer, and execute the boundary suite on its declared CI
+   Python.
+8. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
    document checks; commit one exact workspace/core/CLI tuple.
-8. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
+9. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
@@ -440,11 +458,12 @@ This remediation is complete only when:
 7. ordinary command call graphs remain outside checked-provider gating;
 8. selected merge checked paths have no raw successful bypass, including an
    unlisted writer alias, function pointer whose source-level name is otherwise
-   allowed, crate-local wrapper, or accepted production observer delegate;
+   allowed, crate-local wrapper, or alternative backend observer override;
 9. archive authority rejects any syntactically valid terminal-labelled record
    that the production archived-record validator rejects;
 10. PR/push, release CI, and local release use the same source and compiler
     gates against the exact tree being checked; local tag creation/push cannot
-    skip the compiler gate and a version-bump commit is re-gated by exact SHA;
+    skip the compiler gate, every new tag target is re-gated by exact SHA, and
+    the declared CI Python can execute the complete boundary suite;
 11. all focused/full/static checks pass on a settled tree; and
 12. both independent re-reviews report no open P0/P1/P2 defect.
