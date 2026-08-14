@@ -883,6 +883,22 @@ corrected pre-review tree passed:
 C1 remains unaccepted and C2 remains blocked until both independent focused
 re-reviews report no P0, P1, or P2 finding on the corrected immutable tuple.
 
+### R2-C1 acceptance — 2026-08-14
+
+The corrected immutable checkpoint is workspace root
+`841367f9bc64b632a3f7b9a837a15ab886f2efc2`, `gwz-core`
+`f416e6d7bf8b582087b3dd1512dacc91db066369`, and `gwz-cli`
+`3cca145c0b32410f250f640730ed7ca18f1da59f`. The focused re-reviews
+`GwzM5-8R2C1AggregateClassifier-ReviewCode-2.md` and
+`GwzM5-8R2C1AggregateClassifier-ReviewState-2.md` both returned **GO** with
+zero P0, P1, or P2 findings. The state review reported no P3; the code review's
+sole P3 was a stale provenance sentence in the catalog amendment, corrected
+without changing the reviewed semantic rule or implementation.
+
+R2-C1 is accepted. R2-C2 is unblocked as the first package authorized to
+mutate the catalog namespace; it must consume only the accepted C1 aggregate
+decision and must not weaken the conservative native-equivalence rule.
+
 ## 9. Exit gate
 
 This remediation is complete only when:

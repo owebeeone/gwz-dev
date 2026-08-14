@@ -10,7 +10,12 @@ The controlling reviews are
 `GwzM5-8R2CCatalogBootstrapAmendment-ReviewState.md`. Both report zero
 P0/P1/P2/P3 findings against semantic revision SHA-256
 `bb59775646954b6e1ec8981794071397ca8ee5f3da4d2f9dd4d9592aceb92094`.
-Only this review-status provenance preamble was added afterward.
+The later native-equivalence correction in section 3 is controlled by
+`GwzM5-8R2C1AggregateClassifier-ReviewCode-2.md` and
+`GwzM5-8R2C1AggregateClassifier-ReviewState-2.md`; both report no P0, P1, or
+P2 finding. The reviewed post-correction amendment bytes had SHA-256
+`5168f728e86ecb7d06b79ea4033dc80e5dacbf9e519a06f782a2808d63c1992f`.
+Only this expanded review-status provenance preamble was added afterward.
 
 This amendment controls the first-catalog portions and the cross-cutting
 durable-path schema portions of
