@@ -2,16 +2,16 @@
 
 Date: 2026-08-14
 
-Status: **the ninth filesystem re-review proved that loader aliases and an
-outside-`src` approved target escaped the spelling scan, while an open-backend
-alias could form a new complete `V1Runtime`. The tenth correction stops using
-spelling scans as the completeness proof: the production service accepts only
-a private-sealed runtime, test runtimes use a separate test-only entry, the
-complete v1 tree and mixed preservation-artifact adapter are byte-pinned, and
-the v1 artifact observers retain function-level compiler enforcement. The
-path-edge scanner remains defense in depth. No R2 production conversion may
-begin until this correction receives two independent GO re-reviews on a
-committed settled tuple**.
+Status: **the tenth independent state and code reviews accepted the sealed
+runtime itself but proved that the unprotected parent module declaration could
+redirect rustc away from the pinned v1 tree. The eleventh correction anchors
+the complete compiler route from `Cargo.toml` through `lib.rs`,
+`workspace_ops/mod.rs`, and `merge/mod.rs` into the v1 tree, and adds a positive
+symbol sentinel between the pinned parent and intended root. The descendant
+tree and mixed preservation-artifact adapter remain byte-pinned, with local
+compiler enforcement. No R2 production conversion may begin until this
+correction receives two independent GO re-reviews on a committed settled
+tuple**.
 
 ## 1. Scope and disposition
 
@@ -74,6 +74,11 @@ The ninth filesystem re-review controlling the tenth correction is:
 The attempted ninth state review likewise produced no report or verdict and
 does not count toward the independent-review gate.
 
+The tenth independent re-reviews controlling the eleventh correction are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewCode-10.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-10.md`.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -126,7 +131,11 @@ Their overlapping P2 findings are corrected as one architectural change:
   have exact byte manifests, while the v1 artifact-observation functions keep
   local compiler writer bans; therefore a loader alias, outside-`src` helper,
   new runtime, or changed service adapter requires an explicit reviewed
-  manifest update regardless of source spelling; and
+  manifest update regardless of source spelling;
+- the compiler route into that tree is anchored by exact manifests for the
+  crate target and each parent module from `Cargo.toml` through `merge/mod.rs`;
+  the pinned parent also names a positive sentinel defined by the intended v1
+  root, so a resident-but-unloaded protected directory is not accepted; and
 - source and compiler protections run in PR/push and release CI, while the
   local release script cannot skip them and every new-tag branch converges on
   one exact-target gate immediately before tag creation or push.
@@ -512,9 +521,13 @@ The interface correction precedes all original R2 packages:
     preservation-artifact adapter, and retain function-local compiler bans on
     v1 artifact observation. Pin the ninth-review `cfg_attr`, imported
     `include`, outside-`src` target, and split-runtime examples.
-12. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
+12. **R2-I12 compiler-root trust anchor:** byte-pin the crate target and every
+    parent module edge through `merge/mod.rs`, bind the intended v1 root with a
+    positive compiler sentinel, and pin the tenth-review alternate-root case
+    plus redirects at each higher compiler edge.
+13. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
    document checks; commit one exact workspace/core/CLI tuple.
-13. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
+14. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
@@ -539,7 +552,8 @@ This remediation is complete only when:
    unlisted writer alias, function pointer whose source-level name is otherwise
    allowed, crate-local wrapper, alternative backend observer override,
    unsealed production runtime, or loader indirection outside the exact v1 and
-   artifact-adapter byte manifests;
+   artifact-adapter byte manifests; the compiler-root chain must prove the
+   protected v1 tree is selected rather than merely resident;
 9. archive authority rejects any syntactically valid terminal-labelled record
    that the production archived-record validator rejects;
 10. PR/push, release CI, and local release use the same source and compiler
