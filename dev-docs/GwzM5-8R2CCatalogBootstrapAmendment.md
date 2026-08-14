@@ -163,10 +163,15 @@ opened file identity. Contention returns no lease and performs no catalog
 mutation. The file lock and retained target handles live until the complete
 checked command releases its lease set.
 
-`CatalogMutationLeaseV1` retains and binds the exact workspace root or actual
-Git-directory target on which its advisory lock was acquired. `CatalogOwnerV1`
-derives the target path and retained handles from that opaque lease. It never
-accepts an independent path beside a valid lease:
+`CatalogMutationLeaseV1` retains and binds the exact workspace root or common
+Git-directory target on which its advisory lock was acquired. A Git-target
+request names a repository or worktree, and the sealed lease owner derives its
+common Git directory; callers cannot choose between linked-worktree actual and
+common Git directories. `CatalogOwnerV1` consumes the lease through a sealed
+`begin_preflight` transition, revalidates the retained target and still-named
+final lock inode, and derives the target path and retained provider handles
+from that opaque witness. It never accepts an independent path or provider
+root beside a valid lease:
 
 ```text
 recover_or_create(catalog_target_lease)
@@ -179,9 +184,24 @@ or checked multi-target command uses `CatalogLeaseSetV1`; R2-C never pairs a
 target from one lease with another lease.
 
 Checked multi-target acquisition is fixed now rather than deferred to callers.
-The coordinator derives the complete target set read-only, deduplicates exact
-targets, and sorts by the canonical bytes of `(support_profile,
+The coordinator derives one complete, nonempty target batch read-only. The
+literal maximum is 4,096 targets for one command, matching the global bounded-
+observation ceiling while remaining far above a practical GWZ workspace. The
+batch consumes at most maximum-plus-one iterator items, uses fallible reserved
+allocation throughout, and rejects overflow or allocation failure before any
+catalog mutation. The owner first groups by canonical target location: exact
+full bindings deduplicate, while one location observed with different target
+identity or repository membership rejects before phase-one preparation. It
+then sorts the distinct targets by the canonical bytes of `(support_profile,
 target_durable_identity, root_kind)`.
+
+Equivalent-final-lock alias proof is finite and lossless. A sensitive parent
+requires no distinct-alias enumeration. An ASCII-case-fold parent charges each
+native name against the same literal 4,096-entry, 255-native-unit-per-name,
+510-encoded-byte-per-name, and 2,088,960-aggregate-byte limits used by the
+bounded parent grammar. Capacity ambiguity rejects before final acquisition;
+non-Unicode Unix names and native Windows names are never skipped or converted
+lossily.
 
 Acquisition has two non-interleaved phases. Preparation visits targets in that
 order and, while holding no final target lease, uses each target's transient
@@ -192,6 +212,10 @@ slot in canonical order and releases all locks in reverse order on any failure.
 No transient bootstrap guard may be acquired or re-entered after the first
 final target lock is held. No catalog/private mutation occurs until the whole
 set is locked and every target identity/membership binding is revalidated.
+The lease-owned witness repeats target, repository, runtime-directory, and
+named-lock revalidation before permit issuance and immediately before every
+physical catalog edge; the ready and missing-parent permit constructors accept
+only the resulting bound observation.
 
 Contention, duplicate path with different identity, membership drift, or
 reacquisition mismatch releases the whole set read-only. A checked

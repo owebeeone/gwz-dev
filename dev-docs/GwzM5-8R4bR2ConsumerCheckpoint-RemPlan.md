@@ -700,6 +700,56 @@ No catalog directory, record, scratch object, staging object, or final object
 can be created by C0. R2-C1 remains a pure aggregate grammar/classifier package;
 R2-C2 is still the first package authorized to mutate the catalog namespace.
 
+### R2-C0 independent review correction — 2026-08-14
+
+The first immutable C0 checkpoint was not accepted. The independent code and
+state/lease reviews both returned **NO-GO**: the lease could not bind or
+revalidate a provider root after acquisition, an actual/common Git target was
+still caller-selected, the batch and alias scans were unbounded, and one
+canonical location observed under different identities could reach phase-one
+runtime-slot preparation. The controlling reports are
+`GwzM5-8R2C0Interface-ReviewCode.md` and
+`GwzM5-8R2C0Interface-ReviewState.md`.
+
+The correction replaces the path accessor with a consumed, lease-owned target
+witness. The sole production provider route derives its root from that witness,
+exactly compares the retained live and durable target/repository facts, and
+revalidates the target plus named final-lock inode at permit issuance and every
+future physical edge. Git requests now derive the common Git directory from a
+repository/worktree purpose, so linked worktrees cannot select incompatible
+actual/common targets. Permit constructors accept only a lease-bound provider
+observation; a path-plus-lease or independently retained-root constructor is
+not representable.
+
+The correction also adds a sealed nonempty target batch with a 4,096-target
+ceiling, maximum-plus-one iterator consumption, fallible allocation, and a
+canonical-location ambiguity pass before preparation. Equivalent-alias proof
+uses the literal lossless parent budgets and skips distinct-alias enumeration
+on sensitive parents. Focused tests cover post-return workspace/Git target and
+named-slot replacement, cross-target pairing, linked-worktree convergence,
+both duplicate-identity orders, maximum/maximum-plus-one and infinite batches,
+allocation failure, parent capacity, and Unix non-Unicode names. C0 remains
+pending until the corrected settled tree passes every full gate and both
+independent re-reviews report no open P0/P1/P2 finding; C1 must not start before
+that acceptance.
+
+The corrected pre-review tree passed:
+
+- 1,279 `gwz-core` library tests, with zero failures and one ignored test;
+- the four integration binaries: 10 diff-render, 29 protocol, 7 publish, and
+  2 rename tests;
+- 97 checked-artifact interface tests, 19 production pre-catalog provider
+  tests, and 21 catalog-lease tests;
+- the six-case release-boundary suite and the 57-case adversarial source-
+  boundary suite;
+- protocol regeneration/currentness, the 133-assertion merge-document gate,
+  17 document/compatibility checker tests, Rust 1.95 formatting,
+  `git diff --check`, the checked-artifact source checker, and all-target/all-
+  feature Clippy with warnings denied.
+
+This evidence freezes the correction for re-review; it does not itself change
+the pending verdict to accepted.
+
 ## 9. Exit gate
 
 This remediation is complete only when:
