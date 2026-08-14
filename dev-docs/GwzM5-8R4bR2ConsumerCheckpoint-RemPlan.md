@@ -587,6 +587,13 @@ packages:
     `CatalogOwnerV1`; prove at most one edge per decision and return only an
     opaque retained complete catalog. This is the first package that enables
     catalog namespace mutation.
+
+    The controlling catalog amendment now freezes the exact ten-slot completed
+    layout and the ordered active-owned staging prefixes before the staging
+    writer is implemented. `catalog-format-v1` and
+    `retired-actions-descriptor-v1` carry the same canonical identity-pinned
+    infrastructure record; the catalog-format record is the ownership marker,
+    so C2 may not invent an unnamed or eleventh child.
 18. **R2-C3 admission, reservation, and handoff:** connect the retained catalog
     to reservation lookup/publication and managed-parent handoff, preserve the
     accepted schedule/owner boundaries, run aggregate restart/fault matrices,

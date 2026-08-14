@@ -378,6 +378,47 @@ attempt while independently proving the current collision domain:
 - retired: the exact active record is present at the fixed catalog retirement
   slot and the final infrastructure remains exact.
 
+The first-catalog interior is one closed physical grammar; implementations do
+not infer it from the ten reserved names. At completed bootstrap the slots are:
+
+| Slot | Exact completed fact |
+| --- | --- |
+| `catalog-format-v1` | regular file containing the canonical `InfrastructureRecordV1` |
+| `catalog-anchor-a-v1` | regular file containing exactly `GWZ-CATALOG-ANCHOR-V1\n` |
+| `catalog-anchor-b-v1` | missing; it is the catalog anchor's fixed alternate home |
+| `roaming-anchor-home-v1` | regular file containing exactly `GWZ-ROAMING-ANCHOR-V1\n` |
+| `retired-actions-v1` | empty no-follow directory |
+| `retired-actions-descriptor-v1` | regular file containing the same canonical `InfrastructureRecordV1`, thereby binding the retained retirement root |
+| `catalog-bootstrap-retired-v1` | missing before retirement, then the exact canonical `CatalogBootstrapRecordV1` |
+| `action-admission-active-v1` | missing at idle |
+| `action-admission-scratch-v1` | missing at idle |
+| `action-admission-staging-v1` | missing at idle |
+
+The infrastructure record binds the durable identities of the staged catalog
+directory (both `catalog_root_identity` and `staging_directory_identity`), the
+catalog anchor object, roaming anchor object, and retired-action directory,
+plus the bootstrap record ID/token and the three admission names. The catalog
+format record is therefore also the first-catalog ownership marker; there is
+no unnamed or eleventh marker object.
+
+The only repairable staging prefixes are the ordered prefixes produced by this
+owner: empty; retired-action directory; exact roaming-anchor file; exact
+catalog anchor at B; the same exact anchor published at A with B absent; exact
+retirement descriptor; and exact catalog-format record. A regular file at the
+next prefix position may additionally be zero length or an exact bounded byte
+prefix and is truncated/rebuilt from the active record on retry. Earlier
+objects must be exact, later slots must be missing, the retired record and all
+admission slots must be missing, and no extra child is permitted. The owner
+never adopts a directory whose contents are not one of these prefixes.
+
+After publishing the anchor B-to-A no-replace, the owner reopens and proves its
+identity, then exercises A-to-B-to-A with write-through/no-replace moves and
+reobservation. Staging publication preserves the directory identity. Final
+validation requires the exact completed pre-retirement layout; completed
+validation additionally requires the exact retired bootstrap record. All
+interior enumeration is bounded by ten entries plus one overflow probe and
+charges native names before classification.
+
 Any reserved physical fact not consumed by one listed proof is ambiguity.
 Ordinary `.gwz/locks`, `.gwz/merge`, `.gwz/stash`, and other names outside the
 reserved catalog grammar are charged to the parent-enumeration budget but are
