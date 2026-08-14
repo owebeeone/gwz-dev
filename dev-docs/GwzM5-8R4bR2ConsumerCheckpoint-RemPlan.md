@@ -2,13 +2,20 @@
 
 Date: 2026-08-14
 
-Status: **the eleventh independent state and code reviews are GO/GO with no
-P0/P1/P2. They accepted the complete compiler route from `Cargo.toml` through
-`lib.rs`, `workspace_ops/mod.rs`, and `merge/mod.rs` into the v1 tree, its
-positive parent/root sentinel, the sealed production runtime, and the exact
-consumer manifests. The sole code-review P3 was corrected and both independent
-focused follow-ups are GO with P0-P3 all zero. The R2 interface correction gate
-is closed and R2-A may begin**.
+Status: **the R2 interface correction gate is closed. R2-A is implemented and
+locally verified: the capability-neutral runtime bootstrap, retained runtime
+handles, exact workspace/Git-directory revalidation, convergent guard/final
+lease acquisition, substitution and wrong-kind rejection, and the
+`WorkspaceMutatorLock` compatibility wrapper are in place. Dry runs remain
+bootstrap-free. R2-B is next. Native-platform release evidence remains part of
+the R2-F closure gate rather than a claim made by this local checkpoint**.
+
+The eleventh independent state and code reviews were GO/GO with no P0/P1/P2.
+They accepted the complete compiler route from `Cargo.toml` through `lib.rs`,
+`workspace_ops/mod.rs`, and `merge/mod.rs` into the v1 tree, its positive
+parent/root sentinel, the sealed production runtime, and the exact consumer
+manifests. The sole code-review P3 was corrected and both independent focused
+follow-ups were GO with P0-P3 all zero.
 
 ## 1. Scope and disposition
 
@@ -541,6 +548,25 @@ The interface correction precedes all original R2 packages:
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
 R4b-G shared-router/cross-driver integration follow, then the two final
 full-tree R4b reviews. M5b and A1 remain later.
+
+### R2-A implementation checkpoint — 2026-08-14
+
+R2-A is complete locally. The checkpoint passed:
+
+- 1,238 `gwz-core` library tests, with zero failures and one ignored test;
+- the four integration binaries: 10 diff-render, 29 protocol, 7 publish, and
+  2 rename tests;
+- the 52-case checked-artifact adversarial boundary suite and the six-case
+  release-boundary suite; and
+- Rust 1.95 formatting, all-target/all-feature Clippy with warnings denied,
+  and the checked-artifact source-boundary checker.
+
+The focused runtime suite also covers live contention, first-acquirer
+convergence, linked-worktree Git-directory placement, wrong-kind and symlink
+rejection, final-file replacement, parent substitution, changed linked-
+worktree indirection, post-drop reacquisition, and dry-run non-creation.
+Platform-native release runs remain required by R2-F before R2 as a whole is
+closed.
 
 ## 9. Exit gate
 
