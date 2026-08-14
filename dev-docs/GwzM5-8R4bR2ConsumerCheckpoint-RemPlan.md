@@ -7,7 +7,10 @@ implemented and locally verified. Runtime bootstrap remains capability-neutral
 and dry runs remain bootstrap-free. The retained pre-catalog provider now owns
 workspace/Git-directory proof, platform identity and component equivalence,
 the complete Git index/tracked-worktree snapshot, physical private-namespace
-observation, and immediate retained-handle revalidation. R2-C is next.
+observation, and immediate retained-handle revalidation. The lead-owned R2-C
+first-catalog correction in `GwzM5-8R2CCatalogBootstrapAmendment.md` is settled
+and independently accepted GO/GO with no P0-P3 findings. Physical R2-C proceeds
+in the C0-C3 sequence frozen below.
 Native-platform release evidence remains part of the R2-F closure gate rather
 than a claim made by this local checkpoint**.
 
@@ -94,6 +97,11 @@ The focused confirmations of the P3 maintenance correction are:
 
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewCode-11-P3.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-11-P3.md`.
+
+The independent GO reviews controlling physical R2-C are:
+
+- `GwzM5-8R2CCatalogBootstrapAmendment-ReviewCode.md`; and
+- `GwzM5-8R2CCatalogBootstrapAmendment-ReviewState.md`.
 
 Their overlapping P2 findings are corrected as one architectural change:
 
@@ -337,53 +345,59 @@ the first-merge two-purpose row, partial-bootstrap recovery, all 64 barrier
 ordinals, cleanup masks, schedule digests, and exact capacity totals including
 the `K=1,N=8` and `K=8,N=8` maxima.
 
-## 5. Provider-owned collision snapshot
+## 5. Provider-owned pre-catalog and first-catalog bootstrap
 
-The current caller-supplied index/worktree slices are removed. The closed owner
-has two entry points:
+R2-B's sealed platform provider remains the only source of repository,
+common-directory, actual-Git-directory, index, tracked-worktree, durable
+identity, invocation identity, lookup-mode, rename-domain, and physical
+namespace facts. No production entry accepts caller-selected fact slices,
+root-kind values, paths, raw lease bytes, or a bootstrap callback.
+
+R2-C replaces the provisional path-plus-lease entries with one target-derived
+owner entry:
 
 ```text
-recover_or_create_workspace(workspace_root, lease_binding, bootstrap)
-recover_or_create_git_directory(actual_git_directory, lease_binding, bootstrap)
+recover_or_create(catalog_target_lease)
 ```
 
-The sealed platform provider correspondingly owns two observe/revalidate
-pairs. Workspace observation opens the repository and index through retained
-identities and gathers the complete lossless index plus tracked-worktree fact
-set for the fixed workspace private domain. Git-directory observation proves
-that the root is the actual retained Git directory and scans its fixed private
-namespace without accepting an empty workspace fact list as a substitute.
-Neither entry accepts a domain, index entry, worktree entry, or root-kind enum
-from a caller.
+`CatalogMutationLeaseV1` binds either the existing workspace final lock or the
+fixed Git-target lock to retained target handles. `CatalogLeaseSetV1` prepares
+all fixed runtime slots without holding a final lock, deduplicates and sorts
+the complete target set, then acquires and revalidates every final lock before
+the first catalog mutation. It releases the whole set in reverse order on
+contention or failure and never re-enters a transient bootstrap guard after a
+final lock is held.
 
-The observation returns a 32-byte collision snapshot binding calculated from:
+The provider's closed result is either a live-only
+`MissingGitPrivateParent(MissingCatalogParentPermitV1)` or a
+`Ready(CatalogPermitV1)`. The missing-parent permit can perform only the fixed
+no-replace parent-directory edge and cannot manufacture catalog identity,
+scratch state, token state, or a ready permit. Complete pre-catalog re-entry is
+the only route from that edge to `Ready`.
 
-- root kind and fixed domain-version digest;
-- retained repository/common-directory identity;
-- fixed private-container absence or its retained identity, lookup mode, and
-  rename domain;
-- retained index identity and exact index content digest for workspace roots;
-- every complete, sorted lossless index fact;
-- every complete, sorted tracked-worktree kind fact; and
-- the platform-equivalence result for each private-domain comparison.
+The ready permit separates three non-interchangeable bindings:
 
-The existing 32-byte catalog-bootstrap collision field carries this complete
-snapshot binding; no wire field is added. Its historical generated field name
-is retained for wire compatibility, while Rust code and documentation call the
-value `collision_snapshot_digest`.
+- `FreshObservationDigestV1` proves same-invocation retained-handle and
+  rename-domain freshness immediately before each mutation;
+- `DurableCatalogTargetDigestV1` proves restart-stable target and actual
+  mutation-parent identity; and
+- `HistoricalCollisionDigestV1` preserves the original complete collision
+  evidence without permanently pinning unrelated later index/worktree state.
 
-Immediately before catalog bootstrap, revalidation reopens/reobserves the same
-repository, index, tracked worktree, root, path components, modes, rename
-domain, and equivalence facts and compares the complete binding. A changed
-index or incomplete/unavailable observation rejects before bootstrap. The
-revalidated permit borrows the retained transaction, so no caller can
-interpose work at the mutation boundary.
+Every recovery pass recomputes the stable target digest, performs a new
+complete collision scan, and uses historical values only from owner-classified
+scratch/active/retired progress. The exact scratch name carries target digest,
+historical digest, and random token, so zero-byte and partial-prefix recovery
+does not guess. The active record reserves fixed staging. A bounded aggregate
+enumeration classifies every reserved role and equivalent alias before one
+physical edge; ordinary `.gwz` siblings count against capacity but are not
+catalog facts.
 
-Production-shaped tests prove that no callable API accepts hand-selected fact
-lists. Real repositories cover exact, ancestor, descendant, equivalent-name,
-stage 0..3, skip-worktree, gitlink, tracked-kind, and index-only collisions.
-Changing the real index between observation and revalidation must prevent the
-bootstrap callback and leave private and managed paths byte-identical.
+Every durable record uses `CheckedDurablePathV1`; invocation identities and
+rename domains remain live-only. Generated internal bindings, semantic and
+shape vectors, digest material, and record-ID vectors change together before
+A1. These are private pre-activation corrections, not public protocol or
+released-state migrations.
 
 ## 6. Managed-parent ownership policy
 
@@ -548,9 +562,39 @@ The interface correction precedes all original R2 packages:
 14. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
-Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
-R4b-G shared-router/cross-driver integration follow, then the two final
-full-tree R4b reviews. M5b and A1 remain later.
+Items 1-14 are complete. R2-A and R2-B are implemented at the checkpoints
+below. The independently accepted R2-C amendment now executes in four bounded
+packages:
+
+15. **R2-C0 durable schema and lease interfaces:** write failing schema,
+    compile-boundary, wrong-target, shared-Git-target, lock substitution, and
+    batch-order tests; replace every durable mixed-purpose path with
+    `CheckedDurablePathV1`; introduce the three digest newtypes, closed
+    preflight states, target-bound leases, and lease-set protocol; regenerate
+    bindings/vectors atomically. No catalog namespace mutation is enabled.
+16. **R2-C1 aggregate grammar and classifier:** write failing zero/prefix,
+    malformed/equivalent/duplicate, capacity, staging-ownership, current
+    collision, target-substitution, and completed-reopen tests; implement the
+    dynamic scratch parser, bounded full-parent observation, owner-private
+    aggregate facts, pure one-edge classifier, and literal state/fault matrix.
+    The classifier has no filesystem writer.
+17. **R2-C2 physical first-catalog owner:** write failing real-filesystem and
+    restart fault tests; implement the missing-parent retry and each classified
+    no-follow/no-replace/write/flush/publish/reobserve edge behind sealed
+    `CatalogOwnerV1`; prove at most one edge per decision and return only an
+    opaque retained complete catalog. This is the first package that enables
+    catalog namespace mutation.
+18. **R2-C3 admission, reservation, and handoff:** connect the retained catalog
+    to reservation lookup/publication and managed-parent handoff, preserve the
+    accepted schedule/owner boundaries, run aggregate restart/fault matrices,
+    and close the checked/ordinary call graph without enabling A1.
+19. Run focused, full, structural, protocol/document, format, and all-target/
+    all-feature Clippy gates after every package. Obtain independent critical
+    interface review after C0 and settled implementation reviews after C2/C3.
+
+R2-D through R2-F follow accepted R2-C. R3-R6 and R4b-G shared-router/
+cross-driver integration follow, then the two final full-tree R4b reviews.
+M5b and A1 remain later.
 
 ### R2-A implementation checkpoint — 2026-08-14
 
