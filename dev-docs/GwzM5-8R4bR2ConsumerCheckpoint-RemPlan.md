@@ -2,16 +2,14 @@
 
 Date: 2026-08-14
 
-Status: **the tenth independent state and code reviews accepted the sealed
-runtime itself but proved that the unprotected parent module declaration could
-redirect rustc away from the pinned v1 tree. The eleventh correction anchors
-the complete compiler route from `Cargo.toml` through `lib.rs`,
-`workspace_ops/mod.rs`, and `merge/mod.rs` into the v1 tree, and adds a positive
-symbol sentinel between the pinned parent and intended root. The descendant
-tree and mixed preservation-artifact adapter remain byte-pinned, with local
-compiler enforcement. No R2 production conversion may begin until this
-correction receives two independent GO re-reviews on a committed settled
-tuple**.
+Status: **the eleventh independent state and code reviews are GO/GO with no
+P0/P1/P2. They accepted the complete compiler route from `Cargo.toml` through
+`lib.rs`, `workspace_ops/mod.rs`, and `merge/mod.rs` into the v1 tree, its
+positive parent/root sentinel, the sealed production runtime, and the exact
+consumer manifests. The sole code-review P3 was a version-change regression
+that would become vacuous after a future release bump; it now derives a
+guaranteed-distinct version and proves the fixture changed. That maintenance
+delta requires focused exact-tuple confirmation before R2-A begins**.
 
 ## 1. Scope and disposition
 
@@ -78,6 +76,12 @@ The tenth independent re-reviews controlling the eleventh correction are:
 
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewCode-10.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-10.md`.
+
+The eleventh independent GO re-reviews are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewCode-11.md` (one P3 test
+  maintenance finding); and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-11.md` (no findings).
 
 Their overlapping P2 findings are corrected as one architectural change:
 
