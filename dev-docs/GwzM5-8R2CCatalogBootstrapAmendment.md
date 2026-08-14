@@ -15,7 +15,14 @@ The later native-equivalence correction in section 3 is controlled by
 `GwzM5-8R2C1AggregateClassifier-ReviewState-2.md`; both report no P0, P1, or
 P2 finding. The reviewed post-correction amendment bytes had SHA-256
 `5168f728e86ecb7d06b79ea4033dc80e5dacbf9e519a06f782a2808d63c1992f`.
-Only this expanded review-status provenance preamble was added afterward.
+The exact ten-slot completed layout, ordered staging prefixes, retained-complete
+capability, and platform-specific C2 durability rules below were added after
+that C1-reviewed hash. They are controlled by the C2 implementation and review
+cycle rather than retroactively attributed to the C1 reviews. The first C2
+interface reviews are
+`GwzM5-8R2C2OwnerInterface-ReviewCode.md` and
+`GwzM5-8R2C2OwnerInterface-ReviewState.md`; their NO-GO findings define the
+current remediation gate and are not an acceptance claim.
 
 This amendment controls the first-catalog portions and the cross-cutting
 durable-path schema portions of
@@ -419,6 +426,15 @@ validation additionally requires the exact retired bootstrap record. All
 interior enumeration is bounded by ten entries plus one overflow probe and
 charges native names before classification.
 
+On Windows, every authority-carrying regular file is created or reopened with
+write-through semantics, written completely, flushed through its retained file
+handle, and reobserved by identity and bytes. Every namespace publication uses
+a write-through source handle. Empty staging and retired-action directories
+are provisional restart-idempotent prefixes rather than independent durable
+authority: if they disappear after power loss, classification returns to the
+preceding exact record-owned state and recreates them. R2-F still requires the
+native Windows power-loss/fault matrix before release.
+
 Any reserved physical fact not consumed by one listed proof is ambiguity.
 Ordinary `.gwz/locks`, `.gwz/merge`, `.gwz/stash`, and other names outside the
 reserved catalog grammar are charged to the parent-enumeration budget but are
@@ -428,11 +444,17 @@ changed live invocation identity or rename domain rejects that invocation;
 retry may re-establish new live facts for the same durable objects.
 
 The owner performs one aggregate observation, derives at most one expected
-record, proves current collision freedom, chooses one recovery edge, and
-reobserves after every mutation. It never builds an expected record from a new
-historical digest or token when durable recovery evidence exists. Exact
-retired+final completion reopens under current collision/freshness proof; it
-does not require today's unrelated index bytes to equal the historical digest.
+record, proves current collision freedom, and chooses one recovery edge. Every
+ordinary edge performs one namespace mutation before complete re-entry. The
+one bounded compound edge is the anchor proof: because exact anchor-at-A is
+both its entry and exit state, the owner must execute and reobserve the fixed
+A-to-B-to-A exercise and then publish the next descriptor prefix before it can
+return to classification without looping forever. Each subedge has its own
+fault point and identity reobservation; restart at B repeats the bounded proof.
+The owner never builds an expected record from a new historical digest or token
+when durable recovery evidence exists. Exact retired+final completion reopens
+under current collision/freshness proof; it does not require today's unrelated
+index bytes to equal the historical digest.
 
 ## 6. Missing Git-directory private parent
 
@@ -471,11 +493,15 @@ to `Ready` is complete pre-catalog re-entry after retaining the now-present
 parent and computing all three ready-permit digests.
 
 The owner creates only that fixed directory with no-replace semantics through
-the retained actual-Git-directory handle, flushes the parent edge, and returns
-without creating a catalog scratch, active record, staging directory, or final
-catalog. The coordinator then repeats complete observe, collision validation,
-retention, and immediate revalidation and obtains a permit that retains the
-new parent.
+the retained actual-Git-directory handle and returns without creating a
+catalog scratch, active record, staging directory, or final catalog. On Unix it
+flushes the containing Git-directory edge. Windows does not claim a portable
+directory-handle flush for this empty, authority-free prefix: the coordinator
+instead repeats complete observation, collision validation, retention, and
+immediate revalidation, and loss of the empty parent is simply the original
+missing state. The first durable ownership declaration is the nonempty dynamic
+scratch, created write-through, flushed through its file handle, and freshly
+reobserved before publication.
 
 An interrupted parent edge is restart-idempotent: absent is creatable, an
 exact no-follow directory is reusable only as a parent, and wrong-kind,
@@ -516,8 +542,11 @@ mutations, and post-edge reobservation. Its only production entry is:
 recover_or_create(catalog_target_lease)
 ```
 
-The owner executes at most one physical mutation per classified edge and
-revalidates live freshness plus current collision freedom before the next edge.
+The owner executes at most one classified recovery edge per aggregate
+observation and revalidates live freshness plus current collision freedom
+before the next edge. The sole multi-mutation recovery edge is the fixed anchor
+exercise and descriptor-prefix publication specified in Section 5; no caller
+or callback can extend it.
 The Git-parent edge consumes only `MissingCatalogParentPermitV1` and returns an
 internal `RetryPreCatalog`; every other successful edge requires a ready permit
 and loops through fresh aggregate observation. Only

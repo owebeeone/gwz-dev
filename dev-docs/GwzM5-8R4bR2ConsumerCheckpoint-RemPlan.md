@@ -906,6 +906,68 @@ R2-C1 is accepted. R2-C2 is unblocked as the first package authorized to
 mutate the catalog namespace; it must consume only the accepted C1 aggregate
 decision and must not weaken the conservative native-equivalence rule.
 
+### R2-C2 implementation and first-review remediation — 2026-08-15
+
+The first immutable C2 interface checkpoint was workspace root
+`04d4fc0bc9e203db83d15f13e73e3a7a26a72556`, `gwz-core`
+`1ef95b4ade6fa402cf1f2101a84af493af6a7beb`, and `gwz-cli`
+`3cca145c0b32410f250f640730ed7ca18f1da59f`. It was not accepted. The
+independent code review reported two P2 findings and one P3; the independent
+state/filesystem review reported two P1 and two P2 findings. Their controlling
+reports are `GwzM5-8R2C2OwnerInterface-ReviewCode.md` and
+`GwzM5-8R2C2OwnerInterface-ReviewState.md`.
+
+The correction makes the owner edge an unforgeable value constructed only by
+`CatalogOwnerV1`; all permit execution consumes that value, and only the owner
+generates a fresh scratch token. Exact reference-set and whole-tree gates now
+reject an unrelated checked-artifact sibling that attempts to call a physical
+catalog edge. Existing scratch repair opens without truncation, compares the
+fresh identity and expected-prefix bytes, verifies the same named object, and
+only then truncates through that handle. Active publication similarly opens,
+verifies, and flushes the exact scratch before no-replace publication and
+destination reobservation.
+
+The owner now implements the complete classified path: missing Git parent,
+scratch, active, staging creation and every ordered staging prefix, final
+publication, active retirement, and exact completion. The ten-entry interior
+reader charges native names before classification, rejects aliases, extras,
+wrong kinds, and unowned staging/final directories, and derives both canonical
+infrastructure records from the retained physical identities. The anchor is
+published B-to-A, exercised A-to-B-to-A, and reobserved at each namespace
+edge. Every ordinary owner edge returns only the target witness and repeats
+full lease-bound preflight before further mutation.
+
+Completion retains the final directory and every authority-bearing interior
+file/directory handle under the still-live target lease. Revalidation proves
+both each retained handle and its current named association, including
+byte-identical inode replacement, before the opaque catalog can be consumed by
+C3. Deterministic tests cover scratch, staging, active, final, and interior
+substitution; staging/final content drift; every whole-edge restart; zero and
+partial next-file recovery; and all three intermediate anchor-move states.
+
+The platform contract no longer claims that a successful Windows directory
+`sync_parent` proves an empty-directory namespace edge durable. Empty Git-parent,
+staging, and retired-action directories are authority-free, restart-idempotent
+prefixes. Every authority-carrying Windows regular file uses write-through plus
+handle flush, and every publication uses the existing write-through rename
+primitive. Native Windows and Linux power-loss evidence remains mandatory in
+R2-F; this macOS implementation checkpoint does not substitute for it.
+
+The corrected settled pre-review tree passed:
+
+- 1,338 `gwz-core` library tests with zero failures and one ignored test in
+  792.29 seconds;
+- the four integration binaries: 10 diff-render, 29 protocol, 7 publish, and
+  2 rename tests;
+- the 58-case checked-artifact adversarial source-boundary suite;
+- protocol regeneration/currentness, the 133-assertion merge-document gate,
+  and 23 document/compatibility/release tests; and
+- Rust 1.95 formatting, `git diff --check`, the direct checked-artifact source
+  checker, and all-target/all-feature Clippy with warnings denied.
+
+This evidence freezes the corrected tree for review; it does not accept C2.
+Both independent settled-tree re-reviews must report no P0, P1, or P2 finding.
+
 ## 9. Exit gate
 
 This remediation is complete only when:
