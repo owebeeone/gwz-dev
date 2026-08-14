@@ -2,15 +2,15 @@
 
 Date: 2026-08-14
 
-Status: **the seventh settled re-reviews accepted caller-local containment but
-the state review proved that an already-approved open backend callback, or a
-new unprotected concrete-observer consumer, could still mutate inside the same
-authority decision. The eighth correction introduces a compiler-sealed v1
-merge backend implemented only by `Git2Backend`, removes the unused backend
-parameter from the checked bundle adapter, and inventories every concrete
-observer reference across the crate. No R2 production conversion may begin
-until this correction receives two independent GO re-reviews on a committed
-settled tuple**.
+Status: **the eighth filesystem re-review accepted the sealed v1 backend but
+proved that a non-`.rs` Rust source loaded through `#[path]` or `include!`
+escaped the concrete-observer inventory. The corresponding state review did
+not produce a verdict and must be rerun. The ninth correction freezes every
+approved `#[path]` edge, rejects `include!`, requires each approved target to
+remain a regular in-crate `.rs` file, and includes every descendant file in
+protected tree digests. No R2 production conversion may begin until this
+correction receives two independent GO re-reviews on a committed settled
+tuple**.
 
 ## 1. Scope and disposition
 
@@ -59,6 +59,13 @@ The seventh re-review reports controlling the eighth correction are:
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-7.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-7.md`.
 
+The eighth filesystem re-review controlling the ninth correction is:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-8.md`.
+
+The attempted eighth state review produced no report or verdict, so it does
+not count toward the independent-review gate.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -98,7 +105,11 @@ Their overlapping P2 findings are corrected as one architectural change:
   open outside v1;
 - the checked bundle adapter accepts no backend parameter, and the source gate
   freezes the complete crate-wide reference set for the concrete stash
-  observer so a new wrapper or consumer fails closed; and
+  observer so a new wrapper or consumer fails closed;
+- every Rust `#[path]` source-loading edge is positively inventoried, must
+  resolve to a regular in-crate `.rs` file, `include!` is rejected, and
+  protected source-tree digests include every descendant file regardless of
+  suffix; and
 - source and compiler protections run in PR/push and release CI, while the
   local release script cannot skip them and every new-tag branch converges on
   one exact-target gate immediately before tag creation or push.
@@ -417,8 +428,11 @@ backend rather than the sealed authority backend. The concrete observer
 directly enumerates and decodes native stash objects without calling the
 backend trait, shared stash API, shared repository opener, or external OID
 parser. Its entry, implementation, and checked bundle consumer are all in the
-positive source
-allowlist. `Git2Backend` retains an inherent observation method for ordinary
+positive source allowlist. The checker also freezes every approved `#[path]`
+edge, rejects `include!` and macro-produced nonliteral path edges, validates
+that each target remains a regular in-crate `.rs` file, and includes every
+descendant suffix in protected tree digests. `Git2Backend` retains an inherent
+observation method for ordinary
 and test use. Alternative backends remain available for ordinary dependency
 injection, but cannot implement or substitute this checked observation.
 
@@ -471,9 +485,13 @@ The interface correction precedes all original R2 packages:
    eliminate the checked bundle adapter's unused backend injection, freeze the
    complete concrete-observer reference set, and pin the seventh-review
    import-aliased alternative backend and unprotected-consumer counterexamples.
-10. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
+10. **R2-I10 compiler-loaded source closure:** freeze all approved `#[path]`
+    edges and their regular in-crate `.rs` targets, reject `include!` and
+    macro-produced nonliteral edges, include every descendant suffix in
+    protected tree digests, and pin both eighth-review `.inc` counterexamples.
+11. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
    document checks; commit one exact workspace/core/CLI tuple.
-11. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
+12. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
@@ -496,7 +514,8 @@ This remediation is complete only when:
 7. ordinary command call graphs remain outside checked-provider gating;
 8. selected merge checked paths have no raw successful bypass, including an
    unlisted writer alias, function pointer whose source-level name is otherwise
-   allowed, crate-local wrapper, or alternative backend observer override;
+   allowed, crate-local wrapper, alternative backend observer override, or
+   compiler-loaded source file outside the positive source-edge inventory;
 9. archive authority rejects any syntactically valid terminal-labelled record
    that the production archived-record validator rejects;
 10. PR/push, release CI, and local release use the same source and compiler
