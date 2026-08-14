@@ -842,6 +842,47 @@ This evidence freezes C1 for independent settled-tree review. C1 is not
 accepted, and C2 remains blocked, until both reviews report no P0, P1, or P2
 finding.
 
+### R2-C1 native-equivalence correction — 2026-08-14
+
+The first state/filesystem review returned **GO** with zero findings, but the
+first code/interface review returned **NO-GO** with one P2. Its exact APFS
+counterexample used a non-ASCII long-s spelling that the filesystem resolved
+to the canonical ASCII scratch object. C1 charged the entry and then discarded
+it before equivalence classification, incorrectly exposing an absent scratch
+state. The controlling reports are
+`GwzM5-8R2C1AggregateClassifier-ReviewState.md` and
+`GwzM5-8R2C1AggregateClassifier-ReviewCode.md`.
+
+The correction makes native-name handling conservative and uniform. After
+lossless budget charging, any non-ASCII entry in an admitted case-fold parent
+is namespace ambiguity. A proven case-sensitive parent continues to admit a
+bounded non-ASCII or non-Unicode entry as an unrelated name. The same rule now
+guards the aggregate catalog scan, retained private-parent alias scan, and
+catalog-lease final-slot alias scan. The catalog amendment pins this behavior
+until a separately reviewed provider can prove complete platform-native
+equivalence.
+
+Regression tests cover synthetic Unix and Windows native names, long-s and
+Kelvin substitutions, the physical macOS fixed-role and complete dynamic-
+scratch aliases, retained-parent rejection before callback, final-lock alias
+rejection, and preservation of sensitive-parent non-Unicode behavior. The
+corrected pre-review tree passed:
+
+- 1,315 `gwz-core` library tests, with zero failures and one ignored test, in
+  776.27 seconds;
+- the four integration binaries: 10 diff-render, 29 protocol, 7 publish, and
+  2 rename tests;
+- 109 checked-artifact interface tests, 37 pre-catalog provider tests, and 28
+  catalog-lease tests;
+- the six-case release-boundary suite and the 57-case adversarial source-
+  boundary suite; and
+- protocol regeneration/currentness, Rust 1.95 formatting,
+  `git diff --check`, the checked-artifact source checker, and all-target/all-
+  feature Clippy with warnings denied.
+
+C1 remains unaccepted and C2 remains blocked until both independent focused
+re-reviews report no P0, P1, or P2 finding on the corrected immutable tuple.
+
 ## 9. Exit gate
 
 This remediation is complete only when:

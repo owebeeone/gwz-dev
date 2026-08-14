@@ -121,6 +121,15 @@ needed to reconstruct the expected record even when the file is empty. Multiple,
 malformed-recognized, equivalent-name, wrong-kind, or over-budget candidates
 are ambiguity and permit no mutation.
 
+The admitted case-fold profiles do not treat ASCII-only folding as a complete
+native lookup-equivalence proof. After charging a bounded native name, a
+case-fold parent therefore rejects every non-ASCII entry as namespace
+ambiguity unless a later reviewed provider supplies complete native
+equivalence semantics. A proven case-sensitive parent continues to retain a
+bounded non-ASCII or non-Unicode entry as an unrelated charged name. This rule
+applies consistently to the catalog parent, retained private-parent aliases,
+and catalog-lease final-slot aliases.
+
 The workspace Git collision domain reserves the entire canonical scratch
 family as well as the fixed active, staging, and final roles. Index and tracked
 worktree exact, ancestor, descendant, stage, flag, gitlink, kind, and
