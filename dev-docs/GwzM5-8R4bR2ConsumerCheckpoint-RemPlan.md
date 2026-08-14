@@ -797,6 +797,51 @@ The immutable second-correction checkpoint is workspace root
 `GwzM5-8R2C0Interface-ReviewState-3.md` both returned **GO** with zero P0, P1,
 P2, or P3 findings. R2-C0 is accepted and R2-C1 is unblocked.
 
+### R2-C1 implementation checkpoint — 2026-08-14
+
+R2-C1 is implemented as a read-only aggregate grammar and classifier. The
+dynamic scratch name has one exact ASCII spelling and three fixed 64-hex
+bindings. Parent observation is a single lossless, bounded scan with literal
+entry, native-name, encoded-name, and aggregate budgets. It rejects malformed,
+duplicate, and case-equivalent reserved roles, including non-UTF-8 Unix names
+and UTF-16 Windows names, before any catalog mutation is representable.
+
+The lease-bound provider now issues three separate facts: a fresh observation
+digest for current live collision state, a durable catalog-target digest for
+the stable root and mutation-parent binding, and a historical collision digest
+for the original attempt. Recovery obtains the historical digest only from an
+exact scratch name, active record, or retired record and rejects conflicting
+sources. Ready and missing-parent permits revalidate their complete observed
+state; the missing-parent route remains disjoint and can authorize only the
+future no-replace parent edge.
+
+The pure classifier covers absent, scratch, active, staging, final, retired,
+completed, ambiguous, wrong-owner, and drift outcomes with one closed next-edge
+decision. C1 deliberately treats the interiors of present staging and final
+directories as unowned physical facts: C2 must validate those interiors before
+it can classify them as owned. No C1 production module contains a filesystem
+writer, and R2-C2 remains the first package permitted to mutate the catalog
+namespace.
+
+The settled pre-review tree passed:
+
+- 1,311 `gwz-core` library tests, with zero failures and one ignored test, in
+  768.27 seconds;
+- the four integration binaries: 10 diff-render, 29 protocol, 7 publish, and
+  2 rename tests;
+- 108 checked-artifact interface tests, 35 pre-catalog provider tests, and 27
+  catalog-lease tests;
+- the six-case release-boundary suite and the 57-case adversarial source-
+  boundary suite;
+- protocol regeneration/currentness, the 133-assertion merge-document gate,
+  17 document/compatibility checker tests, Rust 1.95 formatting,
+  `git diff --check`, the checked-artifact source checker, and all-target/all-
+  feature Clippy with warnings denied.
+
+This evidence freezes C1 for independent settled-tree review. C1 is not
+accepted, and C2 remains blocked, until both reviews report no P0, P1, or P2
+finding.
+
 ## 9. Exit gate
 
 This remediation is complete only when:
