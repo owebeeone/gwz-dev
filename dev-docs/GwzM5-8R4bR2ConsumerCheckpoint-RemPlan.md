@@ -2,11 +2,11 @@
 
 Date: 2026-08-14
 
-Status: **the fifth settled re-reviews accepted the byte-pinned read-only leaf
-but proved that its open `GitBackend` entry and one release branch were not
-closed. The sixth correction removes trait dispatch from authority-sensitive
-stash observation, routes every new tag through one final exact-SHA gate, and
-aligns PR/push CI with the release script's Python runtime. No R2 production
+Status: **the sixth settled re-reviews accepted the concrete read-only observer
+and release finalizer but proved that three authority-sensitive callers were
+outside the protected boundary. The seventh correction protects the separate
+preservation-plan caller and treats the complete v1 authority-observer module
+tree as one compiler-guarded, path-and-byte-pinned unit. No R2 production
 conversion may begin until this correction receives two independent GO
 re-reviews on a committed settled tuple**.
 
@@ -47,6 +47,11 @@ The fifth re-review reports controlling the sixth correction are:
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-5.md`; and
 - `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-5.md`.
 
+The sixth re-review reports controlling the seventh correction are:
+
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewFS-6.md`; and
+- `GwzM5-8R4bR2ConsumerCheckpoint-RemPlan-ReviewState-6.md`.
+
 Their overlapping P2 findings are corrected as one architectural change:
 
 - `CheckedManagedActionV1` seals the owner class, exact managed request,
@@ -75,7 +80,11 @@ Their overlapping P2 findings are corrected as one architectural change:
   authority-sensitive merge code uses a concrete crate-private observer that
   terminates in the guarded preservation-image leaf, whose
   selected path enumerates Git stash objects directly and uses only local
-  decoding helpers; and
+  decoding helpers;
+- the separate preservation-plan caller is byte-pinned and compiler-guarded,
+  while the complete v1 authority-observer root, descendant source set, and
+  descendant bytes are covered by one deterministic tree digest and one
+  inherited non-overridable compiler lint; and
 - source and compiler protections run in PR/push and release CI, while the
   local release script cannot skip them and every new-tag branch converges on
   one exact-target gate immediately before tag creation or push.
@@ -377,16 +386,19 @@ and call. Checked bundle owner/evidence helpers are physically contained in
 their guarded adapter, so an unguarded intermediate helper cannot be inserted
 without changing that inventory.
 
-Each checked entry or adapter module has a non-overridable compiler lint
-boundary, but the lint's writer list is defense in depth rather than the
-completeness proof. The proof is a positive, byte-exact allowlist of every
-guarded source module. Any direct call, imported alias, same-name function
-pointer, crate-local wrapper, nested helper, changed literal, or commented-out
-guard changes the protected module digest and fails closed. The source checker
-pins the concrete crate-private preservation observer, rejects restoration of
-the observer to the open `GitBackend` trait, and rejects any
-authority-sensitive merge source that names an open observer callback. The
-concrete observer directly
+Each checked entry, adapter, or authority-observation root has a
+non-overridable compiler lint boundary, but the lint's writer list is defense
+in depth rather than the completeness proof. The proof is a positive,
+byte-exact allowlist of every guarded source module. The authority-observer
+root additionally uses one deterministic aggregate over the sorted relative
+paths and exact bytes of its complete Rust descendant tree. Adding, moving, or
+changing a nested helper therefore fails closed along with any direct call,
+imported alias, same-name function pointer, crate-local wrapper, changed
+literal, or commented-out guard. The separate preservation-plan caller is
+protected as a complete source module. The source checker pins the concrete
+crate-private preservation observer, rejects restoration of the observer to
+the open `GitBackend` trait, and rejects any authority-sensitive merge source
+that names an open observer callback. The concrete observer directly
 enumerates and decodes native stash objects without calling the backend trait,
 shared stash API, shared repository opener, or external OID parser. Its entry,
 implementation, and checked bundle consumer are all in the positive source
@@ -433,9 +445,14 @@ The interface correction precedes all original R2 packages:
    callback from the trait and checked observation, route all new tags through
    one exact-SHA finalizer, and execute the boundary suite on its declared CI
    Python.
-8. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
+8. **R2-I8 complete caller containment:** protect the preservation-plan caller
+   and the complete v1 authority-observer source tree with both inherited
+   compiler enforcement and a deterministic path-and-byte manifest. Pin the
+   sixth-review direct-writer, nested-helper, same-name function-pointer, and
+   new-helper-file counterexamples.
+9. Run focused tests, full `gwz-core` tests, Clippy, formatting, protocol and
    document checks; commit one exact workspace/core/CLI tuple.
-9. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
+10. Obtain two independent settled-tree re-reviews. Any P0/P1/P2 finding repeats
    this correction gate.
 
 Only after GO/GO do the original R2-A through R2-F packages begin. R3-R6 and
