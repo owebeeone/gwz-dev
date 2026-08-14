@@ -789,10 +789,13 @@ remain intact. The second corrected pre-review tree passed:
   `git diff --check`, the checked-artifact source checker, and all-target/all-
   feature Clippy with warnings denied.
 
-This evidence freezes the second correction for re-review; it does not itself
-change the pending verdict to accepted. C0 remains pending until both
-independent reviewers accept the new immutable checkpoint, and C1 remains
-blocked.
+The immutable second-correction checkpoint is workspace root
+`093857634e931696a2178f12970a7743ebe20e5d`, `gwz-core`
+`1c5e42db9851c96b801e5aa7e6996207ecd6c514`, and `gwz-cli`
+`3cca145c0b32410f250f640730ed7ca18f1da59f`. The independent third reviews
+`GwzM5-8R2C0Interface-ReviewCode-3.md` and
+`GwzM5-8R2C0Interface-ReviewState-3.md` both returned **GO** with zero P0, P1,
+P2, or P3 findings. R2-C0 is accepted and R2-C1 is unblocked.
 
 ## 9. Exit gate
 
