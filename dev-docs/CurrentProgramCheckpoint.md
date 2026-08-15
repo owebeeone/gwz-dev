@@ -165,7 +165,19 @@ dual, cross-model where available (mandated tier).
    alongside the R2-F power-loss item; the comment/label pass (§5→§3/§6
    miscite, Windows-arm rationale, error label) is applied in the same
    closure commit.
-   **Open** — legacy
+   **Open** — standing CI red (pre-takeover): the push-triggered
+   `checked-artifact-boundary.yml` run has failed on every push since at
+   least 2026-08-14 (runs 31839074966, 31839893461, 31840579164,
+   31880023029). Failing element: unit test
+   `test_approved_outside_source_target_cannot_hide_an_observer_caller`,
+   whose compiler probe builds a temp copy WITHOUT the lockfile (fresh
+   `crates.io`/git resolution) and dies on `error: redundant guard`
+   (clippy escalation) — environment-coupled, passes locally with warm
+   caches. Fix package queued: pin the probe to the repository lockfile
+   (`--locked` + copy `Cargo.lock` into the probe tree) and re-verify; the
+   per-commit lane-gate step in the same workflow is masked by this
+   earlier failure and its own outcome is unknown on CI until fixed.
+   Also open — legacy
    interior digest-pinning or conversion at R2-D; Windows
    destination-window + object-binding native tests at R2-F; §2.2
    status-strip **done** at `53323d0` (Refactor.md −99 lines to a
