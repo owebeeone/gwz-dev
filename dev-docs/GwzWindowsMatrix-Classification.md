@@ -89,6 +89,16 @@ Totals: **1267 passed / 50 failed** + 27/2 = 52 unique (−12). The
 **126 → 118 → 95 → 93 → 64 → 52**, with W1, W2, W3, and both W4 catalog
 slices extinct at zero occurrences each.
 
+Run 6b — 31885262853 on `117117e` (workflow-only: rust-cache step; no
+tree change): **1267/50/1 + 27/2, identical to run 6** — the 52-failure
+tail is deterministic across runs, no flake component. The run also
+exposed that `rust-cache`'s save step skips on job failure, and this job
+is red by design until the tail clears; `cache-on-failure: true` rides
+the next train. Duration recalibration across runs 1-6b: every matrix
+run completes in 6-10 minutes (not the ~20 assumed while planning), so
+the cache is a minor win and batching fix packages per dispatch is the
+dominant accelerator.
+
 Remaining tail, for the next session (per-site work, not batch classes):
 (a) ~20 error-32 sharing failures scattered one-per-site across
 fault-injection tests (`g15/root_preservation/{faults.rs:153,221,384,
@@ -97,14 +107,49 @@ root_durability.rs:236}`, and bare test-helper unwraps) — each callback's
 substitution strategy conflicts with a handle production legitimately
 holds at that hook on Windows; per-site redesign of the injection
 (substitute-by-handle or drop-then-substitute) rather than a shared fix.
-(b) **Two production-side findings needing real scrutiny**: 2× "live
-rollback state is neither the exact before nor after state"
-(RecoveryEvidenceMismatch) and 2× "root preservation mutation failed
-exact post-verification" — potentially genuine Windows behavioral
-differences in the exact-observation model, to be diagnosed before any
-test-side dismissal, with a State-axis review if production semantics
-are touched. (c) 6 assertion spellings, 3 NotFound, W6 taut generator
+(b) **Two production-side findings needing real scrutiny** — DIAGNOSED,
+see `GwzWindowsMatrix-ExactEvidenceDiagnosis.md`. Corrected counts:
+**4×** RecoveryEvidenceMismatch (class A: CRLF smudge at production
+rollback/recovery checkout edges vs the raw-byte exact-state compare —
+model-consistency amendment required) and 2× PreservationEvidenceMismatch
+(class B: the Windows-only `.gwz/checked-artifacts` durability anchor is
+excluded from the guard image but not from capture/decode/stash sweep —
+genuine production bug, latent on any OS with crash residue). The
+`Stopped(RecoveryRequired) != Terminal` family (~7 tests) is the same two
+roots surfacing through the service loop. Both fixes change production
+semantics → reviewed amendment package; label-only confirmation
+instrumentation dispatched on probe branch
+`probe/exact-evidence-diagnosis`. (c) 6 assertion spellings, 3 NotFound, W6 taut generator
 (1-2), and 2 matrix-row catch_unwind escapes.
+
+Pre-run-7 disposition of tail (c) (second diagnosis pass + probe branch;
+patches ride the run-7 train unless noted):
+- **"2 catch_unwind escapes": misclassification — zero exist.** Both
+  harnesses caught their injected panics (the classifier counted default
+  panic-hook prints); the tests fail downstream in the (b) cascades.
+- **Probe branch `probe/exact-evidence-diagnosis` (run 31886400209,
+  ~30s)**: windows-2022 ships system `core.autocrlf=true`
+  (`C:/Program Files/Git/etc/gitconfig`, git 2.55.0.windows.3) — class
+  A's environmental precondition is proven.
+- **W6 is not CRLF**: `ModuleNotFoundError: No module named 'taut'` —
+  the matrix workflow never installed the pinned generator release.yml
+  uses; fixed by mirroring `taut-proto==0.8.1` install. `.gitattributes`
+  gains `protocol/** text eol=lf` (also fixes the `include_str!`
+  assertion A1).
+- **os-87 twin found**: `preservation_root/parent.rs::rename_windows`
+  still passed a non-NULL `RootDirectory` — the d84a30d/a350746 class,
+  missed at its twin site; fixed by porting platform.rs's absolute-path
+  + null-RootDirectory recipe (NEEDS-WINDOWS-VERIFICATION via run 7).
+- Fixture hermeticity: g15 `seeded_repo` pins `core.autocrlf=false`;
+  root_preservation `support.rs` pins `core.longpaths=true` +
+  `core.autocrlf=false` (MAX_PATH: staged `ca1-*.source` names ≈173
+  chars breach it — product ticket tracked for the private-area
+  relocation option). `recovery_protocol.rs` residue test forks on
+  Windows to expect the fail-closed anchor-missing rejection.
+- Deferred to the exact-evidence amendment lane: `capture_inner`
+  exclusion, `ensure_clean_recovery_state` anchor-dirt (rollback
+  preflight permanently blocked on Windows — production), CRLF checkout
+  semantics, resolver Publication-arm diagnosability (tracked).
 
 ## W1 fix (landed at `4297c17`)
 
