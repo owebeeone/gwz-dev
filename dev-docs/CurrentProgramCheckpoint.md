@@ -136,17 +136,31 @@ dual, cross-model where available (mandated tier).
    last pre-commit step, and a per-commit lane-gate mechanism is a tracked
    obligation below.
 
-   Tracked non-blocking obligations from rounds 3-4: bare-identifier
-   raw-rename counting in the boundary checker + alias-probe regression
-   tests (Code-4 [P3-1] / State-3 [P3-1], convergent — checker-hardening
-   package, with the legacy interior digest-pinned or converted at R2-D);
-   per-commit lane gate mechanism (Code-4 P3-3 reopen); §8.13 "direct raw
-   provider renames" reading recorded as syntactic (matching round-3's own
-   correction spec) with the bare-identifier fix scheduled regardless, so
-   the interpretation carries no load — operator may override; State-2
-   [P3-1] Git-parent dirent barrier (next matrix package or §6 errata);
-   Windows destination-window native test + object-binding test at R2-F;
-   DirectoryInteriorRecheckV1 doc-comment ¶ pointer nit (next docs pass).
+   Tracked obligations from rounds 3-4, status 2026-08-15 (2):
+   **Done** — bare-identifier raw-rename counting + alias/fn-pointer probe
+   tests (`641f03c`; the rebinding evasion both round-4 reviewers found now
+   fails closed, and the §8.13 syntactic-vs-functional interpretation
+   carries no load); per-commit lane gate as a mechanism (`89b414a`:
+   `scripts/checks/check_lane_commits.sh` runs every pushed commit's own
+   boundary checker over the push range, wired into
+   `checked-artifact-boundary.yml` with full-history checkout; validated
+   red against both historical deviation commits and green on the
+   post-floor range; documented floor `ca520e4` excludes the two recorded
+   pre-mechanism reds); I2 supersession items verified already fixed
+   upstream (banners, updated bodies, TD §1 "as amended", manifest
+   coverage — landed 2026-08-11 on the dev line) and hardened with five
+   retired-spelling/stale-claim forbidden tripwires (`ca520e4`, doc gate
+   now 138 assertions); DirectoryInteriorRecheckV1 doc-comment pointer
+   fixed (`641f03c`).
+   **Open** — State-2 [P3-1] Git-parent dirent barrier: next package on
+   this lane (planned shape: idempotent barrier on the AlreadyExists arm
+   plus a git-directory-root flush anchored to the scratch edge where §5's
+   durability claim begins, one new matrix key, entrant-arm regression;
+   production-behavior change → focused State-axis review after); legacy
+   interior digest-pinning or conversion at R2-D; Windows
+   destination-window + object-binding native tests at R2-F; §2.2
+   status-strip in flight (delegated; Refactor.md and ChangeBudget.md
+   mid-edit as of this commit).
 4. ~~Port/supersede the two Windows compile corrections~~ **Done by
    determination 2026-08-15**: both diagnostic-clone commits were located in
    `/Users/owebeeone/limbo/gwz-core-v0.10.5-narrow` and verified already
