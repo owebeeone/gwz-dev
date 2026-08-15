@@ -104,9 +104,21 @@ the force abort checkout equally leaves paths alone where no rewrite is
 needed. Paths materialized earlier by *filtered* checkouts — the user's
 original porcelain clone/checkout, forward integration through
 `merge_prepared.rs` (checked upstream fast-forward; post-true-merge worktree
-materialization) and `refs.rs` `fast_forward` (`create_repo` sets no config,
-so gwz-created member worktrees on a Windows autocrlf host are
-filter-materialized from birth) — keep their filtered on-disk bytes. The
+materialization) and `refs.rs` `fast_forward` — keep their filtered on-disk
+bytes. *(Closure annotation, 2026-08-16, adopted decision D1 landed: as of
+the filter-policy package, `create_repo` pins `core.autocrlf=false` +
+`core.eol=lf` at creation and the clone funnel materializes filters-off —
+gwz-born and gwz-cloned worktrees are blob-exact from birth, closing this
+exposure for them by construction. The exposure narrows to ADOPTED
+worktrees and paths materialized by the user's own porcelain operations;
+the doctrine sentinel
+`doctrine_sentinel_adopted_crlf_worktree_classifies_ambiguous_in_the_reverse_observer`
+(g12) pins the adopted-worktree Ambiguous classification on Windows and
+ends CI blindness for this half of the residual. A post-A1 operator
+`renormalize` command for adopted worktrees remains the tracked follow-up.
+Known spec residual of the D2 probe (State F1, P3): the attribute stack is
+read pre-checkout, so attribute coverage introduced by the target state
+itself escapes the gate; ~15-LOC hardening recorded as a candidate.)* The
 raw-byte observations are **full-tree**
 (`observe_v1_participant_rollback`, `verify_v1_no_mutation_participant`,
 `terminal_v1_participant_is_exact` —
@@ -144,10 +156,23 @@ working production v0 abort becomes a recovery-required wedge, on every OS —
 the ref has moved, the retry hits the idempotent arm
 (`merge_recovery.rs:189-196`) and fails the same verification, wedged until
 manual intervention. No silent corruption, but a real behavioral regression
-class for such repositories. The policy is recorded here as an explicit
-**OPEN DECISION** for the reviewers: (a) refuse the recovery-grade checkout
-when non-builtin filter attributes cover paths it would rewrite, or (b)
-accept the wedge as fail-closed. Related user-visible effect even where
+class for such repositories. The policy was recorded here as an explicit
+OPEN DECISION; **DISCHARGED 2026-08-16 by adopted decision D2 (A′ refined
+refusal, landed in the filter-policy package)**: option (a) — both
+recovery-grade checkout sites now inspect the rewrite set's `filter`
+attributes pre-mutation and refuse with a typed error naming path and
+filter when a foreign non-passthrough driver is configured (`lfs`
+allowlisted by name; True/False/Unspecified attributes pass; non-UTF-8
+driver names refuse fail-closed). The refusal precedes every ref and
+worktree mutation, converting the post-`transaction.commit()` wedge into a
+pre-mutation stop. Mechanism precision from the landing review (F6):
+foreign clean/process commands never execute inside gwz (libgit2 runs no
+config-command drivers), so in-gwz status cannot manufacture the wedge
+in-process; the hazard the refusal closes is real-git-visible divergence
+on covered paths after a raw-byte rewrite — strictly worse than the LFS
+pointer-bytes surprise since clean does not round-trip. A dedicated error
+code (vs the house `DirtyMember` recovery-refusal idiom) is a candidate
+for a future deliberate wire train (F3). Related user-visible effect even where
 the precondition holds: an LFS-managed path rewritten by a recovery checkout
 carries **pointer bytes** on disk after rollback — status stays clean, the
 worktree content is a surprise, and a porcelain re-checkout restores the

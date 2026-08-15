@@ -188,13 +188,21 @@ files (no checkout-options lever exists in git2 0.21/libgit2 1.9.6);
 so filter-materialized paths unchanged between the two commits stay
 CRLF and the full-tree raw-byte observers classify Ambiguous on
 ordinary Windows-CRLF worktrees (availability loss, fail-closed, never
-wrong evidence). Both are recorded as open decisions in
+wrong evidence). Both are recorded in
 `GwzM5-8ExactEvidencePlatformAmendment.md` (Clause A scope limits);
-this entry is the live tracking record — do not read matrix-green as
-real-Windows exact-evidence closure until a reviewed follow-up closes
-them (candidates: recovery-grade full re-materialization at rollback
-entry, filters-off at member materialization, or a clean-side
-comparison mode).
+this entry is the live tracking record. **Update 2026-08-16 (D1/D2
+landed):** exposure (2)'s gwz-born half is CLOSED by construction —
+`create_repo` pins filter neutralization at creation and the clone
+funnel materializes filters-off — and the adopted-worktree half now has
+a live sentinel
+(`doctrine_sentinel_adopted_crlf_worktree_classifies_ambiguous_in_the_reverse_observer`,
+Windows-gated, g12): it asserts today's fail-closed Ambiguous doctrine
+and going green means the doctrine changed and the frozen texts must
+move with it. Exposure (1) (`stash_save` filtered reset) remains
+sentinel-less and open — its fix is a new mutation needing its own
+review. Do not read matrix-green as real-Windows exact-evidence closure
+for ADOPTED worktrees; the post-A1 `renormalize` command is the tracked
+follow-up.
 
 The 24 survivors are **exactly the predicted (b) cluster**, nothing
 else: 4 × g15/root_preservation (stash ×2 + mutation = class B anchor
