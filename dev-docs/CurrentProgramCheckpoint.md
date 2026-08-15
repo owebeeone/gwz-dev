@@ -147,8 +147,24 @@ dual, cross-model where available (mandated tier).
    [P3-1] Git-parent dirent barrier (next matrix package or §6 errata);
    Windows destination-window native test + object-binding test at R2-F;
    DirectoryInteriorRecheckV1 doc-comment ¶ pointer nit (next docs pass).
-4. Port/supersede the two Windows compile corrections; classify the Windows
-   matrix before adding catalog behavior.
+4. ~~Port/supersede the two Windows compile corrections~~ **Done by
+   determination 2026-08-15**: both diagnostic-clone commits were located in
+   `/Users/owebeeone/limbo/gwz-core-v0.10.5-narrow` and verified already
+   incorporated on the dev line by `f532b1a` — `a350746` ("keep Windows
+   anchor names native": all three hunks, the `anchor_roundtrip_name`
+   helper, and its `remains_native` test present verbatim in
+   `platform.rs:418/495/500/521+`) and `d84a30d` ("use stable Windows file
+   identity": `open_named_path`/`identity_from_file` helpers widened,
+   re-exported at `record_wire/mod.rs:48`, consumed at
+   `abort.rs:103/249/261`, in the equal-or-stricter test-gated form). This
+   resolves ReviewCode-3's f532b1a scope-bleed residual: that bleed was the
+   unlabeled Windows port. Native Windows compile/run of the incorporated
+   form remains unverified from this host (libz-sys cross-compile limit)
+   and is owed at the R2-F gate or the next Windows dispatch run.
+   **Remaining from this item**: classify the 98-failure Windows matrix —
+   requires Windows execution; parked for the operator's Windows runner or
+   the next dispatched platform run (cannot execute or trigger CI from this
+   host without a push, which is not authorized).
 5. I2 supersession banners + TransitionDesign §1 authority correction +
    the §2.2 status-strip of `GwzM5-8Refactor.md` and the ledger (docs-only
    package, may interleave; the status-strip also unblocks the remaining
