@@ -1,15 +1,24 @@
 # M5-8 I2 durable preservation-cursor amendment (per-owner no-op skips + reset completion)
 
-Date: 2026-08-16
+Date: 2026-08-16. Revised: 2026-08-16 (dual-review remediation round 1:
+State P1-1, P1-2, P2-1, P2-2, P2-3, P3-1, P3-2, P3-3 + Code P2-1, P3-1,
+P3-2, P3-3 and P4 notes — document-only; no code, no other files).
 
-Status: **DRAFT — pending the mandated dual review (Code + State axes).**
+Status: **DRAFT — dual review round 1 returned NO-GO on both axes against
+the round-1 text** (State: `GwzM5-8DurableCursor-ReviewState.md`, 2×P1 +
+3×P2 + 3×P3, pre-committed GO on a revision resolving its five named
+conditions; Code: `GwzM5-8DurableCursor-ReviewCode.md`, 1×P2 + 3×P3,
+lightweight re-read expected; peer-blind convergence: Code P2-1 and State
+P1-2 are the same defect). This revision applies **all** findings from
+both reports; pending both re-verdicts.
 The underlying decision is adopted: `GwzM5-8A1DecisionPacket.md` Decision 3
 ("Adopt the minimal durable cursor — per-owner no-op skip rows + a
 reset-completion bit … via an I2 journal/record amendment riding the same
 pre-A1 train as the operator-escape wire changes", §0 row 3, §3.5). Per that
-decision the **wire amendment must land pre-A1** ("the last cheap moment",
-`GwzM5-8ProgressReviewF5.md` §9 item 4 :451) while **implementation may trail
-into the A1 package**. No contract text is edited until this document is
+decision the **wire amendment must land pre-A1** ("Pre-A1 is the last cheap
+moment", `GwzM5-8ProgressReviewF5.md` §3.3 :206; §9 item 4 :451) while
+**implementation may trail into the A1 package**. No contract text is
+edited until this document is
 accepted; §7 lists the exact acceptance-time annotations, following the
 idiom `GwzM5-8ExactEvidencePlatformAmendment.md` and
 `GwzM5-8R4bInterfaceAmendment-1/2.md` established (amendment banners on the
@@ -68,7 +77,7 @@ plus another live image capture in the descendant-backup arm at :298-304).
 sweep before any pending action runs — for a pending reset, over **all**
 owners (:138-141). The F5 review named this "the design's weakest joint"
 (`GwzM5-8ProgressReviewF5.md` §3.3 :197-206), asymmetric with rollback's
-decode-derivable cursor (`GwzM5-8I2ActionJournalContract.md` :154-157).
+decode-derivable cursor (`GwzM5-8I2ActionJournalContract.md` :155-158).
 
 This amendment persists exactly the two missing facts as additive fields on
 the existing per-owner preservation evidence rows, makes the durable
@@ -125,6 +134,14 @@ struct PreservationEvidence {
   anchor derivation of the ActionJournal contract).
 - `reset_commit`, when present, must equal the immutable owner anchor.
 
+Two structural rules are normative and generate the legality table; the
+table enumerates all sixteen combinations under them:
+
+1. a stash pair and `noop_commit` may never coexist, regardless of any
+   other field on the row; and
+2. `reset_commit` requires artifact-pass completion evidence on the same
+   row — `noop_commit` or a stash pair.
+
 Legal field combinations for one row (B = backup pair, S = stash pair,
 N = `noop_commit`, R = `reset_commit`):
 
@@ -135,8 +152,8 @@ N = `noop_commit`, R = `reset_commit`):
 | N | yes | artifact pass retired this owner with no artifact needed |
 | B+N | yes | backup created; stash position proven unnecessary |
 | N+R / B+N+R / S+R / B+S+R | yes | reset position also retired (executed or unnecessary) |
-| S+N / B+S+N | **no** | a stash pair contradicts "no artifact needed" |
-| R alone / B+R | **no** | `reset_commit` requires artifact-pass completion evidence on the same row (`noop_commit` or the stash pair); the reset pass cannot legally have reached the owner otherwise |
+| S+N / B+S+N / S+N+R / B+S+N+R | **no** | a stash pair contradicts "no artifact needed" (rule 1), regardless of `reset_commit` |
+| R alone / B+R | **no** | rule 2: `reset_commit` requires artifact-pass completion evidence on the same row (`noop_commit` or the stash pair); unreachable for any post-amendment writer because both reset edges backfill `noop_commit` in the same write (§3.1), and pre-amendment writers cannot write `reset_commit` at all |
 | any value mismatch against §2.2 equations | **no** | typed evidence mismatch, no mutation |
 
 Both fields are **immutable once written**, joining the row's existing
@@ -149,6 +166,19 @@ carries `reset_commit`, is an owner/phase/pass contradiction and rejects at
 decode. Multi-row rejection (`validate/preservation.rs:86-88`) and
 selected-root/publication-root collision rules are unchanged.
 
+**Terminal-plane fate.** Immutability spans the record's open lifetime and
+archival ("survives archival", §8 :385). At the post-GC record rewrite the
+markers are consumed with their row exactly as the backup fields are
+today: `gc.rs:365-381` clears `backup_ref`/`backup_commit` and drops rows
+without a stash pair, and a row whose remaining content is markers only
+retires at that existing edge. Markers contribute no cleanup-worklist
+entries and never block backup-ref deletion, worklist derivation, or
+archive deletion; the archived-cleanup worklist derivation must accept
+marker-only rows (`collect_owner`'s all-None-pair rejection at
+`record_wire/archive/cleanup.rs:163-167` gains a marker-aware arm — §5,
+§8, §9). The extension is v0-inert: no v0 record carries markers, so the
+`from_v0` leg of the shared derivation never sees the new arm.
+
 ### 2.3 v0 boundary and unknown-field survival
 
 - **v0 never writes these fields.** No v0 code path constructs them, and
@@ -156,13 +186,24 @@ selected-root/publication-root collision rules are unchanged.
   identical to today's, including v0 rows that carry preservation evidence
   (`model/v0.rs:158-164` is the shared row struct; its four existing fields
   and their encoding are untouched).
-- **v0 collision rule (extends RecordContract §8).** A v0 unknown field
-  named `noop_commit` or `reset_commit` inside a preservation evidence row
-  collides with a v1 known field and makes migration ineligible; it is
-  never adopted, overwritten, or moved — the same doctrine §8 :369-373
-  already applies to the five top-level v1 names. Read-only and archival
-  paths leave such bytes untouched, per the compatibility contract's
-  byte-preserving rules.
+- **v0 collision rule (extends RecordContract §8).** Presence of
+  `noop_commit` or `reset_commit` inside a v0 record's preservation
+  evidence row makes migration ineligible; the value is never adopted,
+  overwritten, or moved — the same doctrine §8 :369-373 applies to the
+  five top-level v1 names. Mechanism, stated for the shared-struct
+  reality: once §2.1 lands, the two names parse into **typed** fields even
+  when a v0 record carries them, so they never appear in the unknown-field
+  manifest and a naive "unknown-field collision" check would not fire. The
+  ineligibility trigger is therefore specified as raw-YAML-path detection
+  during v0 unknown-field extraction — the evidence-row known-key set
+  (`record_wire/unknown_fields/extract/common.rs:237`, today exactly the
+  four old names) **forks by version**: the v1 set adopts the two names,
+  the v0 set must not — or, equivalently, as post-decode field-presence
+  detection on the v0 row; and `map_v0_to_v1`
+  (`record_wire/unknown_fields/mod.rs:64-81`, today the five top-level
+  names only) gains the in-row leg. Read-only and archival paths leave
+  such bytes untouched, per the compatibility contract's byte-preserving
+  rules.
 - **Archived-v0 projection is unaffected.** Archived v0 records use only
   the archive decoder/projection (`GwzM5-8I2CompatibilityContract.md`
   :163-164) and no v0 record legitimately contains the fields; nothing in
@@ -215,14 +256,36 @@ edges that today discard the fact:
 1. **Executed reset:** in the same atomic rewrite as the reset journal's
    retirement (`finish_reset_attached_ref`,
    `transition/reduce/preservation.rs:202-236` — the write that today
-   clears `pending_preservation` and, uniquely among the three finish arms,
-   writes no evidence at :221-223). The ActionJournal's retirement rule
+   clears `pending_preservation` at :231 and requires an evidence-free
+   payload at :221-223; at **whole-action** granularity the reset is the
+   one action that retires with no durable trace anywhere — backup
+   evidence installs at its own finish, stash ids at the `CreateStash`
+   advance — while at arm granularity the stash finish arm is equally
+   evidence-free by then). The ActionJournal's retirement rule
    ("Retirement occurs only with the verified result/progress write",
    :152-153) is unchanged; the bit rides that same write.
 2. **No-op reset:** when the reset pass proves the position unnecessary
    live — no durable backup target beyond the anchor and
    `plan.live_commit == plan.anchor` (`cursor.rs:290-297`) — the dispatch
    persists `reset_commit` write-ahead, exactly like the skip marker.
+
+**Marker backfill at both reset edges.** When the owner's row at a reset
+edge carries neither `noop_commit` nor a stash pair — the shape a record
+written before this amendment presents after §4's live re-proof, where the
+retained pending action blocks any earlier marker write — the same atomic
+rewrite that writes `reset_commit` also writes `noop_commit`, valued per
+the §2.2 equations. The backfilled fact is not invented: at both edges the
+owner's artifact-pass completion was live-re-proven in the same dispatch
+(`verify_pending_prefix` sweeps all owners for a pending reset,
+`cursor.rs:138-141`; the action-free reset loop runs only after the
+artifact loop passes). One write, one durable step, and the write produces
+only §2.2-legal shapes — `B+N+R` / `N+R`, never `B+R` or `R` alone. The
+same discipline is uniform outside the reset edges: the action-free
+artifact pass writes `noop_commit` for any marker-less owner it
+live-proves, on degraded (pre-amendment) records exactly as on new ones —
+so degraded records converge to marker-bearing rows as the cursor revisits
+them, one write per owner per dispatch, and no write edge can ever emit an
+illegal shape.
 
 Mechanically these are evidence-only record rewrites inside `Preserving`:
 no physical mutation occurs, so no pending action is journaled for them —
@@ -255,9 +318,11 @@ its durable evidence says so —
 With that, `stash_complete`/`reset_complete` stop capturing live images for
 earlier owners (`cursor.rs:251-305` → `v1_preservation_image`,
 `preserve/artifacts.rs:663-680`), and the root-reset carve-out at
-`cursor.rs:264-274` — which exists only to stop the earlier-owner clean
-check from rejecting a journaled intermediate root form — dissolves into
-the general rule. `VerifiedPreservationCursorPrefix` becomes decode-derived
+`cursor.rs:264-275` — which exists only to stop the pending owner's **own**
+stash-*position* clean check from rejecting a journaled intermediate root
+form — dissolves into the general rule: the pending action sits at the
+reset position, so that stash position reads decode-complete.
+`VerifiedPreservationCursorPrefix` becomes decode-derived
 over durable bytes, symmetric with rollback's cursor, with the live
 fallback of §4 for bytes the durable facts do not cover.
 
@@ -293,13 +358,23 @@ skipped earlier owner no longer blocks classification of a later pending
 owner with `PreservationEvidenceMismatch`
 (`GwzM5-8OperatorEscapeDesign.md` §3.3 U3 row :160). Symmetrically, the
 guard `reject_later_durable_owner` (`cursor.rs:47-62`) no longer fires for
-an owner whose retirement is durably recorded — the wedge it produced
+an owner whose retirement is **durably recorded** — the wedge it produced
 ("preservation owner acquired new work ahead of a later durable owner") was
-precisely the live-cursor artifact this amendment removes — while its
-decode-derivable core hardens: a later durable row (artifact, skip, or
-reset marker) while an earlier owner's row shows neither artifacts nor
-markers is now a record-bytes contradiction, rejected by checked-open
-validation per TransitionDesign §6.7 :746-749 without any repository read.
+precisely the live-cursor artifact this amendment removes. For marker-less
+earlier owners the guard is **retained as a live guard, unchanged**: an
+absent (or artifact-only) earlier row beside a later durable row is a
+legitimate pre-amendment shape — today's cursor live-skips a clean owner
+writing no row at all (`cursor.rs:29-38`, :247, :279-282) — and only a
+live fact separates it from regression, so that shape stays on the §4
+live-fallback path and is never rejected from record bytes. What hardens
+at decode is exactly the **marker-bearing** contradiction surface:
+fabricated or mismatched marker values (the §2.2 equations),
+marker/pending-action conflicts, a stash pair coexisting with
+`noop_commit`, and `reset_commit` without artifact-pass evidence on the
+same row — rejected by checked-open validation per the amended
+TransitionDesign §6.7 (:746-749; §7.3's "marker contradictions") without
+any repository read. A present-but-all-absent row remains invalid
+independent of any later row (§2.2 row 1 — unchanged; it always was).
 
 ## 4. Restart legality
 
@@ -321,12 +396,21 @@ pending or next preservation work:
    live observation, where it runs, is byte-for-byte the one the frozen
    text already mandates. A crash between a live pass and its marker write
    therefore re-proves once and re-writes the marker — idempotent, and
-   never worse than the status quo.
-3. **Contradiction** (§2.2 illegal combinations, marker/pending-action
-   conflicts, later-durable-row-vs-empty-earlier-row): rejected at decode
-   as typed evidence mismatch; no rewrite, no physical mutation — the
-   fail-closed arm is unchanged in direction and moves earlier (from live
-   observation to record validation).
+   never worse than the status quo. On a degraded record with a retained
+   pending reset, the earlier-owner sweep stays live per dispatch
+   (observation writes nothing) until the journal retires; the retirement
+   write itself backfills `noop_commit` per §3.1, and subsequent
+   action-free sweeps write the remaining markers — degraded records
+   converge, and no reset edge can produce a §2.2-illegal shape or a stuck
+   retirement.
+3. **Contradiction** (**marker-bearing only**: the §2.2 illegal
+   combinations and value mismatches, and marker/pending-action
+   conflicts): rejected at decode as typed evidence mismatch; no rewrite,
+   no physical mutation — the fail-closed arm is unchanged in direction
+   and moves earlier (from live observation to record validation). An
+   absent or artifact-only earlier row beside a later durable row is
+   **not** a decode contradiction — it is the legitimate pre-amendment
+   shape of item 2, handled there under the retained live guard (§3.3).
 
 The pending owner's own intra-owner prefix (e.g. a pending stash requiring
 its backup position complete, `cursor.rs:124-137`) keeps its current cheap
@@ -373,6 +457,18 @@ surface:
   fields, v0 byte streams are unchanged, archived-v0 projection is
   unaffected, migration ineligibility extends the existing collision
   doctrine, and no protocol field changes.
+- **Terminal plane (archived cleanup and GC).** Marker-only rows are a new
+  archived shape and the terminal plane must accept it. The cleanup
+  worklist derivation's all-None-pair rejection arm (`collect_owner`,
+  `record_wire/archive/cleanup.rs:163-167`, shared by `from_v0` and the
+  A1-destined `from_v1`) gains a marker-aware arm: an `N`-only or `N+R`
+  row is valid, contributes no backup refs and no stash evidence, and must
+  not error — without this, one fully-noop owner would make **every**
+  archived merge's worklist derivation fail, blocking all targeted cleanup
+  (a permanent-retention U8-class growth). The post-GC rewrite consumes
+  markers with their row at the existing retention edge
+  (`gc.rs:365-381`; §2.2 terminal-plane fate). Both deltas are v0-inert:
+  no v0 record carries markers. Tested per §8; owners priced in §9.
 
 ## 6. Interaction — the operator-escape amendment window
 
@@ -417,7 +513,13 @@ controlling wherever the frozen texts say the wire persists neither fact.
    `GwzM5-8DurableCursorAmendment.md`: the preservation evidence row
    persists per-owner no-op skips (`noop_commit`) and the reset completion
    bit (`reset_commit`); the preservation cursor prefix is decode-derived
-   with live fallback." §1 gains the two fields in the wire types. In §2,
+   with live fallback." §1 gains the **complete six-field
+   `PreservationEvidence` definition** — the shared row struct is printed
+   in neither I2 contract today (it is inherited via RecordContract §1's
+   unchanged v0 body and lives at `model/v0.rs:158-164`), so the
+   acceptance-time edit introduces the full struct into §1's wire types,
+   annotated that the first four fields are the inherited v0 fields and
+   the last two are this amendment's. In §2,
    the sentence at :158-160 is replaced by: "Preservation persists per-owner
    no-op skips and reset completion as validated evidence-row derivations;
    a narrower live condition remains only where a durable completion fact
@@ -459,22 +561,42 @@ RecordContract §9 at acceptance:
 1. **Cursor round-trip** (`model/v1/tests.rs`,
    `model/v1/validate/preservation_tests.rs`): exact YAML spellings and
    absent-by-default encoding; every legal and illegal combination of the
-   §2.2 table including both value equations; immutability of both fields
-   across rewrites; marker/pending-action contradictions; multi-row and
-   owner-collision rejection unchanged.
+   §2.2 table — now structurally exhaustive over all sixteen shapes,
+   including `S+N+R` and `B+S+N+R` — with both value equations;
+   **immutability of all six row fields across the new rewrite edges**:
+   the whole-row `set_evidence` replacement
+   (`reduce/preservation.rs:259-264`) makes constancy
+   discipline-enforced, so the four inherited fields are pinned
+   byte-constant across marker writes and the reset-retirement/backfill
+   write, and the two markers across every subsequent rewrite;
+   marker/pending-action contradictions; multi-row and owner-collision
+   rejection unchanged.
 2. **Restart with/without-cursor equivalence**
    (`v1_lifecycle/tests/prefixed_preservation.rs`): the same fixture driven
    to every cursor position, restarted (a) with durable markers and (b)
-   with the markers stripped to the pre-amendment shape — identical
-   classification verdicts wherever live state is exact; the (a) path
-   proven image-capture-free for earlier owners by backend call counting;
-   crash injected between a live pass and its marker write re-proves live
-   and converges (idempotent marker write).
+   with the markers stripped to the pre-amendment shape — stripping an
+   `N`-only row deletes the row entirely, producing the legitimate
+   absent-earlier-row shape, which must classify identically via the live
+   fallback (never reject at decode); identical classification verdicts
+   wherever live state is exact; the (a) path proven image-capture-free
+   for earlier owners by backend call counting; crash injected between a
+   live pass and its marker write re-proves live and converges (idempotent
+   marker write); and (c) **degraded-record pending-reset retirement**: a
+   marker-less record with a retained pending `ResetAttachedRef`, resumed
+   by the amended binary — live re-proof, execution or After
+   classification, retirement **succeeds** and produces exactly
+   `B+N+R` / `N+R` via the §3.1 backfill; no rejected write, no stuck
+   state.
 3. **Unknown-field survival rows**
    (`record_wire/unknown_fields/tests/preservation.rs`): unknown
    descendants beside the new fields survive by stable-owner identity;
-   the two names as v0 unknowns make migration ineligible and are never
-   adopted; archival carries the fields with their row.
+   the two names present inside a **v0** record's evidence row are
+   detected at the raw YAML path during v0 extraction (post-§2.1 they
+   parse as typed fields and never surface in the unknown manifest — the
+   known-key set forks by version per §2.3) and make migration
+   ineligible, never adopted; the v1 known set adopts the two names, so
+   the first marker write passes the overlay's unauthorized-unknown
+   check; archival carries the fields with their row.
 4. **U3 wedge-surface reduction demonstration** (lifecycle matrix rows):
    external dirt/touch on a durably-skipped earlier owner no longer blocks
    classification of a later pending owner (today: typed
@@ -482,7 +604,22 @@ RecordContract §9 at acceptance:
    interference still refuses fail-closed at that owner's own next action
    and at rollback-entry preflight; a dropped native stash of an earlier
    owner is still caught by the unchanged bundle-prefix verification.
-5. **Bundle-identity invariance** (`checked_bundle` evidence): expected
+5. **Post-`reset_commit` preflight-only interference** (the
+   highest-latency legal detection case): owner *k*'s no-op reset proven
+   and `reset_commit` written; the branch then moves (or the worktree
+   dirties) before restart. The reset position is decode-skipped and the
+   owner has **no own next action left** — exhaustion proceeds, and
+   rollback-entry preflight is the sole remaining catcher
+   (`abort/preflight.rs` per-member full-tree observers): it refuses
+   fail-closed with no mutation.
+6. **Cleanup/GC over marker rows** (`record_wire/archive` and `gc`
+   evidence): worklist derivation (`collect_owner`) over archived records
+   whose rows carry `noop_commit`/`reset_commit` succeeds — `N`-only and
+   `N+R` rows contribute no worklist entries and must not error — other
+   owners' backup refs still enumerate, archive deletion proceeds once
+   every recorded ref is observed absent, and the post-GC rewrite retires
+   marker-only rows at the existing retention edge (`gc.rs:365-381`).
+7. **Bundle-identity invariance** (`checked_bundle` evidence): expected
    bundle bytes identical for the same artifact set with and without
    skip/reset markers.
 
@@ -497,12 +634,41 @@ implementation owners (estimate, reconciled against
 `model/v0.rs` (row struct), `model/v1/validate/preservation.rs`,
 `v1_lifecycle/transition/reduce/preservation.rs`,
 `authority/observe/reverse/preservation/cursor.rs` (and its `phase`
-children), plus the test owners named in §8. One write per skipped owner is
-the only persistence-traffic addition, bounded by owner count.
+children), `record_wire/archive/cleanup.rs` (marker-aware worklist arm,
+§5), `gc.rs` (marker fate at the existing retention edge, §2.2),
+`record_wire/unknown_fields/extract/common.rs` (the evidence-row
+known-key set forks by version: the v1 set gains the two names — without
+which the **first marker write fails** the overlay's
+unauthorized-unknown-field check, fail-closed and self-catching — while
+the v0 set must not adopt them, or the §2.3 collision rule loses its
+trigger), and `record_wire/unknown_fields/mod.rs` (`map_v0_to_v1` in-row
+collision leg), plus the test owners named in §8. The two
+`record_wire/unknown_fields` owners and the two terminal-plane owners are
+flagged **now, ahead of the ChangeBudget reconciliation**. Persistence
+traffic, counted precisely: at most one marker write per owner per pass —
+one `noop_commit` write per skipped owner in the artifact pass, and one
+standalone `reset_commit` write per **no-op** reset position (executed
+resets ride the existing retirement write; the §3.1 backfill adds a field
+to an existing write, not a write) — bounded by two writes per owner.
+Implementation-review note (from the Code axis): marker immutability
+across the whole-row `set_evidence` replacement
+(`reduce/preservation.rs:259-264`, the one clone-and-modify rewrite path)
+is discipline-enforced, not structural — the §8.1 pins plus the store's
+known-diff/reread verification are the enforcement.
 
 ## 10. Status
 
-DRAFT. Acceptance requires both review axes GO on this text. The wire
+DRAFT, revision 1. Round 1 returned NO-GO on both axes; this text applies
+every finding of `GwzM5-8DurableCursor-ReviewState.md` (P1-1 via the §3.1
+marker backfill; P1-2 via the §3.3/§4.3 rescope to marker-bearing
+contradictions with the retained live guard; P2-1 via §2.2/§5/§8.6/§9;
+P2-2 via §2.2's structural rules; P2-3 via §8.5; P3-1/2/3 via
+§2.3/§8.1/§9) and of `GwzM5-8DurableCursor-ReviewCode.md` (P2-1 — same
+defect as State P1-2, aligned to §7.3's narrower rule, which is unchanged;
+P3-1 via §3.1; P3-2 via §7.1; P3-3 via §9; P4 notes via §3.2/§9 and the §1
+citation corrections). Acceptance requires the State re-verdict
+(pre-committed GO on resolution of its five conditions) and the Code
+re-read GO on this text. The wire
 delta must be frozen (this document accepted, banners applied) **pre-A1**;
 implementation may trail into the A1 package per the adopted Decision 3.
 If review overturns the decision, the fallback recorded in the packet
