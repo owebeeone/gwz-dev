@@ -105,9 +105,19 @@ recorded in the ledger; the finalization_root closure came via the
 identity gap). Matrix-green does NOT close the tripwired residuals
 (real-Windows exact-evidence satisfiability; stash_save filtered
 reset) nor the amendment's OPEN DECISIONS — all remain tracked below.
-Next per resume order: close the R2-lane obligations that precede
-R4b-G (R2-D legacy interior conversion; R2-F native tests — the
-matrix/probe machinery makes the Windows half cheap now), then R4b-G.
+Next per resume order — SCOPE CORRECTION 2026-08-16: the gate to
+R4b-G is **RemPlan-4's R2-R6 chain** (`GwzM5-8R4bP1P2-RemPlan-4.md`
+§4), not merely two tracked items; this checkpoint's earlier "R2-D
+legacy pinning + R2-F native tests" shorthand understated it.
+Position: R0-L and R1 accepted; **mid-R2** (the catalog-bootstrap
+slice C0/C1/C2 accepted; R2-D managed recovery on
+`CheckedDurablePathV1` and further conversion items remain, TDD-gated
+per the amendment); then R3 complete-checkout/aggregate handoff, R4
+executable-C7 reconciliation, R5 settled gate with real
+three-platform evidence jobs, R6 independent settled-tree re-review.
+Scoping in flight: `GwzM5-8R2D-Plan.md` (R2-D extraction + unblock
+verification + phased plan) and `GwzM5-8R2F-EvidenceMap.md` (R5/R2-F
+platform-evidence gap map vs the green matrix).
 Cleanup candidates for the operator: remote branches
 `probe/exact-evidence-diagnosis` and `probe/finalization-diagnosis`
 (throwaway probes, safe to delete).
