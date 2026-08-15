@@ -1021,3 +1021,18 @@ This remediation is complete only when:
     the declared CI Python can execute the complete boundary suite;
 11. all focused/full/static checks pass on a settled tree; and
 12. both independent re-reviews report no open P0/P1/P2 defect.
+
+## 10. Fault-key vocabulary scope (2026-08-15)
+
+The `fault_v1.rs` families `namespace.*`, `record.*`, `admission.*`,
+`barrier.*`, `managed_bootstrap.*`, `cleanup.*`, `terminal.*`,
+`durable_leaf.*`, and `runtime.*` are declared-reserved for the R2-D+
+conversion of the legacy leaf/admission/runtime edges; they have no
+injection sites today by design. Exit-gate item 9's "every declared fault
+edge" therefore binds the `catalog_bootstrap.*` family (21 keys, executed
+as an interruption/restart/convergence matrix) until each reserved family's
+edges are converted, at which point that family must gain injection sites
+and matrix rows in the same package that converts its edges. The §6 Git
+private-parent creation edge is currently unkeyed; it is keyed or
+explicitly rescoped in the next matrix package. Basis:
+`GwzM5-8R2C2PublicationAudit.md` finding P3-1.

@@ -83,11 +83,16 @@ dual, cross-model where available (mandated tier).
    perimeter extension as bounded package; legacy coexistence to R2-D
    scope; three strict-window tests).
 2. Execute the complete per-fault interruption/recovery matrix; record
-   per-key executed evidence (not inventory). Concrete scope per the audit
-   remainder: run the 21-key `catalog_bootstrap.*` matrix green; add the
-   three P3-4 strict-window tests; extend the matrix to Git-directory
-   targets; key or rescope the §6 parent-creation edge; file the
-   reserved-families rescope note.
+   per-key executed evidence (not inventory). Progress 2026-08-15: the
+   21-key `catalog_bootstrap.*` matrix and the full checked_artifact suite
+   executed green on this host (240 passed / 0 failed, macOS,
+   workspace-target variant; command `cargo test --lib checked_artifact::`);
+   the three P3-4 strict-window tests are implemented
+   (`mutation_tests.rs`: in-place byte drift, destination-in-window,
+   kind-swap-in-window) and pass; the reserved-families rescope note is
+   filed as RemPlan §10. Remaining: extend the matrix to Git-directory
+   targets; key or rescope the §6 parent-creation edge; then settle and
+   launch the dual R2-C2 re-reviews (item 3).
 3. Launch the two settled-tree R2-C2 re-reviews (dual, cross-model) once 1-2
    are green on a committed checkpoint.
 4. Port/supersede the two Windows compile corrections; classify the Windows
