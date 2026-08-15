@@ -193,6 +193,31 @@ suspected; resolver diagnosability tracked if it survives the
 amendment). The matrix is one reviewed package — the exact-evidence
 amendment train — from expected green.
 
+## Run 8 — 31889856607 on `731fcb2`: exact-evidence amendment verified
+
+Totals: **1297 passed / 9 failed / 1 ignored** + integration 29/0 = 9
+unique (−15). Eight-run burn-down: **126 → 118 → 95 → 93 → 64 → 52 →
+24 → 9.** The amendment's classes cleared on first dispatch: every g15
+root-preservation survivor (anchor class B + the anchor-dirt preflight
+finding B′) and the root-side reverse cascades (phases, entry,
+root_ambiguity, root_durability ×2, half the successor matrix,
+publication_root, native-conflict abort) are green on Windows.
+
+The 9 survivors are one mechanism plus one wildcard: eight are
+member-level service loops (reverse preservation faults/real_git/
+recovery/root_fault_matrix/successor short-graphs, rollback
+service_durability/service_fault_matrix) whose fixtures were never
+autocrlf-pinned — the runner's machine-level filter smudges tracked
+files through libgit2 `stash_save`'s internal reset (the documented
+no-lever residual), producing exact-evidence Ambiguous downstream; plus
+`finalization_root` (cause still masked by the resolver's
+Publication-arm error discard — diagnosability edit tracked). Fix:
+fixture hermeticity at the shared `commit_file` config site
+(`workspace_ops/tests/g02.rs` — one line covering every v1 fixture;
+the deliberate autocrlf=true repro sets its filter after fixture
+commits and is unaffected). This closes the TEST exposure only; the
+real-user exposure remains the standing residual tripwire above.
+
 ## W1 fix (landed at `4297c17`)
 
 W1 root cause confirmed at `provider/index.rs`: raw `PathBuf` equality
