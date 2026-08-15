@@ -10,8 +10,8 @@ by this file (rulebook §7.3).**
 
 | Repository | Commit | Note |
 | --- | --- | --- |
-| gwz-dev (root) | this coordinated commit | lock is authoritative |
-| gwz-core | this coordinated commit | R2-C2 round-3 remediation (supersedes `c436180`) |
+| gwz-dev (root) | `f7ba3235703b11eb1c9a6a72e2179afa2b7b5837` + this docs commit | literal restatement per ReviewCode-3 P3-5 |
+| gwz-core | `0d8382e1cbf6500e499bf2dc5ed23d6256f6e642` | R2-C2 remediation tip (b923109 + pin fix) |
 | gwz-cli | `3cca145` | Close R4b P1/P2 remediation gate |
 | gwz-py | `929efb0` | Implement R4b reverse merge lifecycle |
 | taut | `f008419` | 0.8.x fallible from_cbor line |
@@ -120,9 +120,33 @@ dual, cross-model where available (mandated tier).
    comment corrected and §4.1 erratum filed (verification assigned to
    round 4); `try_reserve_exact` parity in the primitive; same-commit
    digest refresh (P3-3 discipline adopted as a lane rule). **Round-4
-   focused dual re-reviews pending on this commit** — both axes, because
-   the remediation changed durable-state publication behavior after
-   State-2's GO.
+   verdicts: Code-4 GO (0 open P0-P2, 2 new P3) and State-3 GO (0 open
+   P0-P2, 1 new P3) — `GwzM5-8R2C2OwnerInterface-ReviewCode-4.md` /
+   `-ReviewState-3.md`. R2-C2 is ACCEPTED at root `f7ba323` / gwz-core
+   `0d8382e` under RemPlan §9 item 12.**
+
+   Deviation record (per Code-4 [P3-2], L1-16): the remediation's first
+   coordinated commit (root `dea0953` / gwz-core `b923109`) landed with the
+   boundary gate red — the platform.rs flat source pin was stale after a
+   comment-only edit, and a piped invocation masked the checker's exit
+   code on the lane; the item-3 sentence above ("same-commit digest
+   refresh") therefore overstated adherence for that commit. Corrected one
+   commit later (`0d8382e`, pin-only). Lane rules now: gate exit codes
+   checked directly (never through a pipe), digest refresh as the literal
+   last pre-commit step, and a per-commit lane-gate mechanism is a tracked
+   obligation below.
+
+   Tracked non-blocking obligations from rounds 3-4: bare-identifier
+   raw-rename counting in the boundary checker + alias-probe regression
+   tests (Code-4 [P3-1] / State-3 [P3-1], convergent — checker-hardening
+   package, with the legacy interior digest-pinned or converted at R2-D);
+   per-commit lane gate mechanism (Code-4 P3-3 reopen); §8.13 "direct raw
+   provider renames" reading recorded as syntactic (matching round-3's own
+   correction spec) with the bare-identifier fix scheduled regardless, so
+   the interpretation carries no load — operator may override; State-2
+   [P3-1] Git-parent dirent barrier (next matrix package or §6 errata);
+   Windows destination-window native test + object-binding test at R2-F;
+   DirectoryInteriorRecheckV1 doc-comment ¶ pointer nit (next docs pass).
 4. Port/supersede the two Windows compile corrections; classify the Windows
    matrix before adding catalog behavior.
 5. I2 supersession banners + TransitionDesign §1 authority correction +
