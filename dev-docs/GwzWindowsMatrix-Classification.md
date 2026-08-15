@@ -35,3 +35,19 @@ time on record).
   ran on the same push; their outcomes are recorded in the checkpoint.
 - The dispatched workflow is retained for re-runs: each fix package ends
   with a fresh dispatch and an updated classification here.
+
+## Run 2 — 31881596373 on `39b66aa` (post W2 + Linux-lint fixes)
+
+Totals: **1201 passed / 116 failed / 1 ignored** + integration 27/2 = 118
+unique (−8 net). `refs/heads/main` occurrences fell 20 → **1** (one
+straggler with a non-`new_git` fixture path — first task of the next
+W-package). The net drop is smaller than the 19 W2 clears because
+formerly-W2 tests now progress into the W3/W4 walls: `os error 5`
+panics rose to 37, confirming the classification's cascade prediction
+(W5 collapse direction). Also on this push: the boundary workflow's
+**first recorded green run** (`31880974224`, after the Linux
+`redundant_guards` fold at `6edb9cb`) — the standing red since 2026-08-14
+is resolved and the per-commit lane gate has its first successful CI
+execution. Remaining matrix work: W1 (index-path containment, 28-class),
+W3 (access-denied, now ~37), W4 (sharing violations), W6 (2 protocol
+currency) — the R2-F product packages.
