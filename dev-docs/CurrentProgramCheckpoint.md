@@ -10,11 +10,15 @@ by this file (rulebook §7.3).**
 
 | Repository | Commit | Note |
 | --- | --- | --- |
-| gwz-dev (root) | `2e6706f` + this docs checkpoint | coordination |
-| gwz-core | `da58135` | Use retained Windows destination paths |
+| gwz-dev (root) | this coordinated commit | lock is authoritative |
+| gwz-core | this coordinated commit | R2-C2 round-3 remediation (supersedes `c436180`) |
 | gwz-cli | `3cca145` | Close R4b P1/P2 remediation gate |
 | gwz-py | `929efb0` | Implement R4b reverse merge lifecycle |
 | taut | `f008419` | 0.8.x fallible from_cbor line |
+
+Exact hashes for "this coordinated commit" rows are pinned by
+`gwz.conf/gwz.lock.yml` in the same commit; the next docs-only commit
+restates them literally (per ReviewCode-3 P3-5).
 
 Workspace lock pins verified equal to member HEADs at writing. Released
 line: v0.10.5 (see `GwzMergeCheckpoint-v0.10.5.md`; v0.10.4 superseded).
@@ -100,8 +104,25 @@ dual, cross-model where available (mandated tier).
    241 passed / 0 failed (macOS host); boundary checker green after the
    deliberate protected-tree digest update for the two edited trees; doc
    gate green. Native Linux/Windows execution remains at the R2-F gate.
-3. Launch the two settled-tree R2-C2 re-reviews (dual, cross-model) once 1-2
-   are green on a committed checkpoint.
+3. Settled-tree R2-C2 re-reviews, round 3 (on `c436180`): **State-2 GO**
+   (0 open P0-P2; two new P3s routed — the Git-parent dirent-barrier gap to
+   the next matrix package/§6 errata, the Windows destination residual to
+   R2-F criteria) and **Code-3 NO-GO** (P2-1 directory-interior
+   acquisition-window gap, probe-proven; P3-1 checker blind to raw renames
+   outside two files, exit-criterion violating; P3-2 comment overclaim;
+   P3-3 digest-discipline break at `95d292f`; P3-4 allocation parity; P3-5
+   stale tuple table). **Round-3 remediation implemented in this commit**:
+   in-window interior re-check inside the sealed primitive for directory
+   sources + destination-interior re-check for retirement (Code-3 option
+   a), two new hooks + two inverted-probe regression tests (243/243 green);
+   subsystem-wide raw-rename caller inventory in the boundary checker with
+   exact allowlist + two adversarial checker unit tests; platform.rs
+   comment corrected and §4.1 erratum filed (verification assigned to
+   round 4); `try_reserve_exact` parity in the primitive; same-commit
+   digest refresh (P3-3 discipline adopted as a lane rule). **Round-4
+   focused dual re-reviews pending on this commit** — both axes, because
+   the remediation changed durable-state publication behavior after
+   State-2's GO.
 4. Port/supersede the two Windows compile corrections; classify the Windows
    matrix before adding catalog behavior.
 5. I2 supersession banners + TransitionDesign §1 authority correction +

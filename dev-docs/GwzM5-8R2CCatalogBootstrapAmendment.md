@@ -295,6 +295,26 @@ substitution and, on Windows, exact-handle association; they do not encode an
 unimplementable Unix compare-and-rename guarantee. Power-loss interruption at
 every actual namespace edge remains in scope.
 
+Erratum (2026-08-15, filed with the R2-C2 round-3 remediation; verified by
+the round-4 re-review): two clarifications to this section's claims as
+implemented. First, the pre-acquisition "directory interior" rejection is
+enforced inside the sealed primitive itself: for directory sources the
+primitive re-verifies the complete bounded interior through its own
+acquired capability, and for the retirement edge it re-verifies the
+destination interior through the retained final handle, immediately before
+the rename — so interior drift up to source-capability acquisition rejects
+before publication, and only post-acquisition drift falls to the same-user
+boundary below. Second, on Windows the destination of the exact-handle
+rename is an absolute path derived from the retained destination handle
+immediately before the rename (`SetFileInformationByHandle` rejects a
+non-null RootDirectory on supported runners); destination re-binding by a
+same-user rename of the destination directory or a path ancestor inside
+that syscall window is possible and is assigned to the same
+cooperating-GWZ/same-user boundary, with the mandatory post-publish
+verification through the retained destination handle detecting a redirect
+read-only. A native Windows destination-window test executes at the R2-F
+platform gate.
+
 ## 5. Live freshness and historical collision evidence
 
 The platform provider continues to observe and retain every physical fact
