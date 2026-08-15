@@ -218,6 +218,27 @@ the deliberate autocrlf=true repro sets its filter after fixture
 commits and is unaffected). This closes the TEST exposure only; the
 real-user exposure remains the standing residual tripwire above.
 
+## Run 9 — 31892216186 on `2e04f58`: REGRESSION (recorded per L1-16), corrected
+
+Totals: **1272 passed / 34 failed / 1 ignored** (9 → 34). The eight
+targeted fixture-smudge survivors cleared, but the `2e04f58` fix was
+wrongly scoped: pinning `core.autocrlf=false` inside the shared
+`commit_file` flipped the key **mid-life** in every fixture repo,
+including the clone-based g23/g25 families — files a filtered
+clone/checkout had already materialized as CRLF became permanent
+manufactured dirt against their LF blobs once the clean filter turned
+off ("cannot switch a dirty worktree to a different commit",
+`g23/fixtures.rs:159`), breaking ~29 previously-green v0
+characterization/abort/continue/pull tests. Mechanism lesson recorded:
+**the pin is safe only at repo creation, before any filtered
+materialization; clone-based fixtures must stay consistently
+filter-aware.** Correction: the global pin is reverted; a documented
+`pin_fixture_autocrlf` helper (g02.rs) states the precondition and is
+applied at the ten creation sites inside the three v1 reverse/
+finalization fixture files only (created empty, never cloned).
+`finalization_root` remained failing in run 9 (masked cause;
+resolver-diagnosability probe next if it survives run 10).
+
 ## W1 fix (landed at `4297c17`)
 
 W1 root cause confirmed at `provider/index.rs`: raw `PathBuf` equality
