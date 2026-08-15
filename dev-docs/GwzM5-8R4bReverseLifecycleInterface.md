@@ -2,6 +2,14 @@
 
 Date: 2026-08-10
 
+Amended 2026-08-16 by `GwzM5-8ExactEvidencePlatformAmendment.md`: the I2
+raw-byte canonical preimage doctrine is unchanged, but its producing edges
+are corrected — recovery-grade rewrite edges write blob-exact bytes, and the
+checked-artifact private area is excluded from capture/decode and from the
+rollback/merge cleanliness predicates. Scope limits and open decisions
+(filtered-materialization exposure; foreign-filter policy) are recorded in
+that amendment.
+
 Status: **P0 and P0.1 accepted after independent re-review; P2-P4 are
 implemented; both independent reviewers accepted amendment 2 through §13 and
 the production-disabled P0.2 implementation and bounded settled-code

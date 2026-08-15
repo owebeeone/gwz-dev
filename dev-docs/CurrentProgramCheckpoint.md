@@ -97,12 +97,23 @@ replay bit-identical (deterministic tail, no flakes). Run-7 train
 (2 fixed / 6 via the parent.rs publish-handle fix / 15 OS-impossible
 injections gated with a positive Windows guarantee test), the os-87
 rename twin fix, CRLF/longpaths fixture pins, the W6 generator install,
-and cache-on-failure. Remaining after run 7 (expected): the (b) cluster —
-CRLF-smudge and durability-anchor exact-evidence findings — owned by the
-**exact-evidence amendment lane** (fixes + Unix repros in progress;
-**dual Code+State review mandated** before landing; probe branch
-`probe/exact-evidence-diagnosis` confirmed the runner's system
-`core.autocrlf=true` precondition). New tracked items from the campaign:
+and cache-on-failure. Run 7 left 24 survivors, all in the (b) exact-evidence cluster. The
+**exact-evidence amendment is ACCEPTED 2026-08-16** and lands in this
+commit: `GwzM5-8ExactEvidencePlatformAmendment.md` (recovery-grade rewrite
+edges blob-exact; checked-artifact private area invisible to the
+preservation-image model and recovery cleanliness predicates), dual
+review round 1 Code **GO** / State doc-only NO-GO → document-only
+remediation → State focused re-verdict **GO** (reports:
+`GwzM5-8ExactEvidenceAmendment-ReviewCode.md` / `-ReviewState.md` with
+appended re-verdict); three red-green Unix repros; four amended
+contracts carry acceptance annotations; probe branch confirmed the
+runner's system `core.autocrlf=true` precondition. Run 8 dispatched on
+this commit. **Open review debts from acceptance (tracked, not
+closed)**: the foreign-filter policy OPEN DECISION (clean-idempotence
+precondition; git-crypt-class wedge) and the real-Windows raw-byte
+satisfiability follow-up (unrewritten smudged files; ordinary CRLF
+worktrees remain outside the satisfiable set — ledger tripwire in
+`GwzWindowsMatrix-Classification.md`). New tracked items from the campaign:
 resolver Publication-arm diagnosability (`execution.rs:16-21` masks
 publication failure causes); MAX_PATH product exposure (~173-char
 `ca1-*` names; the private-area relocation option under `.git/` would

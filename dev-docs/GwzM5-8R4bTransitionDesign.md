@@ -2,6 +2,12 @@
 
 Date: 2026-08-09
 
+Amended 2026-08-16 by `GwzM5-8ExactEvidencePlatformAmendment.md`:
+recovery-grade rewrite edges (the checked rollback and native-abort
+checkouts) are blob-exact (filters disabled), and the checked-artifact
+private area is invisible to the preservation-image model and the recovery
+cleanliness predicates.
+
 Status: **accepted redesign; corrected R4b-TI/R4b-TR are implemented and
 independently accepted; R4b-S and R4b-A are implemented behind the disabled
 production boundary and independently accepted; the concrete R4b-F finalizer

@@ -165,6 +165,24 @@ positive guarantee test `retained_directory_blocks_substitution_rename_windows`
 passed, and the `cfg(windows)` additions compiled clean. rust-cache
 saved on the red run (`cache-on-failure`) — run 8+ starts warm.
 
+**Standing residual tripwire (amendment F6/Code P2 debt).** Two
+real-Windows exposures are deliberately NOT closed by the exact-evidence
+amendment and have no failing CI sentinel (the run-7 fixture
+`core.autocrlf=false` pins make CI structurally blind to them):
+(1) libgit2 `stash_save`'s internal filtered reset of swept tracked
+files (no checkout-options lever exists in git2 0.21/libgit2 1.9.6);
+(2) unrewritten smudged files — recovery checkouts rewrite deltas only,
+so filter-materialized paths unchanged between the two commits stay
+CRLF and the full-tree raw-byte observers classify Ambiguous on
+ordinary Windows-CRLF worktrees (availability loss, fail-closed, never
+wrong evidence). Both are recorded as open decisions in
+`GwzM5-8ExactEvidencePlatformAmendment.md` (Clause A scope limits);
+this entry is the live tracking record — do not read matrix-green as
+real-Windows exact-evidence closure until a reviewed follow-up closes
+them (candidates: recovery-grade full re-materialization at rollback
+entry, filters-off at member materialization, or a clean-side
+comparison mode).
+
 The 24 survivors are **exactly the predicted (b) cluster**, nothing
 else: 4 × g15/root_preservation (stash ×2 + mutation = class B anchor
 contamination; observation/marker_presence = the anchor-dirt preflight

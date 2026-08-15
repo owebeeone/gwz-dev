@@ -4,6 +4,15 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-16 by `GwzM5-8ExactEvidencePlatformAmendment.md`: the §3
+rollback before/after observations are satisfied through blob-exact
+(filter-disabled) recovery-grade rewrite edges, and the §4 decoded-stash
+agreement is evaluated with the checked-artifact private area
+(`.gwz/checked-artifacts`) excluded from capture and decode — restoring the
+preimage equation's satisfiability on Windows. Preimage hashes recorded
+before and after that boundary are incomparable-by-design under the
+unchanged `gwz.merge-preservation-preimage/v1` frame.
+
 Amended 2026-08-11 by
 `GwzM5-8R4bInterfaceAmendment-1.md` and
 `GwzM5-8R4bInterfaceAmendment-2.md`: the durable publication handoff and the

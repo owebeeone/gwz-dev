@@ -11,6 +11,12 @@ code-GO. Both independent reviewers accepted §14's non-publishing native
 release-platform implementation and exact-SHA run with no open P0-P3 finding.
 P1-WR1 is closed and P1 is unpaused against the frozen seam.
 
+Amended 2026-08-16 by `GwzM5-8ExactEvidencePlatformAmendment.md`: §5.3's
+decoded-stash-equals-durable-preimage equation is evaluated with the
+checked-artifact private area excluded on both sides (capture and decode),
+restoring its satisfiability on Windows; equal-frame preimage hashes across
+that boundary are incomparable-by-design.
+
 This amendment is additive to `GwzM5-8R4bInterfaceAmendment-1.md` and is
 controlling where the earlier documents describe root preservation as one
 compound `NormalizeRoot` or `RestoreRoot` action.
