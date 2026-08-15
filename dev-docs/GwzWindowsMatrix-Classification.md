@@ -82,6 +82,30 @@ the primitive's second capability lacking DELETE-share against the
 rename handle, fixed next commit via `open_dir_share_delete` + 5 other),
 7 assertion residue, 3 NotFound, 2 matrix-row escapes to diagnose.
 
+## Run 6 — 31883655778 on `a506a93`: publication share-delete CLOSED
+
+Totals: **1267 passed / 50 failed** + 27/2 = 52 unique (−12). The
+"reopen publication source directory" class is gone. Six-run burn-down:
+**126 → 118 → 95 → 93 → 64 → 52**, with W1, W2, W3, and both W4 catalog
+slices extinct at zero occurrences each.
+
+Remaining tail, for the next session (per-site work, not batch classes):
+(a) ~20 error-32 sharing failures scattered one-per-site across
+fault-injection tests (`g15/root_preservation/{faults.rs:153,221,384,
+mutation.rs:192}`, `reverse_preservation/{root_fault_matrix.rs:118,
+root_durability.rs:236}`, and bare test-helper unwraps) — each callback's
+substitution strategy conflicts with a handle production legitimately
+holds at that hook on Windows; per-site redesign of the injection
+(substitute-by-handle or drop-then-substitute) rather than a shared fix.
+(b) **Two production-side findings needing real scrutiny**: 2× "live
+rollback state is neither the exact before nor after state"
+(RecoveryEvidenceMismatch) and 2× "root preservation mutation failed
+exact post-verification" — potentially genuine Windows behavioral
+differences in the exact-observation model, to be diagnosed before any
+test-side dismissal, with a State-axis review if production semantics
+are touched. (c) 6 assertion spellings, 3 NotFound, W6 taut generator
+(1-2), and 2 matrix-row catch_unwind escapes.
+
 ## W1 fix (landed at `4297c17`)
 
 W1 root cause confirmed at `provider/index.rs`: raw `PathBuf` equality
