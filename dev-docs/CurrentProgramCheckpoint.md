@@ -165,7 +165,19 @@ dual, cross-model where available (mandated tier).
    alongside the R2-F power-loss item; the comment/label pass (§5→§3/§6
    miscite, Windows-arm rationale, error label) is applied in the same
    closure commit.
-   **Open** — standing CI red (pre-takeover): the push-triggered
+   **Resolved 2026-08-15 (3)** — the standing CI red below was diagnosed
+   as a `clippy::redundant_guards` lint in the Linux-only
+   `provider/platform/linux.rs:177` (compiled by Ubuntu CI, never by macOS
+   dev machines — which is why every local gate missed it; the
+   probe-lockfile hypothesis was wrong: the probe already pins the
+   lockfile). Fixed by folding the guard into its pattern (gwz-core
+   `6edb9cb`); boundary run `31880974224` is the workflow's first recorded
+   green push run, which also constitutes the per-commit lane gate's first
+   successful CI execution. Lane ritual gains: cross-target
+   `cargo clippy --target x86_64-unknown-linux-gnu` where the host
+   toolchain permits (full-crate blocked by native build scripts; CI
+   remains the authority). Historical record follows:
+   standing CI red (pre-takeover): the push-triggered
    `checked-artifact-boundary.yml` run has failed on every push since at
    least 2026-08-14 (runs 31839074966, 31839893461, 31840579164,
    31880023029). Failing element: unit test
