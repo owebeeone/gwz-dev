@@ -64,6 +64,24 @@ without delete-sharing on Windows; the failing edge is already named by
 its label, so W4's catalog slice needs sharing-mode reasoning at that
 edge, not more instrumentation). W5 assertion residue: 12.
 
+## Run 4 — 31882850251 on `94fc8ca`: W4 catalog slice CLOSED, W3 named
+
+Totals: 1224/93 (class shift at constant count). "publish final catalog"
+error-32: **0** (was 10) — the caller's staging capability now drops
+before the rename edge. The 31-site instrumentation named every surviving
+error-5 in one run: **all 35 are `sync family entry`** (rebarrier_exact:
+read-only reopen + `sync_all`, which Windows' FlushFileBuffers forbids).
+
+## Run 5 — 31883193051 on `cf1ccaa`: W3 CLOSED
+
+Totals: **1255 passed / 62 failed** + 27/2 = 64 unique (−31).
+`os error 5`: **0** — the family-entry re-sync is Unix-only per the
+write-through doctrine, with the anchor barrier unchanged. Remaining:
+error-32 sharing (13 bare + 10 at "reopen publication source directory" —
+the primitive's second capability lacking DELETE-share against the
+rename handle, fixed next commit via `open_dir_share_delete` + 5 other),
+7 assertion residue, 3 NotFound, 2 matrix-row escapes to diagnose.
+
 ## W1 fix (landed at `4297c17`)
 
 W1 root cause confirmed at `provider/index.rs`: raw `PathBuf` equality
