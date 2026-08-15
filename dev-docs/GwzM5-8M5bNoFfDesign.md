@@ -1,8 +1,19 @@
 # GWZ M5b — v1 no-ff interface design (freeze-first half)
 
-Date: 2026-08-16
+Date: 2026-08-16. Revised: 2026-08-16 (M5b-IF dual-review remediation
+round 1, document-only: Code F-1..F-8 (`GwzM5-8M5bNoFf-ReviewCode.md`,
+NO-GO, 1×P1 + 1×P2 + 6×P3) and State P2-1/P2-2/P3-1..P3-4
+(`GwzM5-8M5bNoFf-ReviewState.md`, NO-GO, doc-only), plus the lane-owner
+adjudications: F-1 disposition = the parallel "v0 forged-action resume
+gate" package (§3.5a); Q6 reconciled tier rule (§8.1); Q8 ratified with no
+ceiling exception (§8.3)).
 
-Status: **DRAFT — pending review.** This is the interface-freeze design for
+Status: **DRAFT — pending focused re-review.** Round-1 verdicts: State
+NO-GO (2×P2, both document corrections; "no semantic, wire, boundary, or
+sequencing defect was found"), Code NO-GO (F-1 P1 contract-vs-production
+divergence + F-2 P2 proof-plan hole; "the machinery claims all held under
+adversarial checking"). This revision applies every finding from both
+reports. This is the interface-freeze design for
 the "M5b — v1 no-ff implementation, activation disabled" milestone
 (`GwzM5-8Refactor.md:2275-2289`). It is a design document: it freezes
 meaning, wire posture, determinism semantics, reconciliation authority,
@@ -74,8 +85,20 @@ tripwires — as named suites.
 
 ## 2. Current-tree inventory: what exists, what M5b owes
 
-Every claim cites the tree at the `CurrentProgramCheckpoint.md` tuple
-(gwz-core `f36d20dda7af631f6d9a5657affd481022bcebed`, run-11 train).
+Every claim cites the tree at the authored basis, gwz-core
+`f36d20dda7af631f6d9a5657affd481022bcebed` (run-11 train). Both round-1
+reviews re-derived every citation at gwz-core HEAD
+`43c37bcff338daf95f053eedbc7467e6c9368eff`; the delta `f36d20d → 43c37bc`
+is exactly one file (`.github/workflows/platform-matrix.yml`, no `src/`
+change), so the two bases are byte-identical for every `src/` citation
+below (Code review §0; F-8). Tree-condition note, stated honestly per the
+State review's tuple: at review time the gwz-core **working tree** carried
+uncommitted modifications from an in-flight lane (including
+`git/gitbackend/merge_recovery.rs` and
+`v1_lifecycle/authority/observe/reverse/rollback.rs`); no cited
+forward/reconciliation semantics live in those files, all citations here
+are against **committed** blobs, and the M5b-IF freeze tuple must be
+re-cut against a clean committed tree at acceptance (State P3-2).
 
 ### 2.1 Already present and accepted (M5b consumes, must not re-open)
 
@@ -83,7 +106,7 @@ Every claim cites the tree at the `CurrentProgramCheckpoint.md` tuple
 | --- | --- |
 | `MergeExecutionMode::{Normal, FfOnly, NoFf}` is one shared closed enum serialized as `mode:` with `no_ff` spelling, omitted when normal, at the same YAML path in v0 and v1 | `gwz-core/src/workspace_ops/merge/model/lifecycle.rs:5-28`; `model/v0.rs:44-45`; `model/v1/record.rs:29-30` |
 | v0 start rejects `--no-ff` before record creation (`MergePhaseUnsupported`, "no_ff requires the v1 record lifecycle and is not yet activated") | `gwz-core/src/workspace_ops/merge/validate.rs:12-14`, pinned by test `validate.rs:201-225` |
-| Open v0 `mode: no_ff` is rejected before adaptation/migration (`UnsupportedLegacyMode`) | `gwz-core/src/workspace_ops/merge/record_wire/open_v0/adapter.rs:88-92`; contract at `GwzM5-8I2CompatibilityContract.md:145,163-165` |
+| Open v0 `mode: no_ff` is rejected before adaptation/migration (`UnsupportedLegacyMode`) — **on the test-gated R3 adaptation path only**: the gate at `adapter.rs:88-96` sits inside `#[cfg(test)] mod open_v0` (`record_wire/mod.rs:13-14`), `UnsupportedLegacyMode` is raised nowhere else in the crate, and the production resume path has no mode gate (Code F-1; §3.5a) | `gwz-core/src/workspace_ops/merge/record_wire/open_v0/adapter.rs:88-96`; contract promise at `GwzM5-8I2CompatibilityContract.md:145,163-165` |
 | The durable typed action vocabulary: `PendingMergeAction` (kind, target_branch, before_commit, source_commit, commit_message, expected_result, commit_spec) with `PendingCommitSpec { tree_oid, author, committer }` and `PendingGitSignature { name, email, time_seconds, timezone_offset_minutes }` — all with unknown-field `extensions` | `gwz-core/src/workspace_ops/merge/model/v0.rs:98-148` |
 | The frozen v1 mode/action matrix, including the no-ff rows ("no-ff, up to date → verify-up-to-date"; "no-ff, fast-forwardable or clean true merge → true-merge / commit / exact two-parent commit spec") and the two-parent sentence ("the two parents implied in order by `before_commit` and `source_commit` … do not reclassify it as a fast-forward") | `GwzM5-8I2RecordContract.md:324-344` (§7) |
 | Executable v1 validator of that matrix: `mode: no_ff` forbids a durable `FastForward` kind; exact shape/state legality; commit-spec canonicality incl. signature bounds | `gwz-core/src/workspace_ops/merge/model/v1/validate/action.rs:41-116`, tests `action_tests.rs:44-104` |
@@ -93,7 +116,7 @@ Every claim cites the tree at the `CurrentProgramCheckpoint.md` tuple
 | Restart adoption of an already-created commit compares two parents, message bytes, tree, and both signatures against the frozen spec | `gwz-core/src/git/gitbackend/merge_prepared.rs:39-69`; consumed via `status/pending.rs:117-152` |
 | The v1 lifecycle prepares mode-aware actions from `record.mode` (`prepared_mode`: `NoFf → ForceMergeCommit`), maps ff-able+forced to effective true-merge, persists the prepared action through an issued proof before execution, and executes only the decoded frozen action | `gwz-core/src/workspace_ops/merge/v1_lifecycle/authority/observe/forward.rs:118-236`; `v1_lifecycle/forward/execute.rs:8-90` |
 | `FfOnly` + true-merge preparation is rejected (`validate_mode`) | `forward.rs:220-228` |
-| Reconciliation from the persisted action (never from live re-analysis): NotStarted/Completed/ExpectedConflict/Ambiguous classification; completion maps durable kind `TrueMerge → Merged` | `gwz-core/src/workspace_ops/merge/status/pending.rs:26-199`; `forward.rs:274-371` |
+| Reconciliation from the persisted action (never from live re-analysis): NotStarted/Completed/ExpectedConflict/Ambiguous classification; completion maps durable kind `TrueMerge → Merged` | `gwz-core/src/workspace_ops/merge/status/pending.rs:26-237` (Ambiguous fall-through to :237); `forward.rs:274-371` (kind mapping :357-362) |
 | Abandonment machinery: a pending forward action retires without an outcome only through the bound exact `NotStarted` proof consumed by abort/preserve entry (`AbandonNotStartedAndBeginRollback/Preservation`), illegal after preservation | `GwzM5-8I2RecordContract.md:346-363` (amended 2026-08-09); `v1_lifecycle/transition/mod.rs:153-158`; `transition/reverse_entry.rs:82-88` |
 | Two end-to-end no-ff tests exist: two-parent creation and exact restart adoption | `gwz-core/src/workspace_ops/merge/v1_lifecycle/tests/forward.rs:81-100,103-139` |
 | Unreachability idiom: whole-module `#[cfg(test)] mod v1_lifecycle;` + compile sentinel; module-local `#![allow(dead_code, reason = "v1 lifecycle remains test-reachable until A1 activates production dispatch")]`; production decoder pins `PRODUCTION_R3` and treats a v1 dispatch as unreachable | `gwz-core/src/workspace_ops/merge/mod.rs:23-26`; `v1_lifecycle/mod.rs:1-5`; `record_wire/decode.rs:82-86` |
@@ -175,7 +198,10 @@ feature is already frozen by the amended I2 contracts:
 This enumeration is the activation boundary the A1 review will invert. It is
 part of the frozen interface.
 
-**M5b freezes/installs (all production-unreachable):**
+**M5b freezes/installs (production-unreachable on the v1 side — request,
+v1 record, preparation, and v1 writer surfaces; the one production-reachable
+consumption lane, the forged-v0 record lane of §3.5a, is closed by the
+parallel "v0 forged-action resume gate" package, not asserted away):**
 
 1. v1 records carrying `mode: no_ff` are valid, decodable, validator-clean,
    and executable through the test-gated v1 lifecycle
@@ -185,7 +211,8 @@ part of the frozen interface.
    (`forward.rs:85-116` proof issuance; store write precedes physical
    execution in the transition kernel).
 3. Reconciliation/abandonment/rollback/preservation consumption of that
-   exact action per §5.
+   exact action per §5 (v1 lifecycle; the v0-side forged-record consumption
+   lane is §3.5a's package and tripwire T-6, outside M5b).
 4. The complete proof corpus of §7.
 5. The two documentation clauses of §3.4.
 
@@ -233,6 +260,11 @@ Reverse ownership is mode-blind by construction, and M5b keeps it that way:
 Therefore M5b proposes **no amendment** to
 `GwzM5-8I2ActionJournalContract.md`. Its §3/§4 observation edges apply to
 no-ff participants without textual change; the platform interplay is §5.4.
+Scope note (State P2-2): "zero delta" here means zero **no-ff** deltas
+proposed by M5b — it does not freeze the journal contract's current text
+against the separately adopted D3 durable-cursor amendment train, whose
+non-collision argument and landing-order independence are recorded as
+freeze positions in §8.2.
 
 ### 3.4 Proposed record-contract amendment M5b-W1 (document-only, additive)
 
@@ -246,19 +278,30 @@ To be applied as a dated banner + two clauses in
 > comprises name, email, epoch seconds, and timezone offset as serialized in
 > `PendingGitSignature`; preparation captures them once, and execution,
 > restart adoption, and reconciliation reuse the frozen values without
-> re-stamping. Second clarification: gwz-created integration commits carry
-> no cryptographic object signature (no GPG/SSH signing); "signatures"
-> throughout §7 means the Git author/committer identity lines. The amendment
-> changes no v1 wire shape, no validator outcome, and no journal semantics.
+> re-stamping. Second clarification: neither integration-commit
+> construction site (the two-parent execution path nor the conflict
+> resolution path) attaches a cryptographic object signature — both are
+> direct libgit2 `commit()` calls, which ignore `commit.gpgsign` — so
+> "signatures" throughout §7 means the Git author/committer identity
+> lines; the AD1 porcelain commit/tag fallbacks elsewhere in the backend
+> deliberately honor signing config and are not integration paths. §7's
+> restart adoption and completion matching are **field-wise** over the
+> frozen fields (parents, message bytes, tree, both identity lines), not
+> commit-OID/byte-wise; an externally created twin commit that matches
+> every frozen field may be adopted even if it carries additional headers.
+> The amendment changes no v1 wire shape, no validator outcome, and no
+> journal semantics.
 
-Rationale: both facts are already true of the tree (§4.2, §4.4) and already
-implied by the wire type, but the contract sentence names only "author,
-committer", and the Refactor's obligation sentence
-("message/tree/signatures", `GwzM5-8Refactor.md:2278-2280`) is only
-dischargeable byte-for-byte if timestamps are inside the freeze. Pinning the
-words prevents a future reviewer reading "author" as identity-sans-time and
-"signatures" as GPG. Additive-only: no shape, spelling, or legality cell
-changes; every existing fixture remains byte-valid.
+Rationale: all three facts are already true of the tree (§4.2, §4.4, §4.6)
+and already implied by the wire type and matchers, but the contract
+sentence names only "author, committer", and the Refactor's obligation
+sentence ("message/tree/signatures", `GwzM5-8Refactor.md:2278-2280`) is
+only dischargeable byte-for-byte if timestamps are inside the freeze.
+Pinning the words prevents a future reviewer reading "author" as
+identity-sans-time, "signatures" as GPG, or "deterministic" as an
+OID-equality claim about adopted foreign twins (Code F-4/F-6; State P3-1).
+Additive-only: no shape, spelling, or legality cell changes; every
+existing fixture remains byte-valid.
 
 ### 3.5 Compatibility argument
 
@@ -270,13 +313,18 @@ contract:
    M5a acceptance criterion `GwzM5-8Refactor.md:3096-3097`), the M5a creation
    row is "unsupported" (`GwzM5-8I2CompatibilityContract.md:69-74`), and R2a
    explicitly did not make `NoFf` writable in v0
-   (`GwzM5-8Refactor.md:374-375`). A hand-forged open v0 `no_ff` row is a
-   known failing shape: structurally validated, then
-   `UnsupportedLegacyMode` before adaptation, migration, rewrite, or Git
-   mutation (`adapter.rs:88-92`; `GwzM5-8I2RecordContract.md:343-344`;
-   fixture obligation `GwzM5-8Refactor.md:2081-2082`). A terminal archived
-   v0 `no_ff` decodes read-only from durable evidence
-   (`GwzM5-8I2CompatibilityContract.md:96-98`).
+   (`GwzM5-8Refactor.md:374-375`). For a hand-forged open v0 `no_ff` row,
+   the contracts promise `UnsupportedLegacyMode` before resume/adaptation/
+   migration/mutation (`GwzM5-8I2CompatibilityContract.md:163-165`;
+   `GwzM5-8I2RecordContract.md:343-344`; fixture obligation
+   `GwzM5-8Refactor.md:2081-2082`); on the R3 adaptation path the mode gate
+   fires at `adapter.rs:88` **before** structural validation at
+   `adapter.rs:97` (envelope-validated only — Code F-5 corrects this
+   design's earlier "structurally validated, then rejected" ordering).
+   **That gate is today `cfg(test)`-only, and the production resume path
+   does not discharge the promise — see §3.5a for the truth and the
+   adjudicated closure.** A terminal archived v0 `no_ff` decodes read-only
+   from durable evidence (`GwzM5-8I2CompatibilityContract.md:96-98`).
 2. **No retained reader can observe a v1 no-ff row as anything but a closed
    envelope rejection.** The no-ff action rows exist only inside
    `gwz.merge-operation/v1`/`1` bodies; v0.10.2 (the pinned durable-v0
@@ -297,6 +345,53 @@ contract:
    decode-legal in this tree's v1 validator; M5b adds proofs, not legality
    flips, so no staged record written by the current test corpus changes
    meaning.
+
+### 3.5a Production resume-side truth (Code F-1, P1) and the adjudicated gate
+
+**The truth this freeze must state rather than assert away.** In today's
+production v0 binary, the two-parent execution machinery is reachable
+through a forged open v0 record, and the contracts' "before resume"
+promise is not implemented on that lane:
+
+- Production load performs no mode or (mode, kind) gating: `store/mod.rs:244-247`
+  → `decode_production_v0` (`NoFf` is a valid enum variant) →
+  `validate_record` (`store/mod.rs:197-214`) checks merge-id/schema/filename
+  only; `validate_v0_structure` is called solely from the cfg(test) adapter
+  (`adapter.rs:97`); nothing on the production resume path consumes
+  `record.mode` after plan time (`plan.rs:211-241`).
+- A forged participant row — retry-eligible state, `pending_action` kind
+  `true_merge` / expected `commit` / `commit_spec.tree_oid` = the source
+  tree, over a genuinely fast-forwardable `(before_commit, source_commit)`
+  pair, with or without the `mode` field — rides the durable continue
+  branch (`continue_op/execution.rs:42-58`), maps `TrueMergeCommit(spec)`
+  straight to `GitPreparedMerge::Commit` without re-preparation
+  (`continue_op/execution.rs:170-173`), classifies NotStarted through the
+  `(FastForward, Commit)` arm (`merge_support.rs:101-112`), and executes a
+  two-parent commit where fast-forward was possible
+  (`merge_prepared.rs:296-336`) — no-ff semantics in the production v0
+  binary, contradicting `GwzM5-8I2CompatibilityContract.md:163-165` and
+  `GwzM5-8I2RecordContract.md:343-344` as they read today.
+
+**Adjudicated disposition (lane owner, incorporated verbatim as a freeze
+position).** The doctrine-consistent fix is a **small production gate,
+landing as its own package outside M5b** — the **"v0 forged-action resume
+gate"** package, implemented in parallel with focused State review: v0
+continue preflight rejects a durable two-parent-over-fast-forwardable
+action outright (v0 has no legitimate writer of that shape), with a typed
+error and forged-row fixtures for **both** the `mode: no_ff` row and the
+modeless forged action. The contract promise is discharged by that named
+package, **not** by the cfg(test) adapter and not by M5b. Consequences
+inside this freeze:
+
+- §3.2's unreachability header is scoped to the v1 side (done above);
+- tripwire **T-6** (§6) references the package's landed gate and its named
+  suites, and M5b's settled acceptance re-runs them — the gate package
+  therefore lands before M5b settled acceptance;
+- Q8's 0-production-line ceiling is **ratified with no ceiling exception**:
+  the gate is production lines, so it lives in the parallel package's own
+  budget row, never quietly absorbed into M5b (§8.3);
+- M5b's Refactor bullet 1 ("without adding it to writable v0") remains
+  satisfied — the F-1 lane concerns forged records, not writers.
 
 ## 4. DETERMINISM — what the frozen two-parent commit is
 
@@ -328,8 +423,9 @@ The timestamps are **pinned at preparation and persisted**, not re-stamped:
   `OperationAttribution.git_author/git_committer` when present (protocol
   identity with optional `time_ms`/offset —
   `gwz-core/src/model/mod.rs:340-377`, materialized at
-  `merge_support.rs:356-386`), else the repository's configured identity
-  stamped **now** (`repo.signature()`), else the stable fallback
+  `merge_support.rs:356-386`), else the **effective Git identity**
+  (repo-local → global → system config resolution) stamped **now**
+  (`repo.signature()`; State P3-3), else the stable fallback
   `gwz <gwz@localhost>` (`merge_support.rs:271-276`).
 - `prepared_signature` copies `when().seconds()` and offset into the durable
   spec (`merge_support.rs:296-317`); `to_pending`/`pending_commit_spec`
@@ -343,12 +439,27 @@ The timestamps are **pinned at preparation and persisted**, not re-stamped:
   (`signature_matches_prepared`, `merge_support.rs:346-354`;
   `commit_matches_prepared_merge`, `merge_prepared.rs:39-69`).
 
-Consequence: a crash anywhere after the durable action write and any number
-of restarts produce **byte-identical** commit objects — the wall clock never
-re-enters. This is "from-freeze" determinism. It is deliberately *not*
+Consequence, stated precisely so it cannot be read as "every crash point
+resumes automatically" (State P2-1): every commit object the frozen action
+ever produces — first execution, or re-execution after a crash that left
+the repository exactly at NotStarted — is **byte-identical**, and an
+already-created commit is adopted, never re-executed; the wall clock never
+re-enters. One mid-execution crash window does **not** auto-resume: a crash
+between worktree materialization and ref publication
+(`merge_prepared.rs:328-333` — `checkout_tree` done, ref transaction not
+committed) leaves the worktree at the frozen tree with the ref at
+`before_commit`, which classifies Ambiguous; continue is refused
+(`RecoveryEvidenceMismatch`, `forward.rs:497-501`) and abandonment is
+refused (not NotStarted) — a typed, fail-closed operator stop. After the
+operator restores the before-state worktree, reconciliation re-yields
+NotStarted and re-execution produces the **identical OID** — the pinned
+suite is §7's
+`no_ff_crash_between_worktree_materialization_and_ref_publication_classifies_ambiguous_and_refuses_abandonment`.
+This is "from-freeze" determinism. It is deliberately *not*
 cross-operation reproducibility: two operations frozen at different moments
 carry different `time_seconds` by design (Q4 records the alternative and why
-this design rejects it by default).
+this design rejects it by default; both round-1 review axes affirmed the
+from-freeze meaning).
 
 ### 4.3 Commit identity source and the fixture precedent
 
@@ -367,13 +478,23 @@ revalidates the frozen identity through `GitObjectIdentity.validate()`
 ±1440 minutes and forbids control bytes (`model/v1/validate/action.rs:103-109`)
 — a forged spec fails closed before mutation.
 
-### 4.4 No cryptographic signing
+### 4.4 No cryptographic signing of integration commits
 
-There is no commit-signing code in the tree (grep: no `gpg`/signing call
-sites in `gwz-core/src`); libgit2's `git_commit_create` does not honor
-`commit.gpgsign`. gwz-created integration commits are therefore unsigned
-Git objects on every platform, and a user's `commit.gpgsign=true` cannot
-break determinism or self-verification. §3.4 pins this in contract text.
+Scoped precisely (Code F-4; State P3-1 — the earlier "no gpg/signing call
+sites in gwz-core/src" sentence was overbroad and is withdrawn): **neither
+integration-commit construction site signs.** Both are direct libgit2
+`repo.commit(...)` calls, which ignore `commit.gpgsign` — the two-parent
+execution path (`merge_prepared.rs:304-313`) and the conflict-resolution
+path (`merge_recovery.rs:424-433`). Integration commits gwz executes are
+therefore unsigned Git objects on every platform, and a user's
+`commit.gpgsign=true` cannot break determinism or self-verification.
+Elsewhere the backend deliberately honors signing: the AD1 porcelain
+fallbacks for ordinary commits and tags shell out to `git` precisely so
+"hooks / signing / committer config are honored" (`repository.rs:293`
+comment; `refs.rs:171`; `contract.rs:813,865-866`) — those are not
+integration paths and are untouched by M5b. §3.4 pins the scoped wording
+in contract text. For what adoption of an externally *signed* twin commit
+means, see §4.6.
 
 ### 4.5 Tree-object lifetime
 
@@ -387,6 +508,37 @@ exact tree to exist and still equal the recomputed clean merge
 `MergeRecoveryRequired` mismatch, never a silent re-derivation. For the
 fast-forwardable arm the tree is the source commit's own tree, alive as long
 as the source commit the action pins.
+
+### 4.6 Adoption is field-wise, not OID-wise; forged-spec edges (Code F-6)
+
+Two edges of the adoption/validation model, stated so the determinism
+claim cannot be over-read:
+
+- **Field-wise adoption.** Restart adoption and completion matching compare
+  the frozen fields — two parents in order, message bytes, tree, author and
+  committer identity lines with seconds/offset
+  (`merge_prepared.rs:39-69`; `merge_support.rs:346-354`) — not the commit
+  OID or raw bytes. A hand-crafted twin commit matching every frozen field
+  but carrying an additional header (e.g. a `gpgsig` added by an external
+  signer) is adopted Completed, with an OID different from the §4.1 pure
+  function's. This is fail-safe in evidence terms — every frozen field
+  still matches, so no wrong evidence is adopted — but the **byte-identity
+  claim of §4.2 covers gwz-executed commits only**; adopted foreign twins
+  are field-verified, not byte-verified. §3.4's amendment pins this
+  wording.
+- **Non-canonical forged specs fail closed, availability-only.** The wire
+  validator forbids `\0\n\r` and bounds offsets (`action.rs:103-109`) but
+  does not reject leading/trailing spaces in name/email; libgit2's
+  `Signature::new` trims that "crud", so a forged space-padded spec can
+  execute — and the created commit then never satisfies
+  `signature_matches_prepared`, leaving the participant permanently
+  Ambiguous: wrong evidence is never adopted; availability is lost until
+  operator action. M5b pins this with the §7 negative row
+  `forged_non_canonical_signature_spec_executes_then_never_reconciles`;
+  a validator trim/canonicality rule is deliberately **not** taken in M5b
+  (it would be a production validator edit — dual-tier under §8.1's rule
+  and outside the 0-production-line ceiling) and is flagged to the A1 /
+  validator lane instead.
 
 ## 5. RECONCILIATION — continue/abort/preservation consume the frozen action
 
@@ -409,15 +561,26 @@ fast-forward vs merge-commit. Concretely:
   flip, tree drift, moved head, dirtiness) is a typed
   `MergeRecoveryRequired`/`MergeDrift`, not a reclassification.
 - Restart reconciliation (`reconcile_pending_action`,
-  `status/pending.rs:26-199`) classifies exactly NotStarted /
+  `status/pending.rs:26-237`) classifies exactly NotStarted /
   Completed / ExpectedConflict / Ambiguous **from the frozen action**: a
   pending two-parent action is NotStarted only at the exact `before_commit`
   with the frozen spec still valid (`pending.rs:117-133`), Completed only
-  when the live head *is* the frozen two-parent commit byte-for-byte in all
-  identity fields (`pending.rs:134-151`); everything else is Ambiguous and
-  authorizes nothing. Completion state maps from the **durable kind**
-  (`TrueMerge → Merged`, `forward.rs:356-368`) — a no-ff result is never
-  relabeled `FastForwarded`.
+  when the live head matches the frozen two-parent commit field-exactly —
+  parents in order, message bytes, tree, both identity lines with
+  seconds/offset (`pending.rs:134-151`; field-wise, not OID-wise — §4.6);
+  everything else is Ambiguous and authorizes nothing. Completion state
+  maps from the **durable kind** (`TrueMerge → Merged`,
+  `forward.rs:357-362`) — a no-ff result is never relabeled
+  `FastForwarded`.
+- A property the State review verified and asked stated (worth freezing as
+  words): between the two *pinned* OIDs, `classify_merge`
+  (`merge_support.rs:4-30`) is a pure function of immutable ancestry — the
+  frozen pair's classification can never drift; only object loss can
+  intervene, and that fails typed. The ff-able no-ff arm is additionally
+  immune to merge-algorithm version skew, because its revalidation is tree
+  equality **by OID** with no recomputation (`merge_support.rs:101-112`);
+  the clean-true-merge arm recomputes the merge and fails closed on skew
+  (`merge_support.rs:120-141`).
 
 This satisfies "reconcile … from that exact v1 action rather than re-deriving
 merge mode from live analysis" with one deliberate nuance the review should
@@ -439,8 +602,20 @@ observation subtlety is already closed: a pending `TrueMerge/Commit` over a
 `(FastForward, Commit)` arm's source-tree equality
 (`merge_support.rs:101-112`) — i.e., the observer proves "this frozen
 two-parent action is still exactly executable" without ever asking "what
-mode would I choose now". Suites F-2/F-3 (§7) pin both directions
-(divergence after freeze → Ambiguous → recovery; completion → adoption).
+mode would I choose now". The two disagreement windows are pinned by named
+§7 suites (State P2-1 — this paragraph previously referenced nonexistent
+"F-2/F-3" suites, repaired here): post-freeze **external divergence**,
+doctrinally centrally the target branch externally fast-forwarded to
+`source_commit` while the two-parent action is pending, must classify
+Ambiguous and never be adopted
+(`no_ff_external_fast_forward_is_ambiguous_never_adopted` — sound in code
+at `pending.rs:117-151`, where `commit_matches_prepared_merge` fails on
+parent shape); and gwz's **own mid-execution crash window** between
+worktree materialization and ref publication must classify Ambiguous with
+both continue and abandonment refused
+(`no_ff_crash_between_worktree_materialization_and_ref_publication_classifies_ambiguous_and_refuses_abandonment`,
+§4.2). Completion → adoption is pinned by the existing restart suite
+(`tests/forward.rs:103-139`).
 
 ### 5.3 Abort / preserve-abort (abandonment) and rollback
 
@@ -489,7 +664,20 @@ Where the accepted amendment's clauses touch M5b:
   edge and no new filter decision**, so it neither widens nor narrows the
   tracked set; its rollback proofs run under the Unix lanes plus the
   fixture pins the matrix already standardized (`pin_fixture_autocrlf`,
-  `g02.rs:832-845`). Q7 asks whether a Windows no-ff sentinel is wanted now.
+  `g02.rs:832-845`). Updated for the adopted A1 decisions (Code F-3; State
+  §3): **D1** (Option B creation-time filter neutralization, adopted
+  2026-08-16, `CurrentProgramCheckpoint.md:122-141`) narrows the practical
+  exposed population — gwz-born repos are LF-from-birth — without touching
+  the doctrine M5b freezes; Clause A stays delta-only and forward stays
+  filtered, so **no §5.4 statement changes**, and the residuals (adopted
+  worktrees, attribute-driven smudge) keep "M5b must not claim Windows
+  reverse-path closure" exactly right. The D1 package itself carries the
+  un-pinned CRLF matrix sentinel, which is the class-level sentinel Q7's
+  resolution relies on (§9 Q7 — resolved: no M5b-specific sentinel; one
+  classification-ledger sentence noting `mode: no_ff` makes the commit-arm
+  materialization reachable for otherwise-ff-able participants, recorded
+  as an M5b-IMPL ledger obligation since both the ff path and the commit
+  path were already class members — bookkeeping, not new exposure).
 - **Clause A covers the rollback of a no-ff result** exactly as any
   `ResetIntegrated`: the recovery-grade checkout is blob-exact, so the
   before-state the two-parent rollback restores is verified raw-byte
@@ -533,29 +721,60 @@ mechanism** and no runtime flag (the boundary is compile/call-graph, per
    `prepare_merge_upstream_checked`/`AllowFastForward`
    (`merge_prepared.rs:121-138`; v0 start/continue via
    `start/execution.rs:151-167`, `continue_op/execution.rs:117`; pull-head
-   preflights), and the sole `ForceMergeCommit` caller is the cfg(test)
-   lifecycle (`forward.rs:190-197`; grep-verified this tree). The default
+   preflights), and every `ForceMergeCommit` construction/caller site is
+   cfg(test) code — the v1 lifecycle (`forward.rs:198,232`) and the g12
+   backend test (`git/tests/g12.rs:217`), plus the declaration and the
+   default-trait **rejection** arm (full-crate enumeration re-derived by
+   the round-1 Code review §4). The default
    trait impl even rejects it for non-implementing backends
    (`contract.rs:277-279`). M5b keeps this a call-graph property and hands
    its verification to the R4b-G call-graph gate
-   (`GwzM5-8Refactor.md:2243-2244`) plus tripwire T-4 below.
+   (`GwzM5-8Refactor.md:2243-2244`) plus tripwire T-4 below. This gate
+   covers the preparation arm only — see the scope statement after gate 5
+   for the consumption lane it does not cover.
 5. **Writer gate**: no v0 serialization path can emit `mode: no_ff`
    (§3.5 item 1); v1 serialization exists only under `cfg_attr(test,
    derive(Serialize))` (`model/v1/record.rs:19`) and the cfg(test) checked
    store.
 
-**M5b tripwires** (new tests, all cheap, all inverted by A1's checklist):
+**Scope of these gates, stated honestly (Code F-1):** gates 1-5 protect the
+request surface, the v1 record surface, the preparation arm, and the v1
+writer. They do **not** close the forged-v0 record lane into the
+production-compiled two-parent *consumption* machinery (§3.5a). That lane
+is closed by the parallel "v0 forged-action resume gate" package; tripwire
+T-6 binds M5b's settled acceptance to its landed gate. No gate in this list
+may be cited as covering that lane.
+
+**M5b tripwires** (all cheap, all inverted by A1's checklist except T-6,
+which survives A1 for the v0 lifecycle's lifetime):
 T-1 start-rejection stays (exists, cited above); T-2 production decoder
 rejects a v1 no-ff record file with typed `required_wave: A1` context
-(exists for v1 generally in R3 suites; add the no-ff body variant); T-3 no
-v0 fixture in the corpus serializes `mode: no_ff` (corpus scan assert);
+(exists for v1 generally in R3 suites; add the no-ff body variant); T-3
+**no writer-produced or positive fixture** in the corpus serializes
+`mode: no_ff` — reworded per Code F-7: the corpus-wide "no v0 fixture"
+scan would fail today against g23's **deliberate negative fixtures**,
+which forge `no_ff` rows precisely to prove rejection
+(`workspace_ops/tests/g23/compatibility_v0.rs:94-97`,
+`compatibility_v0_edges.rs:38,68,164-180`, `atomic_upgrade_v0.rs:79-85`);
+the assert therefore scans writer outputs and positive-path fixtures only,
+with the negative-fixture files enumerated as the exact allowlist;
 T-4 call-graph assertion that `ForceMergeCommit` construction sites are
-`v1_lifecycle`-only (grep-level structural test in the doc/structure gate
-family, or a `#[cfg(not(test))]` shim making misuse a compile error — freeze
-review to pick one); T-5 retained-reader manifest lane: v0.10.2 rejects the
+`v1_lifecycle`-only — **resolved variant: the `#[cfg(not(test))]`
+compile-shim** (misuse is a compile error; machine-checked, not
+convention-checked), adopting the State review's §5 recommendation over
+the grep variant;
+T-5 retained-reader manifest lane: v0.10.2 rejects the
 v1 no-ff envelope pair exactly as the frozen matrix requires
 (`GwzM5-8I2CompatibilityContract.md:266-273` — fixture addition to the
-existing harness, not a new harness, per `GwzProcessOptimization.md` §5.2).
+existing harness, not a new harness, per `GwzProcessOptimization.md` §5.2);
+T-6 **(new, Code F-1 / adjudicated §3.5a)**: the "v0 forged-action resume
+gate" package's landed production gate and its named suites —
+`v0_resume_rejects_forged_two_parent_action_over_fast_forwardable_pair`
+(modeless forged action) and `v0_resume_rejects_forged_no_ff_mode_row`
+(mode row) — re-run green in M5b's settled gate, proving the production v0
+continue preflight rejects a durable two-parent-over-fast-forwardable
+action with the package's typed error before any Git mutation. T-6 red or
+the package unlanded blocks M5b settled acceptance (§8.2).
 
 ## 7. PROOF PLAN — named suites the Refactor's M5b bullets demand
 
@@ -576,6 +795,18 @@ already accepted with R4b-X that M5b's gate re-runs rather than rewrites.
 - NEW `no_ff_true_merge_conflict_row_and_resolution_commit` (divergent no-ff
   → expected-conflict, then resolution; proves the divergent row is
   byte-identical to normal mode's).
+- NEW `no_ff_clean_true_merge_matches_normal_mode_bytes` (Code F-2 — the
+  clean-true-merge half of the frozen matrix cell
+  `GwzM5-8I2RecordContract.md:331`, unproven end-to-end because both
+  existing no-ff suites use `Kind::FastForward` fixtures
+  (`tests/forward.rs:82,104`): divergent-clean under `mode: no_ff` produces
+  a commit byte-for-byte equal to normal mode's — tree is the merge-index
+  tree, not the source tree — discharging the exit bullet's *complete*
+  matrix demand).
+- NEW `no_ff_external_fast_forward_is_ambiguous_never_adopted` (State
+  P2-1a — the target branch is externally fast-forwarded to
+  `source_commit` while the two-parent action is pending: classification
+  is Ambiguous, adoption never occurs, no mutation is authorized; §5.2).
 - NEW `no_ff_preparation_persists_the_frozen_action_before_any_git_mutation`
   (crash injected between the durable action write and execution; restart
   observes NotStarted from the frozen spec and completes with the
@@ -594,9 +825,20 @@ already accepted with R4b-X that M5b's gate re-runs rather than rewrites.
   the strongest form of "deterministic two-parent commit" and subsumes
   byte-level message/tree/signature equality.
 - NEW `no_ff_reexecution_after_crash_is_byte_identical` (execute → crash
-  before outcome write → restart adopts; assert the adopted OID equals the
-  offline-computed OID; extends the existing restart test with the byte
-  claim).
+  **after ref publication**, before the outcome write → restart adopts;
+  assert the adopted OID equals the offline-computed OID; extends the
+  existing restart test with the byte claim. Crash-point scoping per State
+  P2-1: this row deliberately lands its crash after the ref move — the
+  pre-publication window is the separate row below).
+- NEW `no_ff_crash_between_worktree_materialization_and_ref_publication_classifies_ambiguous_and_refuses_abandonment`
+  (State P2-1b — crash in the `merge_prepared.rs:328-333` window:
+  worktree/index at the frozen tree, ref still at `before_commit` →
+  Ambiguous; continue refused (`RecoveryEvidenceMismatch`,
+  `forward.rs:497-501`) **and** abandonment refused (not NotStarted) —
+  typed, fail-closed stop; then the operator restores the before-state
+  worktree → reconciliation re-yields NotStarted → re-execution produces
+  the **identical OID**, the strongest witness of the determinism claim;
+  §4.2).
 - NEW `frozen_signature_timestamps_survive_restart` (explicitly asserts
   `time_seconds`/offset equality through persist → decode → execute →
   adopt; pins amendment M5b-W1's first clause).
@@ -617,11 +859,23 @@ already accepted with R4b-X that M5b's gate re-runs rather than rewrites.
   bytes).
 - NEW `preservation_backup_ref_anchors_on_the_two_parent_result`
   (owner anchor equality, journal contract §2).
+- **Order-independence instruction (State P2-2, binding on M5b-IMPL):**
+  the P-REV preservation suites must **not** assert the absence of
+  preservation-cursor rows and must tolerate the adopted D3 wire (per-owner
+  no-op skip rows + reset-completion bit,
+  `GwzM5-8DurableCursorAmendment.md`) landing **first** — the two pre-A1
+  amendment trains touch the same journal contract, and M5b's suites must
+  pass in either landing order (§8.2).
 
 **P-WIRE — validator/decoder rows** (`model/v1/validate::action_tests`,
 `record_wire` suites):
 
 - matrix accept/reject rows — exist (`action_tests.rs:44-104`).
+- NEW `forged_non_canonical_signature_spec_executes_then_never_reconciles`
+  (Code F-6b negative row: a space-padded name/email spec passes the wire
+  bounds (`action.rs:103-109`), executes through libgit2's crud-trim, and
+  the created commit never satisfies `signature_matches_prepared` —
+  permanently Ambiguous, typed stop, no wrong evidence; §4.6).
 - NEW `two_parent_restart_reconciliation_rows` closing the record-contract
   exit bullet (`GwzM5-8I2RecordContract.md:420-421`): decode → reconcile
   classification table for the no-ff shapes, including intent-mismatch and
@@ -639,7 +893,10 @@ behavior remains exact"):
   reachable change outside the cfg(test) module (the same
   byte-equivalence discipline R4a/R4b used, `GwzM5-8Refactor.md:2264-2265`).
   M5b's claim here is *absence* of change; the suites are the proof.
-- T-1..T-5 unreachability tripwires (§6).
+- T-1..T-6 unreachability tripwires (§6). T-6's forged-row fixtures — both
+  the `mode: no_ff` row and the modeless forged two-parent action — are
+  authored and land in the "v0 forged-action resume gate" package (§3.5a);
+  M5b's settled gate re-runs them rather than duplicating them.
 
 Placement note: all NEW suites extend existing harnesses; none adds a
 bespoke apparatus (`GwzProcessOptimization.md` §5.2). Suites P-FWD/P-DET
@@ -662,16 +919,27 @@ production dispatch without rewriting them (Q5).
 2. **M5b-IMPL** — one implementation package behind the frozen interface
    (single coherent owner per L1-06; files: `v1_lifecycle/**` tests +
    minimal glue, `model/v1/validate/*_tests.rs`, fixture additions; no
-   production-reachable file outside the §6 boundary). Interior checkpoint
-   behind an accepted interface → **single review, axis alternating, with
-   automatic escalation on any P0-P2** (`GwzProcessOptimization.md`
-   §4.2). If review judges M5b activation-adjacent enough to warrant the
-   mandated tier despite being interior, Q6 resolves it — the tier must be
-   recorded at freeze, not chosen mid-lane.
+   production-reachable file outside the §6 boundary). **Review tier —
+   reconciled rule, recorded at freeze, not chosen mid-lane (supersedes
+   this design's earlier draft posture; lane-owner adjudication of Q6
+   reconciling the two round-1 axis positions): M5b-IMPL is mandated-dual
+   BY DEFAULT; single-axis is permitted only when the diff is strictly
+   confined to test modules/files/fixtures (`v1_lifecycle/tests/**`,
+   `*_tests.rs`, fixture corpora); any edit to non-test items under
+   `v1_lifecycle/{authority,forward,transition,checked}/**`,
+   `model/v1/validate/*.rs`, or `git/gitbackend/**` is dual.** Rationale
+   recorded with it (State §5): the 0-production-line ceiling is an
+   *unreachability* guarantee, not a *semantics-neutrality* guarantee —
+   inside the module-root `cfg(test)`, "observation-glue" could rewrite
+   A1-destined state semantics while satisfying the ceiling, and the next
+   dual gate after IMPL would otherwise be A1 itself, the exact cliff
+   `GwzM5-8ProgressReviewF5.md` §3.2 warns about.
 3. **M5b settled acceptance** — suites green, ledger row reconciled,
-   tripwires T-1..T-5 in the gate, `CurrentProgramCheckpoint.md` updated.
-   Per the release sequence this is the direct prerequisite of A1
-   (`CurrentProgramCheckpoint.md:294-295`; `GwzMergeCheckpoint-v0.10.5.md:119-130`).
+   tripwires T-1..T-6 in the gate (T-6 requires the §3.5a package landed),
+   `CurrentProgramCheckpoint.md` updated; freeze tuple re-cut against a
+   clean committed tree (§2, State P3-2). Per the release sequence this is
+   the direct prerequisite of A1 (`CurrentProgramCheckpoint.md:315-316`;
+   `GwzMergeCheckpoint-v0.10.5.md:119-130`).
 
 ### 8.2 Dependency statement (explicit, per the task)
 
@@ -687,11 +955,15 @@ production dispatch without rewriting them (Q5).
   `GwzM5-8R4bTransitionDesign.md:1209-1219`), R2a message bytes, and the
   exact-evidence amendment (accepted 2026-08-16).
 - Drafting (not merging) the §7 suites.
+- The parallel **"v0 forged-action resume gate" package** (§3.5a): its own
+  lane, its own focused State review, its own budget row — R4b-G-independent
+  (it edits the v0 continue preflight, not the `v1_lifecycle` tree). M5b's
+  freeze does not wait for it; M5b's **settled acceptance** does (T-6).
 
 **Dependent on R4b-G settling — must wait:**
 
 - Merging and settled-review of M5b-IMPL. Reasons: (a) the program's frozen
-  resume order is R4b-G → M5b → A1 (`CurrentProgramCheckpoint.md:294-295`;
+  resume order is R4b-G → M5b → A1 (`CurrentProgramCheckpoint.md:315-316`;
   `GwzMergeCheckpoint-v0.10.5.md:128-130`); (b) M5b-IMPL edits the same
   `v1_lifecycle` tree whose P2/P3/P4 lanes (~3.5k production lines) are
   implemented but **not yet independently accepted**
@@ -702,41 +974,99 @@ production dispatch without rewriting them (Q5).
 - The R4b-G gate itself is behind the RemPlan-4 R2-R6 chain (scope
   correction of 2026-08-16, `CurrentProgramCheckpoint.md:108-120`); M5b
   inherits that transitively and takes no dependency on its internals.
-- Not a dependency either way: the exact-evidence amendment's two OPEN
-  DECISIONS (foreign-filter policy; real-Windows raw-byte satisfiability)
-  remain tracked review debts that M5b neither blocks on nor closes (§5.4);
-  M5b's proofs must simply not claim Windows reverse-path closure.
 
-### 8.3 Proposed ledger row (owner to ratify — Q8)
+**Adopted A1 decisions — authority refresh (State P2-2; Code F-3; re-dated
+2026-08-16).** This design's round-1 draft froze the exact-evidence
+amendment's foreign-filter policy and real-Windows satisfiability as "two
+OPEN DECISIONS … tracked review debts". That language is superseded: the
+**A1 decision packet's three recommendations were ADOPTED 2026-08-16**
+(gwz-dev `0298edb`; `CurrentProgramCheckpoint.md:122-141`;
+`GwzM5-8A1DecisionPacket.md`):
+
+- **D1** — real-Windows satisfiability = Option B, creation-time filter
+  neutralization (autocrlf/eol pins at `create_repo`, clone filters-off at
+  the transport funnel, post-A1 renormalize command, permanent fail-closed
+  doctrine note, and the un-pinned CRLF matrix sentinel). Scheduled with D2
+  as one filter-policy package. Effect on M5b: §5.4 unchanged in doctrine;
+  Q7 resolved at class level.
+- **D2** — foreign-filter policy = A′ refined refusal, **release-gated,
+  not A1-gated**. No M5b interaction beyond §5.4's unchanged posture.
+- **D3** — durable preservation cursor = minimal durable cursor
+  (**per-owner no-op skip rows + reset-completion bit**) as a pre-A1,
+  mandated-dual I2 ActionJournal/Record amendment; drafting has begun
+  (`GwzM5-8DurableCursorAmendment.md`, gwz-dev `9893c5a`). **Amendment-train
+  interaction M5b must not alias (State P2-2):** D3 will amend the very
+  journal-contract sentences near those §3.3/§5.3 cite (e.g.
+  `GwzM5-8I2ActionJournalContract.md:156-166`, "persists neither no-op
+  owner skips nor a separate reset completion bit"). M5b's zero-delta claim
+  is therefore scoped precisely: **zero *no-ff* deltas** — M5b proposes no
+  journal change and no frozen M5b sentence forbids D3's. Non-collision
+  argument, recorded as a freeze position: D3's cursor rows are
+  **mode-blind** and **anchor-preserving** (per-owner skip rows and a reset
+  bit; owner anchors — the participant result — unchanged), so no §5.3
+  statement becomes false when D3 lands; conversely nothing in M5b freezes
+  the absence of cursor rows. The two pre-A1 trains may land in either
+  order: the §7 P-REV order-independence instruction binds M5b-IMPL's
+  suites to tolerate the D3 wire landing first, and this paragraph is the
+  single authority statement A1 reviewers should read for how the trains
+  compose.
+- Not a dependency either way: the D1/D2 residuals M5b neither blocks on
+  nor closes (§5.4); M5b's proofs must simply not claim Windows
+  reverse-path closure.
+
+### 8.3 Ledger row (Q8 — RATIFIED, no ceiling exception)
 
 For `GwzM5-8ChangeBudget.md`, package M5b: production-reachable delta
 **0 lines / 0 files** (hard ceiling — everything lands behind `cfg(test)` or
 in test files; the only permitted shared-file edits are new `#[cfg(test)]`
 items); test/fixture delta ≤ 1,200 lines across ≤ 10 files; wire delta:
 none; protocol delta: none; docs: this design + M5b-W1 banner + checkpoint
-row. Estimation health: prior packages overran 2-10x
-(`GwzM5-8ProgressReviewF5.md:429`); the 0-production ceiling is the
+row. **Ratified by lane-owner adjudication with NO ceiling exception**: the
+F-1 production gate is real production lines and lives entirely in the
+parallel "v0 forged-action resume gate" package with **its own budget
+row** (§3.5a) — it is never absorbed, quietly or otherwise, into M5b's
+0-line ceiling; any M5b implementation need to exceed the ceiling still
+forces a return to this freeze. Estimation health: prior packages overran
+2-10x (`GwzM5-8ProgressReviewF5.md:429`); the 0-production ceiling is the
 overrun-proof part, the test budget is the honest risk.
 
 ### 8.4 M5b-IF exit criteria (checklist for the two reviewers)
 
-1. §3's zero-new-fields claim verified against the amended contracts and the
-   tree (no reviewer finds a byte M5b needs that is not already frozen).
+1. §3's zero-new-fields claim verified against the amended contracts and
+   the tree, on a freeze tuple re-cut against a clean committed tree
+   (State P3-2) — round 1 verified the claim itself on both axes.
 2. §4's determinism table confirmed complete: no commit-object input exists
-   outside the frozen action (including the no-signing and no-re-stamping
-   clauses).
+   outside the frozen action (including the scoped no-signing clause, the
+   no-re-stamping clause, and §4.6's field-wise-adoption boundary of the
+   byte-identity claim).
 3. §5's authority rule confirmed against every consumer of
    `PendingMergeAction` in the tree (the freeze fails if any post-freeze
-   site re-derives mode from live analysis).
-4. §6's boundary list confirmed exhaustive for no-ff (any additional
-   production-reachable no-ff symbol found = NO-GO).
+   site re-derives mode from live analysis) — round 1 State traced every
+   consumer and confirmed it.
+4. §6's boundary list confirmed exhaustive for no-ff **on the v1 side**,
+   with exactly one production-reachable consumption lane acknowledged —
+   the §3.5a forged-v0 lane, closed by the parallel gate package and bound
+   by T-6. Any *other* production-reachable no-ff surface found = NO-GO.
+   (Round 1's F-1 found precisely the §3.5a lane while the draft asserted
+   it away; the criterion now names it instead of denying it.)
 5. §7's suite list accepted as discharging Refactor M5b bullets 2-4 and the
-   record-contract exit bullet; A1-runnable seam requirement (Q5) resolved.
+   record-contract exit bullet — including the round-1 additions: the F-2
+   clean-true-merge row, the two P2-1 disagreement-window rows, the F-6b
+   negative row, and the P-REV order-independence instruction; A1-runnable
+   seam requirement (Q5) resolved.
 6. The A1-activates list (§3.2) accepted as the exact inverse checklist the
    A1 change will implement — no item may live in both columns.
-7. Open questions Q1-Q8 dispositioned by the program owner.
+7. Remaining open questions dispositioned by the program owner: Q1-Q5
+   (round-1 lane positions recorded in §9); Q6/Q7/Q8 are already
+   dispositioned at this revision (reconciled rule §8.1; class-level
+   resolution §5.4; ratified ceiling §8.3) and need only sign-off that the
+   recorded texts are the adopted ones.
 
-## 9. Open questions for the program owner
+## 9. Questions for the program owner (round-1 dispositions recorded)
+
+Round-1 review positions and lane-owner adjudications are recorded inline.
+Q6, Q7, and Q8 are dispositioned at this revision; Q1-Q5 remain open for
+owner sign-off, each carrying its round-1 lane position.
 
 - **Q1 — Amendment necessity.** Is M5b-W1 (§3.4) wanted as a formal record-
   contract amendment (dual-review cost), or is this design document's §4
@@ -744,40 +1074,58 @@ overrun-proof part, the test budget is the honest risk.
   already wire-frozen? Default if unanswered: file the amendment — the
   Refactor's "signatures" wording has already confused one reading, and
   document-only amendments are cheap relative to a wrong A1 reviewer
-  assumption.
+  assumption. *Round-1 position (Code §7): sound — file it, with the
+  F-4/F-6a scope corrections folded into its text (done in this revision).*
 - **Q2 — Version-selection function timing.** The
   `max(active_writer_floor, highest_requested_semantic_version)` pure
   function and creation matrix (`GwzM5-8I2CompatibilityContract.md:61-77`)
   are implemented nowhere in this tree. Install it at M5b behind `cfg(test)`
   with the `no-ff → v1` row (so A1's diff is wiring, not construction), or
   keep the whole function in A1's budget? This design assumes A1 (§3.2) but
-  the M5b freeze is the last cheap moment to move it.
+  the M5b freeze is the last cheap moment to move it. *Round-1 position
+  (Code §7): sound as assumed — keep it in A1; symbol absence verified; it
+  is activation machinery, not no-ff semantics.*
 - **Q3 — Intent grouping.** Keep mode consumption at record level
   (`prepared_mode(record.mode)`, current, zero churn) or extend the R2a
   `IntegrationIntent` group with mode now, anticipating Refactor §6's
   eventual `MergeIntent`? This design freezes the former; changing later is
   internal-only (no wire effect) but touches the frozen R2a seam ownership.
+  *Round-1 position (Code §7): sound — record-level matches
+  `forward.rs:188-189`; wire-neutral to revisit later.*
 - **Q4 — Determinism scope.** Confirm "from-freeze" determinism (pinned
   prepare-time timestamps, §4.2) is the accepted meaning, and that
   cross-operation reproducibility (e.g., deriving signature time from
   `created_at`) is explicitly out — it would be a semantic change to
   already-frozen wire meaning and would decouple commit timestamps from
-  reality for no stated requirement.
+  reality for no stated requirement. *Round-1 position: AFFIRMED on both
+  axes (State §2 "verified in code — affirm"; Code §7 "sound") — awaiting
+  only owner sign-off of the affirmed meaning.*
 - **Q5 — A1 reuse of M5b proofs.** Require now that P-FWD/P-DET suites be
   parameterized over the lifecycle entry seam so A1's "same next action
   through production dispatch" proofs (`GwzM5-8Refactor.md:2299-2300`) reuse
   them verbatim? Costs a little harness generality inside the existing
-  apparatus; buys A1 its regression corpus for free.
-- **Q6 — M5b-IMPL review tier.** Interior single-axis (the §4.2 default
-  behind an accepted interface) or mandated dual because M5b is named in
-  the M5a/M5b/A1 release sequence and sits directly under the A1 cliff
-  (`GwzM5-8ProgressReviewF5.md` §3.2)? Must be recorded at freeze.
-- **Q7 — Windows sentinel.** Should M5b add a windows-matrix expected-fail
-  sentinel (or classification-ledger entry) for the no-ff instance of the
-  tracked "unrewritten smudged files" exposure (§5.4), mirroring the
-  amendment's tripwire pattern for stash_save — or is the existing
-  class-level ledger entry deemed to cover the no-ff surface too?
-- **Q8 — Budget ratification.** Ratify (or resize) §8.3's ceilings,
-  especially the 0-production-line hard ceiling — it is the design's
-  strongest unreachability guarantee, and any implementation need to exceed
-  it should force a return to this freeze rather than a quiet widening.
+  apparatus; buys A1 its regression corpus for free. *Round-1 position
+  (Code §7): sound, endorsed — the A1 reuse is real.*
+- **Q6 — M5b-IMPL review tier. RESOLVED at this revision** by lane-owner
+  adjudication reconciling the two axis positions (Code: mandated dual;
+  State: conditional on diff content). The recorded freeze rule — verbatim
+  in §8.1 item 2 — is: **mandated-dual by default; single-axis only for
+  diffs strictly confined to test modules/files/fixtures
+  (`v1_lifecycle/tests/**`, `*_tests.rs`, fixture corpora); any edit to
+  non-test items under `v1_lifecycle/{authority,forward,transition,checked}/**`,
+  `model/v1/validate/*.rs`, or `git/gitbackend/**` is dual. Recorded at
+  freeze, not chosen mid-lane.**
+- **Q7 — Windows sentinel. RESOLVED at this revision** (both axes
+  affirmed class-level coverage; D1 adopted 2026-08-16): no M5b-specific
+  windows-matrix sentinel — the adopted D1 package carries the class-level
+  un-pinned CRLF sentinel — plus the one-sentence classification-ledger
+  note recorded as an M5b-IMPL obligation in §5.4 (naming that
+  `mode: no_ff` makes the commit-arm materialization reachable for
+  otherwise-ff-able participants; bookkeeping, not new exposure).
+- **Q8 — Budget ratification. RATIFIED at this revision, no ceiling
+  exception** (lane-owner adjudication of Code F-1's Q8 interaction): the
+  §8.3 ceilings stand as written; the F-1 production gate lives in the
+  parallel "v0 forged-action resume gate" package's own budget row and is
+  never absorbed into M5b's 0-production-line ceiling; exceeding the
+  ceiling still forces a return to this freeze rather than a quiet
+  widening.
