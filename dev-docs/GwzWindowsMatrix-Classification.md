@@ -218,6 +218,34 @@ the deliberate autocrlf=true repro sets its filter after fixture
 commits and is unaffected). This closes the TEST exposure only; the
 real-user exposure remains the standing residual tripwire above.
 
+## Run 10 — 31894795103 on `a55d20b`: correction verified, ONE failure left
+
+Totals: **1305 passed / 1 failed / 1 ignored** + integration 29/0.
+Ten-run burn-down: **126 → 118 → 95 → 93 → 64 → 52 → 24 → 9 → 34
+(regression, below) → 1.** The creation-time fixture pins cleared all
+eight member-loop survivors AND returned g23/g25 to green. Runtime
+note: runs 8-10 take ~35 min (vs 6-10 min for runs 1-7) because the
+formerly fast-failing reverse service suites now run their full
+real-git loops.
+
+Sole survivor on the entire matrix:
+`finalization::root_tests::unborn_publication_uses_the_exact_checked_first_commit_candidate`
+— its cause still masked by the resolver's non-participant arm
+(`authority/resolver/execution.rs:16-21` discards code/message/detail).
+Diagnosability probe dispatched on branch `probe/finalization-diagnosis`
+(propagates the discarded error into the reject message; single-test
+trimmed workflow). **Probe run 31896698402 unmasked it in one 0.35s
+test execution: `config value 'user.name' was not found`** — the
+unborn-root scenario drives a PRODUCTION first-commit, and this is the
+only fixture whose root never passes through `commit_file` (unborn = no
+fixture commits), so it never inherits the identity config; runners
+carry no machine-level git identity, developer Macs do — a
+host-dependent test visible only on CI. Production behavior is correct
+(git refuses identity-less commits). Fix: `pin_fixture_identity` at the
+fixture root + the resolver's non-participant arm now propagates the
+discarded cause permanently (the bare label cost a run-10→probe
+diagnosis cycle). Run 11 is the expected full-green run.
+
 ## Run 9 — 31892216186 on `2e04f58`: REGRESSION (recorded per L1-16), corrected
 
 Totals: **1272 passed / 34 failed / 1 ignored** (9 → 34). The eight
