@@ -90,9 +90,16 @@ dual, cross-model where available (mandated tier).
    the three P3-4 strict-window tests are implemented
    (`mutation_tests.rs`: in-place byte drift, destination-in-window,
    kind-swap-in-window) and pass; the reserved-families rescope note is
-   filed as RemPlan §10. Remaining: extend the matrix to Git-directory
-   targets; key or rescope the §6 parent-creation edge; then settle and
-   launch the dual R2-C2 re-reviews (item 3).
+   filed as RemPlan §10. **Complete 2026-08-15**: the §6 parent-creation
+   edge is keyed (`catalog_bootstrap.git_parent_create` /
+   `.git_parent_reobserve`, family now 23 keys, inventory 163) and the
+   matrix is extended to Git-directory targets
+   (`restart_and_substitution_matrix_covers_git_directory_targets`, all 23
+   keys interrupted+restarted+converged); workspace matrix completeness
+   assertion now spans both target variants; checked_artifact suite
+   241 passed / 0 failed (macOS host); boundary checker green after the
+   deliberate protected-tree digest update for the two edited trees; doc
+   gate green. Native Linux/Windows execution remains at the R2-F gate.
 3. Launch the two settled-tree R2-C2 re-reviews (dual, cross-model) once 1-2
    are green on a committed checkpoint.
 4. Port/supersede the two Windows compile corrections; classify the Windows
