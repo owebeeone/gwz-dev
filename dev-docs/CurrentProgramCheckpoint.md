@@ -152,11 +152,20 @@ dual, cross-model where available (mandated tier).
    retired-spelling/stale-claim forbidden tripwires (`ca520e4`, doc gate
    now 138 assertions); DirectoryInteriorRecheckV1 doc-comment pointer
    fixed (`641f03c`).
-   **Open** — State-2 [P3-1] Git-parent dirent barrier: next package on
-   this lane (planned shape: idempotent barrier on the AlreadyExists arm
-   plus a git-directory-root flush anchored to the scratch edge where §5's
-   durability claim begins, one new matrix key, entrant-arm regression;
-   production-behavior change → focused State-axis review after); legacy
+   **Done** — State-2 [P3-1] Git-parent dirent barrier: **CLOSED** at
+   gwz-core `660f46c` (AlreadyExists-arm barrier + containing-root flush
+   anchored to the scratch edge — the §3/§6 durability-claim anchor;
+   family 24 keys, inventory 164, both matrices executed; entrant-arm
+   regression drives the real AlreadyExists path). Focused State-axis
+   review GO, no escalation:
+   `GwzM5-8R2C2DirentBarrier-ReviewState.md`. Its two P3s: the
+   resume-window residual (exact-scratch resume paths skip the anchor —
+   strictly narrower than what it replaced; correction options recorded in
+   the report) routes to the next durability package or a §6-style erratum
+   alongside the R2-F power-loss item; the comment/label pass (§5→§3/§6
+   miscite, Windows-arm rationale, error label) is applied in the same
+   closure commit.
+   **Open** — legacy
    interior digest-pinning or conversion at R2-D; Windows
    destination-window + object-binding native tests at R2-F; §2.2
    status-strip **done** at `53323d0` (Refactor.md −99 lines to a
