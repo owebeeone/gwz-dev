@@ -1,3 +1,16 @@
+# Windows matrix classification — GREEN at run 11
+
+**Final state: run 11 (`31897404688` on `f36d20d`, 2026-08-16):
+1306 passed / 0 failed / 1 ignored + integration 29/0 — the first
+fully green Windows matrix on record. Eleven-run burn-down:
+126 → 118 → 95 → 93 → 64 → 52 → 24 → 9 → 34 (recorded regression) →
+1 → 0. The platform matrix is ACCEPTED for the purposes of
+`GwzMergeCheckpoint-v0.10.5.md` item 5.** Green does NOT close the
+standing residual tripwire (see that section below): real-Windows
+exact-evidence satisfiability on filter-materialized worktrees and the
+`stash_save` filtered reset remain reviewed-open decisions; CI is
+structurally blind to both by fixture hermeticity.
+
 # Windows matrix classification — run 31880022755
 
 Date: 2026-08-15

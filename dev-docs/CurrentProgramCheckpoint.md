@@ -10,8 +10,8 @@ by this file (rulebook §7.3).**
 
 | Repository | Commit | Note |
 | --- | --- | --- |
-| gwz-dev (root) | `791807502e4e4b90d243b59f8ffce4f1c22a4516` + this docs commit | literal restatement per ReviewCode-3 P3-5 |
-| gwz-core | `f2fceaf4ff5f2b88c4d7d8ea07cd2363bf7924ed` | Windows tail train (run-7 dispatch); pushed |
+| gwz-dev (root) | this docs commit (parent: the run-11 train) | literal restatement per ReviewCode-3 P3-5 |
+| gwz-core | `f36d20dda7af631f6d9a5657affd481022bcebed` | run-11 train — first GREEN Windows matrix; pushed |
 | gwz-cli | `3cca145` | Close R4b P1/P2 remediation gate |
 | gwz-py | `929efb0` | Implement R4b reverse merge lifecycle |
 | taut | `f008419` | 0.8.x fallible from_cbor line |
@@ -97,7 +97,23 @@ replay bit-identical (deterministic tail, no flakes). Run-7 train
 (2 fixed / 6 via the parent.rs publish-handle fix / 15 OS-impossible
 injections gated with a positive Windows guarantee test), the os-87
 rename twin fix, CRLF/longpaths fixture pins, the W6 generator install,
-and cache-on-failure. Run 7 left 24 survivors, all in the (b) exact-evidence cluster. The
+and cache-on-failure. **CAMPAIGN COMPLETE 2026-08-16: run 11 (`f36d20d`) is GREEN —
+1306/0/1 + 29/0; the platform matrix is ACCEPTED** (eleven-run
+burn-down 126 → … → 1 → 0; the run-9 regression and its mechanism are
+recorded in the ledger; the finalization_root closure came via the
+`probe/finalization-diagnosis` single-test probe unmasking a fixture
+identity gap). Matrix-green does NOT close the tripwired residuals
+(real-Windows exact-evidence satisfiability; stash_save filtered
+reset) nor the amendment's OPEN DECISIONS — all remain tracked below.
+Next per resume order: close the R2-lane obligations that precede
+R4b-G (R2-D legacy interior conversion; R2-F native tests — the
+matrix/probe machinery makes the Windows half cheap now), then R4b-G.
+Cleanup candidates for the operator: remote branches
+`probe/exact-evidence-diagnosis` and `probe/finalization-diagnosis`
+(throwaway probes, safe to delete).
+
+Historical record of the campaign's final stretch: run 7 left 24
+survivors, all in the (b) exact-evidence cluster. The
 **exact-evidence amendment is ACCEPTED 2026-08-16** and lands in this
 commit: `GwzM5-8ExactEvidencePlatformAmendment.md` (recovery-grade rewrite
 edges blob-exact; checked-artifact private area invisible to the
