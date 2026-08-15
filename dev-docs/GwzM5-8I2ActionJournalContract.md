@@ -4,6 +4,11 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`: the preservation
+evidence row persists per-owner no-op skips (`noop_commit`) and the reset
+completion bit (`reset_commit`); the preservation cursor prefix is
+decode-derived with live fallback.
+
 Amended 2026-08-16 by `GwzM5-8ExactEvidencePlatformAmendment.md`: the §3
 rollback before/after observations are satisfied through blob-exact
 (filter-disabled) recovery-grade rewrite edges, and the §4 decoded-stash
@@ -117,6 +122,24 @@ struct PreservationPublicationCandidateV1 {
 }
 ```
 
+As amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`, the shared
+per-owner preservation evidence row is part of these wire types. Its host
+is the v0 body row that v1 reuses unchanged per the record contract; the
+first four fields are the inherited v0 fields, the last two were added by
+that amendment:
+
+```rust
+struct PreservationEvidence {
+    backup_ref: Option<String>,
+    backup_commit: Option<String>,
+    stash_id: Option<String>,
+    stash_object_id: Option<String>,
+    // Added by GwzM5-8DurableCursorAmendment.md; absent-by-default.
+    noop_commit: Option<String>,
+    reset_commit: Option<String>,
+}
+```
+
 ## 2. Recovery and legality
 
 `recovery_context` is required exactly while `state: recovery_required` and is
@@ -155,15 +178,18 @@ only with the verified result/progress write.
 For rollback, owner/kind agreement includes the exact deterministic current
 cursor derived from durable participant terminal states, publication evidence,
 selected-root membership, and pending phase; a wrong or later owner is invalid
-at decode. Preservation has an additional live condition because this wire
-format intentionally persists neither no-op owner skips nor a separate reset
-completion bit. Record validation rejects owner/phase/pass contradictions.
+at decode. Preservation persists per-owner no-op skips and reset completion
+as validated evidence-row derivations; a narrower live condition remains
+only where a durable completion fact is absent. Record validation rejects
+owner/phase/pass contradictions.
 Before a pending preservation action is classified, advanced, or executed, an
-exact bound observation must also prove that every earlier position in the
+exact bound observation must also prove — by durable completion facts where
+present, and by exact bound live observation where absent — that every
+earlier position in the
 two-pass cursor is complete or currently unnecessary. A later pending owner
 with any earlier incomplete or ambiguous position authorizes no rewrite or
-physical mutation. This clarifies the existing deterministic order; it adds no
-field or journal variant.
+physical mutation. This adds two evidence-row fields and no journal variant;
+the deterministic order is unchanged.
 
 All free-looking wire strings are validated derivations, never ambient
 authority:
@@ -361,6 +387,19 @@ and its SHA-256 is
 R3 adds golden byte vectors and hashes for every entry/worktree/object-id tag,
 stage, executable value, and non-UTF-8 ordering case. YAML/JSON/string rendering
 is forbidden as hash input.
+
+As amended 2026-08-16 (`GwzM5-8DurableCursorAmendment.md`), the evidence
+row's two markers are written at exactly two edges. `noop_commit` is
+written write-ahead when the action-free artifact pass retires an owner
+whose remaining artifact positions were proven exactly unnecessary; an
+owner whose stash was created never carries it. `reset_commit` is written
+atomically with the reset journal's retirement, and write-ahead when the
+reset pass proves the position unnecessary; when the row carries neither
+`noop_commit` nor a stash pair at a reset edge, the same write backfills
+`noop_commit`. Both markers are validated derivations — `noop_commit`
+equals the recorded backup target when the backup pair is present and the
+immutable owner anchor otherwise; `reset_commit` equals that anchor — are
+immutable once written, and never authorize any physical mutation.
 
 ## 5. Archived cleanup ownership
 

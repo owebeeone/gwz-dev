@@ -4,6 +4,12 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`: the per-owner
+preservation evidence row gains two additive fields (`noop_commit`,
+`reset_commit`); the §8 retirement row and collision doctrine extend to
+them and §9 gains that amendment's exit-test rows. No top-level field is
+added.
+
 Amended 2026-08-11 by
 `GwzM5-8R4bInterfaceAmendment-1.md` and
 `GwzM5-8R4bInterfaceAmendment-2.md`: the fifth top-level v1 field and its
@@ -370,7 +376,12 @@ remain at that exact path and value. A v0 unknown top-level field named
 `accepted_workspace`, `recovery_context`, `pending_rollback`,
 `pending_preservation`, or `preservation_publication_handoff` collides with a
 v1 known field and makes migration ineligible; it is never adopted,
-overwritten, or moved.
+overwritten, or moved. Presence of `noop_commit` or `reset_commit` inside a
+v0 record's preservation evidence row is the same class of collision and
+likewise makes migration ineligible; the value is never adopted,
+overwritten, or moved. It is detected at the raw YAML path during v0
+unknown-field extraction — the v0 evidence-row known-key set does not adopt
+the two names (`GwzM5-8DurableCursorAmendment.md` §2.3).
 
 Current-version rewrites use this closed retirement table:
 
@@ -382,7 +393,7 @@ Current-version rewrites use this closed retirement table:
 | pending action and commit spec | survive while the same action is pending; retire when its exact result is durably reconciled, or when abort/preserve consumes a bound exact-not-started observation and atomically records deliberate abandonment plus entry to rolling-back/preserving without fabricating an integration result |
 | pending rollback/preservation action | survives while its exact mutation is pending; retires only with the verified result/progress write |
 | conflict paths/snapshot | survive while conflict evidence remains authoritative; retire when resolution or checked abort completes |
-| participant/publication-root preservation evidence | one stable row per owner; the same row survives as ref/stash fields fill and survives archival |
+| participant/publication-root preservation evidence | one stable row per owner; the same row survives as ref/stash/no-op/reset fields fill and survives archival |
 | publication progress, candidate, hashes, root preservation | survive once created; never retired before archival/GC |
 | participant or operation drift entry | survives while the same ordered durable drift fact remains; retires only when that fact is explicitly cleared |
 | participant error | identity is code plus member/target fields and stable detail (diagnostic message text is not identity); unknowns survive only while that exact identity remains. Clear or replacement with a different identity retires the old container before the new typed error is written; unknowns never rebind across replacement |
@@ -424,6 +435,14 @@ implementation plan names tests for:
 - partial multi-ref cleanup proving the immutable archive worklist is an
   idempotent owner and the archive remains until every ref is absent;
 - unknown fields in every surviving and retiring container, including all
-  five top-level v1 collisions; and
+  five top-level v1 collisions;
+- the durable-cursor marker rows of `GwzM5-8DurableCursorAmendment.md` §8:
+  marker round-trip over the structurally exhaustive legality table with
+  six-field immutability across the new rewrite edges; restart
+  with/without-cursor equivalence including degraded-record pending-reset
+  retirement via marker backfill; the in-row marker collision, known-set
+  version fork, and survival rows; U3 wedge-surface reduction and the
+  post-`reset_commit` preflight-only interference case; cleanup/GC over
+  marker-only rows; and bundle-identity invariance; and
 - atomic rewrite verification proving either complete old bytes or complete
   verified new bytes after every injected fault.

@@ -2,6 +2,12 @@
 
 Date: 2026-08-10
 
+Amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`: the preservation
+cursor prefix is issued from durable completion facts where recorded and
+live observation where not; the evidence row's `noop_commit`/`reset_commit`
+markers, their write edges, and the reset-edge backfill are normative in
+that amendment.
+
 Amended 2026-08-16 by `GwzM5-8ExactEvidencePlatformAmendment.md`: the I2
 raw-byte canonical preimage doctrine is unchanged, but its producing edges
 are corrected — recovery-grade rewrite edges write blob-exact bytes, and the
@@ -341,8 +347,9 @@ The owner set is the selected targets in durable order plus
 participant owns the same root ref. Every owner path and derived private ref is
 validated before repository access. Before any pending action is classified,
 advanced, or executed, the observer issues the existing
-`VerifiedPreservationCursorPrefix` only after every earlier live position is
-exactly complete or exactly unnecessary.
+`VerifiedPreservationCursorPrefix` only after every earlier position is
+exactly complete or exactly unnecessary — durably where recorded, live
+where not.
 
 The observer alone derives the existing pending payloads from immutable record
 evidence and exact live facts. It enforces the I2 raw-byte canonical preimage

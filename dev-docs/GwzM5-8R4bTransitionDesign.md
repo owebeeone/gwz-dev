@@ -2,6 +2,14 @@
 
 Date: 2026-08-09
 
+Amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`: §6.7's
+non-persistence paragraph is superseded — the preservation evidence row
+persists no-op skips (`noop_commit`) and reset completion (`reset_commit`),
+the cursor prefix derives from durable completion facts with live fallback,
+checked-open validation gains the marker contradictions, and the
+transition/footprint matrices gain the two evidence-write arms and the
+extended reset-retirement footprint.
+
 Amended 2026-08-16 by `GwzM5-8ExactEvidencePlatformAmendment.md`:
 recovery-grade rewrite edges (the checked rollback and native-abort
 checkouts) are blob-exact (filters disabled), and the checked-artifact
@@ -739,25 +747,39 @@ skipped only by an exact proof that its artifact/reset work is unnecessary or
 already complete. No later owner starts while an earlier owner has an
 unfinished or ambiguous action.
 
-I2 does not persist a no-op row when an owner needs no artifact, nor a separate
-completion bit after a reset journal clears. Consequently, a pure decoder
-cannot distinguish a legitimately later pending owner from the same bytes
-paired with a live earlier owner that has become incomplete. R4b does not fake
-that distinction. Checked-open validation rejects every contradiction that is
-derivable from record bytes: an owner outside the frozen list, an action/phase
-inconsistent with its evidence, a later durable evidence row that contradicts
-the claimed cursor, or an artifact/reset pass mismatch.
+As amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`, I2 persists a
+per-owner no-op skip (`noop_commit`) and a reset completion bit
+(`reset_commit`) on the preservation evidence row, so a decoder derives the
+cursor prefix from durable completion facts wherever they exist; positions
+without a durable fact keep the live re-proof below. R4b does not fake any
+remaining distinction. Checked-open validation rejects every contradiction
+that is derivable from record bytes: an owner outside the frozen list, an
+action/phase inconsistent with its evidence, a later durable evidence row
+that contradicts the claimed cursor, an artifact/reset pass mismatch, and
+the marker contradictions — fabricated or mismatched marker values,
+marker/pending-action conflicts, a stash pair coexisting with
+`noop_commit`, and `reset_commit` without artifact-pass evidence on the
+same row. An absent or artifact-only earlier row beside a later durable
+row is not a decode contradiction; it remains on the live re-proof path.
 
 Before classifying, advancing, or executing any persisted preservation action,
 the observer must additionally produce `VerifiedPreservationCursorPrefix`.
-It binds the record digest, exact two-pass cursor position, and an exact live
-observation proving every earlier position complete or unnecessary. The
+It binds the record digest, exact two-pass cursor position, and an exact
+observation proving every earlier position complete or unnecessary, from
+durable completion facts where present and live observation where absent. The
 matching action proof embeds that prefix proof. A legitimate restart after
 earlier no-op skips or cleared resets therefore continues; a wrong/later owner,
 new earlier work, or ambiguous earlier repository state returns typed
 `PreservationEvidenceMismatch` without journal rewrite or physical mutation.
 The resolver may not process the named pending owner merely because its local
 payload is individually legal.
+
+The transition and footprint matrices gain the two evidence-write arms
+(working names `RecordArtifactNoop` and `RecordResetNoop`; exact spellings
+are settled at implementation review) and the extended reset-retirement
+footprint: the retirement write may add `reset_commit` and, when the row
+carries neither `noop_commit` nor a stash pair, backfill `noop_commit` on
+the owner's row in the same atomic rewrite.
 
 ### 6.8 Drift transitions
 

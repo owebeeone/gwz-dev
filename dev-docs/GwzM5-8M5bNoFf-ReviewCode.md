@@ -90,3 +90,27 @@ Q1 file W1: **sound** (wire already carries the timestamps; the Refactor's "sign
 **NO-GO** for freezing M5b-IF on this draft. The inventory, wire posture, determinism semantics, reconciliation authority rule, v1-side unreachability gates, and the R4b-G dependency statement are otherwise verified accurate at the cited lines — the machinery claims all held under adversarial checking, and no v1-side production route to `ForceMergeCommit` or the v1 writer exists. The block is F-1 (a contract-vs-production divergence the freeze text asserts away, with its Q8 ceiling interaction undecided) plus F-2 (a genuine matrix hole in the proof plan). Both are remediable in the document and proof plan without touching code; I expect a focused re-review to reach GO.
 
 Tuple: design doc **uncommitted** (untracked `dev-docs/GwzM5-8M5bNoFfDesign.md`, gwz-dev at `0298edb`); gwz-core HEAD `43c37bcff338daf95f053eedbc7467e6c9368eff`; date **2026-08-16**.
+
+---
+
+# APPENDED ROUND-2 RE-VERDICT (against `cdb7ec1`): NO-GO on N-1 alone — all F-1..F-8 REMEDIATED (F-1 exactly and without softening); new findings N-1 (P2: the T-4 `#[cfg(not(test))]` compile-shim contradicts the ratified §8.3 ceiling and has no coherent zero-production form), N-2/N-3 (P3 phrase corrections). Pre-commitment: GO on a revision resolving N-1 as specified. (Full round-2 text in the lane record; summarized here at filing.)
+
+---
+
+# APPENDED ROUND-3 ACK (focused check of the four round-2 edits, `cdb7ec1 → 66117b0`)
+
+Structural confirmation complete: `VerifiedParticipantOutcome` is issued **only** from `observe_participant_action`'s three reconciliation arms (`forward.rs:299/344/363 → :378`); `execute.rs::participant` returns `()`, so there is no direct-outcome-write from an execution result.
+
+**N-1 (T-4) — RESOLVED, matches my specification exactly.** Reverted to the structural-scan variant; my reasoning recorded verbatim (production-compiled shim contradicts the ratified §8.3 ceiling; no coherent zero-production form because production legitimately matches on the variant at `merge_prepared.rs:140-195` / `contract.rs:269-280`; poisoned variant = compile break, not tripwire). The State-concern preservation note (scan executes in CI via the checker lane) is ceiling-compatible — a scan in the test/checker lane is zero production lines — and machine-checked as required.
+
+**N-2 (§2 clause) — ACCURATE.** The false "no cited semantics" sentence is gone; the replacement is exactly my overlap statement: `merge_recovery.rs` cited at `:424-433` (verified against the committed blob), uncommitted hunks at `:6/:149+/:224+` inside `abort_merge`/`set_branch_target_checked`, overlapping no cited range; committed-blob basis and re-cut-at-acceptance retained.
+
+**N-3 (D3 bullet) — ACCURATE.** Train state now current: `e9396a9` confirmed in the log between `cdb7ec1` and `66117b0`; re-verdicts pending at ACK time; "wire shape affirmed on both axes" matches the filed reviews verbatim. The folded State-P4 binds-on-the-property clause is consistent with the §7 P-REV order-independence instruction and weakens no M5b position.
+
+**Fourth edit (§4.6 State-P3-new scoping clause) — one new inexactness, N-4 (P3, non-blocking).** The added parenthetical "(an uninterrupted run completes its outcome write normally; the permanent Ambiguity materializes when restart-based reconciliation … intervenes)" is code-false. In the v1 lifecycle there is no outcome-write path from the execution result: `forward/execute.rs::participant` returns `ModelResult<()>`, and the only forward issuers of `VerifiedParticipantOutcome` are `observe_participant_action`'s reconciliation arms (`forward.rs:299/344/363`), whose Completed classification for `TrueMergeCommit` runs `commit_matches_prepared_merge` → `signature_matches_prepared` (`pending.rs:134-151`) — comparing the live, libgit2-trimmed identity against the frozen space-padded wire values, which fails. So for a non-canonical forged spec, **even an uninterrupted run stops Ambiguous at the first post-execution observation**; that is the R4b-X doctrine working as designed. The pre-round-2 wording was correct; the fail direction, the "availability-only" framing, and the §7 suite row all remain right — the suite will adjudicate this mechanically at IMPL. Fix is one clause; flagged to the State axis as a cross-axis disagreement to reconcile in the next docs pass.
+
+## VERDICT: **GO.**
+
+N-1 resolved as specified; N-2/N-3 folded accurately. The single new item N-4 is P3 — non-blocking — recorded for the next documentation pass plus State-axis reconciliation. Per my round-2 pre-commitment, this axis is GO for freezing M5b-IF on the design at `66117b0`, with M5b settled acceptance bound as frozen (T-6: gate package landed and its two suites green; tuple re-cut against a clean committed gwz-core tree at acceptance).
+
+Tuple: design doc **committed** at gwz-dev `66117b0`; gwz-core HEAD `43c37bcff338daf95f053eedbc7467e6c9368eff`; date **2026-08-16**.

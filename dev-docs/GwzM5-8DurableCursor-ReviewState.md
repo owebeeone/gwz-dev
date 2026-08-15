@@ -113,3 +113,42 @@ The row struct is shared (`model/v0.rs:158-164`); after §2.1 lands, `noop_commi
 6. P3-1/2/3 at author's discretion (recommended in the same pass; P3-1 will otherwise produce tests written against a surface that cannot exist).
 
 Filed by the State/Semantics-axis reviewer, 2026-08-16, against (`GwzM5-8DurableCursorAmendment.md` @ gwz-dev `9893c5a`, gwz-core HEAD `43c37bc`, 2026-08-16).
+
+---
+
+# APPENDED RE-VERDICT — STATE/SEMANTICS AXIS, FOCUSED RE-READ (remediation round 1)
+
+**Review object:** `dev-docs/GwzM5-8DurableCursorAmendment.md` at gwz-dev HEAD `e9396a9` ("D3 cursor amendment remediation round 1"; DRAFT revision 1, dated 2026-08-16, revised 2026-08-16; full delta vs `9893c5a` read as a diff, +214/−48, document-only)
+**Code baseline:** gwz-core HEAD `43c37bcff338daf95f053eedbc7467e6c9368eff` — unchanged from round 1
+**Date:** 2026-08-16
+
+## RE-VERDICT: **GO**
+
+All five pre-committed conditions are resolved as specified, none softened. The revision's new code claims were independently verified at HEAD before this verdict. Two P4 observations; nothing at P3 or above.
+
+## Per-condition dispositions
+
+**Condition 1 (P1-1, backfill) — RESOLVED, remedy (a), not softened.** §3.1's new block mandates that when a reset edge finds a row with neither `noop_commit` nor a stash pair, the same atomic rewrite writes `noop_commit` valued per the §2.2 equations. I re-ran the adversarial trace: (i) the degraded pending-reset case (the P1-1 construction) — the pending owner's row always carries B (`recorded_backup_target` is a journaling precondition), retirement now produces `B+N+R`, whose equations hold at reread-verify (N = backup_commit, R = anchor), and the pending/marker cross-check cannot fire because the same write clears the journal; (ii) the no-op-reset-onto-absent-row variant — unreachable at the reset edge, because §3.1's uniform-discipline sentence makes the action-free artifact pass mark every marker-less owner (on degraded records "exactly as on new ones") before the reset loop runs, and the branch-moved rowless owner falls into today's unchanged typed-error class. **B+R and R-alone are genuinely unproducible by post-amendment writers** — I enumerated every marker-touching write edge (artifact-pass N, CreateStash advance, backup finish, both reset edges) and none can emit them; pre-amendment writers cannot write R at all, so the §2.2 illegal rows are now pure tamper tripwires. §4.2's end-to-end degraded-path promise now holds: observation writes nothing while the journal is retained, the retirement backfills, subsequent sweeps converge, monotone and bounded. §8.2(c) pins exactly this scenario including the "no rejected write, no stuck state" assertion. The §2.2 unreachability note is accurate.
+
+**Condition 2 (P1-2, decode rescope) — RESOLVED, exactly to specification.** §3.3's hardened-at-decode list is precisely my marker-bearing surface: §2.2 value equations, marker/pending-action conflicts, stash-pair-with-`noop_commit`, `reset_commit`-without-artifact-evidence — every leg requires a marker on the row, so no pre-amendment record can trip any of them. The optional ordering-based leg I had permitted was dropped entirely — the conservative sound choice. `reject_later_durable_owner` is retained "as a live guard, unchanged" for marker-less earlier owners, with the absent/artifact-only-earlier shape explicitly named legitimate and routed to the §4 live fallback ("never rejected from record bytes"). §4.3 is rewritten as "marker-bearing only" with the explicit carve-out back to item 2. §7.3 is untouched, as required. §8.2(b) now states that stripping an N-only row deletes the row and the resulting absent-earlier shape "must classify identically via the live fallback (never reject at decode)" — the round-1 self-refutation is not just cured but pinned as a test assertion.
+
+**Condition 3 (P2-1, terminal plane) — RESOLVED.** §2.2 terminal-plane-fate paragraph, §5 terminal-plane bullet (with the U8-growth pricing stated in my finding's own terms), §8.6 test row (derivation succeeds, marker rows contribute nothing, other owners' refs enumerate, archive deletion proceeds, post-GC retirement), §9 owners. Cites verified exact at HEAD: `collect_owner`'s all-None-pair rejection is `record_wire/archive/cleanup.rs:163-167`; `post_gc_record`/`retain_remaining_stashes` span `gc.rs:365-381`. The v0-inert claim is correct (the `from_v0` leg never sees marker rows legitimately).
+
+**Condition 4 (P2-2, table exhaustiveness) — RESOLVED.** The two structural rules are normative, verbatim as specified, and the table now enumerates all sixteen shapes — I counted: 1+3+1+1+4+4+2 = 16, with `S+N+R`/`B+S+N+R` in the rule-1 rejection row.
+
+**Condition 5 (P2-3, preflight-only row) — RESOLVED.** §8.5 is my interleaving verbatim: post-`reset_commit` interference, no own next action left, exhaustion proceeds, preflight the sole catcher, refuses fail-closed with no mutation.
+
+**P3-1/2/3 (discretionary) — all applied, and verified.** P3-1's respecified mechanism is better than my sketch and checks out at HEAD: the evidence-row known-key set is a literal four-name list at exactly `record_wire/unknown_fields/extract/common.rs:237`; `map_v0_to_v1` is exactly `mod.rs:64-81` and today checks the five top-level names only with `container.is_empty()` — so the version-forked key set plus the new in-row collision leg is a complete, implementable trigger (raw-YAML extraction runs on `Value`, independent of the typed parse, so it sees the names regardless — the mechanism is coherent). §8.3 is reworded to match. P3-2: §8.1 now pins all six fields byte-constant across the new rewrite edges, citing the whole-row `set_evidence` replacement (`reduce/preservation.rs:259-264`, verified). P3-3: the §9 recount ("at most one marker write per owner per pass … bounded by two writes per owner; the backfill adds a field to an existing write, not a write") is exact.
+
+## New-inexactness sweep (full diff audited; new claims checked at HEAD)
+
+Verified accurate, including fresh claims the revision introduces: the corrected AJ cite `:155-158` (rollback decode-derivable cursor sentence — recounted, correct); the relocated F5 quote (":206" — exact); the rewritten §3.1 edge-1 parenthetical (whole-action vs arm granularity — checked against `finish`: :231 clears the journal, stash finish is indeed also evidence-free, backup finish carries evidence, stash ids install at the `CreateStash` advance — this *fixes* a round-1 looseness); the re-described root carve-out (":264-275", "the pending owner's **own** stash-position check" — more exact than round 1: the carve-out fires inside the all-owner sweep for the pending owner itself); `cursor.rs:29-38`; and §7.1's claim that the row struct is printed in neither I2 contract (grep-verified: no `PreservationEvidence`/`backup_ref` in either).
+
+Two P4 observations, non-blocking, no action required for acceptance:
+
+- **[P4-1]** §2.2 terminal-plane: "consumed with their row exactly as the backup fields are today" — the analogy is loose for *surviving* stash-bearing rows: backup fields are cleared on survivors, while a marker on a survivor (e.g. `S+R`) persists post-GC. The operative sentences describe the code correctly; only the analogy phrase overreaches. Inert either way after archival.
+- **[P4-2]** §9's "the first marker write fails the overlay's unauthorized-unknown-field check" — verified directionally against RecordContract §8's manifest-mismatch pre-mutation error rather than by a line-read of `overlay::apply_surviving`; both branches of the claim are fail-closed (set updated → writes pass; omission → loud failure), so nothing rides on the unverified detail.
+
+**Scope note:** this GO is the State-axis re-verdict on the five conditions plus the new-inexactness sweep. §10's claim that all Code-axis findings are also applied is for the Code axis's re-read to confirm; the one point of overlap (Code P2-1 = State P1-2) is resolved by Condition 2 above either way.
+
+Filed by the State/Semantics-axis reviewer, 2026-08-16, against (`GwzM5-8DurableCursorAmendment.md` @ gwz-dev `e9396a9`, gwz-core HEAD `43c37bc`, 2026-08-16). Both round-1 P1s are closed by construction, the U-class ledger is net-shrinking as the adopted decision promised, and the amendment is, on this axis, fit to freeze pre-A1.

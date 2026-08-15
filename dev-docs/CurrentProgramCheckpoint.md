@@ -139,6 +139,23 @@ window without hard-coupling to its pending owner decisions).
 Implementation: D1+D2 as one filter-policy package (focused State
 review; dual where the doctrine note freezes text); D3 amendment
 drafting begins now.
+
+**M5b-IF FROZEN 2026-08-16 (GO/GO)** at design `66117b0`
+(`GwzM5-8M5bNoFfDesign.md`; reviews + re-verdicts filed in
+`GwzM5-8M5bNoFf-Review{Code,State}.md`): M5b is
+semantics-installation-only — the amended contracts already carry all
+no-ff wire; the delta is proofs/tripwires/W1 doc amendment under a
+ratified zero-production-line ceiling. Settled acceptance is BOUND to
+T-6 (the "v0 forged-action resume gate" package — the freeze review's
+Code F-1 P1 found production v0 resume executes forged
+two-parent-over-ff-able actions today — landed with its two named
+suites green) and to a clean-tree tuple re-cut. M5b-IMPL review tier
+recorded at freeze: mandated-dual by default, single-axis only for
+test/fixture-confined diffs. IMPL merge waits for R4b-G per the frozen
+dependency statement. Tracked: round-3 N-4 (P3 cross-axis wording
+reconciliation, next docs pass). D3 amendment: State re-verdict GO at
+`e9396a9`; Code re-read pending; acceptance ritual (§7 contract
+annotations) on its GO.
 Cleanup candidates for the operator: remote branches
 `probe/exact-evidence-diagnosis` and `probe/finalization-diagnosis`
 (throwaway probes, safe to delete).

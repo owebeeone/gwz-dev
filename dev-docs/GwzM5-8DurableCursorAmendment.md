@@ -3,23 +3,31 @@
 Date: 2026-08-16. Revised: 2026-08-16 (dual-review remediation round 1:
 State P1-1, P1-2, P2-1, P2-2, P2-3, P3-1, P3-2, P3-3 + Code P2-1, P3-1,
 P3-2, P3-3 and P4 notes — document-only; no code, no other files).
+Banner-application edit: 2026-08-16 (acceptance; §7 deltas applied to the
+four contracts; Code R2-1/R2-2/R2-3 and State P4-1 wording repairs).
 
-Status: **DRAFT — dual review round 1 returned NO-GO on both axes against
-the round-1 text** (State: `GwzM5-8DurableCursor-ReviewState.md`, 2×P1 +
-3×P2 + 3×P3, pre-committed GO on a revision resolving its five named
-conditions; Code: `GwzM5-8DurableCursor-ReviewCode.md`, 1×P2 + 3×P3,
-lightweight re-read expected; peer-blind convergence: Code P2-1 and State
-P1-2 are the same defect). This revision applies **all** findings from
-both reports; pending both re-verdicts.
+Status: **accepted 2026-08-16** — dual review round 1: State NO-GO (2×P1 +
+3×P2 + 3×P3) and Code NO-GO (1×P2 + 3×P3) against the round-1 text, with
+peer-blind convergence (Code P2-1 ≡ State P1-2 — the same defect);
+document-only remediation applied; focused re-verdicts **GO on both axes**
+(`GwzM5-8DurableCursor-ReviewState.md` — all five pre-committed conditions
+resolved, both P1s closed by construction — and
+`GwzM5-8DurableCursor-ReviewCode.md`; re-verdicts appended to both
+reports). The four amended contracts carry acceptance annotations dated
+2026-08-16 (§7). Implementation may trail into the A1 package per the
+adopted decision. The §5 F5-lesson compatibility statement stands: no hash
+frame, coverage, or projection changes. Code's three round-2 wording notes
+(R2-1/R2-2/R2-3) and State's P4-1 are applied in this banner-application
+edit.
 The underlying decision is adopted: `GwzM5-8A1DecisionPacket.md` Decision 3
 ("Adopt the minimal durable cursor — per-owner no-op skip rows + a
 reset-completion bit … via an I2 journal/record amendment riding the same
 pre-A1 train as the operator-escape wire changes", §0 row 3, §3.5). Per that
 decision the **wire amendment must land pre-A1** ("Pre-A1 is the last cheap
 moment", `GwzM5-8ProgressReviewF5.md` §3.3 :206; §9 item 4 :451) while
-**implementation may trail into the A1 package**. No contract text is
-edited until this document is
-accepted; §7 lists the exact acceptance-time annotations, following the
+**implementation may trail into the A1 package**. §7 lists the exact
+acceptance-time annotations — applied to the four contracts on acceptance,
+2026-08-16 — following the
 idiom `GwzM5-8ExactEvidencePlatformAmendment.md` and
 `GwzM5-8R4bInterfaceAmendment-1/2.md` established (amendment banners on the
 amended documents; the amendment file is controlling where they disagree).
@@ -168,10 +176,12 @@ selected-root/publication-root collision rules are unchanged.
 
 **Terminal-plane fate.** Immutability spans the record's open lifetime and
 archival ("survives archival", §8 :385). At the post-GC record rewrite the
-markers are consumed with their row exactly as the backup fields are
-today: `gc.rs:365-381` clears `backup_ref`/`backup_commit` and drops rows
+markers follow the row-retirement half of today's discipline:
+`gc.rs:365-381` clears `backup_ref`/`backup_commit` and drops rows
 without a stash pair, and a row whose remaining content is markers only
-retires at that existing edge. Markers contribute no cleanup-worklist
+retires at that existing edge — while a marker on a surviving
+stash-bearing row (`S+R`; `B+S+R` before the field clearing) persists in
+the archived record, inert thereafter. Markers contribute no cleanup-worklist
 entries and never block backup-ref deletion, worklist derivation, or
 archive deletion; the archived-cleanup worklist derivation must accept
 marker-only rows (`collect_owner`'s all-None-pair rejection at
@@ -192,18 +202,19 @@ marker-only rows (`collect_owner`'s all-None-pair rejection at
   overwritten, or moved — the same doctrine §8 :369-373 applies to the
   five top-level v1 names. Mechanism, stated for the shared-struct
   reality: once §2.1 lands, the two names parse into **typed** fields even
-  when a v0 record carries them, so they never appear in the unknown-field
-  manifest and a naive "unknown-field collision" check would not fire. The
-  ineligibility trigger is therefore specified as raw-YAML-path detection
-  during v0 unknown-field extraction — the evidence-row known-key set
+  when a v0 record carries them — but manifest membership is governed by
+  the **extractor's known-key set**, not the typed parse (raw-YAML
+  extraction runs on the value tree regardless of what serde accepts).
+  The evidence-row known-key set
   (`record_wire/unknown_fields/extract/common.rs:237`, today exactly the
-  four old names) **forks by version**: the v1 set adopts the two names,
-  the v0 set must not — or, equivalently, as post-decode field-presence
-  detection on the v0 row; and `map_v0_to_v1`
+  four old names) therefore **forks by version**: the v1 set adopts the
+  two names; the v0 set must not — so in a v0 record the two names **do**
+  surface in the v0 unknown manifest, and that manifest membership is the
+  collision trigger, consumed by `map_v0_to_v1`
   (`record_wire/unknown_fields/mod.rs:64-81`, today the five top-level
-  names only) gains the in-row leg. Read-only and archival paths leave
-  such bytes untouched, per the compatibility contract's byte-preserving
-  rules.
+  names only), which gains the in-row leg. Read-only and archival paths
+  leave such bytes untouched, per the compatibility contract's
+  byte-preserving rules.
 - **Archived-v0 projection is unaffected.** Archived v0 records use only
   the archive decoder/projection (`GwzM5-8I2CompatibilityContract.md`
   :163-164) and no v0 record legitimately contains the fields; nothing in
@@ -292,7 +303,9 @@ no physical mutation occurs, so no pending action is journaled for them —
 the durable write **is** the step. The transition vocabulary gains two
 evidence-write reducer arms (working names `RecordArtifactNoop` and
 `RecordResetNoop`; exact spellings are settled at implementation review)
-plus the one-field footprint extension of `finish_reset_attached_ref`; the
+plus the extended (up to two-field) footprint of
+`finish_reset_attached_ref` — `reset_commit`, and `noop_commit` when the
+backfill fires; the
 TransitionDesign transition/footprint matrices gain the corresponding rows.
 No state changes, no new predecessor edges.
 
@@ -584,18 +597,22 @@ RecordContract §9 at acceptance:
    marker write); and (c) **degraded-record pending-reset retirement**: a
    marker-less record with a retained pending `ResetAttachedRef`, resumed
    by the amended binary — live re-proof, execution or After
-   classification, retirement **succeeds** and produces exactly
-   `B+N+R` / `N+R` via the §3.1 backfill; no rejected write, no stuck
+   classification, retirement **succeeds** with per-case outcomes: a
+   marker-less `B` row retires to `B+N+R` via the §3.1 backfill, and a
+   marker-less `B+S` row retires to `B+S+R` (no backfill — the stash pair
+   is the artifact-pass evidence); `N+R` arises only at the standalone
+   no-op reset edge, never at retirement, because a pending reset
+   requires the recorded backup target; no rejected write, no stuck
    state.
 3. **Unknown-field survival rows**
    (`record_wire/unknown_fields/tests/preservation.rs`): unknown
    descendants beside the new fields survive by stable-owner identity;
-   the two names present inside a **v0** record's evidence row are
-   detected at the raw YAML path during v0 extraction (post-§2.1 they
-   parse as typed fields and never surface in the unknown manifest — the
-   known-key set forks by version per §2.3) and make migration
-   ineligible, never adopted; the v1 known set adopts the two names, so
-   the first marker write passes the overlay's unauthorized-unknown
+   the two names present inside a **v0** record's evidence row surface in
+   the **v0 unknown manifest** (the known-key set forks by version per
+   §2.3: the v0 set does not adopt the two names) and that manifest
+   membership triggers migration ineligibility, never adoption; the v1
+   known set adopts the two names, so they never appear in a v1 manifest
+   and the first marker write passes the overlay's unauthorized-unknown
    check; archival carries the fields with their row.
 4. **U3 wedge-surface reduction demonstration** (lifecycle matrix rows):
    external dirt/touch on a durably-skipped earlier owner no longer blocks
@@ -658,7 +675,8 @@ known-diff/reread verification are the enforcement.
 
 ## 10. Status
 
-DRAFT, revision 1. Round 1 returned NO-GO on both axes; this text applies
+ACCEPTED (history follows). Round 1 returned NO-GO on both axes;
+revision 1 applied
 every finding of `GwzM5-8DurableCursor-ReviewState.md` (P1-1 via the §3.1
 marker backfill; P1-2 via the §3.3/§4.3 rescope to marker-bearing
 contradictions with the retained live guard; P2-1 via §2.2/§5/§8.6/§9;
@@ -666,12 +684,14 @@ P2-2 via §2.2's structural rules; P2-3 via §8.5; P3-1/2/3 via
 §2.3/§8.1/§9) and of `GwzM5-8DurableCursor-ReviewCode.md` (P2-1 — same
 defect as State P1-2, aligned to §7.3's narrower rule, which is unchanged;
 P3-1 via §3.1; P3-2 via §7.1; P3-3 via §9; P4 notes via §3.2/§9 and the §1
-citation corrections). Acceptance requires the State re-verdict
-(pre-committed GO on resolution of its five conditions) and the Code
-re-read GO on this text. The wire
-delta must be frozen (this document accepted, banners applied) **pre-A1**;
+citation corrections). **ACCEPTED 2026-08-16**: the State re-verdict is GO
+(all five pre-committed conditions resolved, both P1s closed by
+construction) and the Code re-verdict is GO (P2-1 resolved exactly to the
+prescribed correction, §7.3 byte-identical); Code's round-2 wording notes
+R2-1/R2-2/R2-3 and State's P4-1 are applied in the banner-application
+edit, which also applied the §7 deltas to the four contracts. The wire
+delta is frozen **pre-A1** (banners dated 2026-08-16);
 implementation may trail into the A1 package per the adopted Decision 3.
-If review overturns the decision, the fallback recorded in the packet
-(§3.5) is Option B (cheap live probe) plus explicit C-style closure of F5
-§9 item 4 — neither of which touches the wire, and neither of which shrinks
-the U3 wedge surface.
+Review did not overturn the decision; the packet's recorded fallback
+(§3.5: Option B, the cheap live probe, plus C-style closure of F5 §9
+item 4) is moot and F5 §9 item 4 is closed by this acceptance.

@@ -64,3 +64,25 @@ ActionJournal §1 (:33-118) prints the pending-action/owner/phase types only; th
 ---
 
 **Disposition:** NO-GO on P2-1 alone. Recommended correction: in §3.3, restrict the hardened decode contradiction to later **marker-bearing** rows (or otherwise state the decode discriminator), and in §4.3 either delete "later-durable-row-vs-empty-earlier-row" or restate it as the §2.2 row-1 (present-empty-row) case; leave §7.3 as drafted — it is already the correct narrow rule. With that sentence-scale fix applied, this axis has no remaining blocker: quotes are exact, the wire delta is byte-safe under the in-use serializer, all three cursor surprises and the cost-elimination trace verify at HEAD, hash/bundle surfaces are untouched, and the survival/collision machinery lands where the amendment says it does.
+
+---
+
+# APPENDED FOCUSED RE-VERDICT (round 2) — CODE/CONSISTENCY AXIS
+
+**Review object:** `dev-docs/GwzM5-8DurableCursorAmendment.md`, revision 1 (677 lines) at gwz-dev HEAD `e9396a9` (working tree clean); gwz-core HEAD `43c37bc` (unchanged); date 2026-08-16. Method: full diff `9893c5a..e9396a9` hunk-by-hunk; every new code citation verified at gwz-core HEAD via `git show HEAD:`; stale-formulation sweep by grep.
+
+## Verdict: **GO.**
+
+No P0-P2 findings remain or entered. One new P3 and two P4s, none blocking; the P3 rides the banner-application edit.
+
+- **P2-1 — RESOLVED, verified against my prescribed correction exactly.** The "later durable row (artifact, skip, or reset marker) vs factless earlier row" formulation is gone (grep-clean); the decode-hardened surface is exactly the marker-bearing set; the absent/artifact-only earlier shape is named legitimate and kept on the live fallback with `reject_later_durable_owner` retained; the empty-row item restated per my vacuity note verbatim; §4.3 rescoped "marker-bearing only"; §7.3 **byte-identical**. The resolution is conservative relative to my minimal fix — it declines even the sound marker-implied cross-owner rejection — removing the entire class of legacy-record decode hazards. Internally consistent with §4.2 and the sharpened §8.2(b).
+- **P3-1/P3-2/P3-3 — RESOLVED** (granularity clauses check against `reduce/preservation.rs` at HEAD; §7.1 introduces the six-field struct with the correct host reality; §2.3/§9/§8.3 carry the version-forked known-key mechanism and all four record_wire/terminal-plane owners, ChangeBudget-flagged). **P4 notes — all applied.**
+- **New State-side blocks checked on this axis:** the marker backfill is wire-exact and mechanism-sound (value equations hold at both edges; produced shapes §2.2-legal only; the pending-blocks-earlier-markers premise matches `cursor.rs:20-26`); both terminal-plane citations verbatim-accurate (`cleanup.rs:163-167` would indeed reject marker-only rows today — the marker-aware arm is genuinely required; `gc.rs:365-381` is exactly the retirement edge); the 16-shape table is rule-generated and exhaustive (9 legal / 7 illegal); §8.5 consistent with `cursor.rs:433-467`; the §9 traffic recount arithmetic verified.
+
+## New findings
+
+- **[R2-1, P3]** §3.1 :295 still reads "the **one-field** footprint extension" six lines below the backfill block making it up to **two** fields. Non-blocking (either wrong implementation fails loudly against §8.2(c)); fix the phrase at the banner-application edit.
+- **[R2-2, P4]** §2.3's "parse into typed fields … never appear in the unknown-field manifest" is causally loose (manifest membership is governed by the extractor's known-key set — under the prescribed fork the names DO appear in the v0 manifest; that is the collision trigger). Operative prescription unambiguous; tighten when convenient.
+- **[R2-3, P4]** §8.2(c)'s "produces exactly `B+N+R` / `N+R`" quotes the two-edge envelope rather than per-case outcomes (N+R is unreachable at retirement proper — a pending reset requires the recorded backup target; a marker-less B+S row retires to B+S+R). Adjust so the suite author doesn't assert an impossible row.
+
+**Disposition:** GO. All four round-1 findings resolved as claimed; P2-1 matches my prescribed correction exactly with §7.3 byte-identical; the State-side additions introduce no contradiction on this axis; the three new findings are non-blocking wording repairs slated for the banner-application edit.
