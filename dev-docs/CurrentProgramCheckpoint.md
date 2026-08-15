@@ -159,8 +159,15 @@ dual, cross-model where available (mandated tier).
    production-behavior change → focused State-axis review after); legacy
    interior digest-pinning or conversion at R2-D; Windows
    destination-window + object-binding native tests at R2-F; §2.2
-   status-strip in flight (delegated; Refactor.md and ChangeBudget.md
-   mid-edit as of this commit).
+   status-strip **done** at `53323d0` (Refactor.md −99 lines to a
+   three-sentence status + changelog, ledger −10, judgment calls recorded
+   in the strip report; doc gate 138 green; review-basis list converted to
+   series form, unblocking eight more L1-33 archivals — 18 superseded
+   rounds now live in `dev-docs/history/`). Remaining archive candidates
+   stay pinned by latest-round closure tables and the RemPlan preamble; a
+   small L1-08 amendment to L1-33 (closure-table citations do not pin,
+   since archived files keep their names) is queued as a future docs
+   package.
 4. ~~Port/supersede the two Windows compile corrections~~ **Done by
    determination 2026-08-15**: both diagnostic-clone commits were located in
    `/Users/owebeeone/limbo/gwz-core-v0.10.5-narrow` and verified already
