@@ -52,7 +52,19 @@ execution. Remaining matrix work: W1 (index-path containment, 28-class),
 W3 (access-denied, now ~37), W4 (sharing violations), W6 (2 protocol
 currency) — the R2-F product packages.
 
-## W1 fix (run 3 pending)
+## Run 3 — 31882396053 on `4297c17`: W1 CLOSED
+
+Totals: **1224 passed / 93 failed / 1 ignored** + integration 27/2 = 95
+unique (−23 net). `index path is not inside` occurrences: **0** — the W1
+class is fully cleared by the canonicalized-parent comparison. Remaining
+leaders: W3 error-5 (preservation artifact 16, bundle 9, plus workspace/
+test-artifact residue) and W4 error-32 (12 bare + 10 at "publish final
+catalog" — the catalog seam's directory rename meeting a held handle
+without delete-sharing on Windows; the failing edge is already named by
+its label, so W4's catalog slice needs sharing-mode reasoning at that
+edge, not more instrumentation). W5 assertion residue: 12.
+
+## W1 fix (landed at `4297c17`)
 
 W1 root cause confirmed at `provider/index.rs`: raw `PathBuf` equality
 between GWZ's recorded git-directory spelling and libgit2's reported index
