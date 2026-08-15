@@ -118,6 +118,27 @@ three-platform evidence jobs, R6 independent settled-tree re-review.
 Scoping in flight: `GwzM5-8R2D-Plan.md` (R2-D extraction + unblock
 verification + phased plan) and `GwzM5-8R2F-EvidenceMap.md` (R5/R2-F
 platform-evidence gap map vs the green matrix).
+
+**A1 decisions ADOPTED 2026-08-16** (operator delegation "proceed with
+your recommendations when the decision packet arrives";
+`GwzM5-8A1DecisionPacket.md`): **D1** real-Windows satisfiability =
+Option B, creation-time filter neutralization (autocrlf=false + eol=lf
+pins at create_repo, clone filters-off at the transport funnel;
+renormalize command for adopted worktrees post-A1; plus the permanent
+fail-closed doctrine note for ident/eol=crlf/foreign residue and an
+un-pinned CRLF matrix sentinel ending CI blindness). **D2**
+foreign-filter policy = A′ refined refusal (pre-checkout attribute
+inspection over the rewrite set, non-passthrough filters refused
+pre-mutation, lfs allowlisted) — **release-gated, not A1-gated**: must
+land before the next release cut, which is the first to carry the
+amendment's disable_filters code. **D3** durable preservation cursor =
+minimal durable cursor (per-owner no-op skip rows + reset-completion
+bit) as a pre-A1 I2 amendment (mandated dual review; implementation
+may trail into the A1 package; may share the escape-design amendment
+window without hard-coupling to its pending owner decisions).
+Implementation: D1+D2 as one filter-policy package (focused State
+review; dual where the doctrine note freezes text); D3 amendment
+drafting begins now.
 Cleanup candidates for the operator: remote branches
 `probe/exact-evidence-diagnosis` and `probe/finalization-diagnosis`
 (throwaway probes, safe to delete).
