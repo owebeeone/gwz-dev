@@ -151,6 +151,30 @@ patches ride the run-7 train unless noted):
   preflight permanently blocked on Windows — production), CRLF checkout
   semantics, resolver Publication-arm diagnosability (tracked).
 
+## Run 7 — 31886821459 on `f2fceaf`: sharing + small tails CLOSED
+
+Totals: **1279 passed / 24 failed / 1 ignored** + integration **29/0**
+(was 27/2) = 24 unique (−28). Seven-run burn-down:
+**126 → 118 → 95 → 93 → 64 → 52 → 24.** Every train element verified on
+first dispatch: zero `os error 32` (parent.rs publish-handle release +
+15 gates hold), zero `os error 87` (the parent.rs rename twin fix —
+NEEDS-WINDOWS-VERIFICATION discharged), zero path-too-long (longpaths
+pin), zero `include_str!`/assertion residue (`.gitattributes` +
+fixture pins), W6 integration currency green (taut-proto install), the
+positive guarantee test `retained_directory_blocks_substitution_rename_windows`
+passed, and the `cfg(windows)` additions compiled clean. rust-cache
+saved on the red run (`cache-on-failure`) — run 8+ starts warm.
+
+The 24 survivors are **exactly the predicted (b) cluster**, nothing
+else: 4 × g15/root_preservation (stash ×2 + mutation = class B anchor
+contamination; observation/marker_presence = the anchor-dirt preflight
+finding), 13 × reverse::preservation and 6 × reverse::rollback service
+tests (class A CRLF + anchor cascades per the diagnosis blast-radius
+list), and finalization_root's masked-resolver failure (same family
+suspected; resolver diagnosability tracked if it survives the
+amendment). The matrix is one reviewed package — the exact-evidence
+amendment train — from expected green.
+
 ## W1 fix (landed at `4297c17`)
 
 W1 root cause confirmed at `provider/index.rs`: raw `PathBuf` equality
