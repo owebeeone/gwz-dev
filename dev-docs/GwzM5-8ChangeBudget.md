@@ -2,18 +2,14 @@
 
 Date: 2026-07-31
 
-Status: **R0, R1, R2a, M5a, I1/I2, R4a, and production-disabled R3
-complete; R4b-TI/R4b-TR and production-disabled R4b-S/R4b-A are
-independently accepted; the R4b-F implementation and its revised scope ceiling
-are independently accepted; R4b-X and its revised scope ceiling are
-independently accepted; R4b-P P0/P0.1 are independently accepted and P2-P4 are
-implemented; both amendment 2 interface reviews are GO through §13 and the
-production-disabled P0.2 implementation and bounded settled-code remediation
-are accepted by both corrected-code reviews with no open P0-P3 finding; the
-Windows portability remediation is code-GO; both §14 settled-implementation
-reviews and the exact-SHA native release-platform run are GO; P1-WR1 is closed
-and P1 is implemented with local tests and static analysis green, pending
-settled-tree review**
+Status: **The change-budget ledger for the M5–M8 refactor packages — frozen
+ceilings, reviewed scope revisions, and measured closure accounting.
+Per-package acceptance and progress state live in
+`CurrentProgramCheckpoint.md`, which supersedes live status paragraphs in
+this document (rulebook §7.3). Dates and measured figures record reviewed
+scope decisions as of their freeze, not current program state.**
+
+Status history: see git log and `CurrentProgramCheckpoint.md`.
 
 This ledger implements the change-budget requirement in
 `GwzM5-8Refactor.md`. Moved production lines are reported separately from
@@ -479,7 +475,7 @@ plus integration groups 10/10, 27/27, 4/4, and 2/2; strict all-target/all-
 feature Clippy, formatting, and diff hygiene passed. Both independent
 settled-tree re-reviews returned **GO** with no P0–P3 finding. No v1 decoder,
 serializer, writer, upgrade entry point, or migration dispatch enters a normal
-production build. R3 is complete at its disabled-writer boundary; R4b is next.
+production build. Status: see `CurrentProgramCheckpoint.md`.
 
 ### R4b — typed v1 lifecycle and persisted-acceptance consumption
 
@@ -817,18 +813,12 @@ ceiling changes.
 All twenty-three production and twenty-seven evidence owners are frozen in
 amendment 2, including the one-path non-publishing Cargo Dist platform gate
 allocated by §14. New cohesion owners remain below 500 lines; `contract.rs` remains below 950 and the
-post-extraction `preservation.rs` below 850. Both protocol and owner-manifest
-interface reviews are GO through §13. The first settled-code architecture
-review found index-only provenance, manifest, evidence, and stale-control
-defects; their bounded remediation is accepted by both corrected-code
-re-reviews. With the allocated workflow implementation present, the measured actual
-is 2,738/3,100 semantic production lines, 450/450 moved production lines, and
-10,648/11,100 evidence lines across 23/27 implemented paths within the 23/27
-manifest. Both §14 settled-implementation reviews and the exact-SHA run are GO.
-P0.2 is accepted locally; P1-WR1 is closed. P1 is implemented against the
-frozen seam with local tests and static analysis green and awaits settled-tree
-review. This does not activate
-production v1 writing or dispatch.
+post-extraction `preservation.rs` below 850. With the allocated workflow
+implementation present, the measured actual is 2,738/3,100 semantic
+production lines, 450/450 moved production lines, and 10,648/11,100 evidence
+lines across 23/27 implemented paths within the 23/27 manifest. This does not
+activate production v1 writing or dispatch. Status: see
+`CurrentProgramCheckpoint.md`.
 
 The document/review/control component measured 1,753 lines at its first
 interface GO. Its 5,200-line ceiling reserves the §13 correction, retained

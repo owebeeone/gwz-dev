@@ -2,39 +2,28 @@
 
 Date: 2026-07-30
 
-Status: **Review 8 and independent F5-2 incorporated; R0, R1, and R2a
-approved; M5a custom-message slice approved; `--no-ff` deferred to v1/A1;
-I1/I2 and R4a accepted after independent re-review; the R3 strict-envelope,
-validated-model, unknown-field, open-v0 adapter, and archive-projection
-checkpoints are implemented with v1 still disabled; R4b-TI/R4b-TR and
-R4b-S/R4b-A/R4b-F/R4b-X are independently accepted; R4b-P P0/P0.1 are
-independently accepted and P2-P4 are implemented; P1 consumption exposed the
-compound root-preservation gap corrected by
-`GwzM5-8R4bInterfaceAmendment-2.md`; both independent reviewers accepted its
-interface through §13 and the production-disabled P0.2 implementation plus
-bounded settled-code remediation are accepted by both corrected-code reviews
-with no open P0-P3 finding; the Windows portability remediation is code-GO;
-both §14 settled-implementation reviews and the exact-SHA native release-
-platform run are GO; P1-WR1 is closed and P1 plus its checked-artifact R1
-boundary are independently accepted at the exact settled tuple; checked-
-artifact R2-R6 are now active before R4b-G and A1
-and later writers by A2–A4**
+Status: **The normative M5–M8 merge-lifecycle refactor proposal — invariants,
+package definitions, test strategy, stop conditions, and acceptance criteria;
+decisions of record include: M5a custom-message slice approved; `--no-ff`
+deferred to v1/A1. Per-package acceptance and progress state live in
+`CurrentProgramCheckpoint.md`, which supersedes live status paragraphs in
+this document (rulebook §7.3). The Date above and dates in the body are
+text-freeze dates, not current program state.**
 
-Review basis: `dev-docs/GwzM5-8Refactor-Review.md`,
-`dev-docs/GwzM5-8Refactor-Review-2.md`,
-`dev-docs/GwzM5-8Refactor-Review-3.md`,
-`dev-docs/GwzM5-8Refactor-Review-4.md`,
-`dev-docs/GwzM5-8Refactor-Review-5.md`,
-`dev-docs/GwzM5-8Refactor-Review-6.md`,
-`dev-docs/GwzM5-8Refactor-Review-7.md`,
-`dev-docs/GwzM5-8Refactor-Review-8.md`,
-`dev-docs/GwzM5-8Refactor-ReviewF5.md`, and
-`dev-docs/GwzM5-8Refactor-ReviewF5-2.md`. This revision accepts all findings
-from the eight numbered reviews and both independent F5 reviews. Review 8
-confirms the prior immediate approval but requires the executable merge plan
-to adopt the safe M5a/M5b/A1 release sequence. F5-2 confirms the earlier
-corrections and adds v3-checkpoint, migration-eligibility, and protocol-code
-precision.
+Status history: see git log and `CurrentProgramCheckpoint.md`.
+
+Review basis: the ten acceptance rounds filed as the
+`GwzM5-8Refactor-Review*` series (eight numbered rounds and two independent
+F5 rounds; superseded rounds live under `dev-docs/history/`). This revision
+accepts all findings from those reviews. Review 8 confirms the prior
+immediate approval but requires the executable merge plan to adopt the safe
+M5a/M5b/A1 release sequence. F5-2 confirms the earlier corrections and adds
+v3-checkpoint, migration-eligibility, and protocol-code precision.
+
+## Changelog
+
+- 2026-08-15: status narrative extracted to `CurrentProgramCheckpoint.md`
+  (`GwzProcessOptimization.md` §2.2).
 
 ## 1. Recommendation
 
@@ -2061,11 +2050,7 @@ M5a proves only the v0-safe message/integration gate.
 
 ### I1 — v1 directional interface memo
 
-Status: **accepted after independent I2 re-review** (2026-08-04). The initial
-reviews found no P0–P3 issue after the root-checkout and lock-membership
-clarifications. I2 inventory then exposed the selected-root metadata-base case;
-that correction and the complete I1/I2 boundary now have two independent GO
-verdicts with no remaining P0–P3 finding.
+Status: see `CurrentProgramCheckpoint.md`.
 
 - Freeze the M6 direction needed by v1: member audit separates integration ref
   from final checkout, but v1 permits only the existing checkout and contains
@@ -2147,15 +2132,7 @@ on the hardest future product policies.
 
 ### R4a — behavior-preserving acceptance extraction
 
-Status: **complete and independently accepted** (2026-08-04). The first
-architecture review required the next-action policy to become the actual
-production dispatcher and the aggregate implementation to be split into
-bounded owners. Both re-reviews then found a write-before-mutation regression
-on direct evidence/publication resume. The corrected dispatcher restores both
-the invocation-prefix participant verification and the durable
-`CommittingEvidence`/`PublishingCandidate` boundaries. Nested mutation faults,
-root metadata drift, and participant drift now pin those exact restart windows;
-both independent reviewers returned GO with no remaining P0–P3 finding.
+Status: see `CurrentProgramCheckpoint.md`.
 
 - Extract complete-lock construction and accepted-root-checkout derivation,
   publication-required classification, candidate-prefix reconciliation, and
@@ -2175,81 +2152,7 @@ writer, migration, or accepted-workspace persistence.
 
 ### R3 — record and adapter implementation, writer disabled
 
-Checkpoint status (2026-08-04): the mechanical v0 model split, strict
-single-parse YAML envelope, ordered v0–v4 header allocation registry,
-production-v0 dispatcher, location-aware store errors, fail-closed archived
-GC, codes 46–61, and structured Rust/Python/JSON/JSONL record context are
-implemented. Production installs only the v0 body decoder; exact v1 returns
-`UnsupportedRecordVersion` with A1 context before body decoding. No v1 writer,
-open-v0 migration entry point, or production upgrade harness is reachable.
-Independent closeout review returned **GO** with no P0–P3 finding. This is the
-envelope/protocol foundation checkpoint, not completion of R3's v1 adapter,
-archive projection, unknown-field manifest, or test-only atomic upgrade work.
-
-Next R3 model checkpoint (2026-08-04): the exact v1 accepted-workspace,
-recovery, rollback, preservation, and complete record shapes now have strict
-byte-only validation and an opaque canonical adapter behind `cfg(test)`.
-Validation closes baseline authority, selected target/root identity and order,
-participant/action/lifecycle state, acceptance, publication, terminal,
-rollback, and preservation cross-fields before canonicalization. Production
-still compiles no v1 body, serializer, writer, or migration path. Focused v1
-validation passed 39 tests, record-wire passed 17, the full core library passed
-760 with 1 ignored plus every integration suite, and the independent settled-
-tree review returned **GO** with no P0–P3 finding. The subsequent
-identity-aware v0/v1 unknown-field checkpoint is also implemented and
-independently accepted: stable sequence/action/error identities prevent
-extension rebinding, every surviving overlay is compared with its exact
-expected manifest, and all four v0 top-level v1 collisions fail closed.
-Production still compiles no v1 body, writer, or migration path.
-
-The archive-projection checkpoint is now implemented behind `cfg(test)` and
-independently accepted. It strictly projects terminal v0 AV0-B–G history and
-persisted v1 acceptance from archive bytes alone, keeps terminal outcome
-separate from acceptance availability, reports every closed legacy gap, and
-rejects contradictory participant, root, marker, candidate, publication, and
-preservation evidence. Its separate immutable cleanup worklist validates exact
-merge-owned backup refs and canonical stash evidence but authorizes no
-deletion. Exact v2–v4 and unknown envelopes still fail before body decoding;
-no v2–v4 projection bodies exist. The focused archive suite passed 17 tests,
-the full core library passed 801 with 1 ignored plus every integration suite,
-and two independent settled-tree reviews returned **GO** with no P0–P3
-finding.
-
-The open-v0 adapter checkpoint is now implemented behind `cfg(test)` and
-independently accepted. It performs true v0 structural validation, orders
-envelope and legacy no-ff rejection before matching, recovers omitted baseline
-bytes only from the closed I2 sources, binds raw unknown fields to the decoded
-record, verifies the exact seven-rule record/live descriptors, and validates
-the resulting canonical v1 model. Structurally valid unlisted modes, lifecycle
-states, participant outcomes, and multi-member workspaces stay on v0; genuine
-candidate, acceptance, evidence, and publication-prefix contradictions retain
-their typed errors. G23 passed 107 tests, the full core library passed 782 with
-1 ignored plus every integration suite, and independent settled-tree re-review
-returned **GO** with no P0–P3 finding. Archive projection and the test-only
-atomic upgrade were completed in the subsequent R3 checkpoints.
-
-The final R3 atomic-upgrade checkpoint is now implemented behind `cfg(test)`
-and independently accepted. It requires the named record to be the sole valid
-open operation, leaves valid-unlisted, legacy no-ff, collision, and
-multi-record inputs byte-exact without staging, and prepares all seven eligible
-I2 rules through the validated v1 model. Publication uses a unique temporary,
-file fsync, staged byte/model/unknown-manifest verification, source contention
-check, atomic replacement, directory fsync, and published hash/model
-verification. Its four fault boundaries prove exact v0 survival before rename,
-stale-temporary exclusion from open-operation discovery, and restart from the
-published v1 record after rename. Exact accepted-lock member extensions are
-authorized only at their derived v1 audit-row destination and remain present
-in both authoritative lock bytes and the typed audit row. The 106-line
-preparer, 187-line store harness, and 411-line test owner remain below 500
-lines; the compatibility binder is 644/650. G23 passed 107 tests, the full core
-library passed 801 with 1 ignored plus integration groups 10/10, 27/27, 4/4,
-and 2/2, strict Clippy/format/diff gates passed, and both independent
-settled-tree re-reviews returned **GO** with no P0–P3 finding.
-
-R3 is therefore complete as a production-disabled machinery package. Normal
-builds still install only the v0 decoder and expose no v1 writer, serializer,
-upgrade entry point, runtime flag, or migration dispatch. R4b is the next
-package; A1 remains the only production activation point.
+Status: see `CurrentProgramCheckpoint.md`.
 
 - Implement the approved v0/v1 wire strategy and envelope dispatcher; do not
   compile dormant v2–v4 lifecycle variants into the A1 canonical model.
@@ -2319,9 +2222,9 @@ The package is split into reviewed checkpoints:
    publication-prefix, verification, completion, and restart behavior.
 6. **R4b-X** implements participant execution/continue and exact
    recovery-origin dispatch. It may proceed beside R4b-F only after the
-   transition, store, and proof-token interfaces settle. It is implemented
-   behind the disabled production boundary and independently accepted with no
-   P0-P3 finding; its reviewed production ceiling is 1,050 lines.
+   transition, store, and proof-token interfaces settle. Its reviewed
+   production ceiling is 1,050 lines. Status: see
+   `CurrentProgramCheckpoint.md`.
 7. **R4b-P** first lands the lead-owned reverse-entry preview, F publication
    handoff, production entry issuers, stable reverse router, and protocol-
    neutral archive result. Its four reviewed lanes then implement preservation
@@ -2329,24 +2232,14 @@ The package is split into reviewed checkpoints:
    status plus the already frozen I2 field-10 cross-driver projection, and
    terminal archive/archive-worklist GC. The v1 mutation route remains
    production-disabled; existing durable-v0 successes gain the append-only
-   projection before A1. P0 passed both independent code re-reviews; the four
-   consumer lanes started and exposed the bounded P0.1 shared-interface
-   omissions, which were corrected and accepted. P1 then exposed that compound
-   root normalization/restoration could not represent separate marker, lock,
-   and raw-index durability boundaries. P0.2 replaces those phases with the
-   exact flattened graph and physical Git contract. It includes a restoration
-   parent phase because native stash can remove that empty directory and, after
-   the four-way physical matrix, explicit pre-clean parent phases for the valid
-   absent-source-parent/present-clean-marker direction. Both corrective-
-   interface reviews accepted the protocol through §13 and the
-   production-disabled P0.2 implementation is present. Its first settled-code
-   architecture review found bounded provenance, manifest, evidence, and
-   control defects; their remediation is accepted by both corrected-code
-   reviews. The Windows portability remediation is code-GO. P0.2 is accepted
-   locally, both amendment 2 §14 settled-implementation reviews and the exact-
-   SHA native release-platform run are GO. P1 and the checked-artifact R1
-   boundary are independently accepted at their exact settled tuple. P2-P4
-   stand; checked-artifact R2-R6 now precede R4b-G.
+   projection before A1. P0.2, frozen in
+   `GwzM5-8R4bInterfaceAmendment-2.md`, replaces the compound root
+   normalization/restoration phases with the exact flattened graph and
+   physical Git contract. It includes a restoration parent phase because
+   native stash can remove that empty directory and, after the four-way
+   physical matrix, explicit pre-clean parent phases for the valid
+   absent-source-parent/present-clean-marker direction. Checked-artifact
+   R2-R6 precede R4b-G. Status: see `CurrentProgramCheckpoint.md`.
 8. **R4b-G** runs aggregate fault, compatibility, byte-equivalence,
    unknown-field, privacy, call-graph, and settled-tree review gates.
 
