@@ -51,3 +51,20 @@ is resolved and the per-commit lane gate has its first successful CI
 execution. Remaining matrix work: W1 (index-path containment, 28-class),
 W3 (access-denied, now ~37), W4 (sharing violations), W6 (2 protocol
 currency) — the R2-F product packages.
+
+## W1 fix (run 3 pending)
+
+W1 root cause confirmed at `provider/index.rs`: raw `PathBuf` equality
+between GWZ's recorded git-directory spelling and libgit2's reported index
+path — guaranteed to diverge under Windows 8.3 short names
+(`RUNNER~1`-class temp paths). Fixed by comparing canonicalized *parents*
+(the always-present anchor; the index file itself may not exist) plus an
+exact `index` file-name check. W3 instrumentation plan for the next
+session: the error-5 opens route through `CheckedArtifact::acquire`'s
+read-only observation chain (`observation.rs` acquire → ambient root Dir →
+`durable_identity`/`canonical_path_identity` → traverse), so the failing
+syscall is not identifiable from the current error text; add the failing
+operation name to the io-error labels in that chain (labels only, no
+behavior), push, re-dispatch, then fix the identified Windows semantics
+(candidates: directory opens without backup semantics in the identity
+helpers; read-only-attribute interactions in replace/quarantine paths).
