@@ -95,10 +95,13 @@ below (Code review §0; F-8). Tree-condition note, stated honestly per the
 State review's tuple: at review time the gwz-core **working tree** carried
 uncommitted modifications from an in-flight lane (including
 `git/gitbackend/merge_recovery.rs` and
-`v1_lifecycle/authority/observe/reverse/rollback.rs`); no cited
-forward/reconciliation semantics live in those files, all citations here
-are against **committed** blobs, and the M5b-IF freeze tuple must be
-re-cut against a clean committed tree at acceptance (State P3-2).
+`v1_lifecycle/authority/observe/reverse/rollback.rs`); one cited file
+(`merge_recovery.rs`, cited at :424-433 for §3.4/§4.4/§4.6) does carry
+uncommitted hunks, but they fall at :6/:149+/:224+ inside
+`abort_merge`/`set_branch_target_checked` and overlap no cited range
+(round-2 Code N-2); all citations here are against **committed** blobs,
+and the M5b-IF freeze tuple must be re-cut against a clean committed
+tree at acceptance (State P3-2).
 
 ### 2.1 Already present and accepted (M5b consumes, must not re-open)
 
@@ -531,9 +534,12 @@ claim cannot be over-read:
   does not reject leading/trailing spaces in name/email; libgit2's
   `Signature::new` trims that "crud", so a forged space-padded spec can
   execute — and the created commit then never satisfies
-  `signature_matches_prepared`, leaving the participant permanently
-  Ambiguous: wrong evidence is never adopted; availability is lost until
-  operator action. M5b pins this with the §7 negative row
+  `signature_matches_prepared` **on any restart or re-verification
+  before the outcome write** (an uninterrupted run completes its outcome
+  write normally; the permanent Ambiguity materializes when
+  restart-based reconciliation of the still-pending action intervenes —
+  round-2 State P3): wrong evidence is never adopted; availability is
+  lost until operator action. M5b pins this with the §7 negative row
   `forged_non_canonical_signature_spec_executes_then_never_reconciles`;
   a validator trim/canonicality rule is deliberately **not** taken in M5b
   (it would be a production validator edit — dual-tier under §8.1's rule
@@ -759,10 +765,17 @@ which forge `no_ff` rows precisely to prove rejection
 the assert therefore scans writer outputs and positive-path fixtures only,
 with the negative-fixture files enumerated as the exact allowlist;
 T-4 call-graph assertion that `ForceMergeCommit` construction sites are
-`v1_lifecycle`-only — **resolved variant: the `#[cfg(not(test))]`
-compile-shim** (misuse is a compile error; machine-checked, not
-convention-checked), adopting the State review's §5 recommendation over
-the grep variant;
+`v1_lifecycle`-only — **resolved variant: the structural scan**
+(boundary-checker idiom: enumerate construction sites, assert the
+allowlist), reverted from round 1's `#[cfg(not(test))]` compile-shim per
+the round-2 Code finding N-1: the shim is compiled into production
+builds (contradicting the ratified §8.3 zero-production-line ceiling)
+and has no coherent zero-production form, since production code
+legitimately matches on the variant (`merge_prepared.rs:140-195`,
+`contract.rs:269-280`) — a poisoned variant is a compile break, not a
+tripwire. The State axis's machine-checked-not-convention-checked
+requirement is preserved: the structural scan executes in CI on every
+push via the checker lane;
 T-5 retained-reader manifest lane: v0.10.2 rejects the
 v1 no-ff envelope pair exactly as the frozen matrix requires
 (`GwzM5-8I2CompatibilityContract.md:266-273` — fixture addition to the
@@ -993,8 +1006,15 @@ OPEN DECISIONS … tracked review debts". That language is superseded: the
   not A1-gated**. No M5b interaction beyond §5.4's unchanged posture.
 - **D3** — durable preservation cursor = minimal durable cursor
   (**per-owner no-op skip rows + reset-completion bit**) as a pre-A1,
-  mandated-dual I2 ActionJournal/Record amendment; drafting has begun
-  (`GwzM5-8DurableCursorAmendment.md`, gwz-dev `9893c5a`). **Amendment-train
+  mandated-dual I2 ActionJournal/Record amendment; under mandated dual
+  review — round-1 NO-GO/NO-GO with the wire shape affirmed on both
+  axes, text remediation applied and committed (`e9396a9`), focused
+  re-verdicts pending (`GwzM5-8DurableCursorAmendment.md`;
+  reports `GwzM5-8DurableCursor-Review{Code,State}.md`). This
+  composition position **binds on the property (mode-blind,
+  anchor-preserving marker rows), not on D3's internal write edges** —
+  D3 text rounds within that property (e.g. the round-1 marker-backfill
+  remedy) do not re-open M5b-IF (round-2 State P4). **Amendment-train
   interaction M5b must not alias (State P2-2):** D3 will amend the very
   journal-contract sentences near those §3.3/§5.3 cite (e.g.
   `GwzM5-8I2ActionJournalContract.md:156-166`, "persists neither no-op
