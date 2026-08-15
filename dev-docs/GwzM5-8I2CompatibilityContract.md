@@ -4,6 +4,14 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-10 by `GwzM5-8R4bInterfaceAmendment-1.md` §4: the normal-build
+boundary is split by capability, so the archived-v0 decoder, neutral archive
+projection, and canonical record-location acquisition are normal-build code
+consumed by ordinary status and GC, while v1 body decoding, open-v1 helpers,
+and migration remain test-gated until A1. §9 below describes the superseded
+test-only form; this document is boundary-authoritative only as amended by
+that accepted interface.
+
 This document freezes v1 envelope dispatch, v0 adaptation/migration,
 archive-only projection, protocol allocation, retained-reader evidence, and
 activation boundaries. The companion `GwzM5-8I2RecordContract.md` freezes the

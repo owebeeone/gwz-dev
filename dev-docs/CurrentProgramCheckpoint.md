@@ -10,8 +10,8 @@ by this file (rulebook §7.3).**
 
 | Repository | Commit | Note |
 | --- | --- | --- |
-| gwz-dev (root) | `f7ba3235703b11eb1c9a6a72e2179afa2b7b5837` + this docs commit | literal restatement per ReviewCode-3 P3-5 |
-| gwz-core | `0d8382e1cbf6500e499bf2dc5ed23d6256f6e642` | R2-C2 remediation tip (b923109 + pin fix) |
+| gwz-dev (root) | `791807502e4e4b90d243b59f8ffce4f1c22a4516` + this docs commit | literal restatement per ReviewCode-3 P3-5 |
+| gwz-core | `f2fceaf4ff5f2b88c4d7d8ea07cd2363bf7924ed` | Windows tail train (run-7 dispatch); pushed |
 | gwz-cli | `3cca145` | Close R4b P1/P2 remediation gate |
 | gwz-py | `929efb0` | Implement R4b reverse merge lifecycle |
 | taut | `f008419` | 0.8.x fallible from_cbor line |
@@ -46,13 +46,9 @@ dual, cross-model where available (mandated tier).
 - M5-8 packages through R4b P1/P2 remediation: closed (eleventh-round GO/GO).
 - R2-C0: accepted (Interface-ReviewCode-3 / ReviewState-3).
 - R2-C1: accepted (AggregateClassifier -2 rounds, no P0-P2).
-- R2-C2: **open.** The `ReviewCode-2` NO-GO (post-verification publication
-  race) drove the accepted sealed-primitive design
-  (`GwzM5-8R2CCatalogBootstrapAmendment.md` §4.1). Implementation has
-  proceeded through the Windows retained-handle/destination-path commits
-  (`e90de60`, `e07eb28`, `da58135`). Completeness against §4.1's four edges
-  and the executed per-fault interruption/recovery matrix are **unverified**;
-  no post-fix re-review has run.
+- R2-C2: **accepted** 2026-08-15 at root `f7ba323` / gwz-core `0d8382e`
+  after the round-4 GO/GO (see Next ordered actions item 3 for the full
+  round history, deviation record, and closed obligations).
 
 ## Open findings and obligations
 
@@ -72,12 +68,46 @@ dual, cross-model where available (mandated tier).
   (`a350746`, `d84a30d` in the release-diagnostic clone) to port or
   supersede deliberately; 98-failure matrix to classify (checkpoint doc
   "Windows backlog").
-- Pre-A1 checklist (`GwzM5-8ProgressReviewF5.md` §9): I2 supersession
-  banners (next docs task), operator escape story for unresolvable states,
-  durable preservation-cursor decision, panic-invariant audit,
-  `decode.rs:86` removal tied to the A1 diff.
+- Pre-A1 checklist (`GwzM5-8ProgressReviewF5.md` §9), status 2026-08-15:
+  **item 1 (I2 re-freeze) CLOSED** — the wire-doc banners/TD §1 landed
+  2026-08-11 upstream; this docs commit adds the fourth stale contract
+  (Compatibility, Amendment-1 §4 normal-build split) with banner + gate
+  coverage (11 sources / 147 assertions), single-axis review GO
+  (`GwzM5-8I2Refreeze-ReviewConsistency.md`, 2 informational P3s).
+  **Item 3 drafted** — `GwzM5-8OperatorEscapeDesign.md` (DRAFT, pending
+  review before adoption; 10 owner decisions in its §10; flags a v0-line
+  wedge-with-no-escape owed a runbook independent of A1). **Item 5 audit
+  half done** — `GwzM5-8PanicInvariantAudit.md` (104 sites: 82 class-A
+  proven, 2 class-B reachable with typed twins, 11 class-C; ~300-LOC
+  pre-A1 conversion plan in 7 packages; 3 of the review's original sites
+  already resolved by the landed P1 slice). Still open: durable
+  preservation-cursor decision (item 4), `decode.rs:86` removal tied to
+  the A1 diff, and the item-5 conversion packages.
 - Rulebook P3 residue: section-anchor checking in the doc gate (Phase 2
   tooling).
+
+## Windows platform campaign (2026-08-15)
+
+Ledger: `GwzWindowsMatrix-Classification.md`; diagnosis:
+`GwzWindowsMatrix-ExactEvidenceDiagnosis.md`. Burn-down 126 → 52 unique
+failures across runs 1-6 (W1 index canonicalization, W2 fixture branches,
+W3 read-only fsync, W4 publication sharing: all extinct at zero); run 6b
+replay bit-identical (deterministic tail, no flakes). Run-7 train
+(`f2fceaf`, dispatched 31886821459) carries the sharing-tail disposition
+(2 fixed / 6 via the parent.rs publish-handle fix / 15 OS-impossible
+injections gated with a positive Windows guarantee test), the os-87
+rename twin fix, CRLF/longpaths fixture pins, the W6 generator install,
+and cache-on-failure. Remaining after run 7 (expected): the (b) cluster —
+CRLF-smudge and durability-anchor exact-evidence findings — owned by the
+**exact-evidence amendment lane** (fixes + Unix repros in progress;
+**dual Code+State review mandated** before landing; probe branch
+`probe/exact-evidence-diagnosis` confirmed the runner's system
+`core.autocrlf=true` precondition). New tracked items from the campaign:
+resolver Publication-arm diagnosability (`execution.rs:16-21` masks
+publication failure causes); MAX_PATH product exposure (~173-char
+`ca1-*` names; the private-area relocation option under `.git/` would
+retire it — candidate for R2-F scope); rollback preflight anchor-dirt
+(in the amendment lane's scope addition).
 
 ## Next ordered actions
 
@@ -215,15 +245,17 @@ dual, cross-model where available (mandated tier).
    unlabeled Windows port. Native Windows compile/run of the incorporated
    form remains unverified from this host (libz-sys cross-compile limit)
    and is owed at the R2-F gate or the next Windows dispatch run.
-   **Remaining from this item**: classify the 98-failure Windows matrix —
-   requires Windows execution; parked for the operator's Windows runner or
-   the next dispatched platform run (cannot execute or trigger CI from this
-   host without a push, which is not authorized).
-5. I2 supersession banners + TransitionDesign §1 authority correction +
-   the §2.2 status-strip of `GwzM5-8Refactor.md` and the ledger (docs-only
-   package, may interleave; the status-strip also unblocks the remaining
-   L1-33 history sweep).
-6. Then R4b-G → M5b → A1 per `GwzMergeCheckpoint-v0.10.5.md` resume order.
+   **Remaining from this item — superseded 2026-08-15**: push was
+   authorized, the dispatch-only `windows-matrix.yml` workflow was added,
+   and the classification/burn-down is running as the Windows platform
+   campaign (see that section above; ledger in
+   `GwzWindowsMatrix-Classification.md`).
+5. ~~I2 supersession banners + TD §1 + status-strip~~ **Done**: wire-doc
+   banners/TD §1 landed 2026-08-11; status-strip at `53323d0`; the
+   Compatibility-contract banner + gate coverage land in this docs commit
+   (review GO — see the pre-A1 bullet above).
+6. Then platform-matrix acceptance (campaign section above) → R4b-G →
+   M5b → A1 per `GwzMergeCheckpoint-v0.10.5.md` resume order.
 
 ## Metrics (per checkpoint; §6 of the optimization plan)
 
