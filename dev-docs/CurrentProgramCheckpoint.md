@@ -184,10 +184,19 @@ Recorded consequences (its §3 Step A):
   pending review adjudication (separate `BeginRollbackOverridden`
   edge because the design's predecessor set could not reach its own
   U1 wedge; doctrine rule 1 refined; `MergeQuarantine*` type prefix;
-  16-hex confirm token). Its Code+State dual review is IN FLIGHT and
-  runs to completion, recorded **NON-GATING for A1 and second-lane**
-  per thin A1 (`GwzFasterProposal.md` §2/§4): reports file on
-  completion; remediation and acceptance are blocked on operator
+  16-hex confirm token). **Round-1 dual review COMPLETE and filed**
+  (peer-blind, cross-axis): Code NO-GO — 0 P0 / 3 P1 / 5 P2 / 6 P3
+  (`-ReviewCode.md`; verdict: all three P1s sentence-scale contract-
+  delta closure gaps, core wire/transition engineering sound; wire
+  allocations, sixth-field serde story, entry-edge repair all
+  verified); State NO-GO — 0 P0 / 6 P1 / 5 P2 / 4 P3
+  (`-ReviewState.md`; consent-digest chain, ordinary-abort terminal
+  leak, rule-8 decidability, sidecar lifecycle). Blind convergence
+  note: both axes independently found the unamended cursor-derivation
+  contract (ActionJournal §2 :178-192 — Code P1-1 ≡ State P1-3).
+  Recorded **NON-GATING for A1 and second-lane** per thin A1
+  (`GwzFasterProposal.md` §2/§4): the merged remediation round (round
+  2 of 2 under the cap) and any acceptance are blocked on operator
   handoff, not this implementor's work. Side finding routed: the accepted
   durable-cursor amendment's "post-GC record rewrite" phrasing is
   inaccurate (`merge/gc.rs:196` shapes the response projection only)
