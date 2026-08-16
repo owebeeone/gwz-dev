@@ -74,9 +74,33 @@ dual, cross-model where available (mandated tier).
   (Compatibility, Amendment-1 §4 normal-build split) with banner + gate
   coverage (11 sources / 147 assertions), single-axis review GO
   (`GwzM5-8I2Refreeze-ReviewConsistency.md`, 2 informational P3s).
-  **Item 3 drafted** — `GwzM5-8OperatorEscapeDesign.md` (DRAFT, pending
-  review before adoption; 10 owner decisions in its §10; flags a v0-line
-  wedge-with-no-escape owed a runbook independent of A1). **Item 5 audit
+  **Item 3: all ten escape decisions DECIDED 2026-08-16 and the
+  amendment DRAFTED.** `GwzM5-8OperatorEscapeDesign.md` §10 dispositions:
+  Q1-Q7 = the design's recommendations (sixth top-level record field;
+  the design's protocol shape; wire pre-A1 with implementation at or
+  before A1; byte-identical restore; `--forget-refs` accepted; user
+  docs + error pointer; quarantine/restore/force-abandon names).
+  **Operator decisions**: Q8 `--reason` OPTIONAL, never mandatory;
+  Q9 = (b) runbook-first, no v0 backport unless later requested;
+  Q10 = per-side consent with the provable-collapse single-prompt
+  refinement ("adopt both recommendations and proceed with the
+  amendment"). `GwzM5-8OperatorEscapeAmendment.md` (1,760 lines,
+  DRAFT) now carries the wire/transition/protocol deltas — third
+  pre-A1 train on the I2 contracts; its §6.4 is the three-train
+  composition authority; its §10 records design-citation corrections
+  (e.g. `--force` not `--destructive`) and drafter refinements
+  pending review adjudication (separate `BeginRollbackOverridden`
+  edge because the design's predecessor set could not reach its own
+  U1 wedge; doctrine rule 1 refined; `MergeQuarantine*` type prefix;
+  16-hex confirm token). Mandated dual review (Code+State, Fable
+  tier) launching on the draft. Side finding routed: the accepted
+  durable-cursor amendment's "post-GC record rewrite" phrasing is
+  inaccurate (`merge/gc.rs:196` shapes the response projection only)
+  — wording erratum for its next docs pass, no behavior involved.
+  (Design DRAFT status otherwise unchanged; the amendment supersedes
+  it where they disagree, per the amendment's authority clause;
+  v0-line wedge runbook stays owed independent of A1 per Q9.)
+  **Item 5 audit
   half done** — `GwzM5-8PanicInvariantAudit.md` (104 sites: 82 class-A
   proven, 2 class-B reachable with typed twins, 11 class-C; ~300-LOC
   pre-A1 conversion plan in 7 packages; 3 of the review's original sites
