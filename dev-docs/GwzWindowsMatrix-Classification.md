@@ -1,4 +1,39 @@
-# Windows matrix classification — GREEN at run 11
+# Windows matrix classification — GREEN at run 11; run 12/13 validation cycle
+
+**Run 12 — 31911445128 on `d70bd57` (the day's full landing set):
+1320/2/1.** Both failures were brand-new tests on first native
+execution (the predicted first-dispatch class): the destination-window
+ancestor test unwrapped an ancestor rename Windows denies at OS level
+(error 5 — the denial IS the property; fixed to assert it, mirroring
+the retained-directory guarantee test), and the LFS-allowlist positive
+failed because CI runners ship system git-lfs with
+`filter.lfs.required=true`, hard-failing the fixture's porcelain
+checkout on fake pointer content (fixed with repo-local hermeticity
+pins; the gate's allowlist keys on the attribute NAME and
+short-circuits before any config probe, so the pins cannot change the
+gate's decision — verified at recovery_support.rs:75-77, and the fix
+was proven under a reproduced hostile system-lfs config locally).
+
+**Platform-leg attribution CORRECTION (per L1-16 — the earlier record
+inverted the legs):** in runs 31901724907 and 31911446334, the
+near-green leg is **macos-14** (1358/1/1 in run 12's sibling — its
+single failure was the same LFS test, now fixed) and the mass-fail leg
+is **ubuntu-24.04-arm** (1094/266/1 in 9.92s). The ARM failure is ONE
+environmental substrate fault, not 266 bugs: 143 direct
+`Bad file descriptor (os error 9)` panics across exactly three sites —
+`sync_parent` fsync (observation.rs:44 ×79, transition.rs:413 ×13) and
+the ext4-UUID ioctl (linux.rs:126 ×50) — with ~123 downstream
+cascades. Diagnostic signature: `fstatfs` succeeds on the same
+descriptor while `fsync`/`ioctl` return EBADF — O_PATH-class directory
+descriptor semantics on the runner's default mount, a substrate the
+suite was never evidenced against (the identity probe runs under sudo
+on a purpose-made ext4 remount). Cheapest lead, tracked for the ARM
+package: `query_error` (linux.rs:173-181) maps only
+EOPNOTSUPP/ENOSYS/ENOTTY/EINVAL to graceful `unsupported` — EBADF
+falls through to a hard Io error instead of a capability downgrade.
+The earlier "macOS burn-down" framing collapses to: macOS is green
+after the LFS fix; the real platform work is the ARM64 substrate
+class.
 
 **Final state: run 11 (`31897404688` on `f36d20d`, 2026-08-16):
 1306 passed / 0 failed / 1 ignored + integration 29/0 — the first
