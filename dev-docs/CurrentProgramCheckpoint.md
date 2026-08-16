@@ -10,8 +10,8 @@ by this file (rulebook §7.3).**
 
 | Repository | Commit | Note |
 | --- | --- | --- |
-| gwz-dev (root) | this docs commit (parent: the run-11 train) | literal restatement per ReviewCode-3 P3-5 |
-| gwz-core | `f36d20dda7af631f6d9a5657affd481022bcebed` | run-11 train — first GREEN Windows matrix; pushed |
+| gwz-dev (root) | this docs commit (parent: `36754a5`, the run-12 residue train) | literal restatement per ReviewCode-3 P3-5 |
+| gwz-core | `90d3f8a` | run-12 residue fixes — Windows GREEN revalidated (run 13), macOS GREEN; pushed |
 | gwz-cli | `3cca145` | Close R4b P1/P2 remediation gate |
 | gwz-py | `929efb0` | Implement R4b reverse merge lifecycle |
 | taut | `f008419` | 0.8.x fallible from_cbor line |
@@ -102,7 +102,12 @@ and cache-on-failure. **CAMPAIGN COMPLETE 2026-08-16: run 11 (`f36d20d`) is GREE
 burn-down 126 → … → 1 → 0; the run-9 regression and its mechanism are
 recorded in the ledger; the finalization_root closure came via the
 `probe/finalization-diagnosis` single-test probe unmasking a fixture
-identity gap). Matrix-green does NOT close the tripwired residuals
+identity gap). **Revalidated at run 13 (`90d3f8a`): Windows 1322/0/1;
+the sibling platform run's macos-14 leg is 1359/0/1 — first macOS
+green. Three of four platform legs green; the ubuntu-24.04-arm leg
+stays 1094/266/1 (one EBADF substrate fault + cascades, its own
+tracked package; lead: linux.rs:173-181 errno allowlist).**
+Matrix-green does NOT close the tripwired residuals
 (real-Windows exact-evidence satisfiability; stash_save filtered
 reset) nor the amendment's OPEN DECISIONS — all remain tracked below.
 Next per resume order — SCOPE CORRECTION 2026-08-16: the gate to

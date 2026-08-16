@@ -1,4 +1,23 @@
-# Windows matrix classification — GREEN at run 11; run 12/13 validation cycle
+# Windows matrix classification — GREEN (runs 11, 13); macOS GREEN at run 13
+
+**Run 13 — 31921194567 on `90d3f8a` (run-12 residue fixes):
+1322/0/1 — GREEN.** Both run-12 first-dispatch failures cleared on
+native re-execution: the destination-window ancestor test now asserts
+the OS-level denial (raw os error 5/32, source untouched) instead of
+unwrapping the rename, and the LFS fixture's repo-local hermeticity
+pins survive the runners' system git-lfs `filter.lfs.required=true`.
+Same test universe as run 12 (1322 executed), both conversions to
+passes, no count drift.
+
+**Platform run 31921196151 on `90d3f8a` (sibling of run 13):**
+the **macos-14 leg is 1359/0/1 — the first macOS green on record**
+(run 12's single macOS failure was the same LFS test, cleared by the
+same hermeticity fix; 752.70s). The ubuntu-24.04-arm leg is 1094/266/1
+in 10.30s — failure count byte-identical to run 12, as predicted: this
+train did not touch the EBADF substrate class, which remains the
+entire ARM64 delta (tracked for its own package; cheapest lead is the
+`query_error` errno allowlist at linux.rs:173-181). Three of four
+platform legs (Windows, ubuntu ext4 probe, macOS) are now green.
 
 **Run 12 — 31911445128 on `d70bd57` (the day's full landing set):
 1320/2/1.** Both failures were brand-new tests on first native
@@ -35,7 +54,8 @@ The earlier "macOS burn-down" framing collapses to: macOS is green
 after the LFS fix; the real platform work is the ARM64 substrate
 class.
 
-**Final state: run 11 (`31897404688` on `f36d20d`, 2026-08-16):
+**Green state: revalidated at run 13 (1322/0/1 on `90d3f8a`).
+First green: run 11 (`31897404688` on `f36d20d`, 2026-08-16):
 1306 passed / 0 failed / 1 ignored + integration 29/0 — the first
 fully green Windows matrix on record. Eleven-run burn-down:
 126 → 118 → 95 → 93 → 64 → 52 → 24 → 9 → 34 (recorded regression) →
