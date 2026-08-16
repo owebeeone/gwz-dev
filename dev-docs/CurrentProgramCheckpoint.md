@@ -41,6 +41,98 @@ in force now; its checklist and CI wiring land in Phase 3, before the next
 contract freeze at I6.) Recorded review tiers: R2-C2 settled re-review —
 dual, cross-model where available (mandated tier).
 
+## Operator decision 2026-08-16 — thin A1
+
+Authority: `dev-docs/GwzFasterProposal.md` (operator instruction; passing
+that file is the L1-28 decision; committed with this checkpoint update).
+Its §2, quoted verbatim:
+
+> **Thin A1.** A1 enables the v1 writer and `--no-ff` on the accepted R4b
+> lifecycle after R2-D settles and M5b's already-bound proofs (T-6 +
+> clean-tree re-cut) are green. R2-E, R2-F, R3, R4, R5, and R6 are **not**
+> A1 gates. They remain real work; they are hardening and consumer
+> conversion, scheduled after A1 or in parallel, not in front of it.
+>
+> Residual you are ordered to accept and name: merge store, archive,
+> stash bundles, and related consumers keep their current call graphs
+> through A1; `recover_or_create` stays without a production caller;
+> legacy writers may still mutate inside `.gwz/checked-artifacts` until
+> R2-E. That residual is already the R2-D defer-out (`GwzM5-8R2D-Plan.md`
+> §5 items 1–5). Coupling those items to A1 was a later gate-chain
+> sentence, not a physical dependency of writing v1 records.
+>
+> **No further pre-A1 I2 contract trains.** A1 ships on the I2 contracts
+> already frozen, plus amendments already accepted (including the durable
+> cursor). The drafted operator-escape amendment
+> (`GwzM5-8OperatorEscapeAmendment.md`, ~1,760 lines) and any further
+> panic-invariant or escape-wire freeze are **not A1 gates**. Keep the
+> v0 wedge runbook owed on its own (Q9). Do not launch mandated dual
+> review of a third I2 train as a prerequisite to A1.
+>
+> **R2-D review caps (already adopted; now binding on this package).**
+> Dual peer-blind review only at (a) the Phase 0 interface freeze, (b)
+> the Phase 1 admission kernel if you still treat Idle↔Preparing as a
+> durable-transition kernel, and (c) the Phase 5 settled-tree gate.
+> That is three duals maximum, not four. Interior steps are single-axis
+> with automatic escalation on P0/P1/P2. Two-round remediation cap:
+> a third new architectural root cause on the same object is
+> redesign-or-accept, not RemPlan-5. P3s file and continue; they do not
+> become packages and they do not enlarge R2-D. While Phase 0 is in
+> review, start Phase 1 failing tests (`GwzProcessOptimization.md` §4.4).
+>
+> **Track P before the freeze is reviewed.** Before
+> `GwzM5-8R2DInterfaceFreeze.md` goes to dual review, spike the admission
+> publish/retire path on macOS and Windows against the already-sealed
+> `publish_verified_no_replace` family. Do not freeze the four
+> `managed_operation_unavailable` defaults into required methods until
+> each new physical edge names an admitted primitive per platform
+> (`GwzProcessOptimization.md` §3.1). Policy is already in force; apply
+> it to this freeze.
+>
+> **Lane split.** You remain the sole writer on merge/catalog/R2-D
+> (L1-06). Pre-A1 docs (escape amendment review, panic-conversion
+> packages, runbook) and M5b proof/doc work are a second lane. Do not
+> pick them up. Record the split in the checkpoint. If a second agent
+> is not yet handed off, leave those items listed as "blocked on
+> operator handoff" and continue R2-D.
+
+Recorded consequences (its §3 Step A):
+
+- **R2-D settle is the last catalog gate on the A1 path.** The gate-chain
+  paragraph below is rewritten accordingly; the superseded clauses are
+  named, with verbatim quotes, in `GwzM5-8ThinA1Amendment.md` (drafted
+  with this update; mandated dual review as a process/scope amendment).
+- **R2-D review tiers, recorded now (supersedes the four-dual listing
+  in `GwzM5-8R2D-Plan.md` §4/§6/§9):** dual peer-blind at the Phase 0
+  interface freeze, the Phase 1 admission kernel, and the Phase 5
+  settled-tree gate — three duals maximum. Interior steps, including
+  the Phase 3 and Phase 4 settles, are single-axis with automatic
+  escalation on P0/P1/P2. Two-round cap; a third architectural root
+  cause on one object is redesign-or-accept.
+- **Second lane — blocked on operator handoff; this implementor does
+  not pick these up:** operator-escape amendment review handling (its
+  Code+State dual review was already in flight when this instruction
+  arrived; it runs to completion and its reports file as NON-GATING
+  for A1 — remediation and any acceptance ritual are second-lane),
+  panic-conversion packages (audit item 5, incl. the two reachable
+  class-B sites), the v0 wedge runbook reproductions/publication (Q9),
+  and M5b proof/doc work (incl. the N-4 wording erratum).
+- **Moved off the A1 gate list (tracked, non-gating):** the
+  operator-escape amendment and any further I2 wire trains; panic
+  conversions; the ARM64 EBADF substrate package; MAX_PATH relocation
+  (Phase 4.3 still only *decides* coexistence); D2 stays release-gated
+  (unchanged). Per the instruction's §5, unchanged and still binding:
+  L1-03/13/14/15/16/17/19/26/32, wire-freeze-first + L2-04
+  retained-reader harness, sealed publication (§4.1), v1 `cfg(test)`
+  until the A1 activation review, M5b's zero-production-line ceiling
+  with T-6 + clean-tree re-cut, and the R2-D stop clauses
+  (RemPlan-4 :1082-1085) — thin A1 waives none of these.
+- **Track P before freeze review:** the Phase 0 freeze memo must name
+  an admitted primitive per new physical edge per platform (macOS and
+  Windows spike against the sealed C2-proven family) before the freeze
+  goes to dual review; the four `managed_operation_unavailable`
+  defaults are not frozen into required methods until it does.
+
 ## Accepted through
 
 - M5-8 packages through R4b P1/P2 remediation: closed (eleventh-round GO/GO).
@@ -92,8 +184,11 @@ dual, cross-model where available (mandated tier).
   pending review adjudication (separate `BeginRollbackOverridden`
   edge because the design's predecessor set could not reach its own
   U1 wedge; doctrine rule 1 refined; `MergeQuarantine*` type prefix;
-  16-hex confirm token). Mandated dual review (Code+State, Fable
-  tier) launching on the draft. Side finding routed: the accepted
+  16-hex confirm token). Its Code+State dual review is IN FLIGHT and
+  runs to completion, recorded **NON-GATING for A1 and second-lane**
+  per thin A1 (`GwzFasterProposal.md` §2/§4): reports file on
+  completion; remediation and acceptance are blocked on operator
+  handoff, not this implementor's work. Side finding routed: the accepted
   durable-cursor amendment's "post-GC record rewrite" phrasing is
   inaccurate (`merge/gc.rs:196` shapes the response projection only)
   — wording erratum for its next docs pass, no behavior involved.
@@ -104,9 +199,12 @@ dual, cross-model where available (mandated tier).
   half done** — `GwzM5-8PanicInvariantAudit.md` (104 sites: 82 class-A
   proven, 2 class-B reachable with typed twins, 11 class-C; ~300-LOC
   pre-A1 conversion plan in 7 packages; 3 of the review's original sites
-  already resolved by the landed P1 slice). Still open: durable
-  preservation-cursor decision (item 4), `decode.rs:86` removal tied to
-  the A1 diff, and the item-5 conversion packages.
+  already resolved by the landed P1 slice). Item 4 (durable
+  preservation-cursor) is DECIDED — D3 adopted, wire accepted
+  (`GwzM5-8DurableCursorAmendment.md`); its implementation package
+  belongs to the A1 window, not started per thin A1 §3. Still open:
+  `decode.rs:86` removal tied to the A1 diff; the item-5 conversion
+  packages are SECOND-LANE (blocked on operator handoff, non-gating).
 - Rulebook P3 residue: section-anchor checking in the doc gate (Phase 2
   tooling).
 
@@ -134,16 +232,19 @@ tracked package; lead: linux.rs:173-181 errno allowlist).**
 Matrix-green does NOT close the tripwired residuals
 (real-Windows exact-evidence satisfiability; stash_save filtered
 reset) nor the amendment's OPEN DECISIONS — all remain tracked below.
-Next per resume order — SCOPE CORRECTION 2026-08-16: the gate to
-R4b-G is **RemPlan-4's R2-R6 chain** (`GwzM5-8R4bP1P2-RemPlan-4.md`
-§4), not merely two tracked items; this checkpoint's earlier "R2-D
-legacy pinning + R2-F native tests" shorthand understated it.
-Position: R0-L and R1 accepted; **mid-R2** (the catalog-bootstrap
-slice C0/C1/C2 accepted; R2-D managed recovery on
-`CheckedDurablePathV1` and further conversion items remain, TDD-gated
-per the amendment); then R3 complete-checkout/aggregate handoff, R4
-executable-C7 reconciliation, R5 settled gate with real
-three-platform evidence jobs, R6 independent settled-tree re-review.
+Next per gate chain — **thin A1** (operator decision 2026-08-16,
+`GwzFasterProposal.md` §2, superseding this checkpoint's SCOPE
+CORRECTION of the same date; superseded clauses quoted in
+`GwzM5-8ThinA1Amendment.md`): **R2-D settle is the last catalog gate
+on the A1 path.** A1 enables the v1 writer and `--no-ff` on the
+accepted R4b lifecycle after R2-D settles (its Phase 5 dual gate) and
+M5b's already-bound proofs (T-6 + clean-tree re-cut) are green.
+R2-E, R2-F, R3, R4, R5, and R6 are NOT A1 gates — real work, kept,
+scheduled after A1 or in parallel as hardening/consumer conversion,
+with the named accepted residual recorded in the thin-A1 section
+above. Position: R0-L and R1 accepted; **mid-R2** (the
+catalog-bootstrap slice C0/C1/C2 accepted; R2-D ADOPTED and in Phase
+0, TDD-gated per the amendment).
 Scoping: `GwzM5-8R2D-Plan.md` is **ADOPTED 2026-08-16** (lane owner;
 §9 adoption record carries the six §7 decision dispositions — C3 as
 Phase 1 badged R2-C tail; quarantine/relocation preferred direction
