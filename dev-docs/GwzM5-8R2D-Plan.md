@@ -2,7 +2,9 @@
 
 Date: 2026-08-16
 
-Status: **DRAFT — pending lane-owner adoption.** This is the scoping
+Status: **ADOPTED 2026-08-16 by the lane owner** — adoption record and
+the §7 decision dispositions are in §9; issued DRAFT earlier the same
+day. This is the scoping
 deliverable forecast by `CurrentProgramCheckpoint.md:118` ("Scoping in
 flight: `GwzM5-8R2D-Plan.md`"). It extracts the binding R2-D specification,
 verifies the unblock conditions on today's tree, and proposes the phased
@@ -570,3 +572,53 @@ grep recover_or_create (production)         → definition + sealed re-export on
 fault inventory                             → 164 keys (fault_expected_keys.rs:171),
                                               catalog_bootstrap.* = 24
 ```
+
+## 9. Adoption record (lane owner, 2026-08-16)
+
+Adopted after a full read on gwz-core `90d3f8a` (four trains after the
+plan's verified `f36d20d`: platform-matrix workflow, D1+D2 filter
+policy + R2-F missing tests, P1-P3 panic conversions + F-1 v0 gate,
+run-12 residue fixes). None of those trains touch the admission/
+namespace/managed surfaces or the §3 gate conditions; the boundary
+workflow was green on every intervening push and the Windows matrix is
+GREEN at `90d3f8a` (run 13, 1322/0/1; ledger). Line citations into
+`platform.rs` may have drifted by the two added `windows_tests`; Step
+0.1 re-verifies at its own tuple. Two nits recorded, neither worth a
+round: §6 says "15 steps" — the §4 phase list enumerates 17; the §6
+size sum brackets 5.1-8.2k, not 5.5-7k. Neither changes any gate.
+
+§7 decisions, as adopted:
+
+1. **C3 badging — option (a):** admission executes as Phase 1 of this
+   lane, badged as R2-C's tail. RemPlan §8 item 19's "settled
+   implementation reviews after C2/C3" is preserved as the Phase 1
+   dual settled gate; no separate R2-C closure checkpoint.
+2. **Coexistence (Phase 4.3) — direction: quarantine/relocation
+   preferred**, because it also retires the MAX_PATH exposure
+   (checkpoint :144-147); convert-in-place remains live as fallback.
+   The binding reviewed decision is made at Phase 4.3 per the plan
+   text — in any case before any production catalog activation — and
+   Step 0.1's freeze memo carries the Track-P analysis for both
+   options so the 4.3 decision is evidence-based, not re-scoped.
+3. **Backend trait surface — confirmed:** Step 0.1 freezes the delta
+   that removes the four `managed_operation_unavailable` defaults
+   (`namespace/backend.rs:411-460`) and makes the methods required;
+   the 0.1 dual review is the gate for changing the frozen R1 trait.
+4. **Fault-family activation map — confirmed** as tabled at §4 end;
+   the matching RemPlan §10 update files in the Phase 0 docs commit.
+5. **Dirent-barrier resume-window — conditional:** in-line fix at
+   4.2/4.3 if it fits the step budget, else the bounded §6-style
+   erratum + R2-F power-loss pin (`DirentBarrier-ReviewState.md:393-395`
+   allows either); ratified in the Phase 0 freeze memo.
+6. **Tier recording — confirmed:** the §4 gate tiers enter
+   `CurrentProgramCheckpoint.md` in the Phase 0 freeze commit.
+
+Cross-lane compatibility noted at adoption: the operator-escape
+amendment (in drafting) and the accepted D3 durable-cursor amendment
+change the **I2 merge record**, not the checked-artifact R1+C0 durable
+record set — no Track-W collision with this plan's zero-new-records
+rule; D3's implementation package runs on `workspace_ops/merge` files,
+file-disjoint from this lane's `checked_artifact` owners.
+
+Execution begins with Phase 0 (Step 0.1 freeze memo + Step 0.2
+scaffolding riding one dual review), per the plan.

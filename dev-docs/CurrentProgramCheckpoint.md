@@ -120,9 +120,16 @@ slice C0/C1/C2 accepted; R2-D managed recovery on
 per the amendment); then R3 complete-checkout/aggregate handoff, R4
 executable-C7 reconciliation, R5 settled gate with real
 three-platform evidence jobs, R6 independent settled-tree re-review.
-Scoping in flight: `GwzM5-8R2D-Plan.md` (R2-D extraction + unblock
-verification + phased plan) and `GwzM5-8R2F-EvidenceMap.md` (R5/R2-F
-platform-evidence gap map vs the green matrix).
+Scoping: `GwzM5-8R2D-Plan.md` is **ADOPTED 2026-08-16** (lane owner;
+§9 adoption record carries the six §7 decision dispositions — C3 as
+Phase 1 badged R2-C tail; quarantine/relocation preferred direction
+for 4.3 coexistence, decided before catalog activation; backend-trait
+delta confirmed for the 0.1 freeze; fault map confirmed; dirent
+resume-window conditional; tiers recorded at freeze). Execution
+begins at Phase 0: `GwzM5-8R2DInterfaceFreeze.md` + failing-test
+scaffolding under one mandated dual review.
+`GwzM5-8R2F-EvidenceMap.md` (R5/R2-F platform-evidence gap map vs the
+green matrix) remains adopted-in-part (this-week list executed).
 
 **A1 decisions ADOPTED 2026-08-16** (operator delegation "proceed with
 your recommendations when the decision packet arrives";
