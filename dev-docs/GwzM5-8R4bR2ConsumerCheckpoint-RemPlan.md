@@ -1036,3 +1036,33 @@ and matrix rows in the same package that converts its edges. The §6 Git
 private-parent creation edge is currently unkeyed; it is keyed or
 explicitly rescoped in the next matrix package. Basis:
 `GwzM5-8R2C2PublicationAudit.md` finding P3-1.
+
+### Activation map frozen — 2026-08-16
+
+The per-family activation map is now **frozen** by
+`GwzM5-8R2DInterfaceFreeze.md` §3.5 (R2-D Phase 0 Step 0.1), executing adopted
+plan §4-end as confirmed by its §9.4 owner decision. This section's duty is
+unchanged — a family gains injection sites and matrix rows in the same package
+that converts its edges — and the owning package for each reserved family is
+now named:
+
+- `admission.*` (19 keys) → R2-D Phase 1 (R2-C3 admission);
+- `durable_leaf.*` (11) → R2-D Step 2.1;
+- `namespace.*` (11) → R2-D Steps 2.2/2.3;
+- `record.*` (13) → R2-D Step 2.4;
+- `managed_bootstrap.*` (30) → R2-D Phase 3;
+- `cleanup.*` (11) → R2-D Phase 4 (Step 4.1 legacy leaf edges);
+- `barrier.*` (16) → R2-D Phase 4 (Step 4.2 Windows retirement closure);
+- `terminal.*` (11) → R2-D Phase 4 (Step 4.2 terminal retirement edges);
+- `catalog_bootstrap.*` (25) → **executed** at R2-C2 (this section's count of
+  21 predates the §6 parent-edge keying and the matrix extensions);
+- `runtime.*` (18) → **executed** at R2-A/R2-B, through the separate
+  `bootstrap/runtime/fault.rs` mechanism rather than
+  `CheckedArtifactFaultKeyV1` references.
+
+Any key whose edge genuinely converts later than the phase above is explicitly
+re-reserved for R2-E/R2-F in the same update (plan §4-end). The map is now
+machine-checked: `interface_tests/fault_expected_keys.rs` carries it as
+`FAULT_FAMILY_ACTIVATION` and fails if a family changes size, gains an
+injection site while still declared reserved, or changes activation state
+without the converting package's deliberate edit.
