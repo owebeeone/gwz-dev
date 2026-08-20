@@ -1,17 +1,93 @@
 # Current program checkpoint
 
-Date: 2026-08-15
+Date: 2026-08-16 (paused)
 Status: **the single current-state authority for the GWZ merge program.
 Update at every checkpoint boundary; keep concise; history belongs in git,
 not in this file. Live status paragraphs in other documents are superseded
 by this file (rulebook §7.3).**
 
+## PAUSED 2026-08-16 — resume from here
+
+Operator paused the program ("pause after all the current tasks are
+finished and create a checkpoint") after the thin-A1 instruction was
+executed. All in-flight agents completed before the pause; the tree is
+clean; nothing is mid-edit. **gwz-core local HEAD `d32b2c9` is one
+commit ahead of `origin/main` (`90d3f8a`) and is deliberately
+UNPUSHED**: it parks the R2-D Phase 0 freeze package, whose acceptance
+gate (dual review) has not run — push only with a review GO/GO train
+or by operator instruction. Everything else is committed in the root
+repo only (docs), which is never pushed by the implementor.
+
+State at pause, by lane:
+
+1. **R2-D (my lane, the A1 path).** Plan ADOPTED (§9 record). Phase 0
+   package DRAFTED and PARKED at `d32b2c9`: freeze memo
+   `GwzM5-8R2DInterfaceFreeze.md` (DRAFT, 692 lines — five frozen
+   seams, per-platform Track-P table for all 22 edges, six adopted
+   owner decisions, three-dual tier statement), backend trait delta
+   (four `managed_operation_unavailable` defaults → required),
+   admission owner skeleton, 11 green scaffolding tests incl. the
+   macOS-green admission publish/retire spike
+   (`tests_admission_spike.rs`, 2 tests) against the sealed
+   `publish_verified_no_replace` family, RemPlan §10 append-only
+   activation-map annotation, digest pins refreshed (checker green).
+   Gates: fmt/clippy/checker green; full suite partitioned
+   1370/1371 pass, 0 fail — the one unexecuted test
+   (`root_fault_matrix::every_root_physical_and_successor_boundary_
+   recovers_without_repeating_mutation`, workspace_ops, >585s alone)
+   is pre-existing, outside this package's file set, and was green in
+   CI at `90d3f8a` (run 13); confirm on the next matrix run.
+   Track-P verdict: NO new platform primitive; ONE in-seam Phase-1
+   obligation recorded as memo contingency C-2 (admission arms for
+   `DirectoryInteriorRecheckV1.expected` / `DestinationRecheckV1`
+   inside the sealed primitive — protocol-shaped extension, not a
+   bypass). Memo §7 corrects plan line-drift, including one material
+   correction: `LeafObserver` has ZERO impls on this tree (the plan's
+   `contracts.rs:183/:236` citation was wrong); Phase 2.1 writes the
+   first.
+2. **Thin-A1 gate-chain amendment (my lane).** DRAFT committed;
+   round-1 dual FILED: Consistency NO-GO (2 P1 — missed supersession
+   targets `GwzM5-8R4bR2ConsumerCheckpoint.md:21-23`/`:404`,
+   `…-RemPlan.md:605-607`, and the frozen M5b `:987-989` dependency
+   clause vs §5's "Untouched" row) and Safety NO-GO (3 P1 — the ~3.5k
+   LOC of R4b P2/P3/P4 lifecycle lanes whose only scheduled
+   independent acceptance was the deferred R6 must be NAMED as an
+   A1-activation-review exception; more missed live sentences + the
+   ConsumerCheckpoint §14 ninth stop clause needs an explicit
+   post-A1 re-scope; the three-dual cap must name the operator
+   override of §4.2 and stop citing the empty metrics table). All
+   five P1s are text/disclosure fixes that keep the descope intact.
+3. **Operator-escape amendment (second lane, parked).** DRAFT
+   committed; round-1 dual FILED: Code NO-GO (3 P1) / State NO-GO
+   (6 P1), 0 P0 anywhere; blind convergence on the unamended
+   cursor-derivation contract. Non-gating for A1. Remediation is
+   round 2 of 2 and is BLOCKED ON OPERATOR HANDOFF (thin A1 lane
+   split) — this implementor does not pick it up.
+4. **Tracked, untouched:** D3 cursor implementation (A1 window);
+   ARM64 EBADF substrate package (lead linux.rs:173-181); MAX_PATH
+   relocation (4.3 decides); v0 wedge runbook reproductions (Q9,
+   second lane); panic class-B conversions (second lane); M5b N-4
+   wording; probe-branch cleanup (operator's call); R2-D plan §6
+   step-count nit.
+
+**Resume order (estimated first hour):**
+(a) verify tuple: root HEAD = the pause-checkpoint commit, gwz-core
+local `d32b2c9` unpushed over `90d3f8a`, trees clean;
+(b) thin-A1 remediation — one merged patch for the 5 P1s + focused
+re-verdicts from the same two reviewers (contexts intact), then the
+RemPlan-4 supersession banner on GO/GO;
+(c) launch the R2-D Phase 0 dual review (dual #1 of 3, peer-blind,
+Code+State axes, cross-model where available) on the parked package;
+(d) start Phase 1 (R2-C3) failing tests the moment (c) is in flight
+(pipeline rule, `GwzFasterProposal.md` §2); push the Phase 0 train on
+its GO/GO. (b) and (c) may run in parallel.
+
 ## Exact tuple
 
 | Repository | Commit | Note |
 | --- | --- | --- |
-| gwz-dev (root) | this docs commit (parent: `36754a5`, the run-12 residue train) | literal restatement per ReviewCode-3 P3-5 |
-| gwz-core | `90d3f8a` | run-12 residue fixes — Windows GREEN revalidated (run 13), macOS GREEN; pushed |
+| gwz-dev (root) | this docs commit (the pause checkpoint) | literal restatement per ReviewCode-3 P3-5 |
+| gwz-core | `d32b2c9` local, **unpushed** (origin/main `90d3f8a`, Windows GREEN run 13, macOS GREEN) | parked R2-D Phase 0 package, pre-review |
 | gwz-cli | `3cca145` | Close R4b P1/P2 remediation gate |
 | gwz-py | `929efb0` | Implement R4b reverse merge lifecycle |
 | taut | `f008419` | 0.8.x fallible from_cbor line |
