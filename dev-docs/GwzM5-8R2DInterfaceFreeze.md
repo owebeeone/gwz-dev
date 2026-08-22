@@ -1031,15 +1031,22 @@ python3.13 scripts/checks/check_checked_artifact_boundaries.py
         exit 1
 ```
 
-The single checker finding is the **other lane's** `workspace_ops` tree digest,
-caused by its uncommitted files; it is the same finding both round-1 reviews
-attributed to that lane. This revision owes **no** digest refresh: the checker
-excludes `interface_tests` from every rule it applies
-(`check_checked_artifact_boundaries.py:668`), so
-`interface_tests/fault_expected_keys.rs` is not a pinned file and editing it
-produces no finding. No new allowlist-count, bare-token, module-rule,
-publication-seam, catalog-lease-reference, or provisional-interface finding
-appeared.
+Checker findings at round-2 commit time, corrected per ReviewCode round-2
+[P1-3]: the remediation's own files owed no digest refresh (the checker
+excludes `interface_tests` from every rule it applies,
+`check_checked_artifact_boundaries.py:668`, so
+`interface_tests/fault_expected_keys.rs` is not a pinned file), **but** the
+round-2 commit also carried the ReviewCode P3-4 one-line citation fix in
+`tests_admission_spike.rs`, which sits inside the
+`checked_artifact/capability/pre_catalog.rs` **tree** digest — that pin was
+not refreshed in the same commit (a literal-last ritual miss by the lane
+owner, caught by the round-2 re-verdict) and is refreshed to
+`877e9d18…b3a3e3c1` in the P1-3 fix commit that carries this sentence. The
+remaining working-tree finding (`workspace_ops/merge/v1_lifecycle/mod.rs`)
+belongs to the other lane's uncommitted files, as both round-1 reviews
+recorded. No allowlist-count, bare-token, module-rule, publication-seam,
+catalog-lease-reference, or provisional-interface finding appeared in any
+round.
 
 `cargo clippy` was not re-run in round 2: the other lane's working-tree files
 break it independently of this package (round 1 recorded exit 0 on a clean
