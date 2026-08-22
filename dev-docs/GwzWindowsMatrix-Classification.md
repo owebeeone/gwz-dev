@@ -7,6 +7,25 @@ participants; both the ff path and the commit path were already members
 of the CRLF/materialization class covered by the un-pinned CRLF matrix
 sentinel (D1 package), so this is bookkeeping, not new exposure.
 
+**Run 15 — 32555573059 on `ae4e143` (Phase 1 settled + ARM64 train):
+1359/14/1.** One cause, fourteen symptoms, all in the new admission
+kernel on its first native execution: the sealed publication's
+retained rename-source handle on the admission STAGING DIRECTORY
+(a child of the catalog root) carries DELETE access, and the same
+edge's `AdmissionCatalogInterior` destination recheck re-enumerates
+that root through `interior.rs`'s plain `open_dir_nofollow`, which
+omits FILE_SHARE_DELETE → `ERROR_SHARING_VIOLATION` (os 32) at
+"open catalog interior directory". Novel composition: Phase 1's
+staging publish is the first in the tree whose rename-source is a
+directory child of the very root its destination recheck walks
+(PreRetirementFinal publishes a regular file from a different
+parent, which is why Windows stayed green until now). Ordering was
+barred in principle — the retained handle IS the seam's identity
+proof — so the fix is the pre-written house recipe
+`platform::open_dir_share_delete` (one hunk, +24/−2, non-Windows
+arm byte-identical), landed at `6c7c8f3` with the pre_catalog pin;
+the 14 admission tests are the behavioral detector on the next run.
+
 **Platform run 32555574473 on `ae4e143` (Phase 1 settled + the ARM64
 EBADF package): the repair verified — ubuntu-24.04-arm went
 1094/266 → 1372/49**, clearing the 143 direct EBADF panics and their
