@@ -4,6 +4,17 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO): the record gains a sixth top-level field `operator_override`
+carrying append-only, per-side operator dispositions and two one-shot
+consent slots; the §7 forward-action retirement rule gains the override
+path; §8's top-level collision list and retirement table extend to the new
+name and container. Applied per that amendment's §7 item 1. The frozen
+sentences below are **not rewritten**: each amended clause carries a dated
+§-local annotation holding the amendment's exact replacement text, and that
+amendment is controlling wherever the two disagree. Its §2.1/§2.2 hold the
+field's exact wire shape, encoding rules, and structural legality.
+
 Amended 2026-08-22 by `GwzM5-8M5bNoFfDesign.md` §3.4 (amendment M5b-W1,
 document-only, additive; applied at M5b package acceptance GO/GO): §7's
 "exact tree, author, committer" is clarified to include the exact
@@ -77,6 +88,25 @@ record at `.gwz/merge/<merge-id>.yaml` or
 sidecar journal, cleanup journal, or record self-hash. The pending fields are
 the write-ahead owners for one in-flight reverse or preservation action; they
 are not generic action bags.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), the count and the struct above read as **six**: "It adds five
+top-level fields:" becomes "It adds six top-level fields:", and the struct
+block gains `operator_override: Option<OperatorOverrideV1>,` after
+`preservation_publication_handoff`. The field is optional and
+absent-by-default, is emitted after `preservation_publication_handoff` and
+before the flattened `extensions` map, is invalid in a v0 record, and carries
+append-only per-side operator dispositions plus the `overridden_entry` and
+`overridden_abort` one-shot consent slots. Its exact wire shape is that
+amendment's §2.1/§2.2, its encoding rules §2.2.1, and its structural legality
+§2.2.4 — all controlling.
+
+"There is no sibling acceptance file, sidecar journal, cleanup journal, or
+record self-hash." above gains, by the same amendment, the scoping annotation
+"(scoped to the record's own lifecycle storage under `.gwz/merge/` and
+`done/`)": the quarantine sidecar (that amendment's §3.1) is store-plane
+escape evidence under `quarantine/`, consumed by no lifecycle path, and is
+not this sentence's "sidecar journal".
 
 The v1 body does not contain a generic versioned payload, capability list,
 future projection, M6 branch action/checkout restoration, M7 snapshot
@@ -389,6 +419,23 @@ for an action that did not run. There is no intermediate action-free
 Completed, expected-conflict, or ambiguous observations cannot be treated as
 abandonment.
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), the first sentence of the paragraph above gains the
+operator-override path. Its exact replacement text is:
+
+> A durable forward action may also retire without an integration outcome in
+> exactly two cases: when an abort or preserve-abort request consumes the
+> matching bound exact `NotStarted` observation; or when an operator-override
+> rollback-side mark copies the action verbatim into its disposition row in
+> the same atomic rewrite. Neither case reports success, conflict, or failure
+> for an action that did not run, and neither changes the participant's state
+> or evidence.
+
+The remainder of the paragraph is unchanged: there is still no intermediate
+action-free `Executing`/`Halted` abandonment row, continue never uses either
+path, and completed, expected-conflict, or ambiguous observations still
+cannot be treated as abandonment.
+
 ## 8. Unknown fields and container retirement
 
 Migration first records every v0 unknown YAML path and raw value. The v1 body
@@ -437,6 +484,20 @@ surviving unknown manifest, rereads the exact bytes through the v1 decoder,
 and compares both the canonical model and unknown manifest. A mismatch is a
 pre-mutation recovery error.
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §8 extends to the sixth top-level field and its container without
+altering any sentence, table row, or identity above:
+
+- the collision sentence's name list gains `operator_override` as a sixth
+  name — a v0 unknown top-level field so named collides with a v1 known field
+  and makes migration ineligible on exactly the frozen terms, and is never
+  adopted, overwritten, or moved;
+- the retirement table gains the row "| operator override | append-only; each
+  owner/side disposition and each consent slot is immutable once written;
+  survives archival; never retired |";
+- the sequence-identity list gains "operator-override dispositions by
+  `(owner, side)`".
+
 ## 9. Record-contract exit tests
 
 R3 may begin only after independent review accepts this contract and the
@@ -464,6 +525,18 @@ implementation plan names tests for:
   retirement via marker backfill; the in-row marker collision, known-set
   version fork, and survival rows; U3 wedge-surface reduction and the
   post-`reset_commit` preflight-only interference case; cleanup/GC over
-  marker-only rows; and bundle-identity invariance; and
+  marker-only rows; and bundle-identity invariance;
+- the operator-escape rows of `GwzM5-8OperatorEscapeAmendment.md` §8 (added
+  by that amendment at acceptance, 2026-08-22): override round-trip over the
+  complete owner/side legality matrix with per-side and per-consent-slot
+  immutability across every rewrite edge; `reason` inertness; the
+  half-marked-owner shapes including the `Aborted`-plus-`overridden_abort`
+  checked-validator delta from open and archived bytes alike;
+  provable-collapse consent rows written as one atomic pair; quarantine and
+  byte-identical restore with sidecar supersession and orphan inertness; the
+  thirteen-row escape restart/fault matrix with the consent-round flow rows;
+  unknown-field survival by `(owner, side)` and the sixth-name collision;
+  projection/parity across the three record sources; GC forget-refs; and
+  bundle/frame invariance with and without the block present; and
 - atomic rewrite verification proving either complete old bytes or complete
   verified new bytes after every injected fault.

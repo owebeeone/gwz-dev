@@ -2,6 +2,21 @@
 
 Date: 2026-08-09
 
+Amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO): §6's closed vocabulary gains one arm, `Escape(EscapeTransition)`,
+with three variants; a new §6.10 carries their predecessor/footprint rows,
+their constructibility restriction, and the checked-record legality delta for
+an overridden terminal; §6.1's two ordinary edges are unchanged and gain a
+non-constructibility note; §6.6's reverse-cursor derivation and §6.7's cursor
+paragraph each gain a disposition arm, for cursor purposes only; §6.9 gains
+three physical-mutation rows; §7's closed request form gains force-abandon
+and its preservation-first paragraph gains the explicit-request carve-out;
+§13 gains the escape restart/fault matrix rows. Applied per that amendment's
+§7 item 3. The frozen sentences below are **not rewritten**: each amended
+clause carries a dated §-local annotation holding the amendment's exact
+replacement text, and that amendment is controlling wherever the two
+disagree.
+
 Amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`: §6.7's
 non-persistence paragraph is superseded — the preservation evidence row
 persists no-op skips (`noop_commit`) and reset completion (`reset_commit`),
@@ -327,6 +342,35 @@ numeric phase comparison. Every enum is exhaustively matched. Adding a
 variant requires an explicit predecessor rule, field footprint, unknown-field
 effect, positive test, and cross-owner rejection tests.
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), the `V1Transition` block above gains one arm and its definition:
+
+```rust
+enum V1Transition {
+    // … the eight existing arms, unchanged …
+    // New in this amendment.
+    Escape(EscapeTransition),
+}
+
+enum EscapeTransition {
+    MarkOwnerUnrecoverable { mark: PreparedOwnerMark },
+    BeginRollbackOverridden { entry: PreparedOverriddenRollbackEntry },
+    AbortOperationOverridden { proof: VerifiedOverriddenRollbackExhaustion },
+}
+```
+
+The escape vocabulary is structurally separate, so no ordinary sub-enum
+grows. Each payload is an opaque bound value carrying the §8 proof binding,
+per the frozen payload-authority rule above; no escape payload is
+constructible from a member id or a request string. The code idiom's `Box`ing
+of `V1Transition` arms is unaffected — the sketch prescribes the arm and its
+payload authority, not its boxing. The closed-vocabulary rule above is
+satisfied in full by §6.10, which carries the predecessor rules, field
+footprints, unknown-field effects, and the required positive and cross-owner
+rejection tests. `V1LifecycleRequest` gains one variant, `ForceAbandon`;
+`EffectKind` gains the three mirroring effects; `V1ResponseDisposition` gains
+`EscapeManifest`, the no-op first pass of the amendment's §3.3.3.
+
 Every successful transition updates `writer_version` as store metadata in the
 same rewrite. This metadata update is implicit in every footprint and is never
 available as a standalone transition.
@@ -450,6 +494,19 @@ it is never sufficient transition authority.
 Idempotence is handled by reading the current state and selecting no mutation,
 not by allowing same-state transition variants. A predecessor not listed in
 the table is rejected.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), the `BeginRollback` and `AbortOperation` rows above are **unchanged**
+and gain this note:
+
+> A bound `VerifiedRollbackExhausted`, a bound
+> `VerifiedPreservationExhausted`, and a `PreparedRollbackEntry` for the
+> `Preserving` origin are **not constructible** while any `operator_override`
+> disposition exists — definitionally, independent of what the live world
+> shows; only §6.10's edges may terminalize, or enter rollback from
+> `Preserving`, on such a record. Ordinary `BeginRollback` from the other
+> origins remains obtainable in a healed world and is safe: cursor derivation
+> still skips marked sides and the terminal edge still refuses.
 
 ### 6.2 Participant transitions
 
@@ -654,6 +711,16 @@ preflight derives its complete payload; the transition persists and rereads
 that action before the action classifier is allowed to label the live state
 `NotStarted`, `Completed`, or `Ambiguous`.
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), the derivation sentence above carries this exact replacement text:
+
+> The reverse cursor is fully derivable from participant terminal states,
+> **operator-override rollback-side dispositions**, publication rollback
+> evidence, selected-root membership, and the exact pending phase.
+
+The checked-open validation sentence that follows it applies to the amended
+derivation unchanged.
+
 | Variant | Exact predecessor | Result and owned fields |
 | --- | --- | --- |
 | `BeginParticipantRollback` | `RollingBack`; no pending rollback; named participant is current reverse owner | installs exact `Participant` action |
@@ -781,6 +848,13 @@ footprint: the retirement write may add `reset_commit` and, when the row
 carries neither `noop_commit` nor a stash pair, backfill `noop_commit` on
 the owner's row in the same atomic rewrite.
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), the cursor paragraph of this section gains:
+
+> A durable operator-override mark retires its owner's remaining positions on
+> the marked side for cursor-prefix purposes only; it never satisfies
+> `VerifiedPreservationExhausted` and never authorizes a physical mutation.
+
 ### 6.8 Drift transitions
 
 Drift is diagnostic evidence, never mutation authority.
@@ -828,6 +902,56 @@ bundles are retained by GC as required by I2. Candidate construction is also
 read-only: its opaque pure-builder result becomes durable only through
 `RecordCandidate`.
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), the matrix above gains exactly three rows and no existing row
+changes:
+
+| Physical mutation | Required persisted owner |
+| --- | --- |
+| open-record quarantine move (`.gwz/merge/<id>.yaml` → `.gwz/merge/quarantine/<name>.yaml`) | the **already-written quarantine sidecar** — §3.1 writes it atomically before the move, so it is the persisted owner this matrix's frame requires — recording the operator-consented request and the byte digest re-verified immediately before and after the move; **no lifecycle transition, no decode requirement** |
+| quarantine restore move (the exact inverse) | operator-consented restore request, sidecar digest equality, empty open slot, and a successful supported-open-record decode |
+| archive deletion with forgotten refs ([Q5]) | immutable validated archive plus operator-consented `--forget-refs`; every exactly-matching ref already observed absent after checked deletion; mismatched/unavailable refs observed and enumerated, never mutated |
+
+The `§3.1`, `§3.2`, and `[Q5]` references are that amendment's. The escape
+lane adds no new participant, publication, preservation, or rollback mutation
+owner: every mutation it performs for a tractable owner is executed by the
+**unchanged** executors under the **unchanged** owners.
+
+### 6.10 Escape transitions
+
+Added 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at GO/GO),
+per its §7 item 3. This section carries that amendment's §2.3.2
+predecessor/footprint table verbatim — it is reproduced there in full and is
+controlling — prefixed by:
+
+> Escape transitions are constructible only from an explicit `ForceAbandon`
+> request carrying digest-bound operator consent of the current consent
+> round. No dispatcher, observation, resolver, or executor path may construct
+> one.
+
+The three rows cover `MarkOwnerUnrecoverable` (any open state; appends
+exactly one `OwnerDispositionV1` side, or both sides of one owner in the same
+rewrite for a provable `:both` collapse, and clears the retired journal field
+it copied in that same atomic rewrite; **no state change**),
+`BeginRollbackOverridden` (every open state except `RollingBack`; state
+becomes `RollingBack`, writes `overridden_entry`, and clears
+`recovery_context` in the same write from a `RecoveryRequired` predecessor),
+and `AbortOperationOverridden` (`RollingBack`; state becomes `Aborted` and
+writes `overridden_abort`, with marked participants keeping their last honest
+state). Idempotence follows the frozen rule — it is handled by reading the
+current state and selecting no mutation, never by same-state variants — and a
+predecessor not listed is rejected.
+
+This section also carries the **checked-record legality delta**:
+
+> Under `state: Aborted` with `overridden_abort` present, a participant is
+> legal in a non-rollback-terminal state **iff** its rollback side carries an
+> `operator_override` disposition; with `overridden_abort` absent, the
+> existing all-rollback-terminal rule
+> (`model/v1/validate/lifecycle.rs:56`, error `TerminalRollbackMismatch`) is
+> unchanged. The delta applies identically in the open decoder and the
+> archived decoder — write-legality and read-legality never diverge.
+
 ## 7. Closed next-action dispatcher
 
 Typed writes do not by themselves prevent orchestration policy from becoming
@@ -871,6 +995,16 @@ struct V1Invocation {
     attempted_physical_actions: OrderedMap<ActionIdentity, ExecutionDiagnostic>,
 }
 ```
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), the closed-request-form sentence above carries this exact replacement
+text:
+
+> `V1LifecycleRequest` is the closed internal form of resume-start, continue,
+> abort, preserve, force-abandon, status, and archive work.
+
+`V1ResponseDisposition` likewise gains `EscapeManifest` for the no-op first
+pass of the two-step consent flow (that amendment's §3.3.3, §2.3.1).
 
 Neither enum contains a function pointer or arbitrary callback. The dispatcher
 is the only constructor of `BoundObservationRequest`. The observation resolver
@@ -931,6 +1065,15 @@ two-pass preservation cursor even between actions, regardless of an incoming
 abort request. It may return `BeginRollback` only after a fresh bound
 `VerifiedPreservationExhausted` proof. There is no implicit abandonment of a
 partially completed preservation plan.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), "regardless of an incoming abort request" above becomes "regardless
+of an incoming **ordinary** abort request", and the paragraph gains:
+
+> An explicit force-abandon request with digest-bound per-side consent may
+> retire a cursor position through a durable `MarkOwnerUnrecoverable` write;
+> there is still no implicit abandonment of a partially completed
+> preservation plan.
 
 The service loop restarts after every step:
 
@@ -1341,6 +1484,20 @@ The complete gate includes:
   plan; and
 - two independent settled-tree reviews with no open P0/P1/P2 finding before
   A1.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §13 gains that amendment's escape restart/fault matrix rows (its §8
+item 8, which is controlling): fault injection immediately before and after
+each of the thirteen §4 crash points; one footprint test per new variant
+proving the actual known semantic diff equals only its declared fields;
+unknown-survivor and retirement-manifest checks after each new transition;
+and the consent-round flow rows (a) the first pass writes nothing and exits
+code 63 carrying the token, (b) the correct token against an unchanged digest
+proceeds and every consent row of a multi-row invocation carries the one
+round anchor verbatim, (c) a wrong, stale, or digest-mismatched `--confirm`
+token is a code-63 refusal writing nothing, and (d) a collapse basis that
+turned false between manifest and confirm — the re-run preflight refuses the
+now-observable side with code 64.
 
 ## 14. Stop conditions
 

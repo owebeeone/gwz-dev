@@ -447,15 +447,21 @@ Recorded consequences (its §3 Step A):
   leak, rule-8 decidability, sidecar lifecycle). Blind convergence
   note: both axes independently found the unamended cursor-derivation
   contract (ActionJournal §2 :178-192 — Code P1-1 ≡ State P1-3).
-  Recorded **NON-GATING for A1** per thin A1 (`GwzFasterProposal.md`
-  §2/§4). **Second-lane block LIFTED for this item by operator
-  handoff 2026-08-22 ("burn it", during the quota burn-down window):**
-  the merged round-2 remediation is IN DRAFTING (strong tier — the
-  consent-digest chain and the five other State P1s are cross-contract
-  semantic surgery), with focused re-verdicts from the round-1
-  reviewers to follow, acceptance ritual on GO/GO. The Q1-Q10
-  operator decisions are an immutable envelope for the remediation.
-  Side finding routed: the accepted
+  Recorded **NON-GATING for A1** per thin A1. **ACCEPTED 2026-08-22
+  at GO/GO** (operator handoff "burn it" lifted the second-lane block
+  for remediation): round-1 dual NO-GO/NO-GO (9 P1, 0 P0) → one
+  merged round-2 revision at root `20f1654` (all 14 P1/P2 + every P3
+  inside the immutable Q1-Q10 envelope; consent-round redesign:
+  one round anchored to the shown digest, atomic both-side collapse
+  writes, crash ends the round) → round-2 re-verdicts GO/GO with
+  zero unresolved and R-1/R-2/R-3 confirmed unconditionally on both
+  axes. Acceptance ritual applied §7 to all five contracts as dated
+  banners + 22 §-local annotations with exact replacement texts
+  (frozen prose byte-preserved — the doc gate pins it); doc gate
+  green at baseline (11 sources, 147 assertions). The escape wire is
+  now the FOURTH accepted train on the I2 contracts; implementation
+  lands as its own reviewed package(s) after R4b-G, at or before A1
+  (Q3). Side finding routed: the accepted
   durable-cursor amendment's "post-GC record rewrite" phrasing is
   inaccurate (`merge/gc.rs:196` shapes the response projection only)
   — wording erratum for its next docs pass, no behavior involved.

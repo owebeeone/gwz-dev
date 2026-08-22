@@ -4,6 +4,20 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO): §1's error table appends codes 62-65 and its context-legality
+sentences extend to them; §2's enum allocation appends the escape enums and
+two `MergeOp` values; §3's `MergeRecordProjection` gains fields 6-8, the new
+escape/quarantine messages are appended, `MergeRequest` gains field 8,
+`MergeResponse` gains field 11, the field-10 population list extends, and the
+record-context range sentence extends to 45–65; §4 gains the escape rendering
+rules. Every change is **append-only**: no existing discriminant, field
+number, message shape, message name, rendering rule, or error code changes.
+Applied per that amendment's §7 item 5. The frozen sentences below are **not
+rewritten**: each amended clause carries a dated §-local annotation holding
+the amendment's exact replacement text, and that amendment is controlling
+wherever the two disagree.
+
 This slice freezes I2 error allocations, structured record context, merge
 record/acceptance/recovery projections, and Rust/Python/JSON/JSONL parity.
 
@@ -51,6 +65,28 @@ contradiction. Existing `MergeRecordUnreadable`, `MergeDrift`, and
 command failure; they omit it when the header itself cannot be read. Every
 other error forbids context. Codes 46–61 have absent member/detail/target
 fields.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §1's error table appends codes 62-65 after
+`terminal_rollback_mismatch = 61` (the verified current maximum; 0..61
+contiguous), with the message bodies of that amendment's §2.5.4 and the same
+registered-reason requirement the table already imposes on codes 49-61:
+
+| Numeric | Taut/Rust | Message body after `merge record '<id>' ` |
+| ---: | --- | --- |
+| 62 | `operator_override_invalid` / `OperatorOverrideInvalid` | `operator override is invalid: <reason>` |
+| 63 | `escape_consent_required` / `EscapeConsentRequired` | `escape requires explicit consent: <reason>` |
+| 64 | `escape_not_applicable` / `EscapeNotApplicable` | `escape is not applicable: <reason>` |
+| 65 | `quarantine_state_invalid` / `QuarantineStateInvalid` | `quarantine state is invalid: <reason>` |
+
+All four require record context and carry absent member/detail/target fields.
+The context-legality sentences above therefore extend by exact edit, so the
+appended codes fall inside the require-context set rather than under "every
+other error forbids context": **"codes 49–61 require id and installed pair"
+becomes "codes 49–65 require id and installed pair", and "Codes 46–61 have
+absent member/detail/target fields." becomes "Codes 46–65 have absent
+member/detail/target fields."** The sentence "Every other error forbids
+context." is **unchanged** and stays true.
 
 Messages for 46–48 are:
 
@@ -117,6 +153,16 @@ MergeCompatibilityNextAction:
 ```
 
 No v2–v4 body/discriminant is allocated at I2.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §2's enum allocation appends `MergeRecordSource`, `MergeEscapeOwner`,
+`MergeEscapeSide`, `MergeSideDispositionKind`, `MergeConsentCollapseBasis`,
+`MergeRetiredActionKind`, `MergeObservedFactKind`, and the two `MergeOp`
+values `quarantine=5` and `restore=6`. Their exact discriminants are that
+amendment's §2.5.1/§2.5.2, which are controlling; each takes the next free
+slot and no existing discriminant is renumbered. Force-abandon is **not** a
+new op — it is a flag on `abort`, so the frozen mutual-exclusion rule is
+unchanged. No v2–v4 allocation is added.
 
 ## 3. Message fields
 
@@ -212,6 +258,29 @@ whenever the header is readable and the code is one of 45–61,
 projection then issue id-qualified status. Renderers never synthesize a
 partial record in an error payload.
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §3 appends, and changes nothing existing:
+
+- `MergeRecordProjection` gains fields **6-8** — `6 source?:
+  MergeRecordSource`, `7 operator_override?:
+  MergeOperatorOverrideProjection`, `8 quarantine?:
+  MergeQuarantineProjection`. Fields 1-5 are unchanged; `archived` (field 2)
+  stays authoritative, with the pinned equivalence
+  `archived == (source == archived)`;
+- the new messages of that amendment's §2.5.2 are appended
+  (`MergeOperatorOverrideProjection`, `MergeOperatorConsentProjection`,
+  `MergeOwnerDispositionProjection`, `MergeSideDispositionProjection`,
+  `MergeObservedFact`, `MergeQuarantineProjection`);
+- `MergeRequest` gains field **8** `escape?: MergeEscapeRequest`, and
+  `MergeResponse` gains field **11** `escape`, carrying the structured
+  destruction manifest of the no-op first pass;
+- the field-10 population list gains "quarantine, restore, and force-abandon
+  successes".
+
+The record-context range sentence above carries this exact edit: **"the code
+is one of 45–61" becomes "the code is one of 45–65"**, so the four appended
+codes carry `record_context` on exactly the frozen readable-header terms.
+
 ## 4. Discriminants and rendering
 
 `supported_persisted` requires only the installed wrapper; A1 accepts exactly
@@ -247,3 +316,19 @@ identities reject. Taut omits absent optionals. JSON/JSONL emit every projection
 key with `null` for absent optional scalar/message and `[]` for repeated fields.
 Human output never invents absent data. Generated Rust/Python, corpus, both
 JSON renderers, JSONL, and retained readers must agree exactly.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §4 gains that amendment's §2.5.3 rendering rules:
+
+- a record whose `source` is `quarantined` renders `archived=false` and
+  `MergeResponse.open=false`; the pinned equivalence
+  `archived == (source == archived)` is fixture-enforced;
+- an overridden abort is **never** rendered as a plain abort in any renderer
+  (human, JSON, JSONL, both drivers): the terminal line carries
+  `aborted (operator override)` and the per-owner rows carry
+  `abandoned:preservation` / `abandoned:rollback` / `abandoned:both`;
+- open status of a record with dispositions but no `overridden_abort` renders
+  `force-abandon in progress` plus the marked-side count;
+- human output never invents absent data; JSON/JSONL emit every projection
+  key with `null`/`[]` per the frozen rule above — unchanged, and restated
+  here because the escape projections are optional throughout.

@@ -4,6 +4,17 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO): §1 gains the escape lane's closed wire vocabulary; §2's retirement
+authority gains the verified operator-override mark, and the rollback
+cursor's closed derivation-input list and the preservation prefix proof each
+gain a disposition arm — for cursor/prefix purposes only, never as an
+exhaustion proof; §5's archived cleanup gains the [Q5] operator-consented
+`--forget-refs` release. Applied per that amendment's §7 item 2. The frozen
+sentences below are **not rewritten**: each amended clause carries a dated
+§-local annotation holding the amendment's exact replacement text, and that
+amendment is controlling wherever the two disagree.
+
 Amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`: the preservation
 evidence row persists per-owner no-op skips (`noop_commit`) and the reset
 completion bit (`reset_commit`); the preservation cursor prefix is
@@ -140,6 +151,18 @@ struct PreservationEvidence {
 }
 ```
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §1 also carries the escape lane's wire types verbatim as that
+amendment's §2.2 states them — `OperatorOverrideV1` with its
+`OwnerDispositionV1`, `EscapeOwnerV1`, `SideDispositionV1`,
+`SideDispositionKindV1`, `OperatorConsentV1`, `ConsentCollapseV1`,
+`ConsentCollapseBasisV1`, `EscapeSideV1`, `AbandonEvidenceV1`,
+`ObservedFactV1`, and `ObservedFactKindV1` — under its §2.2.1 encoding rules
+and §2.2.4 structural legality, all controlling. They are the escape lane's
+**closed** vocabulary: the lane adds no other wire type, and no observation,
+resolver, or executor path may construct one outside the escape edges (that
+amendment's §2.3.4).
+
 ## 2. Recovery and legality
 
 `recovery_context` is required exactly while `state: recovery_required` and is
@@ -190,6 +213,42 @@ two-pass cursor is complete or currently unnecessary. A later pending owner
 with any earlier incomplete or ambiguous position authorizes no rewrite or
 physical mutation. This adds two evidence-row fields and no journal variant;
 the deterministic order is unchanged.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), three sentences above carry exact replacement text. The replacements
+are:
+
+> Retirement occurs only with the verified result/progress write, or with the
+> verified operator-override mark that copies the action verbatim into its
+> disposition row in the same atomic rewrite; no other path clears or
+> advances a pending action.
+
+> For rollback, owner/kind agreement includes the exact deterministic current
+> cursor derived from durable participant terminal states,
+> **operator-override rollback-side dispositions**, publication evidence,
+> selected-root membership, and pending phase; a wrong or later owner is
+> invalid at decode. A disposition retires its owner's remaining rollback
+> positions for cursor purposes only; it never satisfies an exhaustion proof
+> — `VerifiedRollbackExhausted` remains complete-domain and is not
+> constructible while any disposition exists.
+
+> Before a pending preservation action is classified, advanced, or executed,
+> an exact bound observation must also prove — by durable completion facts
+> where present, **by an operator-override preservation-side disposition on
+> that owner where one exists**, and by exact bound live observation where
+> absent — that every earlier position in the two-pass cursor is complete or
+> currently unnecessary. A disposition retires a position for cursor/prefix
+> purposes only; it never satisfies `VerifiedPreservationExhausted`, and only
+> the §6.10 escape edges' `…ExhaustedOrMarked` proofs consume it.
+
+The `§6.10` named in the third replacement is `GwzM5-8R4bTransitionDesign.md`
+§6.10, added by the same amendment's §7 item 3. Explicitly **unchanged** by
+this amendment: the pending-action legality table above, and the sentence
+"Ambiguous observation changes only operation state/context; it never clears
+or advances a pending action." Any journal a mark retires is cleared by that
+mark's own atomic rewrite, and the overridden abort — like the ordinary
+one — requires that no journal remain, so the "direct or terminal state |
+neither pending reverse action is legal" row holds without exception.
 
 All free-looking wire strings are validated derivations, never ambient
 authority:
@@ -419,6 +478,16 @@ not rewritten. For every recorded backup ref:
 The archive may be deleted only after every recorded ref is observed absent.
 Native stashes and stash bundles are never deleted by merge GC. An archive
 with no backup refs may be deleted after archive-only validation.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §5 gains the [Q5] release valve:
+
+> Targeted GC additionally accepts an operator-consented `--forget-refs`
+> release. It deletes every exact-target ref through the unchanged checked
+> deletion, leaves every ref classified different-target or unavailable
+> exactly as observed (no repository mutation), and may then delete the
+> archive after proving every deleted-set ref absent. Without that explicit
+> consent the stop-and-retain rule above is unchanged.
 
 ## 6. Exit tests
 

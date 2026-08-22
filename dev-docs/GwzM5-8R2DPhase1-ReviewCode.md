@@ -476,11 +476,14 @@ object — the anchored filter yields **274/0** and the unanchored form
 **278/0**; the suite is green either way, so this is an evidence-recording
 discrepancy only (most plausibly a dirty-tree or transcription artifact), and
 the number that stands for the settle is my pristine 274/0. **(b)** a
-supplementary full-`--lib` run (my own belt-and-braces, not a mandated gate —
-every changed file lies inside the focused scope) was still executing when
-this section was appended, dominated by the known >585 s pre-existing
-`workspace_ops` matrix test; its result does not gate this verdict and will
-be reported to the coordinator when it lands.
+supplementary full-`--lib` run on the same pristine extraction (my own
+belt-and-braces, not a mandated gate — every changed file lies inside the
+focused scope) completed after this section was first appended:
+**1,410 passed; 0 failed; 1 ignored** (the one ignored test is the
+pre-existing known-ignored case; 838.7 s, dominated by the known >585 s
+pre-existing `workspace_ops` matrix test). Whole-tree green corroborates the
+focused verdict; this line was updated in place when the run landed, before
+the review was handed back.
 
 ## Per-finding disposition
 

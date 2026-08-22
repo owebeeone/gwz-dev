@@ -2,6 +2,16 @@
 
 Date: 2026-08-10
 
+Amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO): §9 gains a **third** read-only status source — a quarantined record,
+decoded solely from quarantined bytes and its sidecar — and its source
+arbitration table gains the quarantined rows, made total over that third
+axis; §11's targeted GC gains the [Q5] operator-consented `--forget-refs`
+release. Applied per that amendment's §7 item 4. The frozen sentences and
+table rows below are **not rewritten**: each amended clause carries a dated
+§-local annotation holding the amendment's exact replacement text, and that
+amendment is controlling wherever the two disagree.
+
 Amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`: the preservation
 cursor prefix is issued from durable completion facts where recorded and
 live observation where not; the evidence row's `noop_commit`/`reset_commit`
@@ -458,6 +468,37 @@ Source arbitration is exact:
 | nonterminal source | any present destination | typed contradiction; no mutation |
 | noncanonical/symlink parent or leaf | any | typed unreadable; no live access |
 
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), "Status has two sources and no mutation path:" above becomes "Status
+has three sources and no mutation path:", and the bullet list gains a third
+bullet:
+
+> a quarantined record is decoded solely from quarantined bytes and its
+> sidecar, and projected without consulting live repositories.
+
+The source arbitration table gains the quarantined rows, **total over the
+third axis**. "Quarantine present" means a record file exists under
+`quarantine/`; an orphan sidecar is historical and never arbitrates (that
+amendment's §3.1):
+
+- quarantine present + open absent + archive absent → quarantined projection
+  when the bytes decode as a supported record; the §3.2 typed error (code 65)
+  when they do not;
+- quarantine present + open present, **identical bytes** → open projection;
+  the quarantine copy renders shadowed/historical; status does not reconcile
+  (the frozen identical-terminal-bytes posture);
+- quarantine present + open present, **different bytes** → typed
+  contradiction; no mutation;
+- quarantine present + **archive present** (open present or absent) → typed
+  contradiction naming every present path; no mutation (the frozen
+  different-destination fail-closed posture);
+- quarantine present without sidecar → quarantined projection marked
+  `sidecar_present: false` when the bytes decode (the same typed error when
+  they do not); restore refused.
+
+The quarantined source is live-blind by rule: it consults no repository, and
+a quarantined record renders `archived=false` with `MergeResponse.open=false`.
+
 Open status reports the exact operation state, recovery origin, pending
 forward/reverse owner and phase, participant outcomes, persisted drift,
 read-only live drift, continue/abort eligibility, preservation evidence,
@@ -546,6 +587,16 @@ validation. Native stashes and preservation bundles are never deleted.
 Ordinary retention exempts any archive whose validated worklist owns backup
 refs and retains any unreadable or unsupported-future archive. GC never clears
 evidence by rewriting terminal history.
+
+As amended 2026-08-22 by `GwzM5-8OperatorEscapeAmendment.md` (accepted at
+GO/GO), §11 gains the [Q5] release valve:
+
+> Targeted GC additionally accepts an operator-consented `--forget-refs`
+> release. It deletes every exact-target ref through the unchanged checked
+> deletion, leaves every ref classified different-target or unavailable
+> exactly as observed (no repository mutation), and may then delete the
+> archive after proving every deleted-set ref absent. Without that explicit
+> consent the stop-and-retain rule above is unchanged.
 
 ## 12. Planned implementation ownership
 

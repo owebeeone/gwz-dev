@@ -2,15 +2,26 @@
 
 Date: 2026-08-16. Round-2 revision: 2026-08-22.
 
-Status: **DRAFT — round-2 revision of 2026-08-22, pending focused
-re-verdicts** (Code and State axes; the amendment tier of
-`GwzProcessOptimization.md` §4.2 :104-118, cross-model per §4.3; round 2 of
-the two-round cap). Round 1 returned NO-GO on both axes; this revision
-applies **every** round-1 P1 and P2 of
-`GwzM5-8OperatorEscapeAmendment-ReviewCode.md` (P1-1, P1-2, P1-3, P2-1..P2-5)
-and `GwzM5-8OperatorEscapeAmendment-ReviewState.md` (P1-1..P1-6, P2-1..P2-5),
-plus the one-line P3s of both; §10.4 maps every finding to its exact edit.
-**No §0 decided input changed.** This document is the
+Status: **ACCEPTED 2026-08-22 at GO/GO** (Code and State axes, cross-model;
+the amendment tier of `GwzProcessOptimization.md` §4.2 :104-118, per §4.3;
+round 2 of the two-round cap, no round 3 required). Review history: round 1
+returned a dual **NO-GO/NO-GO** — Code 3 P1 / 5 P2 / 6 P3, State 6 P1 /
+5 P2 / 4 P3, zero P0 on either axis. **One** merged remediation revision
+applied every round-1 P1 and P2 of
+`GwzM5-8OperatorEscapeAmendment-ReviewCode.md` (P1-1..P1-3, P2-1..P2-5) and
+`GwzM5-8OperatorEscapeAmendment-ReviewState.md` (P1-1..P1-6, P2-1..P2-5),
+plus the one-line P3s of both, and landed at gwz-dev `20f1654` ("Apply the
+escape amendment round-2 remediation"). The round-2 focused re-verdicts
+returned **GO/GO with zero unresolved findings** on either axis — appended
+to the two review documents above, with no condition attached to either
+GO — and §10.3's R-1, R-2, and R-3 are **CONFIRMED unconditionally on both
+axes** (R-2's round-1 condition discharged by the applied [P1] fixes).
+§10.4 maps every finding to its exact edit. **No §0 decided input changed.**
+This train is **second-lane and NON-GATING for A1** per the accepted
+`GwzM5-8ThinA1Amendment.md`; the §7 contract deltas are applied to the five
+amended documents at this acceptance, and **implementation lands as its own
+reviewed package(s)** after R4b-G, at or before A1 ([Q3]). This document is
+the
 wire/transition/protocol amendment for the operator escape story frozen in
 `GwzM5-8OperatorEscapeDesign.md`, with all ten of that design's §10 open
 questions **decided by the program owner on 2026-08-16** (§0). It is the
@@ -149,6 +160,25 @@ it separately from the record/transition work for exactly that reason.
 Every frozen sentence this amendment changes is quoted here first. Clauses
 quoted as **UNCHANGED** are reproduced because a new edge is their analogue
 and reviewers must see that the original obligation is not weakened.
+
+**Anchors below are pre-acceptance**, as reviewed. Applying §7 at acceptance
+(2026-08-22) inserted a dated head banner and dated §-local annotations into
+each of the five contracts, so every anchor in this section now sits lower in
+its file by the annotations preceding it. The **verbatim quote, not the line
+number, is the identifying key** — every quoted sentence below was re-verified
+byte-identical in the post-acceptance files, and each is now reachable from
+the dated annotation placed immediately after it. Verified post-acceptance
+re-pin offsets, by region within each file: RecordContract +11 (§1), +17
+(§6), +30 (§7), +47 (§8), +61/+62 (§9); ActionJournal +23 (§2 through
+:185-192), +59 (§2 :194-195 onward, §5); TransitionDesign +15 (§6 :325-328),
++44/+45 (§6 payload authority and the §6.1 rows), +57 (§6.6), +74 (§6.8,
+§6.9), +124 (§7 :843-844), +134 (§7 :929-933), +143 (§13);
+ReverseLifecycleInterface +10 (§9 :441-459), +47 (§9 :482-495), +41/+42
+(§11); ProtocolContract +14 (§1), +36 (§2), +46 (§3), +69 (§4). Frozen prose
+was **never rewritten in place** — a requirement, not a style choice: the
+document-consistency gate pins RecordContract's "It adds five top-level
+fields:" and "five top-level v1 collisions" as required strings, so the
+amended readings can only live in annotations beside them.
 
 ### 1.1 `GwzM5-8I2RecordContract.md`
 
@@ -1348,7 +1378,7 @@ dispatcher, observers, and executors.
 | 1 | after the manifest is printed, before any write | nothing is written. Re-run re-prints and re-earns consent; the digest is unchanged so the token is the same, but consent still does not persist |
 | 2 | between the sidecar write and the quarantine move | the sidecar exists with a matching digest; re-run detects it and completes the move idempotently |
 | 3 | after the quarantine move, before the response | no open record; a quarantine entry with matching digest exists; re-run reports idempotent success and echoes the sidecar |
-| 4 | after a `MarkOwnerUnrecoverable` write | the record is open with a partially populated block and the marked owner's journal already cleared. **The ordinary dispatcher's outcome is unchanged in kind**: ordinary `--continue`/`--abort` still refuse to terminalize (the exhaustion proofs are over the complete domain), while cursor derivation skips the marked side so ordinary rollback work on *unmarked* owners proceeds. A re-issued force-abandon resumes: already-marked sides stay marked, consent is re-earned against the new digest |
+| 4 | after a `MarkOwnerUnrecoverable` write | the record is open with a partially populated block and the marked owner's journal already cleared. **The ordinary dispatcher's outcome is unchanged in kind**: ordinary `--continue`/`--abort` still refuse to terminalize (the ordinary exhaustion proofs are **not constructible** while any disposition exists — definitionally, §2.3.4; the complete-domain wording alone would not suffice), while cursor derivation skips the marked side so ordinary rollback work on *unmarked* owners proceeds. A re-issued force-abandon resumes: already-marked sides stay marked, consent is re-earned against the new digest |
 | 5 | between two `MarkOwnerUnrecoverable` writes | identical to 4; marks are independent, append-only, and order-insensitive within an owner. A collapsed `:both` pair is **one** write (§2.3.2), so no crash can split it; the next round's marks carry the new round's consent while already-written rows keep theirs |
 | 6 | after `BeginRollbackOverridden`, before the first ordinary rollback action | state is `RollingBack` with `overridden_entry` present. Ordinary `--abort` resumes the tractable owners' rollback with no consent (nothing new is destroyed) and then refuses at the terminal edge; force-abandon resumes and re-earns terminal consent |
 | 7 | between two ordinary rollback actions inside an overridden run | ordinary restart legality, entirely unchanged — the marked sides are durable and the unmarked owners are recognized by the unchanged exact observers |
@@ -1845,7 +1875,10 @@ contract-level rows join RecordContract §9 at acceptance.
    as inapplicable;
    (d) rollback-marked + preservation-exactly-complete — legal;
    (e) preservation-marked only, at the terminal edge, with the rollback side
-   applicable and neither proven nor marked — **rejected** with code 62;
+   applicable and neither proven nor marked — **rejected** with code 62
+   (the refused write would create a §2.2.4 rule-8-contradicted **written**
+   block, which is exactly what 62 is reserved for; it is **not** a
+   consent-flow refusal, which is always 63 — §2.5.4);
    (f) a half-marked owner surviving archival and projecting identically from
    archived bytes;
    (g) an owner with a retained forward action and only a preservation-side
@@ -2141,7 +2174,7 @@ input; none is left open.**
 | Code P2-1 | §1.2 annotation reworded — marks clear journals, the terminal edge requires none remain (:227-232) |
 | Code P2-2 ≡ State P3-1 | Marker-aware arm retensed to "requires … not yet landed", plus the E-packages-must-not-assume note — §5.4:1431-1437 |
 | Code P2-3 | Arbitration made total: archive×quarantine and all-three-present are typed contradictions naming every present path — §7 item 4 (:1772-1774) |
-| Code P2-4 | `record.rs:79-110` corrected to :18-51 / :39-50 at evidence base :60, §2.1:383 and :397 |
+| Code P2-4 | `record.rs:79-110` corrected to :18-51 / :39-50 at evidence base :45, §2.1:383 and :400 |
 | Code P2-5 | Stale/wrong/mismatched `--confirm` pinned to code 63 (62 reserved for written-block contradictions) — §2.5.4:855-858, §3.3.3:1097-1100; flow rows (a)-(d) in §8 item 8 (:1915-1922) |
 | State P1-1 | The consent round: single anchor digest, validated once at round entry under lock+lease, frozen consent carried verbatim by every row of the round, crash ends the round — §3.3.3:1103-1125; §5.5:1462-1471; §2.3.2 rows :668-672; rule 7 :583-594; collapsed pair is one atomic write — §3.3.4:1159-1165, §4 row 5 :1349 |
 | State P1-2 | Ordinary-proof non-constructibility made definitional (`VerifiedRollbackExhausted`, `VerifiedPreservationExhausted`, `PreparedRollbackEntry` from `Preserving`) — §2.3.4:703-723; frozen-note text §7 item 3 (:1722-1732) |
@@ -2172,15 +2205,22 @@ re-verified against the landed M5b suites (`v1_lifecycle/tests/` with its
 
 ## 11. Status
 
-**DRAFT — round-2 revision of 2026-08-22, pending focused re-verdicts**
-(Code and State axes, cross-model; round 2 of the two-round cap). Round 1:
-NO-GO/NO-GO. This revision resolves every round-1 P1 and P2 on both axes —
-Code [P1-1..P1-3], [P2-1..P2-5]; State [P1-1..P1-6], [P2-1..P2-5] — plus the
-one-line P3s of both reports; §10.4 is the finding-by-finding map, and no §0
-decided input changed. Both round-1 reviews answered §10.3's R-1/R-2/R-3
-CONFIRMED, conditioned on the [P1] fixes now applied; the ten [Q] inputs of
-§0 remain decided and are not review questions. On a GO the §7 annotations
-are applied to the five contracts in the acceptance edit and the wire delta
-freezes **pre-A1** — second-lane and non-gating for A1 per the accepted
+**ACCEPTED 2026-08-22 at GO/GO** (Code and State axes, cross-model; round 2
+of the two-round cap, no round 3 required). Round 1: **NO-GO/NO-GO** — Code
+3 P1 / 5 P2 / 6 P3, State 6 P1 / 5 P2 / 4 P3, zero P0 on either axis. **One**
+merged remediation revision, landed at gwz-dev `20f1654`, resolved every
+round-1 P1 and P2 on both axes — Code [P1-1..P1-3], [P2-1..P2-5]; State
+[P1-1..P1-6], [P2-1..P2-5] — plus the one-line P3s of both reports; §10.4 is
+the finding-by-finding map, and no §0 decided input changed. Round 2:
+**GO/GO with zero unresolved findings** and no condition attached to either
+GO; both re-verdicts answer §10.3's R-1/R-2/R-3 **CONFIRMED
+unconditionally**. The residual P4-class notes each axis recorded as
+explicitly non-blocking are folded into this acceptance pass: §4 row 4's
+parenthetical now cites the definitional rule rather than the superseded
+derivational one (State), and §10.4's two drifting map pointers and §8 item
+3(e)'s code-62 reading are corrected/clarified (Code). The ten [Q] inputs of
+§0 remain decided and were never review questions. At this acceptance the §7
+annotations are applied to the five contracts and the wire delta freezes
+**pre-A1** — second-lane and non-gating for A1 per the accepted
 `GwzM5-8ThinA1Amendment.md` — and implementation proceeds per §9.1/§9.3
-after R4b-G, at or before A1.
+after R4b-G, at or before A1, as its own reviewed package(s) ([Q3]).
