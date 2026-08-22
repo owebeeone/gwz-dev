@@ -476,6 +476,69 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > counts stay at 165 throughout. Until 3.2 lands, this record is the durable
 > statement that the edge conversion and the activation are intentionally
 > split, not drifted.
+>
+> *(Superseded in part at the Step 3.1b landing, 2026-08-22, per the
+> Step-3.1b review's [P2-1]: Step 3.1b's own flip below moved the family to
+> 23 executed / 7 reserved, so the five writer keys now sit among the **7**
+> reserved and the list edit Step 3.2 owes is **23 → 28**. The duty itself —
+> five sites, their rows, the list edit — is unchanged.)*
+>
+> `managed_bootstrap.*` activation annotation (2026-08-22, Step 3.1b landing;
+> discharges `GwzM5-8R2DStep31-Review.md` [P2-1] and records Step 3.1b's own
+> conversion): **23 of the 30 keys are executed**, the remaining **7 stay
+> reserved**. Two steps moved edges since the Step-2.3 annotation above.
+>
+> **Step 3.1 (landed `e72e376`) converted five edges without activating them.**
+> `stage_component` and `write_or_rewrite_marker`
+> (`capability/pre_catalog/provider/managed_mutation.rs`) cross
+> `staging_directory_create`, `ownership_marker_create`, `ownership_marker_write`,
+> `ownership_marker_flush` and `staging_directory_flush`. Their **activation
+> remains Step 3.2's** by plan assignment, and RemPlan §10's duty is satisfied at
+> the *package* level: both the converting and the activating step sit inside
+> `managed_bootstrap.*`'s own owning package, Phase 3, whose gate is the phase
+> settle — the condition that forced Step 2.3's early flip (a different phase)
+> does not hold here. Nothing unactivated is reachable in the interim:
+> `mod provider` carries `allow(dead_code)` and plan §5 item 2 forbids production
+> catalog activation. Step 3.2 owes these five sites, their matrix rows on both
+> target variants, and this list's edit; its Git-directory arm must drive through
+> the Step-2.3 door (`retain_managed_parent_at_for_test`) or place its managed
+> prefix under that target's own retained root, because a Git-directory catalog
+> has no `.gwz` ancestor (review [P3-3]).
+>
+> **Step 3.1b converts row E17 and activates its fifteen keys same-commit:**
+> `initial_intent_scratch_create`, `initial_intent_scratch_write`,
+> `initial_intent_scratch_flush`, `initial_intent_publish`,
+> `initial_intent_reobserve`, `successor_scratch_create`, `successor_scratch_write`,
+> `successor_scratch_flush`, `successor_scratch_reobserve`, `successor_publish`,
+> `successor_reobserve`, `prior_generation_retire`, `prior_generation_reobserve`,
+> `final_intent_retire`, `final_intent_retired_reobserve` — the managed intent
+> record's durable lifecycle. All fifteen have injection sites in
+> `capability/pre_catalog/provider/managed_mutation.rs` (the `namespace` owner
+> holds none, as with `namespace.*`) and executed interruption/restart/convergence
+> rows on both target variants in `bootstrap/managed/tests_intent_matrix.rs`, plus
+> 13×2 repeated-boundary rows at twelve rounds each. This closes the
+> partial-retirement window review [P1-1] recorded: a row with two or more missing
+> components interrupted inside marker retirement now resumes from its resident
+> record instead of refusing for ever.
+>
+> **E17's two §4.4 Class 1 arms resolve to none**, by the same
+> conditional-resolution mechanism §4.3's E16 annotation used. Every move of this
+> lifecycle is a *regular-file protocol record* travelling between two
+> deterministic slots of one retained action directory, through Step 2.2's
+> role-validated `publish_bootstrap_generation` / `retire_bootstrap_generation`,
+> carrying `PublicationSourceV1::regular_file` and `DestinationRecheckV1::None`
+> exactly as E12/E13 do. No directory is published, so no managed source-interior
+> arm exists to add; no retirement destination is re-checked, so no destination arm
+> is either. `PublicationSourceV1` and `DestinationRecheckV1` are unchanged by this
+> step. Consequently §4.4's arm table rows "managed source-interior | E15, E17" and
+> "managed destination | E16, E17" are, on this tree, driven by E15 and by neither
+> respectively; the rows are left as written, since this annotation is the
+> sanctioned mechanism.
+>
+> **Counts.** 165 total, unchanged; no key minted. Executed 8 → 23, reserved 22 →
+> 7. The `capability_permit.rs` caller inventory holds at **13** and
+> `CATALOG_PUBLICATION_CALL_COUNTS` is unchanged: this step adds zero
+> `publish_verified_no_replace` call sites.
 | `cleanup.*` | 11 | R2-D **Phase 4** (step 4.1 legacy leaf edges) | reserved |
 | `barrier.*` | 16 | R2-D **Phase 4** (step 4.2 Windows retirement closure) | reserved |
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
