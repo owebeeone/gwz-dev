@@ -391,3 +391,200 @@ clause, one clarifying clause). None requires touching the frozen seams or
 the parked code beyond `fault_expected_keys.rs`'s `FAULT_INJECTION_SOURCES`
 entry. With those landed, this axis expects to confirm C-1 (as annotated) and
 C-2 (as generalized) and issue GO in round 2.
+
+---
+
+# Focused re-verdict (round 2) — 2026-08-22
+
+Axis: **State / durable-state** (focused re-verdict on this axis's round-1
+findings plus the round-2 new material, per the coordinator's instruction;
+round 2 of the two-round cap). Peer-blind: the Code-axis report remains
+unread.
+Object: gwz-core `2ed2435` (round-2 remediation) + `c40e712` (ReviewCode
+round-2 P1-3 pin fix) on top of the parked `d32b2c9`; root `7ecc1a7` +
+`85f9fe6` (memo revised 2026-08-22, now 1,069 lines; RemPlan §10 correction
+block, +27/−0).
+
+**Verification basis.** Committed state only (`git show` at the commits
+above). Unlike round 1, no gate was re-executed here: the gwz-core working
+tree now carries the Phase-1 lane's uncommitted files (`admission/tests.rs`,
+a modified `admission/mod.rs`, a modified checker), so any tree run would
+test that lane, not this object. The basis is: committed-state reading and
+static verification, this axis's round-1 executions (256/0, checker
+object-clean), the lane's attributed round-2 runs recorded at memo §10.2, and
+independent GitHub corroboration of the Windows spike run (below).
+
+## 6. Round-1 findings — per-finding status
+
+**[P1-1] RESOLVED.** §4.4 is rewritten as "the two in-seam extension
+classes"; Class 1 defines the recheck-arm class once, in substance the class
+rule this review drafted (in-seam; no platform surface; acquisition window,
+identity compare, retained handle, no-replace rename untouched; caller-pin +
+same-commit digest discipline), and assigns **every** arm with an owner:
+admission source-interior/destination → Phase 1 (C-2), managed
+source-interior → 2.3/3 (E15, E17), managed destination → 2.3/3 (E16
+conditional — honest, since the marker is leaf-shaped today — and E17),
+further retirement-destination → Phase 4. The §4.3 table now carries the
+dependency on rows E3/E7/E15/E16/E17 itself, with a preamble stating that an
+arm is an extension of an admitted primitive, not a new one. §2's C-2 is
+reworded as the class contingency with the admission arms Phase-1-owned, and
+names round 1's "one bounded extension" as false. The "managed rows are not
+optional" paragraph carries the structural argument this review's finding
+rested on (mandatory `interior` field; §8.13 + checker fail-closed).
+Verified against the committed memo text.
+
+**[P2-1] RESOLVED.** Verified in the committed code at `c40e712`:
+`aggregate.rs` is declared in `FAULT_INJECTION_SOURCES`, and the new
+completeness anchor
+(`the_declared_injection_sources_are_every_production_source_holding_sites`)
+rescans `src/checked_artifact/` at test time under the checker's own
+production-file rule and asserts set equality both ways. Soundness checks
+done here: `fault_v1.rs` contains no `CheckedArtifactFaultKeyV1::` token (no
+self-trip); a tree-wide token sweep at `c40e712` finds exactly the three
+declared production files (plus two `interface_tests` files the walk
+correctly excludes), so the anchor passes as committed and fails on any
+unregistered file; the `pub(super)` visibility argument making the subtree
+scan exhaustive is correct. §3.5 now states the true inventory (3 sources,
+15+9+1 = 25 sites = 25 keys — matching this review's counts) and scopes the
+reserved-family scan claim honestly ("in a declared source") with the anchor
+supplying tree-completeness; §8 D3 matches; the RemPlan §10 correction block
+is append-only (+27/−0, verified) and restates both corrections.
+
+**[P2-2] RESOLVED — on the stronger option (executed, not waived).**
+Independently corroborated here: `gh run view 32542469665` reports
+conclusion **success**, workflow "Windows matrix", branch
+`probe/track-p-spike`, headSha `e448d7f1c989548e57316da11d76321f0a4a2cf1`;
+the local object `e448d7f` differs from `d32b2c9` by a 2-line
+`.github/workflows/windows-matrix.yml` trim **only** (verified by diff), so
+the run executed the parked object's spike source on native Windows; memo
+§10.3 records the per-test lines ("ok. 2 passed; 0 failed"). §4.2 now
+discharges both legs of Step C.1 (naming and execution), explicitly names and
+retracts round 1's amendment-`:667` mis-citation (fault evidence ≠ spike
+execution — the exact category error this review flagged), demotes run-13 to
+corroboration, and files the tracked acceptance item "both spike cases green
+on the next full Windows matrix run".
+
+**[P2-3] RESOLVED.** §4.4 Class 1 "the surface today, and its true shape"
+and §6's C-2 bullet now state the code-accurate shape: a variant on the
+`DestinationRecheckV1` enum, a generalization of the
+`DirectoryInteriorRecheckV1` struct's mandatory catalog-typed `expected`
+field, and verification reach into `provider/interior.rs` within the same
+owner. Matches the code verified in round 1.
+
+**[P3-1] RESOLVED.** All three pointers fixed: checker dict cited at
+`:657-660` (§4.2, with the round-1 error named); `RuntimeBootstrapFault` enum
+at `fault.rs:4-11` with `run_next_at` at `:19` (§3.5); lane rule re-cited to
+`CurrentProgramCheckpoint.md:483`/`:495-497` at root `13b98df` (§10.1) — both
+lines verified verbatim here ("digest refresh as the literal last pre-commit
+step").
+
+**[P3-2] RESOLVED.** §10.1 corrects the partition total to **1,371** lib
+tests (naming round 1's self-contradiction) and carries the
+one-unexecuted-test disclosure (>585 s `workspace_ops` matrix test,
+pre-existing, green in CI at run 13) into §10 itself.
+
+**[P3-3] RESOLVED.** RemPlan correction ¶2 adds the "frozen … on acceptance"
+reading, append-only, original sentence untouched.
+
+**[P3-4] RESOLVED.** §5.2 now states the relocation move executes on the
+R2-F-candidate package, not inside R2-D, and why it is therefore not an
+E-row.
+
+## 7. New material — C-3 and the §3.1 persisted-home pin
+
+**C-3's code facts: all verified here against the committed object**
+(`d32b2c9`; `interior.rs` untouched by the round-2 commits):
+
+1. `exact_slot` walks `InfrastructureSlotV1::ALL` and refuses any other
+   catalog-root child ("catalog directory contains an unowned child") — so
+   the `action-<hex>-v1` row that `RootEntryNameV1::ActiveAction(action)
+   .name()` renders, and that the **durable admission record commits to**
+   (`ActionDirectoryAdmissionV1::preparing`, `final_action_name` at
+   `protocol/admission.rs:156`), is refused by today's observer.
+   `RootEntryNameV1::parse` has no production caller (verified: test callers
+   only).
+2. `staging_plan` returns `Other` and `completed_record` returns `None`
+   whenever any `ActionAdmission{Active,Scratch,Staging}` slot is present
+   (both `any_present` guards read directly in the committed code).
+3. `MAX_INTERIOR_ENTRIES = 10` is enforced during `observe` ("catalog
+   interior exceeds the ten-slot bound") and equals `|ALL|` — zero headroom.
+4. The consequence chain is exactly as the memo prints it and was re-traced
+   here: `recover_or_create` (`catalog/bootstrap.rs:145-149`) →
+   `execute_owner_complete` (`capability/pre_catalog.rs:297-308`) →
+   `retain_completed_catalog` (`completed.rs:49`), which refuses when
+   `interior::completed_record(..)` is `None` (`:61`); the retained-catalog
+   revalidation re-runs `interior::observe` on the Final directory
+   (`completed.rs:178+`), so both the fresh-recovery and revalidation paths
+   break. One sharpening this review adds: the nine-step sequence persists
+   `Idle → Preparing` (step 3) **before** publishing, so the admission
+   active/scratch slot files exist from the first admission **attempt** — the
+   breakage does not wait for a completed admission. The memo's "Phase 1's
+   first admission breaks the next `recover_or_create` reobservation" (§2
+   C-3) is therefore accurate and, if anything, conservative.
+
+**Ruling on C-3: REAL, MATERIAL, and correctly handled.** Without it, Phase
+1's first write would permanently brick every subsequent catalog
+reobservation — the exact durable-state unsoundness this axis exists to
+catch, and a gap of the same kind as round-1 P1-1 (an unrecorded in-seam
+extension a later step must make). Folding it into the freeze as a third
+named contingency with Phase-1 ownership is the correct freeze-level
+treatment, and its placement in round 2 is legitimate scope: it is
+lane-disclosed new material (found by the §9-permitted Phase-1 test
+drafting), adds no code to the package, reshapes none of the five frozen
+seams (the extension sits behind `OpaqueRetainedCatalogV1` inside the
+provider owner), and is put before this review to confirm — not smuggled past
+it. **Track-W adjudication confirmed NOT Track-W**: the extension widens what
+the provider observer *accepts and calls complete*; every durable item it
+reads — the `ActionAdmission*` triad, the `RootEntryNameV1` two-arm grammar,
+the admission record fields — is already in the frozen R1+C0 vocabulary
+(verified), and `MAX_INTERIOR_ENTRIES` is a provider-side constant, not a
+durable record. Class 2's definition, ownership, and rules (same discipline
+as the recheck arms; "the cap and the grammar have to move together") are
+adequate for Phase 1 to build against without a further freeze round.
+
+**§3.1 persisted-home pin: confirmed, code-true.** The three
+`ActionAdmission*` slots exist in the enum, in `ALL`, and as rendered names
+(`protocol/slots.rs`, verified round 1); the durable infrastructure record
+already **issues** the triad (`infrastructure_record.rs:100-104`) and its
+decoder **refuses any other value** ("infrastructure record binding
+mismatch", `:181-193` — verified here); the admission record itself names the
+staging slot (`admission.rs:153-155`). So the pin is not merely a memo
+assertion — the binding is machine-enforced by the record codec, which is
+stronger than a test pin. It grounds §6's zero-new-durable-records rule
+structurally for admission ("Phase 1 adds no new slot, no new record, and no
+new name") and correctly makes C-3 a grammar obligation, not a vocabulary
+one.
+
+**Contingency confirmations (this axis):** **C-1 confirmed** — the §4.3
+table is per-platform-complete and correct, and now carries its own arm
+dependencies; **C-2 confirmed as generalized** — the recheck-arm class is an
+in-seam extension class, not a new primitive and not a bypass, with the
+admission arms Phase-1-owned; **C-3 confirmed** — an in-seam observer/slot-
+grammar extension in the same provider owner, Phase-1-owned, not a Track-W
+event.
+
+## 8. New finding this round
+
+**[P3-5, round 2] Two stale "owed to the lane owner" sentences contradict
+the commits that carry them.** Memo §4.2's closing paragraph ("the one-line
+comment edit is owed to the lane owner at the acceptance commit") and the
+header's Code-P3-4 bullet still describe the `tests_admission_spike.rs:84`
+citation fix as pending — but twin commit `2ed2435` carries exactly that edit
+(`:1082-1085` → `:1089-1092`, verified in the diff), `c40e712` refreshed its
+tree pin, and §10.2 (rewritten in the pin-fix commit) records the true
+sequence. Two sentences to clean at the acceptance/docs pass; no frozen fact
+is affected. Files-and-continues per the operator cap; not a gate.
+
+## 9. VERDICT (round 2): **GO** — State axis
+
+All round-1 findings on this axis are resolved (P1-1, P2-1, P2-2, P2-3,
+P3-1..P3-4); the round-2 new material (C-3, §3.1 pin) is verified and
+adequate; the only new finding is P3-5, informational. Zero P0/P1/P2 open on
+this axis.
+
+Items traveling with the package to acceptance (already recorded in the memo
+or filed here): (a) both `tests_admission_spike` cases green on the next
+**full** Windows matrix run (§4.2/§10.3); (b) the P3-5 sentence cleanup;
+(c) the pre-existing >585 s `workspace_ops` matrix test confirmed on the next
+matrix run (§10.1, checkpoint-tracked); (d) the §9 tier-recording duty at the
+freeze commit (lane owner).

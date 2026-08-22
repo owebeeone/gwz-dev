@@ -33,8 +33,20 @@ fable token only where it makes a difference." Recorded consequences:
   re-frame, and the Refactor/R1 naming sentence — landed with
   acceptance; `GwzM5-8ThinA1Amendment.md` is now the controlling
   gate-chain text).
-  Wave 2 on Phase-0 GO/GO: land+push the freeze train, Phase 1
-  driver, D3 cursor implementation lane.
+  **Phase 0 freeze ACCEPTED 2026-08-22 at GO/GO** — dual #1 of 3
+  consumed (Code GO after the round-2 [P1-3] pin catch at `c40e712`;
+  State GO with C-3 ruled real/Phase-1-owned/not-Track-W and the
+  §3.1 pin verified). `GwzM5-8R2DInterfaceFreeze.md` is FROZEN: five
+  seams, two extension classes (C-2 recheck arms, C-3 observer
+  grammar) with per-phase assignments, §3.1 persisted-home pin — all
+  binding on Phases 1-5. Tier recording per plan §7.6: done (this
+  section + the thin-A1 section). Freeze train PUSHED to origin
+  through `c40e712`; the M5b park (`3e60529`) stays local pending
+  its own dual. Tracked: both Track-P spike cases green on the next
+  full Windows matrix run (dispatched at push). Wave 2 LAUNCHED:
+  Phase 1 Step 1.2 driver (Opus; makes the six red admission tests
+  green, implements C-2 arms + C-3 observer grammar under the frozen
+  rules) and the D3 durable-cursor implementation lane (Opus).
 
   **M5b package DELIVERED and PARKED pre-review** (2026-08-22): the
   no-ff semantics installation per the frozen design — 21 new green

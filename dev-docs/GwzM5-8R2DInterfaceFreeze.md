@@ -2,11 +2,23 @@
 
 Date: 2026-08-16; **revised 2026-08-22 (round 2)**.
 
-Status: **DRAFT — round-2 revision of 2026-08-22, pending focused
-re-verdicts.** This is R2-D Phase 0 Step 0.1 of the adopted plan, landing
-together with the Step 0.2 scaffolding under **one** dual peer-blind review
-(adopted plan §4 Step 0.2 "Rides Step 0.1's review"; `GwzFasterProposal.md` §3
-Step C.2). Nothing physical mutates in this package.
+Status: **FROZEN — ACCEPTED 2026-08-22 at GO/GO** (dual #1 of R2-D's
+three retained duals). Code axis: round-2 GO after the [P1-3] pin
+refresh at `c40e712`, verified on a pristine extraction. State axis:
+round-2 GO — all round-1 findings resolved; C-3 ruled real, material,
+Phase-1-owned, and not Track-W; the §3.1 persisted-home pin verified
+machine-enforced; one informational [P3-5] cleaned in this acceptance
+pass. History: round-1 NO-GO/NO-GO (2 P1 + 1 P1/3 P2), one merged
+remediation at `2ed2435`, the pin fix at `c40e712` — within the
+two-round cap. Tracked to the next full Windows matrix run: both
+Track-P spike cases green natively. This is R2-D Phase 0 Step 0.1 of
+the adopted plan, landed together with the Step 0.2 scaffolding under
+**one** dual peer-blind review (adopted plan §4 Step 0.2 "Rides Step
+0.1's review"; `GwzFasterProposal.md` §3 Step C.2). Nothing physical
+mutates in this package. The five frozen seams, the two extension
+classes (C-2 recheck arms, C-3 observer grammar) with their per-phase
+assignments, and the §3.1 persisted-home pin are now binding on
+Phases 1-5.
 
 Round-1 verdicts were NO-GO on both axes
 (`GwzM5-8R2DInterfaceFreeze-ReviewCode.md`: 2 × P1, 8 × P3;
@@ -29,11 +41,12 @@ revision addresses **every** finding on both axes:
   the pre-catalog interior observer/slot grammar, is named as **C-3** (§2,
   §4.4), and §3.1 pins the admission record's persisted home to the three
   already-frozen `ActionAdmission*` infrastructure slots.
-- **Code P3-1..P3-8, State P3-1..P3-4** — all corrected in place, except
-  Code P3-4 (a citation inside `tests_admission_spike.rs`, outside this
-  revision's file ownership: the correct target is recorded at §4.2 and the
-  one-line file edit is owed to the lane owner) and Code P3-8 (an environment
-  note about another lane's working-tree files, no memo change possible).
+- **Code P3-1..P3-8, State P3-1..P3-4** — all corrected in place. Code
+  P3-4's one-line citation fix inside `tests_admission_spike.rs` LANDED
+  in the round-2 commit `2ed2435` (with the matching pre_catalog tree
+  pin refreshed at `c40e712` after the Code round-2 [P1-3] catch);
+  Code P3-8 is an environment note about another lane's working-tree
+  files, no memo change possible. (State round-2 [P3-5] cleanup.)
 
 Verified tree: gwz-core `d32b2c9cb67a0d25ddb2dd047e1c5d1a70d0c39b` (the parked
 package commit), workspace root `13b98df`. **Every file:line in this memo is
@@ -555,9 +568,11 @@ accurately (it does forbid allocating a fresh retry scratch name, which is why
 the spike uses deterministic indexed names), but in
 `GwzM5-8R4bP1P2-RemPlan-4.md` it now sits at **`:1089-1092`**; the citation was
 inherited verbatim from `GwzFasterProposal.md:160` and was already stale when
-the package was parked. `tests_admission_spike.rs` is outside this revision's
-file ownership, so the correction is recorded here and the one-line comment
-edit is owed to the lane owner at the acceptance commit.
+the package was parked. The one-line comment edit LANDED with the round-2
+commit `2ed2435` (`tests_admission_spike.rs:84` now cites `:1089-1092`), and
+the pre_catalog tree pin it disturbed was refreshed at `c40e712` per the Code
+round-2 [P1-3] finding. (Sentence updated at acceptance per State round-2
+[P3-5].)
 
 ### 4.3 Every R2-D physical edge mapped onto a proven primitive
 
