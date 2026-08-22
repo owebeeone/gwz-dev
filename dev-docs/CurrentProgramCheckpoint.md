@@ -430,10 +430,15 @@ Recorded consequences (its §3 Step A):
   leak, rule-8 decidability, sidecar lifecycle). Blind convergence
   note: both axes independently found the unamended cursor-derivation
   contract (ActionJournal §2 :178-192 — Code P1-1 ≡ State P1-3).
-  Recorded **NON-GATING for A1 and second-lane** per thin A1
-  (`GwzFasterProposal.md` §2/§4): the merged remediation round (round
-  2 of 2 under the cap) and any acceptance are blocked on operator
-  handoff, not this implementor's work. Side finding routed: the accepted
+  Recorded **NON-GATING for A1** per thin A1 (`GwzFasterProposal.md`
+  §2/§4). **Second-lane block LIFTED for this item by operator
+  handoff 2026-08-22 ("burn it", during the quota burn-down window):**
+  the merged round-2 remediation is IN DRAFTING (strong tier — the
+  consent-digest chain and the five other State P1s are cross-contract
+  semantic surgery), with focused re-verdicts from the round-1
+  reviewers to follow, acceptance ritual on GO/GO. The Q1-Q10
+  operator decisions are an immutable envelope for the remediation.
+  Side finding routed: the accepted
   durable-cursor amendment's "post-GC record rewrite" phrasing is
   inaccurate (`merge/gc.rs:196` shapes the response projection only)
   — wording erratum for its next docs pass, no behavior involved.
