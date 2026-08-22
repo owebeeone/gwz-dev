@@ -247,3 +247,34 @@ macOS unchanged (green).
 Diagnosis lane, 2026-08-22. Non-gating (thin A1). This memo dispatched
 one platform-matrix run (32559626688) for the A/B; no branches, tags,
 commits, or pushes were created.
+
+## Correction at the fix landing (2026-08-22, gwz-core `c2d2f15`) — the libgit2 premise
+
+This memo (and the probe report after it) explained the g15-vs-v1 split
+by builder: "the v1 fixtures build via libgit2, which does not copy that
+template tree." That premise is **false**, proven at the fix lane from
+the dependency sources: git2-rs 0.21's `RepositoryInitOptions::new()`
+sets `GIT_REPOSITORY_INIT_EXTERNAL_TEMPLATE` by default
+(`git2-0.21.0/src/repo.rs:3488-3500`), and libgit2's template copy maps
+an executable source to `0777 & ~umask` = 0755
+(`libgit2/src/libgit2/repository.c:2594-2599`,
+`util/futils.c:1095-1100`). All 17 failing v1_lifecycle rows build via
+libgit2 only — no CLI `git init` exists anywhere in their fixture path.
+
+The true discriminator is **republication, not builder**: fixtures whose
+boundary file is republished through `ensure_workspace_exclude` →
+`artifact::write_atomic` land a fresh inode at mode 0644 and were only
+*accidentally* immune; the 17 are the rows whose root boundary is never
+republished before the gate reads it, or is rewritten with
+mode-preserving `fs::write`. The three v1 rows this memo cited as
+reaching the marker-parent sync were immune by republication, not by
+builder. Recorded per L1-16 as attribution correction #3 of the ARM
+campaign. The fix (test/fixture-side mode pinning at creation, g15
+`write_pinned` + v1 `pin_fixture_boundary_mode`, with a permanent
+non-executable regression pin) landed at `c2d2f15` with a red-green
+proof under a faithful runner simulation (scratch HOME,
+`init.templatedir` pointing at an executable template): red reproduces
+exactly the 29 + the named 17; green is the full population under both
+plain and simulated HOME. The operator policy question above (typed
+refusal for real-world repos initialized from executable templates)
+remains open and is unchanged by this fix.

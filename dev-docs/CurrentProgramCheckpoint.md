@@ -299,6 +299,59 @@ fable token only where it makes a difference." Recorded consequences:
   follow-up 3). Budget 980 code vs <500 aspirational — reviewed as
   load-bearing, recorded for the settle.
 
+  **Step 3.1b DELIVERED 2026-08-22, under State-lead single-axis
+  review.** The E17 durable managed-intent lifecycle: initial
+  scratch/publish/reobserve, per-generation successor,
+  prior-generation retirement, final retirement; resume_intent walks
+  the resident chain link-by-link (each retired record's intent_id is
+  the next link's expected predecessor — verified, not adopted); the
+  review's [P1-1] wedge case (≥2-component row interrupted inside
+  marker retirement) now converges, driven by name. Token read-back
+  from the resident record with the self-consistency-not-exclusion
+  boundary stated. FIFTEEN keys activated same-commit with sites and
+  matrix rows (executed 8→23, reserved 22→7, counts held 165, no
+  mint) — the 3.1 [P2-1] lesson absorbed; E17's two §4.4 arms
+  resolve to none by the E16 mechanism; publication seam unchanged
+  (21 sites, permit 13). Budget 812 code (~1.6×). Liftable §3.5
+  annotation drafted. Open after 3.1b: 3.2's five writer keys +
+  preflight/plan_complete disposition (reviewer asked to rule),
+  follow-up 3, 3.3 glue.
+
+  **ARM fixture package LANDED 2026-08-22 (gwz-core `c2d2f15`,
+  direct-with-record per the fixture-class precedent — red-green
+  proof standard exceeded review).** Mode pinning at fixture
+  creation: g15 write_pinned at all five write sites + a permanent
+  no-executable-leaf regression pin; v1 pin_fixture_boundary_mode in
+  the four fixture builders owning the 17 rows. Red-green under a
+  faithful runner simulation (scratch HOME + executable
+  init.templatedir): red = exactly 29 g15 + the 17 named v1 rows;
+  green = full population under plain AND simulated HOME.
+  **ATTRIBUTION CORRECTION #3 (L1-16), recorded in the memo:** the
+  probe's "libgit2 does not copy templates" premise was FALSE
+  (git2-rs sets EXTERNAL_TEMPLATE by default; the copy maps
+  executable→0755); all 17 v1 rows are libgit2-built, and the true
+  discriminator is REPUBLICATION — write_atomic republication lands
+  a fresh 0644 inode, so the passing fixtures were accidentally
+  immune. Validation dispatched at `c2d2f15`: platform 32573547362
+  (the program's first shot at ARM green), Windows 32573548540 (run
+  18 — the anchor package's tracked acceptance item: legacy
+  AnchoredPrivateArea suites + the namespace four).
+
+  **Incident record (lane owner, 2026-08-22): reconcile stashes
+  swept a live lane's edits, twice.** My post-landing reconciles
+  (`git stash push -- <list> && git reset --hard origin/main`)
+  stashed a REMEMBERED file list; the ARM fixture lane had
+  meanwhile extended its edit set (v1 fixture files), and reset
+  --hard reverted those uncommitted edits — twice. The lane detected
+  the interference, restored from its own insurance copies, and
+  re-verified every number on the post-landing tree; nothing was
+  lost. RITUAL (6), effective immediately: the stash keep-list for
+  any reconcile is computed from live `git status` at that moment
+  (full complement of every path not in the train being landed),
+  never from a remembered lane inventory; and lanes are told at
+  launch to keep insurance copies of uncommitted work in their
+  scratch area (this one did, which is why the burn cost nothing).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
