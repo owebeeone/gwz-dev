@@ -129,6 +129,37 @@ fable token only where it makes a difference." Recorded consequences:
   no-replace primitive with all three crash windows proven
   convergent — re-spike if the reviewer reads E4 as requiring an
   atomic replacing rename; (iii) absent-active ≡ idle semantics.
+  **Steps 2.1 + 2.2 LANDED 2026-08-22 (one combined train).** 2.1
+  (LeafObserver production impl, durable_leaf 11/11 executed): Code
+  single-axis round-1 NO-GO on one real P1 — sync_all on the
+  read-only handle breaks E9 on Windows — fixed with a documented
+  platform-routed arm + non-vacuous os-error-5 canary; round-2 GO;
+  escalation State axis GO (0 P0/P1; its P2 discharged by the freeze
+  §4.3 E9 annotation landed with this train: writer-class-conditional
+  durability, per-platform ExactDurable meaning, MissingDurable
+  negative space — binding on Step 2.4's caller). 2.2 (namespace
+  backend, namespace 11/11 executed): State single-axis GO; its
+  auto-escalation trigger was a P2 that IS the landing commit's own
+  checker counts entry — lane-owner adjudication: discharged at
+  landing, second-axis scrutiny folds into the Phase 5 settled dual
+  per the three-dual cap; repeatability-taxonomy comment corrected
+  at landing per its P3-1. Both tree pins + the counts entry
+  validated GREEN on a pristine overlay before commit. Phase 2
+  remaining: Steps 2.3 + 2.4 (launched on landing).
+
+  **ARM64 attribution correction #2 (L1-16):** the platform run at
+  the twin fix proves EBADF EXTINCT (zero os-error-9 in the log; the
+  three reverse-preservation EBADF rows cleared), but 46 of the 49
+  prior failures were NEVER its cascades: 29 g15::root_preservation
+  + 17 v1_lifecycle failures persist with
+  `PreservationEvidenceMismatch: "root preservation preparation
+  requires the exact durable handoff"` (support.rs:424) — a distinct
+  first-Linux-execution class in the preservation-root durable
+  handoff — plus one new first-execution test fragility
+  (exact_source inode-reuse assumption; tmpfs/ext4 recycles inode
+  numbers). ARM now 1374/47. Fable diagnosis package launched;
+  non-gating throughout (thin A1).
+
   **PHASE 1 SETTLED 2026-08-22 at GO/GO — dual #2 of 3 consumed.**
   Round 1: State NO-GO (1 P1 — the 65th-admission catalog-bricking
   capacity gap, a genuine kernel catch; 2 P2, 4 P3) / Code GO (1 P2,

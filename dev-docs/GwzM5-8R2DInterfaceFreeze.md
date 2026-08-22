@@ -602,7 +602,24 @@ primitive, not a new one.
 | E6 | bounded global classification of interior action rows | 1 | P4 | `interior.rs:50`, `enumeration.rs:8-12` | identical | identical | no |
 | E7 | action directory retirement into the retired root | 1/4 | P1 with destination recheck | `publication.rs:157-173` | same + `windows_destination_path` `platform.rs:196` | as mac | no — spiked §4.2 (mac+win); **needs the admission destination arm, §4.4 class, Phase 1 (C-2)** |
 | E8 | bounded/streamed leaf read through one retained handle | 2.1 | P3 + P2 | `platform.rs:159` no-follow | `platform.rs:165` share-delete | as mac | no |
-| E9 | leaf flush | 2.1 | P2 | `sync_all` | `sync_all` | `sync_all` | no |
+| E9 | leaf flush | 2.1 | P2 | `sync_all` | documented no-op (see annotation) | `sync_all` | no |
+
+> E9 activation annotation (2026-08-22, Step 2.1 landing; discharges the
+> Step-2.1 State escalation [P2-1] and Code round-1 settle duty): the
+> Windows arm of `flush_observed_leaf` performs no handle flush —
+> `FlushFileBuffers` requires `GENERIC_WRITE` and the observation handle
+> is read-only by design; widening the open would make read-only
+> artifacts unobservable. The durability property substituting for it is
+> writer-class-conditional and consumer-facing: every gwz writer reaches
+> observed leaves through write-through or write-handle `sync_all`
+> (verified across `mutation.rs`/`directory_mutation.rs`/
+> `admission_mutation.rs`/`residue.rs`), so for gwz-written leaves
+> `ExactDurable` means the same on every platform; for FOREIGN-written
+> leaves `ExactDurable` is strictly weaker on Windows (namespace ordering
+> via the E10/P5 anchor round-trip only, no byte-flush claim). Step 2.4's
+> production caller binding must carry this condition. Same annotation,
+> negative space of E11's proof: `MissingDurable` is a two-sided absence
+> proof; it does not assert continuous absence across the barrier window.
 | E10 | leaf namespace barrier | 2.1 | P5 | `platform.rs:271` | `platform.rs:458` anchor | as mac | no |
 | E11 | same-parent reobserve; two-sided durable-absence proof | 2.1 | P3 + P4 | identical | identical | identical | no |
 | E12 | backend `publish_exact` over scheduled roles | 2.2 | P1 | `platform.rs:23/:78` | `platform.rs:48/:98` | as mac | no |
