@@ -411,6 +411,45 @@ fable token only where it makes a difference." Recorded consequences:
   record (dispositions: preflight/plan_complete,
   retain_managed_parent).
 
+  **PHASE 3 SETTLED 2026-08-23 (single-axis regime per freeze §9 —
+  the plan's Phase-3/Phase-4 "Gate: dual" lines are superseded by
+  thin-A1's three-dual cap; recorded deliberately).** Steps landed:
+  3.1 `e72e376`, 3.1b `fcec69e`, 3.2 `7169d89`, 3.3 `3a45619`.
+  Step 3.3's round-1 P1 — authorize_write bound a CALLER-CHOSEN
+  reservation — closed round 2 by comparing the observation's
+  OBSERVED retained-parent identity (the one binding fact a caller
+  cannot supply); the reviewer proved the check load-bearing by
+  deleting it in scratch (only the cross-action row failed) and
+  ruled the landed form STRONGER than its own remedy 2. Second
+  occurrence of the caller-supplied-restatement class (first: 2.4
+  P1) — named as a Phase 5 dual audit item: every gate that copies
+  binding fields from an argument. SETTLE DISPOSITIONS (docket of
+  8, all verified true of the tree by the 3.3 reviewer):
+  (1) preflight/plan_complete — DETERMINED never-gain-boundaries;
+  dated §3.5 determination filed at this settle; census 165 stands;
+  5.1's evidence duty reading amended accordingly. (2)
+  retain_managed_parent — KEEP as the documented cfg(test) door
+  retainer; revisit only on an R2-E production caller. (3)
+  Git-directory workspace-root binding — R2-E input; the typed
+  preflight refusal is production-safe today. (4)
+  staging_directory_flush second site — ACCEPTED one-key/two-sites
+  (interior-first ordering proven; no sixth key for zero coverage
+  gain). (5) multi-component writer interruption rows — assigned to
+  Phase 5.1's evidence train. (6) partial-handoff resume via the
+  test door — R2-E interface input; documented settled-tuple caveat;
+  the admission-classifier widening belongs with real consumers.
+  (7) blanket allow(dead_code) narrowing — assigned to Phase 4.3.
+  (8) seam-level action binding in AuthorityObservationFactsV1 —
+  assigned to Phase 4.3 (NOT deferred to R2-E: the defect class has
+  fired twice), in the action-digest form with the reviewer's
+  refinement adopted: it rests on slot-name derivation, so it lands
+  PAIRED with an explicit consumer obligation stated at the seam.
+  Also to 4.3: the 3.3 round-2 P3s (detail-string pin on the
+  cross-action row; the stranded leaf_digests doc line). Escalation
+  ledger riding to the Phase 5 dual: 2.3, 2.4, anchor, 3.1, 3.1b
+  (2.2's discharged at its landing; 3.3's discharged at round 2)
+  plus the named class audit. Phase 4 launches on `3a45619`.
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its

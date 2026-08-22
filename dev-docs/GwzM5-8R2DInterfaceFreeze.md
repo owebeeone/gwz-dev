@@ -594,6 +594,22 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > `capability_permit.rs` caller inventory holds at **13** and
 > `CATALOG_PUBLICATION_CALL_COUNTS` is unchanged: this step adds zero
 > `publish_verified_no_replace` call sites.
+>
+> Phase 3 settle determination (2026-08-23, lane owner, at the Step 3.3
+> landing `3a45619`; discharges the Step-3.1b review's [P3-1] docket item):
+> **`preflight` and `plan_complete` never gain fault boundaries.** They name
+> plan-level states of the request lifecycle — a preflight observation and a
+> completed plan — not durable edges: no create, write, flush, publish,
+> retire, or reobserve occurs at either, and every edge-bearing key of the
+> family (28 of 30) is executed. The states they name are proven by the
+> purpose-policy matrix's ProofOnly/Scheduled arms and the coordinator suite
+> (`tests_purpose_policy.rs`, `coordinator/tests_execution.rs`), which is the
+> correct evidence form for a state, as fault injection is for an edge. They
+> remain in the vocabulary — census stays 165/30, no key retired — with the
+> key-by-key siteless proof (`fault_expected_keys.rs`) as their permanent
+> evidence. Step 5.1's per-key executed-evidence duty accordingly reads:
+> edge-bearing keys carry executed interruption rows; these two carry this
+> determination and their state proofs.
 | `cleanup.*` | 11 | R2-D **Phase 4** (step 4.1 legacy leaf edges) | reserved |
 | `barrier.*` | 16 | R2-D **Phase 4** (step 4.2 Windows retirement closure) | reserved |
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
