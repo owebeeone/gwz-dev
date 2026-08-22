@@ -1,12 +1,39 @@
 # Current program checkpoint
 
-Date: 2026-08-16 (paused)
+Date: 2026-08-22 (resumed)
 Status: **the single current-state authority for the GWZ merge program.
 Update at every checkpoint boundary; keep concise; history belongs in git,
 not in this file. Live status paragraphs in other documents are superseded
 by this file (rulebook §7.3).**
 
-## PAUSED 2026-08-16 — resume from here
+## RESUMED 2026-08-22 — parallel execution, refined tier economy
+
+Operator resumed 2026-08-22: "proceed now with parallelization the
+focus (reduce calendar cost) but also optimize model use so we use
+fable token only where it makes a difference." Recorded consequences:
+
+- **Refined tier policy (supersedes the 2026-08-16 economy policy's
+  reviewer line):** Fable ONLY at the program-level dual gates —
+  R2-D's three duals, the M5b dual, R4b-G, the A1 activation review,
+  this amendment-tier work — plus escalations and deep diagnosis.
+  Interior single-axis reviews (R2-D Phases 2-4 steps) run on the
+  Opus tier with automatic escalation to a Fable pass on any P0/P1/P2
+  finding. Drafting/implementation stays Opus; mechanical stays
+  Sonnet.
+- **Parallel structure:** 2-3 lanes + reviews shadowed by the next
+  package (the §4.4 pipeline rule). Wave 1 launched 2026-08-22:
+  (i) Phase 0 dual review (Fable ×2, Code+State, peer-blind) on the
+  parked `d32b2c9`; (ii) Phase 1 Step 1.1 failing tests (Opus)
+  shadowing it; (iii) M5b implementation (Opus) on its own subtree;
+  (iv) thin-A1 round-2 remediation applied inline (this commit) with
+  focused re-verdicts requested from the round-1 reviewers.
+  Wave 2 on Phase-0 GO/GO: land+push the freeze train, Phase 1
+  driver, D3 cursor implementation lane.
+- The escape amendment stays second-lane/blocked on operator handoff
+  (unchanged). The paused-state facts below remain the baseline the
+  waves execute against.
+
+## Pause record 2026-08-16 (baseline for the resume)
 
 Operator paused the program ("pause after all the current tasks are
 finished and create a checkpoint") after the thin-A1 instruction was
