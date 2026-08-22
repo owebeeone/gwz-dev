@@ -617,6 +617,86 @@ primitive, not a new one.
 | E21 | legacy leaf edge `residue.rs:486` | 4.1 | P1 (same) | as E18 | as E18 | as E18 | no |
 | E22 | legacy Windows durability anchor retirement | 4.2 | P1 + P5 | n/a (`cfg(windows)`) | `platform.rs:380-604`; random scratch at `:420` is the R2 stop-clause violation this step removes | n/a | no |
 
+**Activation record 2026-08-22 — E4's retire half, a first-of-kind removal
+edge.** Recorded in the §3.5 activation-record form rather than by reshaping the
+frozen table above, and entered on both settled review axes' finding (Code
+[P2-1] ≡ State [P2-1]).
+
+E4's row reads "P2 + P1", and that is accurate for the two halves the table was
+written to describe: the write-ahead scratch (P2) and the no-replace publication
+onto the active name (P1). Phase 1 implemented the composition as **write-ahead
+scratch → retire the superseded active record → no-replace publish**, and the
+middle step is a physical shape no admitted family expresses:
+
+| Edge | Physical shape | Where |
+| --- | --- | --- |
+| E4-retire | `cap_std::fs::Dir::remove_file` of the frozen `ActionAdmissionActive` slot name, then the P2 parent flush (`platform::sync_parent`) | `capability/pre_catalog/provider/admission_mutation.rs`, `retire_admission_record` |
+
+The record, stated once:
+
+- **Why no admitted family covers it.** §4.1's five families are P1 sealed
+  rename-publication, P2 write-through + flush, P3 identity, P4 bounded
+  enumeration, P5 barrier. None is a removal. The §4.2 spike exercised no unlink
+  on either platform. The publish half *is* over the sealed primitive; the
+  checkpoint's shorthand "retire-then-publish over the no-replace primitive"
+  overstates by covering both halves with the one phrase, and is corrected here.
+- **Why the alternatives were unavailable rather than unattractive.** The
+  publication family is no-replace by construction (§4.1, §8.13, and the
+  checker's raw-rename scan), so the superseded record cannot be displaced by a
+  replacing rename. Retiring it *by rename* needs a destination name, and
+  `completed_record` requires an **empty** `RetiredActions` root, so no
+  in-vocabulary target exists; minting one is forbidden by §6 and the §3.1
+  persisted-home pin. Removal is what remains.
+- **Write-ahead protection.** The next durable state is written, `sync_all`-ed,
+  open-file verified, named-file verified and parent-flushed into
+  `ActionAdmissionScratch` **before** the active name is touched. Authority
+  lives in the active slot and the publish is the commit point, so the retire
+  never destroys the only copy of a committed state — it removes a record whose
+  successor is already durable.
+- **Idempotence.** The edge is derived from the current durable state, targets a
+  compile-time slot constant, and allocates nothing. A lost retire re-presents
+  the pre-retire window and the driver retires again; a retire whose flush is
+  lost is indistinguishable from one that never happened. Its durability is
+  therefore not correctness-critical, which is also why the Windows
+  delete-pending wrinkle degrades to a typed refusal plus restart convergence
+  (a lingering name fails either the no-replace publish or the delete-pending
+  open; both stop, and the state remains a covered window) rather than to
+  corruption. ConsumerCheckpoint §8 (:242-243) is not violated.
+- **Ordering against the publish is namespace-enforced, not timing-enforced.**
+  Both edges target the same name in the same directory and the publish is
+  no-replace, so on the closed support table (journaled NTFS/ext4/APFS) no crash
+  state can hold both the superseded and the published record under one name.
+  Losing the retire yields the pre-retire window; losing the publish yields the
+  post-retire window; both converge.
+- **Convergence evidence.** Both post-retire windows are now reconstructed on
+  disk and re-entered as fresh processes by
+  `every_admission_record_install_window_converges_to_the_settled_state`
+  (`admission/driver/tests.rs`): the `idle` variant (step 7) as
+  "retired, scratch idle", and — added in this round-2 remediation — the
+  `preparing` variant (step 3, action row not yet published) as
+  "post-retire, scratch preparing". The pre-retire windows are covered in both
+  directions by "preparing, scratch idle" and "idle, scratch preparing". Under
+  real interruption the four scratch publish/reobserve keys crash and restart
+  green on both target variants.
+- **Not a Track-P event.** `remove_file` is not a new platform capability: it is
+  already production-used at `cleanup.rs:87/:127/:157`, `platform.rs:408` and
+  `transition.rs:234`. §4.4's "New platform primitive required: **NO**" verdict
+  stands unchanged; what was wrong was the *inventory*, not the verdict.
+
+**Open question carried to the re-verdict — the fault key, deliberately not
+minted.** No `admission.*` key sits between the unlink and the publish, so the
+matrix's own claim that every row is "a real process stop across a real durable
+edge" (`admission/tests_fault_matrix.rs`) does not hold for this one edge; its
+post-state is covered by the on-disk window rows above instead. The State axis
+offered two closures: (i) this record **plus** minting `admission.record_retire`
+with its own matrix row, or (ii) this record alone, recording the accepted
+no-key deviation with the window rows cited as covering evidence. **Route (ii)
+is implemented.** Route (i) is not refused on the merits — it is stronger — but
+minting a key moves the frozen census from **19/165 to 20/166** (§3.5,
+`EXPECTED_KEY_COUNT`), which is a deliberate freeze edit and not a remediation
+the implementation lane may take silently. The re-verdict owns the decision: if
+the settle wants route (i), the count change is the reviewed edit it asks for.
+
 ### 4.4 Verdict, and the two in-seam extension classes the R2-D phases own
 
 **New platform primitive required: NO.** Every edge E1-E22 names an admitted
