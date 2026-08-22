@@ -1,5 +1,12 @@
 # Windows matrix classification — GREEN (runs 11, 13); macOS GREEN at run 13
 
+**Class-membership note (M5b-IMPL ledger obligation, design §9 Q7,
+recorded 2026-08-22):** a v1 record row carrying `mode: no_ff` makes
+the commit-arm materialization reachable for otherwise-fast-forwardable
+participants; both the ff path and the commit path were already members
+of the CRLF/materialization class covered by the un-pinned CRLF matrix
+sentinel (D1 package), so this is bookkeeping, not new exposure.
+
 **Run 13 — 31921194567 on `90d3f8a` (run-12 residue fixes):
 1322/0/1 — GREEN.** Both run-12 first-dispatch failures cleared on
 native re-execution: the destination-window ancestor test now asserts

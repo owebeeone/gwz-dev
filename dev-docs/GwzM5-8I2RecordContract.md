@@ -4,6 +4,27 @@ Date: 2026-08-04
 
 Status: **accepted; R4a unblocked and R3 remains sequenced after R4a**
 
+Amended 2026-08-22 by `GwzM5-8M5bNoFfDesign.md` §3.4 (amendment M5b-W1,
+document-only, additive; applied at M5b package acceptance GO/GO): §7's
+"exact tree, author, committer" is clarified to include the exact
+signature **timestamps** — a commit action's author/committer freeze
+comprises name, email, epoch seconds, and timezone offset as serialized
+in `PendingGitSignature`; preparation captures them once, and execution,
+restart adoption, and reconciliation reuse the frozen values without
+re-stamping. Second clarification: neither integration-commit
+construction site (the two-parent execution path nor the conflict
+resolution path) attaches a cryptographic object signature — both are
+direct libgit2 `commit()` calls, which ignore `commit.gpgsign` — so
+"signatures" throughout §7 means the Git author/committer identity
+lines; the AD1 porcelain commit/tag fallbacks elsewhere in the backend
+deliberately honor signing config and are not integration paths. §7's
+restart adoption and completion matching are **field-wise** over the
+frozen fields (parents, message bytes, tree, both identity lines), not
+commit-OID/byte-wise; an externally created twin commit that matches
+every frozen field may be adopted even if it carries additional headers.
+The amendment changes no v1 wire shape, no validator outcome, and no
+journal semantics.
+
 Amended 2026-08-16 by `GwzM5-8DurableCursorAmendment.md`: the per-owner
 preservation evidence row gains two additive fields (`noop_commit`,
 `reset_commit`); the §8 retirement row and collision doctrine extend to

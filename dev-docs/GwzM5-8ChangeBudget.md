@@ -825,6 +825,32 @@ interface GO. Its 5,200-line ceiling reserves the §13 correction, retained
 code-review, and bounded remediation/re-review appendices in the same two memo
 paths; it cannot fund test or code scope and adds no path.
 
+### M5b — no-ff semantics installation (accepted 2026-08-22, GO/GO)
+
+Intentional production behavior delta: **none** (zero-production-line
+ceiling of the frozen design §8.3 — held, proven three ways by the Code
+review including non-test dep-info).
+
+```text
+package: M5b no-ff semantics installation (gwz-core 3e60529 + the
+  acceptance-train scan/CI additions)
+baseline revision: gwz-core c40e712
+production LOC added/deleted: 0 / 0
+production LOC moved: 0
+test/tool/doc LOC added/deleted: 1,424 added at 3e60529 (+~45 scan/CI
+  at acceptance) / 26 deleted
+production files touched/created: 0
+test/tool/doc files touched/created: 6 (4 new) + workflow step + this row
+wire/protocol delta (expected / actual): none / none (M5b-W1 is
+  document-only, applied to the record contract at acceptance)
+ceiling result: 0-production-line ceiling HELD; ≤10 files held (6);
+  test-line ceiling exceeded 1,424 vs 1,200 — lane-owner freeze-ledger
+  decision raised to 1,450 for this package (checkpoint record
+  2026-08-22), ratified by both review axes
+scope exceptions requested: the 1,450 test-line raise (granted, above);
+  none other
+```
+
 ## Package reporting template
 
 Every package handoff records:

@@ -67,10 +67,32 @@ fable token only where it makes a difference." Recorded consequences:
   probe fails identically) — routed to the R4b acceptance-debt
   surface at the A1 activation review (thin-A1 amendment §1);
   the abandonment suites are written at the authority/reducer level
-  per tree precedent. T-5 (retained-reader manifest), the §5.4/Q7
-  ledger sentence, the M5b-W1 record-contract item, the ChangeBudget
-  row, and the clean-tree re-cut are acceptance-ritual steps, on the
-  lane owner at the M5b settle.
+  per tree precedent.
+
+  **M5b ACCEPTED 2026-08-22 at GO/GO — round-1 clean on both axes**
+  (the program's first): Code GO (0 P0/P1, 1 P2, 3 P3; zero-production
+  proven via diff surface + cfg chain + non-test dep-info; all 21
+  suites mapped to design obligations; the stopped abandonment item
+  independently re-probed — modes fail identically, routing ruled
+  correct) and State GO (0 P0/P1, 1 P2, 5 P3; determinism, reverse,
+  composition, mode isolation verified; ceiling raise ratified).
+  Acceptance train dispositions: both P2s closed — the T-3 second
+  scan (`no_ff_mode_mentions_stay_inside_the_pinned_surface`, 16-file
+  NoFf surface pin with the pre-A1 subsumption argument) and the
+  push-lane CI step running the tripwire scans in the boundary
+  workflow (also discharges Code P3 on T-4's CI scan); M5b-W1 applied
+  to `GwzM5-8I2RecordContract.md` §7 (dated banner, document-only);
+  the §9-Q7 class-membership sentence recorded in the classification
+  ledger; the ChangeBudget M5b row filed (test-ceiling raise 1,450
+  granted+ratified). Clean-tree re-cut: satisfied by both reviewers'
+  pristine-extraction gate runs at `3e60529` (Code: full lib
+  1,391/0/1, boundary checker ok; State: 532/0 merge partition,
+  21/21 suites, T-6 by name). T-5 remains the retained-reader lane's
+  per the design's own assignment. Remaining State/Code P3s
+  (FfOnly durable assertion, inert tree assertion, F-2 cross-mode
+  bytes, Q5 partiality note) are file-and-continue, listed in the
+  reports. **M5b's A1 proof obligations (thin A1 leg two) are now
+  standing: T-6 + the accepted package.** Pushed with this train.
 - The escape amendment stays second-lane/blocked on operator handoff
   (unchanged). The paused-state facts below remain the baseline the
   waves execute against.
