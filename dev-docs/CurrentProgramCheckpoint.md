@@ -94,6 +94,32 @@ fable token only where it makes a difference." Recorded consequences:
   reports. **M5b's A1 proof obligations (thin A1 leg two) are now
   standing: T-6 + the accepted package.** Pushed with this train.
 
+  **R2-D Phase 1 Steps 1.1+1.2 PARKED pre-settle** (2026-08-22): the
+  physical admission driver landed green — all six Step-1.1
+  acceptance tests pass UNEDITED on first run (byte-untouched,
+  verified); `checked_artifact::` 267/0 (257 pre-existing + 6
+  acceptance + 4 new unit); Track-P spike still green; no wire
+  change (`protocol/generated.rs` untouched; no new slot, record,
+  purpose, or phase); C-2 arms and C-3 observer grammar implemented
+  exactly per the frozen §4.4 classes with the memo-clause map in
+  the driver report. Production LOC ~768 code (+1051 raw) vs the
+  aspirational <500 — lane-owner disposition: accepted for the
+  settle review, structural cause being the round-2 freeze assigning
+  BOTH extension classes to Phase 1 after the plan's budget was set;
+  no ChangeBudget ceiling exists for R2-D and no §16-22 stop rule
+  fires. THREE judgment calls explicitly queued for the Phase-1 dual
+  settle (dual #2): (i) visibility widening of the R1 classifier
+  types to `pub(in crate::checked_artifact)` (seams unchanged, pin
+  test green); (ii) E4 install as retire-then-publish over the
+  no-replace primitive with all three crash windows proven
+  convergent — re-spike if the reviewer reads E4 as requiring an
+  atomic replacing rename; (iii) absent-active ≡ idle semantics.
+  Step 1.3 (`admission.*` fault activation) is next; the dual settle
+  reviews Steps 1.1-1.3 together. Driver-lane disclosures on record:
+  its one whole-crate `cargo fmt` slip canonicalized whitespace in
+  up to five of the D3 lane's in-progress files (no semantic change;
+  not reverted to avoid destroying uncommitted work).
+
   Incident record (L1-16, lane owner, 2026-08-22): the M5b acceptance
   commit `8c1624a` accidentally swept the Phase-1 driver's in-flight
   checker inventory lines (a CATALOG_PUBLICATION_CALL_COUNTS entry
