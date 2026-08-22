@@ -1,4 +1,26 @@
-# Windows matrix classification — GREEN (runs 11, 13); macOS GREEN at run 13
+# Windows matrix classification — GREEN (runs 11, 13, 18); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+
+**Run 18 — 32573548540 on `c2d2f15`: 1472 passed / 0 failed / 1
+ignored.** The first fully green Windows run since the R2-D fault
+families began landing. Discharges the anchor package's TRACKED
+ACCEPTANCE ITEM (review [P2-3]): the seven legacy
+`AnchoredPrivateArea` call-site suites (cleanup/residue/transition
+paths) ran green under the classed barrier, and the run-16/17
+namespace fault-matrix four are extinct at `6b8b76e` exactly as the
+trimmed probe (32569434565) predicted. Tree note: `c2d2f15` includes
+Step 3.1 but neither 3.1b nor 3.2 — the intent and writer matrices
+make their Windows debut in the next full run, pre-attributed here as
+expected-green (they drive the same classed barrier and the managed
+matrix has been green natively since run 17).
+
+**Platform run 32573547362 on `c2d2f15` (sibling of run 18):
+ubuntu-24.04-arm 1510/0/1 — THE FIRST GREEN ARM RUN IN THE PROGRAM —
+and macos-14 1521/0/1.** The 46-row template-mode class is extinct on
+its first post-fix execution, exactly as the fixture package's
+red-green under the simulated runner HOME predicted (29 g15 + 17 v1,
+name for name). With run 18 green the same hour, the ENTIRE platform
+matrix is green simultaneously at one tree for the first time since
+the fault families began landing.
 
 **Class-membership note (M5b-IMPL ledger obligation, design §9 Q7,
 recorded 2026-08-22):** a v1 record row carrying `mode: no_ff` makes

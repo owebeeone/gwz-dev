@@ -375,6 +375,20 @@ fable token only where it makes a difference." Recorded consequences:
   BootstrapIntentRowV1::Scratch selector bypass ([P3-2]) and two
   inverted comments ([P3-3]).
 
+  **PLATFORM MILESTONE 2026-08-22: the ENTIRE matrix is green
+  simultaneously at `c2d2f15` — the first time since the R2-D fault
+  families began landing.** Windows run 18 (32573548540): 1472/0/1 —
+  the anchor acceptance item DISCHARGED (all seven legacy
+  AnchoredPrivateArea suites green under the classed barrier; the
+  namespace four extinct at `6b8b76e` as the probe predicted).
+  Platform sibling (32573547362): ubuntu-24.04-arm 1510/0/1 — THE
+  FIRST GREEN ARM RUN IN THE PROGRAM'S HISTORY (the 46-row
+  template-mode class extinct name-for-name per the red-green) —
+  and macos-14 1521/0/1. Remaining platform debt: none open; the
+  3.1b/3.2 suites debut on Windows in the next full run
+  (pre-attributed expected-green in the ledger); the g15 probe
+  branches are cleanup candidates (operator's call, standing).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
