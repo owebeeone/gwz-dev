@@ -581,3 +581,212 @@ all three queued judgment calls; remediation of P1-1 (and the P2 pair) is
 round-2 scope, within the two-round cap. The E4 and absent≡idle admitting
 arguments in §1 are entered as the durable record and survive the
 remediation unchanged.
+
+---
+
+# Focused re-verdict (round 2)
+
+Date: 2026-08-22. Axis: STATE. Object of this re-verdict: gwz-core
+**`bf438ed`** ("Apply the Phase 1 settle round-2 remediation", local,
+UNPUSHED; base `c13f773` + the remediation files only:
+`admission/driver.rs`, `admission/mod.rs`, `admission/tests.rs`,
+`admission/driver/tests.rs`, `admission/tests_fault_matrix.rs`,
+`admission/tests_namer_pin.rs` (new), `provider/interior.rs`,
+`provider/publication.rs`, `protocol/admission.rs` (stale
+`#[allow(unused_imports)]` removed only), the checker's pre_catalog tree
+digest), plus the dated freeze append committed at workspace root
+**`a99b77e`** (`GwzM5-8R2DInterfaceFreeze.md` §4.3 activation record).
+Peer-blind vs the Code report maintained. All file:line positions in this
+section are at `bf438ed`.
+
+The gwz-core working tree now carries four other lanes' uncommitted files
+**inside `src/checked_artifact/`** (provider.rs, completed.rs, namespace/*,
+leaf files), so in-tree runs are not evidence for the committed object.
+Verification therefore executed on a **pristine extraction** (root `20f1654`
+archive + gwz-core `bf438ed` archive + sibling member archives, fresh target
+directory):
+
+```text
+python3.13 scripts/checks/check_checked_artifact_boundaries.py
+    → checked-artifact boundary: ok (15 visible entries, 5 classified
+      modules); exit 0 — fully green on pristine (round 1's in-tree noise was
+      the other lanes', as recorded)
+cargo test --lib checked_artifact::admission::
+    → ok. 15 passed; 0 failed (12 round-1 suites + the 2 capacity cases +
+      the namer pin; matrix and 12-round suites on both target variants)
+cargo test --lib checked_artifact::
+    → ok. 274 passed; 0 failed — reconciles exactly: 271 at c13f773
+      + 2 capacity + 1 namer pin
+```
+
+## Per-finding disposition
+
+### [P1-1] — RESOLVED
+
+Both refusal paths landed per the round-1 sketch, plus the tests:
+
+- **(a) driver gate** (`admission/driver.rs:111-114`): in the Idle arm,
+  placed **after** `owner.admit` and after the final-conflict stop and
+  **before** the first durable write, refusing a new admission when
+  `observed.census.active_actions >= MAX_ACTIVE_ACTION_DIRS` with the exact
+  typed stop "the catalog root already holds the frozen active-action
+  budget". Resume-of-existing at full capacity is untouched by construction
+  (`admit` returns first — pinned by the test below).
+- **(b) commit-point recheck** (`provider/publication.rs:222-244`): the
+  `AdmissionCatalogInterior` arm computes `full` **only for `ActiveAction`
+  destinations** (`fresh.action_rows.len() >= MAX_ACTIVE_ACTION_DIRS`) and
+  refuses before the rename with "publication would exceed the frozen
+  active-action bound". Two subtleties verified correct: Infrastructure
+  destinations (the E4 record publish) never trip it — blocking record
+  installs at 64 actives would have wedged step-3/7 settles at capacity —
+  and the refusal fires inside the acquisition window, race-free, with the
+  staging directory left intact for a later retry.
+- **(c) tests** (`admission/tests.rs:496-663`):
+  `a_full_catalog_root_refuses_a_new_admission_and_still_resumes_and_recovers`
+  fills the root to exactly 64 grammar-legal rows, asserts the 65th refuses
+  with the exact typed message and **zero mutation**, asserts
+  `recover_or_create` still recovers and the resident action still resumes
+  byte-identically at full capacity, then frees one row and asserts the
+  refused admission completes and settles idle.
+  `a_resumed_in_flight_admission_refuses_at_the_publish_when_the_root_filled`
+  reconstructs the Preparing-installed in-flight state on disk, fills the
+  root, and asserts the refusal comes from the destination recheck (exact
+  fact/detail), root unchanged, staging intact. Both use the new
+  `stopped_with` so neither can pass on an unrelated ambiguity.
+
+**Ruling on the recorded limitation (`can_admit_new` still unwired): NOT a
+gap — the deferral is the only coherent choice at this phase.** The
+retirement-credit inequality needs a bounded retired-root count, and
+`completed_record` requires the `RetiredActions` root **empty**
+(`provider/interior.rs:349` inside `completed_record` `:333`), so no catalog
+this kernel can observe carries a nonzero retired count: the inequality is
+vacuous until the phase that lands retirement widens `completed_record`,
+which is exactly where the driver comment records the debt
+(`driver.rs:85-110`) — matching this report's own round-1 disposition
+("record it as owed to the phase that lands retirement"). Unlike the active
+bound, exhausting retirement credit cannot make the catalog unobservable.
+Consulting `census.active_actions` directly is complete for Phase 1.
+
+The round-1 P1 sequence is now closed at both ends: the 65th admission
+refuses before its first durable write, and the one path that bypasses the
+new-admission gate (a resumed in-flight publish) refuses at the commit
+point. The catalog can no longer reach the unobservable state through any
+admission edge.
+
+### [P2-1] — RESOLVED via route (ii), which this re-verdict RATIFIES; no key mint owed
+
+The dated activation record ("Activation record 2026-08-22 — E4's retire
+half, a first-of-kind removal edge", freeze §4.3, committed at root
+`a99b77e`) is append-only (the frozen E-table is not reshaped), names both
+axes' finding, states the physical shape and location of E4-retire, and
+carries the argument chain — **every leg of which was re-verified here**:
+
+- *no admitted family covers removal* — true (P1-P5 inventory, §4.2 spike
+  exercised no unlink);
+- *no in-vocabulary rename destination exists* — **verified**:
+  `completed_record` requires an empty `RetiredActions` root
+  (`interior.rs:349`), so retiring the record *by rename* would un-complete
+  every catalog; minting a destination is barred by freeze §6/§3.1. Removal
+  is what remains;
+- *write-ahead protection, commit-at-publish, idempotence,
+  namespace-enforced ordering against the publish, Windows delete-pending
+  degrading to typed refusal + restart convergence* — all match this
+  report's own §1.2/§P2-1 analysis, and the record corrects the
+  checkpoint's overstated "retire-then-publish over the no-replace
+  primitive" shorthand explicitly;
+- *convergence evidence* — now covers **both record-kind variants of the
+  post-retire window on disk** ("retired, scratch idle" and the new
+  "post-retire, scratch preparing" with the action row not yet published)
+  plus both pre-retire windows ("preparing, scratch idle", new
+  "idle, scratch preparing"), each re-entered as a fresh process
+  (`driver/tests.rs`, 15/15 green on pristine).
+
+**Ruling (i) vs (ii): route (ii) is sufficient and is ratified; the
+`admission.record_retire` mint is NOT owed for the settle.** What a minted
+key would add over the delivered evidence is only the kill mechanics at a
+boundary whose post-state is already directly re-entered from disk in both
+variants — the production retire edge itself executes on every step-7
+crossing throughout the matrix and suites, and its two loss modes (lost
+unlink → pre-retire window; lost publish → post-retire window) are both
+covered states. The frozen census stands at **19/165**; no freeze edit is
+requested. Route (i) remains open to the lane as *optional* hardening if a
+later phase wants the matrix property restated as universal, but nothing is
+owed. The matrix's own 12-round doc block now also names its exclusions
+honestly (`tests_fault_matrix.rs:323-350`) and the 12-round set was widened
+to a third boundary (`admission.reservation_create`, the empty-resident-
+reservation `PartialExpectedPrefix` loop) on both variants — beyond what
+round 1 asked.
+
+### [P2-2] — RESOLVED
+
+`staging_plan`'s triad refusal is restored **verbatim** — the refusal list
+is again `[CatalogBootstrapRetired, ActionAdmissionActive,
+ActionAdmissionScratch, ActionAdmissionStaging]` (`interior.rs:203-211`),
+byte-equal in effect to `c40e712`'s list — with a comment that records why
+the C-3 widening is deliberately not applied to the bootstrap-staging
+adoption grammar. `completed_record` keeps the drop it needs. Regression:
+the full 274-test partition (including every catalog_bootstrap suite) is
+green, so no previously-accepted interior changed classification.
+
+### [P3-1] — RESOLVED
+
+The `(Idle, preparing)` durable state is now restart-entered directly:
+window row "idle, scratch preparing" (`driver/tests.rs:210-225`) with
+`installs: true` demanding continuation to full settle. The remediation
+additionally added the unpublished-final flavor ("post-retire, scratch
+preparing", `:263-330`), converting round 1's virgin-state-identity
+argument into direct evidence.
+
+### [P3-2] — RESOLVED
+
+The invariant is commented at both ends, each naming the other and the
+future-widening obligation: the `exact_row`-refusal guarantee at the
+`interior.rs:92-98` `expect` site, and the deliberately-unreachable census
+stop at `driver.rs:46-51`.
+
+### [P3-3] — RESOLVED
+
+`admission/tests_namer_pin.rs` (new, wired at `admission/mod.rs:61-62`) pins
+the namer set in the completeness-anchor idiom — a **rescan** of
+`src/checked_artifact/` under the production-file rule, not a trusted list —
+so a new namer of `CatalogAdmissionOwnerV1`/`ObservedActionDirectoryV1` is a
+reviewed edit; substring over-catching fails closed. The declared set is
+round 1's three (driver.rs, provider/interior.rs, protocol/admission.rs)
+plus the classifier's own module tree (`protocol/admission/owner.rs`,
+`protocol/admission/test_support.rs`) — legitimate: the definition site and
+its `#[cfg(test)]` fixture could name the items at `pub(super)` and are
+unaffected by the widening. Green on pristine. The location outside
+`interface_tests/` is an ownership artifact, recorded honestly in the file
+header with relocation named a lane-owner decision — the property is
+mechanical and identical from either home; relocation is file-and-continue,
+not a finding.
+
+### [P3-4] — RESOLVED
+
+The non-empty undecodable torn-scratch row ("scratch undecodable",
+truncated canonical `preparing` bytes, `driver/tests.rs:271-283` and the
+loop below) converges through the truncate-rewrite of the same compile-time
+slot name, completing the torn-shape set alongside the 12-round empty-file
+shape.
+
+## New findings introduced by the remediation
+
+None. Sweep performed: the `>=` gate direction; census counting of
+wrong-kind action-named entries (counted toward capacity by name — the
+fail-closed direction); the `(occupied, full)` split sparing Infrastructure
+destinations (required — see P1-1(b)); the wedged-in-flight-at-capacity
+liveness shape (an out-of-band-only state; fail-closed stop semantics
+pre-date this package and were accepted in round 1; resolves when headroom
+returns); the namer-pin scan rule mirroring `production_rust_files`; the
+checker digest refresh verified against committed content on pristine
+(round 1's incident lesson held); the `protocol/admission.rs` edit is the
+stale allow's removal only.
+
+## Re-verdict
+
+**GO** — all seven round-1 findings resolved (1 × P1, 2 × P2, 4 × P3 →
+closed); route (ii) ratified on the key-mint question with the 19/165
+census standing; zero new findings; 0 × P0/P1/P2/P3 open on the STATE axis.
+The §1 admitting arguments (E4 composition, absent≡idle) carry forward
+unchanged as the durable record. Within the two-round cap: this axis's
+settle gate is satisfied at `bf438ed` + root `a99b77e`.

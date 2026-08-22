@@ -446,3 +446,132 @@ green on the pristine committed object; all three queued judgment calls
 ratified on code evidence.
 
 **VERDICT: GO** (0 × P0, 0 × P1, 1 × P2, 2 × P3).
+
+---
+
+# Focused re-verdict (round 2)
+
+Date: 2026-08-22
+Axis: **CODE** (round 2 of 2 — focused confirmation pass)
+Object: gwz-core **`bf438ed`** ("Apply the Phase 1 settle round-2
+remediation"; local, UNPUSHED; base `c13f773` + remediation files only —
+10 files, +535/−29), verified against the **committed** revision via
+`git show bf438ed:<path>` and a fresh pristine `git archive` extraction; the
+working tree's four other lanes' uncommitted files were not used as evidence.
+Peer-blind vs `GwzM5-8R2DPhase1-ReviewState.md` maintained.
+
+## Gates re-executed on pristine `bf438ed`
+
+| Gate | Result |
+| --- | --- |
+| boundary checker (Python 3.12) | **ok** — the `pre_catalog.rs` tree digest is applied in-commit (`446cb7…` → `d7d5c4…`); pins coherent on pristine bytes. |
+| `cargo test --lib 'checked_artifact::'` | **274 passed; 0 failed** (271 + the 2 new capacity tests + the namer pin). |
+| `rustfmt --edition 2024 --check`, all 9 changed `.rs` files | clean |
+| `cargo clippy --lib --all-targets --all-features` | **clean, zero allowances** (matches the remediator's record). |
+| `r2d_seam_freeze` / `tests_admission_spike` | 6/6 and 2/2 — no seam regression. |
+
+Two for-the-record notes, neither a code defect: **(a)** the remediator's
+recorded "302/0 focused suite" is not reproducible against the committed
+object — the anchored filter yields **274/0** and the unanchored form
+**278/0**; the suite is green either way, so this is an evidence-recording
+discrepancy only (most plausibly a dirty-tree or transcription artifact), and
+the number that stands for the settle is my pristine 274/0. **(b)** a
+supplementary full-`--lib` run (my own belt-and-braces, not a mandated gate —
+every changed file lies inside the focused scope) was still executing when
+this section was appended, dominated by the known >585 s pre-existing
+`workspace_ops` matrix test; its result does not gate this verdict and will
+be reported to the coordinator when it lands.
+
+## Per-finding disposition
+
+**[P2-1] — RESOLVED, beyond prescription.** (a) The dated activation record
+is appended to freeze §4.3 (:620-672) in the §3.5 activation-record form,
+explicitly filed on "Code [P2-1] ≡ State [P2-1]" (the two axes converged
+blind on the same defect): it names the E4-retire physical shape
+(`cap_std::fs::Dir::remove_file` of the frozen `ActionAdmissionActive` name +
+P2 parent flush, at `retire_admission_record`), states why no admitted family
+covers it and why every rename alternative was structurally unavailable
+(no-replace family + empty-`RetiredActions` completeness + no-minting), and
+records write-ahead protection, idempotence (including the Windows
+delete-pending degradation argument and the §8 :242-243 non-violation),
+namespace-enforced ordering, and the convergence evidence. It also corrects
+the checkpoint's "retire-then-publish over the no-replace primitive"
+shorthand. (b) The prescribed preparing-variant post-retire window landed in
+`driver/tests.rs` ("post-retire, scratch preparing", fresh reservation,
+action row not yet published, convergence to an exactly-predicted child set),
+**plus** two rows I did not demand: step 3's pre-retire window
+`(Idle, preparing)` reconstructed directly, and a torn-scratch window
+(truncated canonical bytes — non-empty proper prefix decodes `Other` by the
+self-digest argument, and step 3 truncate-rewrites the same compile-time slot
+name). Both post-retire windows of both record kinds are now on-disk
+evidence, not structural argument.
+
+**[P3-1] — RESOLVED as prescribed, with the optional extension taken.** The
+exclusivity sentence is gone; the rewritten comment
+(`tests_fault_matrix.rs:321-340`) states the write boundaries' true
+non-repeatability mechanism, names the selection principle (resident row a
+retry could be tempted to re-name), **names the boundaries left out** —
+`idle_scratch_create` (repeatable, but re-crosses the slot name
+`preparing_scratch_create` already proves stable) and the two trivially
+re-crossable observation boundaries — and is code-true on every claim I
+checked. `Fault::AdmissionReservationCreate` joins the 12-round set (now
+three boundaries × 12 rounds × both variants); the loop's census assertions
+hold for the new row (round-stable staging holding exactly the derived
+reservation row).
+
+**[P3-2] — RESOLVED.** The dead `#[allow(unused_imports)]` and its stale
+reason are deleted; the bare re-export stands
+(`protocol/admission.rs:18`), and the zero-warning clippy gate on pristine
+`bf438ed` re-proves what my round-1 removal probe showed.
+
+## Ruling on the new capacity code (State-axis [P1] fix, Code-axis sanity)
+
+The two-sided capacity refusal is correct and minimal. **Driver half**
+(`driver.rs:82-115`): the gate sits in the `Idle` arm after `owner.admit` and
+after the conflict stop, so resume of an exact existing action is untouched
+and the refusal fires before the first durable write; the comparison
+`census.active_actions >= MAX_ACTIVE_ACTION_DIRS` is off-by-one-correct (the
+64th action admits at count 63; the 65th refuses at 64, and at this point the
+count cannot include this action's own row — an exact row already returned
+via `admit`, a non-exact one already stopped as a conflict). The accompanying
+unreachability comment on `has_unowned_row` is accurate (`exact_row` refuses
+malformed/foreign before the census can charge one) and keeping the stop as
+defence-in-depth is reasonable; the "owed to Phase 4"
+`CatalogOccupancyV1::can_admit_new` citation is real (`bounds.rs:74/:144`)
+and the deferral is sound — no retirement edge exists in Phase 1, and unlike
+the active bound, retirement credit cannot make the catalog unobservable.
+**Commit-point half** (`publication.rs:219-240`): the bound is re-proved
+inside the acquisition window from the same single destination observation,
+gating **only** `ActiveAction` destinations (`full = false` for the
+infrastructure arm — correctly, or a full catalog could never finish its own
+step-7 record install), with a distinct typed refusal
+("publication would exceed the frozen active-action bound") before the
+untouched compound refusal. A fresh whole-function extraction diff of
+`publish_verified_no_replace` (`c13f773` → `bf438ed`) confirms the
+acquisition window, identity compare, retained handle, no-replace rename, and
+both other recheck arms are byte-identical; the only change is the
+`(occupied, full)` tuple and the guarded early return. Both halves carry
+exact-match typed-refusal tests (`stopped_with`), including the driver-bypass
+path (in-flight admission rewound on disk, root filled, refusal at the
+rename, staging preserved for retry, zero mutation). The `interior.rs`
+changes are the `staging_plan` triad **restore** (byte-identical to the R1
+four-slot list — code-side this narrows round 1's C-3 widening to exactly the
+predicate the §4.4 "Consequence" chain needs, `completed_record`; no Phase-1
+flow consumed the dropped half, and it closes the stray-record adoption
+hazard my round-1 report noted as unreachable-but-real) plus the documented
+no-panic invariant over `infrastructure_slot().expect(..)`. The new
+`tests_namer_pin.rs` (a State-axis P3 remediation inside my surface) is a
+sound rescan-idiom pin on judgment call (i)'s accepted cost: it rescans
+production sources for the two widened classifier names against a declared
+five-module set (scan and exclusion logic checked; the declared set matches
+the tree; the file excludes itself by the `tests` prefix), with the
+lane-owner relocation note to `interface_tests/` recorded. No new findings.
+
+## Verdict
+
+[P2-1] resolved; [P3-1] resolved; [P3-2] resolved; the new capacity code is
+correct, placed right, race-closed at the commit point, and fully typed-refusal
+tested; all mandated gates green on the pristine committed object; no new
+findings at any severity. Unresolved items: none.
+
+**ROUND-2 VERDICT: GO** (all round-1 findings resolved; 0 new).

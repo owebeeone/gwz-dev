@@ -129,6 +129,23 @@ fable token only where it makes a difference." Recorded consequences:
   no-replace primitive with all three crash windows proven
   convergent — re-spike if the reviewer reads E4 as requiring an
   atomic replacing rename; (iii) absent-active ≡ idle semantics.
+  **PHASE 1 SETTLED 2026-08-22 at GO/GO — dual #2 of 3 consumed.**
+  Round 1: State NO-GO (1 P1 — the 65th-admission catalog-bricking
+  capacity gap, a genuine kernel catch; 2 P2, 4 P3) / Code GO (1 P2,
+  2 P3), with blind convergence on the E4 retire-edge inventory gap.
+  One merged remediation at `bf438ed` (capacity refusal on both the
+  new-admission and commit-point paths, typed and test-proven;
+  route (ii) on the retire edge — freeze §4.3 activation record, NO
+  key mint, 19/165 stands, ratified by the State re-verdict; triad
+  refusal restored; all P3s). Round-2 re-verdicts: State GO (zero
+  new findings; `can_admit_new` deferral ruled not-a-gap) and Code
+  GO (capacity code ruled correct; the remediator's 302/0 vs the
+  reviewer's 274/0-anchored count noted as an evidence-recording
+  discrepancy only, green both ways). The admission kernel is
+  settled; Phase 2.3/2.4 and Phase 3 unblock behind their
+  dependencies' reviews. Pushed with the ARM64 train; both matrices
+  dispatched at the push.
+
   **Step 1.3 DELIVERED and PARKED with this record (2026-08-22):**
   all 19 `admission.*` keys given injection sites in the one
   owner-private mutation file (driver holds zero — it decides, never
