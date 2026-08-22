@@ -352,6 +352,29 @@ fable token only where it makes a difference." Recorded consequences:
   launch to keep insurance copies of uncommitted work in their
   scratch area (this one did, which is why the burn cost nothing).
 
+  **Step 3.1b LANDED 2026-08-22 (gwz-core `fcec69e`) — review GO
+  round 1 (conditional, State-lead), escalation trigger RECORDED,
+  routed to the Phase 5 dual.** E17 real; the partial-retirement
+  wedge closed (the reviewer confirmed the fixture reproduces the
+  3.1 [P1-1] case exactly and the base would have refused it
+  permanently); chain linkage verified adversarially (binds action,
+  reservation AND owner via matches_reservation — no fabricated
+  higher generation, no cross-action adoption); both §4.4 arms
+  resolve to none by direct read. Fifteen keys activated
+  same-commit: executed 8→23, reserved 22→7, counts 165 held.
+  Freeze: the 3.1b §3.5 annotation lifted at this landing, with the
+  review's [P2-1] supersession clause added to the 3.1 deferral
+  record (the five writer keys now sit among 7 reserved; 3.2's list
+  edit is 23→28). Production LOC alone (440) was inside the <500
+  target — the overrun is entirely mandated matrix evidence.
+  DOCKETED SETTLE-BLOCKING for the Phase 3 settle (review [P3-1]
+  ruling): `preflight` and `plan_complete` need a disposition — a
+  step that owns them or a recorded determination they never gain
+  boundaries; "reserved indefinitely" ruled incoherent now their
+  converting package has landed. Folded into 3.2's brief: the
+  BootstrapIntentRowV1::Scratch selector bypass ([P3-2]) and two
+  inverted comments ([P3-3]).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
