@@ -1066,3 +1066,30 @@ machine-checked: `interface_tests/fault_expected_keys.rs` carries it as
 `FAULT_FAMILY_ACTIVATION` and fails if a family changes size, gains an
 injection site while still declared reserved, or changes activation state
 without the converting package's deliberate edit.
+
+#### Correction and status — 2026-08-22 (round-2 remediation)
+
+Two corrections to the paragraph immediately above, both filed by the round-1
+dual review of the freeze (`GwzM5-8R2DInterfaceFreeze-ReviewCode.md` P1-2 /
+`-ReviewState.md` P2-1 and P3-3):
+
+1. **The injection-site inventory was incomplete.** There are **three**
+   production sources holding `CheckedArtifactFaultKeyV1` injection sites, not
+   two: `capability/pre_catalog/provider/directory_mutation.rs` (15 sites),
+   `.../mutation.rs` (9), and `.../aggregate.rs` (1 —
+   `CatalogBootstrapCatalogEnumerate` at `aggregate.rs:26-29`), totalling the
+   family's 25 keys. The third was missing from `FAULT_INJECTION_SOURCES`, which
+   scans only its declared sources, so "gains an injection site while still
+   declared reserved" held **only for declared sources** on the day this block
+   landed. The fixture now declares all three, and a completeness anchor
+   (`the_declared_injection_sources_are_every_production_source_holding_sites`)
+   rescans the production tree and fails if any production source naming
+   `CheckedArtifactFaultKeyV1` is absent from the declared list. Since
+   `CheckedArtifactFaultKeyV1` is `pub(super)` on `checked_artifact::fault_v1`,
+   no injection site can exist outside `src/checked_artifact/`, so that scan is
+   exhaustive and the "machine-checked" sentence above now holds tree-wide as
+   written — no qualification needed.
+2. **Status of the citing freeze.** `GwzM5-8R2DInterfaceFreeze.md` is **DRAFT**
+   (round-2 revision, 2026-08-22) pending its Step 0.1 dual review; read "is now
+   frozen" above as "is frozen by that package on acceptance". The substantive
+   assignments are unchanged by either correction.
