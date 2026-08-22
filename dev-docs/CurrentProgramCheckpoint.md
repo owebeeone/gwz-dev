@@ -389,6 +389,28 @@ fable token only where it makes a difference." Recorded consequences:
   (pre-attributed expected-green in the ledger); the g15 probe
   branches are cleanup candidates (operator's call, standing).
 
+  **Step 3.2 LANDED 2026-08-22 (gwz-core `7169d89`) — review GO
+  round 1, CLEAN (no P0/P1/P2, escalation NOT triggered; second
+  round-1 clean of the program after M5b).** The five writer keys
+  activated: managed_bootstrap.* at 28/30 executed, counts 165 held,
+  the docketed pair (preflight/plan_complete) the only reserve. The
+  single-crossing probe mechanism (crash → re-arm → next drive must
+  settle without firing) machine-checks the partition's other half,
+  caught a real once-per-component misclassification, and runs
+  retroactively on 3.1b's keys; row shape is now a declared matrix
+  property. Purpose policy matrix: four purposes via production
+  constructors, §9 overlap rejection both directions. Two-sites-
+  one-key for staging_directory_flush adjudicated honest (the 3.1
+  review's own table specified it). The 3.2 §3.5 annotation lifted
+  at this landing WITH the review's [P3-4] route-(b) sentence. Five
+  P3s ride: shape-sentence corrections and dead fixture helpers fold
+  into Step 3.3; the is_err-only §9 assertion and the over-applied
+  one-component shape are recorded for the settle. Budget: 357 net
+  test lines vs the plan's <500 — WITHIN; production +38. Phase 3
+  remaining: Step 3.3 coordinator glue, then the Phase 3 settle
+  record (dispositions: preflight/plan_complete,
+  retain_managed_parent).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its

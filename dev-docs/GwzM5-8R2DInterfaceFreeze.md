@@ -539,6 +539,61 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > 7. The `capability_permit.rs` caller inventory holds at **13** and
 > `CATALOG_PUBLICATION_CALL_COUNTS` is unchanged: this step adds zero
 > `publish_verified_no_replace` call sites.
+>
+> `managed_bootstrap.*` activation annotation (2026-08-22, Step 3.2 landing;
+> discharges the deferral record above, as superseded at the Step-3.1b landing):
+> **28 of the 30 keys are executed**, the remaining **2 stay reserved**.
+>
+> **Step 3.2 activates the five staged-component writer keys** whose edges Step
+> 3.1 converted on the record: `staging_directory_create`,
+> `ownership_marker_create`, `ownership_marker_write`, `ownership_marker_flush`
+> and `staging_directory_flush`. All five have injection sites in
+> `capability/pre_catalog/provider/managed_mutation.rs` (the `namespace` owner
+> still holds none, as with `namespace.*`) — `staging_directory_flush` at both of
+> the writer's directory flushes, the staged interior's and the managed parent's,
+> because both are the state that key names and minting a second would move the
+> frozen census. Executed interruption/restart/convergence rows on both target
+> variants are in `bootstrap/managed/tests_writer_matrix.rs`, with one
+> repeated-boundary row at twelve rounds and four named single-crossing
+> exclusions. This closes the split the deferral record above declared
+> intentional; nothing about it drifted.
+>
+> **The single-crossing half of the partition is now machine-checked**, in this
+> matrix and retroactively in Step 3.1b's. `run_single_crossing_probe`
+> (`tests_provider.rs`'s shared `matrix` harness) crashes a boundary, re-arms it,
+> and requires the next drive to settle without firing it. It caught a real
+> misclassification at once: every boundary inside `stage_component` is crossed
+> *once per component*, so on a two-component row a crash at the first
+> component's crossing leaves the second's ahead and the boundary is neither
+> repeatable nor single-crossing. The writer matrix therefore drives a
+> **one-component** row (`gwz.conf/markers`) — the shape the criterion is written
+> for — while the intent matrix keeps its two-component row, which it needs to
+> reach a mid-retirement interruption. Row shape is now a declared property of
+> each matrix rather than an accident of its fixture.
+>
+> **The purpose policy matrix** (plan §4 Step 3.2's other half) is
+> `bootstrap/managed/tests_purpose_policy.rs`: all four purposes bootstrapped on
+> both target variants through production request constructors only, and
+> ConsumerCheckpoint §9 (:253-256) driven on real durable state in both
+> directions — `MergeArchive` refused over a missing `.gwz/merge` (retained count
+> one, below the purpose's minimum of two) and bootstrapping exactly its own
+> `done` component over a resident one, so a missing `.gwz/merge` can only ever
+> be `MergeStore`'s to create. A fully present purpose set plans no row. Its
+> Git-directory arm takes route (b) — the managed prefix under that target's own
+> retained root — because route (a), the Step-2.3 door, stages with `fs::write`
+> and can never reach the writer boundaries; the managed parent's home on that
+> variant is fixture-placed, with follow-up 3 (the Git-directory catalog's
+> workspace-root binding) attached as the owner decision it awaits.
+>
+> **Counts.** 165 total, unchanged; no key minted. Executed 23 → 28, reserved 7 →
+> 2. The two that remain are `preflight` and `plan_complete`: every edge-bearing
+> key of the family is now executed, no step has given these two a boundary, and
+> the plan's Step-3.2 clause ("every component/generation/marker boundary") does
+> not reach them — their disposition is the Phase 3 settle determination the
+> Step-3.1b review's [P3-1] docketed, not this step's. The
+> `capability_permit.rs` caller inventory holds at **13** and
+> `CATALOG_PUBLICATION_CALL_COUNTS` is unchanged: this step adds zero
+> `publish_verified_no_replace` call sites.
 | `cleanup.*` | 11 | R2-D **Phase 4** (step 4.1 legacy leaf edges) | reserved |
 | `barrier.*` | 16 | R2-D **Phase 4** (step 4.2 Windows retirement closure) | reserved |
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
