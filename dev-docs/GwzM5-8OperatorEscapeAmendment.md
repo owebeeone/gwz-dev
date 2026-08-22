@@ -1,17 +1,26 @@
 # M5-8 I2 operator-escape amendment (force-abandon, quarantine/restore, GC forget-refs)
 
-Date: 2026-08-16.
+Date: 2026-08-16. Round-2 revision: 2026-08-22.
 
-Status: **DRAFT — pending mandated dual review** (Code and State axes; the
-amendment tier of `GwzProcessOptimization.md` §4.2 :104-118, cross-model per
-§4.3). This document is the wire/transition/protocol amendment for the
-operator escape story frozen in `GwzM5-8OperatorEscapeDesign.md`, with all ten
-of that design's §10 open questions **decided by the program owner on
-2026-08-16** (§0). It is the third pre-A1 train on the same I2 contracts,
-after `GwzM5-8ExactEvidencePlatformAmendment.md` (accepted 2026-08-16) and
+Status: **DRAFT — round-2 revision of 2026-08-22, pending focused
+re-verdicts** (Code and State axes; the amendment tier of
+`GwzProcessOptimization.md` §4.2 :104-118, cross-model per §4.3; round 2 of
+the two-round cap). Round 1 returned NO-GO on both axes; this revision
+applies **every** round-1 P1 and P2 of
+`GwzM5-8OperatorEscapeAmendment-ReviewCode.md` (P1-1, P1-2, P1-3, P2-1..P2-5)
+and `GwzM5-8OperatorEscapeAmendment-ReviewState.md` (P1-1..P1-6, P2-1..P2-5),
+plus the one-line P3s of both; §10.4 maps every finding to its exact edit.
+**No §0 decided input changed.** This document is the
+wire/transition/protocol amendment for the operator escape story frozen in
+`GwzM5-8OperatorEscapeDesign.md`, with all ten of that design's §10 open
+questions **decided by the program owner on 2026-08-16** (§0). It is the
+third pre-A1 train on the same I2 contracts, after
+`GwzM5-8ExactEvidencePlatformAmendment.md` (accepted 2026-08-16) and
 `GwzM5-8DurableCursorAmendment.md` (accepted 2026-08-16); §6.4 is the single
 composition-authority statement A1 reviewers should read for how the three
-trains compose.
+trains compose. Per the accepted `GwzM5-8ThinA1Amendment.md` (2026-08-22,
+:59-60) this train is **second-lane and non-gating for A1**; [Q3]'s pre-A1
+wire placement stands as the decided schedule, not as an A1 gate.
 
 Authority: `GwzM5-8Refactor.md` remains the behavioral authority; the I2
 contracts as amended remain wire-authoritative; `GwzM5-8R4bTransitionDesign.md`
@@ -21,13 +30,20 @@ clauses quoted verbatim in §1. Per the adopted schedule the **wire amendment
 lands pre-A1**; **implementation lands as its own reviewed package(s) after
 R4b-G, at or before A1** ([Q3]).
 
-Evidence base — direct reads on the current lane tip (`36754a5`, clean tree),
-not on the design's citations, which moved (§10.1 lists every correction):
+Evidence base — direct reads on the current lane tip (round 1: `36754a5`,
+clean tree; this round-2 revision re-verified every citation on 2026-08-22
+against gwz-core `c13f773`, whose merge-lane non-test sources are unchanged
+since the round-1 review baseline `90d3f8a`, and against the current
+contracts: `GwzM5-8I2RecordContract.md` gained the M5b-W1 banner 2026-08-22
+and **every anchor in it shifted by +21** — all its citations below are
+re-pinned; the other four amended documents are unshifted), not on the
+design's citations, which moved (§10.1 lists every correction):
 `GwzM5-8OperatorEscapeDesign.md` (end to end), the four amended contracts,
 `GwzM5-8M5bNoFfDesign.md` §8.2, `GwzM5-8A1DecisionPacket.md` §3.4/§4,
 `GwzMergeWedgeRunbook-v0.md`, and the tree:
 `gwz-core/src/workspace_ops/merge/model/v0.rs`,
-`model/v1/record.rs:79-110`, `model/lifecycle.rs:54-64`, `:83-117`,
+`model/v1/record.rs:18-51`, `model/v1/validate/lifecycle.rs:56`,
+`model/v1/canonical.rs:53-59`, `model/lifecycle.rs:54-64`, `:83-117`,
 `store/mod.rs:81-98`, `:269-285`, `store/persistence.rs:43-48`,
 `store/gc.rs:8`, `gc.rs:162-207`, `:365-381`,
 `v1_lifecycle/store/archive.rs:11-86`,
@@ -73,7 +89,8 @@ and carries no wire content.
 P3's ownership is settled (`GwzM5-8R4bReverseLifecycleInterface.md` §9
 :482-495: P3 owns "the Taut append, generated Rust/Python bindings, the one
 semantic projection owner, response population, renderers, and parity fixtures
-before A1"; `GwzM5-8ChangeBudget.md` prices it at 18 files). Adopting [Q2]
+before A1"; `GwzM5-8ChangeBudget.md` prices it at 18 charged paths). Adopting
+[Q2]
 **reopens that settled scope in exactly five places**, and in no others:
 
 1. **Request vocabulary.** `MergeOp` gains two values
@@ -135,7 +152,12 @@ and reviewers must see that the original obligation is not weakened.
 
 ### 1.1 `GwzM5-8I2RecordContract.md`
 
-**§1 :38-51 — the five top-level fields (AMENDED, §2.1):**
+Anchors in this document are **post-W1-banner** (the 2026-08-22 M5b-W1 banner
+shifted every line by +21; all re-verified for this revision). The W1
+clarification itself composes with this amendment disjointly — §6.2 names the
+composition.
+
+**§1 :59-72 — the five top-level fields (AMENDED, §2.1):**
 
 > `MergeOperationRecordV1` retains every v0 field, field name, enum spelling,
 > and nested container at the same YAML path. It adds five top-level fields:
@@ -152,7 +174,7 @@ struct MergeOperationRecordV1 {
 }
 ```
 
-**§7 :360-371 — forward-action abandonment (AMENDED, §3.3.7):**
+**§7 :381-390 — forward-action abandonment (AMENDED, §3.3.7):**
 
 > A durable forward action may also retire without an integration outcome only
 > when an abort or preserve-abort request consumes the matching bound exact
@@ -165,7 +187,7 @@ struct MergeOperationRecordV1 {
 > Completed, expected-conflict, or ambiguous observations cannot be treated as
 > abandonment.
 
-**§8 :373-379 — the top-level collision doctrine (AMENDED, §5.2):**
+**§8 :394-400 — the top-level collision doctrine (AMENDED, §5.2):**
 
 > Migration first records every v0 unknown YAML path and raw value. The v1 body
 > keeps all surviving v0 containers at the same path, so their unknown fields
@@ -175,8 +197,9 @@ struct MergeOperationRecordV1 {
 > v1 known field and makes migration ineligible; it is never adopted,
 > overwritten, or moved.
 
-**§8 :386-412 — the retirement table and sequence identities (AMENDED, §5.3);
-the operative rows quoted:**
+**§8 :407-433 — the retirement table and sequence identities (AMENDED, §5.3);
+the operative rows quoted (the evidence row :417; the identity sentence
+:424-430):**
 
 > | participant/publication-root preservation evidence | one stable row per owner; the same row survives as ref/stash/no-op/reset fields fill and survives archival |
 
@@ -187,24 +210,47 @@ the operative rows quoted:**
 > drift by `(kind, every expected/live field, occurrence index among identical
 > keys)`; and operation drift by its unique `kind`.
 
-**§6 :296-303 — the acceptance legality table (UNCHANGED).** An overridden
-abort obeys the same two aborted rows ("aborted after accepted
+**§6 :315-324 — the acceptance legality table (UNCHANGED).** An overridden
+abort obeys the same two aborted rows (:323-324: "aborted after accepted
 publication/preservation/rollback work | present"; "aborted before acceptance |
 absent") with no exception.
 
 ### 1.2 `GwzM5-8I2ActionJournalContract.md`
 
-**§2 :174-177 — retirement authority (AMENDED, §3.3.7):**
+**§2 :173-176 — retirement authority (AMENDED, §3.3.7):**
 
 > An owner/kind must agree with participant, publication, acceptance, and
 > operation-baseline evidence. Ambiguous observation changes only operation
 > state/context; it never clears or advances a pending action. Retirement occurs
 > only with the verified result/progress write.
 
-**§2 :164-171 — the pending-action legality table (UNCHANGED).** An overridden
-abort clears the journal in the same write it writes `Aborted`, so the
-"direct or terminal state | neither pending reverse action is legal" row
-remains true without exception. No row is added or altered.
+**§2 :164-171 — the pending-action legality table (UNCHANGED).** Any journal
+a mark retires is cleared by that mark's own atomic rewrite (§3.3.7), and the
+overridden abort — like the ordinary one — requires that **no** journal
+remain (§2.3.2), so the "direct or terminal state | neither pending reverse
+action is legal" row remains true without exception. No row is added or
+altered.
+
+**§2 :178-181 — the rollback cursor's closed derivation-input list (AMENDED,
+§3.3.2, §7 item 2). This sentence is decode law; without amending it, a
+post-mark `BeginParticipantRollback` for the next unmarked owner would fail
+its own post-write re-decode as "a later owner":**
+
+> For rollback, owner/kind agreement includes the exact deterministic current
+> cursor derived from durable participant terminal states, publication evidence,
+> selected-root membership, and pending phase; a wrong or later owner is invalid
+> at decode.
+
+**§2 :185-192 — the two-arm prefix proof (the D3-amended sentence; AMENDED by
+a third arm, §3.3.2, §7 item 2). Without the third arm, a marked earlier
+preservation position would demand exact live observation of a destroyed
+repository — precisely the wedge force-abandon exists to break:**
+
+> Before a pending preservation action is classified, advanced, or executed, an
+> exact bound observation must also prove — by durable completion facts where
+> present, and by exact bound live observation where absent — that every
+> earlier position in the
+> two-pass cursor is complete or currently unnecessary.
 
 **§5 :414-421 — archived cleanup ownership (AMENDED by [Q5], §3.4):**
 
@@ -219,7 +265,7 @@ remains true without exception. No row is added or altered.
 
 ### 1.3 `GwzM5-8R4bTransitionDesign.md`
 
-**§6 :325-330 — the closed vocabulary rule (AMENDED by one arm, §2.3):**
+**§6 :325-328 — the closed vocabulary rule (AMENDED by one arm, §2.3):**
 
 > There is no `SetField`, `SetState`, `SetPublicationStep`, arbitrary patch, or
 > numeric phase comparison. Every enum is exhaustively matched. Adding a
@@ -240,12 +286,22 @@ remains true without exception. No row is added or altered.
 
 > | `AbortOperation` | `RollingBack`; no pending action/journal; bound `VerifiedRollbackExhausted` proof covers every participant and exact selected-root baseline | state becomes `Aborted` |
 
+**§6.6 :648-652 — the reverse-cursor derivation and its decode law (AMENDED,
+§3.3.2, §7 item 3). The same defect as ActionJournal §2 :178-181: a closed
+input list with no disposition arm, and checked-open validation enforces it:**
+
+> Only the derived current owner can be started or advanced. The reverse cursor
+> is fully derivable from participant terminal states, publication rollback
+> evidence, selected-root membership, and the exact pending phase. Checked-open
+> validation rejects a pending action whose owner, kind, terminal state, or
+> phase is not that exact cursor.
+
 **§7 :843-844 — the closed request form (AMENDED, §2.3.1):**
 
 > `V1LifecycleRequest` is the closed internal form of resume-start, continue,
 > abort, preserve, status, and archive work.
 
-**§7 :928-932 — preservation-first ordering (AMENDED in scope only, §3.3.2):**
+**§7 :929-933 — preservation-first ordering (AMENDED in scope only, §3.3.2):**
 
 > When the current state is `Preserving`, the dispatcher completes the exact
 > two-pass preservation cursor even between actions, regardless of an incoming
@@ -253,7 +309,7 @@ remains true without exception. No row is added or altered.
 > `VerifiedPreservationExhausted` proof. There is no implicit abandonment of a
 > partially completed preservation plan.
 
-**§6.9 :800-830 — the physical mutation ownership matrix (AMENDED by three
+**§6.9 :800-829 — the physical mutation ownership matrix (AMENDED by three
 rows, §2.4).**
 
 ### 1.4 `GwzM5-8R4bReverseLifecycleInterface.md`
@@ -291,6 +347,24 @@ AMENDED by append only (§2.5).** The operative frozen shape:
 > }
 > ```
 
+**§1 :46-53 — the context-legality sentences (AMENDED, §7 item 5). These
+enumerate by code, not by table membership; without amending them, appended
+codes 62-65 would fall under "every other error forbids context" while §2.5.4
+requires them to carry it:**
+
+> Codes 46/47 require applicable context; codes 49–61 require id
+> and installed pair; code 48 includes every valid field available before the
+> contradiction. […] Every
+> other error forbids context. Codes 46–61 have absent member/detail/target
+> fields.
+
+**§3 :208-210 — the record-context range sentence (AMENDED, §7 item 5):**
+
+> Its
+> `GwzError.record_context` must carry the merge id and exact schema/version pair
+> whenever the header is readable and the code is one of 45–61,
+> `MergeDrift`, or `MergeRecoveryRequired`.
+
 ### 1.6 `GwzM5-8OperatorEscapeDesign.md`
 
 **§2 rule 1 :75-78 — the separate-consent-lane doctrine (REFINED, §3.3.2):**
@@ -306,7 +380,7 @@ AMENDED by append only (§2.5).** The operative frozen shape:
 
 ### 2.1 The sixth top-level field
 
-`MergeOperationRecordV1` (`model/v1/record.rs:79-110`) gains one trailing
+`MergeOperationRecordV1` (`model/v1/record.rs:18-51`) gains one trailing
 optional field, joining the five of RecordContract §1:
 
 ```rust
@@ -323,7 +397,7 @@ struct MergeOperationRecordV1 {
   five existing top-level names). The name is free tree-wide today.
 - **Position.** Appended after `preservation_publication_handoff` and before
   the flattened `extensions` map; YAML emission order is declaration order
-  (`record.rs:79-110`; the same rule
+  (`record.rs:39-50`; the same rule
   `GwzM5-8DurableCursorAmendment.md` §2.1 fixed for the evidence row).
 - **Encoding.** Absent when unset (`skip_serializing_if`), never `null` —
   every byte stream produced by a writer that does not set it is identical to
@@ -335,7 +409,8 @@ struct MergeOperationRecordV1 {
 
 ```rust
 struct OperatorOverrideV1 {
-    // Append-only; ordered by owner key then side; unique by (owner, side).
+    // Append-only; ordered by owner key; unique by owner (each row carries
+    // its two optional sides; unknown-descendant identity is (owner, side), §5.3).
     dispositions: Vec<OwnerDispositionV1>,
     // One-shot consent slots, each written by exactly one escape edge.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -382,7 +457,7 @@ struct OperatorConsentV1 {
     operator: String,          // claimed actor id; see §2.2.3
     recorded_at_ms: String,    // decimal epoch-milliseconds, the `created_at` convention
     writer_version: String,
-    record_sha256: String,     // digest of the source bytes the manifest was printed from
+    record_sha256: String,     // the consent round's anchor: digest of the bytes the manifest was printed from (§3.3.3)
     confirm_token: String,     // the first 16 lowercase hex chars of record_sha256
     #[serde(default, skip_serializing_if = "Option::is_none")]
     reason: Option<String>,    // [Q8] optional; inert diagnostic text; verbatim
@@ -390,7 +465,7 @@ struct OperatorConsentV1 {
 
 struct ConsentCollapseV1 {
     basis: ConsentCollapseBasisV1,
-    implied_side: EscapeSideV1,   // the side the operator did not name separately
+    implied_side: EscapeSideV1,   // this row's own side (§3.3.4); present iff collapsed
 }
 
 #[serde(rename_all = "snake_case")]
@@ -422,7 +497,7 @@ enum ObservedFactKindV1 {
 
 - All object ids, refs, branches, paths, member ids, and SHA-256 strings use
   the validators already applied to their existing sources (RecordContract §2
-  :171-176). SHA-256 values are lowercase 64-character hexadecimal.
+  :194-197). SHA-256 values are lowercase 64-character hexadecimal.
 - `recorded_at_ms`/`observed_at_ms` are decimal strings of the injected
   clock's epoch-milliseconds value — exactly the existing `created_at`
   convention (`merge/start/record.rs:83`,
@@ -448,7 +523,7 @@ strings are validated derivations, never ambient authority." `reason` is the
 single deliberate exception, and it is bounded so the doctrine survives:
 
 - It is **inert diagnostic text**, in the same class as `MergeRecordError.message`
-  which RecordContract §8 :399 already declares non-identity ("diagnostic
+  which RecordContract §8 :420 already declares non-identity ("diagnostic
   message text is not identity").
 - It is excluded from **every** identity, equality, legality, cursor,
   exhaustion, footprint-diff, and proof computation. No decision anywhere
@@ -505,21 +580,37 @@ Normative rules; the tests of §8.1 enumerate them exhaustively.
 6. **Journal exclusivity preserved.** A side row carrying a retired action and
    a *live* journal of the same owner/kind cannot coexist: the mark write
    clears the journal in the same atomic rewrite (§3.3.7).
-7. **Collapse legality.** `collapse` is present only when the operator did not
-   name that side separately; its `basis` must be corroborated by an
+7. **Collapse legality.** `collapse` is present on a side row exactly when
+   that side's consent arrived through the `:both` collapse (§3.3.4) rather
+   than a separate naming, and each row's `implied_side` equals **that row's
+   own side**. The `basis` must be corroborated by an
    `ObservedFactV1 { kind: RepositoryState, value: "missing" | "unreadable" }`
-   on **both** sides of the same owner, and both sides must carry the same
-   `consent` (identical operator, timestamp, digest, token). Any other shape
-   rejects.
-8. **Terminal legality.** `overridden_abort` is present **exactly** when
-   `state == Aborted` and the record was terminalized by the overridden edge;
-   its presence requires, for every owner in the closed domain, that each
-   *applicable* side is either proven-retired by ordinary evidence or marked
-   (§3.3.6 defines applicability). `overridden_abort` present with
-   `state != Aborted`, or with any applicable side neither proven nor marked,
-   is invalid. `overridden_entry` present requires that the record has been in
-   `RollingBack` (or is terminal); it never appears alone on a record that
-   never left `Preserving`/`RecoveryRequired`.
+   on **both** sides of the same owner; both sides must carry `collapse` with
+   the same `basis`; and both sides must carry the same `consent` (identical
+   operator, timestamp, digest, token — constructible because a collapsed
+   pair is written by **one** atomic `MarkOwnerUnrecoverable` rewrite
+   (§2.3.2) carrying the round's single consent (§3.3.3), so no crash can
+   split the pair and no second write can move the digest between them). Any
+   other shape rejects.
+8. **Terminal legality — the decode form, decidable from durable facts
+   alone.** `overridden_abort` is present **exactly** when `state == Aborted`
+   and the record was terminalized by the overridden edge. Its presence
+   requires, for every owner in the closed domain, that each **durably
+   applicable** side (§3.3.6's decode derivation: rollback sides by the
+   closed cursor-visit rule; preservation sides **iff** that owner carries a
+   preservation evidence row or a preservation-side disposition) is either
+   proven-retired by durable ordinary evidence or marked. A position retired
+   by live proof alone leaves no durable witness, is therefore not durably
+   applicable, and is **never re-derived at decode**: the consuming edge's
+   bound proof re-proved it live (§2.3.2, §3.3.6 write-edge form), and the
+   decode form trusts the recorded edge — an open or archived overridden
+   record is never read-invalid for lack of a live fact, and the terminal
+   edge never deadlocks on a preservation plan that was actually fine.
+   `overridden_abort` present with `state != Aborted`, or with any durably
+   applicable side neither proven nor marked, is invalid. `overridden_entry`
+   present requires that the record has been in `RollingBack` (or is
+   terminal); it never appears alone on a record that never left
+   `Preserving`/`RecoveryRequired`.
 9. **Immutability.** Every written `OwnerDispositionV1` side and both consent
    slots are **immutable once written**, joining the record's existing
    immutability discipline. The block itself is **append-only**: dispositions
@@ -559,22 +650,26 @@ enum EscapeTransition {
 
 `V1LifecycleRequest` (`dispatcher.rs:17-24`) gains one variant,
 `ForceAbandon`, carrying the bound escape request. `EffectKind`
-(`transition/effect.rs:30-32`) gains the three mirroring effects.
+(`transition/effect.rs:24`) gains the three mirroring effects.
 `V1ResponseDisposition` gains `EscapeManifest` (the no-op first pass of §3.3.3).
+(Code idiom: the `V1Transition` arms are `Box`ed —
+`Operation(Box<OperationTransition>)`, `transition/mod.rs:89-98`; the sketch
+above and the §7 item 3 edit prescribe the arm and its payload authority, not
+its boxing.)
 
 Each payload is an opaque bound value carrying the §8 proof binding, per the
 frozen rule that "variants that carry data accept only opaque bound values,
 never raw strings/records supplied by a lifecycle caller" (TransitionDesign §6
-:335-338). No escape payload is constructible from a member id or a request
+:334-337). No escape payload is constructible from a member id or a request
 string.
 
 #### 2.3.2 Predecessor and footprint table (the §6.1-style rows)
 
 | Variant | Exact predecessor | Result and owned fields |
 | --- | --- | --- |
-| `MarkOwnerUnrecoverable` | any open state (`Executing`, `AwaitingResolution`, `Halted`, `Finalizing`, `Preserving`, `RollingBack`, `RecoveryRequired`); request is `ForceAbandon`; bound `PreparedOwnerMark` carries the fresh full preflight classification proving the named owner/side is permanently unobservable, the digest-bound consent, and the verbatim journal copy when one is retired; the owner/side is not already marked | appends exactly one `OwnerDispositionV1` side (creating the row, and the block, when absent) and, in the **same** atomic rewrite, clears the retired journal field it copied (`pending_preservation`, `pending_rollback`, or the participant's `pending_action`). **No state change**, no participant outcome, no acceptance/candidate/evidence touch |
-| `BeginRollbackOverridden` | `Executing`, `AwaitingResolution`, `Halted`, `Finalizing`, `Preserving`, or `RecoveryRequired`; **never `RollingBack`**; no forward or reverse journal remains (marked owners' journals were retired by their marks; unmarked owners' journals must be absent exactly as ordinary `BeginRollback` requires); bound `PreparedOverriddenRollbackEntry` = the ordinary `PreparedRollbackEntry` computed over the **unmarked** member domain, plus `VerifiedPreservationExhaustedOrMarked` when the origin is `Preserving`, plus the complete marked-side table, plus fresh digest-bound consent | state becomes `RollingBack`; writes `overridden_entry`; clears `recovery_context` in the same write when the predecessor is `RecoveryRequired` (the ActionJournal §2 :146-148 rule that leaving recovery clears the context in the same write is honored, not excepted) |
-| `AbortOperationOverridden` | `RollingBack`; no pending action/journal; bound `VerifiedOverriddenRollbackExhaustion` = `VerifiedRollbackExhausted` **restricted to unmarked owners** plus the complete marked-owner disposition table plus fresh digest-bound consent | state becomes `Aborted`; writes `overridden_abort`. Participants rolled back exactly keep their ordinary `Aborted`/`RolledBack` terminal rows; **marked participants keep their last honest state** (`Merged`, `Conflicted`, …) — no fabricated terminal outcome |
+| `MarkOwnerUnrecoverable` | any open state (`Executing`, `AwaitingResolution`, `Halted`, `Finalizing`, `Preserving`, `RollingBack`, `RecoveryRequired`); request is `ForceAbandon`; bound `PreparedOwnerMark` carries the fresh full preflight classification proving the named owner/side — or, for a provable collapse, both sides — permanently unobservable, the current §3.3.3 round's digest-bound consent, and the verbatim journal copy when one is retired; the owner/side is not already marked | appends exactly one `OwnerDispositionV1` side — or, for a provable-collapse `:both` mark, **both sides of that one owner in the same rewrite** (§3.3.4; this is what makes rule 7's identical-consent pair constructible and un-splittable by a crash) — creating the row, and the block, when absent, and, in the **same** atomic rewrite, clears the retired journal field it copied (`pending_preservation`, `pending_rollback`, or the participant's `pending_action`; at most one exists under the §1.2 legality table). **No state change**, no participant outcome, no acceptance/candidate/evidence touch |
+| `BeginRollbackOverridden` | `Executing`, `AwaitingResolution`, `Halted`, `Finalizing`, `Preserving`, or `RecoveryRequired`; **never `RollingBack`**; no forward or reverse journal remains (marked owners' journals were retired by their marks; unmarked owners' journals must be absent exactly as ordinary `BeginRollback` requires); bound `PreparedOverriddenRollbackEntry` = the ordinary `PreparedRollbackEntry` computed over the **unmarked** member domain, plus `VerifiedPreservationExhaustedOrMarked` when the origin is `Preserving`, plus the complete marked-side table, plus the current round's digest-bound consent (§3.3.3) | state becomes `RollingBack`; writes `overridden_entry`; clears `recovery_context` in the same write when the predecessor is `RecoveryRequired` (the ActionJournal §2 :145-147 rule that leaving recovery clears the context in the same write is honored, not excepted) |
+| `AbortOperationOverridden` | `RollingBack`; no pending action/journal; bound `VerifiedOverriddenRollbackExhaustion` = `VerifiedRollbackExhausted` **restricted to unmarked owners**, plus the complete marked-owner disposition table, plus a preservation exhausted-or-marked **re-proof** over the write-edge preservation domain (§3.3.6 — exact live re-proof precisely where no durable witness exists), plus the current round's digest-bound consent (§3.3.3) | state becomes `Aborted`; writes `overridden_abort`. Participants rolled back exactly keep their ordinary `Aborted`/`RolledBack` terminal rows; **marked participants keep their last honest state** (`Merged`, `Conflicted`, …) — no fabricated terminal outcome. The rewrite is decode-legal under the checked-record legality delta of §7 item 3: with `overridden_abort` present, a participant may stand non-rollback-terminal **iff** its rollback side carries a disposition (`model/v1/validate/lifecycle.rs:56` is amended for exactly this shape; unchanged when `overridden_abort` is absent) |
 
 Idempotence follows the frozen rule: it is handled by reading the current
 state and selecting no mutation, never by same-state variants. A predecessor
@@ -608,10 +703,23 @@ edge, the rollback-side marks by the terminal edge. Reviewer question R-1
 #### 2.3.4 What is NOT weakened
 
 - `OperationTransition::BeginRollback` and `::AbortOperation` keep their
-  frozen §6.1 rows **byte-for-byte**. Their proofs remain over the complete
-  domain and are therefore *unobtainable* once any mark exists — so the
-  ordinary path can never terminalize an overridden record. Only the escape
-  edges can, and only with fresh digest-bound consent.
+  frozen §6.1 rows **byte-for-byte**, and the ordinary path can never
+  terminalize an overridden record — **by definition, not by derivation**: a
+  bound `VerifiedRollbackExhausted`, a bound `VerifiedPreservationExhausted`,
+  and a `PreparedRollbackEntry` for the `Preserving` origin are **not
+  constructible while any `operator_override` disposition exists**, whatever
+  the live world shows (§7 item 3 writes this into the frozen note). The
+  complete-domain wording alone would not suffice: with preservation-side-only
+  marks, an ordinary rollback pass can genuinely satisfy the complete rollback
+  domain — the definitional rule is what keeps a plain `Aborted` off an
+  overridden record. And in a healed world (a wrongly-marked repository
+  restored), ordinary `BeginRollback` from a non-`Preserving` origin remains
+  obtainable and safe: it enters, cursor derivation still skips marked sides,
+  nothing is executed for them, and the terminal edge still refuses — the
+  record terminalizes only through force-abandon's own consent gate (§8
+  item 7's healed-world row pins this; permanence per §10.3 R-3). Only the
+  escape edges can terminalize such a record, and only with the current
+  round's digest-bound consent.
 - No escape transition may be returned by `next_action` for any request other
   than `ForceAbandon`; no observation, resolver, or executor path may
   construct an `EscapeTransition` payload. This is policed by the same
@@ -627,7 +735,7 @@ edge, the rollback-side marks by the terminal edge. Reviewer question R-1
 
 | Physical mutation | Required persisted owner |
 | --- | --- |
-| open-record quarantine move (`.gwz/merge/<id>.yaml` → `.gwz/merge/quarantine/<name>.yaml`) | operator-consented quarantine request plus a verified byte digest re-read immediately before and after the move; **no lifecycle transition, no decode requirement** |
+| open-record quarantine move (`.gwz/merge/<id>.yaml` → `.gwz/merge/quarantine/<name>.yaml`) | the **already-written quarantine sidecar** — §3.1 writes it atomically before the move, so it is the persisted owner this matrix's frame requires — recording the operator-consented request and the byte digest re-verified immediately before and after the move; **no lifecycle transition, no decode requirement** |
 | quarantine restore move (the exact inverse) | operator-consented restore request, sidecar digest equality, empty open slot, and a successful supported-open-record decode |
 | archive deletion with forgotten refs ([Q5]) | immutable validated archive plus operator-consented `--forget-refs`; every exactly-matching ref already observed absent after checked deletion; mismatched/unavailable refs observed and enumerated, never mutated |
 
@@ -742,8 +850,14 @@ codes 0..61 contiguous):
 All four require record context, carry absent member/detail/target fields, and
 take their `<reason>` from the registered lists in
 `gwz-core/dev-docs/GwzM5-8I2CompatibilityPredicates.json` — the same
-discipline as codes 49-61. Code 63 is the exit code of the no-op first pass
-(§3.3.3) and its message carries the confirm token.
+discipline as codes 49-61 (§7 item 5 amends the ProtocolContract §1 :46-53
+context-legality sentences and the §3 :208-210 range so the frozen text says
+the same). Code 63 is the exit code of the no-op first pass (§3.3.3) and its
+message carries the confirm token. Code 63 is **also** the refusal for a
+wrong, stale, or digest-mismatched `--confirm` token — for force-abandon and
+for `--forget-refs` alike — with distinct registered reasons for the three
+shapes; code 62 is reserved for decode-time contradictions of a **written**
+block and is never returned for a consent-flow refusal.
 
 ### 2.6 CLI surface
 
@@ -841,6 +955,29 @@ is unsupported (it would be a record candidate by the `*.yaml` rule). A
 hand-parked record has no sidecar; status reports "quarantined without
 sidecar" and restore refuses (§3.2).
 
+**Sidecar naming, lifecycle, and supersession.** The sidecar of `<name>.yaml`
+is `<name>.escape.yaml`; a sidecar's **history name** is
+`<stem>.<first 8 hex of its record_sha256>.escape.yaml` — the destination-
+collision suffix rule above, extended to the sidecar plane. Three rules make
+every sidecar state deterministic:
+
+- **Supersession, never adoption.** A plain-name sidecar already present
+  whose `record_sha256` does not match the bytes being parked belongs to a
+  **different episode**: quarantine renames it byte-identically to its
+  history name (content is never rewritten — the immutable-once-written
+  discipline is a statement about bytes, which the rename preserves) and then
+  writes its own fresh sidecar first, as above. A stale sidecar is never
+  adopted as the current attempt's anchor. An identical existing sidecar is
+  the idempotent-convergence arm of §4 row 2. A history-name collision with
+  different bytes is a typed refusal (code 65).
+- **Restore disposes.** Successful restore renames the sidecar to its history
+  name in the same operation (§3.2) — it is never deleted and never left at
+  the plain name.
+- **Orphans are inert.** A sidecar with no record file beside it is an
+  **orphan**: historical evidence only. It never makes a stem "quarantined"
+  (§7 item 4's predicate is the record file), never blocks a fresh
+  quarantine, and status reports it as historical without arbitrating on it.
+
 **Exact effects.** Record bytes moved byte-identically; journal untouched (it
 lives inside the record bytes); **no** preserved artifact touched — backup
 refs `refs/gwz/merge/<merge-id>/<owner-key>/head`, native stash
@@ -862,7 +999,10 @@ Permitted **only** when all of: the open slot contains no `*.yaml` at all
 (not merely no valid record); the quarantined bytes still digest-equal the
 sidecar's `record_sha256`; the sidecar is present and structurally valid; and
 the bytes decode as a **supported open** record. The move is the exact
-inverse, with the same digest/fsync discipline.
+inverse, with the same digest/fsync discipline. In the same operation,
+immediately after the record move, the sidecar is renamed to its history name
+(§3.1) — the window between the two renames is §4 row 13, and the orphan it
+can momentarily leave is inert and converges idempotently.
 
 - **Edited bytes are permanently manual.** A digest mismatch is a typed
   refusal (code 65) with the manual-surgery pointer. The "checked re-admit of
@@ -877,9 +1017,24 @@ inverse, with the same digest/fsync discipline.
   `--continue`/`--abort` resume through the unchanged exact machinery. A
   record carrying `operator_override` dispositions may be quarantined and
   restored; it re-enters the escape lane, not the ordinary one.
-- **Status third source.** `merge --status <id>` projects a quarantined record
-  from quarantined bytes and the sidecar only, never from live repositories —
-  the same discipline the archived projection already obeys.
+- **Status third source — a success projection for decodable bytes only.**
+  `merge --status <id>` projects a quarantined record from quarantined bytes
+  and the sidecar only, never from live repositories — the same discipline
+  the archived projection already obeys. **Quarantined bytes that do not
+  decode as a supported record have no success projection**: a status success
+  is a `MergeResponse` whose field 3 `state` is required
+  (`gwz.taut.py:1699`), the projection's field 1 `source_version` is required
+  with only `v0`/`v1` allocated, no `unknown` discriminant is appended, and
+  "Human output never invents absent data" forbids synthesis. Status of such
+  a record is therefore a **typed error** — code 65 with a registered reason;
+  the message names the quarantine file and, when the sidecar exists, its
+  recorded digest and decoded/motivating summary; `record_context` follows
+  the frozen readable-header rule — mirroring the existing unreadable-open
+  posture (`MergeRecordUnreadable`, `merge/status/snapshot.rs:176`). The
+  decodable-quarantined success populates `MergeResponse.state` from the
+  decoded record, `open=false`, `archived=false`, `source=quarantined`, and
+  `MergeQuarantineProjection.decoded_state` (§2.5.2). §7 item 4's arbitration
+  rows and §8 items 5/10 carry both arms.
 
 ### 3.3 Force-abandon
 
@@ -924,7 +1079,7 @@ every later position), but the failure direction never does — every remaining
 edge is still fail-closed, and the marked owner's own repository is never
 touched. The trade is exactly what the operator consented to.
 
-The TransitionDesign §7 :928-932 sentence is narrowed accordingly: the
+The TransitionDesign §7 :929-933 sentence is narrowed accordingly: the
 dispatcher still completes the two-pass cursor "regardless of an incoming
 abort request" for every **ordinary** request, and there is still no
 **implicit** abandonment — abandonment exists only as an explicit, per-side
@@ -935,11 +1090,36 @@ consented, durably recorded mark.
 Invoked without `--confirm`, the command runs the **complete** preflight,
 prints the destruction manifest, **makes no change**, and exits nonzero with
 code 63 carrying `confirm token: <first 16 hex of record sha256>`. Re-invoked
-with `--confirm <token>`, it proceeds only while the record digest still
-matches — consent is bound to exactly the bytes whose consequences were shown,
-and any concurrent rewrite invalidates it. Consent **never persists**: each
-invocation, and each post-crash resumption, re-earns it against the current
-digest.
+with `--confirm <token>`, it **re-runs the full preflight** — the digest gate
+freezes the record, not the world: a basis that turned false between manifest
+and confirm (a repository that reappeared) makes the named side observable
+again, and the fresh classification refuses it with code 64, quoting the
+current classification (§3.3.5) — and proceeds only while the record digest
+still matches; consent is bound to exactly the bytes whose consequences were
+shown, and any concurrent rewrite invalidates it. A wrong, stale, or
+digest-mismatched `--confirm` token is a typed refusal, code 63 with a
+registered reason (§2.5.4); nothing is written.
+
+**The consent round.** One confirmed invocation is one **consent round**, and
+the round has a single anchor: `record_sha256`, the digest of the exact bytes
+the manifest was printed from. The round is validated **once** — token
+against the current record bytes at invocation entry, under the workspace
+mutator lock and the v1 mutation lease, both held for the whole invocation
+(§3.3.5) — and its `OperatorConsentV1` is frozen at that validation
+(`operator`, `recorded_at_ms` stamped then, `writer_version`, the anchor
+digest, the derived token, the verbatim `reason`). **Every** consent row the
+invocation writes — each mark's `SideDispositionV1.consent`,
+`overridden_entry`, `overridden_abort` — carries that frozen consent
+verbatim, as inert provenance (§5.5). This is what makes multi-row
+invocations constructible: the second and later writes of a round move the
+record bytes past the anchor, and their consent rows still carry the anchor
+— never a digest the operator was not shown. "Fresh" and "current round's
+digest-bound consent" in §2.3.2 mean exactly this: written by the round whose
+token was validated at entry. Consent **never persists across rounds**: a
+crash, an exit, or any release of the lock/lease ends the round, and every
+re-invocation re-earns a new round against the then-current digest (§4 rows
+1, 4, 11). Each `AbandonEvidenceV1.observed_at_ms` remains the per-mark
+observation time — evidence is per-fact, consent is per-round.
 
 The manifest is printed **per side**, one row per destruction:
 
@@ -978,12 +1158,16 @@ a rewritten integration ref, a mangled bundle — implies **at most one** side
 and must be consented per side. There is no "operator judgement" arm.
 
 **The collapse is a prompt affordance only; the record never collapses.** A
-collapsed consent writes **two** `SideDispositionV1` rows, each carrying the
-same `OperatorConsentV1` and a `ConsentCollapseV1 { basis, implied_side }`.
-The consent text of a collapsed prompt must **name both destructions
-explicitly** — the manifest prints the two rows above in full, and the
-`:both` token is refused when the basis does not hold, with a typed error
-naming the two side tokens the operator must use instead.
+collapsed consent writes, in **one atomic rewrite** (§2.3.2), **two**
+`SideDispositionV1` rows, each carrying the same `OperatorConsentV1` (the
+round's frozen consent, §3.3.3) and a `ConsentCollapseV1` whose `basis` is
+the proven implication and whose `implied_side` is **that row's own side** —
+`collapse` presence records that this side's consent arrived through the
+`:both` collapse rather than a separate naming (§2.2.4 rule 7). The consent
+text of a collapsed prompt must **name both destructions explicitly** — the
+manifest prints the two rows above in full, and the `:both` token is refused
+when the basis does not hold, with a typed error naming the two side tokens
+the operator must use instead.
 
 #### 3.3.5 Preconditions
 
@@ -1025,16 +1209,37 @@ operator_override:
 ```
 
 **Applicability** decides whether an absent side is legal at the terminal
-edge, and is derived from durable facts alone:
+edge. It has two forms, each decidable in its own plane — the write edge
+consumes live proofs it earns freshly; the decoder consumes durable facts
+alone:
 
-- The **rollback** side is applicable to every owner the rollback cursor
-  visits: every selected participant, `PublicationEvidence` when publication
-  evidence exists, `SelectedRootMetadata` for a selected-root operation.
-- The **preservation** side is applicable only when the record entered
-  preservation — state is or was `Preserving` (including `RecoveryRequired`
-  with `origin_state: preserving`), or a preservation evidence row exists. A
-  plain abort with no `--preserve` has **no** applicable preservation side
-  anywhere, so no preservation mark is ever required or legal.
+- The **rollback** side is applicable, in both forms, to every owner the
+  rollback cursor visits: every selected participant, `PublicationEvidence`
+  when publication evidence exists, `SelectedRootMetadata` for a
+  selected-root operation.
+- The **preservation** side, **write-edge form** (consumed by the §2.3.2
+  bound proofs): applicable when the record entered preservation — state is
+  or was `Preserving` (including `RecoveryRequired` with
+  `origin_state: preserving`), or a preservation evidence row exists. The
+  terminal edge's `VerifiedOverriddenRollbackExhaustion` discharges this form
+  in full, per owner, by a durable completion fact, by a mark, **or by a
+  fresh exact live re-proof** where neither durable witness exists — a
+  position retired by live proof alone leaves none (D3's acknowledged
+  crash-window shape, and every pre-D3-implementation record). Rule 8 can
+  therefore never deadlock on a preservation plan that was actually
+  complete: what cannot be shown durably is re-proven live by the consuming
+  edge, while marking an observable side stays a typed refusal (§3.3.5) —
+  no consent obligation is waived.
+- The **preservation** side, **decode form** (consumed by §2.2.4 rule 8):
+  applicable **iff** that owner carries a preservation evidence row or a
+  preservation-side disposition — per-owner durable facts alone, with no
+  "was `Preserving`" reconstruction, so write-legality and read-legality of
+  an overridden record can never diverge and an archived read re-derives no
+  live fact. The decode form trusts the recorded edge for exactly what the
+  write-edge form re-proved live.
+- A plain abort with no `--preserve` has **no** applicable preservation side
+  anywhere, in either form, so no preservation mark is ever required or
+  legal.
 
 **Validity by phase:**
 
@@ -1043,7 +1248,7 @@ edge, and is derived from durable facts alone:
 | open, any state | **legal**, unconditionally (subject to §2.2.4 owner/side legality) |
 | `BeginRollbackOverridden` | legal; the edge consumes only preservation-side marks. A rollback-side-only owner is untouched by this edge |
 | ordinary rollback work in `RollingBack` | legal; the unmarked side is processed by the unchanged machinery and may reach an ordinary exact terminal row |
-| `AbortOperationOverridden` | legal **iff** every applicable side is proven-retired or marked. A participant marked on the preservation side whose rollback ran exactly carries a real `RolledBack`/`Aborted` terminal row **and** a preservation-side disposition — the common, healthiest overridden shape |
+| `AbortOperationOverridden` | legal **iff** the bound terminal proof discharges every applicable side in the write-edge form — per owner and side: durable ordinary evidence, a mark, or the fresh exact live re-proof of §3.3.6 (the decode form of §2.2.4 rule 8 then holds by construction). A participant marked on the preservation side whose rollback ran exactly carries a real `RolledBack`/`Aborted` terminal row **and** a preservation-side disposition — the common, healthiest overridden shape |
 | archived / after GC | legal and immutable; never retired |
 
 **Rendering.** Per-owner status is exactly one of `restored` (ordinary),
@@ -1112,9 +1317,17 @@ The forgotten refs are namespaced under `refs/gwz/merge/<id>/` and inert.
 the only durable record of what was forgotten. The valve therefore requires
 the same two-step consent as force-abandon — the first pass prints every ref
 to be forgotten with its exact name, expected target, and observed
-target/state, and makes no change — and the JSONL event stream emits one event
-per forgotten ref. After the archive is gone, the refs are recoverable only by
-hand from the printed manifest or the driver log.
+target/state, and makes no change. **The consent anchor is the validated
+archive bytes**: the confirm token is the first 16 lowercase hex characters
+of the archive's SHA-256 as read through the unchanged canonical no-follow
+reader, and a token that no longer matches the current archive digest is a
+typed refusal — code 63, registered stale-token reason — exactly as in
+§3.3.3. Because this is the one consent that lands in no durable artifact
+(the artifact it would ride is being deleted), the JSONL event stream emits
+one event per forgotten ref **carrying the ref's exact name, expected target,
+observed target/state, the archive digest, and the consumed confirm token**
+— the driver log is the audit trail. After the archive is gone, the refs are
+recoverable only by hand from the printed manifest or the driver log.
 
 ### 3.5 Error-text and status pointers ([Q6])
 
@@ -1136,16 +1349,17 @@ dispatcher, observers, and executors.
 | 2 | between the sidecar write and the quarantine move | the sidecar exists with a matching digest; re-run detects it and completes the move idempotently |
 | 3 | after the quarantine move, before the response | no open record; a quarantine entry with matching digest exists; re-run reports idempotent success and echoes the sidecar |
 | 4 | after a `MarkOwnerUnrecoverable` write | the record is open with a partially populated block and the marked owner's journal already cleared. **The ordinary dispatcher's outcome is unchanged in kind**: ordinary `--continue`/`--abort` still refuse to terminalize (the exhaustion proofs are over the complete domain), while cursor derivation skips the marked side so ordinary rollback work on *unmarked* owners proceeds. A re-issued force-abandon resumes: already-marked sides stay marked, consent is re-earned against the new digest |
-| 5 | between two `MarkOwnerUnrecoverable` writes | identical to 4; marks are independent, append-only, and order-insensitive within an owner |
+| 5 | between two `MarkOwnerUnrecoverable` writes | identical to 4; marks are independent, append-only, and order-insensitive within an owner. A collapsed `:both` pair is **one** write (§2.3.2), so no crash can split it; the next round's marks carry the new round's consent while already-written rows keep theirs |
 | 6 | after `BeginRollbackOverridden`, before the first ordinary rollback action | state is `RollingBack` with `overridden_entry` present. Ordinary `--abort` resumes the tractable owners' rollback with no consent (nothing new is destroyed) and then refuses at the terminal edge; force-abandon resumes and re-earns terminal consent |
 | 7 | between two ordinary rollback actions inside an overridden run | ordinary restart legality, entirely unchanged — the marked sides are durable and the unmarked owners are recognized by the unchanged exact observers |
 | 8 | after `AbortOperationOverridden`, before archive | terminal `Aborted` with `overridden_abort`. The unchanged terminal/archive path applies; `store/archive.rs:15-24` still requires the lease and a terminal state |
 | 9 | mid-archive of an overridden record | the unchanged four-way archive state machine applies (`archive.rs:11-86`): source-only, both-copies-identical, destination-only, or a typed rejection that deletes neither copy |
-| 10 | during a restore move | either the quarantine copy or the open copy exists with a verified digest; a partial state is impossible (`rename_noreplace` + both-directory fsync). If both exist with identical bytes, the open copy is authoritative and the quarantine copy is retained; different bytes is a typed refusal (manual surgery, runbook step 4) |
+| 10 | during a restore move | either the quarantine copy or the open copy exists with a verified digest; a partial state is impossible (`rename_noreplace` + both-directory fsync). If both exist with identical bytes, the open copy is authoritative and the quarantine copy is retained (status renders it shadowed/historical, §7 item 4); different bytes is a typed refusal (manual surgery, runbook step 4) |
 | 11 | during `--forget-refs` GC, after some deletions | restart treats absent refs as complete (unchanged), re-derives the same worklist from the unchanged archive, and re-earns consent before proceeding |
 | 12 | between a mark write and the `--force-abandon` response | indistinguishable from 4 for every reader; the durable block is the only state |
+| 13 | between the restore's record move and the sidecar's history-rename | the record is open and digest-verified; the plain-name sidecar is an orphan (no record file beside it) and is inert (§3.1). A re-run restore is an idempotent success that completes the history-rename; a later quarantine supersedes it per §3.1; status reports it as historical; nothing arbitrates on it |
 
-**Invariant across all twelve:** a crash never leaves the record in a shape the
+**Invariant across all thirteen:** a crash never leaves the record in a shape the
 ordinary machinery misreads as clean, and never leaves a marked owner's
 repository mutated. Every partially-force-abandoned record is completable only
 by force-abandon with fresh consent, or by quarantine, or by repairing the
@@ -1216,8 +1430,11 @@ same mechanism the durable-cursor amendment documented for its two row names.
 - **The cleanup worklist derivation is untouched.** The override block
   contributes no worklist entries and names no artifacts (§3.3.8); the
   worklist is derived only from preservation evidence rows, whose marker-aware
-  arm the durable-cursor amendment already added
-  (`record_wire/archive/cleanup.rs:149-197`).
+  arm the durable-cursor amendment **requires** at
+  `record_wire/archive/cleanup.rs:149-197` — specified by D3, **not yet
+  landed**: `collect_owner` today still rejects a row with neither backup
+  pair nor stash pair. The E packages must not assume D3's implementation has
+  landed (§6.4's any-order rule).
 - **GC never sees the block.** `merge/store/gc.rs:8` reads only `done/`;
   `quarantine/` is invisible by the same subdirectory rule as `done/`, which
   this amendment converts from an accident into a tested rule (§8.4). A `--gc`
@@ -1245,13 +1462,15 @@ same mechanism the durable-cursor amendment documented for its two row names.
   preservation evidence rows with stash ids only; the override block never
   enters bundle bytes. §8.7 pins byte-identical expected-bundle output with
   and without the block.
-- **No record self-hash is introduced.** RecordContract §1 :55-58's "There is
+- **No record self-hash is introduced.** RecordContract §1 :76-77's "There is
   no … record self-hash" stands. `consent.record_sha256` is the digest of the
-  **predecessor** bytes the manifest was printed from, not of the containing
-  record. It is validated **once**, at the consuming edge, against the exact
-  source bytes the transition is applied to; thereafter it is inert
-  provenance and no reader recomputes it. It is not an integrity frame and
-  never becomes a cross-version identity.
+  **round-anchor** bytes the manifest was printed from, not of the containing
+  record. It is validated **once per consent round**, at the round's entry,
+  against the then-current record bytes (§3.3.3); every consent row of that
+  round carries it verbatim thereafter as inert provenance — including rows
+  whose own rewrite base has moved past the anchor — and no reader ever
+  recomputes it against the containing bytes. It is not an integrity frame
+  and never becomes a cross-version identity.
 
 ### 5.6 Graceful degradation
 
@@ -1322,7 +1541,31 @@ particular — the `NotStarted`-consuming abandonment keeps its exact proof, its
 exact footprint, and its exact prohibition on reporting an outcome — and the
 override path is distinguishable from it by one field-presence check. M5b's
 suites must tolerate this wire landing first, per the same §7 P-REV
-order-independence instruction M5b already binds itself to.
+order-independence instruction M5b already binds itself to — an instruction
+stated there for the D3 wire and **extended here** to this train by this
+sentence.
+
+**Composition with M5b-W1** (the 2026-08-22 RecordContract banner, applied at
+M5b acceptance): W1 freezes signature **timestamps** into the forward
+action's identity fields and makes restart adoption and completion matching
+**field-wise** over the frozen fields (parents, message bytes, tree, both
+identity lines) — an externally created twin commit matching every frozen
+field may be adopted. The escape lane composes disjointly, on three facts:
+
+1. **Disjoint worlds.** Adoption is an observable-world path; a mark requires
+   permanent unobservability. The same fresh preflight that could observe a
+   W1-adoptable twin makes `MarkOwnerUnrecoverable` for that owner/side a
+   typed refusal (§3.3.5) — no owner is simultaneously eligible for both.
+2. **No adoption subject after retirement.** A rollback-side mark that
+   retires a forward action clears the journal in the same rewrite (§3.3.7);
+   W1's field-wise matching runs against a *pending* action's frozen
+   `PendingGitSignature`, and a marked owner has none. The disposition row's
+   verbatim copy is evidence outside every derivation — no observer,
+   adoption, or reconciliation path reads it (§2.3.4).
+3. **Different equality planes.** §2.2.4 rule 5's retired-copy check is
+   byte-equality of journal YAML at mark time; W1's is field-wise equality of
+   a live commit against frozen signature fields. Neither rule reads the
+   other's inputs, and neither weakens the other.
 
 ### 6.3 Exact-evidence amendment doctrine compliance
 
@@ -1370,6 +1613,17 @@ and reviewable without the others, and each one's suites must tolerate the
 other two's wire landing first. This paragraph is the single authority
 statement A1 reviewers should read for how the three compose.
 
+Two 2026-08-22 landings do not disturb this paragraph. The accepted
+`GwzM5-8ThinA1Amendment.md` re-scopes the A1 **gate chain** only — this train
+is second-lane and non-gating for A1 (its :59-60) — and reopens no I2 wire,
+so it composes with all three trains by construction. The M5b-W1
+RecordContract banner is document-only and composes per §6.2. Because M5b
+§8.2's frozen sentence names two trains and cannot be edited, **at acceptance
+`CurrentProgramCheckpoint.md` gains a one-line pointer naming this §6.4 as
+the three-train composition authority** — the checkpoint is the live router
+(rulebook §7.3), so an A1 reviewer routed by M5b's sentence still finds the
+third train.
+
 ---
 
 ## 7. Contract deltas applied at acceptance
@@ -1378,17 +1632,23 @@ On acceptance the amended documents receive banners dated with the acceptance
 date, plus these exact text changes. This document is controlling wherever the
 frozen texts and this one disagree.
 
-1. **`GwzM5-8I2RecordContract.md`** — banner: "Amended 2026-08-16 by
+1. **`GwzM5-8I2RecordContract.md`** — banner: "Amended (acceptance date) by
    `GwzM5-8OperatorEscapeAmendment.md`: the record gains a sixth top-level
    field `operator_override` carrying append-only, per-side operator
    dispositions and two one-shot consent slots; the §7 forward-action
    retirement rule gains the override path; §8's top-level collision list and
    retirement table extend to the new name and container."
-   - §1 :39 — "It adds five top-level fields:" becomes "It adds six top-level
+   - §1 :60 — "It adds five top-level fields:" becomes "It adds six top-level
      fields:", and the struct block gains
      `operator_override: Option<OperatorOverrideV1>,` after
      `preservation_publication_handoff`.
-   - §7 :362 — "A durable forward action may also retire without an
+   - §1 :76-77 — "There is no sibling acceptance file, sidecar journal,
+     cleanup journal, or record self-hash." gains the scoping annotation
+     "(scoped to the record's own lifecycle storage under `.gwz/merge/` and
+     `done/`)": the quarantine sidecar (§3.1) is store-plane escape evidence
+     under `quarantine/`, consumed by no lifecycle path, and is not this
+     sentence's "sidecar journal".
+   - §7 :381 — "A durable forward action may also retire without an
      integration outcome only when an abort or preserve-abort request consumes
      the matching bound exact `NotStarted` observation." becomes: "A durable
      forward action may also retire without an integration outcome in exactly
@@ -1398,22 +1658,43 @@ frozen texts and this one disagree.
      the same atomic rewrite. Neither case reports success, conflict, or
      failure for an action that did not run, and neither changes the
      participant's state or evidence."
-   - §8 :375-379 — the collision sentence's name list gains
+   - §8 :394-400 — the collision sentence's name list gains
      `operator_override` as a sixth name.
    - §8 retirement table gains: "| operator override | append-only; each
      owner/side disposition and each consent slot is immutable once written;
      survives archival; never retired |".
    - §8 sequence-identity list gains: "operator-override dispositions by
      `(owner, side)`".
-   - §9 gains this amendment's exit-test rows (§8 below).
+   - §9 :440 gains this amendment's exit-test rows (§8 below).
 2. **`GwzM5-8I2ActionJournalContract.md`** — banner of the same form.
    - §1 gains the escape wire types of §2.2 verbatim, annotated as the escape
      lane's closed vocabulary.
-   - §2 :176-177 — "Retirement occurs only with the verified result/progress
+   - §2 :175-176 — "Retirement occurs only with the verified result/progress
      write." becomes "Retirement occurs only with the verified
      result/progress write, or with the verified operator-override mark that
      copies the action verbatim into its disposition row in the same atomic
      rewrite; no other path clears or advances a pending action."
+   - §2 :178-181 — "For rollback, owner/kind agreement includes the exact
+     deterministic current cursor derived from durable participant terminal
+     states, publication evidence, selected-root membership, and pending
+     phase; a wrong or later owner is invalid at decode." becomes "For
+     rollback, owner/kind agreement includes the exact deterministic current
+     cursor derived from durable participant terminal states,
+     **operator-override rollback-side dispositions**, publication evidence,
+     selected-root membership, and pending phase; a wrong or later owner is
+     invalid at decode. A disposition retires its owner's remaining rollback
+     positions for cursor purposes only; it never satisfies an exhaustion
+     proof — `VerifiedRollbackExhausted` remains complete-domain and is not
+     constructible while any disposition exists."
+   - §2 :185-192 — the two-arm prefix sentence gains the third arm: "…must
+     also prove — by durable completion facts where present, **by an
+     operator-override preservation-side disposition on that owner where one
+     exists**, and by exact bound live observation where absent — that every
+     earlier position in the two-pass cursor is complete or currently
+     unnecessary." with the appended carve-out sentence: "A disposition
+     retires a position for cursor/prefix purposes only; it never satisfies
+     `VerifiedPreservationExhausted`, and only the §6.10 escape edges'
+     `…ExhaustedOrMarked` proofs consume it."
    - §2's legality table and the "Ambiguous observation changes only operation
      state/context" sentence are **unchanged** (annotated as such).
    - §5 gains the [Q5] paragraph: "Targeted GC additionally accepts an
@@ -1429,12 +1710,33 @@ frozen texts and this one disagree.
    - A new §6.10 "Escape transitions" carries the §2.3.2 predecessor/footprint
      table verbatim, prefixed by: "Escape transitions are constructible only
      from an explicit `ForceAbandon` request carrying digest-bound operator
-     consent. No dispatcher, observation, resolver, or executor path may
-     construct one."
+     consent of the current consent round. No dispatcher, observation,
+     resolver, or executor path may construct one." The block also carries
+     the **checked-record legality delta**: "Under `state: Aborted` with
+     `overridden_abort` present, a participant is legal in a
+     non-rollback-terminal state **iff** its rollback side carries an
+     `operator_override` disposition; with `overridden_abort` absent, the
+     existing all-rollback-terminal rule
+     (`model/v1/validate/lifecycle.rs:56`, error `TerminalRollbackMismatch`)
+     is unchanged. The delta applies identically in the open decoder and the
+     archived decoder — write-legality and read-legality never diverge."
    - §6.1's `BeginRollback` and `AbortOperation` rows are **unchanged**, with
-     an added note: "These proofs remain over the complete owner domain and
-     are therefore unobtainable once any operator-override mark exists; only
-     §6.10's edges can terminalize such a record."
+     an added note: "A bound `VerifiedRollbackExhausted`, a bound
+     `VerifiedPreservationExhausted`, and a `PreparedRollbackEntry` for the
+     `Preserving` origin are **not constructible** while any
+     `operator_override` disposition exists — definitionally, independent of
+     what the live world shows; only §6.10's edges may terminalize, or enter
+     rollback from `Preserving`, on such a record. Ordinary `BeginRollback`
+     from the other origins remains obtainable in a healed world and is safe:
+     cursor derivation still skips marked sides and the terminal edge still
+     refuses."
+   - §6.6 :648-652 — "The reverse cursor is fully derivable from participant
+     terminal states, publication rollback evidence, selected-root
+     membership, and the exact pending phase." becomes "The reverse cursor is
+     fully derivable from participant terminal states, **operator-override
+     rollback-side dispositions**, publication rollback evidence,
+     selected-root membership, and the exact pending phase." The decode-law
+     sentence that follows applies to the amended derivation unchanged.
    - §6.9 gains the three rows of §2.4.
    - §7 :843 — "resume-start, continue, abort, preserve, status, and archive
      work" becomes "resume-start, continue, abort, preserve, force-abandon,
@@ -1449,20 +1751,43 @@ frozen texts and this one disagree.
      its owner's remaining positions on the marked side for cursor-prefix
      purposes only; it never satisfies `VerifiedPreservationExhausted` and
      never authorizes a physical mutation."
-   - §13 gains the escape matrix rows (§8.2).
+   - §13 gains the escape matrix rows (§8 item 8).
 4. **`GwzM5-8R4bReverseLifecycleInterface.md`** — banner of the same form.
    - §9 :441 — "Status has two sources and no mutation path:" becomes "Status
      has three sources and no mutation path:", with a third bullet: "a
      quarantined record is decoded solely from quarantined bytes and its
      sidecar, and projected without consulting live repositories." The source
-     arbitration table gains the quarantined rows (quarantine present + open
-     absent → quarantined projection; quarantine present + open present →
-     typed contradiction, no mutation; quarantine present without sidecar →
-     quarantined projection marked `sidecar_present: false`, restore refused).
+     arbitration table gains the quarantined rows, **total over the third
+     axis** — "quarantine present" means a record file exists under
+     `quarantine/`; an orphan sidecar is historical and never arbitrates
+     (§3.1):
+     - quarantine present + open absent + archive absent → quarantined
+       projection when the bytes decode as a supported record; the §3.2
+       typed error (code 65) when they do not;
+     - quarantine present + open present, **identical bytes** → open
+       projection; the quarantine copy renders shadowed/historical; status
+       does not reconcile (the frozen identical-terminal-bytes posture);
+     - quarantine present + open present, **different bytes** → typed
+       contradiction; no mutation;
+     - quarantine present + **archive present** (open present or absent) →
+       typed contradiction naming every present path; no mutation (the
+       frozen different-destination fail-closed posture);
+     - quarantine present without sidecar → quarantined projection marked
+       `sidecar_present: false` when the bytes decode (the same typed error
+       when they do not); restore refused.
    - §11 gains the [Q5] paragraph of item 2 above.
 5. **`GwzM5-8I2ProtocolContract.md`** — banner of the same form.
    - §1's error table appends codes 62-65 with the message bodies of §2.5.4
      and the registered-reason requirement.
+   - §1 :46-53 — the context-legality sentences extend by exact edit, so the
+     appended codes are inside the require-context set rather than under
+     "every other error forbids context": "codes 49–61 require id and
+     installed pair" becomes "codes 49–65 require id and installed pair", and
+     "Codes 46–61 have absent member/detail/target fields." becomes
+     "Codes 46–65 have absent member/detail/target fields." The sentence
+     "Every other error forbids context." is unchanged and stays true.
+   - §3 :208-210 — the record-context range sentence: "the code is one of
+     45–61" becomes "the code is one of 45–65".
    - §2's enum allocation appends `MergeRecordSource`, `MergeEscapeOwner`,
      `MergeEscapeSide`, `MergeSideDispositionKind`,
      `MergeConsentCollapseBasis`, `MergeRetiredActionKind`,
@@ -1524,10 +1849,19 @@ contract-level rows join RecordContract §9 at acceptance.
    (f) a half-marked owner surviving archival and projecting identically from
    archived bytes;
    (g) an owner with a retained forward action and only a preservation-side
-   mark — typed refusal naming the missing rollback-side consent.
+   mark — typed refusal naming the missing rollback-side consent;
+   (h) the §7 item 3 checked-validator delta, both directions:
+   `state: Aborted` + `overridden_abort` + a `Merged` participant whose
+   rollback side is marked — decode-legal, from open bytes and archived bytes
+   alike; the same shape with `overridden_abort` absent, or with that
+   participant's rollback side unmarked — rejected
+   (`TerminalRollbackMismatch`).
 4. **Provable-collapse consent rows** (`force_abandon.rs`): `:both` accepted
    under `repository_missing` and under `repository_unreadable`, writing two
-   side rows with identical consent and `collapse.implied_side` set; `:both`
+   side rows in **one atomic rewrite** (the footprint test proves the pair is
+   one write) with identical consent (the round's frozen consent, §3.3.3) and
+   `collapse.implied_side` equal to each row's **own** side (preservation row
+   → `preservation`, rollback row → `rollback`); `:both`
    **refused** for every narrower basis (dropped stash, pruned commit,
    retargeted backup ref, rewritten integration ref, mangled bundle) with the
    error naming the two side tokens; a collapsed manifest asserted to name
@@ -1542,7 +1876,14 @@ contract-level rows join RecordContract §9 at acceptance.
    idempotently; destination-collision suffixing; `--file` selection under the
    multiple-records error; restore refused over a non-empty open slot, over a
    digest mismatch, over a sidecar-less entry, and for a record that decodes
-   as terminal.
+   as terminal; the sidecar lifecycle (§3.1/§3.2): restore renames the
+   sidecar to its history name in the same operation (never deleted, never
+   left at the plain name), the §4 row-13 orphan converges idempotently and
+   blocks nothing, and a stale plain-name sidecar from a previous episode is
+   superseded to its history name — never adopted, never overwritten; status
+   of an undecodable quarantined record is the typed code-65 error, never a
+   `MergeResponse`, in both the sidecar-present and sidecar-less arms
+   (§3.2.4).
 6. **Forged and tampered override evidence** (`operator_override_tests.rs`):
    every rejection is proven to need **no repository read** —
    `operator_override` on a v0 record; `overridden_abort` with a non-`Aborted`
@@ -1561,12 +1902,24 @@ contract-level rows join RecordContract §9 at acceptance.
    rollback and then **refuses** at the terminal edge; ordinary
    `BeginRollback` from `Preserving` still refuses; `AbortOperation` cannot
    consume a mark; no escape transition is reachable from any non-
-   `ForceAbandon` request (a dispatcher matrix row per request kind).
+   `ForceAbandon` request (a dispatcher matrix row per request kind); the
+   **healed-world row**: with marks present and the marked repository
+   restored, ordinary `BeginRollback` from a non-`Preserving` origin enters,
+   completes every unmarked owner exactly, executes nothing for the marked
+   side, and the terminal edge still refuses (§2.3.4); force-abandon on a
+   **v0** record — typed refusal, code 64, with the quarantine hint (§5.1).
 8. **Escape restart/fault matrix** (TransitionDesign §13 rows): fault
-   injection immediately before and after each of the twelve §4 crash points,
-   plus one footprint test per new variant proving the actual known semantic
-   diff equals only its declared fields, plus unknown-survivor and
-   retirement-manifest checks after each new transition.
+   injection immediately before and after each of the thirteen §4 crash
+   points, plus one footprint test per new variant proving the actual known
+   semantic diff equals only its declared fields, plus unknown-survivor and
+   retirement-manifest checks after each new transition. The **consent-round
+   flow rows** (§3.3.3): (a) the first pass writes nothing and exits code 63
+   carrying the token; (b) the correct token against an unchanged digest
+   proceeds, and every consent row of a multi-row invocation carries the one
+   round anchor verbatim; (c) a wrong, stale, or digest-mismatched
+   `--confirm` token is a code-63 refusal writing nothing; (d) a collapse
+   basis that turned false between manifest and confirm — the re-run
+   preflight refuses the now-observable side with code 64.
 9. **Unknown-field survival** (`record_wire/unknown_fields/tests/`): unknown
    descendants inside the block survive by `(owner, side)` identity across
    every append; the name present at v0 top level surfaces in the **v0**
@@ -1578,7 +1931,11 @@ contract-level rows join RecordContract §9 at acceptance.
     rendering as a plain abort in any of human/JSON/JSONL × Rust/Python;
     half-marked per-owner rendering strings; quarantined projection performing
     **zero** live observations (backend call counting); corpus goldens for the
-    four new error codes and the manifest response.
+    four new error codes and the manifest response; the quarantined-
+    undecodable typed-error route rendering identically in human/JSON/JSONL
+    across both drivers; named CBOR/corpus round-trip goldens for
+    `MergeOp::{quarantine, restore}`, `MergeEscapeRequest`, and every new
+    projection message (the frozen §4 agree-exactly rule, made self-evident).
 11. **GC forget-refs** (`gc` evidence): exact-target refs deleted,
     mismatched/unavailable refs left byte-identical and enumerated, archive
     deleted only after the deleted set is observed absent; without the flag
@@ -1588,6 +1945,12 @@ contract-level rows join RecordContract §9 at acceptance.
     `.gwz/merge/` proven rejected (§3.1).
 12. **Bundle and frame invariance**: expected bundle bytes and every preimage
     hash identical with and without the override block present.
+13. **CLI refusal and pointer fixtures** (`gwz-cli` + render goldens): bare
+    `@publication` — typed refusal listing the three exact owner tokens
+    (§2.6); a member owner named with no side — typed refusal; the [Q6]
+    pointer line present in every stuck-state typed error and every stuck
+    `--status` render (§3.5), goldened across human/JSON/JSONL and both
+    drivers.
 
 ---
 
@@ -1611,7 +1974,10 @@ durable cursor's ~700-1,100, driven by E3's parity surface and E2's matrix
 obligations. Reconciled against `GwzM5-8ChangeBudget.md` at implementation
 review, not binding here. Expected owners to flag **now**, ahead of that
 reconciliation: `model/v0.rs` and `model/v1/record.rs` (the sixth field),
-`model/v1/validate/` (a new override validator module),
+`model/v1/canonical.rs:53-59` (`CanonicalV1State` mirrors the top-level
+optionals and gains the sixth),
+`model/v1/validate/` (a new override validator module, plus the §7 item 3
+delta in `validate/lifecycle.rs:56`),
 `v1_lifecycle/transition/{mod,effect,reduce}.rs`,
 `v1_lifecycle/authority/dispatcher.rs` (the `ForceAbandon` request arm),
 `merge/store/{mod,persistence}.rs` (quarantine move), `merge/gc.rs`,
@@ -1620,7 +1986,11 @@ known-key fork), `protocol/gwz.taut.py` + both generated outputs,
 `merge/{response,status/snapshot}.rs`, `v1_lifecycle/status.rs`,
 `gwz-cli/src/{globalargs/parser.rs,clirequest/merge.rs,merge_render.rs}`,
 `gwz-core/src/workspace_ops/merge/validate.rs` (the `--force` carve-out), and
-the `gwz-py` renderer set.
+the `gwz-py` renderer set. One activation change is chartered here rather
+than left incidental: at A1 the `#[cfg(test)]` on `mod v1_lifecycle`
+(`merge/mod.rs:23-24`) and the test-only `Serialize` derive on
+`MergeOperationRecordV1` (`record.rs:19`) become unconditional — E2 cannot
+write production records otherwise.
 
 ### 9.2 Review tier
 
@@ -1652,6 +2022,11 @@ pre-committed conditions: a GO must dispose of each explicitly.
 
 Program-level: escapes performed by the program on real workspaces are
 recorded in the ledger like any other deviation (rulebook L1-16 precedent).
+One packaging note for the ledger: `GwzM5-8A1DecisionPacket.md` §4 step 2
+prescribed a single combined D3+escape I2 amendment; the program shipped them
+as separate trains (D3 accepted 2026-08-16; this one after it). The pre-A1
+placement is honored; the split is a recorded deviation, not a change
+request.
 
 ---
 
@@ -1692,7 +2067,7 @@ re-derives them:
    `GwzM5-8DurableCursorAmendment.md` §2.2/§5's "post-GC record rewrite"
    phrasing inaccurate — routed to its next docs pass; no behavior of that
    amendment depends on it (§5.4).
-8. **`store/mod.rs:90-95`** — the multiplicity error's code is
+8. **`store/mod.rs:90-96`** — the multiplicity error's code is
    `ErrorCode::MergeRecoveryRequired` (not an unreadable-class code) and an
    unreadable record hard-fails discovery **before** the count check
    (`:85`), so U7's two shapes surface as two different codes.
@@ -1751,10 +2126,61 @@ re-derives them:
 
 ---
 
+### 10.4 Round-2 disposition (revision of 2026-08-22)
+
+Every round-1 P1/P2 of both reports, and every P3 taken, mapped to its edit.
+Line numbers are this document's own, post-revision. Convergent findings are
+listed once with both ids. **No finding required breaching a §0 decided
+input; none is left open.**
+
+| Finding | Disposition (section:line) |
+| --- | --- |
+| Code P1-1 ≡ State P1-3 | The frozen cursor-derivation sentences are now quoted and amended: ActionJournal §2 :178-181 and :185-192 quoted at §1.2:234-253; TransitionDesign §6.6 :648-652 quoted at §1.3:289-298; exact replacement texts in §7 item 2 (:1677-1698) and item 3 (:1733-1740) |
+| Code P1-2 | ProtocolContract §1 :46-53 quoted at §1.5:350-359; exact 49–65 / 46–65 edits in §7 item 5 (:1782-1788); cross-noted at §2.5.4:853-855 |
+| Code P1-3 (with State P2-5) | Undecodable-quarantined status is a typed code-65 error, never a `MergeResponse`; decodable-only success projection — §3.2.4:1017-1035; arbitration rows §7 item 4 (:1760-1777); suites §8 items 5 (:1879-1885) and 10 (:1934-1936) |
+| Code P2-1 | §1.2 annotation reworded — marks clear journals, the terminal edge requires none remain (:227-232) |
+| Code P2-2 ≡ State P3-1 | Marker-aware arm retensed to "requires … not yet landed", plus the E-packages-must-not-assume note — §5.4:1431-1437 |
+| Code P2-3 | Arbitration made total: archive×quarantine and all-three-present are typed contradictions naming every present path — §7 item 4 (:1772-1774) |
+| Code P2-4 | `record.rs:79-110` corrected to :18-51 / :39-50 at evidence base :60, §2.1:383 and :397 |
+| Code P2-5 | Stale/wrong/mismatched `--confirm` pinned to code 63 (62 reserved for written-block contradictions) — §2.5.4:855-858, §3.3.3:1097-1100; flow rows (a)-(d) in §8 item 8 (:1915-1922) |
+| State P1-1 | The consent round: single anchor digest, validated once at round entry under lock+lease, frozen consent carried verbatim by every row of the round, crash ends the round — §3.3.3:1103-1125; §5.5:1462-1471; §2.3.2 rows :668-672; rule 7 :583-594; collapsed pair is one atomic write — §3.3.4:1159-1165, §4 row 5 :1349 |
+| State P1-2 | Ordinary-proof non-constructibility made definitional (`VerifiedRollbackExhausted`, `VerifiedPreservationExhausted`, `PreparedRollbackEntry` from `Preserving`) — §2.3.4:703-723; frozen-note text §7 item 3 (:1722-1732) |
+| State P1-4 | Checked-record legality delta for `Aborted`+`overridden_abort` (`model/v1/validate/lifecycle.rs:56`), open and archived decode alike — §7 item 3 (:1713-1721); §2.3.2 terminal row :672; §8 item 3(h) :1853-1859; evidence base :61 |
+| State P1-5 | Rule 8 split into a durably-decidable decode form and a full-strength write-edge form with live re-proof where no durable witness exists; archived reads trust the recorded edge — §2.2.4 rule 8 :595-614; §3.3.6:1211-1246; §2.3.2 terminal row :672; §3.3.6 table row :1251 |
+| State P1-6 | Sidecar lifecycle specified: history names, restore renames in-operation, supersession never adoption, orphans inert; crash row 13 added and the invariant extended to thirteen — §3.1:958-982; §3.2:1001-1006; §4:1360-1364; §7 item 4 predicate :1761-1763; §8 item 5 :1879-1885 |
+| State P2-1 | Both-copies arbitration split by byte identity (identical → open wins, quarantine copy shadowed; different → contradiction) — §7 item 4 (:1767-1771); §4 row 10 :1357 |
+| State P2-2 | `implied_side` pinned to the row's own side — §2.2:468, §2.2.4 rule 7 :583-588, §3.3.4:1159-1165, §8 item 4 :1860-1866 |
+| State P2-3 | §3 :208-210 range 45–61 → 45–65 — quoted §1.5:361-367; edit §7 item 5 (:1789-1790) |
+| State P2-4 | GC consent anchor = validated archive bytes; stale token = code 63; JSONL events carry ref, targets, archive digest, token — §3.4:1320-1331 |
+| Code P3-1 | Citation-drift bundle fixed: §7 item 1 :381 (was ":362"); §1.2 :173-176 / §7 item 2 :175-176; §1.3 :325-328, :929-933 (and §3.3.2:1082), :800-829; §2.3.1 `effect.rs:24` (:653) and TransitionDesign §6 :334-337 (:662); §10.1 item 8 :90-96 (:2070); "18 charged paths" (:92); "§8 item 8" (:1745); ActionJournal recovery rule :145-147 (:671) |
+| Code P3-2 | Boxing note added — §2.3.1:655-658 |
+| Code P3-3 | RecordContract §1 :76-77 scoping annotation — §7 item 1 (:1645-1651) |
+| Code P3-4 | Healed-world tightening — §2.3.4:714-720; §8 item 7 row :1905-1910 |
+| Code P3-5 | v0 force-abandon code-64 row (§8 item 7 :1910-1912); bare-`@publication`, no-side refusal, and [Q6] pointer fixtures (§8 item 13 :1948-1954); named CBOR/corpus rows (§8 item 10 :1934-1939) |
+| Code P3-6 | P-REV "extended here" (§6.2:1544-1547); `canonical.rs:53-59` owner (§9.1:1976-1977); §6.9 quarantine row names the sidecar as persisted owner (§2.4:738); §2.2 uniqueness comment aligned (:410-412); A1 cfg activation chartered (§9.1:1989-1993) |
+| State P3-2 | Checkpoint pointer to §6.4 at acceptance — §6.4:1616-1625 |
+| State P3-3 | A1DecisionPacket §4 step-2 packaging deviation recorded for the ledger — §9.3:2025-2030 |
+| State P3-4 | `--confirm` re-runs the full preflight; reappeared basis refused with code 64 — §3.3.3:1091-1097 |
+
+Tree-currency updates folded into the same revision: post-W1 RecordContract
+anchors re-pinned throughout (+21; §1.1:155-158, evidence base :24-31);
+thin-A1 second-lane/non-gating status recorded (:22-24, §6.4:1610-1616,
+§11); the M5b-W1 composition named (§6.2:1548-1569); §8's suite paths
+re-verified against the landed M5b suites (`v1_lifecycle/tests/` with its
+`mod.rs`, the `model/v1/validate/*_tests.rs` convention, `model/v1/tests.rs`,
+`record_wire/unknown_fields/tests/` — all real at gwz-core `c13f773`).
+
 ## 11. Status
 
-**DRAFT — pending mandated dual review (Code and State axes, cross-model).**
-The ten [Q] inputs of §0 are decided and are not review questions; §10.3's
-R-1/R-2/R-3 are. On a GO the §7 annotations are applied to the five contracts
-in the acceptance edit, the wire delta freezes **pre-A1**, and implementation
-proceeds per §9.1/§9.3 after R4b-G, at or before A1.
+**DRAFT — round-2 revision of 2026-08-22, pending focused re-verdicts**
+(Code and State axes, cross-model; round 2 of the two-round cap). Round 1:
+NO-GO/NO-GO. This revision resolves every round-1 P1 and P2 on both axes —
+Code [P1-1..P1-3], [P2-1..P2-5]; State [P1-1..P1-6], [P2-1..P2-5] — plus the
+one-line P3s of both reports; §10.4 is the finding-by-finding map, and no §0
+decided input changed. Both round-1 reviews answered §10.3's R-1/R-2/R-3
+CONFIRMED, conditioned on the [P1] fixes now applied; the ten [Q] inputs of
+§0 remain decided and are not review questions. On a GO the §7 annotations
+are applied to the five contracts in the acceptance edit and the wire delta
+freezes **pre-A1** — second-lane and non-gating for A1 per the accepted
+`GwzM5-8ThinA1Amendment.md` — and implementation proceeds per §9.1/§9.3
+after R4b-G, at or before A1.
