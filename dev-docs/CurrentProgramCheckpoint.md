@@ -35,6 +35,30 @@ fable token only where it makes a difference." Recorded consequences:
   gate-chain text).
   Wave 2 on Phase-0 GO/GO: land+push the freeze train, Phase 1
   driver, D3 cursor implementation lane.
+
+  **M5b package DELIVERED and PARKED pre-review** (2026-08-22): the
+  no-ff semantics installation per the frozen design — 21 new green
+  suites across 6 `cfg(test)` files, 1,424 test lines, **0 production
+  lines** (§8.3 hard ceiling holds), fmt/clippy green, both T-6
+  suites green and their file byte-identical to HEAD, full lib suite
+  green in partitions (1,399 tests; the only failures are the Phase-1
+  lane's 6 red-by-design admission tests). **Freeze-ledger decision
+  (lane owner, per §8.3's return-to-the-freeze rule, subject to the
+  M5b dual review):** the package's test-line ceiling is raised
+  1,200 → 1,450 for this package only — every line maps to a
+  design-named §6/§7 obligation and ~140 lines are shared harness;
+  the 0-production-line and ≤10-file ceilings are unchanged.
+  **Stopped and tracked (not M5b's to fix):** service-level
+  abandonment of a NotStarted frozen action is unreachable
+  MODE-BLIND (pre-existing reducer guard at
+  `transition/reduce/participant.rs:105-119`; Normal-mode control
+  probe fails identically) — routed to the R4b acceptance-debt
+  surface at the A1 activation review (thin-A1 amendment §1);
+  the abandonment suites are written at the authority/reducer level
+  per tree precedent. T-5 (retained-reader manifest), the §5.4/Q7
+  ledger sentence, the M5b-W1 record-contract item, the ChangeBudget
+  row, and the clean-tree re-cut are acceptance-ritual steps, on the
+  lane owner at the M5b settle.
 - The escape amendment stays second-lane/blocked on operator handoff
   (unchanged). The paused-state facts below remain the baseline the
   waves execute against.
