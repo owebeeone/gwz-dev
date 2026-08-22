@@ -12,8 +12,23 @@ Operator resumed 2026-08-22: "proceed now with parallelization the
 focus (reduce calendar cost) but also optimize model use so we use
 fable token only where it makes a difference." Recorded consequences:
 
+- **QUOTA BURN-DOWN WINDOW (operator, 2026-08-22, ~17h until the
+  weekly reset): "use the remaining quota".** For this window only:
+  interior single-axis reviews (Phase 2 steps) run on the FABLE tier
+  instead of Opus; the deferred-by-economy ARM64 EBADF substrate
+  package (Fable-tier deep diagnosis) is launched; Phase 2 Steps
+  2.1 and 2.2 launched in parallel (Opus implementation, per the
+  plan's own §4.4 pipelining — legal behind the Phase 1 settle
+  in-review). At quota reset the tier policy below resumes
+  unchanged. Concurrent lanes at window open: Phase 1 settle dual
+  (Fable ×2), D3 cursor (Opus), Steps 2.1 + 2.2 (Opus ×2), ARM64
+  EBADF (Fable). Fixture-collision rule in force: 2.1 owns the
+  `durable_leaf.*` region and 2.2 the `namespace.*` region of
+  fault_expected_keys.rs; per-lane scratch CARGO_TARGET_DIRs
+  mandatory; commits serialize through the lane owner.
 - **Refined tier policy (supersedes the 2026-08-16 economy policy's
-  reviewer line):** Fable ONLY at the program-level dual gates —
+  reviewer line; suspended only as stated in the window note
+  above):** Fable ONLY at the program-level dual gates —
   R2-D's three duals, the M5b dual, R4b-G, the A1 activation review,
   this amendment-tier work — plus escalations and deep diagnosis.
   Interior single-axis reviews (R2-D Phases 2-4 steps) run on the
