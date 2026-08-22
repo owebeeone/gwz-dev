@@ -1,5 +1,13 @@
 # R4b-G evidence inventory — gate requirements vs today's evidence
 
+> Re-frame banner (2026-08-22): this inventory was drafted against the
+> pre-thin-A1 frame in which R4b-G ran "after RemPlan-4's R2-R6 chain
+> settles the tree" (:8; the SCOPE CORRECTION restated at :121 is
+> superseded). Under the accepted `GwzM5-8ThinA1Amendment.md`, R4b-G
+> follows **R2-D settle** and M5b's bound proofs; read the gate
+> obligations here against that tree. The evidence items themselves are
+> unaffected.
+
 Date: 2026-08-16
 
 Status: **DRAFT — pending lane-owner adoption.** This document inventories

@@ -293,3 +293,101 @@ round — adding the ConsumerCheckpoint/ConsumerCheckpoint-RemPlan and
 M5b §8.2 clauses to §2, correcting the §5 M5b row, fixing two line
 citations, and the P2-2/P2-3/P2-4 one-liners — clears every P0/P1/P2
 found on this axis within the two-round cap.
+
+## Focused re-verdict (round 2)
+
+Date: 2026-08-22
+Object: `dev-docs/GwzM5-8ThinA1Amendment.md` as committed at root
+`df22f63` ("Apply the thin-A1 round-2 remediation; resume the program
+in parallel waves"), 256 lines. Scope: this axis's round-1 P1/P2
+findings only, per the focused-re-verdict request; cross-axis
+round-2 additions (§1 acceptance-debt paragraph, §2.11, §2.12, §4
+additions) are Safety-owned and were not judged here. Peer-blind
+maintained: the Safety report filed in the same train was not read
+(the two escape-amendment round-1 reports, a different object, were
+read only to verify §3's new support citation). Every new §2 quote
+was re-verified byte-wise (whitespace-normalized) against its source
+at its cited lines.
+
+- **[P1-1] RESOLVED.** §2 gains items 7-9: the
+  `GwzM5-8R4bR2ConsumerCheckpoint.md:21-23` and `:404` clauses and
+  `…-RemPlan.md:605-607` are quoted byte-accurately at the correct
+  lines (verified; ":404 (§15 acceptance gate)" label confirmed —
+  "## 15. Acceptance gate" opens at :388). Dispositions are sound and
+  correctly narrow: item 8 leaves "Only then may RemPlan-4 R3 begin"
+  standing as R3's own precondition; item 9 preserves "R2-D still
+  follows accepted R2-C". The closing completeness claim is restated
+  over the enlarged list, §5 gains a ConsumerCheckpoint-pair row, and
+  the same-train checkpoint names the exact targets. Non-blocking
+  note: unlike RemPlan-4 (§2.1-2.3), the M5b design (§2.10), and the
+  EvidenceInventory, the ConsumerCheckpoint pair is promised no
+  in-document banner — the old-document half of the L1-08 precedence
+  trail routes only through the checkpoint. Recommend adding the pair
+  to the post-review banner pass for parity; recorded as a
+  recommendation, not a reopened finding, since round 1 offered the
+  stated-reliance alternative and the §5 row plus checkpoint record
+  state the disposition.
+- **[P1-2] RESOLVED.** §2.10 quotes the frozen
+  `GwzM5-8M5bNoFfDesign.md:987-989` dependency clause byte-accurately
+  (elision of the internal checkpoint citation is marked), supersedes
+  it as a dependency statement with the inheritance re-pointed at the
+  R2-D settled gate, and routes the physical correction through a
+  dated annotation applied after this review passes — the right
+  mechanism for a frozen GO/GO design. The §5 M5b row is corrected
+  accordingly ("Untouched" removed; semantics/ceiling/T-6 explicitly
+  preserved), and M5b no longer appears in the untouched row.
+- **[P2-1] RESOLVED.** §2.1 now cites ":5-7" and §2.3 ":1238"; both
+  verified against the file (quotes unchanged and still
+  byte-accurate).
+- **[P2-2] RESOLVED.** The empty-metrics-table citation is gone. §3's
+  replacement support is real and verified: R2-C2 settled round 3 was
+  State-2 GO vs Code-3 NO-GO on the probe-proven directory-interior
+  acquisition-window gap (`CurrentProgramCheckpoint.md`, Next ordered
+  actions item 3), and the escape amendment's round-1 duals filed in
+  this same train are Code NO-GO with three P1 vs State NO-GO with
+  six P1, with blind convergence on the unamended cursor-derivation
+  contract (`GwzM5-8OperatorEscapeAmendment-ReviewCode.md` /
+  `-ReviewState.md` verdict sections) — "a 3-vs-6 P1 split with one
+  blind-convergent finding" is accurate.
+- **[P2-3] RESOLVED.** §1's caps restatement now carries the
+  instruction's hedge verbatim — "if you still treat Idle↔Preparing
+  as a durable-transition kernel" (byte-checked, including U+2194) —
+  plus "which this program does", matching `GwzM5-8R2D-Plan.md` §4
+  Phase 1. Exactly the round-1 remediation option.
+- **[P2-4] PARTIALLY RESOLVED — one narrow residue, P2-class.**
+  Resolved: the two R1 status lines are named in §2's closing note
+  with the correct §7.3 auto-supersession rationale, and
+  `GwzM5-8R4bG-EvidenceInventory.md` is named there and in a new §5
+  row (DRAFT re-frame banner after review; its exhibit lines
+  :8/:121/:374/:597 are all real, and the row correctly flags :121's
+  verbatim restatement of the superseded SCOPE CORRECTION).
+  Unresolved: `GwzM5-8Refactor.md:2242` — "Checked-artifact R2-R6
+  precede R4b-G. Status: see `CurrentProgramCheckpoint.md`." — is
+  named nowhere in the revision (not in §2's closing note, not in §5,
+  and the train's checkpoint edits do not touch it), while its live
+  entry point stands: the checkpoint's Next-ordered-actions item 6
+  still routes through `GwzMergeCheckpoint-v0.10.5.md:128-130`
+  ("…in the dependency order defined by `GwzM5-8Refactor.md`").
+  Secondarily, the R1 body sentences
+  (`GwzM5-8R4bR1InterfaceCheckpoint.md:445`,
+  `GwzM5-8R4bR1Interface-RemPlan.md:556`) ride only on the note's
+  "e.g." under a predicate ("are live-status paragraphs") that fits
+  the status lines but not body text. Minimal remediation: one
+  sentence in §2's closing note naming `Refactor.md:2242` (deferred
+  by its own inline checkpoint pointer) and the two R1 body lines —
+  addable via the amendment's own "added here by remediation"
+  mechanism or the scheduled post-review banner/annotation pass, per
+  `GwzProcessOptimization.md` §4.1's allowance for non-architectural
+  corrections.
+
+P3s were informational and required no verification; noted in
+passing: the revision also addresses P3-2's substance (§3 now names
+the red ubuntu-24.04-arm leg as tracked non-gating).
+
+### Verdict on the Consistency axis: **GO**
+
+Zero P0/P1 open. Both P1s and three of four P2s are fully resolved;
+the P2-4 residue above is a one-sentence naming gap that does not
+sequence anything false into the amendment itself, and it is routed
+to the pre-agreed remediation mechanism rather than blocking. Under
+the round-1 rule (GO requires zero P0/P1), this axis is GO.

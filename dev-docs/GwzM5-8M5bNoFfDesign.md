@@ -1149,3 +1149,14 @@ owner sign-off, each carrying its round-1 lane position.
   never absorbed into M5b's 0-production-line ceiling; exceeding the
   ceiling still forces a return to this freeze rather than a quiet
   widening.
+
+## Dated annotation (2026-08-22) — gate-chain supersession
+
+The dependency statement at :987-989 ("The R4b-G gate itself is behind
+the RemPlan-4 R2-R6 chain … M5b inherits that transitively and takes
+no dependency on its internals") is superseded per the accepted
+`GwzM5-8ThinA1Amendment.md` §2.10: R4b-G is behind **R2-D settle**
+alone (thin A1, operator decision 2026-08-16), and M5b inherits the
+new gate the same transitively-no-internals way. This design's frozen
+semantics, its zero-production-line ceiling, and the T-6 settled-
+acceptance binding are untouched by that supersession.

@@ -25,8 +25,14 @@ fable token only where it makes a difference." Recorded consequences:
   (i) Phase 0 dual review (Fable ×2, Code+State, peer-blind) on the
   parked `d32b2c9`; (ii) Phase 1 Step 1.1 failing tests (Opus)
   shadowing it; (iii) M5b implementation (Opus) on its own subtree;
-  (iv) thin-A1 round-2 remediation applied inline (this commit) with
-  focused re-verdicts requested from the round-1 reviewers.
+  (iv) thin-A1 round-2 remediation applied inline — **and ACCEPTED
+  2026-08-22 at GO/GO** (Consistency GO / Safety GO focused
+  re-verdicts, both appended to the report files; every round-1
+  P0-P2 resolved in one merged round; the banner pass — RemPlan-4
+  supersession banner, M5b dated annotation, EvidenceInventory
+  re-frame, and the Refactor/R1 naming sentence — landed with
+  acceptance; `GwzM5-8ThinA1Amendment.md` is now the controlling
+  gate-chain text).
   Wave 2 on Phase-0 GO/GO: land+push the freeze train, Phase 1
   driver, D3 cursor implementation lane.
 - The escape amendment stays second-lane/blocked on operator handoff
@@ -347,7 +353,8 @@ reset) nor the amendment's OPEN DECISIONS — all remain tracked below.
 Next per gate chain — **thin A1** (operator decision 2026-08-16,
 `GwzFasterProposal.md` §2, superseding this checkpoint's SCOPE
 CORRECTION of the same date; superseded clauses quoted in
-`GwzM5-8ThinA1Amendment.md`): **R2-D settle is the last catalog gate
+`GwzM5-8ThinA1Amendment.md`, ACCEPTED 2026-08-22 GO/GO): **R2-D
+settle is the last catalog gate
 on the A1 path.** A1 enables the v1 writer and `--no-ff` on the
 accepted R4b lifecycle after R2-D settles (its Phase 5 dual gate) and
 M5b's already-bound proofs (T-6 + clean-tree re-cut) are green.

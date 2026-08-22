@@ -361,3 +361,111 @@ descope: name the lifecycle acceptance debt and the D3/D4 P2 classes
 as an explicit A1-activation-review exception (P1-1); name the missed
 live sentences and re-scope ConsumerCheckpoint §14.9 (P1-2); name the
 §4.2 override and fix the empty-table citation (P1-3).
+
+## Focused re-verdict (round 2)
+
+Date: 2026-08-22
+
+Object: the round-2 revision committed at gwz-dev `df22f63` ("Apply
+the thin-A1 round-2 remediation; resume the program in parallel
+waves"), read via `git show df22f63:dev-docs/GwzM5-8ThinA1Amendment.md`
+(256 lines). Scope per the coordinator's instruction: this axis's
+round-1 P1/P2 findings only; the object was not re-reviewed
+wholesale, but every remediation paragraph was checked adversarially
+for regressions and every newly quoted clause was verified against
+its committed source. Peer-blind maintained: the Consistency report
+remains unread. This append is the round's only write; no git write
+operations.
+
+### Per-finding disposition
+
+- **[P1-1] RESOLVED.** §1 gains the named-residual paragraph exactly
+  in the remediation's shape: the v1_lifecycle P2/P3/P4 acceptance
+  debt (~3.5k production lines, `GwzM5-8ProgressReviewF5.md` §2.1)
+  and the open accepted-real D3/D4 P2 classes (with the
+  `preservation/cursor.rs:277-345` mechanism citation) are named as
+  part of the accepted residual and ride to the **A1 activation
+  review** — dual, §4.2 activation tier — with the two-branch
+  disposition verbatim: (a) subsumed settled-tree acceptance with an
+  operator-signed named-residual disposition for D3/D4, or (b)
+  blocking per L1-19. §3's first bullet now states the actual
+  acceptance surface ("accepted at its design, interface, and R0/R1
+  checkpoints", correctness claims qualified to what "they have
+  actually been reviewed to") instead of the round-1 "accepted R4b
+  reverse lifecycle". §4 binds the obligation as the activation
+  review's explicit input. The silent weakening is now a named
+  A1-gate exception; the L1-19 collision is closed by the explicit
+  (a)/(b) branch.
+- **[P1-2] RESOLVED.** §2 items 7-9 name the missed live sentences:
+  `GwzM5-8R4bR2ConsumerCheckpoint.md` §15's closing sentence
+  (":404", quote verified verbatim; the chain-internal "Only then may
+  R3 begin" precondition is deliberately kept, which is the
+  conservative and coherent split) and the checkpoint's own R2
+  charter sentence (quote verified — see nit below), plus
+  `…ConsumerCheckpoint-RemPlan.md:605-607` (verified verbatim at
+  exactly those lines; a live sequencing sentence this axis's
+  round-1 sweep itself missed — its naming strengthens §2 beyond the
+  round-1 ask). §2.10 supersedes the frozen M5b design's :987-989
+  dependency clause via a dated annotation applied after this review
+  passes — the correct mechanism for a frozen GO/GO document — with
+  the matching §5 row (semantics/ceiling/T-6 untouched). §2.11
+  re-scopes ConsumerCheckpoint §14's ninth stop condition exactly per
+  the round-1 minimal remediation (binds every pre-A1 R2 package
+  unchanged; post-A1 reachability governed by the A1 activation
+  review; the remaining eight bullets unchanged), reinforced by the
+  new §4 bullet. The closing note makes the §7.3 auto-supersession of
+  the two status lines explicit and gives `GwzM5-8R4bG-
+  EvidenceInventory.md` a §5 re-frame-banner row; its "DRAFT"
+  characterization is accurate per that document's own status line
+  ("DRAFT — pending lane-owner adoption"). The dueling-authorities
+  scenario is closed: every found sentence now has a written
+  disposition.
+- **[P1-3] RESOLVED.** §2.12 quotes `GwzProcessOptimization.md:
+  106-114` verbatim and names the reduction as an **operator override
+  (L1-28)** scoped to the R2-D Phase 3/4 settles specifically, with
+  the durable-transition-kernel classification acknowledged against
+  the adopted plan's own sentences (`GwzM5-8R2D-Plan.md:387-388`,
+  `:426-428`) and the axis-divergent-detection risk stated in the
+  override text itself ("escalation-on-finding cannot reproduce" the
+  R2-C2 round-3 State-GO/Code-NO-GO case) — the "silent
+  contradiction" branch is eliminated. §3's fourth bullet replaces
+  the empty-metrics-table citation with the two recorded cases
+  (R2-C2 settled round 3; the escape amendment's 3-vs-6 P1 round-1
+  split with one blind-convergent finding) and books the downgrade
+  as a named override "not a cost-free redirection". §2.12's "rule
+  is otherwise intact" clause preserves §4.2's remaining mandatory
+  duals (Phase 0/1/5, R4b-G, A1 activation, release boundaries) and
+  with them §4.2's own §6-monitored per-tier revert tripwire.
+- **[P2-1] RESOLVED.** §4 adds the R2-F/R5 native-evidence release
+  gates as unwaived and unmoved, with both citations
+  (`GwzM5-8R2CCatalogBootstrapAmendment.md:667`;
+  `GwzM5-8R4bP1P2-RemPlan-4.md:1131-1138`) and the explicit "off the
+  A1 gate, not off the release gate" sentence.
+- **[P2-2] RESOLVED.** §3's third bullet names the fourth platform
+  leg red (ubuntu-24.04-arm, 1094/266, EBADF substrate fault,
+  tracked non-gating). The omitted trailing ignored-count ("/1") is
+  immaterial.
+
+Round-1 P3 status (file-and-continue; non-blocking): P3-2's citation
+drifts are fixed (§2.1 now :5-7, §2.3 now :1238). P3-1 stands as
+filed — §2.6's wholesale "Gate: dual sentences" wording is unchanged,
+though §4's explicit L2-04 retention plus §2.12's tier-only framing
+now make the tier-only reading dominant. P3-3 stands as
+informational. One new P3-class nit from the revision: §2.7 cites
+`ConsumerCheckpoint.md:21-23` for text that sits at :20-22 on the
+committed file (quote itself verbatim-faithful) — same class as the
+fixed P3-2, correctable in any later docs pass; not a blocker.
+
+Regression check on the new text: the §1 (a)/(b) branch preserves
+L1-19 in both directions; §2.8's split of :404 keeps the hardening
+chain's internal ordering intact; §2.10's annotate-after-review
+mechanism honors the freeze discipline; no new waiver, no new
+unguarded path, no touched proof obligation found in any added
+paragraph.
+
+### Verdict on this axis
+
+**GO.** All three P1 and both P2 findings of round 1 are resolved in
+the committed revision; no P0-P2-class regression was introduced by
+the remediation text. Open on this axis: P3s only (P3-1, P3-3, and
+the §2.7 line-drift nit), which file and continue per the cap rules.

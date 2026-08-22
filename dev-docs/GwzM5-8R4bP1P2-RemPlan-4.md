@@ -1,5 +1,12 @@
 # R4b-P P1/P2 fourth remediation plan
 
+> Supersession banner (2026-08-22): this plan's R2-R6→R4b-G gate-chain
+> clauses (:5-7, :1142-1143, :1238) are superseded as A1/R4b-G gates by
+> the accepted `GwzM5-8ThinA1Amendment.md` (thin A1 — R2-D settle is the
+> last catalog gate on the A1 path; R2-E/R2-F and R3-R6 run post-A1 or
+> parallel). R2 scope, the §4 stop clauses, and all technical content
+> are unchanged.
+
 Date: 2026-08-12
 
 Status: **design accepted; R0-L complete; R1 interface checkpoint independently

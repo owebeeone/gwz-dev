@@ -2,13 +2,16 @@
 
 Date: 2026-08-16
 
-Status: **DRAFT — round-2 revision of 2026-08-22, pending focused
-re-verdicts** (process/scope amendment tier per
-`GwzProcessOptimization.md` §4.2; Consistency and Safety axes,
-cross-model per §4.3, two-round remediation cap in force — this
-revision is the one merged remediation, addressing
-ReviewConsistency P1-1/P1-2 + P2-1..P2-4 and ReviewSafety
-P1-1/P1-2/P1-3 + P2-1/P2-2).
+Status: **ACCEPTED 2026-08-22 — GO/GO at round 2** (Consistency GO,
+Safety GO; focused re-verdicts appended to both report files; the
+one non-blocking Consistency naming residue is closed by the §2
+closing-note sentence added in the acceptance commit, as that
+re-verdict prescribed). History: round-1 dual NO-GO/NO-GO
+(2 P1 + 3 P1); one merged remediation at `df22f63` resolved every
+P0-P2 on both axes, within the two-round cap. The §5 banner pass
+(RemPlan-4, M5b design annotation, EvidenceInventory re-frame)
+landed with acceptance. This document is now the controlling
+gate-chain text.
 
 Authority: `dev-docs/GwzFasterProposal.md` — operator instruction of
 2026-08-16; passing that file is the L1-28 decision. This amendment is
@@ -159,7 +162,16 @@ here so that supersession is explicit rather than inferred; the
 R4b-G execution checklist `GwzM5-8R4bG-EvidenceInventory.md`
 (:8/:121/:374/:597), whose frame assumes the R2-R6-settled tree,
 is DRAFT material re-framed by a banner per §5. (ReviewConsistency
-P2-4; ReviewSafety P1-2 items 3-4.)
+P2-4; ReviewSafety P1-2 items 3-4.) The same §7.3-auto-superseded
+disposition is hereby named for the remaining chain restatements the
+round-2 re-verdict listed: `GwzM5-8Refactor.md:2242` ("R2-R6 precede
+R4b-G. Status: see `CurrentProgramCheckpoint.md`." — it already
+defers to the checkpoint, which carries the thin-A1 rule),
+`GwzM5-8R4bR1InterfaceCheckpoint.md:445`, and
+`GwzM5-8R4bR1Interface-RemPlan.md:556` ("RemPlan-4 R3-R6 still
+precede R4b-G…") — all describe the pre-thin-A1 chain as of their
+own dates and are superseded as A1/R4b-G sequencing by this
+amendment. (ReviewConsistency round-2 residue.)
 
 No other live sentence is known to sequence R3-R6 in front of R4b-G
 or A1. If the re-verdict round finds one, it is added here by
