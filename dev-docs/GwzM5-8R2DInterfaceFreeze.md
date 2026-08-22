@@ -701,7 +701,10 @@ the settle wants route (i), the count change is the reviewed edit it asks for.
 
 **New platform primitive required: NO.** Every edge E1-E22 names an admitted
 primitive with a macOS arm and a Windows arm (Linux shares the macOS arm on
-P1/P2/P3/P5 and has its own identity child). No platform spike is triggered, and
+P1/P2/P3/P5 and has its own identity child). (Drift annotation 2026-08-22,
+ARM64 EBADF package: Linux's P2/P3 arms now route descriptor-consuming
+operations through a same-object reopen — `GwzArm64EbadfDiagnosis.md`; an
+intra-family repair, not a new primitive, per `GwzArm64Ebadf-Review.md`.) No platform spike is triggered, and
 this freeze is not stopped (`GwzProcessOptimization.md` §3.1; brief's stop
 condition).
 
