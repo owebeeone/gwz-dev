@@ -7,6 +7,19 @@ participants; both the ff path and the commit path were already members
 of the CRLF/materialization class covered by the un-pinned CRLF matrix
 sentinel (D1 package), so this is bookkeeping, not new exposure.
 
+**Run 14 — 32545131198 on `c40e712` (the R2-D Phase 0 freeze train):
+1333/1/1.** The single failure is the new seam pin
+`r2d_seam_freeze::the_track_p_publication_spike_is_test_only` on its
+first native execution (the predicted first-dispatch class):
+`include_str!` receives working-tree bytes, so on a CRLF checkout the
+pin's hard-coded `\n` needle misses — fixed the same hour by
+normalizing `\r\n` before matching (test-only file, no pin owed).
+Both Track-P spike cases ran GREEN natively inside this run,
+discharging the freeze acceptance's tracked item ("both spike cases
+green on the next full Windows matrix run"). The trimmed probe run
+32542469665 on `probe/track-p-spike` (2/2 in 0.04s) remains the
+recorded Windows arm of the Step C.1 spike.
+
 **Run 13 — 31921194567 on `90d3f8a` (run-12 residue fixes):
 1322/0/1 — GREEN.** Both run-12 first-dispatch failures cleared on
 native re-execution: the destination-window ancestor test now asserts
