@@ -114,8 +114,21 @@ fable token only where it makes a difference." Recorded consequences:
   no-replace primitive with all three crash windows proven
   convergent — re-spike if the reviewer reads E4 as requiring an
   atomic replacing rename; (iii) absent-active ≡ idle semantics.
-  Step 1.3 (`admission.*` fault activation) is next; the dual settle
-  reviews Steps 1.1-1.3 together. Driver-lane disclosures on record:
+  **Step 1.3 DELIVERED and PARKED with this record (2026-08-22):**
+  all 19 `admission.*` keys given injection sites in the one
+  owner-private mutation file (driver holds zero — it decides, never
+  mutates); interruption/restart/convergence executed per-key on BOTH
+  target variants; 12-round same-boundary crashes at the two genuinely
+  re-crossable boundaries prove stable slots (the write-boundary
+  non-repeatability finding is recorded in the report for the settle
+  reviewers); activation flipped Reserved→Executed with EXPECTED_KEY
+  counts HELD at 19/165 — no key minted; `checked_artifact::` 271/0;
+  the memo §3.5 row and source-count note updated as the activation
+  record. **The Phase 1 package (Steps 1.1-1.3) is complete; the dual
+  settle (dual #2 of 3) is launching on it.** Note for reviewers on
+  the record: commits 5a7ff0f (1.1+1.2) reached origin early beneath
+  a hotfix push (incident + ritual below); the settle judges the
+  committed object as published. Driver-lane disclosures on record:
   its one whole-crate `cargo fmt` slip canonicalized whitespace in
   up to five of the D3 lane's in-progress files (no semantic change;
   not reverted to avoid destroying uncommitted work).

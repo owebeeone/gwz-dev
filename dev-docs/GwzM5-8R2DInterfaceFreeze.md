@@ -33,7 +33,11 @@ revision addresses **every** finding on both axes:
   (`FAULT_INJECTION_SOURCES` :257), and a completeness **anchor** now pins the
   declared set against a scan of the production tree (§8 D3), so the
   "machine-checked" claim in the RemPlan §10 annotation is delivered rather
-  than qualified.
+  than qualified. (Activation update 2026-08-22: Step 1.3 added the fourth
+  production source, `provider/admission_mutation.rs` with 19 sites — the
+  fixture's declaration moved to :271 and the runtime-exception block to
+  :356-364 by that insertion; the anchor verified the fourth source the
+  designed way.)
 - **State P1-1 / State P2-3** — §4.4 no longer claims "one bounded extension".
   It defines the recheck-arm **class** once, gives its true shape, and assigns
   the arms per phase; §4.3 rows E3/E7/E15/E16/E17 carry the dependency.
@@ -428,7 +432,7 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 | --- | --- | --- | --- |
 | `runtime.*` | 18 | R2-A/R2-B runtime bootstrap and catalog lease | **executed** |
 | `catalog_bootstrap.*` | 25 | R2-C2 physical first-catalog owner | **executed** |
-| `admission.*` | 19 | R2-D **Phase 1** (R2-C3 admission) | reserved |
+| `admission.*` | 19 | R2-D **Phase 1** (R2-C3 admission) | **executed** (Step 1.3, 2026-08-22 — 19 sites in `capability/pre_catalog/provider/admission_mutation.rs`, matrix on both target variants, 12-round same-boundary crash stability; counts held at 19/165, no key minted) |
 | `durable_leaf.*` | 11 | R2-D **Step 2.1** | reserved |
 | `namespace.*` | 11 | R2-D **Steps 2.2/2.3** | reserved |
 | `record.*` | 13 | R2-D **Step 2.4** | reserved |
