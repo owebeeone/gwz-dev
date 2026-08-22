@@ -93,6 +93,21 @@ fable token only where it makes a difference." Recorded consequences:
   bytes, Q5 partiality note) are file-and-continue, listed in the
   reports. **M5b's A1 proof obligations (thin A1 leg two) are now
   standing: T-6 + the accepted package.** Pushed with this train.
+
+  Incident record (L1-16, lane owner, 2026-08-22): the M5b acceptance
+  commit `8c1624a` accidentally swept the Phase-1 driver's in-flight
+  checker inventory lines (a CATALOG_PUBLICATION_CALL_COUNTS entry
+  for a not-yet-committed module) via a whole-file `gwz add`, and its
+  v1_lifecycle tree pin had been computed from the dirty shared tree
+  — the pushed checker crashed on pristine extraction. Corrected
+  within minutes at `558f834` (pristine-worktree corrective commit:
+  foreign lines removed, pin recomputed from committed content,
+  checker green on pristine). Rituals hardened: shared mutable files
+  are staged from pristine worktrees or per-hunk while lanes are in
+  flight, and digest pins are computed from the pristine extraction
+  of the commit being built, never the dirty tree. The driver lane
+  was notified to re-apply its counts entry as part of its own
+  package.
 - The escape amendment stays second-lane/blocked on operator handoff
   (unchanged). The paused-state facts below remain the baseline the
   waves execute against.
