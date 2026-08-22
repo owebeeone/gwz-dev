@@ -12,6 +12,14 @@ Operator resumed 2026-08-22: "proceed now with parallelization the
 focus (reduce calendar cost) but also optimize model use so we use
 fable token only where it makes a difference." Recorded consequences:
 
+- **BURN-DOWN WINDOW CLOSED (operator, 2026-08-22, ~10% Fable
+  remaining: "prolong by reducing Fable usage").** Interior reviews
+  revert to Opus single-axis effective immediately (Steps 2.3/2.4
+  review on Opus); the only remaining Fable spends this week are the
+  in-flight ARM diagnosis and D3's two focused re-verdicts; Phase 5
+  dual, R4b-G, and the A1 activation review hold for the quota
+  reset; lane-owner operation minimized (delegation-first, batched
+  bookkeeping). The window note below is historical.
 - **QUOTA BURN-DOWN WINDOW (operator, 2026-08-22, ~17h until the
   weekly reset): "use the remaining quota".** For this window only:
   interior single-axis reviews (Phase 2 steps) run on the FABLE tier
