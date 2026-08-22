@@ -396,3 +396,241 @@ paper-freeze revert), the P1-2 fixture/memo/annotation correction (with or
 without a completeness anchor), and optionally the P3 corrections batched
 into the same edit. No architectural root cause was found in the frozen
 seams themselves; under the two-round cap this object should close in round 2.
+
+---
+
+# Focused re-verdict (round 2)
+
+Date: 2026-08-22
+Axis: CODE (round 2 of the two-round cap; focused on this report's round-1
+findings only, per the coordinator's instruction — no whole-object re-review).
+Peer-blind maintained: the State-axis report was not read; State finding IDs
+appearing below are quoted from the revised memo, which is the object.
+
+Object of the re-verdict:
+
+- gwz-core `2ed2435` ("Apply the Phase 0 freeze round-2 remediation (merged,
+  all 14 findings)"; code delta vs `d32b2c9`: `tests_admission_spike.rs`
+  1+/1−, `fault_expected_keys.rs` +87/−1 — nothing else).
+- Workspace root `7ecc1a7` (same-named docs commit; revised memo now 1062
+  lines; RemPlan §10 correction block; RemPlan-4 supersession banner).
+
+Method: all reads via `git show 2ed2435:<path>` / `git show 7ecc1a7:<path>`
+(the working tree now carries further uncommitted other-lane files, including
+red-by-design `checked_artifact/admission/tests.rs` Phase-1 tests). Gates were
+re-run on a pristine `git archive` extraction of 2ed2435 in the session
+scratchpad. The Windows run was verified first-hand via `gh run view`
+(metadata + job log), not taken from the memo.
+
+## Per-finding disposition
+
+**[P1-1] — RESOLVED (by execution, my remediation option 2).**
+Verified first-hand: GitHub Actions run **32542469665**, workflow "Windows
+matrix", `workflow_dispatch`, branch `probe/track-p-spike`, conclusion
+`success`, headSha `e448d7f1c989548e57316da11d76321f0a4a2cf1`. Local commit
+`e448d7f` is exactly `d32b2c9` plus a 2+/2− trim of
+`.github/workflows/windows-matrix.yml` (the suite step narrowed to the spike
+filter) — **no `src/` change**, so the code that executed on Windows is
+byte-identical to the reviewed object's spike. The job log shows both named
+spike tests `ok` and `test result: ok. 2 passed; 0 failed; … 1332 filtered
+out` on a native Windows runner. (Caveat noted, not blocking: that workflow's
+suite step uses `|| true` with a FAILED-grep gate, which would not catch a
+compile failure — but the log lines themselves are direct evidence the two
+tests ran and passed.) The memo now records the two-leg discharge (§2), the
+per-arm execution table (§4.2), the §10.3 run record, explicitly **withdraws
+run-13 as discharging evidence** (retained as corroboration only), corrects
+its round-1 misreading of amendment `:667` (fault evidence ≠ spike execution),
+and carries the tracked acceptance item "both spike cases green on the next
+full Windows matrix run" in §4.2 and §10.3. No waiver was needed and none was
+claimed.
+
+**[P1-2] — RESOLVED.**
+- `FAULT_INJECTION_SOURCES` now declares all three sources including
+  `capability/pre_catalog/provider/aggregate.rs` (fault_expected_keys.rs
+  :266-269 at 2ed2435), with a corrected doc ("three files, all holding
+  `catalog_bootstrap.*` sites") that states the pin/anchor split explicitly.
+- The new completeness anchor
+  `the_declared_injection_sources_are_every_production_source_holding_sites`
+  (:418) is sound: it rescans `src/checked_artifact` at runtime with a filter
+  that faithfully mirrors the checker's `production_rust_files` (skip dirs
+  named `tests`/`interface_tests`; skip `tests`-prefixed and non-`.rs` files),
+  collects every file containing `CheckedArtifactFaultKeyV1::`, and asserts
+  **set-equality** with the declared list — so it fails on an unregistered
+  file gaining sites *and* on a declared file losing them, naming the
+  difference in the assert output. Its scope justification is code-true:
+  `pub(super) enum CheckedArtifactFaultKeyV1` at `fault_v1.rs:10` under
+  `mod fault_v1;` at `checked_artifact/mod.rs:51`, so no injection site can
+  exist outside the scanned subtree; and `fault_v1.rs` itself contains zero
+  `CheckedArtifactFaultKeyV1::` tokens (macro-generated, `Self::` internally),
+  so the anchor passes exactly on the three declared files. Empirically
+  confirmed: `cargo test --lib checked_artifact::` at the 2ed2435 extraction
+  → **257 passed, 0 failed** (256 + the anchor), and the scoped fmt check on
+  both changed files is clean.
+- All three claim sites corrected: memo §3.5 now tables the three sources
+  with per-file counts (aggregate.rs `:26-29`,
+  `CatalogBootstrapCatalogEnumerate`, 1 site) and names the round-1
+  porousness; the fixture doc is rewritten; and the RemPlan §10 correction is
+  a **+27/−0 append-only** dated block that restates the three-source truth,
+  the anchor, and the tree-wide validity of the "machine-checked" sentence,
+  plus a DRAFT-status clarification. Append-only discipline maintained.
+- Residual (note only, no severity): both the reserved-family scan and the
+  anchor key on the literal `CheckedArtifactFaultKeyV1::` token, so a
+  deliberate alias import (`use …::CheckedArtifactFaultKeyV1 as K`) could
+  still evade both. That is the same token convention the boundary checker
+  itself uses, it applies uniformly inside already-declared files, and
+  defeating it requires deliberate circumvention that review would catch.
+
+**[P3-1] — RESOLVED.** Memo §8 now reads "+19/−27 = net −8 lines" and tags
+the round-1 error.
+
+**[P3-2] — RESOLVED.** Memo §8 now says **240** lines (r2d_seam_freeze.rs)
+and **191** lines (tests_admission_spike.rs), both tagged.
+
+**[P3-3] — RESOLVED.** §10.1 corrects the full-suite figure to **1 371** lib
+tests at d32b2c9 and acknowledges the round-1 self-contradiction. Consistent
+with my measurements (1371 at d32b2c9; 1372 at 2ed2435 with the anchor).
+
+**[P3-4] — RESOLVED, with a correction to my own round-1 attribution.**
+The spike comment at :84 now cites ":1089-1092", which is correct at
+`7ecc1a7` (verified: "R2 stops" at `GwzM5-8R4bP1P2-RemPlan-4.md:1089` there).
+But the round-1 timeline claim — mine, repeated by memo §4.2 — that the
+original ":1082-1085" citation "was already stale when the package was
+parked" is **wrong**: at the park-time root (`a59c5d0`) the clause sat at
+**:1082** (verified via `git show a59c5d0:…`), so the original citation was
+accurate at commit. The staleness was created mid-round-1 by the thin-A1
+supersession-banner commit `6a458aa` (+7 lines at the file top; **not** an
+ancestor of `a59c5d0` — it landed between `a59c5d0` and `7ecc1a7`), which my
+round-1 working-tree grep then observed. The fix as applied is correct
+against the current head; the memo §4.2 sentence repeating the "already
+stale at park" attribution (and blaming inheritance from
+`GwzFasterProposal.md:160`, which was likewise accurate when written) is a
+one-line historical nit for the next memo touch, not a blocker. Also noted:
+§4.2 still says the spike one-liner is "owed to the lane owner at the
+acceptance commit", while 2ed2435 already applied it — narrative staleness
+with a real consequence recorded as P1-3 below.
+
+**[P3-5] — RESOLVED.** Memo §3.5 now cites the enum at
+`bootstrap/runtime/fault.rs:4-11` and separately names `run_next_at` as the
+injection entry.
+
+**[P3-6] — RESOLVED.** The §4.1 P2 row now owns the `sync_parent`
+root-flush callers (`mutation.rs:396/:412/:426`, `directory_mutation.rs:729`)
+with an explicit tag, and the P5 row lists `private_barrier`'s true
+production callers (`cleanup.rs:89/:129/:159`, `residue.rs:407/:500/:529`,
+`transition.rs:427`, `platform.rs:410`) — exactly matching my round-1 grep.
+
+**[P3-7] — RESOLVED at cause.** The memo is re-baselined: §3.2 declares
+"All positions in this table are at `d32b2c9`" and the Recording-backend row
+now cites `:465-607` with ops `:524/:541/:561/:578` (the very numbers I
+computed in round 1), keeping the 90d3f8a positions as labeled history.
+Spot-checks elsewhere hold (spike spans `:72-152`/`:157-191` verified against
+the file).
+
+**[P3-8] — RESOLVED as far as the object can.** §10.2 attributes the dirty
+tree (now including the other lane's red-by-design
+`checked_artifact/admission/tests.rs` and `workspace_ops` edits), scopes each
+gate accordingly, and gives the clippy rationale. Standing operational note
+(unchanged): the acceptance/push train must run on a clean checkout.
+
+## New finding (round 2)
+
+### [P1-3] NEW — the boundary checker is RED at the committed 2ed2435: the P3-4 spike edit landed without the mandated same-commit digest refresh
+
+Evidence: on a pristine extraction of 2ed2435,
+`python3.13 scripts/checks/check_checked_artifact_boundaries.py` →
+"checked-artifact boundary: **failed** — protected source tree changed:
+`checked_artifact/capability/pre_catalog.rs`", exit 1. The round-1 extraction
+of d32b2c9 was GREEN, and the only delta under that digest root is the spike
+comment line. The causal mechanism is unambiguous: `source_tree_digest`
+(checker :746-762) hashes the root file plus **every** file under
+`capability/pre_catalog/` via unfiltered `rglob("*")` — tests-prefixed files
+included (which is precisely why round 1's addition of the spike file forced
+this same digest refresh). 2ed2435 changed `tests_admission_spike.rs` but not
+the pinned digest value, violating the adopted same-commit refresh lane rule
+the memo itself cites, and falsifying §10.2's "This revision owes **no**
+digest refresh" for the *merged* commit (the sentence was written for the
+three-file docs edit; the merge then also applied the spike one-liner §4.2
+had recorded as "owed to the lane owner").
+
+Not an architectural root cause: this is a mechanical gate omission in the
+remediation application, so it does not trigger the two-round cap's
+redesign-or-accept clause.
+
+Minimal remediation: refresh
+`PROTECTED_SOURCE_TREE_DIGESTS["checked_artifact/capability/pre_catalog.rs"]`
+in `scripts/checks/check_checked_artifact_boundaries.py` in the same commit
+train as the spike edit (or equivalently drop the spike edit back out to the
+acceptance commit as §4.2 planned), re-run the checker to GREEN on the
+committed object, and correct the one §10.2 sentence.
+
+## Lane-owner additions (judged as in-axis code claims)
+
+- **§3.1 persisted-home pin — ACCEPTED, code-true.** Every cite verified at
+  the committed object: the `ActionAdmission{Active,Scratch,Staging}` triad in
+  the enum (`protocol/slots.rs:47-58`), in `ALL` (:61-72), named at :83-85;
+  issued into the infrastructure record at
+  `infrastructure_record.rs:102-104` and re-checked on decode at :181-193
+  with the ":191" refusal; `ActionDirectoryAdmissionV1::preparing` naming the
+  staging slot at `admission.rs:153-155` and the final action name at :156.
+  The pin strengthens §6's zero-new-records argument without widening any
+  seam.
+- **C-3 (observer/slot-grammar class, §2 + §4.4 Class 2) — ACCEPTED,
+  code-true and correctly bounded.** All three cited facts verified at
+  `interior.rs`: `exact_slot` walks `InfrastructureSlotV1::ALL` and refuses
+  any other child ("catalog directory contains an unowned child",
+  :309-329); `staging_plan` returns `Other` (:127-138) and
+  `completed_record` returns `None` (:261-272) when any `ActionAdmission*`
+  slot is present; `MAX_INTERIOR_ENTRIES = 10` = `|ALL|` is enforced with the
+  ten-slot bound error (:64-69), zero headroom. `RootEntryNameV1`
+  (`slots.rs:366-377`) already carries the `ActiveAction` arm the observer
+  does not yet admit, and `RootEntryNameV1::parse` has no production caller.
+  The consequence chain to `retain_completed_catalog`
+  (`completed.rs:49`, `completed_record(..).is_none()` at :61) holds, so a
+  first admission genuinely breaks the next `recover_or_create` reobservation
+  until Phase 1 extends the observer's reading. Classifying that as an
+  in-seam, Phase-1-owned grammar extension (no new slot/record/name — the
+  vocabulary is already frozen per the §3.1 pin) is consistent with the code.
+  Recording C-3 tightens the freeze; it does not widen it. (The reshape of
+  C-2 into an extension *class* originates from the State axis and is outside
+  this focused re-verdict; nothing in it contradicts this report's round-1
+  C-2 code verification.)
+
+## Verdict (round 2)
+
+**NO-GO — on [P1-3] alone.** All ten round-1 findings from this report are
+**resolved** (P1-1 by direct Windows execution, P1-2 by inventory + anchored
+completeness + three corrected claim sites, P3-1..P3-8 as dispositioned
+above), and both lane-owner additions are accepted as code-true. The sole
+blocker is the red boundary checker at the committed 2ed2435 — a one-value
+digest refresh plus one corrected sentence, after which (checker GREEN on the
+committed object re-confirmed) this axis has no remaining objection to GO.
+
+---
+
+## [P1-3] confirmation and final verdict — 2026-08-22 (single-item follow-up)
+
+Object: gwz-core `c40e712` ("Refresh the pre_catalog tree pin for the spike
+citation fix (ReviewCode round-2 P1-3)"; delta vs `2ed2435` is exactly one
+line in `scripts/checks/check_checked_artifact_boundaries.py`) and root
+`85f9fe6` (memo §10.2 correction; the other changed root files are gwz tool
+bookkeeping).
+
+Verified:
+
+- The `checked_artifact/capability/pre_catalog.rs` tree pin at c40e712 (:154)
+  is `877e9d1867de17c8b6778ed2506888ead515cde75947e2d6ccfcb8c2b3a3e3c1`, and —
+  decisively — the checker run on a **pristine extraction of c40e712** returns
+  "checked-artifact boundary: ok (15 visible entries, 5 classified modules)",
+  exit 0, which is what validates that pin value against the committed tree.
+- Memo §10.2 at 85f9fe6 now records the cause (the P3-4 one-liner inside the
+  pre_catalog **tree** digest), owns the same-commit-refresh miss, names the
+  refreshed value, and keeps the sole remaining working-tree finding
+  (`workspace_ops/merge/v1_lifecycle/mod.rs`) attributed to the other lane's
+  uncommitted files.
+
+**[P1-3] — RESOLVED.**
+
+**FINAL VERDICT: GO.** Every finding this axis raised across both rounds is
+resolved; zero P0/P1 remain. Standing operational note only (from P3-8): run
+the acceptance/push train on a clean checkout of the accepted commits — the
+shared working tree still carries other lanes' uncommitted files.
