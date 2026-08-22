@@ -155,6 +155,107 @@ fable token only where it makes a difference." Recorded consequences:
   validated GREEN on a pristine overlay before commit. Phase 2
   remaining: Steps 2.3 + 2.4 (launched on landing).
 
+  **Steps 2.3 + 2.4 LANDED 2026-08-22 (one combined train, gwz-core
+  `c2564ba`).** 2.3 (managed backend ops, E15/E16 real): State
+  single-axis round-1 NO-GO (1 P1 — the checker counts entry, a
+  verbatim repeat of 2.2's finding; 3 P2, 6 P3); round-2 GO with all
+  ten closed — §3.5 managed_bootstrap activation filed (8/30
+  PartiallyExecuted, 22 proved siteless), 4×2 repeat taxonomy with a
+  partition assertion, and the E16 cross-parent atomicity record
+  (Branch A: wedge proved unreachable — the rename is the commit
+  point, the three post-crash states all carry green matrix rows,
+  EXDEV and foreign removal refuse typed; the reviewer ruled Branch A
+  correct on the merits and a recovery arm UNSOUND, since the two
+  causes are indistinguishable from durable evidence). 2.4 (authority
+  parse/proof split): Code single-axis round-1 NO-GO (proven P0 —
+  `cfg(windows)` const fn E0015, Windows did not compile; P1 —
+  proof/parent provenance unbound; P2 — taxonomy 4-of-9); round-2 GO
+  — the P0 closed structurally (one always-compiled body over
+  `cfg!(windows)`, zero platform predicates left; the reviewer
+  reproduced the forced-flip proof and endorsed it as stronger than
+  its own cfg-swap), the streamed proof now carries its own
+  provenance (the transaction lost its parent parameter; typed
+  fail-closed join guard precedes the boundary announcement), and the
+  taxonomy is a machine-checked 9/4 partition. Both escalation
+  triggers RECORDED (2.3: 1 P1 + 3 P2; 2.4: P0 + P1 + P2);
+  lane-owner routing for both: second-axis scrutiny folds into the
+  Phase 5 settled dual (dual #3) per the three-dual cap.
+  `capability_permit` callers 11→13 with the 2.4 file joined to the
+  inventory at landing; the shared pre_catalog tree pin recomputed on
+  the pristine overlay (checker green pre-push; the overlay pin
+  matched the 2.3 lane's independently reported union value). The ARM
+  exact_source fixture fix (distinct inode by construction) rode this
+  train. Landing-brief duty conflict RESOLVED going forward (the
+  mechanism behind this P1 and 2.2's identical finding, surfaced by
+  the 2.3 implementer): checker counts/allowlist companions are the
+  CONVERTING PACKAGE's same-commit duty; tree digest pins remain the
+  lane owner's land-time duty, computed from the pristine overlay.
+
+  **D3 LANDED 2026-08-22 (gwz-core `8b83a2c`) — dual settled GO/GO at
+  round 2.** Round 1: Code GO (2 P2, 3 P3) / State NO-GO (1 P1 — four
+  undelivered §8 legs; 2 P2, 3 P3). One merged remediation: all four
+  §8 legs green in their designated homes (identical classification
+  proven image-capture-free at the real seam against a paying
+  degraded control; crash-window reproof and convergence;
+  rollback-entry preflight made the structurally sole catcher by
+  fixture geometry; byte-identical bundles; post-GC retention),
+  CleanupMarkers v0/v1 fork (a marker-only row stays an empty row →
+  ContradictoryEvidence on the v0 leg; §5 row content on v1),
+  computed backfill at both reset edges, rename landed with the old
+  identifier extinct. State P3-2 adjudicated IN THE IMPLEMENTER'S
+  FAVOR: the reviewer withdrew its own decode-reject proposal as
+  overreach (it would have bricked a reachable §4-protected shape)
+  and accepted the write-edge marker-carry closure; the residual
+  (fail-closed illegal-row refusal pre-publish) is recorded with a
+  named follow-up to carry the stash pair. Code round 2 unconditional
+  GO. Budget reconciled on the record: +2192/−103 vs §9's ~700–1,100
+  — the excess is the 755-line §8 acceptance suite. Bonus erratum
+  surfaced by the §8.6 seam: post-GC is projection-only (no durable
+  rewrite) — strictly stronger terminal-plane immutability than
+  documented. The three workspace_ops checker pins recomputed at
+  landing. Spend-limit incident #2: the monthly limit killed the Code
+  re-verdict mid-gates; resumed from transcript zero-loss after the
+  operator reset and returned its GO. The conservation holds
+  (Phase 5 dual, R4b-G, A1 activation) are LIFTED by the reset; the
+  refined tier policy stands.
+
+  **ARM diagnosis CLOSED (both clusters attributed; non-gating per
+  thin A1).** Cluster (b) exact_source: ext4 recycles the freed
+  inode; the fixture's assert_ne precondition broke while the
+  production refusal held on every failing run; fixed fixture-side
+  (rode the 2.3/2.4 train). Cluster (a) 29 g15 + 17 v1_lifecycle:
+  Linux-RUNNER-only, never green on any Linux, NOT ARM-specific — a
+  faithful arm64 parity rig (ubuntu:24.04, loop-ext4, PPA git 2.55,
+  runner config, both uids) is fully green. Probe branch
+  `probe/g15-gate-dump` (run 32561108291) named the cause: gate 4
+  `files::observe_boundary` false 78/78 because `.git/info/exclude`
+  is mode 0755 — the RUNNER IMAGE's git template tree carries the
+  executable bit, `git init` copies it, the fixture's `fs::write`
+  preserves the mode, and the leaf observer classifies executables
+  Invalid BY DESIGN (observation.rs:216). Single-variable local
+  proof: chmod 0755 on that file alone reproduces the verbatim CI
+  message. libgit2-built fixtures (no template copy) pass —
+  consistent with the v1 split. Remediation is fixture-side
+  (pin/normalize the boundary-file mode), queued on the clean tree.
+  OPERATOR POLICY QUESTION recorded for post-A1: a real repository
+  initialized from an executable template tree (Ubuntu images ship
+  exactly this) receives a typed root-preservation refusal — doc
+  note vs a mode-tolerant arm for this one boundary file. Memo:
+  `GwzArmPreservationHandoffDiagnosis.md`.
+
+  **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
+  share-delete fix HELD (os-32 extinct) and all 14 admission tests
+  are green. The 4 failures are the namespace fault matrix — its
+  first Windows execution — all failing at BASELINE, pre-injection,
+  with one typed message: "checked action namespace barrier: private
+  durability anchor is not ready" (tests_fault_matrix.rs:376). A
+  deterministic Windows arm gap in 2.2's barrier anchor-readiness
+  (E9-family territory); diagnosis launched on the clean tree; the
+  managed matrix (landed with 2.3) is expected to hit the same wall
+  in run 17 — same class, pre-attributed here. Validation runs at
+  `8b83a2c` dispatched: 32568481700 (Windows), 32568483432
+  (platform).
+
   **ARM64 attribution correction #2 (L1-16):** the platform run at
   the twin fix proves EBADF EXTINCT (zero os-error-9 in the log; the
   three reverse-preservation EBADF rows cleared), but 46 of the 49

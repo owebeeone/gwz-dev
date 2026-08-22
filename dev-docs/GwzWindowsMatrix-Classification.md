@@ -7,6 +7,25 @@ participants; both the ff path and the commit path were already members
 of the CRLF/materialization class covered by the un-pinned CRLF matrix
 sentinel (D1 package), so this is bookkeeping, not new exposure.
 
+**Run 16 — 32559979514 on `6c7c8f3` (the share-delete fix):
+1399/4/1.** The run-15 class is EXTINCT: all 14 admission tests green
+on their first post-fix execution (the behavioral detector fired
+clean), zero os-32 anywhere. The 4 failures are the namespace fault
+matrix (`checked_artifact::namespace::tests_fault_matrix`, both
+matrices × both target variants) on ITS first native execution —
+every row dies at BASELINE, before any fault injection, with one
+typed message: `Ambiguous { fact: "action namespace barrier",
+detail: "checked action namespace barrier: private durability anchor
+is not ready" }` (`tests_fault_matrix.rs:376`). One cause, four
+symptoms: a deterministic Windows arm gap in Step 2.2's barrier
+anchor-readiness (E9-family: the readiness evidence the barrier
+demands is presumably unobtainable through the Windows no-op flush
+arm). Production fails typed and closed — correct posture, wrong
+availability. Diagnosis dispatched on the clean post-landing tree;
+the managed matrix landed with Step 2.3 (`c2564ba`) drives the same
+barrier and is EXPECTED to join this class in run 17 — same cause,
+pre-attributed here, do not count it as a new class.
+
 **Run 15 — 32555573059 on `ae4e143` (Phase 1 settled + ARM64 train):
 1359/14/1.** One cause, fourteen symptoms, all in the new admission
 kernel on its first native execution: the sealed publication's

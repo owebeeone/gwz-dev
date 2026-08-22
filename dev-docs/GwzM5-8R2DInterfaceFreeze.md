@@ -436,7 +436,31 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 | `durable_leaf.*` | 11 | R2-D **Step 2.1** | reserved |
 | `namespace.*` | 11 | R2-D **Steps 2.2/2.3** | reserved |
 | `record.*` | 13 | R2-D **Step 2.4** | reserved |
-| `managed_bootstrap.*` | 30 | R2-D **Phase 3** | reserved |
+| `managed_bootstrap.*` | 30 | R2-D **Phase 3** | **partially executed** (see annotation) |
+
+> `managed_bootstrap.*` activation annotation (2026-08-22, Step 2.3 landing;
+> discharges the obligation `GwzM5-8R2DStep22-Review.md` routed to Step 2.3's
+> gate, and the Step-2.3 State review's [P2-1]): **8 of the 30 keys are
+> executed**, the remaining **22 stay reserved for Phase 3**. The family's owning
+> package is still Phase 3; what moved is per *edge*, because RemPlan §10's duty
+> — "that family must gain injection sites and matrix rows in the same package
+> that converts its edges" — follows the edge, and §4.3 assigns rows **E15** and
+> **E16** to Step 2.3. The executed subset is exactly the boundaries those two
+> edges and their two restart observations cross: `parent_revalidate`,
+> `staging_directory_publish`, `final_directory_reopen`,
+> `final_directory_reobserve`, `component_reobserve`, `marker_retire`,
+> `marker_retired_reobserve`, `final_identity_reobserve`. All eight have
+> injection sites in
+> `capability/pre_catalog/provider/managed_mutation.rs` (the `namespace` owner
+> holds none, as with `namespace.*`) and executed
+> interruption/restart/convergence rows on both target variants in
+> `namespace/tests_managed_matrix.rs`, plus 4×2 repeated-boundary rows. The 22
+> reserved keys are Phase 3's writer, intent-record and successor halves; they
+> are proved siteless **key by key**, not merely family-wide, by the
+> `FaultFamilyActivationV1::PartiallyExecuted` arm added for this flip
+> (`interface_tests/fault_expected_keys.rs`). Counts held at **165**, no key
+> minted; the caller pin moved 9 → 11 with its `CATALOG_PUBLICATION_CALL_COUNTS`
+> companion in the same package.
 | `cleanup.*` | 11 | R2-D **Phase 4** (step 4.1 legacy leaf edges) | reserved |
 | `barrier.*` | 16 | R2-D **Phase 4** (step 4.2 Windows retirement closure) | reserved |
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
@@ -627,6 +651,44 @@ primitive, not a new one.
 | E14 | backend `barrier` | 2.2 | P5 | `platform.rs:271` | `platform.rs:458` | as mac | no |
 | E15 | managed component install (staged dir → final) | 2.3/3 | P1 + P2 + P3 | as E3 | as E3 | as E3 | no — but **needs a managed source-interior arm, §4.4 class, Phase 2.3/3** |
 | E16 | managed ownership-marker retirement | 2.3/3 | P1 | as E13 | as E13 | as E13 | no — leaf-shaped today; **needs a destination arm only if the marker retires as a directory, §4.4 class, Phase 2.3/3** |
+> E16 activation annotation (2026-08-22, Step 2.3 landing; discharges the
+> Step-2.3 State review's [P2-3], and resolves this row's conditional). **The
+> conditional resolves to no arm.** The marker retires as a *regular file*, not a
+> directory: `managed_marker_name()` (`protocol/managed_bootstrap_record.rs`) is
+> the frozen leaf `gwz-bootstrap-owner-v1`, and `namespace/operations.rs`'s
+> pre-existing R1 role validator already pins the retirement source to
+> `NamespaceObjectKind::RegularFile`. So E16 publishes through
+> `PublicationSourceV1::regular_file` with `DestinationRecheckV1::None`, and
+> `DestinationRecheckV1` is unchanged by Step 2.3. Consequently §4.4's arm table
+> row "managed destination (marker/generation retirement) | E16, E17 | Phase 2.3
+> / Phase 3" is, on this tree, driven by **E17 alone and owned by Phase 3
+> alone**; that row is left as written rather than edited, since this annotation
+> is the sanctioned mechanism and §4.3's conditional already carried the
+> substance.
+>
+> **Cross-parent atomicity, recorded because the recovery path rests on it.**
+> E16 is the lane's first cross-*directory* durable edge — every prior edge in
+> the provider's namespace family renames within one retained handle — so it owes
+> the cross-parent twin of the E4 record above. The rename is the commit point;
+> the two `sync_directory_edge` calls that follow order the *observation*, not
+> the atomicity. On the closed support table a rename spanning two parents of one
+> filesystem is a single metadata transaction, replayed or discarded whole, so
+> the reachable post-crash states are only: rename discarded (the drive re-enters
+> the edge and re-derives the same scheduled row), or rename durable with either
+> or both parents unflushed (the retirement row is resident and the drive
+> short-circuits on it). Rows `marker_retire`, `marker_retired_reobserve` and
+> `final_identity_reobserve` execute those states on both target variants; the
+> window *between* the two flushes carries no namespace transition and therefore
+> no key of its own, which is deliberate — minting one would move the frozen
+> 165-key census. The state that would wedge a restart — marker absent from the
+> component *and* the retirement row absent — is **not producible** on that
+> table; a cross-filesystem attempt fails `EXDEV` before touching either parent
+> (typed refusal, nothing durable changed, idempotent retry), and foreign removal
+> is outside the accepted same-user namespace boundary. Off the supported table
+> that state would be refused permanently and by design, typed rather than
+> silent, by the installed-component interior check. Full derivation at the edge
+> in `capability/pre_catalog/provider/managed_mutation.rs` `retire_marker`.
+
 | E17 | managed successor publish, prior-generation retirement, final reproof | 3 | P1 + P2 + P3 | as E3/E13 | as E3/E13 | as E3/E13 | no — but **needs managed source-interior *and* destination arms, §4.4 class, Phase 3** |
 | E18 | legacy leaf edge `transition.rs:275` | 4.1 | P1 (replaces `platform::rename_relative` `platform.rs:276`) | `platform.rs:276` today | `platform.rs:324` today | `platform.rs:276` today | no |
 | E19 | legacy leaf edge `transition.rs:368` | 4.1 | P1 (same) | as E18 | as E18 | as E18 | no |
