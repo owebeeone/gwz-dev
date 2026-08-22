@@ -7,6 +7,20 @@ participants; both the ff path and the commit path were already members
 of the CRLF/materialization class covered by the un-pinned CRLF matrix
 sentinel (D1 package), so this is bookkeeping, not new exposure.
 
+**Platform run 32555574473 on `ae4e143` (Phase 1 settled + the ARM64
+EBADF package): the repair verified — ubuntu-24.04-arm went
+1094/266 → 1372/49**, clearing the 143 direct EBADF panics and their
+cascades at all three repaired sites, and **macos-14 is 1410/0/1**
+(matching the Phase-1 reviewer's pristine full-lib count). The 49
+residue is ONE cause, named in advance by `GwzArm64EbadfDiagnosis.md`:
+the untouched preservation-root twin (`preservation_root/parent.rs`
+`sync_dir` dup+fsync) — 29 direct in `g15::root_preservation`, 20 as
+`v1_lifecycle` finalization/reverse cascades (raw "Bad file descriptor
+(os error 9)" in the reverse rows; RecoveryRequired downstream). Fixed
+the same hour by applying the identical review-verified reopen recipe
+to `sync_dir` (Linux arm; other-unix dup+fsync retained); g15 45/0
+locally, clippy/fmt clean. Re-dispatched for verification.
+
 **Run 14 — 32545131198 on `c40e712` (the R2-D Phase 0 freeze train):
 1333/1/1.** The single failure is the new seam pin
 `r2d_seam_freeze::the_track_p_publication_spike_is_test_only` on its
