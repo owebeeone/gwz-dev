@@ -243,6 +243,62 @@ fable token only where it makes a difference." Recorded consequences:
   note vs a mode-tolerant arm for this one boundary file. Memo:
   `GwzArmPreservationHandoffDiagnosis.md`.
 
+  **Windows anchor package LANDED 2026-08-22 (gwz-core `6b8b76e`) —
+  review GO round 1, escalation trigger RECORDED (1 P1 + 4 P2),
+  routed to the Phase 5 dual.** Root cause of the run-16 class: P5's
+  Windows arm demanded a resident durability anchor only the
+  checked-artifact private area may retain; E14 runs the barrier on
+  the never-anchored retained action directory. Fix:
+  `platform::DirentBarrierClass` — the caller states its writer
+  class; seven legacy private-area sites keep the round trip;
+  E10/E14's ExactInterior arm is a documented no-op in E9's
+  writer-class-conditional sense (anchoring the action dir refuted
+  structurally: admission exactness + exact-capture re-entry; the P2
+  re-route refuted as a family move buying zero physical
+  difference). Probe-verified GREEN on windows-2022 pre-landing
+  (probe/namespace-anchor-win, run 32569434565, 22/0). Round-2
+  remediation closed the review's record findings: the falsified E9
+  residual-ordering claim corrected at five carrier sites including
+  the shipped foreign-leaf refusal string; the §4.3 E10/E14
+  activation annotation landed in contract form (win cells + §4.1 P5
+  two-arm cell edited with it; the DurableNamespace-witness and
+  parent_barrier-row negative space recorded directly; E9's clause
+  superseded with its frozen text preserved verbatim). Both pins
+  (platform.rs flat, pre_catalog tree) recomputed on the overlay and
+  matched the lane's independently reported values. TRACKED: run 18
+  must return the legacy AnchoredPrivateArea suites green (the
+  trimmed probe exercised none of them) — the ledger carries the
+  acceptance item.
+
+  **Step 3.1 LANDED 2026-08-22 (gwz-core `e72e376`) — review GO
+  round 1 (conditional), escalation trigger RECORDED (1 P1 + 1 P2),
+  routed to the Phase 5 dual; both escalating findings were
+  lane-owner dispositions, no remediation round.** The
+  managed-parent bootstrap consumer: all three trait methods real
+  (bounded no-follow preflight planning only the missing suffix —
+  the Step-2.3 populated-components caution discharged;
+  depth-tolerant revalidation; per-row execute_bound through
+  stage/observe/retire/reprove). Zero publication sites added,
+  permit 13 byte-untouched, census 165 with zero flips. Review
+  adjudications: deterministic ownership token CORRECT AS BUILT
+  (forced by the R2 stop clause; guarantee is self-consistency, NOT
+  exclusion — re-litigate if E17 read-back or an R2-E consumer ever
+  adopts a directory this action did not create); the
+  retain_managed_parent re-export removal permitted and load-bearing
+  for 3.3; refusal fail-closed structurally. LANE-OWNER DISPOSITIONS
+  on the escalations: [P1-1] the E17 remainder (durable successor +
+  prior-generation retirement; the partial-retirement restart window
+  wedges ≥2-component rows) had no budgeted home in the plan — Step
+  3.1b is MINTED for it, before the Phase 3 settle, same
+  implementer; [P2-1] the five edges-converted-without-sites are now
+  durably recorded as the §3.5 deferral record (this landing's
+  freeze edit) with 3.2's exact debt enumerated (sites, rows,
+  PartiallyExecuted 8→13). 3.1's P3s ride to 3.1b/3.2: the
+  retain_managed_prefix comment corrections, the vanished-component
+  settled-row pin, and 3.2's Git-directory arm blocker (test door or
+  follow-up 3). Budget 980 code vs <500 aspirational — reviewed as
+  load-bearing, recorded for the settle.
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its

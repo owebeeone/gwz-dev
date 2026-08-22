@@ -461,6 +461,21 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > (`interface_tests/fault_expected_keys.rs`). Counts held at **165**, no key
 > minted; the caller pin moved 9 → 11 with its `CATALOG_PUBLICATION_CALL_COUNTS`
 > companion in the same package.
+>
+> Deferral record (2026-08-22, Step 3.1 landing; discharges the Step-3.1
+> review's [P2-1]): Step 3.1's `execute_bound` converts the *edges* of five of
+> the 22 reserved keys — `staging_directory_create`, the three
+> `ownership_marker_*`, and `staging_directory_flush` — **without** injection
+> sites or matrix rows, deliberately: the plan assigns activation to Step 3.2
+> by name, both steps sit inside the family's owning package (Phase 3), and
+> RemPlan §10's duty binds per package with the phase settle as its gate.
+> Step 3.2 therefore owes: injection sites for the five in
+> `managed_mutation.rs`, their interruption/restart/convergence and
+> repeated-boundary rows, and the `PartiallyExecuted` list edit (8 → 13
+> executed). The five stay counted among the 22 reserved until 3.2's flip;
+> counts stay at 165 throughout. Until 3.2 lands, this record is the durable
+> statement that the edge conversion and the activation are intentionally
+> split, not drifted.
 | `cleanup.*` | 11 | R2-D **Phase 4** (step 4.1 legacy leaf edges) | reserved |
 | `barrier.*` | 16 | R2-D **Phase 4** (step 4.2 Windows retirement closure) | reserved |
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
@@ -523,7 +538,7 @@ design, which the fixture asserts (§8, D3).
 | P2 | Write-through open + handle flush + parent flush | `durable_write_options` `mutation.rs:377-394` and `directory_mutation.rs:703-727`; `file.sync_all()` `mutation.rs:163/:236`, `directory_mutation.rs:561`; the catalog root-flush callers `mutation.rs:396/:412/:426` and `directory_mutation.rs:729` call `platform::sync_parent` and so belong to **this** family, not to P5 (Code P3-6) | `platform::sync_parent` `platform.rs:367-370` (`cfg(not(windows))`, directory fsync) | `platform::sync_parent` `platform.rs:372-377` is a documented no-op; Windows durability is the write-through open plus the anchor barrier in P5 |
 | P3 | No-follow open + durable identity compare | `platform::open_dir_share_delete` `platform.rs:159-163` / `:165-194`; `HostPlatform` identity at `capability/pre_catalog/provider/platform.rs:23-33`; encoding at `provider/retained.rs:417-427` | per-OS children `provider/platform/linux.rs`, `provider/platform/macos.rs` selected by the `#[path]` edges at `provider/platform.rs:8-13` (macOS: `getattrlist` persistent object/volume identity, `fpathconf(_PC_CASE_SENSITIVE)`) | `provider/platform/windows.rs` via `provider/platform.rs:14-16`; `open_dir_share_delete` `platform.rs:165-194` adds the `FILE_SHARE_DELETE` recipe so the directory open does not collide with the retained rename-source handle |
 | P4 | Bounded interior / global enumeration | `provider/interior.rs:50-91` with `MAX_INTERIOR_ENTRIES = 10` (`interior.rs:27`); global catalog grammar budgets `catalog/enumeration.rs:8-12` (4 096 parent entries, 255 native name units, 510 encoded bytes) | portable; identical code path | portable; identical code path |
-| P5 | Dirent barrier | `platform::private_barrier`; production callers today are the legacy `cleanup.rs:89/:129/:159`, `residue.rs:407/:500/:529`, `transition.rs:427`, plus the Windows anchor internals at `platform.rs:410` | `platform.rs:271-274` (`cfg(not(windows))`, directory handle fsync) | `platform.rs:458-514` — the durability-anchor round trip (`ANCHOR_BYTES` `:380`, `ANCHOR_PREFIX` `:383`, `prepare_private` `:386`, `anchor_state` `:517`, `anchor_roundtrip_name` `:575`, `verify_anchor` `:582`) |
+| P5 | Dirent barrier | `platform::private_barrier`; production callers today are the legacy `cleanup.rs:89/:129/:159`, `residue.rs:407/:500/:529`, `transition.rs:427`, plus the Windows anchor internals at `platform.rs:410` | `platform.rs:271-274` (`cfg(not(windows))`, directory handle fsync) | two arms, selected by the caller's `DirentBarrierClass` (`platform.rs:281`): the durability-anchor round trip `platform.rs:551-584` (`ANCHOR_BYTES` `:427`, `ANCHOR_PREFIX` `:430`, `prepare_private` `:433`, `anchor_state` `:607`, `anchor_roundtrip_name` `:665`, `verify_anchor` `:672`) for `AnchoredPrivateArea` callers, and the documented no-op `platform.rs:514-549` for `ExactInterior` callers (see the E10/E14 activation annotation) |
 
 ### 4.2 Spike executed for this freeze
 
@@ -644,11 +659,103 @@ primitive, not a new one.
 > production caller binding must carry this condition. Same annotation,
 > negative space of E11's proof: `MissingDurable` is a two-sided absence
 > proof; it does not assert continuous absence across the barrier window.
-| E10 | leaf namespace barrier | 2.1 | P5 | `platform.rs:271` | `platform.rs:458` anchor | as mac | no |
+| E10 | leaf namespace barrier | 2.1 | P5 | `platform.rs:271` | `platform.rs:514` documented no-op (see the E10/E14 activation annotation) | as mac | no |
 | E11 | same-parent reobserve; two-sided durable-absence proof | 2.1 | P3 + P4 | identical | identical | identical | no |
 | E12 | backend `publish_exact` over scheduled roles | 2.2 | P1 | `platform.rs:23/:78` | `platform.rs:48/:98` | as mac | no |
 | E13 | backend `retire_exact` over scheduled roles | 2.2 | P1 | as E12 | as E12 | as E12 | no |
-| E14 | backend `barrier` | 2.2 | P5 | `platform.rs:271` | `platform.rs:458` | as mac | no |
+| E14 | backend `barrier` | 2.2 | P5 | `platform.rs:271` | `platform.rs:514` documented no-op (see the E10/E14 activation annotation) | as mac | no |
+> **E10/E14 activation annotation** (2026-08-22, the Windows anchor-readiness
+> repair over the Step 2.2 and Step 2.3 landings, gwz-core `6b8b76e`;
+> discharges the `GwzWindowsMatrix-Classification.md` run-16 class — all four
+> `checked_artifact::namespace::tests_fault_matrix` tests plus the managed
+> matrix that entry pre-attributes to it — and the Code review's [P2-1],
+> [P2-2] and [P2-4]): **P5's Windows column is two arms, and which one an
+> edge takes is a property of the caller, not of the directory.**
+>
+> The round trip renames a resident `.ca1-durability-anchor-<32hex>` file, so
+> it presupposes a directory that is *permitted to retain one*. Only the
+> checked-artifact private area is: the anchor is permanent by design and
+> `finish()` never removes it. An action directory is not, and the refusal is
+> structural rather than stylistic — admission requires `extra_children: 0`
+> (`protocol/admission/owner.rs:29-38`), so a resident anchor would make the
+> action permanently inadmissible, and the catalog root (`.gwz` / `gwz`) is
+> outside the private path the preservation-image model excludes, so it would
+> also re-enter exact captures. The barrier is therefore given its writer
+> class explicitly (`platform::DirentBarrierClass`, `platform.rs:281`):
+> `AnchoredPrivateArea` keeps the round trip unchanged, and `ExactInterior`
+> takes a documented no-op (`platform.rs:514`). E10 and E14 both pass
+> `ExactInterior` and can never take the other arm — `host.rs:667-681` pins
+> the barrier target to the retained action directory and
+> `namespace_mutation.rs:328` hardcodes the class — which is why both win
+> cells now name the no-op. Off Windows the class selects nothing: both arms
+> are the same directory `fsync` (`platform.rs:294`), so no non-Windows
+> behaviour of any P5 caller moves.
+>
+> The substituting property is the P2 family's own, and it is
+> writer-class-conditional in exactly E9's sense: every row of an exact
+> interior is gwz-written through `durable_write_options`
+> (`FILE_FLAG_WRITE_THROUGH`) and moved by the sealed exact-handle rename,
+> and no portable directory flush exists on Windows to add to that — the
+> same ground `sync_parent`'s Windows no-op and `sync_directory_edge`'s
+> already stand on. Carriage: the condition is carried by
+> `authority_record_binding.rs` — the file E9's annotation already
+> designates as the carrier — at `:34-45` (the doc contract), `:321`
+> (`FOREIGN_EXACT_DURABLE_IS_WEAKER`) and `:340`
+> (`require_authority_strength`), and by this package's own arm comment at
+> `platform.rs:514-549`. No new carrier is created and no other consumer is
+> asked to carry anything.
+>
+> **This annotation supersedes one clause of E9's.** E9 records that for
+> FOREIGN-written leaves `ExactDurable` is "strictly weaker on Windows
+> (namespace ordering via the E10/P5 anchor round-trip only, no byte-flush
+> claim)". That residual no longer exists: E10 has no anchor path, so on
+> Windows a foreign-written leaf's `ExactDurable` carries **no byte-flush
+> claim and no namespace-ordering claim — the residual is empty, not
+> weaker**. Nothing rests on it: the class was always refused rather than
+> accepted at reduced strength (`FOREIGN_AUTHORITY_REFUSAL`, whose text moves
+> with this annotation to "a foreign-written leaf carries no durable proof on
+> this platform"), and an exact interior admits no foreign row by
+> construction. E9's own text above is left verbatim; this annotation is the
+> governing statement of that clause.
+>
+> **Negative space, stated directly rather than by reference** (E9's residual
+> clause is the record this arm falsifies, so it cannot serve as the
+> citation). Three things this arm does *not* prove, in the form of the
+> E4-retire activation record:
+>
+> 1. **The `DurableNamespace` witness is still issued where no physical edge
+>    occurred.** `host.rs:681` returns `Ok(self.issuer().durable())`
+>    unconditionally, so on Windows the witness is minted after a no-op. It
+>    proves what the schedule proves — that a barrier the admitted action
+>    reserved was reached at its ordinal, with the retained parent
+>    revalidated — and on Windows it proves *nothing physical beyond that*.
+>    It is not a dirent-flush receipt there. Nothing dereferences it for
+>    durability today; the one consumer class that could is refused before it
+>    reaches the witness (`require_authority_strength`). Any future consumer
+>    that wants a physical claim from it must state the platform condition
+>    itself rather than infer it from the type's name.
+> 2. **The `namespace.parent_barrier` matrix row is a process stop across a
+>    no-op edge on Windows.** The key (`fault_v1.rs:119`) is live and its row
+>    executes on every platform — its `hit` is at `namespace_mutation.rs:334`,
+>    outside `private_barrier`, so the 165-key census and the 11-row matrix
+>    are untouched (`tests_fault_matrix.rs:85`, `:464`). But the matrix's
+>    claim that every row is "a real process stop across a real durable edge"
+>    does not hold for this row there. The convergence it proves on Windows is
+>    the restart's re-derivation, not the edge's durability. Recorded as an
+>    accepted deviation rather than left implicit; it mints no key and changes
+>    no count.
+> 3. **`MissingDurable` is unchanged and still two-sided.** E9's other
+>    negative space survives this annotation intact: it does not assert
+>    continuous absence across the barrier window, and an arm that performs no
+>    physical edge does not widen that window's claim.
+>
+> **Discharged at this landing by the lane owner:** the two win cells and the
+> §4.1 P5 cell (edited with this annotation); the two protected-source pins
+> (`platform.rs` flat and the `pre_catalog.rs` tree, recomputed at gwz-core
+> `6b8b76e`); the tracked acceptance item (recorded in the classification
+> ledger): the next full Windows matrix run must return the legacy
+> `AnchoredPrivateArea` suites green, since the trimmed probe run that
+> validated this arm (`32569434565`) executed none of them.
 | E15 | managed component install (staged dir → final) | 2.3/3 | P1 + P2 + P3 | as E3 | as E3 | as E3 | no — but **needs a managed source-interior arm, §4.4 class, Phase 2.3/3** |
 | E16 | managed ownership-marker retirement | 2.3/3 | P1 | as E13 | as E13 | as E13 | no — leaf-shaped today; **needs a destination arm only if the marker retires as a directory, §4.4 class, Phase 2.3/3** |
 > E16 activation annotation (2026-08-22, Step 2.3 landing; discharges the

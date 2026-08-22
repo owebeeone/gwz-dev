@@ -7,6 +7,38 @@ participants; both the ff path and the commit path were already members
 of the CRLF/materialization class covered by the un-pinned CRLF matrix
 sentinel (D1 package), so this is bookkeeping, not new exposure.
 
+**Run 17 — 32568481700 on `8b83a2c` (Steps 2.3+2.4 and D3 landed):
+1457/4/1.** The four failures are byte-for-byte run 16's namespace
+fault-matrix class — same tests, same baseline refusal — now
+root-caused and FIXED at `6b8b76e` (P5 gets its writer class;
+E10/E14's `ExactInterior` arm is a documented no-op; freeze §4.3
+E10/E14 activation annotation; probe run `32569434565` on
+`probe/namespace-anchor-win` was GREEN 22/0 before landing).
+**Correction to run 16's pre-attribution:** the managed matrix did
+NOT join the class — `tests_managed_matrix`, `tests_managed`, and
+both 2.4 suites all ran natively green here at the un-fixed base, so
+the class was always scoped to the namespace matrix's baseline E14
+barrier call; the probe's managed-matrix rows confirm the fix keeps
+them green rather than rescuing them. Population 1404 → 1462
+(+58: the 2.3/2.4/D3 test mass). **TRACKED ACCEPTANCE ITEM (review
+[P2-3]):** the trimmed probe exercised none of the seven legacy
+`AnchoredPrivateArea` call sites, so the anchor repair's acceptance
+evidence is run 18 — the next full Windows matrix run must be green
+across the legacy private-area suites (cleanup/residue/transition
+paths) as well as the four namespace-matrix tests. Expected run 18:
+1462/0/1, the first fully green Windows run since the R2-D fault
+families began landing.
+
+**Platform run 32568483432 on `8b83a2c` (sibling of run 17):
+ubuntu-24.04-arm 1463/46/1.** `exact_source` CLEARED on its first
+post-fix execution (47 → 46, exactly the diagnosis's prediction);
+the surviving 46 are the one template-mode class
+(29 g15 + 17 v1_lifecycle; probe `probe/g15-gate-dump` proved
+`.git/info/exclude` mode 0755 from the runner image's git template
+tree; fixture-side mode pinning in flight). Expected next platform
+run after that package lands: ARM green for the first time in the
+program.
+
 **Run 16 — 32559979514 on `6c7c8f3` (the share-delete fix):
 1399/4/1.** The run-15 class is EXTINCT: all 14 admission tests green
 on their first post-fix execution (the behavioral detector fired
