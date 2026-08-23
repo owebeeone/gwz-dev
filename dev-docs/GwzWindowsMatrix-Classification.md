@@ -1,4 +1,13 @@
-# Windows matrix classification — GREEN (runs 11, 13, 18–21); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+# Windows matrix classification — GREEN (runs 11, 13, 18–22); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+
+**Run 22 — 32672188425 on `b91bdeb` (THE R2-D SETTLED OBJECT):
+1530 passed / 0 failed / 1 ignored.** The settled object's own full
+matrix record, closing the R4b-G evidence inventory's F-6 and
+discharging the settled-dual Code axis's [P3-4] ledger duty: the ten
+multi-component writer rows and the 5.1/round-2 deltas executed
+natively. Platform sibling (32672189557): ubuntu-24.04-arm 1569/0/1,
+macos-14 1580/0/1. Five consecutive fully-green dispatched trees
+(`c2d2f15`, `9c454ce`, `51a9cba`, `514f8e6`, `b91bdeb`).
 
 **Run 21 — 32616954369 on `514f8e6` (Step 4.3, Phase 4 settled):
 1528 passed / 0 failed / 1 ignored.** The racing-contention row's
