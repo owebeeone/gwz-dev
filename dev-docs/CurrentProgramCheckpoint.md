@@ -571,6 +571,38 @@ fable token only where it makes a difference." Recorded consequences:
   train, then the 5.2 settled dual (Fable ×2, cross-model per the
   plan's own line, two-round cap).
 
+  **Step 5.1 LANDED 2026-08-23 — THE SETTLED TUPLE TREE IS gwz-core
+  `d45458d`.** The twelve-gate train ran and recorded verbatim
+  (dev-docs/GwzM5-8R2DSettledTuple.md, 683 lines, run-21 slot
+  filled); it caught and repaired a red gate (the boundary unit
+  suite's companion assertion, broken by MY 4.2-landing flat→tree
+  pin conversion — repaired and HARDENED: the generic prefix would
+  have passed on any finding) and a stale audit note (4.3's own
+  narrowing falsified it; corrected and measured at 29 live
+  warnings). Evidence: 107 keys tabled site+row+both-variants; 2
+  determinations; 38 reserved with records; ONE GAP REPORTED NOT
+  PAPERED — runtime.*'s 18 keys are declared Executed on a disjoint
+  six-variant mechanism with no per-key correspondence and a
+  hard-coded exemption; §3.5 declares the exception, but its worth
+  is below the other families' standard — FILED FOR THE 5.2 DUAL
+  with two census-neutral options (re-reserve like cleanup.*, or
+  restate the frozen claim). Phase-3 settle item 5 discharged (10
+  multi-component rows, correctly refusing partition claims).
+  Platform record: nine of nine green — three consecutive
+  fully-green trees on all three arms. NEW OPEN ITEMS for the dual:
+  the L2-05 merge-doc gate is wired into NO workflow (passes only
+  where the sibling gwz-cli checkout exists — a gate that only
+  passes on a developer's machine is not a gate; CI-wiring item);
+  the two not-run gates scoped honestly (the network matrix job —
+  CI's; regen.py --check — the release venv's).
+  managed_mutation.rs at 1,251 lines is the one over-trigger file,
+  deliberately unsplit during the evidence step. Budget +53 net vs
+  <300. THE 5.2 SETTLED DUAL LAUNCHES ON `d45458d` — Fable ×2 per
+  the tier policy (the plan's "cross-model" line is satisfied in
+  axis, not vendor; recorded as a deliberate reading), two-round
+  cap, carrying the full escalation ledger and the runtime.*
+  adjudication.
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
