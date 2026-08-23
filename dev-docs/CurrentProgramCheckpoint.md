@@ -524,7 +524,7 @@ fable token only where it makes a difference." Recorded consequences:
   no-exit refusal on foreign contamination (the block's
   reachable-state claim stays precise); the 4.2 review's round-1
   [P3-4] freeze-cite drift fixed at this landing against the landed
-  tree. Budget: net +1061 across both rounds (≈28% production /
+  tree. Budget: net +1062 across both rounds (the dual corrected the round-1 figure by one) (≈28% production /
   ≈20% bound relocation / ≈52% evidence) — second consecutive
   over-budget Phase-4 step, composition recorded per the reviewer's
   ChangeBudget guidance. Escalation ledger for the Phase 5 dual
@@ -559,9 +559,9 @@ fable token only where it makes a difference." Recorded consequences:
   extinct (anchor + authority family); raw-rename surface = one
   delegation reference; cleanup./barrier./terminal. all
   re-reserved for R2-E with sanctioned records (the census stands
-  at 165 with 51 keys executed program-wide: 19 admission + 11
-  durable_leaf + 11 namespace + ... per the §3.5 map, and
-  managed_bootstrap 28/30); three consecutive fully-green matrix
+  at 165; the executed arithmetic is the settled tuple §4.8's
+  (the "51" this record first carried reconciled with no sum —
+  corrected on the dual's finding), with managed_bootstrap 28/30); three consecutive fully-green matrix
   trees. ESCALATION LEDGER — FINAL FOR THE PHASE 5 DUAL: riding =
   2.3 (1 P1+3 P2), 2.4 (P0+P1+P2), anchor (1 P1+4 P2), 3.1
   (1 P1+1 P2), 3.1b (recorded), 4.3 (1 P2, remediated at landing);

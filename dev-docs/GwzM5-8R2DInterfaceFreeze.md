@@ -431,11 +431,105 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 | Family | Keys | Owning package | Status today |
 | --- | --- | --- | --- |
 | `runtime.*` | 18 | R2-A/R2-B runtime bootstrap and catalog lease | **executed** |
+> `runtime.*` evidence restatement (2026-08-23, ruled by the 5.2 settled
+> dual's State axis; adjudicates the open item Step 5.1 filed at
+> `GwzM5-8R2DSettledTuple.md` §4.6/§11.3(3). The row is left as written,
+> since this annotation is the sanctioned mechanism, and it is the governing
+> statement of the row's **executed** cell and of the closing `runtime.*`
+> paragraph below the map). **The family's "executed" status is a
+> family-level claim on a disjoint mechanism, and it claims no per-key
+> evidence.** What the tree proves, and all it proves: the six-variant
+> `RuntimeBootstrapFault` enum (`bootstrap/runtime/fault.rs`) is produced at
+> six production sites — `bootstrap/runtime/mod.rs` (final lease open, final
+> lease lock), `catalog_lease.rs` (initial-retention-complete, preparation),
+> `catalog_lease/target.rs` (catalog final lease open, catalog final lease
+> lock) — and driven by eight named substitution/drift-rejection tests in
+> `bootstrap/runtime/tests.rs`, `catalog_lease/tests.rs` and
+> `catalog_lease/tests/association.rs`. No correspondence exists or is
+> claimed between the 18 stable keys and the six variants; none of the 18
+> keys has a `CheckedArtifactFaultKeyV1` injection site or matrix row
+> (verified per key at the settled tuple, `d45458d`); the six tests are
+> substitution-rejection tests, not interruption/restart/convergence
+> matrices, and are not variant-paired. The per-key L1-16/L2-14 table the
+> settled tuple produces for the R2-D families (§4.1-§4.5 there) therefore
+> does not exist for this family, and the `fault_expected_keys.rs` runtime
+> exemption is the machine form of this restatement, not a debt of the R2-D
+> lane.
+>
+> **Why restated rather than re-reserved.** "Reserved" in this map means the
+> family's edges are not yet converted and the converting package owes sites
+> and rows in the same commit (RemPlan §10). `runtime.*`'s edges were
+> converted and accepted in R2-A/R2-B, before this key census existed, and
+> run in production on this tree; re-reserving would restate the map's
+> falsehood in the other direction and would mint an activation duty no
+> planned package owns — the `cleanup.*`/`barrier.*`/`terminal.*` records
+> each name the R2-E consumer conversion that genuinely owns their edges,
+> and no such owner exists for edges already converted. The 18 keys remain
+> in the vocabulary as the family's names. Any future package that wants
+> per-key runtime evidence — the natural candidate is the R2-F native fault
+> evidence release gate (plan §5 item 4) — takes the standard upgrade path:
+> `CheckedArtifactFaultKeyV1` injection sites, both-variant matrix rows, and
+> deletion of the `fault_expected_keys.rs` runtime exemption, all in the
+> same package. Until that package exists, no duty is open and none is
+> deferred by this record.
+>
+> **Counts.** 165 total, unchanged; no key minted, none retired; 18/165
+> unchanged. Census-neutral by construction: this annotation moves no
+> activation state — it states the evidence class of one that has stood
+> since R2-B.
 | `catalog_bootstrap.*` | 25 | R2-C2 physical first-catalog owner | **executed** |
 | `admission.*` | 19 | R2-D **Phase 1** (R2-C3 admission) | **executed** (Step 1.3, 2026-08-22 — 19 sites in `capability/pre_catalog/provider/admission_mutation.rs`, matrix on both target variants, 12-round same-boundary crash stability; counts held at 19/165, no key minted) |
 | `durable_leaf.*` | 11 | R2-D **Step 2.1** | reserved |
 | `namespace.*` | 11 | R2-D **Steps 2.2/2.3** | reserved |
 | `record.*` | 13 | R2-D **Step 2.4** | reserved |
+> `durable_leaf.*` activation annotation (2026-08-23, filed at the 5.2
+> settled dual's State-axis round 1; records the Step 2.1 flip the landing
+> train left out of this map — the row above is left as written, since this
+> annotation is the sanctioned mechanism and is its governing statement):
+> **all 11 keys are executed** (Step 2.1, landed `d2cf755`, 2026-08-22).
+> Sites: `capability/pre_catalog/provider/leaf_observation.rs`, all eleven.
+> Matrix: `provider/tests_leaf_fault_matrix.rs`,
+> `DURABLE_LEAF_MATRIX: [(Fault, LeafArmV1); 14]` — 14 rows over 11 distinct
+> keys, covering both sides of the two-sided proof (Exact and Absent arms;
+> three boundaries shared), interruption/restart/convergence on both target
+> variants plus 2×2 repeated-boundary rows. The family's Windows arm carries
+> the §4.3 E9 activation annotation landed with the same train. Counts held
+> at 165; no key minted.
+>
+> `namespace.*` activation annotation (2026-08-23, same filing): **all 11
+> keys are executed** (Step 2.2, landed `d2cf755`, 2026-08-22). Sites:
+> `capability/pre_catalog/provider/namespace_mutation.rs`, all eleven — the
+> `namespace` owner holds none, which is the rule the later
+> `managed_bootstrap.*` annotations cite as precedent. Matrix:
+> `namespace/tests_fault_matrix.rs`, `NAMESPACE_MATRIX: [Fault; 11]`,
+> both target variants, repeated subset 3. The `parent_barrier` row's
+> Windows semantics are governed by the §4.3 E10/E14 activation annotation
+> (a process stop across a documented no-op edge there — recorded deviation,
+> no count moved). Counts held at 165; the caller pin's 2.2 extension is the
+> `CATALOG_PUBLICATION_CALL_COUNTS` namespace_mutation.rs entry, recorded in
+> the checker in the converting commit.
+>
+> `record.*` activation annotation (2026-08-23, same filing): **all 13 keys
+> are executed** (Step 2.4, landed `c2564ba`, 2026-08-22). Sites split as
+> the family's own shape: the four bounded-parse stages with the R1 parse
+> owner (`protocol/authority_record.rs`), the nine install/retire/join
+> boundaries with the binding owner
+> (`capability/pre_catalog/provider/authority_record_binding.rs`). Matrix:
+> `provider/tests_authority_record_matrix.rs`, `RECORD_MATRIX: [Fault; 13]`,
+> both target variants, with
+> `the_repeatability_taxonomy_accounts_for_every_boundary` proving the 9/4
+> repeatable/unrepeatable partition machine-checked. Counts held at 165; the
+> caller inventory's move to 13 with the 2.4 file joined is recorded in the
+> landing record and the checker.
+>
+> Inventory addendum (2026-08-23, appended to the §3.5 injection-site
+> inventory; the round-2 paragraph above is left as written as the Phase-0
+> statement it is): on the settled tree `d45458d` the declared-and-anchored
+> production source list is **nine** files — the three `catalog_bootstrap.*`
+> sources above, `admission_mutation.rs` (19), `leaf_observation.rs` (11),
+> `namespace_mutation.rs` (11), `protocol/authority_record.rs` (4),
+> `authority_record_binding.rs` (9), `managed_mutation.rs` (28) — pinned
+> tree-complete by the round-2 completeness anchor exactly as designed.
 | `managed_bootstrap.*` | 30 | R2-D **Phase 3** | **partially executed** (see annotation) |
 
 > `managed_bootstrap.*` activation annotation (2026-08-22, Step 2.3 landing;
@@ -927,6 +1021,8 @@ green on the **next full Windows matrix run** (the run above is a
 branch-scoped workflow-trimmed run, so the full matrix is still owed). This item
 travels with the package to acceptance; the lane owner records it in
 `CurrentProgramCheckpoint.md` with the tier statement of §9.
+
+*(Discharged 2026-08-23 at the 5.2 settled dual's State-axis [P3-1]: runs 18-21 — 32573548540, 32607411300, 32613728318, 32616954369 — are fully-green full-matrix Windows runs, 1472-1528 passed / 0 failed, and both spike cases are ordinary lib tests inside each. Recorded here so the owed item is neither silently satisfied nor open.)*
 
 Corroborating Windows evidence that P1 carries the *same* physical edge shape
 today: the accepted run-13 matrix (1322/0/1, GREEN at `90d3f8a`,

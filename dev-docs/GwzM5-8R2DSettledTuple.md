@@ -424,7 +424,7 @@ That ratio is the shape of this program and belongs in the record.
 switched off over most of the subsystem.** Seven subtree blankets remain in
 `checked_artifact/mod.rs` — `bootstrap`, `capability`, `entry`, `fault_v1`,
 `leaf`, `namespace`, `protocol` — covering **103 of 160 files and 34,941 of
-54,956 lines: 63.6% of `src/checked_artifact/`**. Every hidden item is
+54,962 lines: 63.6% of `src/checked_artifact/`**. Every hidden item is
 R1/R2-frozen interface whose first consumer is R2-E; Step 4.3's narrowing found
 **zero orphans**, two stale covers (deleted) and two over-broad ones (moved
 inward).
@@ -643,6 +643,29 @@ companion-class and were fixed in the step.
 | The whole §10 consumer conversion table | plan §5 item 1 |
 | First production catalog activation | plan §5 item 2; gated by §11.3 |
 | The 481-item / 63.6%-of-subsystem frozen surface behind the seven blankets | §5.3 |
+
+**Added at the settled-dual round-2 remediation (2026-08-23):**
+
+- `authority_name` embeds no identity digest (the non-self-checking-name
+  design; descends from the Step-4.1 review's E21 P2 finding) — R2-E must
+  weigh a self-checking rename or a compensating observation when it gives
+  the family its next consumer (checkpoint 4.1 record; State [P3-2]).
+- `BarrierIntentV1::issue` (`protocol/barrier.rs:39`) accepts caller-asserted
+  anchor/home identity facts with no observation check — the named
+  caller-restatement class's one remaining seam shape, production-unreachable
+  today (sealed witness, zero production callers). **BINDING R2-E
+  obligation**: apply the 4.3 observe-or-refuse pattern before the roaming
+  anchor gains its first admitted-action caller (Code [P3-1]).
+- Anchor nits inside the accepted same-user boundary (Code [P3-5]): `verify`
+  rides the legacy unbounded `read_to_end`; the retired-ordinal parse accepts
+  non-canonical renderings (convergence unaffected); `unsupported.rs` claims
+  the Linux support profile (fail-closed shields it). R2-E/R2-F hygiene items.
+- The ten multi-component writer rows (5.1's delta) have no native
+  Windows/ARM execution record — runs 19-21 predate `d45458d`; expected-green,
+  ledger entry owed at the next matrix dispatch (Code [P3-4]).
+- The L2-05 merge-doc gates are wired into no workflow — **wire them into CI
+  before any lane relies on L2-05 mechanically** (both axes concur; Code
+  [P3-6], tuple §11.3).
 
 ### 11.2 Pinned to R2-F
 
