@@ -630,6 +630,32 @@ fable token only where it makes a difference." Recorded consequences:
   settled tree ✓ — the A1 activation's two preconditions stand.
   Remaining: R4b-G, then A1 activation.
 
+  **R4b-G evidence executed 2026-08-23
+  (dev-docs/GwzM5-8R4bG-Evidence.md, 851 lines): 22 PASS / 7 FAIL /
+  6 RE-FRAMED (5 evidenced) / 2 DEFERRED-BY-AMENDMENT / 1 PENDING.**
+  Members verified at the tuple pins (gwz-cli 3cca145 139/0; gwz-py
+  929efb0 330/0 with regen --check green; taut f008419); the
+  acceptance object stated (the ~25k-line R4b reverse lifecycle;
+  GO unblocks the M5b-IMPL settled review and the escape
+  implementation packages). Remediation of F-1..F-5/F-7 dispatched
+  (matrices for F-6 dispatched at b91bdeb = run 22); new citable
+  measurement root_fault_matrix 318.71s release at b91bdeb (vs the
+  576.03s on record). LANE-OWNER ADJUDICATION OF J-1, on record for
+  the dual: M5b-IMPL (3e60529, 8c1624a) reached b91bdeb's ancestry
+  ahead of R4b-G against the must-wait clause
+  (GwzM5-8M5bNoFfDesign.md:976-986) — the deviation is REAL and was
+  a sequencing artifact of the 2026-08-22 acceptance train, before
+  thin-A1 re-framed R4b-G behind the R2-D settle. Ruled ACCEPTED
+  WITH RECORD on four legs: M5b measured zero production lines
+  under its ceiling with T-6 and the clean-tree re-cut; its dual
+  was round-1 clean on both axes; the leaned-on call-graph gate
+  (F-3) lands with this remediation as a standing guard rather
+  than a retroactive claim; and the settled dual's Code axis
+  re-verified the M5b surfaces byte-identical. The R4b-G dual
+  judges the acceptance; if it rules the deviation disqualifying,
+  the remedy is the M5b-IMPL settled review running BEFORE A1
+  rather than concurrent with it.
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
@@ -791,7 +817,7 @@ its GO/GO. (b) and (c) may run in parallel.
 | Repository | Commit | Note |
 | --- | --- | --- |
 | gwz-dev (root) | this docs commit (the pause checkpoint) | literal restatement per ReviewCode-3 P3-5 |
-| gwz-core | `d32b2c9` local, **unpushed** (origin/main `90d3f8a`, Windows GREEN run 13, macOS GREEN) | parked R2-D Phase 0 package, pre-review |
+| gwz-core | `b91bdeb` = origin/main — **the R2-D settled object** (2026-08-23; the `d32b2c9` row above this correction was the 2026-08-16 pause state, long since landed through the Phase 0→5 trains) | R2-D SETTLED; matrix green runs 18-21 |
 | gwz-cli | `3cca145` | Close R4b P1/P2 remediation gate |
 | gwz-py | `929efb0` | Implement R4b reverse merge lifecycle |
 | taut | `f008419` | 0.8.x fallible from_cbor line |
