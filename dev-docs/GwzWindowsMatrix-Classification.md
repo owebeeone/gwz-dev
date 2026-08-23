@@ -1,4 +1,16 @@
-# Windows matrix classification — GREEN (runs 11, 13, 18, 19); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+# Windows matrix classification — GREEN (runs 11, 13, 18, 19, 20); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+
+**Run 20 — 32613728318 on `51a9cba` (Step 4.2, the anchor
+retirement): 1526 passed / 0 failed / 1 ignored.** The full native
+validation of the retirement beyond the probe slice: the
+ordinal-indexed durable retirement, the deterministic staging names
+(anchor and authority family), all ten protocol boundaries including
+both retirement boundaries, and the seven legacy AnchoredPrivateArea
+suites — green first-execution at full population. Platform sibling
+(32613729322): ubuntu-24.04-arm 1565/0/1, macos-14 1576/0/1. Three
+consecutive fully-green trees (`c2d2f15`, `9c454ce`, `51a9cba`)
+spanning two production write-path rewrites and the anchor
+retirement.
 
 **Run 19 — 32607411300 on `9c454ce` (Phase 3 complete + Step 4.1):
 1506 passed / 0 failed / 1 ignored.** The native Windows debut of the
