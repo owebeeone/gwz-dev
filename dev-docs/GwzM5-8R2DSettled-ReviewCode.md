@@ -464,3 +464,111 @@ ledger entry ([P3-4]), anchor nits for R2-F ([P3-5]), and concurrence on the
 tuple's own CI-wiring item ([P3-6]). Nothing here blocks the last catalog
 gate on the A1 path. The `runtime.*` freeze-row ruling is the State axis's,
 with §7 as this axis's evidence.
+
+---
+
+# ROUND 2 — focused re-verdict (final round of the two-round cap)
+
+Date: 2026-08-23. Axis: **Code**, round 2 of 2, still peer-blind to the
+State report itself (only the merged remediation's amended documents were
+read, as instructed). Object: **gwz-core `b91bdeb`**
+("Settled-dual round-2 remediation: the streamed-proof provenance comment
+states the action field's true origin") — verified
+`b91bdebbb422843df85379e39ce30ffb8b04128b`, working tree clean, and
+**exactly one commit over `d45458d`** whose complete delta is two files:
+the [P3-2] comment fix (+7/−2 comment lines inside
+`authority_record_binding.rs`, zero code changes) and the
+`pre_catalog.rs` tree-pin digest that comment edit forces in
+`check_checked_artifact_boundaries.py` (one line; the tree pin covers the
+edited file, so the recompute is the mandatory companion, and no other pin
+moved).
+
+## R2.1 The [P3-2] fix, verified against the mechanism
+
+The replacement comment makes five claims; each was re-checked against the
+code as read in round 1, and each is true of the mechanism:
+
+1. "artifact_root and retained_parent_identity are read off the capability
+   these payloads were actually streamed through, never re-supplied later" —
+   true (`parent.path_profile()` / `parent.identity()` at the constructor;
+   `AuthorityTransactionV1` takes no parent).
+2. "`action` is the caller's argument" — the corrected clause; true, and the
+   round-1 falsehood is gone.
+3. "its trustworthiness rests on slot-name derivation (every slot name this
+   stream read was built from it)" — true (`slot(action, SourcePayload /
+   GoalPayload)` are the only names streamed).
+4. "the obligation stated on `AuthorityFactsIssuerV1::issue`" — true
+   (`owner/host.rs:53-66`).
+5. "enforced by the seam gate and the join guard downstream" — true
+   (`CheckedAuthorityObservationOwnerV1::observe`'s digest+binding equality;
+   `validate_terminal_relation`'s provenance clause).
+
+The comment now says exactly what the mechanism does. **[P3-2] FIXED.**
+
+## R2.2 Gates re-executed at `b91bdeb`
+
+- Boundary checker: **ok (15 visible entries, 5 classified modules)** — the
+  recomputed pre_catalog pin validates against the landed tree.
+- `cargo fmt --all -- --check`: clean.
+- Focused `cargo test --lib checked_artifact::`: **400 / 0** (1170
+  filtered), 55.76s.
+
+A comment cannot alter code behavior; the round-1 executions of the full
+train at `d45458d` therefore remain the record for the unchanged code, with
+the three re-runs above covering everything the one-commit delta could
+touch (the pinned manifest, formatting, and the subsystem suite).
+
+## R2.3 The amended freeze §3.5, checked for contradiction
+
+Read as instructed (the State-axis lifts only; the State report itself
+remains unread). No contradiction with any code finding of round 1 — in
+detail:
+
+- The **`runtime.*` evidence restatement** is the governing annotation on
+  the row and matches this axis's §7 characterization fact-for-fact: six
+  variants at the six sites this review verified, the eight named
+  substitution tests, no key correspondence, no
+  interruption/restart/convergence form, no variant pairing, the
+  `fault_expected_keys.rs` exemption as the machine form; it cites the
+  per-key verification performed at `d45458d`. Its restate-not-re-reserve
+  reasoning matches §7's code-facts summary (edges converted pre-census in
+  R2-A/B; re-reserving would mint a duty no package owns; R2-F named as the
+  natural per-key upgrade path). Census 165 untouched.
+- The **three Phase-2 activation annotations** (durable_leaf 11/11,
+  namespace 11/11, record 13/13) record the flips whose sites, matrix
+  constants and partition test this review verified independently in round
+  1 (§2); every number in them matches this report's measurements. They
+  cure a map-truth gap on the State axis's territory (rows that still read
+  "reserved" over executed families); nothing in this axis's round-1 report
+  relied on those rows' literal text.
+- The **inventory addendum**'s nine declared-and-anchored sources sum to
+  25+19+11+11+4+9+28 = **107** sites — exactly the 107 tabled keys this
+  review spot-verified by line number.
+- The tuple's §4.6/§11.3(3) docket lines are left as written with the
+  freeze annotation as the governing ruling that names them — the
+  program's sanctioned-annotation convention; noted, no action needed.
+
+## R2.4 Grades per finding
+
+| Finding | Round-2 grade |
+| --- | --- |
+| [P3-1] `BarrierIntentV1::issue` caller-asserted identity facts | **CLOSED AS RECORDED** — binding R2-E obligation filed in tuple §11.1 ("apply the 4.3 observe-or-refuse pattern before the roaming anchor gains its first admitted-action caller"); code correctly unchanged (production-unreachable) |
+| [P3-2] provenance comment overstatement | **FIXED** at `b91bdeb`, verified §R2.1 |
+| [P3-3] record-precision notes | **CLOSED** — both hard numeric errors corrected in the exactness pass (checkpoint's unreconcilable "51 keys" replaced by a pointer to tuple §4.8; the §5.3 denominator corrected to 54,962, matching this review's measurement); the dead-code scan-convention note stands as informational — the claimed 29/12 lies inside this review's measured bracket (27/10–30/13) |
+| [P3-4] ten multi-component rows without native execution | **CLOSED AS RECORDED** — ledger duty at the next matrix dispatch, filed in tuple §11.1 |
+| [P3-5] anchor nits | **CLOSED AS RECORDED** — register hygiene items (R2-E/R2-F), filed in tuple §11.1 |
+| [P3-6] L2-05 CI wiring | **CLOSED AS RECORDED** — hardened to "wire them into CI before any lane relies on L2-05 mechanically", both axes concurring, filed in tuple §11.1 |
+
+## R2.5 Final verdict
+
+**GO — unconditional — for the R2-D settled gate.** The one-commit
+remediation delta is exactly what it claims: a comment made true of its
+mechanism plus the pin recompute that edit forces, with checker, fmt and
+the subsystem suite green on the landed tree. Every round-1 finding is
+fixed or durably filed where its owner will meet it — the one live-code
+class instance this audit named is now a binding R2-E obligation in the
+settled record, the platform-ledger and CI-wiring duties are written where
+the next dispatch and the next lane must read them, and the amended freeze
+§3.5 makes the frozen map true of the tree without contradicting a single
+code fact this axis verified. Nothing outstanding on the Code axis blocks
+the last catalog gate on the A1 path.

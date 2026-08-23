@@ -603,6 +603,33 @@ fable token only where it makes a difference." Recorded consequences:
   cap, carrying the full escalation ledger and the runtime.*
   adjudication.
 
+  **R2-D IS SETTLED — 2026-08-23, dual #3 of 3 consumed, GO/GO at
+  round 2 within the two-round cap. The settled object is gwz-core
+  `b91bdeb` with the freeze as amended at the remediation commit.**
+  Round 1: Code GO (0 P0/P1/P2, 6 P3 — the named-class audit
+  returned an 18-gate table with an affirmative no-live-instance
+  statement; the one remaining seam SHAPE, BarrierIntentV1::issue,
+  is production-unreachable and now a BINDING R2-E obligation) /
+  State NO-GO (1 P1 — THE AGGREGATE CATCH THE DUAL EXISTS FOR: the
+  three Phase-2 activations never got their §3.5 amendments, 35
+  keys misdeclared "reserved", fallen in the seam between Phase 1's
+  row-edit and Phase 3's annotation disciplines; + the runtime.*
+  adjudication RULED RESTATE with drafted text; 3 P3). One merged
+  document-class remediation: the reviewer-drafted annotations
+  lifted verbatim (mechanically verified 45/45 and 44/44 lines),
+  the comment-clause fix at `b91bdeb`, the register completed, the
+  exactness bundle corrected. Round 2: Code GO unconditional /
+  State GO — "the map is now true for all ten families; what
+  remains open is exclusively named P3 residue filed where the next
+  lane reads it. R2-E may start behind this gate." The deferred
+  second-axis design is VINDICATED on the record: every riding
+  escalation got its scrutiny and the dual caught the one defect
+  class only an aggregate view could see. Reports:
+  GwzM5-8R2DSettled-Review{Code,State}.md (rounds 1+2 appended).
+  THIN-A1 STATUS: R2-D settled ✓ and M5b bound proofs green on the
+  settled tree ✓ — the A1 activation's two preconditions stand.
+  Remaining: R4b-G, then A1 activation.
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its

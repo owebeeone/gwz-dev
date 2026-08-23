@@ -419,3 +419,98 @@ green as recorded).
 
 — State axis, round 1 of 2. NO-GO; remediation drafted liftable in full
 above; expected one merged round to GO.
+
+---
+
+# ROUND-2 RE-VERDICT (final round of 2) — 2026-08-23
+
+Object as re-reviewed: **gwz-core `b91bdeb`** ("the streamed-proof provenance
+comment states the action field's true origin") **plus the freeze/tuple/
+checkpoint as amended at docs commit `5f090eb`**. Peer-blindness maintained:
+the remediation commit carries `GwzM5-8R2DSettled-ReviewCode.md`; it was not
+opened — the Code-axis register additions were verified via the tuple's
+lifted §11 text and the tree only.
+
+## VERDICT: **GO** — the R2-D settled gate is passed.
+
+The tree delta over `d45458d` is exactly as declared and nothing more: two
+files — a comment-only clause in `authority_record_binding.rs` (full diff
+read; no code line moves; the new clause states `action`'s caller origin,
+its slot-name-derivation ground, and the seam gate + join guard that enforce
+it, which is consistent with the 4.3 settle-item-8 record and the
+caller-restatement class audit this review carried) and the matching
+`pre_catalog.rs` tree-pin recompute. Re-run at `b91bdeb`: boundary checker
+`ok (15 visible entries, 5 classified modules)`, `cargo fmt` clean, focused
+`checked_artifact::` **400/0**, clippy all-targets/all-features **zero
+diagnostics**. The document remediation makes the frozen map true: every row
+of §3.5 now agrees with the tree, which is the sentence round 1 could not
+certify.
+
+## Grades per finding
+
+- **[P1-1] CLOSED.** The three activation annotations and the inventory
+  addendum are lifted **verbatim** (mechanical check: all 45 non-empty
+  draft lines present in order, exact substrings) as one blockquote run
+  under the `record.*` row — the last of the three contiguous rows, so the
+  placement serves all three, each annotation family-named, matching the
+  map's existing blockquote-segmentation precedent
+  (cleanup/barrier/terminal). New cosmetic residual filed, non-blocking:
+  the addendum's self-locating phrases ("appended to the §3.5
+  injection-site inventory", "the round-2 paragraph above") do not match
+  its physical position under the map — reword or relocate at any future
+  docs commit.
+- **[P2-1] CLOSED.** The runtime.* evidence restatement is lifted
+  **verbatim** (all 44 lines in order) directly under the `runtime.*` row,
+  governing-statement clause intact; census untouched (165 asserted by the
+  fixture inside the green 400).
+- **[P3-1] CLOSED.** Discharge note at the §4.2 tracked-item site, runs
+  18-21 enumerated by the exact IDs this review verified in round 1
+  (32573548540 / 32607411300 / 32613728318 / 32616954369) with the correct
+  pass-count range. Cosmetic residual: §10.3's one-line restatement of the
+  item carries no mirror note.
+- **[P3-2] CLOSED.** The `authority_name` row is present with its R2-E
+  action. The four Code-axis register additions were each verified
+  consistent with this axis's audit and with the tree before accepting:
+  `BarrierIntentV1::issue` is at `protocol/barrier.rs:39`, takes four
+  caller-asserted identity/path facts, and its issuing wrapper
+  (`namespace/mod.rs` `barrier_intent`, sealed-witness-gated) has no
+  production caller — the binding R2-E obligation is exactly the named
+  class's remaining seam shape and does not contradict the barrier.*
+  non-activation record; the anchor `verify` claim is true via
+  `observe_leaf_exact` → `read_to_end` (`observation.rs:249`); the run-22
+  ledger duty is consistent with the platform record (runs 19-21 predate
+  the ten multi-component rows and `b91bdeb`; expected-green, entry owed at
+  the next dispatch); the hardened CI-wiring line concurs with this
+  review's own §11.3(7) verification.
+- **[P3-3] CLOSED IN SUBSTANCE.** (a) checkpoint now reads **+1062**,
+  matching this review's measurement; (b) tuple §5.3 denominator now
+  **54,962**, matching; the lane-extended "51 keys" correction (not in this
+  axis's round-1 bundle — credited accordingly) now defers to tuple §4.8,
+  whose arithmetic this review verified exact. Residual filed,
+  file-and-continue per process rules: the dev-docs range endpoints remain
+  unpinned; the checkpoint 3.1b "21 sites" phrase remains unreconciled; the
+  freeze-internal `:348-355`/`:356-364` cite clash stands; plus the two
+  cosmetic notes above.
+
+## One-paragraph justification
+
+Round 1 found the tree impeccable and the contract stale; round 2 finds them
+agreeing. The only code motion is a comment that makes a true statement
+where a vaguer one stood, under a correctly recomputed pin, with every gate
+this review re-ran green at the new tuple; the freeze's §3.5 map now
+declares for all ten families exactly what the fixture, the census, and the
+sampled evidence prove on the tree — the three missing activations recorded
+in this axis's own drafted idiom, verbatim; the runtime.* row's worth is now
+stated honestly by the lifted restatement, with its upgrade path named and
+no owner-less duty minted; the ledger leaks are plugged (spike item
+discharged against the run IDs this review verified; the R2-E register now
+carries every "carries to" item both axes found, each checked against the
+tree before acceptance); and what remains open is exclusively named,
+non-blocking P3 residue filed where the next lane will read it. The
+aggregate gate's mandate — certify that the settled tree and the freeze as
+amended cohere — is met at `b91bdeb` + `5f090eb`.
+
+**R2-D SETTLED GATE: GO.** Dual #3 of 3 consumed on this axis; two-round cap
+respected; R2-E may start its interface work behind this gate per plan §4.4.
+
+— State axis, round 2 of 2, final.
