@@ -450,6 +450,37 @@ fable token only where it makes a difference." Recorded consequences:
   (2.2's discharged at its landing; 3.3's discharged at round 2)
   plus the named class audit. Phase 4 launches on `3a45619`.
 
+  **Step 4.1 LANDED 2026-08-23 (gwz-core `9c454ce`) — review GO
+  round 1, no escalation (6 P3).** E18-E21 convert in situ through a
+  sealed composition of P1's arms carrying the legacy identity
+  vocabulary. SCOPE DIVERGENCE RATIFIED (lane owner): my brief's
+  publish_verified_no_replace route was WRONG — HostPlatform-bound
+  to the closed support table while the legacy writer is the live
+  path on any persistent-handle filesystem; the reviewer added a
+  fourth leg (the route would not even compile — pub(super)) and
+  ruled the twin seam SOUND with both halves pin-protected.
+  **E21 latent defect, graded P2 as it stood, found and closed by
+  this step:** authority_name embeds no identity digest, so the old
+  code completed a same-byte authority substitution outright;
+  adversarial-only, same-user boundary, hence P2 not P1. Recorded
+  for the settle and the metrics table. cleanup.* flips ZERO keys —
+  duty never attached (all 11 need AdmittedActionV1); re-reserved
+  for R2-E via the §3.5 record lifted at this landing (with the
+  reviewer's one-word placement fix). Landing adoptions:
+  transition.rs and residue.rs gain flat digest pins (both sealed);
+  platform.rs pin recomputed; the platform.rs split (1,093 lines) is
+  BOUND TO STEP 4.2 BY NAME. Riding notes: twin-seam unification
+  docketed for R2-F ([P3-1]); the authority_name
+  non-self-checking-name design note carries to R2-E; [P3-4] (one
+  fault variant, four sites — split or record deliberate) routed to
+  4.2; the macOS-narrowing prose error ([P3-2]: it is MNT_LOCAL, not
+  persistent-id absence) corrected in the lifted record. L2-04
+  harness green locally (86 tests, 24 tuples); its network matrix
+  job runs automatically on push (path filter covers
+  scripts/checks/**) — no dispatch needed. Both matrices dispatched
+  at `9c454ce` (Windows 32607411300 = run 19, first native execution
+  of the 3.1b/3.2/3.3/4.1 suites; platform 32607412448).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its

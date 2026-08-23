@@ -611,6 +611,61 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > edge-bearing keys carry executed interruption rows; these two carry this
 > determination and their state proofs.
 | `cleanup.*` | 11 | R2-D **Phase 4** (step 4.1 legacy leaf edges) | reserved |
+> `cleanup.*` non-activation record (2026-08-23, Step 4.1 landing; records the
+> disposition of the plan's "activate `cleanup.*` rows for the cleanup edges this
+> converts" clause): **0 of the 11 keys are executed; all 11 stay reserved.**
+> Step 4.1 converts §4.3 rows **E18-E21** — the four legacy *rename* edges. The
+> `cleanup.*` vocabulary names a different edge set: five keys are the
+> `CleanupWorklistV1` record's own scratch/publish/reobserve lifecycle
+> (`protocol/cleanup.rs`, `BaseActionSlotV1::CleanupWorklist`), and the remaining
+> six are the retirement of the three `CleanupAliasV1` aliases — Source, Goal,
+> Authority — into their `Retired*Alias` slots with their source/destination
+> reobservations and row/completion records (`namespace/mod.rs`
+> `cleanup_retirement`, `retire_exact`). None of those edges exists on this tree
+> outside the R1 vocabulary: every one requires an `AdmittedActionV1` and a
+> scheduled action directory, so their conversion is a consumer conversion, which
+> plan §5 items 1 and 2 place outside R2-D. The legacy twin of that work is
+> `cleanup.rs`'s three `remove_file` calls, which are removals, not renames — the
+> shape the E4-retire activation record above already establishes no admitted
+> family expresses — and Step 4.1's scope names only the four rename sites.
+>
+> Per the map's own carried clause ("any key whose edge genuinely converts later
+> is explicitly re-reserved for R2-E/R2-F in the same update"), all eleven
+> `cleanup.*` keys are **re-reserved for R2-E**, the lane that gives the cleanup
+> worklist its first production consumer; the row above is left as written, since
+> this annotation is the sanctioned mechanism and the family's Phase-4 assignment
+> was made against the step, not against the edges. RemPlan §10's duty is not
+> deferred by this record — it never attached, because Step 4.1 converts no
+> `cleanup.*` edge.
+>
+> **What Step 4.1 did convert, and where its evidence is.** E18-E21 route through
+> one sealed source-associated composition of §4.1's **P1** arms,
+> `platform::publish_verified_leaf_no_replace`, which the frozen §4.3 rows already
+> specify ("P1 (replaces `platform::rename_relative`)") and which §5 decision 2
+> already calls converting E18-E21 "in situ through P1". It is P1's *arms* —
+> `open_rename_source` then `rename_open_source` — and not a call into
+> `publish_verified_no_replace`, because that function's identity compare is
+> `HostPlatform`-bound and `HostPlatform` admits only the closed support table
+> (ext4 + `FS_IOC_GETFSUUID`, `ATTR_CMN_OBJPERMANENTIDS` with `MNT_LOCAL`, NTFS
+> `FileId128`), while the legacy leaf writer is live on every filesystem carrying
+> a persistent file handle; routing these edges through it would narrow
+> production merge and stash flows to that table, against the step's own "with
+> identical external behavior". The composition therefore carries the legacy
+> family's durable identity vocabulary — the one its authority record already
+> commits to. Evidence: `tests/leaf_publication.rs` drives each of the four edges
+> to the front of a real flow and substitutes its source inside the closed
+> window; all four are red against the raw rename (verified by reverting the four
+> sites in scratch: 1 passed, 4 failed) and green against the composition. The
+> new `BeforeSealedLeafPublication` boundary is a legacy `CheckedArtifactFault`,
+> not a `CheckedArtifactFaultKeyV1`, so it mints no key; it is driven on all
+> three legacy restart/convergence matrices. `RAW_RENAME_CALL_ALLOWLIST` lost its
+> `transition.rs` and `residue.rs` entries and `platform.rs`'s pair counts moved
+> 5 → 6, leaving the subsystem's whole raw-rename surface in two sealed files.
+>
+> **Counts.** 165 total, unchanged; no key minted. `cleanup.*` 0 executed / 11
+> reserved. The `capability_permit.rs` caller inventory holds at **13** and
+> `CATALOG_PUBLICATION_CALL_COUNTS` is unchanged: this step adds zero
+> `publish_verified_no_replace` call sites.
 | `barrier.*` | 16 | R2-D **Phase 4** (step 4.2 Windows retirement closure) | reserved |
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
 
