@@ -667,7 +667,163 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > `CATALOG_PUBLICATION_CALL_COUNTS` is unchanged: this step adds zero
 > `publish_verified_no_replace` call sites.
 | `barrier.*` | 16 | R2-D **Phase 4** (step 4.2 Windows retirement closure) | reserved |
+> `barrier.*` non-activation record (2026-08-23, Step 4.2 landing; records the
+> disposition of the plan's "activate `barrier.*` … with rows" clause):
+> **0 of the 16 keys are executed; all 16 stay reserved.** Step 4.2 converts §4.3
+> row **E22**, the legacy Windows durability anchor. The `barrier.*` vocabulary
+> names a different protocol: the frozen **action-scoped roaming anchor**, whose
+> `BarrierIntentV1` (`protocol/barrier.rs`) binds a catalog anchor identity, a
+> private home, a target parent and path profile, a reserved target leaf and an
+> ordinal, and whose `issue` refuses without a `NamespaceBarrierAuthority`, an
+> `ActionCapacityReservationV1` and an ordinal inside `schedule().barrier_count()`.
+> Its five intent keys move a record between `BarrierIntentScratch`,
+> `BarrierIntentActive(ordinal)` and `BarrierIntentRetired(ordinal)`; its target
+> and alias keys move the anchor into a target parent and retire a stranded alias
+> onto `RetiredRoamingAnchorAlias(ordinal)`. None of that exists without an
+> `AdmittedActionV1`, so its conversion is a consumer conversion, which plan §5
+> items 1 and 2 place outside R2-D — and landing the anchor inside an admitted
+> action directory additionally requires teaching admission's `extra_children: 0`
+> grammar the reserved target leaf, which is the very contamination class the
+> E10/E14 annotation records as diagnosed and fixed.
+>
+> The legacy anchor is that protocol's **ancestor**, not an instance: source and
+> destination are one directory, there is no intent record, no ordinal and no
+> target leaf. §4.3's E22 row already says which primitives serve it — "P1 + P5",
+> win cell `platform.rs`, "New primitive? no" — and that is what this step used.
+> Per the map's carried clause, all sixteen `barrier.*` keys are **re-reserved for
+> R2-E**, the lane that gives the roaming anchor its first admitted action.
+> RemPlan §10's duty is not deferred by this record — it never attached, because
+> Step 4.2 converts no `barrier.*` edge.
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
+> `terminal.*` non-activation record (2026-08-23, Step 4.2 landing; resolves the
+> plan's own conditional, "and `terminal.*` if its edges convert here"): **0 of
+> the 11 keys are executed; all 11 stay reserved, re-reserved for R2-E.** The
+> conditional resolves to *no*. Every key of the family names the admitted action
+> directory's terminal retirement into the catalog's retired root — §4.4's "E7's
+> Phase-4 half and the terminal retirement edges" — and each needs an
+> `AdmittedActionV1` and a production catalog, which plan §5 item 2 forbids in
+> R2-D. No edge of the legacy anchor touches one.
+>
+> **What Step 4.2 did convert, and where its evidence is.** E22's machinery is
+> retired in place on P1 + P5. The random `.ca1-anchor-scratch-<16 bytes>` — the
+> R2 stop clause's nonce, whose orphans the legacy survey could not even
+> classify, one per crash and unreclaimable — is replaced by the single
+> deterministic `.ca1-anchor-scratch-v1`, resumed onto and rewritten in place. The
+> correctness-critical `remove_file` on the stranded outbound alias is replaced by
+> a durable retirement onto ordinal-indexed retired names through the sealed P1
+> composition. All four surviving anchor renames publish through that same
+> composition, so `platform/anchor.rs` names no raw rename and the subsystem's
+> whole `rename_relative` surface is now **one** reference —
+> `rename_open_source`'s own non-Windows delegation
+> (`RAW_RENAME_CALL_ALLOWLIST`, `platform.rs` 5 → 1).
+>
+> **Amendment (2026-08-23, round-2 remediation of the Step-4.2 review's [P2-2]).**
+> The retirement destination is **ordinal-indexed, not singular**. Round 1
+> retired the stranded alias onto one fixed `.ca1-anchor-retired-v1` and refused
+> a second retirement while it stood; that refusal was permanent on a *reachable*
+> state — two foreign strandings, each interrupted at one window — and it bricked
+> P5 for all seven `AnchoredPrivateArea` callers with no in-code exit. E16's
+> standard admits a permanent typed refusal only where the wedge state is
+> unreachable or off the supported table, and this one was neither, so it is
+> fixed mechanically rather than derived away. `RETIRED_PREFIX` +
+> `smallest_free_ordinal` now read the ordinal off the ordinals actually resident
+> and publish onto the smallest free one; smallest-free rather than count or
+> max+1, because count has a fixed point on a gap and would have wedged inside
+> the fix itself. Retired objects are bounded by **actual crash occurrences** —
+> one per foreign stranding a crash interrupted — and deliberately uncapped,
+> since a cap would restore a wedge at the cap. Every reachable post-crash state
+> has a typed exit, and the recurrence windows are executed rather than asserted
+> (`a_recurring_stranding_retires_onto_the_next_free_ordinal_and_converges`,
+> `the_retirement_ordinal_is_the_smallest_free_one_observed`).
+>
+> **[P2-1] closure.** `BOUNDARIES` carries all **ten** boundaries the protocol
+> announces, and the matrix builds the stranded-alias state before driving the
+> two retirement ones. Round 1 announced and injected them and drove neither.
+> They execute natively on Windows (probe `32612243125`, 82/0), where
+> `hard_link_identity_sharing_is_what_the_retirement_rows_assume` proves the rows
+> took the retirement branch rather than the platform skip.
+>
+> **A platform fact, recorded because a reader would otherwise mis-read the
+> evidence.** `NeedsRetireAlias` — the state the retired removal reconciled —
+> requires one object under two names with one durable identity. On macOS
+> `ATTR_CMN_OBJPERMANENTID` is allocated per hard link and creating the second
+> link re-homes the first, so **the state, and the legacy removal, have always
+> been unreachable there**; it is reachable on Linux and on Windows, the platform
+> the anchor serves. The rows assert the retirement where the state is producible
+> and the refusal where it is not, and the pinning row measures the platform
+> rather than reading a `cfg`, so the coverage cannot silently rot.
+>
+> **Legacy nonce orphans are tolerated, never reclaimed.** The closed grammar is
+> forward-looking. A `.ca1-anchor-scratch-<32hex>` left by a pre-4.2 Windows
+> crash matches none of the closed names; `survey` ignores it, so it refuses
+> nothing and blocks nothing, but no drive reclaims it either. The count is
+> bounded by past crashes and cannot grow, because nothing mints that shape any
+> more. Reclamation is an optional R2-E item, not a debt of this step;
+> `legacy_nonce_orphans_are_tolerated_and_block_nothing` pins the upgraded tree.
+>
+> **The same nonce, one file away, closed in the same package.** Until this
+> remediation the private area was not nonce-free: `authority::scratch_name`
+> minted `.ca1-scratch-<kind>-<16 random bytes>` per attempt on E20
+> (`ensure_goal`) and E21 (`publish_scratch`) — the very edges Step 4.1 put on a
+> successful converted path, which is plan §4 Step 4.2's own trigger condition.
+> It is now `.ca1-{family}-{action}-{kind}.scratch`, derived from the same
+> observed durable state as the published names beside it, with the same resume
+> discipline the anchor uses (`create_new` fresh, truncate on resume). It is
+> **action-scoped**, so determinism needs no serialization argument: two drives
+> collide only on the same family and action, a case that already ended in a
+> typed refusal. It stays dotted, so `inspect_family`'s `ca1-{family}-` grammar
+> is unchanged and no older gwz classifies it as foreign. Legacy random orphans
+> get the disposition above exactly: tolerated, invisible, never reclaimed,
+> bounded by past crashes.
+>
+> **§4.4's arm table row "any further retirement-destination arm | Phase 4"
+> resolves to NO ARM for this step**, by the same conditional-resolution
+> mechanism E16's and E17's annotations used. The anchor's retirement
+> destination is a *regular file* published through P1 with the legacy family's
+> own identity vocabulary; it re-checks no destination interior, so there is no
+> `DestinationRecheckV1` arm to add and `DestinationRecheckV1` is unchanged by
+> Step 4.2. On this tree that row is therefore driven by E7's Phase-4 half and
+> the terminal retirement edges alone — both `terminal.*`'s, re-reserved for
+> R2-E above. The row is left as written, since this annotation is the
+> sanctioned mechanism.
+>
+> **Two behaviour deltas, declared.** (a) **Truncate at a predictable staging
+> name.** Both the anchor's `.ca1-anchor-scratch-v1` and the family's
+> `.ca1-{family}-{action}-{kind}.scratch` are now derivable, so a *foreign*
+> object planted there is truncated and reused where the legacy random name
+> would never have touched it. It is inside the amendment's cooperating-same-user
+> boundary (the actor needs write access to the private area, which already lets
+> it delete or rewrite anything there), and it cannot promote foreign content:
+> the resume writes our own bytes, takes the identity from its own write handle,
+> and the sealed publication re-verifies identity and bytes through the handle
+> it renames before anything durable moves. What it removes is the pre-4.2
+> alternative — allocating beside the foreign object and leaking an orphan for
+> ever. (b) **The `NeedsReturn` pre-verify.** The return arm gains a `verify`
+> the legacy arm did not have. It can only reject, and it converts
+> rename-then-fail into refuse-without-mutation. Both are improvements; both are
+> deltas, not nulls.
+>
+> **The P5 row and the E10/E14 annotation stay true, with two amendments of
+> record.** (1) §4.1's P5 row cited the anchor internals in `platform.rs`; they
+> now live in `platform/anchor.rs`, and `private_barrier`,
+> `DirentBarrierClass` and the `ExactInterior` documented no-op — everything the
+> E10/E14 annotation and `authority_record_binding.rs` cite by name — stay in
+> `platform.rs` unchanged. (2) The annotation's subject is which arm a caller
+> takes on Windows; that is untouched, and `ExactInterior` still takes the
+> no-op. Both amendments are relocations, not substantive edits: no caller
+> changed class, and the seven `AnchoredPrivateArea` call sites are
+> byte-identical.
+>
+> **Counts.** 165 total, unchanged; no key minted. `barrier.*` 0/16,
+> `terminal.*` 0/11. The `capability_permit.rs` caller inventory holds at **13**
+> and `CATALOG_PUBLICATION_CALL_COUNTS` is unchanged: this step adds zero
+> `publish_verified_no_replace` call sites.
+>
+> *(Step-4.1 [P3-4], discharged in this package.)* `BeforeSealedLeafPublication`
+> is split into four per-edge variants — `BeforeAuthorityPublication`,
+> `BeforeGoalPublication`, `BeforeDetachPublication`,
+> `BeforeManagedPublication`. The three legacy restart matrices carry 9 rows in
+> place of 3, each flow driving exactly the sealed leaf edges it crosses.
 
 Total 165 keys, equal to `EXPECTED_KEY_COUNT`
 (`interface_tests/fault_expected_keys.rs:174`; the key list ends `:172`).
@@ -727,7 +883,7 @@ design, which the fixture asserts (§8, D3).
 | P2 | Write-through open + handle flush + parent flush | `durable_write_options` `mutation.rs:377-394` and `directory_mutation.rs:703-727`; `file.sync_all()` `mutation.rs:163/:236`, `directory_mutation.rs:561`; the catalog root-flush callers `mutation.rs:396/:412/:426` and `directory_mutation.rs:729` call `platform::sync_parent` and so belong to **this** family, not to P5 (Code P3-6) | `platform::sync_parent` `platform.rs:367-370` (`cfg(not(windows))`, directory fsync) | `platform::sync_parent` `platform.rs:372-377` is a documented no-op; Windows durability is the write-through open plus the anchor barrier in P5 |
 | P3 | No-follow open + durable identity compare | `platform::open_dir_share_delete` `platform.rs:159-163` / `:165-194`; `HostPlatform` identity at `capability/pre_catalog/provider/platform.rs:23-33`; encoding at `provider/retained.rs:417-427` | per-OS children `provider/platform/linux.rs`, `provider/platform/macos.rs` selected by the `#[path]` edges at `provider/platform.rs:8-13` (macOS: `getattrlist` persistent object/volume identity, `fpathconf(_PC_CASE_SENSITIVE)`) | `provider/platform/windows.rs` via `provider/platform.rs:14-16`; `open_dir_share_delete` `platform.rs:165-194` adds the `FILE_SHARE_DELETE` recipe so the directory open does not collide with the retained rename-source handle |
 | P4 | Bounded interior / global enumeration | `provider/interior.rs:50-91` with `MAX_INTERIOR_ENTRIES = 10` (`interior.rs:27`); global catalog grammar budgets `catalog/enumeration.rs:8-12` (4 096 parent entries, 255 native name units, 510 encoded bytes) | portable; identical code path | portable; identical code path |
-| P5 | Dirent barrier | `platform::private_barrier`; production callers today are the legacy `cleanup.rs:89/:129/:159`, `residue.rs:407/:500/:529`, `transition.rs:427`, plus the Windows anchor internals at `platform.rs:410` | `platform.rs:271-274` (`cfg(not(windows))`, directory handle fsync) | two arms, selected by the caller's `DirentBarrierClass` (`platform.rs:281`): the durability-anchor round trip `platform.rs:551-584` (`ANCHOR_BYTES` `:427`, `ANCHOR_PREFIX` `:430`, `prepare_private` `:433`, `anchor_state` `:607`, `anchor_roundtrip_name` `:665`, `verify_anchor` `:672`) for `AnchoredPrivateArea` callers, and the documented no-op `platform.rs:514-549` for `ExactInterior` callers (see the E10/E14 activation annotation) |
+| P5 | Dirent barrier | `platform::private_barrier`; production callers today are the legacy `cleanup.rs:89/:129/:159`, `residue.rs:407/:500/:529`, `transition.rs:427`, plus the Windows anchor internals, owned since Step 4.2 by `platform/anchor.rs` | `platform.rs:271-274` (`cfg(not(windows))`, directory handle fsync) | two arms, selected by the caller's `DirentBarrierClass` (`platform.rs:364`): the durability-anchor round trip, owned since Step 4.2 by `platform/anchor.rs` (`round_trip` `:183`, `ANCHOR_BYTES` `:74`, `ANCHOR_PREFIX` `:76`, `prepare` `:129`, `survey` `:284`, `roundtrip_name` `:388`, `verify` `:394`; retirement `RETIRED_PREFIX` `:100`), for `AnchoredPrivateArea` callers, and the documented no-op `platform.rs:526` for `ExactInterior` callers (see the E10/E14 activation annotation) |
 
 ### 4.2 Spike executed for this freeze
 
@@ -848,11 +1004,11 @@ primitive, not a new one.
 > production caller binding must carry this condition. Same annotation,
 > negative space of E11's proof: `MissingDurable` is a two-sided absence
 > proof; it does not assert continuous absence across the barrier window.
-| E10 | leaf namespace barrier | 2.1 | P5 | `platform.rs:271` | `platform.rs:514` documented no-op (see the E10/E14 activation annotation) | as mac | no |
+| E10 | leaf namespace barrier | 2.1 | P5 | `platform.rs:271` | `platform.rs:526` documented no-op (see the E10/E14 activation annotation) | as mac | no |
 | E11 | same-parent reobserve; two-sided durable-absence proof | 2.1 | P3 + P4 | identical | identical | identical | no |
 | E12 | backend `publish_exact` over scheduled roles | 2.2 | P1 | `platform.rs:23/:78` | `platform.rs:48/:98` | as mac | no |
 | E13 | backend `retire_exact` over scheduled roles | 2.2 | P1 | as E12 | as E12 | as E12 | no |
-| E14 | backend `barrier` | 2.2 | P5 | `platform.rs:271` | `platform.rs:514` documented no-op (see the E10/E14 activation annotation) | as mac | no |
+| E14 | backend `barrier` | 2.2 | P5 | `platform.rs:271` | `platform.rs:526` documented no-op (see the E10/E14 activation annotation) | as mac | no |
 > **E10/E14 activation annotation** (2026-08-22, the Windows anchor-readiness
 > repair over the Step 2.2 and Step 2.3 landings, gwz-core `6b8b76e`;
 > discharges the `GwzWindowsMatrix-Classification.md` run-16 class — all four
@@ -870,14 +1026,14 @@ primitive, not a new one.
 > action permanently inadmissible, and the catalog root (`.gwz` / `gwz`) is
 > outside the private path the preservation-image model excludes, so it would
 > also re-enter exact captures. The barrier is therefore given its writer
-> class explicitly (`platform::DirentBarrierClass`, `platform.rs:281`):
+> class explicitly (`platform::DirentBarrierClass`, `platform.rs:364`):
 > `AnchoredPrivateArea` keeps the round trip unchanged, and `ExactInterior`
-> takes a documented no-op (`platform.rs:514`). E10 and E14 both pass
+> takes a documented no-op (`platform.rs:526`). E10 and E14 both pass
 > `ExactInterior` and can never take the other arm — `host.rs:667-681` pins
 > the barrier target to the retained action directory and
 > `namespace_mutation.rs:328` hardcodes the class — which is why both win
 > cells now name the no-op. Off Windows the class selects nothing: both arms
-> are the same directory `fsync` (`platform.rs:294`), so no non-Windows
+> are the same directory `fsync` (`platform.rs:377`), so no non-Windows
 > behaviour of any P5 caller moves.
 >
 > The substituting property is the P2 family's own, and it is
@@ -891,7 +1047,7 @@ primitive, not a new one.
 > designates as the carrier — at `:34-45` (the doc contract), `:321`
 > (`FOREIGN_EXACT_DURABLE_IS_WEAKER`) and `:340`
 > (`require_authority_strength`), and by this package's own arm comment at
-> `platform.rs:514-549`. No new carrier is created and no other consumer is
+> `platform.rs:526`. No new carrier is created and no other consumer is
 > asked to carry anything.
 >
 > **This annotation supersedes one clause of E9's.** E9 records that for

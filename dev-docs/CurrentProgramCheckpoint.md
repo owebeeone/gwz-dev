@@ -481,6 +481,57 @@ fable token only where it makes a difference." Recorded consequences:
   at `9c454ce` (Windows 32607411300 = run 19, first native execution
   of the 3.1b/3.2/3.3/4.1 suites; platform 32607412448).
 
+  **Step 4.2 LANDED 2026-08-23 (gwz-core `51a9cba`) — review round 1
+  GO with §9 escalation RECORDED (2 P2, 5 P3); round 2 GO, both P2s
+  closed AT THE MECHANISM, escalation DISCHARGED.** The legacy
+  Windows anchor machinery retired: nonce → one deterministic
+  staging name (the standing R2 stop-clause violation removed);
+  alias remove_file → durable retirement onto ordinal-indexed names
+  chosen smallest-free from observed state (round 1's fixed
+  destination was a REACHABLE permanent wedge — deleted, not derived
+  away; the reviewer independently re-derived that count-based
+  naming would have wedged inside the fix). All ten boundaries
+  driven incl. both retirement boundaries, natively probe-verified
+  (probe/anchor-retirement-win, final run 32612243125, 82/0, with
+  the hard-link pin proving the retirement branch executed; the
+  probe cycle itself caught a fixture bug red-then-green). [P3-2]
+  fixed in-package: authority::scratch_name's nonce on 4.1's
+  converted E20/E21 — Phase 4's own trigger condition — now
+  action-scoped deterministic; getrandom gone from authority.rs.
+  SCOPE DIVERGENCES RATIFIED (lane owner): barrier.* (16) and
+  terminal.* (11) flip ZERO keys — both vocabularies name frozen
+  admitted-action protocols (the roaming anchor; terminal
+  retirement), consumer conversions outside R2-D; the legacy anchor
+  is the roaming protocol's ANCESTOR, not an instance; all 27 keys
+  re-reserved for R2-E via the §3.5 records lifted at this landing.
+  MACOS PLATFORM FACT pinned by measurement: per-hard-link
+  ATTR_CMN_OBJPERMANENTID means the stranded-alias state was never
+  reachable there. Landing adoptions (both reviewer-blessed):
+  platform.rs converts FLAT→TREE pin (covers the anchor module +
+  its 548-line evidence file); authority.rs gains a flat pin as the
+  private family's naming authority. PROBE DISCLOSURES accepted:
+  four pushes total to probe/anchor-retirement-win (remediation +
+  fixture fix beyond the one authorized), same branch only, verified
+  by the reviewer (origin/main untouched, no tags). LANDING INCIDENT
+  (ritual 2 vindicated): my overlay rsync silently dropped the new
+  platform/anchor/ subdirectory (git status collapses new dirs to
+  one line; --files-from without -r copies them empty) — caught
+  BEFORE push by the pin cross-check against the reviewer's
+  independently computed tree digest; anchor files copied, pin
+  recomputed to the matching value. Riding to 4.3/settle: [P3-6]
+  the racing-drive window has no executed row (three of four
+  executed + the gap named); [P3-7] survey's Invalid is a permanent
+  no-exit refusal on foreign contamination (the block's
+  reachable-state claim stays precise); the 4.2 review's round-1
+  [P3-4] freeze-cite drift fixed at this landing against the landed
+  tree. Budget: net +1061 across both rounds (≈28% production /
+  ≈20% bound relocation / ≈52% evidence) — second consecutive
+  over-budget Phase-4 step, composition recorded per the reviewer's
+  ChangeBudget guidance. Escalation ledger for the Phase 5 dual
+  gains: 4.2 round-1 (2 P2, discharged round 2 — recorded as
+  discharged). Run 20 dispatched at `51a9cba` (Windows 32613728318,
+  platform 32613729322).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
