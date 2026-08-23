@@ -1,4 +1,13 @@
-# Windows matrix classification — GREEN (runs 11, 13, 18, 19, 20); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+# Windows matrix classification — GREEN (runs 11, 13, 18–21); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+
+**Run 21 — 32616954369 on `514f8e6` (Step 4.3, Phase 4 settled):
+1528 passed / 0 failed / 1 ignored.** The racing-contention row's
+retirement branch executed natively (discharging the closure doc's
+run-21 expectation), alongside the seam-level refusal row and the
+narrowed-allow tree. Platform sibling (32616955672):
+ubuntu-24.04-arm 1567/0/1, macos-14 1578/0/1. **Four consecutive
+fully-green trees** (`c2d2f15`, `9c454ce`, `51a9cba`, `514f8e6`) —
+the settled tuple's platform record.
 
 **Run 20 — 32613728318 on `51a9cba` (Step 4.2, the anchor
 retirement): 1526 passed / 0 failed / 1 ignored.** The full native
