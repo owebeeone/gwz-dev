@@ -532,6 +532,45 @@ fable token only where it makes a difference." Recorded consequences:
   discharged). Run 20 dispatched at `51a9cba` (Windows 32613728318,
   platform 32613729322).
 
+  **Step 4.3 LANDED and PHASE 4 SETTLED 2026-08-23 (gwz-core
+  `514f8e6`; single-axis regime per thin-A1, the plan's Phase-4 dual
+  line superseded on record).** Review GO round 1 (1 P2, 7 P3 — all
+  record-class; corrected at the landing per the review's own
+  values, including the lift-blocking exact_row fix, the honest
+  dead-code figures, and the [P3-6] rationale clause; escalation
+  RECORDED and routed to the Phase 5 dual). THE COEXISTENCE
+  DECISION (audit P3-3, A1-gating) IS MADE AND RECORDED:
+  **quarantine/relocation**, per §7.2's adopted direction plus two
+  facts new since adoption (Windows anchor permanence makes the
+  grammar collision permanent; the retirement family is
+  crash-bounded, not constant-bounded); execution pinned to the
+  R2-F relocation package; the A1 gate stays fail-closed in code.
+  Record: dev-docs/GwzM5-8R2DPhase4Closure.md §2.7. The
+  dirent-barrier resume-window residual is verified CLOSED in code
+  (all six Ready edges through the keyed prologue; regression
+  pinned; R2-F power-loss companion survives). Settle item 8
+  LANDED: the 2.4 seam refuses mis-paired action digests itself,
+  consumer obligation on the signature, two smuggles/two gates both
+  executed. Settle item 7 LANDED: blankets narrowed; dead-code
+  reality recorded FOR STEP 5.1'S AUDIT: **481 items were hidden by
+  the module-level allows; the global measure is 1657 spans / 85
+  files**, all R1/R2-frozen interface awaiting R2-E, zero orphans.
+  PHASE 4 TOTALS: E18-E22 converted; the R2 stop-clause nonce class
+  extinct (anchor + authority family); raw-rename surface = one
+  delegation reference; cleanup./barrier./terminal. all
+  re-reserved for R2-E with sanctioned records (the census stands
+  at 165 with 51 keys executed program-wide: 19 admission + 11
+  durable_leaf + 11 namespace + ... per the §3.5 map, and
+  managed_bootstrap 28/30); three consecutive fully-green matrix
+  trees. ESCALATION LEDGER — FINAL FOR THE PHASE 5 DUAL: riding =
+  2.3 (1 P1+3 P2), 2.4 (P0+P1+P2), anchor (1 P1+4 P2), 3.1
+  (1 P1+1 P2), 3.1b (recorded), 4.3 (1 P2, remediated at landing);
+  discharged-on-record = 2.2, 3.3 (round 2), 4.2 (round 2); plus
+  the named class audit (caller-supplied restatement — fired 2.4,
+  3.3; hardened at the seam by 4.3). NEXT: Phase 5.1 evidence
+  train, then the 5.2 settled dual (Fable ×2, cross-model per the
+  plan's own line, two-round cap).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
