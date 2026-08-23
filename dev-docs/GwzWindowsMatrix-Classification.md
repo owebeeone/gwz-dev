@@ -1,4 +1,16 @@
-# Windows matrix classification — GREEN (runs 11, 13, 18); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+# Windows matrix classification — GREEN (runs 11, 13, 18, 19); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
+
+**Run 19 — 32607411300 on `9c454ce` (Phase 3 complete + Step 4.1):
+1506 passed / 0 failed / 1 ignored.** The native Windows debut of the
+Step 3.1b intent matrix, the 3.2 writer/purpose matrices, the 3.3
+coordinator suite, and 4.1's leaf_publication substitution rows — all
+green first-execution, discharging run 17's pre-attribution. The
+platform sibling (32607412448) is green both legs (ubuntu-24.04-arm
+1544/0/1, macos-14 1555/0/1), and `retained-readers` ran green at the
+same sha INCLUDING its network matrix job (triggered by the push's
+scripts/checks/** change), completing L2-04's CI verification of the
+4.1 leaf-publication conversion. Two consecutive trees (`c2d2f15`,
+`9c454ce`) now fully green across a production write-path change.
 
 **Run 18 — 32573548540 on `c2d2f15`: 1472 passed / 0 failed / 1
 ignored.** The first fully green Windows run since the R2-D fault
