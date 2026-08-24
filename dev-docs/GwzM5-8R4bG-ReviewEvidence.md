@@ -435,3 +435,103 @@ corrections in the same pass if convenient. P3-1/P3-2 are the dual's
 recorded grading of R-1/R-2 and require only the lane's acknowledgment (or
 the operator's routing) — they do not block under L1-19. On a focused
 re-verdict after that remediation, nothing this axis has seen prevents GO.
+
+---
+
+# ROUND-2 FOCUSED RE-VERDICT — 2026-08-24 (round 2 of 2, final)
+
+Object of the re-verdict: the merged round-2 remediation — gwz-core
+`78badbc` → **`1bd885f`** ("Harden the R4b-G gate tooling per the dual's
+round-2 prescriptions"; verified: exactly three `scripts/checks/` files,
++114/−17, zero `src/` lines, zero `PROTECTED_*` pin lines in the diff,
+HEAD = origin/main, tree clean) and the record remediation at gwz-dev
+`aeb4411`. Everything mechanical below was re-executed on this host at
+`1bd885f` under the same fresh scratch `CARGO_TARGET_DIR`.
+
+## VERDICT: **GO** — final for this axis. P2-1 CLOSED; all six P3s closed
+or validly dispositioned; no new finding at any P-level.
+
+**One-paragraph justification.** The single blocking finding is closed at
+its root: J-1 leg 4 is restated at both annotation sites to its true source
+— the **D3 dual's round-2 re-verdicts**, whose cites I verified resolve and
+carry exactly the missing fact (`GwzM5-8D3Impl-ReviewCode.md:447-448`: "all
+five M5b files byte-identical vs `0b059e8`; `store/tests.rs` exactly
++2/−0"; `GwzM5-8D3Impl-ReviewState.md:550-552`: "M5b four-filter 37/0 with
+all five M5b files `git status`-clean (byte-identical)") — with the
+mis-attribution bracketed on the record ("the fact was true, its citation
+was not"), and both J-1 bookkeeping asks landed (the frozen design's
+`:976-986` annotation; the checkpoint's `:1147-1157` retained-not-struck
+annotation preserving the owed-pre-A1 M5b-IMPL settled review). The
+reconciled C-1/C-2 record (§12.7, mirrored into the settled tuple's §11.1
+as a new dated block) is evidence-sound: it credits and quotes the
+categorical contract clause this axis found, names the four live-residue
+rows with finder attribution (my `J-NO-PUBLICATION-UNBORN` plus the
+Correctness axis's three finalizing-state `F-*` shapes, whose
+adaptation-disposition hazard is a genuinely sharper argument than my
+class-cite carve-out), grades the residue **P2 OPEN BLOCKING-FOR-A1 per
+L1-19**, and routes it under the accepted amendment's own debt clause
+(`:43-55`/`:242-244`) with pre-A1 exposure mechanically ZERO — all three
+`cfg(test)` gates verified in code by me (`merge/mod.rs:23-24`,
+`record_wire/mod.rs:13-14`, `merge/mod.rs:44-50`). Decisively, §12.8 puts
+the **PARTIAL** statement of the byte-equivalence battery inside the
+acceptance record itself, so the gate closes telling the truth about O8
+(13/39; row 2.3b/O8 stays FAIL) rather than over it — the named-exception
+structure the accepted amendment already established for the acceptance
+debt, not a silent waiver, and therefore not an open P0-P2 against the
+R4b-G object. Every remediation artifact re-executed green here at
+`1bd885f`: boundary checker `ok` (same line, no pin moves), M4 map `ok`
+with the full-count marker the driver now pins (C-4 closed both halves —
+malformed-token guard + whole-line marker), the hardened privacy suite
+**8/8 in 142.1 s** including the three new root-binding probes that close
+the two-edit re-export channel with the `as`-rename residual honestly
+pinned to the tree digest (C-3), and the driver's fault battery now
+carrying all four disjoint partitions (P3-5/C-5) — `fault:3` (**400
+passed**, the checked-artifact census) and `fault:4` (**914 passed**, the
+remainder) executed through the driver itself with PARTIAL semantics
+intact. Zero production lines, zero pin moves, tooling-only.
+
+## Round-1 findings, graded
+
+| Finding | Grade | Basis |
+| --- | --- | --- |
+| **P2-1** (J-1 leg 4) | **CLOSED** | Restated to the D3 dual round-2 sources at both sites; cites resolve and carry per-file byte-identity; mis-attribution bracketed; design + checkpoint annotations landed; **J-1 RATIFIED by both axes, the before-A1 remedy NOT triggered, and the M5b-IMPL settled review recorded as owed pre-A1** in the checkpoint and the tuple register. |
+| **P3-1** (R-1 grading frame) | **CLOSED AS RECONCILED** | §12.7 supersedes §12.6's grading with the contract clause quoted, the four live rows named per finder, C-1 at P2 bound BLOCKING-FOR-A1 on the A1 input register; §12.8 states the battery PARTIAL in the acceptance record; named cheap closures recorded for A1 to inherit (registry refusal rows; one parametric `adapt_open` → `ValidUnlisted` test; the archive-equivalence mechanism decision). The re-homing is licensed: same clause structure as the amendment's own acceptance-debt routing, explicit, graded, and register-carried. |
+| **P3-2** (R-2) | **CLOSED** | C-2 recorded P3, both axes concurring, owner = the A1 activation review's input register, alongside C-1. |
+| **P3-3** (F-7 provenance) | **CLOSED** | RULING re-dated **2026-08-24** in place with the correction bracketed and this axis's 352.48 s corroboration cited; "the A1 brief" corrected at all three sites to its true source (lane owner's session notes, out-of-band — "no A1 input should cite it"); §13.4's sign-no-ruling bullet SUPERSEDED-annotated; §8 item 4 re-counted (29 items; the post-`5f090eb` commit list stated); the tuple row carries the corrected date. |
+| **P3-4** (ledger) | **CLOSED, one residue + one OPEN row properly owned** | (i) W4/W5 line counts corrected in place, pinned to `78badbc`, matching my `wc`/diff measurements; residue: `GwzM5-8R4bG-EvidenceInventory.md:743` still reads "139 lines" — checklist-class, one line, next docs pass. (ii) The charging convention is filed **OPEN on the operator's ChangeBudget row with both reproducible figures (2,028 uniform / 582 review-artifact), the recorded 1,177 marked superseded, and pass-1's "spent 0" corrected** — I judge this filing ACCEPTED: the axis required the rule be named, not chosen; the rule's owner is the operator; both figures reproduce from diffs I verified; and a ledger-convention question is not a P0-P2 class finding, so it does not hold the gate — but the operator must close it at ratification, knowing the uniform reading is over ceiling. |
+| **P3-5** (driver scope) | **CLOSED** | Four-partition fault battery at `1bd885f`, executed green through the driver here (`fault:3` 400, `fault:4` 914); scope reasoning recorded in the driver's own docstring with dual attribution (C-5 + P3-5). |
+| **P3-6** (bookkeeping) | **CLOSED with one named close-condition** | §7.2 anchors swept; run-numbering header note landed in the classification doc ("ledger run 22 = GH run_number 32"); the tuple's perf row carries the `78badbc` corroboration. On the row-bump question the coordinator posed: **no interim bump is owed** — the register rows cite the trees their measurements were taken at, which stays true at `1bd885f` (scripts-only delta, verified); the drift class is subsumed **iff the gate-close checkpoint record restates the final tuple literally (gwz-core `1bd885f` + the three member pins) per the checkpoint's own ReviewCode-3 P3-5 convention**. If the close record does that, no register edit is needed; if it does not, the J-6(i) class recurs a third time. |
+
+Also verified absorbed, from the Correctness axis's round-1 (read only as
+reconciled into the record, not from their report): **C-6**'s
+forbid-islands correction (the crate root's
+`#![allow(clippy::disallowed_methods, …)]` at `gwz-core/src/lib.rs:4-7` vs
+the 8 checker-verified forbid islands — the evidence §3.3/2.6a clause now
+states the true mechanism), and **C-7.x**'s record sweeps where they
+overlapped mine.
+
+## Gate-closing statement (this axis)
+
+The two conditions this axis can certify are met: (1) no P0/P1/P2 of this
+axis remains open **against the R4b-G object** — C-1's P2 is open
+BLOCKING-FOR-A1 on the A1 activation review's input register, where the
+accepted amendment routes that debt class by name, stated PARTIAL inside
+the acceptance record itself; (2) the evidence record as amended is, on
+every claim this axis tested across both rounds, reproducible — and where
+it was not, it now says so itself, in place, dated. Named at close, none
+blocking this verdict: the `1bd885f` push-lane runs were `in_progress` at
+re-verdict time (scripts-only delta; the identical suite is green at
+`78badbc` and everything changed was re-executed green locally — the close
+record should note the lane's completion); the close record restates the
+final tuple literally; the operator closes the OPEN ledger-convention row
+at ratification; the inventory's `:743` one-line count residue rides the
+next docs pass. **Final: GO.** With the Correctness axis's round-2
+concurrence (by existence and its own text — its round-1 GO-conditional
+named exactly the §12.8 statement and the C-1/C-2 register binding now in
+the record), the two independent full-tree R4b reviews stand at no open
+P0/P1/P2 and R4b-G closes; per the acceptance object, that unblocks the
+M5b-IMPL settled review (owed pre-A1, tier as frozen) and the
+operator-escape implementation package(s), and puts the A1 activation
+review — with its register now carrying C-1 (P2, blocking), C-2, the D3/D4
+named residual, the acceptance debt, and the signed perf-pricing row —
+last in line before activation.

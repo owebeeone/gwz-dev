@@ -504,3 +504,204 @@ was not read. This file is the only repository write of this review.
 PARTIAL byte-equivalence verdict and binding C-1 [P2] / C-2 [P3] to the
 A1-activation input register (where L1-19 makes C-1 blocking); J-1
 ratified; 1 P2, 6 P3, 0 P0/P1.**
+
+---
+
+---
+
+# ROUND 2 (final) — focused re-verdict on the merged remediation
+
+Date: 2026-08-24. Axis: **Correctness**, round 2 of the two-round cap —
+final. Object: **the four-repo tuple with gwz-core moved `78badbc` →
+`1bd885f`** ("Harden the R4b-G gate tooling per the dual's round-2
+prescriptions"); gwz-cli `3cca145`, gwz-py `929efb0`, taut `f008419`
+unmoved. Verified: `1bd885f` = `origin/main`, all four trees clean; the
+code delta is **exactly the three `scripts/checks/` files the coordinator
+named** (`check_m4_scenario_map.py` +26/−2, `run_r4bg_aggregate_gates.py`
++28/−8, `test_v1_lifecycle_privacy_probe.py` +60/−7), **zero `src/` lines,
+zero digest-pin lines** — so every Rust execution result of round 1
+carries to this pin byte-for-byte, and everything re-run below was run at
+`1bd885f`. The record remediation is gwz-dev `aeb4411` (+ `d378db9`/
+`48ee7fe`/`d5967c9` context). Same host, same discipline: no git write
+operation; the only repository write is this appended section.
+
+## R2.1 The GO-condition is satisfied on the record — verified
+
+- **(a) PARTIAL stated in the acceptance record.** `GwzM5-8R4bG-Evidence.md`
+  §12.8 carries the byte-equivalence battery verdict **block-quoted, in the
+  form round 1 required**: "PARTIAL, not met … 7 proven + 6 refusal-pinned
+  of 39 … 22 UNBOUND and 4 NO FIXTURE … A green byte-equivalence battery is
+  **not** claimed by this gate and must not be cited from it." Row 2.3b/O8
+  stays FAIL. Nothing about the measured numbers moved.
+- **(b) C-1/C-2 bound to the A1-activation register.** §12.7 (the two axes'
+  reconciled record) grades **C-1 P2, OPEN, BLOCKING-FOR-A1 per L1-19**,
+  routed under `GwzM5-8ThinA1Amendment.md:43-55` branch (a)/(b); the
+  settled tuple's §11.1 gained the dated 2026-08-24 block carrying C-1 and
+  C-2 in the register the A1 review consumes. The **four live-residue rows
+  are named**: my `F-BASELINE`/`F-MARKER`/`F-LOCK` (finalizing-state,
+  adaptation disposition unstated and untested) plus the Evidence axis's
+  `J-NO-PUBLICATION-UNBORN` (class membership ambiguous). The three cheap
+  closures are recorded for A1 to inherit.
+- **The new categorical-exclusion strengthening is genuine and correctly
+  used.** I verified `GwzM5-8I2CompatibilityContract.md:117-125` and
+  `:159-165` against the frozen text — the 22 unbound rows are indeed
+  contractually dispositioned by class ("Marker/lock-only prefixes …
+  preservation, rollback, and terminal rows are not A1 migration rules";
+  "Zero whitelist matches is not an error … Archived v0 uses only the
+  archive decoder/projection"). §12.7 uses the cite to establish that the
+  unbound space is *class-dispositioned and byte-pinned*, while **keeping
+  the P2 open** for the missing per-scenario record and the four rows where
+  the class cite is insufficient — that is exactly the honest shape; the
+  contract cite dissolves nothing it should not.
+
+Pre-A1 exposure remains zero on my own round-1 triple-`cfg(test)`
+verification, which §12.7 now cites; nothing in the `1bd885f` delta touches
+it (scripts only).
+
+## R2.2 Findings re-verified at `1bd885f`, one by one
+
+**C-3 — CLOSED; residual statement judged and ACCEPTED.** The three
+`ROOT_BINDING` probes assert **both** an error code (E0432/E0603) **and the
+rejected path** (`v1_lifecycle::<name>`), so an unrelated build failure
+cannot green them; the raw-writer root probe correctly runs from **inside**
+the lifecycle (a private root `use` is nameable by every descendant, and
+that seal claims to hold against the rest of the lifecycle too). Executed:
+the full 8-probe suite green on the real tree (150.7 s, via the driver's
+`privacy` battery). Both directions demonstrated by me on scratch copies:
+(i) all three seals widened with **unaliased** root re-exports → **all
+three root probes fire** (failures=3, each `AssertionError: 0 == 0` — the
+probe import compiles); (ii) the lane's `demo/widen` tree — all three
+seals widened with **`as`-renamed** re-exports and an outside consumer
+naming `V1RewritePlan` baked into `finalize_dispatch.rs`, i.e. the seal
+demonstrably broken in every compile — **8/8 probes stay green**. That
+quantifies the docstring's residual exactly as stated: name-based probes
+cannot predict an alias; the channel is held by
+`PROTECTED_SOURCE_TREE_DIGESTS`. **Judgment on the residual statement:
+honest and accepted** — with one P4 wording note, in the guard's favor:
+the docstring says the digest "pins `v1_lifecycle/mod.rs` where any such
+re-export must be written", but a widening re-export could also live in a
+new child module file; the hold survives because the pin is a **tree**
+digest over the whole `v1_lifecycle` subtree (round 1 demonstrated it
+firing on a `tests/fixtures.rs` append), so the digest holds the aliased
+channel wherever the `use` lands. The stated reason is narrower than the
+actual guard; no action owed.
+
+**C-4 — CLOSED.** Question 4 (malformed path-shaped tokens hard-fail) is
+in the checker and verified red with named lines on all three demo
+classes: the lane's `mangled.md` ("malformed test path") and
+`mangled_case.md` ("malformed registry case id" **plus** the now-unclaimed
+registry row — a double catch), and **my exact round-1 uppercase mangle,
+which passed silently at `78badbc`, now exits 1 at `1bd885f`**. All exit
+codes captured directly (my first capture in this round was polluted by a
+`$(basename)` command substitution resetting `$?` — re-run cleanly, all
+three exit 1). The narrowness of the rule (`::` ⇒ test path, `/` ⇒ case
+id) is right: the map's other vocabulary carries neither separator. The
+second half — the driver now pins the **full count line**
+(`ok (39 scenario rows, 38 named tests, 13 registry rows all claimed)`) —
+verified green on the real tree and verified **red** on the lane's
+`demo/ws` workspace copy, whose map has one well-formed row
+(`A-EXECUTING`) deleted: the checker alone passes it (`ok (38 scenario
+rows, 36 named tests, 13 registry rows all claimed)`, exit 0 — reproduced
+with `--test-list`), and the driver's `byte-equivalence:1` fails on the
+absent marker (exit 1). The fail-open crack I demonstrated in round 1 is
+closed from both sides.
+
+**C-5 — CLOSED.** The `fault` battery now carries all four disjoint,
+exhaustive lib partitions, with the composition and its origin stated in
+the driver's docstring. Executed by me: `fault:3` → ok, `400 passed`
+(38.3 s, the checked-artifact 165-key census); `fault:4` → ok, `914
+passed` (52.2 s, the remainder). With round 1's `fault:1` (254) and
+`fault:2` (1, release) on byte-identical Rust, the battery's four
+partitions reconcile to the full **1569 / 0 / 1** — the driver's fault
+battery now matches evidence row 2.1's claimed scope.
+
+**C-6 — CLOSED.** The evidence's §3.3 now states the true topology in
+place: **8 checker-verified forbid islands, not a crate-wide forbid**,
+with the crate-root `#![allow(clippy::disallowed_methods)]` named at
+`lib.rs:4-7` and the enforcement chain attributed to the checker's
+masked-scan verification plus the structural digests plus the privacy
+seals. Matches what I established in round 1.
+
+**C-7 — CLOSED, with one self-healing residue.** (1) The must-wait clause
+carries a dated, quote-preserving annotation in both places
+(`GwzM5-8M5bNoFfDesign.md:988` block: "clause text above is frozen and is
+not edited"; `CurrentProgramCheckpoint.md:1147-1157`: sentence "retained,
+not struck, as the text the J-1 adjudication is against", the owed
+M5b-IMPL settled review restated). (2) J-1's leg 4 was restated to its
+true source — the D3 dual's round-2 re-verdicts, not the settled dual — and
+I verified the corrected cites against the reports themselves
+(`GwzM5-8D3Impl-ReviewCode.md:447-448`: all five M5b files byte-identical,
+`store/tests.rs` exactly +2/−0; `GwzM5-8D3Impl-ReviewState.md:550-552`:
+M5b four-filter 37/0, five files `git status`-clean). **The fact my
+ratification rested on is intact; only its citation moved. J-1's
+ratification stands.** (3) F-7 swept: SIGNED/INSERTED state restated
+against every stale "unsigned"/"not inserted" sentence, signature date
+corrected to 2026-08-24, and the phantom "~343 s" re-attributed to the
+lane owner's session notes rather than "the A1 brief". (4) The checkpoint
+tuple row was re-pinned with the carries-by-construction note — to
+`78badbc`, which the round-2 code commit has already made **one commit
+stale again**; the same carries-by-construction statement applies verbatim
+(`1bd885f` is three script files over `78badbc`, zero `src/`). P4, the
+literal-restatement treadmill's inherent lag, self-healing at the next
+docs-only commit per the table's own note; recorded here so the next
+reader need not re-derive it.
+
+**C-1 / C-2 — OPEN BY DESIGN, where round 1 required them to be.** C-1
+[P2] and C-2 [P3] now live on the A1-activation input register (§12.7 +
+settled tuple §11.1), C-1 explicitly BLOCKING-FOR-A1 under L1-19. They are
+no longer unrecorded debts of this gate; they are the A1 review's named
+inputs. No new P0-P3 findings were opened by this round's verification;
+the two P4 notes above (digest-hold wording; tuple-row lag) are recorded,
+not graded.
+
+## R2.3 Round-2 provenance and disclosures
+
+Executed 2026-08-24 at `1bd885f`, same host and discipline as round 1. New
+runs this round: driver `fault:3`/`fault:4`, `privacy` (8 probes, 150.7 s),
+`byte-equivalence` (full-count marker green, g23 111/0); the three
+malformed-map demos plus my round-1 mangle, exit codes captured directly;
+the `demo/ws` dropped-row demo through both the bare checker (exit 0) and
+the driver (exit 1); the aliased-residual suite run (8/8 green) and my
+de-aliased variant (3/3 root probes fire). One environment incident,
+disclosed: the host's data volume hit 100% (437 of 460 GiB used
+machine-wide; my round-1 dev+release target contributed ~4 GiB) and one
+suite attempt against the widen copy failed with ENOSPC before any
+compile ran — I deleted my release-profile artifacts and incremental
+caches, re-ran on a fresh target directory, and the results above are from
+the clean re-run; my derived copies and targets were deleted afterwards.
+The lane's `demo/{widen,ws,m4}` copies were left in place. All four trees
+verified clean at the pins after all work. The peer report remains unread;
+peer-axis facts cited here (J-NO-PUBLICATION-UNBORN, the leg-4
+mis-attribution, Evidence [P3-x] ids) come from the coordinator's resume
+message and the lane's merged records, not from the report.
+
+## R2.4 FINAL VERDICT
+
+**GO — final, for the R4b-G gate at the tuple gwz-core `1bd885f` /
+gwz-cli `3cca145` / gwz-py `929efb0` / taut `f008419`. The round-1
+conditional converts: the condition was satisfied on the record and
+verified here, not waived.** Grades at close: **0 open P0/P1/P2 against
+the gate object** — C-3, C-4, C-5, C-6, C-7 CLOSED-VERIFIED at `1bd885f`;
+C-1 [P2] and C-2 [P3] stand OPEN on the A1-activation input register,
+C-1 BLOCKING-FOR-A1 per L1-19, which is their required placement, with
+the four live-residue rows and three cheap closures named for the A1
+review to consume. J-1 remains ratified on its corrected citation.
+
+One-paragraph justification: every mechanical claim this gate accepts has
+now been executed twice on byte-identical Rust — the full 1569/0/1 train,
+the seven batteries with the fault battery finally congruent to its own
+name, cross-repo 139/0 and 330/0 — and the three guards the gate newly
+relies on have each been driven to failure in the direction that matters
+and shown to fail closed (root-binding probes firing on the unaliased
+widening; malformed and dropped map rows red at checker or driver; the
+census partitions pinned by count), with the one genuinely unclosable
+channel (`as`-renamed re-exports) measured, declared in the guard's own
+text, and held by the tree digest. The gate's single real defect — the
+byte-equivalence battery's 13/39 — is not repaired and is not pretended
+repaired: it is recorded PARTIAL in the acceptance record in words that
+cannot be cited as green, graded P2, and bolted to the A1 activation
+review's register where L1-19 makes it blocking, with its live residue
+named row by row. A tree-acceptance gate whose evidence is twice-executed,
+whose guards are demonstrably fail-closed, and whose one open debt is
+measured, recorded, and routed to the review that can actually retire it,
+has done what a gate is for. **R4b-G is GO.**
