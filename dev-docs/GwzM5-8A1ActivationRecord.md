@@ -390,3 +390,43 @@ check_m4_scenario_map.py     M4 scenario map: ok (39 scenario rows, 41 named tes
 check_merge_compatibility…   validated 7 migration rules and 7 runtime bindings
 check_merge_docs.py          merge document consistency: ok (11 sources, 147 assertions)
 ```
+
+## 17. Dated addendum, 2026-08-25 — the landing-commit CI incident and corrective `8e40fa8`
+
+At the landing commit `1a31851`, three of the four CI runs were green
+(Windows matrix `32749489320`, Platform matrix `32749492896`,
+Retained readers `32749441866`); the **Checked-artifact boundary run
+`32749441874` FAILED on the newly wired [P2-2] step**, at its first
+command: `check_m4_scenario_map.py` reported "unreadable ([Errno 2]
+… /home/runner/work/gwz-core/dev-docs/GwzM5-8R4bG-Evidence.md)".
+
+Root cause: the m4 scenario-map checker resolves its map document
+ONE LEVEL ABOVE the checkout **by design**
+(`check_m4_scenario_map.py:59`, `MAP_DOC = ROOT.parent / "dev-docs"
+/ …` — its own docstring says so), i.e. against the development
+workspace root — **the same blocker class the workflow's own L2-05
+comment records**, unnoticed for this checker because every prior
+execution (builder, both round-2 axes, the landing train, the
+overlay) ran inside the workspace, where the parent directory
+exists. The wired batteries (`privacy`, `call-graph`) have no
+workspace-root reads (`run_r4bg_aggregate_gates.py:47-49` — ROOT is
+the repo, REGISTRY in-repo) and their contents had already run green
+in CI's earlier step at `1a31851`; the step's `bash -e` exited
+before reaching them.
+
+Corrective commit `8e40fa8` (overlay ritual, exact-ref pushed):
+un-wires `check_m4_scenario_map.py` from the CI step and records the
+blocker in the workflow beside L2-05's, same owner and cure (the
+R2-F multi-repo checkout, tuple §11.3 item 7); the batteries stay
+wired. **[P2-2]'s delivered substance, restated:** wired-in-CI =
+the privacy and call-graph batteries through the pinned-count
+runner; local/release-lane with the blocker recorded = L2-05
+([P3-R2-3]) AND the m4 scenario map (this addendum). That is the
+same accepted structure Safety ruled for L2-05, now applied to both
+workspace-root-reading checkers. The m4 map remains executed in
+every landing gate set and at release lane. Lesson minted for the
+wiring class: **a checker green locally proves nothing about a
+single-repo runner — wiring acceptance requires executing the wired
+command under the CI checkout topology (or an explicit topology
+audit of its path resolution), before the push.** Boundary run at
+the corrective: recorded in the checkpoint at completion.

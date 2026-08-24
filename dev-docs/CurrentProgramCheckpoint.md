@@ -920,6 +920,34 @@ fable token only where it makes a difference." Recorded consequences:
   boundary + retained-readers (`32749441874`/`32749441866`) running
   with the newly wired [P2-2] step; pre-attributed expected-green:
   the +11 package tests and C-1's 3 first-native executions.
+  **LANDING-COMMIT CI INCIDENT + CORRECTIVE `8e40fa8` —
+  2026-08-25.** At `1a31851`: Windows/Platform/Retained-readers
+  GREEN; the boundary run `32749441874` FAILED on the newly wired
+  [P2-2] step's FIRST command — `check_m4_scenario_map.py` resolves
+  its map doc ONE LEVEL ABOVE the checkout by design
+  (`:59 ROOT.parent/dev-docs/GwzM5-8R4bG-Evidence.md`), absent on a
+  single-repo runner: the SAME blocker class the workflow's own
+  L2-05 comment records, missed by the builder, both round-2 axes,
+  and the landing train because every execution was
+  inside-workspace. Corrective `8e40fa8` (overlay ritual, exact-ref
+  push, live reconciled): the m4 map un-wired with the blocker
+  recorded beside L2-05's — same owner, same R2-F
+  multi-repo-checkout cure (tuple §11.3 item 7); the privacy and
+  call-graph batteries STAY WIRED (verified no workspace-root
+  reads; their contents ran green in CI's earlier step at
+  `1a31851`). [P2-2] substance restated in activation record §17
+  (the addendum). LESSON MINTED (wiring class): local-green proves
+  nothing about single-repo-runner topology — wiring acceptance
+  requires executing the wired command under the CI checkout
+  topology, or an explicit path-resolution topology audit, BEFORE
+  the push. Boundary run at `8e40fa8`: **`32754064482` GREEN**
+  (completed:success in ~41 min — the wired privacy + call-graph
+  batteries executing for real in CI, pinned counts and all). With
+  it, EVERY CI surface at the activation is green: Windows
+  `32749489320`, Platform `32749492896`, Retained readers
+  `32749441866` at `1a31851`; boundary at the corrective
+  `8e40fa8`.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
