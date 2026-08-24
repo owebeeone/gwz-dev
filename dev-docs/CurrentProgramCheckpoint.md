@@ -741,6 +741,82 @@ fable token only where it makes a difference." Recorded consequences:
   with the §14 ninth-stop-clause post-A1 re-scope and the R2-F/R5
   native-evidence RELEASE gates explicitly unmoved.
 
+  **THE A1 ACTIVATION REVIEW, ROUND 1 (2026-08-24, peer-blind, on
+  the accepted tuple): Safety GO-CONDITIONAL / Completeness
+  GO-CONDITIONAL — zero tree defects on either axis.** Reports
+  `GwzM5-8A1Activation-Review{Safety,Completeness}.md`. The Safety
+  report's §2 is THE BINDING ACTIVATION SPEC: six compile gates,
+  four runtime gates (the NoFf-refusal fall COUPLED with the
+  message-validation exclusion fall), both CLI unhides, and the
+  must-not-flip list. Safety conditions: [P1-1] F-MARKER/F-LOCK v0
+  resume recovery pinned post-activation; [P2-1] a Finalizing
+  pre-check gating the adaptation preflight; [P2-2] CI wiring of
+  the unwired checkers; [P2-3] the landing record set incl. the
+  OPERATOR-SIGNED D3/D4 dirty-boolean residual disposition (sites
+  cursor.rs:305-306/:332-333/:498) — **the operator signature is
+  the halting item: branch (a) accept-as-residual or branch (b)
+  remediate first; without it activation is NO-GO.** Completeness:
+  the 364 routed phrases swept (17 delivered / 12 judged-here /
+  14 post-A1 / 2 leaked, both placed); its [P2-1] (T-5 artifact
+  durability) CLOSED pre-build — candidate pair archived to
+  `GwzM5-8T5CandidatePair.patch` + the R2-F carrier owner row in
+  the settled tuple §11.2; round-2 conditions: the [P2-1] legs and
+  the activation record carrying the report's §3 enumeration; P3
+  folds owed to the landing record set (P3-1 Q3 citing line, P3-2
+  abandonment-witness placement, P3-3 owners at register close,
+  P3-6 register consumption statement, F5 §9 dispositions).
+
+  **THE A1 ACTIVATION PACKAGE IS DELIVERED — 2026-08-24, in-tree
+  (uncommitted) over the accepted tuple; report filed verbatim as
+  `GwzM5-8A1ActivationPackage-Report.md`; ROUND 2 DISPATCHED to
+  both axes on the tree + filed report.** 88 files gwz-core
+  (+1852/−609; new: `merge/model/version.rs`,
+  `merge/v1_lifecycle/start.rs`, `tests/g23/a1_activation.rs`),
+  3 gwz-cli, 2 gwz-py. Lands: §2.1 all six compile gates FELL (G6
+  REPLACED not un-gated — `_for_r3_tests` re-exports renamed to
+  production decode names, fault injectors keep cfg; the gate was
+  wider than the six coordinates — 97 further cfg(test) markers +
+  28 cfg_attr(Serialize) fell; the fall measured behaviour-neutral
+  at 1572/0); §2.2 R1+R2 in one edit, R3 =
+  `classify_merge_record_header` with PRODUCTION{v0,v1} (T-2
+  inverted at header dispatch + archive decoder), R4 PARTIAL — THE
+  ROUND-2 DECISION: `select_record_version = max(floor, semantic)`
+  is production and NoFf→V1 writes v1 end-to-end today, but
+  ACTIVE_WRITER_FLOOR stays V0 — raising it was MEASURED to break
+  every ordinary start (no production v1 owner for root
+  participants / dry-run prediction / drift-conflict surfaces /
+  the v0 event stream); one-line change when that owner lands, the
+  max proven by test. §2.3 both CLI surfaces (docs tripwire
+  inverted, CLI.md regenerated); §2.4 the production callers
+  (V1Router with sealed MergeAuthorityBackend; classify_open_record
+  envelope probe; NEW `create_open` + `handle_start_durable_v1`;
+  dead-code warnings 921→63 when dispatch landed). Conditions
+  [P1-1] / [P2-1 via option (i), archive shapes riding as named
+  residual] / [P2-2 — L2-05 unwired with the reason recorded] /
+  [P3-1: T-1/T-2 inverted, T-3 re-pinned 16→19, T-4 unchanged] MET
+  per report; must-not-flip verified 9/9, F-3 still 0 hits. Gates
+  at delivery: core 1582/0/1 (census 1583, +10), cli 139/0, py
+  330, L2-04 86/0 tuple_count 24, scenario map ok, docs 147
+  assertions ok. EXPECTED-RED, landing-train duty (report §6): 5
+  boundary digests (merge/mod.rs root manifest; artifacts.rs +
+  plan.rs flat; observe.rs + v1_lifecycle/mod.rs tree), 3 R4b-G
+  count markers (fault 254→255 and 917→926; byte-equivalence
+  114→119), and 11/69 checker probe-harness tests (G1's
+  blanket-allow expiry broke the probe compile; LANE-OWNER RULING
+  on record: apply the builder's minimal fix — emit
+  `#[allow(dead_code)]` with the injected probe — at landing;
+  the guarded property itself is intact, F-3 scan 0 hits). Named
+  residuals (report §7): the R4 ordinary-start row; ONE BEHAVIOUR
+  PIN MOVED deliberately (the g23 finalization nested-fault test's
+  final window now asserts the migration; v0-fault-injector
+  coverage on the authority path reduced for the seven whitelisted
+  shapes — flagged to round 2); positive executed evidence that
+  migrated Boundary/Staging prefixes keep the v0-equivalent next
+  action (contract §4); the gc_archived family's
+  no-production-caller allowance. Insurance:
+  `scratchpad/insurance-a1/` M-A…M-I-delivery. **THE LANDING
+  HALTS ON THE OPERATOR SIGNATURE.**
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
