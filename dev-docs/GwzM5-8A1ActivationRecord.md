@@ -1,9 +1,10 @@
 # GwzM5-8 A1 Activation Record
 
 Date: 2026-08-25 (drafted post round-2 GO/GO; finalized at the landing
-commit). Author: the implementation lane (lane owner). Status at
-drafting: **AWAITING THE OPERATOR SIGNATURE (§1) — the landing commit
-halts on it.**
+commit). Author: the implementation lane (lane owner). Status:
+**OPERATOR-SIGNED, branch (a) (§1, 2026-08-25) — the landing halt is
+lifted; the landing commit proceeds on the landing train's green
+report.**
 
 This is the activation record the A1 review's verdicts are conditioned
 on. It consumes the A1 input register **directly** from
@@ -62,14 +63,21 @@ pricing consumed (318.71 s citable, signed 2026-08-24; no optimization
 owed by A1); and the R4 partial-engagement scope (§2/L2 — owned by
 M5c).
 
-**THE OPERATOR SIGNATURE:**
+**THE OPERATOR SIGNATURE — SIGNED, BRANCH (a).**
 
-> ⟨SLOT: the operator's one-line reply, verbatim, with date. Branch
-> (a) — "the D3/D4 dirty-boolean residual over the site set above is
-> ACCEPTED AS A NAMED RESIDUAL; remediation, if any, is post-A1 work
-> scheduled by the operator" — or branch (b), remediate first, in
-> which case this record does not land until the remediation train
-> and its re-verdicts complete.⟩
+> Operator reply, verbatim: **"sign branch (a)"** — Gianni,
+> 2026-08-25, in-session.
+
+The disposition as signed: **the D3/D4 dirty-boolean residual over
+the site set above is ACCEPTED AS A NAMED RESIDUAL; remediation, if
+any, is post-A1 work scheduled by the operator.** The formal
+disposition text is the lane owner's drafting bound to the operator's
+verbatim reply above, per the standing arrangement recorded before
+the review ("a one-line reply is all the record needs; the lane owner
+drafts the formal disposition text either way"). This satisfies the
+Safety axis round-1 [P2-3] operator-signature hinge and discharges
+L1's halt: **THE LANDING HALT IS LIFTED** — the landing proceeds on
+the landing train's green report.
 
 ## 2. L2 — the activation's true scope (and Safety condition (a))
 

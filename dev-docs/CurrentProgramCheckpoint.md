@@ -868,6 +868,19 @@ fable token only where it makes a difference." Recorded consequences:
   in-tree: cursor.rs:283-308/:310-335 fallthroughs,
   phase.rs:187,198, observe/finalization.rs:217, cursor.rs:498).
 
+  **THE OPERATOR SIGNATURE IS IN — 2026-08-25, BRANCH (a), verbatim
+  "sign branch (a)".** The D3/D4 dirty-boolean residual over the L1
+  site set is ACCEPTED AS A NAMED RESIDUAL; remediation, if any, is
+  post-A1 work scheduled by the operator. Recorded in
+  `GwzM5-8A1ActivationRecord.md` §1 with the formal disposition
+  text; the Safety [P2-3] signature hinge is satisfied. **THE
+  LANDING HALT IS LIFTED.** The landing now waits only on the
+  landing train's green report, then: overlay ritual (pins
+  recomputed from pristine extraction, checker+gates green in
+  overlay), the coordinated `gwz commit` (records + contract
+  annotation + lock re-pin + package), the exact-ref gwz-core push,
+  and the three-arm matrix dispatch at the landing commit (L11).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
