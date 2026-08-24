@@ -817,6 +817,57 @@ fable token only where it makes a difference." Recorded consequences:
   `scratchpad/insurance-a1/` M-A…M-I-delivery. **THE LANDING
   HALTS ON THE OPERATOR SIGNATURE.**
 
+  **A1 ROUND 2 IS GO/GO — 2026-08-25.** SAFETY GO (0 P0 · 0 P1 ·
+  1 P2 · 5 P3; report §"Round 2" appended): the package accepted
+  against the enumeration with every quoted gate re-run by the
+  axis (census 1583 reproduced; py 330/0 against a native module
+  the axis REBUILT itself — the builder's py tail ruled
+  not-evidence, [P3-R2-4]); the wider compile-gate fall ruled
+  in-spec (the 28 Serialize cfg_attrs are logically G2); **R4's
+  V0 ordinary-start floor RULED an ACCEPTED NAMED RESIDUAL** on
+  four grounds, with three binding record conditions — (a) the
+  ordinary-start v1 owner becomes a first-class named milestone
+  and the floor raise lands WITH it as one reviewed change, (b) a
+  dated annotation on the frozen contract §2 creation-matrix A1
+  row, (c) the release-time retained-reader manifest describes
+  SHIPPED behaviour (ordinary=v0, no-ff=v1); the moved pin
+  ACCEPTED with the compensating obligation named — the
+  eligible-row upgrade-failure fallback, carrier R2-E
+  ([P3-R2-2]); **[P2-R2-1]: the probe-harness cure is FOUR
+  classes** (the recorded allow-emit fix cures only
+  probe-compile; the sentinel reinstated UN-GATED; the
+  seam-surgery string updated; the digest re-pins) — applying
+  only class (a) would land a RED push on the newly wired CI
+  step. COMPLETENESS GO (0 P0/P1/P2 · 2 P3; §"Round 2"
+  appended): its round-2 conditions closed ([P2-1] byte-identical
+  archive at `47bbd7a` + the §11.2 OWNED-CARRIER row; the §3
+  enumeration verified in-tree with executions g23 119/0, no_ff
+  32/0, version 15/0, map 39/41/13); **THE LANDING SPECIFICATION
+  L1-L14 filed for verbatim folding** (L7/L8 added to the fold
+  list by the axis); [P3-7] a fresh `unreachable!` v1 arm at
+  decode.rs:123 (typed-twin conversion, L13); [P3-8] three named
+  blockers lacked named carriers. LANE-OWNER RULINGS for the
+  record set: the ordinary-start v1 owner is MINTED AS **M5c** (a
+  first-class named milestone on the register; the `version.rs:39`
+  floor raise rides it as ONE reviewed change per contract §9
+  discipline); the archive/GC family (gc_archived route,
+  18-UNBOUND record debt, the archive-equivalence mechanism
+  decision, the two archive shapes riding [P2-1] option (i)) is
+  owned by **R2-E's archive/GC consumer sub-package**; the
+  moved-pin coverage restoration IS [P3-R2-2] at R2-E (the two
+  axes converged on the same arm); L10 item 2: `cargo fmt
+  --check` release-lane-only ADOPTED-AS-IS; L5: the
+  abandonment-witness probe LANDS with the train (the
+  commit-the-probe arm); L13: the typed-twin conversion LANDS.
+  **LANDING TRAIN DISPATCHED IN-TREE** (the package builder
+  resumed): the four-class cure, L13, L5's probe, the [P3-R2-5]
+  doc nit — then count markers and digest re-pins computed from
+  the FINAL tree, then the full gate set incl. the boundary
+  harness 69/69 and a fresh-maturin py run. THE COMMIT STILL
+  HALTS ON THE OPERATOR SIGNATURE (L1; the site set verified
+  in-tree: cursor.rs:283-308/:310-335 fallthroughs,
+  phase.rs:187,198, observe/finalization.rs:217, cursor.rs:498).
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
