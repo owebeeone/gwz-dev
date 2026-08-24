@@ -1,5 +1,12 @@
 # Windows matrix classification — GREEN (runs 11, 13, 18–22); macOS GREEN at run 13; ARM GREEN at the run-18 sibling
 
+*(Run numbers in this ledger are the ledger's own sequence; GitHub
+`run_number` diverges — e.g. ledger run 22 = GH `run_number` 32 for the
+Windows matrix, and 13 for its Platform sibling. The workflow **run ids**
+quoted per entry, e.g. `32672188425`, are the unambiguous handles. Note added
+2026-08-24 per the R4b-G Evidence axis [P3-6](v), so a future auditor does not
+conclude the id is wrong.)*
+
 **Run 22 — 32672188425 on `b91bdeb` (THE R2-D SETTLED OBJECT):
 1530 passed / 0 failed / 1 ignored.** The settled object's own full
 matrix record, closing the R4b-G evidence inventory's F-6 and

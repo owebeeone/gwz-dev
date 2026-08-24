@@ -97,6 +97,26 @@ leans on R4b-G's call-graph gate (§6 item 4)."
 must rule on it.** See §9 judgment call J-1: M5b-IMPL is merged, in
 `b91bdeb`'s ancestry, and pushed.
 
+**[J-1 ANNOTATION 2 of 2 — leg 4 restated and the call ruled, 2026-08-24.]**
+The R4b-G dual ruled on it at round 1: **J-1 RATIFIED by both axes**
+(Correctness §5 J-1 "the adjudication's ACCEPTED-WITH-RECORD stands";
+Evidence §6 "not disqualifying"), **the before-A1 remedy not triggered**.
+Leg 4 of the adjudication is **restated**, not struck: it read "the settled
+dual's Code axis re-verified the M5b surfaces byte-identical", which the
+Evidence axis's [P2-1] showed no settled-dual report contains (`M5b`,
+`no_ff`, `3e60529`, `8c1624a`: zero hits in
+`GwzM5-8R2DSettled-Review{Code,State}.md`). The verification is real but
+belongs to **the D3 dual's round-2 re-verdicts**, on both axes —
+`GwzM5-8D3Impl-ReviewCode.md:447-448` (`store/tests.rs` at exactly +2/−0,
+all five M5b files byte-identical vs `0b059e8`) and
+`GwzM5-8D3Impl-ReviewState.md:550-552` (M5b 37/0, all five files
+`git status`-clean). **The fact was true; its citation was not.** What this
+sub-section names as unblocked is therefore unchanged in substance — the
+merge already happened and is accepted with record — but **the M5b-IMPL
+settled review this dependency anticipates is still owed, pre-A1**, and is
+carried as an owed-pre-A1 row in `GwzM5-8R2DSettledTuple.md` §11.1. Full
+restatement and ruling at §9.3 J-1's two annotations.
+
 **(b) The operator-escape implementation package(s).**
 `GwzM5-8OperatorEscapeDesign.md:751-753`: "implementation lands as its own
 reviewed package after R4b-G, before or at A1". Restated at
@@ -211,6 +231,11 @@ successor_boundary_recovers_without_repeating_mutation` — **318.71 s,
 release, at `b91bdeb`, green.** See §8 item 3: the "~343 s release" figure
 the A1 brief expects does not exist in the repository; this measurement, and
 the 576 s release figure at `GwzM5-8D3Impl-ReviewState.md:553`, are what does.
+**[Attribution corrected 2026-08-24 (Evidence axis [P3-3]): "the A1 brief" is
+wrong — the "~343 s" figure came from the lane owner's session notes, an
+out-of-band recollection, not from any brief and not from any corpus document.
+See §8 item 3 addendum for the full restatement. The measurement claims in this
+sentence are unaffected.]**
 
 ### 3.2 Integration binaries and protocol currentness
 
@@ -259,7 +284,29 @@ inside the checked-artifact writer perimeter — it has no `clippy.toml` of its
 own, and neither does the workspace root. So the failure is a **scoping
 artifact of the command as written**, not a gwz-core defect and not a gwz-cli
 regression: without the override, `--workspace` is clean, and gwz-core keeps
-its own `clippy.toml` plus `#![forbid(clippy::disallowed_methods)]`. The CI
+its own `clippy.toml` plus `#![forbid(clippy::disallowed_methods)]`
+**[CORRECTION 2026-08-24 — R4b-G Correctness axis C-6: that clause reads
+crate-wide and is not true crate-wide. gwz-core's **crate root carries
+`#![allow(clippy::disallowed_methods, …)]`** (`gwz-core/src/lib.rs:4-7`, with
+the reason "raw writers are isolated from the checked merge boundary by
+module-level structural and compiler probes"). The seal is **8 checker-verified
+forbid islands, not a crate-wide forbid**: the files of
+`PROTECTED_COMPILER_MODULES` (`scripts/checks/check_checked_artifact_boundaries.py:26-35`),
+each verified to contain `#![forbid(clippy::disallowed_methods)]` **through the
+masked scan** — `mask_non_code()` is applied before the membership test, so a
+commented-out or string-literal forbid cannot satisfy it
+(`:902` defines the token, `:994-999` runs the per-module check). Of the 8,
+only `workspace_ops/merge/v1_lifecycle/authority/observe.rs` is inside
+`v1_lifecycle/`. The true topology is therefore: **crate-level allow + 8
+masked-scan-verified forbid islands + the structural digests + the privacy
+seals** — which is coherent by design (the raw v1 writer `store/rewrite.rs` is
+*supposed* to write and is sealed by privacy, not by lint), but it is not the
+standing crate-wide guarantee this sentence implies. This matters to J-3's
+optics: v1 test code freely calls `std::fs::write` (e.g. the fault matrix's
+`seed_recovery`,
+`src/workspace_ops/merge/v1_lifecycle/tests/reverse_preservation/root_fault_matrix.rs:174`)
+while gwz-cli was flagged for the identical call under the imposed conf. No code
+change is owed; the wording was the defect.]**. The CI
 form (`checked-artifact-boundary.yml:30-35`, run inside the gwz-core
 checkout) is gwz-core-scoped and green. **The runbook step needs correcting
 to `-p gwz-core` or the perimeter needs extending — a real, if small, R4b-G
@@ -384,8 +431,8 @@ claims (`GwzM5-8R2DSettledTuple.md:683-686`).
 | W1 | privacy compile probe (`PreparedV1Rewrite` / proof tokens / raw v1 writer) | **FAIL → LANDED 2026-08-24** | Was absent; zero `compile_fail`/`trybuild` anywhere, and none of the 22 sibling compiler probes named `PreparedV1Rewrite`, a proof token, or `store/rewrite.rs`. **`scripts/checks/test_v1_lifecycle_privacy_probe.py`, 138 lines, 5/5 green.** J-4's reading is adopted: R3 is post-A1, so the "sequence after R3" hedge was spent, not deferred. |
 | W2 | v1→v0 call-graph check | **FAIL → LANDED 2026-08-24** | Was absent. **Masked-token scan in `check_checked_artifact_boundaries.py`**, seam derived from `merge/mod.rs`'s re-exports, floor-checked so a restructured re-export fails the derivation rather than silently scanning nothing. Pins the stronger 0-hits-including-tests property. Explicitly NOT subsumed by the `PROTECTED_SOURCE_TREE_DIGESTS` pin on `v1_lifecycle/mod.rs`: that digest says "this tree changed", states no property, and is refreshed whenever the tree legitimately moves. |
 | W3 | rollback-prefix privacy/call-graph gate (`RollbackPrefixIssuer`) | **DEFERRED-BY-AMENDMENT** | `grep -rn RollbackPrefixIssuer src/` → **0**. Owned by RemPlan-4 R3 step 6 (`:1087-1101`, exit criterion 12). R3 is superseded off the A1 path by `GwzM5-8ThinA1Amendment.md:73-78`/`:79-82`/`:113-119`. The current seam remains `pub(super) fn issue_verified_rollback_prefix` (`…/observe/reverse/rollback_prefix.rs:240`, cite exact) — visibility-private, unprobed. **R4b-G cannot verify a gate its own amendment moved past A1; it can only record that the seam is private today.** |
-| W4 | "every M4 scenario" enumeration | **FAIL → LANDED 2026-08-24** | Was absent. **§12 of this document + `scripts/checks/check_m4_scenario_map.py` (133 lines).** The work item is discharged; its *result* is a new open finding (13/39 bound), which is the honest outcome of making an unmeasurable clause measurable. |
-| W5 | aggregate gate wiring | **FAIL (half-discharged) → LANDED 2026-08-24** | As executed 2026-08-23 there was no driver and no gate manifest. The **recorded-checklist** half was discharged by §3-§6 of this document. The **mechanised-driver** half is now `scripts/checks/run_r4bg_aggregate_gates.py` (139 lines), driving the seven gates of `GwzM5-8Refactor.md:2243-2244` with a required output marker per command; the seventh reports REVIEW and is never counted green. §13.2-§13.3. |
+| W4 | "every M4 scenario" enumeration | **FAIL → LANDED 2026-08-24** | Was absent. **§12 of this document + `scripts/checks/check_m4_scenario_map.py` (144 lines *[corrected in place 2026-08-24 from "133 lines" per Evidence axis [P3-4](i); `wc -l` over `git show 78badbc:scripts/checks/check_m4_scenario_map.py`, and the `b91bdeb..78badbc` diff, both give 144 at the review object, matching §13.1's table. Counts are pinned to `78badbc`; the sibling tooling lane's post-review work moves the working tree]*).** The work item is discharged; its *result* is a new open finding (13/39 bound), which is the honest outcome of making an unmeasurable clause measurable. |
+| W5 | aggregate gate wiring | **FAIL (half-discharged) → LANDED 2026-08-24** | As executed 2026-08-23 there was no driver and no gate manifest. The **recorded-checklist** half was discharged by §3-§6 of this document. The **mechanised-driver** half is now `scripts/checks/run_r4bg_aggregate_gates.py` (150 lines *[corrected in place 2026-08-24 from "139 lines" per Evidence axis [P3-4](i); `wc -l` over `git show 78badbc:scripts/checks/run_r4bg_aggregate_gates.py`, and the `b91bdeb..78badbc` diff, both give 150 at the review object, matching §13.1's table. Counts are pinned to `78badbc`; the sibling tooling lane's post-review work moves the working tree]*), driving the seven gates of `GwzM5-8Refactor.md:2243-2244` with a required output marker per command; the seventh reports REVIEW and is never counted green. §13.2-§13.3. |
 
 **Table 3 tally (5 rows): FAIL 4 · DEFERRED-BY-AMENDMENT 1.**
 **Re-tallied 2026-08-24: LANDED 4 · DEFERRED-BY-AMENDMENT 1 (W3, unchanged —
@@ -599,6 +646,14 @@ Branch (c) taken: the record did not exist, so it is written here. **This is a
 draft for the lane owner.** The RULING line is deliberately unsigned; drafting
 a record is not adjudicating it.
 
+**[Status correction 2026-08-24 (R4b-G Evidence axis [P3-3]; Correctness axis
+C-7.3) — this paragraph is superseded and is retained only as the drafting
+frame. The ruling below IS SIGNED (gwz-dev `d378db9`, 2026-08-24 10:24:43) and
+its register row IS INSERTED at `GwzM5-8R2DSettledTuple.md` §11.1. Both axes
+found the document contradicting itself on this point across §8, §9.2, §13.1
+and §13.4; the signed state is the real one, and it is now said once, here,
+with each surviving "unsigned"/"not inserted" sentence annotated in place.]**
+
 **Object.** `workspace_ops::merge::v1_lifecycle::reverse::preservation::tests::
 root_fault_matrix::every_root_physical_and_successor_boundary_recovers_without_
 repeating_mutation`, the single most expensive test in the tree.
@@ -612,9 +667,16 @@ repeating_mutation`, the single most expensive test in the tree.
 
 Neither figure is wrong and the gap is not a regression: they are different
 trees on different hosts, and the D3 figure was never re-measured after the
-round-2 delta landed. **The "~343 s release" figure the A1 brief expects
-exists nowhere in this workspace or its history** (§8 item 3 body). Any A1
-input citing "~343 s" is citing nothing.
+round-2 delta landed. **The "~343 s release" figure exists nowhere in this
+workspace or its history** (§8 item 3 body), and **its provenance is now
+stated rather than guessed: it came from the lane owner's own session notes.
+It is not from the A1 brief, not from any other brief, and not from any
+document in the corpus — it is an out-of-band recollection, and no A1 input
+should cite it.** **[Attribution corrected 2026-08-24 per the R4b-G Evidence
+axis [P3-3], which found "the A1 brief" to be the one unsourced authority
+reference in §8 and required the brief be named or the figure marked
+out-of-band. It is marked out-of-band: lane-owner session notes. The exhaustive
+negative search recorded in the §8 item 3 body is unchanged and stands.]**
 
 **Pricing frame: PRICED, NOT OPTIMIZED.** What is being bought is the D3
 amendment's §8 acceptance suite — `GwzM5-8DurableCursorAmendment.md:568-642`,
@@ -638,7 +700,12 @@ blocking per L1-19"; binding restated at `:242-244`. L1-19
 (`AgentProcessRules.md:392-401`) is what makes branch (b) exact: "A gate is
 `NO-GO` while any P0, P1, or P2 is open."
 
-**RULING — SIGNED by the lane owner, 2026-08-23.** The record's citable price is **318.71 s (release, `b91bdeb`)** — the settled tree's own measurement, corroborated by the driver's 327.6 s wall (`fault:2`) — with 576.03 s retained as the historical figure at the D3 review tree. "Priced, not optimized" is **ACCEPTED** as the disposition the A1 activation review consumes under branch (a): the cost is the crash matrix's evidence weight, and no optimization is owed pre-A1. The "~343 s" figure the A1 brief expected never existed in the corpus and is corrected by this ruling. Original unsigned frame follows: Which figure is the record's
+**RULING — SIGNED by the lane owner, 2026-08-24** *[signature date corrected in
+place 2026-08-24 per the R4b-G Evidence axis [P3-3]: it read "2026-08-23", a
+date on which neither the ruling nor its lifted tuple row existed — both landed
+in gwz-dev `d378db9` (2026-08-24 10:24:43), and the ruling cites the driver's
+327.6 s corroboration, itself measured 2026-08-24. Substance unchanged; the axis
+independently corroborated it at 352.48 s release on `78badbc`.]*. The record's citable price is **318.71 s (release, `b91bdeb`)** — the settled tree's own measurement, corroborated by the driver's 327.6 s wall (`fault:2`) — with 576.03 s retained as the historical figure at the D3 review tree. "Priced, not optimized" is **ACCEPTED** as the disposition the A1 activation review consumes under branch (a): the cost is the crash matrix's evidence weight, and no optimization is owed pre-A1. The "~343 s" figure the A1 brief expected never existed in the corpus and is corrected by this ruling *[attribution corrected 2026-08-24 per Evidence axis [P3-3]: not "the A1 brief" — **the figure came from the lane owner's session notes**, an out-of-band recollection, not from any brief and not from any corpus document. The ruling's substance is unchanged; only the source of the figure it corrects is restated.]*. Original unsigned frame follows: Which figure is the record's
 citable price (576.03 s at the D3 tree, or 318.71 s at the settled tree), and
 whether "priced, not optimized" is ACCEPTED as the disposition the A1
 activation review consumes under branch (a). This document supplies the
@@ -650,6 +717,15 @@ this matches). The row is drafted, not inserted — the tuple document is the
 lane owner's:
 
 > | `root_fault_matrix` perf pricing — 576.03 s (D3 review tree) vs 318.71 s (release, `b91bdeb`) | PRICED-NOT-OPTIMIZED; the cost is `GwzM5-8DurableCursorAmendment.md` §8's crash matrix, accepted as evidence weight. A1-activation-review input per `GwzM5-8ThinA1Amendment.md:43-55` / L1-19. Record drafted at `GwzM5-8R4bG-Evidence.md` §8 item 3 addendum; RULING unsigned. The "~343 s" figure the A1 brief expects does not exist anywhere in the corpus. |
+
+**[Lift executed 2026-08-24 — the block quote above is the historical draft and
+is left unedited. The row IS INSERTED in `GwzM5-8R2DSettledTuple.md` §11.1
+(landed `d378db9`), and the inserted row is corrected this pass on two points
+the R4b-G dual found: its date reads **2026-08-24**, not 2026-08-23 (Evidence
+[P3-3] — the block it sits in is headed "Added at the settled-dual round-2
+remediation (2026-08-23)", which the inserted row postdates), and the "~343 s"
+clause names the figure's real provenance, **the lane owner's session notes**,
+not "the A1 brief" and no corpus document.]**
 
 ### Item 4 — the settled tuple's open-item register
 
@@ -663,6 +739,22 @@ verbatim "**Added at the settled-dual round-2 remediation (2026-08-23):**");
 remediation: the frozen map is made true"); no later commit touches the file.
 This matches `CurrentProgramCheckpoint.md:617-621` ("the register
 completed").
+
+**[Re-counted 2026-08-24 — Evidence axis [P3-3] found the three figures above
+stale the moment F-7's row was lifted, and the R4b-G round-2 remediation has
+since added three more rows. The paragraph above is left as the
+2026-08-24-morning reading; the current reading is:** `GwzM5-8R2DSettledTuple.md`
+§11 now runs `:634-793` (still to EOF) — §11.1 base table **6 rows**
+(`:640-645`); the settled-dual round-2 additions block **6 bullets**
+(`:649-693`, header verbatim "**Added at the settled-dual round-2 remediation
+(2026-08-23):**"); a **new** block, **3 bullets** (`:696-751`, header "**Added
+at the R4b-G dual's round-2 remediation (2026-08-24):**" — C-1, C-2, and the
+owed-pre-A1 M5b-IMPL settled review); §11.2 **6 rows** (`:756-761`); §11.3
+**8 numbered caveats** (`:765-793`). **29 items.** Commits that touch the file
+after `5f090eb`: **`d378db9`** (the F-7 perf-pricing row lifted in — which is
+why "5 bullets … 25 items … no later commit touches the file" all went stale
+at once) and this round-2 records commit. The §11.3(7) double-count caveat in
+the note below still applies to a naive tally.**]**
 
 The `runtime.*` adjudication — "RULED RESTATE with drafted text" — landed in
 the freeze document: `GwzM5-8R2DInterfaceFreeze.md:426-479`, §3.5, with the
@@ -706,7 +798,10 @@ S10≡2.7b).
 
 **Remediation pass, 2026-08-24 (§13).** F-2, F-3, F-4, F-5 closed with
 executed evidence; F-7 drafted with its RULING left unsigned for the lane
-owner; F-1's work item (W4) discharged, and in discharging it the row it
+owner **[superseded 2026-08-24 — the ruling was SIGNED and its register row
+INSERTED later the same day at gwz-dev `d378db9` (10:24:43); the signature date
+is corrected to 2026-08-24 in §8 item 3 per Evidence [P3-3] / Correctness
+C-7.3]**; F-1's work item (W4) discharged, and in discharging it the row it
 serves stays FAIL with a **measured** denominator — 13 of 39 M4 scenarios
 bound. Two residual findings are opened by that measurement, **R-1** and
 **R-2** (§12.6), and they are new inputs to this review, not closures.
@@ -725,10 +820,10 @@ equivalent is only half-evidenced** — see F-8.
 | **F-1** | Row 2.3b / O8 — "every M4 scenario" byte-equivalence clause is **not checkable**: no enumeration of the M4 scenario set mapped to equivalence evidence exists. | W4 | R4b-G. Doc-only, unblocked, cheap. An R4b obligation quoted verbatim from `GwzM5-8Refactor.md:2265` cannot be confirmed today. **[CLOSED 2026-08-24 — §12 enumerates all 39 M4 scenarios from `GwzM5-8R0Inventory.md` §4/§5.2 and maps each to its tests; `check_m4_scenario_map.py` keeps the map honest. The clause is now checkable, and it **is not met**: 13/39 bound, 22 UNBOUND, 4 NO FIXTURE. F-1 is discharged; residual findings **R-1 (P2 candidate)** and **R-2 (P3 candidate)** at §12.6 are what it exposed, and they are the review's to rule on — not papered.]** |
 | **F-2** | Row 2.5b / W1 — no privacy compile probe. Visibility gives the property; **nothing proves it fails closed** the way 22 sibling probes do for the checked-artifact boundary. Battery source `TransitionDesign:1478-1479` is unmet. | W1 | R4b-G. Fits the ≤1,500 test/tool line budget. **[CLOSED 2026-08-24 — `scripts/checks/test_v1_lifecycle_privacy_probe.py`, 5/5 green, and demonstrated to FAIL when the visibility is widened. §13.1.]** |
 | **F-3** | Row 2.6b / W2 — no mechanical assertion that v1 lifecycle modules contain no raw v0 persistence call. Battery source `TransitionDesign:1480-1481` is unmet. | W2 | R4b-G. Property is 0-hit clean today, so the pin is trivial to write and trivial to break silently without it. **[CLOSED 2026-08-24 — masked-token scan in `check_checked_artifact_boundaries.py`, seam derived from `merge/mod.rs`'s own re-exports, covering test code too; inherits the checker's per-commit CI wiring. Load-bearing for J-1. §13.1.]** |
-| **F-4** | W5 — no aggregate gate driver. The **record** half is discharged by this document; the **mechanised** half (≤150 lines, `ChangeBudget.md:515`) is unspent. | W5 | R4b-G. This is literally the only material the R4b-G row's budget is for. **[CLOSED 2026-08-24 — `scripts/checks/run_r4bg_aggregate_gates.py`, 139 lines, seven batteries, executed. §13.2-§13.3. Note the "≤150 lines" reading is wrong — see §7.5 step 8's correction.]** |
+| **F-4** | W5 — no aggregate gate driver. The **record** half is discharged by this document; the **mechanised** half (≤150 lines, `ChangeBudget.md:515`) is unspent. | W5 | R4b-G. This is literally the only material the R4b-G row's budget is for. **[CLOSED 2026-08-24 — `scripts/checks/run_r4bg_aggregate_gates.py`, 150 lines *[count corrected in place 2026-08-24 from "139": at the review object `78badbc` both `git show` and the `b91bdeb..78badbc` diff give 150; §13.1's table was the correct one all along — Evidence axis [P3-4](i)]*, seven batteries, executed. §13.2-§13.3. Note the "≤150 lines" reading is wrong — see §7.5 step 8's correction.]** |
 | **F-5** | Runbook step 5 — `CLIPPY_CONF_DIR=$PWD cargo clippy --workspace --all-targets --all-features -- -D warnings` **exits 101** with 7 `disallowed_methods` errors in gwz-cli: 2 production (`gwz-cli/src/pager.rs:127,131`, `io::Write::write_all`) and 5 test (`src/tests/g01/commands.rs:460`; `src/tests/m2c.rs:51,55,85,99`). | runbook command scope | R4b-G. **Not a gwz-core defect.** Either correct the runbook to `-p gwz-core` (matching CI) or make an explicit decision to extend the writer perimeter to gwz-cli. Do not silently drop the step. **[CLOSED 2026-08-24 — runbook step 5 is now two lines (`-p gwz-core` WITH the CONF_DIR; workspace-wide plain clippy as its own line), with the reason recorded in place: the perimeter is gwz-core's by design and the 7 gwz-cli hits are out-of-perimeter, verified not silently suppressed because the plain workspace line still compiles every one of those sites under `-D warnings`. The step was corrected, not dropped. J-3 is answered by choosing `-p gwz-core` (match CI); if the review prefers extending the perimeter to gwz-cli that is a scope decision it still owns.]** |
 | **F-6** | Runbook step 7 — **no Windows-matrix and no Platform-matrix run exists at the settled tuple.** Last is run 21 at `514f8e6`, three commits back (`d45458d`, `b91bdeb` uncovered). `linux-identity-probe` last ran at `f36d20d`. | dispatch not issued | R4b-G to decide: dispatch, or record the deferral with the risk named. The tuple already owes this as a round-2 ledger duty (`GwzM5-8R2DSettledTuple.md:663-665`) — scoped there to "the ten multi-component writer rows"; the CI record shows the gap is **the whole settled tree**, not ten rows. |
-| **F-7** | §8 item 3 — the **D3 perf pricing record does not exist.** No "~343 s release", no "priced not optimized", anywhere in the repo or its history. | record never written | The A1 activation review is expected to consume a figure that is not filed. This document supplies **318.71 s release at `b91bdeb`**; the nearest filed figure is **576 s release** (`GwzM5-8D3Impl-ReviewState.md:553`). **[DRAFTED 2026-08-24 — §8 item 3 addendum carries both figures (576.03 s / 318.71 s), the priced-not-optimized frame with the D3 amendment §8 crash matrix as the cost, and the L1-19 routing; plus a one-row register addition drafted for `GwzM5-8R2DSettledTuple.md` §11.1. The **RULING line is unsigned** and the tuple row is **not inserted** — both are the lane owner's. F-7 moves from "record never written" to "record drafted, ruling open".]** |
+| **F-7** | §8 item 3 — the **D3 perf pricing record does not exist.** No "~343 s release", no "priced not optimized", anywhere in the repo or its history. | record never written | The A1 activation review is expected to consume a figure that is not filed. This document supplies **318.71 s release at `b91bdeb`**; the nearest filed figure is **576 s release** (`GwzM5-8D3Impl-ReviewState.md:553`). **[DRAFTED 2026-08-24 — §8 item 3 addendum carries both figures (576.03 s / 318.71 s), the priced-not-optimized frame with the D3 amendment §8 crash matrix as the cost, and the L1-19 routing; plus a one-row register addition drafted for `GwzM5-8R2DSettledTuple.md` §11.1. The **RULING line is unsigned** and the tuple row is **not inserted** — both are the lane owner's. F-7 moves from "record never written" to "record drafted, ruling open".]** **[SUPERSEDED / CLOSED 2026-08-24 — per the R4b-G Evidence axis [P3-3] and Correctness axis C-7.3, this row's "unsigned"/"not inserted" reading was left standing after the state changed. The **RULING IS SIGNED** and the **tuple row IS INSERTED** (`GwzM5-8R2DSettledTuple.md` §11.1), both at gwz-dev `d378db9`, 2026-08-24 10:24:43; the signature date is corrected from 2026-08-23 to **2026-08-24** at §8 item 3. F-7 is **record written, ruling signed**. Substance corroborated independently by the Evidence axis at 352.48 s release on `78badbc` — inside the 319-353 band, decisively not 576. The "~343 s" figure it corrects is **the lane owner's session notes**, out-of-band, not the A1 brief and not any corpus document.]** |
 
 ### 9.3 Judgment calls
 
@@ -773,6 +868,35 @@ and pushed 2026-08-22, ahead of both R4b-G and the R2-D settle (2026-08-23).
   lane strike `CurrentProgramCheckpoint.md:1092` and annotate the design's
   `:976-986`), or record it as a deviation under L1-16. Either way the
   reason-(c) dependency needs an answer.
+- **[J-1 ANNOTATION 1 of 2 — leg 4 restated, 2026-08-24, round-2 merged
+  remediation.]** The lane-owner adjudication's fourth leg read "the settled
+  dual's Code axis re-verified the M5b surfaces byte-identical". **That
+  attribution was wrong**: the strings `M5b`, `no_ff`/`no-ff`, `3e60529` and
+  `8c1624a` appear zero times in `GwzM5-8R2DSettled-Review{Code,State}.md`
+  (rounds 1+2, whole files) — the R4b-G **Evidence axis's [P2-1]**, the one
+  P2 of its round-1 NO-GO. **The true source is the D3 dual**, whose round-2
+  re-verdicts verified the five M5b surfaces byte-identical on **both** axes:
+  `GwzM5-8D3Impl-ReviewCode.md:447-448` ("all five M5b files byte-identical
+  vs `0b059e8`; `store/tests.rs` exactly **+2/−0**", inside the round-2
+  "Gates (re-executed by me, release, round-2 binary)" section) and
+  `GwzM5-8D3Impl-ReviewState.md:550-552` ("M5b four-filter **37/0** with all
+  five M5b files `git status`-clean (byte-identical)", inside the ROUND-2
+  FOCUSED RE-VERDICT). **The fact was true; its citation was not.** The leg
+  is restated at its source, `CurrentProgramCheckpoint.md`'s J-1 record, with
+  the same dated bracket.
+- **[J-1 RULING, 2026-08-24 — RATIFIED BY BOTH AXES.]** Correctness §5 J-1:
+  "**RATIFIED**: the adjudication's ACCEPTED-WITH-RECORD stands", on facts
+  re-verified independently (`3e60529`/`8c1624a` ancestors of `78badbc`; prod
+  net **0** for both at `GwzM5-8R2DSettledTuple.md:375-376` rows 3-4; leg 3
+  proved fail-closed by that axis's own guard probes). Evidence §6: deviation
+  REAL and fairly stated, legs 1-3 verified on the record, **not
+  disqualifying**. **The named before-A1 remedy is NOT triggered** by either
+  axis. What survives is not the merge but the review: **the M5b-IMPL settled
+  review remains owed pre-A1** on its frozen tier (mandated-dual by default),
+  recorded at `CurrentProgramCheckpoint.md`'s M5b-IF freeze record and in the
+  settled tuple's §11.1 register. The two bookkeeping annotations both axes
+  make the price of ratification are landed:
+  `GwzM5-8M5bNoFfDesign.md:976-986` and the checkpoint's live restatement.
 
 **J-2 — Does the R2-D 5.2 settled dual discharge row 2.7a?** The checklist
 treats RemPlan-4 R6 as G's precondition. Thin A1 substitutes the R2-D Phase
@@ -1127,8 +1251,118 @@ exists.
 clean; Darwin 25.5.0 / arm64; `cargo test --lib -p gwz-core
 workspace_ops::tests::g23::` -> **111 passed; 0 failed**, and
 `scripts/checks/check_m4_scenario_map.py` -> ok. Tails at §13.3. Unexecuted
-remainder: none for the named tests; the 21 UNBOUND and 4 NO FIXTURE rows are
-inventory gaps, not unexecuted tests.
+remainder: none for the named tests; the 22 *[in-place arithmetic fix
+2026-08-24: this read "21"; the §12.6 disposition table and both R4b-G axes
+give **22** UNBOUND — 14 progress + 8 archive]* UNBOUND and 4 NO FIXTURE rows
+are inventory gaps, not unexecuted tests.
+
+### 12.7 R-1/R-2 reconciled — the C-1 and C-2 record (added 2026-08-24, R4b-G dual round 2)
+
+Both R4b-G axes examined R-1 and R-2 independently and converged. This
+sub-section is the reconciled record; it supersedes the *grading* of §12.6's
+"R-1 (P2 candidate)" / "R-2 (P3 candidate)" labels and leaves every measured
+number in §12.3-§12.6 exactly as recorded.
+
+**C-1 (= R-1) — GRADED P2, OPEN, BLOCKING-FOR-A1.** The 22 UNBOUND rows are
+**not** an unmeasured behavioural space. `GwzM5-8I2CompatibilityContract.md`
+disposes of them **categorically, in frozen accepted text**: `:117-125` — "A1
+deliberately whitelists only seven one-member-workspace, `Finalizing`,
+normal-mode shapes … **Marker/lock-only prefixes, multi-member workspaces,
+selected root, born root, drift, pending actions, recovery, preservation,
+rollback, and terminal rows are not A1 migration rules**" — and `:159-165` —
+"**Zero whitelist matches is not an error.** Open read-only status leaves bytes
+unchanged … Completed and aborted v0 records remain v0 and use byte-preserving
+archival. **Archived v0 uses only the archive decoder/projection**". Every one
+of the 22 falls inside a named exclusion class of that clause (A-* pre-
+acceptance; `F-BASELINE`/`F-MARKER`/`F-LOCK` as marker/lock-only prefixes;
+`G-VERIFYING` outside the seven; H-* preservation; `I-EVIDENCE-ROLLBACK`
+rollback; K/M terminal; the ten archive shapes under the archive-projection
+clause), and 18 of the 22 additionally carry the v0 byte/restart pins §12.3
+names, executed green inside g23 111/0. **So the substance of the unbound space
+is: contractually dispositioned fail-closed by class, and byte-pinned per
+shape. What is missing is the per-scenario *record*** — a registry row or an O8
+acceptance note citing the clause per row — so the disposition is
+machine-visible where `check_merge_compatibility_predicates.py` looks.
+
+**The class cite does not cover the whole residue. Four rows are live and are
+named here:**
+
+| Row | Why the class cite is not enough | Found by |
+| --- | --- | --- |
+| `J-NO-PUBLICATION-UNBORN` | the only UNBOUND row whose class membership is **ambiguous**: whether the whitelisted no-publication descriptor matches the unborn-root twin is untested per-case | Evidence axis [P3-1] |
+| `F-BASELINE`, `F-MARKER`, `F-LOCK` | all three are **`Finalizing`-state, i.e. inside the only state the whitelist adapts**, and no test drives `adapt_open` on them (`characterization_publication_prefix_v0.rs` contains no adapt/upgrade/`ValidUnlisted` reference). The adapter's descriptor *should* make a mid-prefix observation differ from `changed/prefix-boundary`'s and fall through to `ValidUnlisted` (`open_v0/descriptor.rs`: `publication_step`, candidate/composition/hash relations, `normalized_i2_root_observation`) — **but nothing pins that.** If a mid-prefix observation ever coincided with the boundary descriptor, v1 would adapt with a boundary-tuned `next_action` and the publication restart would re-drive the prefix from the wrong position. **Adaptation disposition unstated and untested.** | Correctness axis C-1 |
+
+**Grade and routing.** **P2** — a concrete compatibility/correctness defect
+under L1-19 (`AgentProcessRules.md:392-401`), not a documentation nit, because
+the four named rows are finalizing-era or ambiguous and the registry is the
+tree's only machine-checked adapt-vs-refuse statement, `include_str!`-bound
+into both the production adapter and the tests. **Pre-A1 exposure is ZERO**,
+verified in code by the Correctness axis (§6): three independent `cfg(test)`
+gates stand between production and the v1 writer/migration dispatch —
+`#[cfg(test)] mod v1_lifecycle;` (`merge/mod.rs:23-24`), the **entire**
+`open_v0` adapter module `#[cfg(test)]` (`record_wire/mod.rs:13-14`), and every
+r3-test re-export `#[cfg(test)]` (`merge/mod.rs:44-50`), with
+`recover_or_create` carrying no production caller. The unbound dispositions
+therefore have **no reachable consumer at this tuple**; their load-bearing
+moment is **A1 activation**. C-1 is accordingly **bound to the A1 activation
+review's input register as BLOCKING-FOR-A1 per L1-19**, under the routing
+`GwzM5-8ThinA1Amendment.md:43-55` already defines for this debt class (branch
+(a)/(b)), restated at `:242-244`. Row 2.3b / O8 **stays FAIL**; the fix is
+disposition-recording plus the four named rows, by clause, never silently.
+Named cheap closures, recorded so A1 inherits them rather than re-deriving
+them: (i) registry rows — adapted or declared-refusal — for the 14 unbound
+progress shapes, where `assert_i2_valid_unlisted_fixture`'s own closure
+assertion (every rule is open+finalizing) forces the refusal answer for most;
+(ii) **one parametric test driving `adapt_open` over every non-whitelisted
+fixture asserting `ValidUnlisted` + byte preservation**, which alone pins the
+F-row residue above; (iii) an archive-equivalence **mechanism decision** for
+the ten archive shapes — the registry's two corpora model open-record
+adaptation only and there is **no registry vocabulary in which an archive
+shape could be bound**, so what O8's archive clause still owes is different and
+real: proof that operations *finishing under v1* produce archives
+byte-equivalent to v0's for the same scenario. No such comparison exists; that
+is A1-shaped work.
+
+**C-2 (= R-2) — GRADED P3, named, owner = the A1 activation review's input
+register.** Four scenarios have no durable fixture and cannot be dispositioned
+either way: **`B-NOT-STARTED`** and **`B-PREPARING-EMPTY`** (R0 §4 row B's own
+recorded gap, re-verified still true — no `NotStarted` injection exists in g23
+outside `fixtures.rs`), **`AC-NOPUB-UNBORN`**, and **`AP-PRESERVED`**
+(live-workspace GC evidence verified present at
+`characterization_preservation_v0.rs:442` and `gc.rs:46`, but no
+archive-projection fixture, exactly as R0 §5.2 records). Both axes concur on
+P3. Fixture them or route them **named, with the acceptance debt**; the owner
+is the A1 activation review's register, alongside C-1.
+
+### 12.8 GATE CONDITION — the byte-equivalence battery is recorded PARTIAL, not green
+
+**Required by the Correctness axis as an explicit condition of its GO**
+(round-1 verdict §1 and §9: R4b-G "may close as GO only if its acceptance
+record (a) states the byte-equivalence battery as PARTIAL … and (b) binds
+C-1/C-2 onto the A1-activation input register"). Stated here, in the acceptance
+record, in the form the axis requires:
+
+> **The O8 / `GwzM5-8R4bTransitionDesign.md:1476-1477` byte-equivalence
+> battery — "byte-equivalent accepted lock, candidate, root output, and
+> archive results **across all M4** and all seven R3 adapted-v0 scenarios",
+> restated at `GwzM5-8Refactor.md:2264-2265` — is `PARTIAL`, not met, and is
+> recorded as `PARTIAL` in this acceptance record.**
+>
+> **7 proven + 6 refusal-pinned of 39.** 7 ADAPTED cases carry the full O8
+> property (descriptor equality + canonical-JSON SHA256 against the registry,
+> I2-vs-v1 restart-action identity, accepted-lock byte identity
+> `accepted.lock.exact_yaml == candidate.lock_yaml` + SHA256, the four-point
+> upgrade fault matrix, unknown-field survival at six depths, and before/after
+> head+status observation proving the upgrade mutates no repository); 6
+> UNLISTED cases are **refusal-pinned** — refusal asserted plus byte-exact v0
+> preservation plus the whitelist's own closure assertion. **22 UNBOUND** and
+> **4 NO FIXTURE** carry no v1 equivalence binding at all. The battery's
+> substance is strong **where bound**; the denominator is C-1.
+>
+> R4b-G accepts the tree with this battery PARTIAL and with **C-1 [P2]** and
+> **C-2 [P3]** bound to the A1-activation input register, where **L1-19 makes
+> C-1 blocking for A1**. A green byte-equivalence battery is **not** claimed by
+> this gate and must not be cited from it.
 
 ---
 
@@ -1149,7 +1383,7 @@ operation. No production line. No digest pin moved.**
 | **F-3** (W2) | Masked-token scan over all **128** `v1_lifecycle/**/*.rs` (including the ten `#[path]`-mounted test files §7.3 warns about — they resolve inside the tree, so `rglob` reaches them), seam **derived** from `workspace_ops/merge/mod.rs`'s own `use store::{…}` re-exports — **9 names today**: `MergeStore`, `FileMergeStore`, `archive_merge_record`, `enter_finalizing`, `persist_merge_record`, `persist_operation_transition`, `AtomicUpgradeFault`, `AtomicUpgradeOutcome`, `upgrade_open_v0_for_r3_tests` — so a newly exported v0 persistence item is covered the day it is added, with a floor check that fails the derivation closed if that re-export is restructured away. Measured: `enter_finalizing` is **10 raw grep hits / 0 masked hits** in that tree. Four fail-closed tests, one of them a compiler probe proving the violation compiles before asserting the checker rejects it. Comment marks it **load-bearing for J-1**. | `scripts/checks/check_checked_artifact_boundaries.py` (+76), `scripts/checks/test_check_checked_artifact_boundaries.py` (+74) | 150 |
 | **F-4** (W5) | The seven-battery driver, each command carrying the output marker its green result must print. | `scripts/checks/run_r4bg_aggregate_gates.py` (new) | 150 |
 | **F-5** | Runbook step 5 corrected in place to two lines with the reason recorded. | `GwzM5-8R4bG-EvidenceInventory.md` §5 step 5 | doc |
-| **F-7** | Pricing record drafted at §8 item 3 addendum; register row drafted, **not inserted**, for `GwzM5-8R2DSettledTuple.md` §11.1; **RULING unsigned**. | §8 of this document | doc |
+| **F-7** | Pricing record drafted at §8 item 3 addendum; register row drafted, **not inserted**, for `GwzM5-8R2DSettledTuple.md` §11.1; **RULING unsigned**. **[SUPERSEDED 2026-08-24 (Evidence [P3-3] / Correctness C-7.3): the ruling was SIGNED and the register row INSERTED at gwz-dev `d378db9`, 2026-08-24 10:24:43. Signature date corrected to 2026-08-24 at §8 item 3; the inserted tuple row is corrected to the same date this pass. F-7 = record written, ruling signed.]** | §8 of this document | doc |
 | corrections | `clippy.toml` 19-not-21 and `FinalizationFault` eight-not-seven, as bracketed dated corrections in place (not silent rewrites); plus the `ChangeBudget.md:515` column transposition this document itself carried (§7.5 step 8). | `GwzM5-8R4bG-EvidenceInventory.md`, §7.5 here | doc |
 
 **Ledger.** 0 net production-bearing Rust, 0 moved, **1,177 net test/tool/doc
@@ -1159,6 +1393,26 @@ column, at **78% of the ≤1,500 test/tool/doc ceiling** — the tightest column
 and the reason the driver was held to 150 lines even though nothing required
 it. Doc lines dominate (595 of 1,177) because §12's enumeration and this
 section are the deliverable, not overhead.
+
+**[Charging convention, stated 2026-08-24 (Evidence axis [P3-4](ii), which
+found the recorded 1,177 to be "neither convention" and unreproducible without
+guessing).** The figure uses **per-pass net charging**: each pass charges the
+`git diff --numstat` net of exactly the files *it* wrote — here 582 tool LOC in
+gwz-core `78badbc` (five `scripts/checks/` files, +582/−0, zero `src/` lines)
+plus 595 dev-docs lines at gwz-dev `d378db9` (evidence +552/−25, inventory
++73/−5; net 595, verified by the axis). **Applied consistently, that convention
+also charges pass 1**, whose own text declared "this document spent 0 of all
+five" for an 851-line evidence document — that declaration is **wrong under
+this convention** and is corrected here, and the two-pass cumulative
+test/tool/doc column is therefore **2,028 (582 + 595 + 851), over the ≤1,500
+ceiling**, not 78% of it. The only reading under which the package fits is the
+program's **review-artifact precedent** — review reports and the settled tuple
+are never charged — which yields **582** and no doc column at all. This record
+does not pick between them, because `GwzM5-8ChangeBudget.md` is the operator's
+row: **the R4b-G ledger row is filed as OPEN on the convention question**, with
+both reproducible figures (**2,028 uniform / 582 review-artifact**) and the
+recorded 1,177 marked superseded. Every underlying number here is diff-verified;
+what was missing was the rule, and the rule is now named.]
 
 **F-6 is not this pass's** — the Windows/Platform matrices were dispatched
 separately (`CurrentProgramCheckpoint.md:640-641`, run 22 at `b91bdeb`).
@@ -1349,6 +1603,17 @@ libtest time on the same tree. Consistent; neither is anywhere near 576 s.
   `GwzM5-8R2DSettledTuple.md` register row is drafted in a block quote, not
   inserted. J-1, J-2, J-3, J-5, J-6, J-7 are untouched as judgments; J-1 and
   J-3 gained facts, not verdicts.
+  **[SUPERSEDED 2026-08-24 — Evidence axis [P3-3] and Correctness axis C-7.3
+  found this bullet still describing a state that had already changed within
+  the same commit. It was true of the drafting pass and is **false of the
+  record as it stands**: the F-7 RULING **is signed** and its register row
+  **is inserted** in `GwzM5-8R2DSettledTuple.md` §11.1, both at gwz-dev
+  `d378db9` (2026-08-24 10:24:43). The J-* sentence still holds for this pass,
+  but the judgments have since been ruled by the R4b-G dual itself: **J-1
+  RATIFIED by both axes** (round 1), with J-2/J-4/J-5 concurred and J-3
+  concurred-with-C-6's-sharpening by the Correctness axis, and J-7 ruled
+  acceptable-with-the-debt-registered. The pin statement above is unchanged and
+  still true.]**
 - **Paper over nothing.** F-1's enumeration made O8's clause checkable and the
   answer came back **negative** — 13 of 39. Row 2.3b and O8 stay **FAIL**, and
   §12.6 opens two new residual findings, R-1 and R-2, as inputs to the R4b-G

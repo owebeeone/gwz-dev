@@ -650,11 +650,40 @@ fable token only where it makes a difference." Recorded consequences:
   under its ceiling with T-6 and the clean-tree re-cut; its dual
   was round-1 clean on both axes; the leaned-on call-graph gate
   (F-3) lands with this remediation as a standing guard rather
-  than a retroactive claim; and the settled dual's Code axis
-  re-verified the M5b surfaces byte-identical. The R4b-G dual
-  judges the acceptance; if it rules the deviation disqualifying,
-  the remedy is the M5b-IMPL settled review running BEFORE A1
-  rather than concurrent with it.
+  than a retroactive claim; and the D3 dual's round-2 re-verdicts
+  verified the five M5b surfaces byte-identical on both axes
+  (`GwzM5-8D3Impl-ReviewCode.md:447-448`: `store/tests.rs` at
+  exactly +2/−0, M5b byte-identity intact;
+  `GwzM5-8D3Impl-ReviewState.md:550-552`: M5b 37/0 with all five
+  files byte-identical) — **[leg restated 2026-08-24 per the
+  R4b-G Evidence axis's P2-1: the original text mis-attributed
+  this verification to the settled dual, whose reports do not
+  mention M5b; the fact was true, its citation was not.]** The
+  R4b-G dual judges the acceptance; if it rules the deviation
+  disqualifying, the remedy is the M5b-IMPL settled review
+  running BEFORE A1 rather than concurrent with it.
+
+  **R4b-G DUAL ROUND 1 (2026-08-24, peer-blind, at the tuple
+  gwz-core `78badbc` / gwz-cli `3cca145` / gwz-py `929efb0` /
+  taut `f008419`): Correctness GO-conditional (1 P2, 6 P3) /
+  Evidence NO-GO (1 P2, 6 P3)** — reports
+  `GwzM5-8R4bG-Review{Correctness,Evidence}.md`. Merged round-2
+  remediation executed 2026-08-24: **tooling at the next gwz-core
+  train; records in this commit.** C-1 (the "every M4"
+  byte-equivalence clause measured NOT MET at 13/39) is **bound to
+  the A1 activation review's input register as BLOCKING-FOR-A1 per
+  L1-19** (`AgentProcessRules.md:392-401`), routed under
+  `GwzM5-8ThinA1Amendment.md:43-55`; C-2 (4 unfixtured scenarios)
+  rides the same register at P3. **J-1 is RATIFIED by both axes**
+  on independently re-verified facts (Correctness §5 J-1;
+  Evidence §6), **the before-A1 remedy is NOT triggered**, and the
+  **M5b-IMPL settled review is recorded as owed pre-A1** on its
+  frozen tier. Records landed this pass:
+  `GwzM5-8R4bG-Evidence.md` (J-1 leg 4, F-7 provenance, the C-1
+  reconciliation and the PARTIAL gate condition),
+  `GwzM5-8R2DSettledTuple.md` §11.1 (perf-pricing date, C-1, C-2,
+  M5b-IMPL), `GwzM5-8M5bNoFfDesign.md:976-986` (annotation),
+  `GwzWindowsMatrix-Classification.md` (run-number header note).
 
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
@@ -817,7 +846,7 @@ its GO/GO. (b) and (c) may run in parallel.
 | Repository | Commit | Note |
 | --- | --- | --- |
 | gwz-dev (root) | this docs commit (the pause checkpoint) | literal restatement per ReviewCode-3 P3-5 |
-| gwz-core | `b91bdeb` = origin/main — **the R2-D settled object** (2026-08-23; the `d32b2c9` row above this correction was the 2026-08-16 pause state, long since landed through the Phase 0→5 trains) | R2-D SETTLED; matrix green runs 18-21 |
+| gwz-core | `78badbc` = origin/main — **the R4b-G gate tooling train** ("Land the R4b-G gate tooling: privacy probe, call-graph guard, M4 scenario checker, aggregate driver"), sitting one commit over **the R2-D settled object `b91bdeb`** (2026-08-23; the `d32b2c9` row above the earlier correction was the 2026-08-16 pause state, long since landed through the Phase 0→5 trains) — **[row re-pinned 2026-08-24 per the R4b-G Evidence axis [P3-6](i) and the Correctness axis C-7.2: it named `b91bdeb` and was one commit stale; it now tracks the tooling train, which is the R4b-G dual's review object]** | R2-D SETTLED at `b91bdeb`; matrix green runs 18-22 (run 22 = `b91bdeb`). **No native matrix run exists at `78badbc` itself**; `git diff b91bdeb..78badbc` is exactly the five `scripts/checks/` files, **+582/−0, zero `src/` lines**, so run 22's evidence carries to this pin by construction (Correctness axis C-7.4) |
 | gwz-cli | `3cca145` | Close R4b P1/P2 remediation gate |
 | gwz-py | `929efb0` | Implement R4b reverse merge lifecycle |
 | taut | `f008419` | 0.8.x fallible from_cbor line |
@@ -1116,8 +1145,17 @@ two-parent-over-ff-able actions today — landed with its two named
 suites green) and to a clean-tree tuple re-cut. M5b-IMPL review tier
 recorded at freeze: mandated-dual by default, single-axis only for
 test/fixture-confined diffs. IMPL merge waits for R4b-G per the frozen
-dependency statement. Tracked: round-3 N-4 (P3 cross-axis wording
-reconciliation, next docs pass). D3 amendment: State re-verdict GO at
+dependency statement. **[Annotation 2026-08-24 (R4b-G Evidence axis
+P2-1's bookkeeping ask; Correctness axis C-7.1): this sentence is
+overtaken by events and is retained, not struck, as the text the J-1
+adjudication is against. The M5b-IMPL merge (`3e60529`, `8c1624a`)
+preceded R4b-G; that sequencing deviation is adjudicated
+ACCEPTED-WITH-RECORD in the J-1 record above, ratified by both R4b-G
+axes at round 1. What still stands from this sentence is the
+**settled review**, not the merge: the M5b-IMPL settled review remains
+owed pre-A1 on the tier recorded here.]** Tracked: round-3 N-4 (P3
+cross-axis wording reconciliation, next docs pass). D3 amendment:
+State re-verdict GO at
 `e9396a9`; Code re-read pending; acceptance ritual (§7 contract
 annotations) on its GO.
 Cleanup candidates for the operator: remote branches

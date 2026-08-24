@@ -984,6 +984,23 @@ production dispatch without rewriting them (Q5).
   R4b-G's settled-tree/call-graph/byte-equivalence gates a moving target and
   alias finding ownership; (c) M5b's own unreachability argument leans on
   R4b-G's call-graph gate (§6 item 4).
+
+  **[Annotation 2026-08-24: the sequencing deviation against this clause is
+  adjudicated ACCEPTED-WITH-RECORD in `CurrentProgramCheckpoint.md`'s J-1
+  record, ratified by both R4b-G axes round 1 on independently re-verified
+  facts; the M5b-IMPL settled review this clause anticipates remains owed
+  pre-A1.]** The clause text above is frozen and is **not edited** — this
+  annotation records the adjudication against it, nothing more. Supporting
+  detail, for a reader landing here alone: reason (b) is materially defused
+  for the production surface (M5b landed prod net **0** on both commits,
+  `GwzM5-8R2DSettledTuple.md:375-376` rows 3-4) and reason (c) is answered by
+  the standing F-3 masked-token call-graph guard, which lands as a guard going
+  forward rather than a retroactive claim and which the R4b-G Correctness axis
+  independently proved fail-closed. Reason (a)'s violation is what "with
+  record" records. The named before-A1 remedy — the M5b-IMPL settled review
+  running BEFORE A1 rather than concurrent with it — is **not triggered** by
+  either axis; the settled review itself is carried as an owed-pre-A1 row in
+  `GwzM5-8R2DSettledTuple.md` §11.1.
 - The R4b-G gate itself is behind the RemPlan-4 R2-R6 chain (scope
   correction of 2026-08-16, `CurrentProgramCheckpoint.md:108-120`); M5b
   inherits that transitively and takes no dependency on its internals.

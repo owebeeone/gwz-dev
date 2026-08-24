@@ -666,12 +666,88 @@ companion-class and were fixed in the step.
 - `root_fault_matrix` perf pricing: **318.71 s (release, `b91bdeb`)** is the
   citable price (driver-corroborated at 327.6 s wall); 576.03 s stands as the
   historical D3-review-tree figure. **PRICED-NOT-OPTIMIZED, ruling signed
-  2026-08-23** — the cost is the §8 crash matrix's evidence weight, accepted;
-  A1-activation-review input per `GwzM5-8ThinA1Amendment.md` §1 / L1-19.
-  Record: `GwzM5-8R4bG-Evidence.md` §8 item 3 addendum.
+  2026-08-24** *[date corrected in place 2026-08-24 per the R4b-G Evidence
+  axis [P3-3]: it read "2026-08-23", a date on which neither the ruling nor
+  this row existed — both landed in gwz-dev `d378db9` at 2026-08-24 10:24:43,
+  and the ruling cites a 327.6 s corroboration measured 2026-08-24. Note this
+  row postdates the block header above it, which is dated 2026-08-23 and is
+  left unedited as the header of the block it names.]* — the cost is the §8
+  crash matrix's evidence weight, accepted; A1-activation-review input per
+  `GwzM5-8ThinA1Amendment.md` §1 / L1-19. **The "~343 s release" figure this
+  ruling corrects came from the lane owner's session notes — an out-of-band
+  recollection. It is not from the A1 brief, not from any other brief, and not
+  from any document in the corpus; an exhaustive search of the workspace and
+  its full history finds no such figure** *[provenance stated 2026-08-24 per
+  Evidence axis [P3-3], which found "the A1 brief" to be the one unsourced
+  authority reference in the record and required the source be named or the
+  figure marked out-of-band]*. Independently corroborated by the R4b-G
+  Evidence axis at **352.48 s release on `78badbc`** — inside the 319-353
+  band, decisively not 576. Record: `GwzM5-8R4bG-Evidence.md` §8 item 3
+  addendum.
 - The L2-05 merge-doc gates are wired into no workflow — **wire them into CI
   before any lane relies on L2-05 mechanically** (both axes concur; Code
-  [P3-6], tuple §11.3).
+  [P3-6], tuple §11.3). *[R4b-G note 2026-08-24: still true at `78badbc`,
+  independently re-verified by both R4b-G axes; the three new R4b-G tools
+  (privacy probe, M4 map checker, aggregate driver) join this CI-wiring item on
+  the A1-activation register per the Correctness axis's J-7 ruling.]*
+
+**Added at the R4b-G dual's round-2 remediation (2026-08-24):**
+
+- **C-1 — the O8 "every M4" byte-equivalence clause is measured NOT MET
+  (13/39). [P2] — OPEN, BLOCKING-FOR-A1 per L1-19
+  (`AgentProcessRules.md:392-401`).** Both R4b-G axes converged: 7 ADAPTED +
+  6 UNLISTED = 13 bound; **22 UNBOUND; 4 NO FIXTURE**. The 22 are **not** an
+  unmeasured behavioural space — the frozen accepted compatibility contract
+  disposes of them categorically:
+  `GwzM5-8I2CompatibilityContract.md:117-125` ("A1 deliberately whitelists
+  only seven one-member-workspace, `Finalizing`, normal-mode shapes …
+  Marker/lock-only prefixes, multi-member workspaces, selected root, born
+  root, drift, pending actions, recovery, preservation, rollback, and terminal
+  rows are not A1 migration rules") and `:159-165` ("**Zero whitelist matches
+  is not an error** … Completed and aborted v0 records remain v0 and use
+  byte-preserving archival. Archived v0 uses only the archive
+  decoder/projection"). Every one of the 22 falls in a named exclusion class,
+  and 18 carry v0 byte/restart pins executed green inside g23 111/0. What is
+  missing is the **per-scenario record** where
+  `check_merge_compatibility_predicates.py` looks. **The class cite does not
+  cover the whole residue — four rows are live and named:**
+  `J-NO-PUBLICATION-UNBORN` (the only UNBOUND row whose class membership is
+  ambiguous — whether the whitelisted no-publication descriptor matches the
+  unborn-root twin is untested per-case; Evidence axis [P3-1]); and
+  **`F-BASELINE`, `F-MARKER`, `F-LOCK`** — all three `Finalizing`-state, i.e.
+  inside the only state the whitelist adapts, with **adaptation disposition
+  unstated and untested** (no test drives `adapt_open` on them; Correctness
+  axis C-1). **Pre-A1 exposure is ZERO**, verified in code by the Correctness
+  axis: three independent `cfg(test)` gates
+  (`merge/mod.rs:23-24`, `record_wire/mod.rs:13-14`, `merge/mod.rs:44-50`)
+  stand between production and the v1 writer/migration dispatch, so the
+  unbound dispositions have no reachable consumer at this tuple. **Owner: the
+  A1 activation review's input register**, routed under
+  `GwzM5-8ThinA1Amendment.md:43-55` / `:242-244` branch (a)/(b). Record:
+  `GwzM5-8R4bG-Evidence.md` §12.7.
+- **C-2 — four M4 scenarios have no durable fixture at all. [P3]** —
+  `B-NOT-STARTED`, `B-PREPARING-EMPTY` (R0 §4 row B's own recorded gap,
+  re-verified still true), `AC-NOPUB-UNBORN`, `AP-PRESERVED` (live-workspace
+  GC evidence exists at `characterization_preservation_v0.rs:442` and
+  `gc.rs:46`, but no archive-projection fixture, exactly as
+  `GwzM5-8R0Inventory.md` §5.2 records). Undispositionable either way until
+  fixtures exist; a regression touching them is invisible to every battery.
+  Both axes concur at P3. **Owner: the A1 activation review's input register**,
+  alongside C-1. Record: `GwzM5-8R4bG-Evidence.md` §12.7.
+- **M5b-IMPL settled review — OWED PRE-A1.** The frozen dependency statement
+  (`GwzM5-8M5bNoFfDesign.md:976-986`, "**Dependent on R4b-G settling — must
+  wait:** … Merging and settled-review of M5b-IMPL") was overtaken on its
+  *merge* leg — `3e60529`/`8c1624a` reached `b91bdeb`'s ancestry ahead of
+  R4b-G — and that sequencing deviation is adjudicated **ACCEPTED WITH
+  RECORD** in `CurrentProgramCheckpoint.md`'s J-1 record, **ratified by both
+  R4b-G axes at round 1** on independently re-verified facts (prod net **0**
+  for both commits at §4's LOC audit rows 3-4, `:375-376`; the D3 dual's
+  round-2 byte-identity re-verdicts; the F-3 standing guard proved
+  fail-closed). **The named before-A1 remedy is NOT triggered.** What survives
+  is the *review*, not the merge: the **M5b-IMPL settled review remains owed
+  before A1 activation**, on the tier recorded at its freeze (mandated-dual by
+  default; single-axis only for test/fixture-confined diffs). R4b-G's GO
+  unblocks it; it is not discharged by it.
 
 ### 11.2 Pinned to R2-F
 
