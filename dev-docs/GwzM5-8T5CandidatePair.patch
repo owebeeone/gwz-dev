@@ -1,0 +1,22 @@
+--- insurance-t5/retained_readers/generate_retained_reader_fixtures.py	2026-08-04 23:59:49
++++ exp/retained_readers/generate_retained_reader_fixtures.py	2026-08-24 13:27:28
+@@ -368,7 +368,19 @@
+             shutil.copytree(temporary / "archived-v0", archived_fixture)
+             _rewrite_record_envelope(
+                 archived_fixture, archived=True, schema=schema, version=version
++            )
++        shutil.copytree(temporary / "no-ff-fast-forwardable", temporary / "archived-no-ff-v0")
++        _archive_fixture(temporary / "archived-no-ff-v0")
++        for prefix, source, archived in (
++            ("future", "no-ff-fast-forwardable", False),
++            ("archived-future", "archived-no-ff-v0", True),
++        ):
++            fixture = temporary / f"{prefix}-v1-no-ff"
++            shutil.copytree(temporary / source, fixture)
++            _rewrite_record_envelope(
++                fixture, archived=archived, schema="gwz.merge-operation/v1", version=1
+             )
++        shutil.rmtree(temporary / "archived-no-ff-v0")
+         os.replace(temporary, destination)
+         temporary = Path()
+     finally:

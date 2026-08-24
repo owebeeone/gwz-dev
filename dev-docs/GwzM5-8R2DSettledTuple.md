@@ -775,6 +775,17 @@ companion-class and were fixed in the step.
 
 ### 11.2 Pinned to R2-F
 
+- **T-5 candidate pair — OWNED CARRIER: the R2-F native-evidence
+  regeneration (binding per the A1 Safety review's T-5 acceptance).** The
+  built `mode: no_ff` v1 envelope pair (digests `e4ea14de…` /
+  `a1cb103c…`) is durably archived at
+  `dev-docs/GwzM5-8T5CandidatePair.patch` (moved from session scratch at
+  the A1 Completeness review's [P2-1]); it lands with the first evidence
+  regeneration that re-runs the retained-reader matrix against released
+  binaries, alongside the five-surface variant-key rule change enumerated
+  in the T-5 closure report.
+
+
 | item | record |
 | --- | --- |
 | **Quarantine/relocation execution** — the legacy private area moves out of the catalog Final directory | `GwzM5-8R2DPhase4Closure.md` §2.7; freeze §5 decision 2; plan §5 item 7 |
