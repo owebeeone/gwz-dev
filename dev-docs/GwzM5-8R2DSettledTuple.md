@@ -749,6 +749,30 @@ companion-class and were fixed in the step.
   default; single-axis only for test/fixture-confined diffs). R4b-G's GO
   unblocks it; it is not discharged by it.
 
+**Added at the pre-A1 closures (2026-08-24):**
+
+- C-1 — CLOSED at gwz-core `26f48f5`: the four live residue rows
+  dispositioned from the frozen contract (two UNLISTED, two REFUSED-typed,
+  the J twins split on the born-root exclusion — with the enumeration's
+  labels corrected: the ADAPTED case is the UNBORN twin), tested through
+  the real decode path with a positive control; the M4 map binds 41 named
+  tests. An explicit A1-activation-review input.
+- M5b settled [P2-1] (the T-5 no_ff envelope pair) — **CLOSED BY
+  LANE-OWNER NARROWING, ruled 2026-08-24**: the retained-reader matrix's
+  frozen contract keys, name-derives, and exactness-checks envelope
+  classification entirely on `(schema, record_schema_version)`
+  (`retained_reader_matrix.py:47-52/:83-88/:177-183`,
+  `retained_reader_harness.py:93-95`) — the record body, where `mode`
+  lives, is structurally incapable of participating, which mechanizes the
+  mode-blindness property in the tooling itself. The literal fixture
+  requires a five-surface frozen-contract change plus regeneration of
+  executed-binary evidence over the network (blockers measured, not
+  assumed). The candidate pair is BUILT and SAVED with digests
+  (`scratchpad/insurance-t5/CANDIDATE-generator-t5-pair.NOT-APPLIED.patch`;
+  e4ea14de… / a1cb103c…) and RIDES ANY FUTURE evidence regeneration
+  (R2-F's native-evidence gate is the natural carrier). The A1 activation
+  review judges this ruling as its input.
+
 ### 11.2 Pinned to R2-F
 
 | item | record |

@@ -871,3 +871,21 @@ scope exceptions requested:
 The lead updates this ledger only when a reviewed scope decision changes a
 ceiling. Passing under a ceiling does not substitute for behavioral tests or
 interface review.
+
+## F-1 v0 forged-action resume gate — row filed 2026-08-24 (M5b settled review [P3-1])
+
+Landed at gwz-core `d70bd57` with its GO review, before this ledger's
+current section structure; the row was owed under the Q8-ratified
+"its own budget row" ruling and never filed (no absorption occurred —
+M5b's 0/0 row holds by measurement). Figures from `git show d70bd57
+--stat` at filing time:
+
+| package | net production Rust | moved | test/tool/doc LOC | production files | test/tool/doc files |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| F-1 v0 forged-action resume gate (`d70bd57`) | filed-from-history: see the commit's own stat; the gate is `continue_v0_gate.rs` + its 3 tests | 0 | — | — | — |
+
+(Column values deliberately not reconstructed beyond the commit
+citation: the ledger's convention question is OPEN [the operator's
+row]; this filing discharges the *existence* debt — the row is here,
+its source commit named, its review on record — without minting
+numbers under a disputed convention.)

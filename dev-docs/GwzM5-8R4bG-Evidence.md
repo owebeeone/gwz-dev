@@ -1132,6 +1132,26 @@ subcase.
 - **NO FIXTURE** — no independently injected durable fixture exists for the
   shape at all. **Hard residual finding.**
 
+Two further dispositions were added on 2026-08-24 by the C-1 closure (§12.9)
+for shapes the registry's two corpora **cannot** express, because both corpora
+model non-`Finalizing` refusal (`assert_i2_valid_unlisted_fixture` asserts
+`record.state != Finalizing`, and every corpus row's own `operation_state` value
+is terminal, recovery, preserving, or rolling-back — never `finalizing`) while
+these shapes are `Finalizing`:
+
+- **DISPOSITIONED-UNLISTED** — a well-formed descriptor that matches zero
+  whitelist rules. `adapt_open` returns `ValidUnlisted` and the atomic upgrade
+  leaves the v0 bytes exact with nothing staged, driven through the real
+  decode/adapt/upgrade path and recorded by contract clause in §12.9 rather
+  than by a registry row.
+- **DISPOSITIONED-REFUSED** — the row refuses before staging with an exact
+  `ErrorCode` and the registry's own `rejection_reasons` sentence; v0 bytes
+  exact, nothing staged. Also driven through the real path and recorded in
+  §12.9.
+
+Both are *stronger* than UNBOUND (an executed per-scenario answer, not a class
+cite) and *weaker* than ADAPTED (no v1 output exists to be byte-equivalent to).
+
 <!-- m4-map:begin -->
 
 ### 12.3 Table A — the 29 durable progress shapes (`GwzM5-8R0Inventory.md` §4)
@@ -1153,9 +1173,9 @@ qualified.
 | C | `C-CANDIDATE-PERSISTED` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `candidate_persisted_before_evidence`, fault `AfterCandidatePersistence`) | `changed/candidate-persisted` | **ADAPTED** |
 | D | `D-EVIDENCE-CREATED-UNRECORDED` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `evidence_created_before_recording`, fault `AfterEvidenceCommit`) | `changed/evidence-unrecorded` | **ADAPTED** |
 | E | `E-EVIDENCE-RECORDED` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `evidence_recorded_before_publication`, fault `AfterEvidencePersistence`) | `changed/evidence-recorded` | **ADAPTED** |
-| F | `F-BASELINE` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation` | — | **UNBOUND** |
-| F | `F-MARKER` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation`, `drift::status_detects_marker_and_boundary_drift_without_a_prior_recovery_mutation` | — | **UNBOUND** |
-| F | `F-LOCK` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation` | — | **UNBOUND** |
+| F | `F-BASELINE` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation`; adaptation disposition `compatibility_residue_v0::v0_mid_publication_prefixes_are_not_a1_migration_rules` (subcase `F-BASELINE`) | — (no registry vocabulary; §12.9) | **DISPOSITIONED-UNLISTED** |
+| F | `F-MARKER` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation`, `drift::status_detects_marker_and_boundary_drift_without_a_prior_recovery_mutation`; adaptation disposition `compatibility_residue_v0::v0_mid_publication_prefixes_are_not_a1_migration_rules` (subcase `F-MARKER`) | — (typed refusal, not a corpus row; §12.9) | **DISPOSITIONED-REFUSED** |
+| F | `F-LOCK` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation`; adaptation disposition `compatibility_residue_v0::v0_mid_publication_prefixes_are_not_a1_migration_rules` (subcase `F-LOCK`) | — (typed refusal, not a corpus row; §12.9) | **DISPOSITIONED-REFUSED** |
 | F | `F-BOUNDARY` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `candidate_published_before_recording`, fault `AfterLockPublication`) | `changed/prefix-boundary` | **ADAPTED** |
 | G | `G-VERIFYING` | `characterization_publication_v0::v0_verifying_publication_is_durable_for_born_and_unborn_roots` | — | **UNBOUND** |
 | G | `G-COMPLETE-PRE-ARCHIVE` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `completed_before_archive`, fault `BeforeArchive`), `characterization_v0::v0_terminal_completed_before_archive_is_read_only_and_closes_byte_exactly` | `terminal/completed` | **UNLISTED** ("terminal v0 archives byte-exact") |
@@ -1164,8 +1184,8 @@ qualified.
 | H | `H-PRESERVING-PREFIX` | `characterization_preservation_v0::v0_preserving_overlay_round_trips_every_recorded_root_prefix`, `preserve::review_remediation::preserve_retry_repairs_interrupted_root_publication_normalization` | — | **UNBOUND** |
 | I | `I-PARTICIPANT-ROLLBACK` | `characterization_preservation_v0::v0_participant_rollback_has_restartable_durable_reverse_prefixes` | `rollback/participant` | **UNLISTED** ("v0 has no lossless write-ahead reverse owner") |
 | I | `I-EVIDENCE-ROLLBACK` | `characterization_preservation_v0::v0_evidence_rollback_records_each_reverse_artifact_prefix`, `abort_recovery::born_root_evidence_abort_recovers_both_record_persistence_windows`, `abort_recovery::unborn_root_evidence_abort_recovers_both_record_persistence_windows` | — | **UNBOUND** |
-| J | `J-NO-PUBLICATION-BORN` | `characterization_v0::v0_no_publication_complete_before_terminal_write_is_read_only` (fault `AfterNoPublicationComplete`, the eighth variant, driven separately from the seven-window array) | `unchanged/no-publication-finalizing` | **ADAPTED** |
-| J | `J-NO-PUBLICATION-UNBORN` | `characterization_v0::v0_no_publication_completion_preserves_born_and_unborn_root_inputs`, `characterization_publication_v0::v0_publication_windows_have_born_and_unborn_root_twins` | — | **UNBOUND** |
+| J | `J-NO-PUBLICATION-BORN` | `characterization_v0::v0_no_publication_complete_before_terminal_write_is_read_only` (fault `AfterNoPublicationComplete`, the eighth variant, driven separately from the seven-window array) | `unchanged/no-publication-finalizing` | **ADAPTED** *[twin-label correction 2026-08-24, §12.9: the corpus fixture named here builds an **unborn** root, and `GwzM5-8I2CompatibilityContract.md:123` excludes "born root" by name, so the adapted case is the UNBORN twin. The born twin at this same window is valid-unlisted, pinned by `compatibility_residue_v0::v0_no_publication_finalizing_twins_split_on_the_born_root_exclusion`. The count is unaffected — one J twin is adapted either way — but the label is on the wrong row.]* |
+| J | `J-NO-PUBLICATION-UNBORN` | `characterization_v0::v0_no_publication_completion_preserves_born_and_unborn_root_inputs`, `characterization_publication_v0::v0_publication_windows_have_born_and_unborn_root_twins`; adaptation disposition `compatibility_residue_v0::v0_no_publication_finalizing_twins_split_on_the_born_root_exclusion` and `compatibility_residue_v0::v0_no_publication_terminal_twins_stay_v0_for_born_and_unborn_roots` | `unchanged/no-publication-finalizing` (finalizing twin; §12.9) | **ADAPTED** (finalizing twin) + **DISPOSITIONED-UNLISTED** (R0 terminal shape) |
 | K | `K-COMPLETED-CANDIDATE-OPEN` | `characterization_v0::v0_terminal_completed_before_archive_is_read_only_and_closes_byte_exactly` | `terminal/completed` (shared with `G-COMPLETE-PRE-ARCHIVE` — one durable object, two R0 rows) | **UNLISTED** |
 | K | `K-COMPLETED-NOPUB-OPEN` | `characterization_publication_v0::v0_no_publication_completed_open_record_closes_byte_exactly` — **this closes R0 §4 row K's "no-publication terminal-open byte-exact fixture missing" gap** | — | **UNBOUND** |
 | L | `L-RECOVERY-OVERLAY` | `characterization_v0::v0_recovery_required_overlays_preserve_candidate_and_no_publication_evidence` (subcases `candidate`, `no_publication`), `characterization_publication_v0::v0_recovery_required_overlays_keep_each_constructible_publication_row_byte_exact` | `recovery/candidate` + `recovery/no-publication` (two rows, one shape) | **UNLISTED** ("recovery origin is not uniquely owned") |
@@ -1218,6 +1238,16 @@ met — 13 of 39 scenarios carry a v1 equivalence binding.**
 | **UNBOUND** — no registry row at all | 14 | 8 | **22** |
 | **NO FIXTURE** — no durable fixture either | 2 | 2 | **4** |
 | **Total named scenarios** | **29** | **10** | **39** |
+
+*[C-1 closure movement, 2026-08-24 — this table is left exactly as the two
+R4b-G axes measured it, per §12.7's rule. §12.9 moves four of the 14 progress
+UNBOUND rows: `F-BASELINE` to DISPOSITIONED-UNLISTED, `F-MARKER` and `F-LOCK`
+to DISPOSITIONED-REFUSED, and `J-NO-PUBLICATION-UNBORN` to ADAPTED at its
+finalizing twin plus DISPOSITIONED-UNLISTED at its R0 terminal shape. Read
+forward: **18 UNBOUND** (10 progress + 8 archive), and the four rows now carry
+an executed per-scenario answer. The 13-registry-row arithmetic below is
+unchanged — none of the four gained a registry row, and §12.9(c) records why
+none can.]*
 
 Registry-row arithmetic, since the map is not 1:1 in either direction: the 7
 `fixture_corpus` rows bind 7 shapes one-for-one; the 6 `valid_unlisted_corpus`
@@ -1363,6 +1393,100 @@ record, in the form the axis requires:
 > **C-2 [P3]** bound to the A1-activation input register, where **L1-19 makes
 > C-1 blocking for A1**. A green byte-equivalence battery is **not** claimed by
 > this gate and must not be cited from it.
+
+### 12.9 The C-1 dispositions record — the four live residue rows, stated and tested (added 2026-08-24)
+
+§12.7 grades C-1 P2/BLOCKING-FOR-A1 and names **four rows the class cite does
+not settle**: `F-BASELINE`, `F-MARKER`, `F-LOCK` (all `Finalizing`, i.e. inside
+the only operation state the whitelist adapts, with **no test driving
+`adapt_open` on them**) and `J-NO-PUBLICATION-UNBORN` (class membership
+ambiguous per case). This sub-section states each row's adaptation disposition,
+**derived from the frozen `GwzM5-8I2CompatibilityContract.md` and its machine
+half `GwzM5-8I2CompatibilityPredicates.json`, never invented**, and binds each
+to an executed test that drives the shape's real durable form through the real
+`decode -> adapt_open -> atomic upgrade` path.
+
+**The dispositions.**
+
+| Shape | Disposition | Contract clause it is derived from | Test that pins it |
+| --- | --- | --- | --- |
+| `F-BASELINE` — `Finalizing`, step `PublishingCandidate`, candidate + evidence durable, live root still at the pre-publication baseline prefix | **DISPOSITIONED-UNLISTED.** A well-formed descriptor is built; its root observation normalizes to `recorded_evidence` at step `publishing_candidate`, a pair no whitelist rule carries; zero matches; `adapt_open` -> `ValidUnlisted`; atomic upgrade -> `ValidUnlisted` with the v0 bytes exact and nothing staged. | `:117-121` whitelists seven shapes whose only publication-era member is the "exact boundary/index publication prefix" — a baseline prefix is not it, and it is not "evidence recorded" either, which the registry pins at step `committing_evidence`. `:159-160` "Zero whitelist matches is not an error. Open read-only status leaves bytes unchanged". | `compatibility_residue_v0::v0_mid_publication_prefixes_are_not_a1_migration_rules`, subcase `F-BASELINE` |
+| `F-MARKER` — same durable record; live root carries the candidate marker only, lock and boundary still baseline, index unpublished | **DISPOSITIONED-REFUSED**, typed `PublicationPrefixMismatch`, before staging. No descriptor is built at all: the observation is not one exact index-aligned publication prefix. v0 bytes exact, nothing staged. The message carries the registry's own frozen sentence, "filesystem or index does not match one legal recorded publication prefix". | `:123-125` "**Marker**/lock-only prefixes … are not A1 migration rules", read with `:121-123` "every selected result, … participant HEAD/ref/index/worktree, and root observation **is exact**". `:167-169` "an unreadable/contradictory row … rejects before staging". Refusal text: registry `rejection_reasons.PublicationPrefixMismatch`. | `compatibility_residue_v0::v0_mid_publication_prefixes_are_not_a1_migration_rules`, subcase `F-MARKER` |
+| `F-LOCK` — same durable record; live root carries the candidate marker and lock, boundary still baseline, index unpublished | **DISPOSITIONED-REFUSED**, typed `PublicationPrefixMismatch`, identically. | `:123-125` "Marker/**lock-only** prefixes … are not A1 migration rules", plus the same `:121-123` exactness clause and `:167-169`. | `compatibility_residue_v0::v0_mid_publication_prefixes_are_not_a1_migration_rules`, subcase `F-LOCK` |
+| `J-NO-PUBLICATION-UNBORN` | **Two-part, and both parts are now executed.** (i) At the pre-terminal `Finalizing` window the **unborn** twin *is* the whitelisted rule `no-publication-complete-before-terminal`: descriptor equality against the registry, exactly one match, `adapt_open` -> `Eligible` with next action `complete_no_publication` — so the row is **ADAPTED**, per case, not by class. (ii) In R0 §4 row J's own terminal shape (`Completed`, publication `Complete`, no candidate) it is **DISPOSITIONED-UNLISTED**: `adapt_open` -> `ValidUnlisted`, upgrade -> `ValidUnlisted`, bytes exact — for the unborn and born roots alike. | (i) `:117-121`, seventh whitelisted shape, "no-publication complete before the terminal state write"; every rule's `baseline.root_checkout` is `unborn_attached` with `root_commit_hash: absent`, which is the same fact stated in the registry. (ii) `:162-163` "Completed and aborted v0 records remain v0 and use byte-preserving archival", with `:125` "terminal rows are not A1 migration rules". | (i) `compatibility_residue_v0::v0_no_publication_finalizing_twins_split_on_the_born_root_exclusion`; (ii) `compatibility_residue_v0::v0_no_publication_terminal_twins_stay_v0_for_born_and_unborn_roots` |
+
+**(a) Why the three F rows split two ways, which is the whole of C-1's
+scenario.** C-1's sharpest live scenario is a workspace interrupted
+mid-candidate-publication, and its worry is exact: "if a mid-prefix observation
+ever coincided with the boundary descriptor, v1 would adapt with a
+boundary-tuned `next_action` and the publication restart would re-drive the
+prefix from the wrong position." The measurement is that **all four F shapes
+share one durable record** — the record is persisted once when the step
+advances to `PublishingCandidate` and not again until the whole prefix is
+published, so `F-BASELINE`, `F-MARKER`, `F-LOCK` and `F-BOUNDARY` differ in the
+**live observation only**. The descriptor's `publication` block is therefore
+byte-identical across all four, and the test asserts that identity against the
+registry's `candidate-published-before-recording` rule directly, so the
+coincidence C-1 fears is measured rather than assumed. What separates them is
+one field: `observation.root`, which is `prefix_boundary` for the published
+prefix and `recorded_evidence` for the baseline one. The marker-only and
+lock-only prefixes never reach that field, because the live index has not been
+published either — the producer stages the lock and marker last — so the
+observation is not one exact recorded prefix and the row refuses typed. The
+unstaged **boundary** prefix behaves the same way and is driven with them; the
+whitelisted `F-BOUNDARY` case is the fully staged one, and it rides in the same
+test as the positive control, so the discrimination is non-vacuous in both
+directions.
+
+**(b) The J twins, and a label correction the record needs.** [P3-1] asks
+"whether the whitelisted no-publication descriptor matches the unborn-root
+twin", untested per case. It matches it exactly — and the reason is that the
+whitelist has **no born-root rule at all**: `:124` names "born root" in the
+excluded list, every rule's baseline descriptor is `unborn_attached` /
+`root_commit_hash: absent`, and the adapter classifies a record with a present
+`baseline.root_head` straight to `ValidUnlisted`. Consequently §12.3's J rows
+carry their labels the wrong way round: the corpus fixture bound there
+(`characterization_v0::v0_no_publication_complete_before_terminal_write_is_read_only`)
+initialises a workspace whose root is **unborn**, so the ADAPTED case is the
+UNBORN twin, and the BORN twin at the same window is valid-unlisted. This
+changes **no count** — one J twin is adapted either way, and the 7-ADAPTED /
+13-bound arithmetic in §12.6 stands — but the A1 review must not read §12.3's
+J-BORN row as a statement that a born-root v0 record can be migrated. It cannot.
+Both facts are now executed in one test.
+
+**(c) Why none of the four gained a registry row, and why that is the correct
+mechanism.** §12.7's named cheap closure (i) proposes registry rows for the
+unbound progress shapes. It does not reach these four: the
+`valid_unlisted_corpus` **cannot express a `Finalizing` shape**. Its runtime
+binding asserts the whitelist's own closure property (every rule is
+open+finalizing) and then `assert_ne!(record.state, OperationState::Finalizing)`
+on the fixture; no corpus row's own `operation_state` value is `finalizing`, and
+the runtime mapping panics on one. That closure assertion is load-bearing — it
+is what makes "not whitelisted" mean something for the corpus — so widening it
+to admit these rows would weaken the registry, not extend it. The disposition
+is therefore recorded **here, by clause, with an executed test**, which is the
+`§12.7` branch "an O8 acceptance note citing the clause per row". §12.2 defines
+the two new disposition tokens; the map cites the tests in the ordinary way, so
+`check_m4_scenario_map.py` verifies they exist and the driver pins the count.
+
+**(d) What C-1 still owes after this, unchanged.** This closes the four named
+rows and nothing else. **18 UNBOUND rows remain** (10 progress + 8 archive),
+still disposed of categorically by `:117-125` / `:159-165` and byte-pinned per
+shape, still lacking a per-scenario record; the **archive-equivalence mechanism
+decision** for the ten archive shapes is untouched and remains A1-shaped work
+(there is no registry vocabulary in which an archive shape could be bound, and
+what O8's archive clause owes is a comparison of archives produced by
+operations *finishing under v1* against v0's, which does not exist); **C-2
+[P3]** is untouched. §12.8's byte-equivalence verdict therefore stays
+**PARTIAL** and must still not be cited as green: the four rows gain an
+executed adaptation disposition, which is not the O8 byte-equivalence property.
+
+**Executed run binding.** Tree gwz-core `1bd885f` plus this package, clean
+otherwise; Darwin 25.5.0 / arm64. `cargo test --lib -p gwz-core
+workspace_ops::tests::g23::` -> **114 passed; 0 failed** (111 + the three tests
+above), and `scripts/checks/check_m4_scenario_map.py` -> ok at the new counts
+(39 scenario rows, 41 named tests, 13 registry rows all claimed), with the
+aggregate driver's pinned markers moved to match in the same package.
 
 ---
 
