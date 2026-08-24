@@ -78,6 +78,20 @@ participants; both the ff path and the commit path were already members
 of the CRLF/materialization class covered by the un-pinned CRLF matrix
 sentinel (D1 package), so this is bookkeeping, not new exposure.
 
+**[Dated update, 2026-08-25 — A1 landing (activation record L11).]**
+The note above was written while the v1 writer was `cfg(test)`-only;
+at the A1 landing commit that clause changes truth-value: the v1
+writer is production and `--no-ff` creates v1 records with
+`mode: no_ff` in ordinary operation (ordinary/custom starts remain v0
+under the `ACTIVE_WRITER_FLOOR = V0` named residual, owner M5c). The
+class membership recorded above is now a production fact, still
+inside the same CRLF/materialization class — bookkeeping then,
+production bookkeeping now. Pre-attributed EXPECTED-GREEN at the
+landing-commit dispatch: the activation package's +11 tests (census
+1573 → 1584, incl. the L5 abandonment witness) and the C-1 closure's
+3 `compatibility_residue_v0` tests (in-base since `26f48f5`, first
+native execution at this dispatch).
+
 **Run 17 — 32568481700 on `8b83a2c` (Steps 2.3+2.4 and D3 landed):
 1457/4/1.** The four failures are byte-for-byte run 16's namespace
 fault-matrix class — same tests, same baseline refusal — now

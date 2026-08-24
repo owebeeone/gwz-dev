@@ -80,6 +80,25 @@ The core derives the semantic version from immutable typed request intent.
 Drivers never choose it. Unsupported requested semantics reject before record
 creation. The chosen version is frozen before the first mutation.
 
+> **[Dated annotation, 2026-08-25 — A1 row partial engagement. Frozen text
+> above unchanged.]** The shipped A1 activation engages this matrix's A1 row
+> partially: the pure function `max(active_writer_floor, semantic)` is
+> production and `no-ff → v1` is live end-to-end, but `ACTIVE_WRITER_FLOOR`
+> remains `V0` (`gwz-core src/workspace_ops/merge/model/version.rs:39`, doc
+> comment states it), so **ordinary/custom starts continue to create v0**
+> until the production v1 ordinary-start owner lands (root participants,
+> dry-run prediction, drift/conflict response surfaces, the v0 event
+> stream). Engaging `V1` at activation was measured breaking every ordinary
+> start; the under-flip is the conservative side of this row (no reader can
+> regress on a record that was never written). Ruled an ACCEPTED NAMED
+> RESIDUAL by the A1 activation review, Safety axis round 2
+> (`GwzM5-8A1Activation-ReviewSafety.md` §R2.2), with binding conditions:
+> the remainder is owned by milestone **M5c** and the floor raise lands
+> with M5c as ONE reviewed change per §9's discipline; the release-time
+> retained-reader manifest describes the SHIPPED behaviour (ordinary=v0,
+> no-ff=v1), not this row, until M5c lands. Record:
+> `GwzM5-8A1ActivationRecord.md`.
+
 Existing v1+ records never change version. Open v0 records may use only the
 explicit A1 migration path. Archived records never migrate. `writer_version`
 means the last binary that successfully wrote the record. Every mutating

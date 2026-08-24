@@ -881,6 +881,57 @@ fable token only where it makes a difference." Recorded consequences:
   annotation + lock re-pin + package), the exact-ref gwz-core push,
   and the three-arm matrix dispatch at the landing commit (L11).
 
+  **A1 IS LANDED — 2026-08-25. THE ACTIVATION TUPLE: gwz-core
+  `1a31851` (exact-ref pushed, main 26f48f5 → 1a31851) / gwz-cli
+  `3000916` (local) / gwz-py `3d19dcd` (local) / taut `f008419`
+  (unchanged). The v1 merge writer and `--no-ff` are live on the
+  mainline.** The landing train's tree duties completed green
+  first: the four probe-harness cure classes PLUS A FIFTH the train
+  discovered and cured (cfg-agreement on injected observer-caller
+  probes — pre-A1 the `v1_preservation_image` call site was itself
+  v1-gated so edge and call agreed; G1 broke the agreement; cure
+  gates the injected statement `#[cfg(test)]`, checker
+  cfg-indifferent); L13's typed twin (`RecordDecodeError::Body`,
+  "the v0 decoder received a v1 record"); **L5's abandonment
+  witness PASSES with EQUAL shapes** —
+  `service_level_abandonment_of_a_not_started_action_is_mode_blind`
+  (no_ff_wire.rs:319; both modes `Refused {
+  MergeRecoveryRequired, "v1 transition predecessor or authority
+  mismatch" }`; non-vacuity verified; zero NoFf tokens, T-3 stands
+  at 19 files) — M5b [P3-3]'s unreachability executable for the
+  first time; the sentinel reinstated un-gated; [P3-R2-5] doc nit;
+  counts 256/926/119 and the five digests re-pinned from the final
+  tree (merge/mod.rs `76e4830e…`, v1_lifecycle/mod.rs `74a416a6…`
+  moved past the report — sentinel + witness). Final tree: census
+  1584 (1583+1 ignored), harness 69/69, checker ok, clippy clean,
+  R4b-G batteries green, cli 139/0, py 330/0 on a fresh maturin
+  build (01:42:48 .so). gwz-py Cargo.lock refresh ruled in (record
+  §8). LANDING RITUAL CLEAN: overlay at origin tip `26f48f5`, 91
+  files `rsync -rR`, checker green IN OVERLAY (the pin
+  cross-check), check/fmt/clippy-from-clean/focused (5+2+1+1)
+  green, commit, exact-ref push, live reconcile with LIVE SET ==
+  LANDED SET verified by diff before reset — zero stash incidents.
+  Root activation commit (this one): the operator-signed record
+  `GwzM5-8A1ActivationRecord.md` (all slots filled), the frozen
+  contract §2 A1-row dated annotation, the ChangeBudget L12 row,
+  the classification L11 dated update, `gwz.lock.yml` captured to
+  the tuple. MATRIX AT THE LANDING COMMIT: windows `32749489320` +
+  platform `32749492896` dispatched at `1a31851`; push-triggered
+  boundary + retained-readers (`32749441874`/`32749441866`) running
+  with the newly wired [P2-2] step; pre-attributed expected-green:
+  the +11 package tests and C-1's 3 first-native executions.
+  **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
+  post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
+  obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
+  sub-package, BarrierIntentV1::issue observe-or-refuse), R2-F
+  (native evidence, the T-5 pair carrier, C-2's four fixtures, the
+  L2-05 multi-repo-checkout cure), **M5c** (minted — the v1
+  ordinary-start owner + the floor raise as one reviewed change),
+  the escape packages (second lane, BLOCKED ON OPERATOR HANDOFF),
+  R3-R6 per RemPlan-4. Operator items open (non-gating): the
+  ChangeBudget charging-convention ruling; the executable-template
+  policy question; probe-branch cleanup.
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its

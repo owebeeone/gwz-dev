@@ -889,3 +889,21 @@ citation: the ledger's convention question is OPEN [the operator's
 row]; this filing discharges the *existence* debt — the row is here,
 its source commit named, its review on record — without minting
 numbers under a disputed convention.)
+
+## A1 activation package — row filed 2026-08-25 (activation record L12)
+
+Filed under the OPEN charging convention, with the operator's
+convention-ruling row (2,028 uniform / 582 review-artifact — the
+ruling is the operator's, still OPEN) resurfaced beside it. Figures
+verified by both round-2 axes and the landing train (delivered
+package + landing-train tree duties, over the base tuple gwz-core
+`26f48f5` / gwz-cli `3cca145` / gwz-py `929efb0`):
+
+| package | files | insertions | deletions | split |
+| --- | ---: | ---: | ---: | --- |
+| A1 activation (gwz-core) | 85 M + 3 new = 88 | +2019 | −621 | production src 68 files +901/−387; test tree 15 files +301/−216; scripts+CI 5 files +74/−18; new files 3 (+743: `merge/model/version.rs` 195, `merge/v1_lifecycle/start.rs` 245, `tests/g23/a1_activation.rs` 303) |
+| A1 activation (gwz-cli) | 3 | +14 | −3 | parser unhide + regenerated `docs/CLI.md` + g01 |
+| A1 activation (gwz-py) | 3 | +43 | −4 | cli unhide + test + `Cargo.lock` refresh (ruled in, record §8) |
+
+Record: `GwzM5-8A1ActivationRecord.md`. Review: A1 activation review
+rounds 1-2, GO/GO (`GwzM5-8A1Activation-Review{Safety,Completeness}.md`).
