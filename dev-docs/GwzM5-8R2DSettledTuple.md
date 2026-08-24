@@ -663,6 +663,12 @@ companion-class and were fixed in the step.
 - The ten multi-component writer rows (5.1's delta) have no native
   Windows/ARM execution record — runs 19-21 predate `d45458d`; expected-green,
   ledger entry owed at the next matrix dispatch (Code [P3-4]).
+- `root_fault_matrix` perf pricing: **318.71 s (release, `b91bdeb`)** is the
+  citable price (driver-corroborated at 327.6 s wall); 576.03 s stands as the
+  historical D3-review-tree figure. **PRICED-NOT-OPTIMIZED, ruling signed
+  2026-08-23** — the cost is the §8 crash matrix's evidence weight, accepted;
+  A1-activation-review input per `GwzM5-8ThinA1Amendment.md` §1 / L1-19.
+  Record: `GwzM5-8R4bG-Evidence.md` §8 item 3 addendum.
 - The L2-05 merge-doc gates are wired into no workflow — **wire them into CI
   before any lane relies on L2-05 mechanically** (both axes concur; Code
   [P3-6], tuple §11.3).

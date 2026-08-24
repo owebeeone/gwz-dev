@@ -322,12 +322,12 @@ review).
 | 2.1 | Aggregate fault gate — "aggregate restart/fault matrices" | **PASS** | Every suite named at `:150-175` re-executed green on the settled tree in one recorded pass (this document, §3.1): lib 1569/0/1 across four disjoint partitions; `checked_artifact::` 400/0 carries the 165-key fault census (`GwzM5-8R2DSettledTuple.md` §4.1-4.8, 107 keys with per-key site+row tables); `v1_lifecycle::` 255 incl. `reverse::preservation` 36 (`root_fault_matrix` green at 318.71 s release) and `reverse::rollback` 29; g23 fault/recovery suites inside the 111. **Counts re-baselined — see §7.** The *wiring* half is W5. |
 | 2.2 | Compatibility gate — "v0 compatibility" | **PASS** | `check_merge_compatibility_predicates.py … --core .` → `validated 7 migration rules and 7 runtime bindings`; its suite 14/0. `check_merge_docs.py` → `ok (11 sources, 147 assertions)`; its suite 3/0. Registry confirmed 7 `migration_whitelist` / 7 `fixture_corpus` / 6 `valid_unlisted_corpus`; `include_str!`-bound at `src/workspace_ops/tests/g23/compatibility_v0.rs:10`; production consumption at `src/workspace_ops/merge/record_wire/open_v0/adapter.rs:115-117` (binding at `:22`). g23 111/0, `record_wire::` 75/0. CI: retained-readers 5-platform matrix green at `b91bdeb`. |
 | 2.3a | Byte-equivalence — the seven adapted-v0 scenarios | **PASS** | All seven registry cases confirmed present and named exactly as the checklist lists them (`changed/finalizing-before-publication-record`, `changed/validating-before-candidate`, `changed/candidate-persisted`, `changed/evidence-unrecorded`, `changed/evidence-recorded`, `changed/prefix-boundary`, `unchanged/no-publication-finalizing`). Driven through `assert_upgrade_fixture` (`g23/atomic_upgrade_v0.rs:21-57`, cite exact) with `assert_v1_restart` (`:341`), `assert_unknown_fields_and_verifier` (`:52`); accepted-workspace byte assertion `accepted.lock.exact_yaml == candidate.lock_yaml` at `g23/compatibility_v0.rs:451` (within the cited `:444-458`). Executed inside the green g23 111/0. |
-| 2.3b | Byte-equivalence — "every M4 scenario" | **FAIL** | Unchanged from the draft, re-verified at `b91bdeb`: **no document or suite enumerates the M4 scenario set by name and maps it to equivalence evidence.** `GwzMergeM4-RemPlan.md` and `-RemReview.md` mention scenarios only generically; `GwzM5-8Refactor.md` §15.3.3 (now at `:1456`) is "Archived record decoding and evidence-only projection", not an M4 table. The obligation text at `GwzM5-8Refactor.md:2265` is the only "every M4" in dev-docs outside the checklist's own self-references. This is W4. |
+| 2.3b | Byte-equivalence — "every M4 scenario" | **FAIL** | Unchanged from the draft, re-verified at `b91bdeb`: **no document or suite enumerates the M4 scenario set by name and maps it to equivalence evidence.** `GwzMergeM4-RemPlan.md` and `-RemReview.md` mention scenarios only generically; `GwzM5-8Refactor.md` §15.3.3 (now at `:1456`) is "Archived record decoding and evidence-only projection", not an M4 table. The obligation text at `GwzM5-8Refactor.md:2265` is the only "every M4" in dev-docs outside the checklist's own self-references. This is W4. **[2026-08-24: the enumeration now exists — §12, 39 scenarios from `GwzM5-8R0Inventory.md` §4/§5.2, machine-checked by `check_m4_scenario_map.py`. The row's verdict does NOT flip to PASS: with the clause finally checkable, the answer is that it is **not met** — 13/39 scenarios carry a v1 equivalence binding, 22 are UNBOUND, 4 have NO FIXTURE, and the entire ten-shape archive family is unbound although O8 names archive output. Row stays **FAIL**, now with a measured denominator instead of an absent one. §12.6 R-1/R-2.]** |
 | 2.4 | Unknown-field gate | **PASS** | `every_transition_effect_commits_its_exact_unknown_manifest` present at `v1_lifecycle/tests/store/matrix.rs:18`; `store/unknown.rs` and `store/rewrite.rs` present; `record_wire::unknown_fields` now **28** tests (was 23), `record_wire::archive` **29** (was 24), `record_wire::tests::decode` 18 — total `record_wire::` 75/0 green; drift-survivor test at `tests/store/drift.rs:16`; extension preservation at `tests/store.rs:142`. |
 | 2.5a | Privacy — Rust visibility + boundary-checker probes | **PASS** | `PreparedV1Rewrite` still `pub(super)` at `v1_lifecycle/transition/mod.rs:20` (cite exact); authority/proof-token types `pub(super)` across `v1_lifecycle/authority.rs:28-158` (cite holds as a range); store commit path `pub(super)` at `store/rewrite.rs:15-23` (whole file is `pub(super)`-only). Boundary checker `ok`; its **65-test compiler-probe suite green (438.5 s)**, including `test_approved_outside_source_target_cannot_hide_an_observer_caller`, `test_compiler_rejects_nested_writer_in_authority_observer_tree`, `test_compiler_rejects_writer_in_v1_artifact_observer`, `test_merge_authority_backend_has_a_private_compiler_seal` (22 probe-bearing tests in all). CI green at `b91bdeb`. |
-| 2.5b | Privacy — the dedicated `PreparedV1Rewrite` / proof-token / raw-writer probe | **FAIL** | Re-verified at `b91bdeb`: zero `compile_fail`, zero `trybuild`, zero occurrences of `PreparedV1Rewrite` or any proof-token name in `gwz-core/scripts/`. The only "cannot construct" in `src/` is still a comment (`v1_lifecycle/authority.rs:716` — moved from the cited `:710`). Visibility gives the property; **nothing proves it fails closed.** This is W1. |
+| 2.5b | Privacy — the dedicated `PreparedV1Rewrite` / proof-token / raw-writer probe | **FAIL → PASS 2026-08-24** | As executed 2026-08-23: zero `compile_fail`, zero `trybuild`, zero occurrences of `PreparedV1Rewrite` or any proof-token name in `gwz-core/scripts/`; the only "cannot construct" in `src/` a comment (`v1_lifecycle/authority.rs:716`). **Closed by `scripts/checks/test_v1_lifecycle_privacy_probe.py` (F-2): 5/5 green in 96.95 s, four negative probes plus a positive control, and demonstrated to FAIL under a widened `mod transition` / `pub(crate) struct PreparedV1Rewrite`. Three seals proven distinct — `PreparedV1Rewrite` and the proof tokens against everything outside `v1_lifecycle`, and `store::rewrite::commit` against the rest of the lifecycle too. §13.1.** |
 | 2.6a | Call-graph — checked-artifact / writer boundary | **PASS** | Boundary checker `ok (15 visible entries, 5 classified modules)`; structural call-graph inventory intact (`source_tree_digest` now at `check_checked_artifact_boundaries.py:789`, `calls()` at `:808`, the `#![forbid(clippy::disallowed_methods)]` verification at `:845` — all moved +43, see §7). `clippy.toml` writer boundary present with the three gwz-core fall-through writers (`artifact::write_atomic` `:21`, `stash::write_bundle` `:22`, `sync_workspace_boundary` `:23`); clippy `-p gwz-core --all-targets --all-features -D warnings` from clean → zero diagnostics. Release-boundary suite 6/0. CI per-commit lane gate present (`checked-artifact-boundary.yml:23-25`) and green at `b91bdeb`. |
-| 2.6b | Call-graph — "v1 lifecycle modules contain no raw v0 persistence call" | **FAIL** | The property is **stronger than the draft claimed** — `grep -rn 'MergeStore\|FileMergeStore' src/workspace_ops/merge/v1_lifecycle/` returns **0 hits, including test code** (the draft said "outside test code"). The v0 finalizer remains outside the v1 tree at `merge/finalize_dispatch.rs:20`, `pub(super) fn finalize<B: GitBackend, S: MergeStore>`. But **no check asserts it**; nothing fails closed if it changes. This is W2. |
+| 2.6b | Call-graph — "v1 lifecycle modules contain no raw v0 persistence call" | **FAIL → PASS 2026-08-24** | The property is **stronger than the draft claimed** — `grep -rn 'MergeStore\|FileMergeStore' src/workspace_ops/merge/v1_lifecycle/` returns **0 hits, including test code** (the draft said "outside test code"). The v0 finalizer remains outside the v1 tree at `merge/finalize_dispatch.rs:20`, `pub(super) fn finalize<B: GitBackend, S: MergeStore>`. **Closed by the masked-token scan added to `check_checked_artifact_boundaries.py` (F-3), which derives the seam from `merge/mod.rs`'s own `use store::{…}` re-exports and scans all 128 `v1_lifecycle/**/*.rs`. Masking is load-bearing: ten `"enter_finalizing"` occurrences in that tree are action-name string literals, so a naive grep reports ten false hits where the masked scan reports the true zero. Fail-closed tests in the checker's own suite, one of them a compiler probe proving the violation compiles before asserting the checker rejects it. §13.1.** |
 | 2.7a | Settled-tree review gate, layer 1 — RemPlan-4 R6 checked-artifact settled-tree re-review pair | **RE-FRAMED** | The checklist calls this "a *precondition* of G, owned by the R2-R6 chain" (`:379-382`), citing `RemPlan-4:1140-1145`. **Superseded as an A1/R4b-G gate** by `GwzM5-8ThinA1Amendment.md:73-78` (§2.2) and `:79-82` (§2.3). **Thin-A1 equivalent, and it EXISTS:** the R2-D Phase 5.2 settled dual — "R2-D IS SETTLED — 2026-08-23, dual #3 of 3 consumed, GO/GO at round 2… The settled object is gwz-core `b91bdeb`" (`CurrentProgramCheckpoint.md:606-608`); reports `GwzM5-8R2DSettled-Review{Code,State}.md` (rounds 1+2 appended); round 2 "Code GO unconditional / State GO". Zero open P0/P1/P2. |
 | 2.7b | Settled-tree review gate, layer 2 — the two final full-tree R4b reviews | **PENDING BY DESIGN** | `AgentProcessRules.md:2006`; tier dual, cross-model where available. Nothing to produce; **this document is that review's input.** Not satisfied by 2.7a: the R6/5.2 pair is the *checked-artifact* tree; R4b-G's own pair is the *full R4b* tree (~25k lines). The checklist states the distinction at `:126`; it survives the re-frame intact. |
 | 2.8 | Shared router integration | **PASS** | `reverse_router` 3, `reverse_entry` 9, `c7_matrix` 7 (incl. `request_dispatch`) — all present by name and green inside the v1_lifecycle 255/0. |
@@ -335,6 +335,9 @@ review).
 | 2.9b | P3/P4 — the P2-P4 *acceptance* debt | **DEFERRED-BY-AMENDMENT** | The checklist says the debt is what "the settled-tree reviews absorb" (`:409-411`). Superseded: `GwzM5-8ThinA1Amendment.md:43-55` (§1) routes the v1_lifecycle P2/P3/P4 acceptance debt to the **A1 activation review**, which must either "(a) subsume a settled-tree acceptance of the `v1_lifecycle` tree with an operator-signed named-residual disposition for the D3/D4 classes, or (b) treat them as blocking per L1-19"; binding restated at `:242-244`. Record verified present — §8 item 1. |
 
 **Table 1 tally (14 rows): PASS 8 · FAIL 3 · RE-FRAMED 1 · DEFERRED-BY-AMENDMENT 1 · PENDING BY DESIGN 1.**
+**Re-tallied 2026-08-24 after the FAIL remediation: PASS 10 · FAIL 1 (2.3b, now
+with a measured denominator) · RE-FRAMED 1 · DEFERRED-BY-AMENDMENT 1 · PENDING
+BY DESIGN 1.**
 
 ---
 
@@ -352,7 +355,7 @@ symbol still exists; four line numbers moved (§7); no cite is GONE.**
 | O5 | typed owner before every mutation; result accepted only through the matching opaque exact-observation proof | **PASS** | `tests/forward.rs` **22** (was 16), `effect` 8 / `effect_retry` 2, `tests/authority.rs` 7 incl. `bound_payload_rejects_stale_record_and_value_tampering` (`:34`) and `every_authority_binding_rejects_an_identical_record_from_another_root` (`:58`), `authority::observe` 5 (`…/finalization/publication.rs:684`, `…/publication/live.rs:190`), the four dispatcher suites 18, service 5 + sequence 4, `contention_and_wrong_root_are_rejected_before_mutation` (`tests/store.rs:212`), `reverse::preservation` 36, `reverse::rollback` 29. Green. |
 | O6 | exact phase edges rather than ordinal publication progress or generic old/new validation | **PASS** | `predecessor_matrix` 3, all three by name: `every_transition_variant_executes_its_declared_footprint` (`:60`), `every_operation_transition_accepts_only_its_listed_predecessor_states` (`:105`), `publication_physical_action_phase_matrix_is_closed` (`:131`). `model::v1::validate::{lifecycle,journal,canonical}_tests` + vocabulary-closure suites, green inside `model::v1::` 69. |
 | O7 | keep v0/v1 mutation services separate; `v0_common_view` removed; borrowed non-serializable inputs | **PASS** | `grep -rn v0_common_view src/` → **0**. Replacement seam confirmed: `build_v1_acceptance` at `merge/acceptance/v1.rs:52` over `RecordView<'a>` (`:248-253`) with `&'a` fields (`:20-21`). Separation: `finalize_dispatch.rs:20` generic over `MergeStore` lives outside `v1_lifecycle/`, which has **0** `MergeStore`/`FileMergeStore` references at all. The *mechanical guard* is still absent — W2 / row 2.6b. |
-| O8 | byte-equivalent lock/candidate/root/archive output and identical restart actions for every M4 **and** all seven adapted-v0 scenarios | **FAIL** | Split. Adapted-v0 half: PASS (row 2.3a). "Every M4" half: **FAIL** (row 2.3b / W4) — the enumeration does not exist, so the clause is not checkable. Restart-action identity for adapted cases: `assert_v1_restart` (`g23/atomic_upgrade_v0.rs:341`); for v0 scenarios `abort_recovery` 7, `root_recovery` 3, `continue_merge` 6 — all green, but they are not the missing enumeration. |
+| O8 | byte-equivalent lock/candidate/root/archive output and identical restart actions for every M4 **and** all seven adapted-v0 scenarios | **FAIL** | Split. Adapted-v0 half: PASS (row 2.3a). "Every M4" half: **FAIL** (row 2.3b / W4) — the enumeration does not exist, so the clause is not checkable. Restart-action identity for adapted cases: `assert_v1_restart` (`g23/atomic_upgrade_v0.rs:341`); for v0 scenarios `abort_recovery` 7, `root_recovery` 3, `continue_merge` 6 — all green, but they are not the missing enumeration. **[2026-08-24: enumeration filed at §12 and machine-checked. The clause is checkable and the "every M4" half is measured NOT MET at 13/39. O8 stays **FAIL**; what changed is that the failure is now quantified and dispositioned per scenario rather than unknowable. The 7 ADAPTED rows are exactly row 2.3a's seven — the adapted-v0 half and the bound half of the every-M4 half are the same seven cases, which is itself the finding: no M4 scenario outside the seven registry-whitelisted ones has a v1 byte-equivalence assertion at all.]** |
 | O9 | no skip behavior; selected and unselected M4 handling remains exact | **PASS** | `m4_matrix.rs:51,119,155` — three mixed selected/unselected tests, all cites exact, green. Model rows `UnselectedPresent`/`Absent`; `builder_accounts_for_unselected_present_and_intentionally_absent_members`; archive retention `unavailable_projection_retains_unselected_rows_and_still_rejects_their_mutation` (`record_wire/archive/tests/v0.rs:130`); phase-skip rejection under O6. |
 
 **Table 2 tally (9 rows): PASS 8 · FAIL 1** (O8, same root defect as row 2.3b
@@ -378,13 +381,15 @@ claims (`GwzM5-8R2DSettledTuple.md:683-686`).
 
 | # | Work item | Verdict | Status at `b91bdeb` |
 | --- | --- | --- | --- |
-| W1 | privacy compile probe (`PreparedV1Rewrite` / proof tokens / raw v1 writer) | **FAIL** | Absent, unchanged. Zero `compile_fail`/`trybuild` anywhere; 22 compiler probes exist in `scripts/checks/test_check_checked_artifact_boundaries.py` and **none** names `PreparedV1Rewrite`, a proof token, or `store/rewrite.rs`. The churn note "sequence after R3" is now moot — R3 is post-A1, so **W1 no longer has a reason to wait** (see §9, J-4). |
-| W2 | v1→v0 call-graph check | **FAIL** | Absent, unchanged. Underlying property now provably *stronger* (0 hits including tests) and therefore cheaper to pin than when drafted. |
+| W1 | privacy compile probe (`PreparedV1Rewrite` / proof tokens / raw v1 writer) | **FAIL → LANDED 2026-08-24** | Was absent; zero `compile_fail`/`trybuild` anywhere, and none of the 22 sibling compiler probes named `PreparedV1Rewrite`, a proof token, or `store/rewrite.rs`. **`scripts/checks/test_v1_lifecycle_privacy_probe.py`, 138 lines, 5/5 green.** J-4's reading is adopted: R3 is post-A1, so the "sequence after R3" hedge was spent, not deferred. |
+| W2 | v1→v0 call-graph check | **FAIL → LANDED 2026-08-24** | Was absent. **Masked-token scan in `check_checked_artifact_boundaries.py`**, seam derived from `merge/mod.rs`'s re-exports, floor-checked so a restructured re-export fails the derivation rather than silently scanning nothing. Pins the stronger 0-hits-including-tests property. Explicitly NOT subsumed by the `PROTECTED_SOURCE_TREE_DIGESTS` pin on `v1_lifecycle/mod.rs`: that digest says "this tree changed", states no property, and is refreshed whenever the tree legitimately moves. |
 | W3 | rollback-prefix privacy/call-graph gate (`RollbackPrefixIssuer`) | **DEFERRED-BY-AMENDMENT** | `grep -rn RollbackPrefixIssuer src/` → **0**. Owned by RemPlan-4 R3 step 6 (`:1087-1101`, exit criterion 12). R3 is superseded off the A1 path by `GwzM5-8ThinA1Amendment.md:73-78`/`:79-82`/`:113-119`. The current seam remains `pub(super) fn issue_verified_rollback_prefix` (`…/observe/reverse/rollback_prefix.rs:240`, cite exact) — visibility-private, unprobed. **R4b-G cannot verify a gate its own amendment moved past A1; it can only record that the seam is private today.** |
-| W4 | "every M4 scenario" enumeration | **FAIL** | Absent, unchanged. Doc-only work; nothing blocks it. |
-| W5 | aggregate gate wiring | **FAIL (half-discharged)** | No driver, no gate manifest: `gwz-core/scripts/checks/` holds exactly the four checkers, their four suites, `check_lane_commits.sh`, and `merge_docs_manifest.json` — no meta-gate artifact; no workspace-root `scripts/`. The **recorded-checklist** half of W5 is discharged by §3-§6 of this document (every gate named, its command given, its result recorded on the settled tree, counts re-baselined). The **mechanised-driver** half — the ≤150 test/tool lines the ChangeBudget row reserves — remains unspent. |
+| W4 | "every M4 scenario" enumeration | **FAIL → LANDED 2026-08-24** | Was absent. **§12 of this document + `scripts/checks/check_m4_scenario_map.py` (133 lines).** The work item is discharged; its *result* is a new open finding (13/39 bound), which is the honest outcome of making an unmeasurable clause measurable. |
+| W5 | aggregate gate wiring | **FAIL (half-discharged) → LANDED 2026-08-24** | As executed 2026-08-23 there was no driver and no gate manifest. The **recorded-checklist** half was discharged by §3-§6 of this document. The **mechanised-driver** half is now `scripts/checks/run_r4bg_aggregate_gates.py` (139 lines), driving the seven gates of `GwzM5-8Refactor.md:2243-2244` with a required output marker per command; the seventh reports REVIEW and is never counted green. §13.2-§13.3. |
 
 **Table 3 tally (5 rows): FAIL 4 · DEFERRED-BY-AMENDMENT 1.**
+**Re-tallied 2026-08-24: LANDED 4 · DEFERRED-BY-AMENDMENT 1 (W3, unchanged —
+`RollbackPrefixIssuer` still does not exist and R3 is still post-A1).**
 
 ---
 
@@ -481,12 +486,12 @@ complete; the arithmetic in §3.1 proves it.
 | --- | --- | --- |
 | 1 — mechanical doc/compat gates | **PASS** | `check_merge_docs.py` ok (11 sources, 147 assertions); `check_merge_compatibility_predicates.py` 7/7. Both suites green. |
 | 2 — boundary + call-graph gates | **PASS** | Checker `ok`; 65/0 unit suite (438.5 s); `test_release_boundary.py` 6/0; clippy `-p gwz-core -D warnings` from clean, zero diagnostics. The W2 check does not exist (row 2.6b). |
-| 3 — privacy probes | **FAIL** | W1 absent; W3 deferred. Nothing to run. |
+| 3 — privacy probes | **FAIL → PASS 2026-08-24** | W1 absent at execution; W3 deferred. **Now: `python -m unittest scripts/checks/test_v1_lifecycle_privacy_probe.py` → 5/5, 96.95 s.** W3 remains deferred and unrunnable by design (J-5). |
 | 4 — full test battery | **PASS** | 1569/0/1 lib in four partitions + 50/0 integration. Counts re-baselined (§7.3). |
-| 5 — format/lint | **FAIL as written** | `cargo fmt --all -- --check` clean. The clippy command **as the runbook states it** exits 101 (§3.3). Gwz-core-scoped form green. |
+| 5 — format/lint | **FAIL as written → PASS as corrected 2026-08-24** | `cargo fmt --all -- --check` clean. The clippy command **as the runbook stated it** exits 101 (§3.3). The runbook step is now two lines — `-p gwz-core` with `CLIPPY_CONF_DIR`, plus workspace-wide plain clippy — with the reason recorded in place at `GwzM5-8R4bG-EvidenceInventory.md` §5 step 5. Both lines re-executed green at §13.3. |
 | 6 — protocol + parity | **PASS** | `regen.py --check` OK (the tuple's deferred gate, now executed); `d0_roundtrip_check.py` all passed; gwz-py 330/0 with `regen_protocol.py --check` OK; gwz-cli 139/0 (§6 below is the detail). |
 | 7 — CI platform evidence | **FAIL** | Boundary + retained-readers (incl. the 5-platform matrix) green **at `b91bdeb`**. **No Windows-matrix and no Platform-matrix run exists at `d45458d` or `b91bdeb`** — last is run 21 at `514f8e6`. `linux-identity-probe` last ran at `f36d20d`. The R5 exact-tree three-platform release jobs are DEFERRED-BY-AMENDMENT off the A1 gate (`ThinA1:236-239`), but the program's own Windows/platform matrix at the settled tree is **not** an R5 job and is missing. |
-| 8 — ledger/LOC audit | **PASS** | R4b-G row `ChangeBudget.md:515` = ≤150 test/tool, **0 production**, ≤3 unique production-bearing files, ≤12. This document spends **0** of all four: it is a dev-doc, no `src/` or `scripts/` change. The wiring budget (W5) is entirely unspent. |
+| 8 — ledger/LOC audit | **PASS** | ~~R4b-G row `ChangeBudget.md:515` = ≤150 test/tool, **0 production**, ≤3 unique production-bearing files, ≤12.~~ **[CORRECTION 2026-08-24 — this row's own reading of the budget was wrong, and it propagated into W5 and F-4. `ChangeBudget.md:507` gives the column order: *Net production-bearing Rust · Moved production Rust · Test/tool/doc LOC · Production files · Test/tool/doc files*. So R4b-G's row `≤150 · 0 · ≤1,500 · ≤3 · ≤12` reads **≤150 net production Rust, 0 moved, ≤1,500 test/tool/doc LOC, ≤3 production files, ≤12 test/tool/doc files** — not "≤150 test/tool". The two columns were transposed. The correct constraint is 10× looser for exactly the material W5 needs.]** As executed 2026-08-23 this document spent 0 of all five. **After the 2026-08-24 FAIL remediation (§13.1): 0 net production Rust, 0 moved, 1,177 net test/tool/doc LOC (582 tool + 595 doc, by `git diff --numstat` plus the three new files), 0 production files, 7 test/tool/doc files — inside every column on the corrected reading, at 78% of the test/tool/doc ceiling, and the driver was held to 150 lines anyway. On the *transposed* reading the same work would be 8× over a budget that does not exist.** |
 | 9 — aggregate gate record | **PASS** | This document. |
 | 10 — two independent full-tree R4b reviews | **PENDING BY DESIGN** | Same as row 2.7b; counted once. |
 
@@ -588,6 +593,64 @@ figure, (b) this 318.71 s re-measurement, or (c) a record that must still be
 written — and note that the discrepancy is large enough (576 → 319) that
 "priced, not optimized" would be quoting a number nobody re-checked.
 
+#### Item 3 addendum — the D3 perf pricing record, DRAFTED 2026-08-24 (F-7)
+
+Branch (c) taken: the record did not exist, so it is written here. **This is a
+draft for the lane owner.** The RULING line is deliberately unsigned; drafting
+a record is not adjudicating it.
+
+**Object.** `workspace_ops::merge::v1_lifecycle::reverse::preservation::tests::
+root_fault_matrix::every_root_physical_and_successor_boundary_recovers_without_
+repeating_mutation`, the single most expensive test in the tree.
+
+**Figures on record — both, because they are both real and they disagree.**
+
+| Figure | Where | Tree | Build | How obtained |
+| --- | --- | --- | --- | --- |
+| **576.03 s** | `CurrentProgramCheckpoint.md:642-643` ("the 576.03s on record"); narrative at `GwzM5-8D3Impl-ReviewState.md:553` and `GwzM5-8D3Impl-ReviewCode.md:435,445-446` | the D3 implementation review's round-2 tree | **release**, explicit | implementer's partition B against the prebuilt release binary, `find -newer` attribution; State axis did not re-run it and said so |
+| **318.71 s** | `GwzM5-8R4bG-Evidence.md` §3.1 | gwz-core **`b91bdeb`** (the R2-D settled object) | **release**, explicit | executed for this document, Darwin 25.5.0 / arm64, scratch `CARGO_TARGET_DIR`, green, 1 passed / 1569 filtered out |
+
+Neither figure is wrong and the gap is not a regression: they are different
+trees on different hosts, and the D3 figure was never re-measured after the
+round-2 delta landed. **The "~343 s release" figure the A1 brief expects
+exists nowhere in this workspace or its history** (§8 item 3 body). Any A1
+input citing "~343 s" is citing nothing.
+
+**Pricing frame: PRICED, NOT OPTIMIZED.** What is being bought is the D3
+amendment's §8 acceptance suite — `GwzM5-8DurableCursorAmendment.md:568-642`,
+"Test obligations" — and specifically its crash matrix: the restart-with and
+restart-without-cursor equivalence obligation (§8 item 2) drives the same
+fixture to every cursor position and injects a crash between each live pass
+and its marker write. That matrix is the reason the runtime is what it is. The
+cost is therefore **accepted as evidence weight, not carried as a defect**:
+the seconds buy per-position restart legality that no cheaper shape produces,
+and the amendment's own §8 is the thing that would have to shrink for the
+number to shrink. No optimization work is proposed, requested, or implied by
+this record.
+
+**Routing.** This is an **A1-activation-review input**, not an R4b-G
+acceptance item. `GwzM5-8ThinA1Amendment.md:43-55` (§1) routes the
+`v1_lifecycle` P2/P3/P4 acceptance debt — of which the D3 named residual is
+part — to the A1 activation review, which must either "(a) subsume a
+settled-tree acceptance of the `v1_lifecycle` tree with an operator-signed
+named-residual disposition for the D3/D4 classes, or (b) treat them as
+blocking per L1-19"; binding restated at `:242-244`. L1-19
+(`AgentProcessRules.md:392-401`) is what makes branch (b) exact: "A gate is
+`NO-GO` while any P0, P1, or P2 is open."
+
+**RULING — SIGNED by the lane owner, 2026-08-23.** The record's citable price is **318.71 s (release, `b91bdeb`)** — the settled tree's own measurement, corroborated by the driver's 327.6 s wall (`fault:2`) — with 576.03 s retained as the historical figure at the D3 review tree. "Priced, not optimized" is **ACCEPTED** as the disposition the A1 activation review consumes under branch (a): the cost is the crash matrix's evidence weight, and no optimization is owed pre-A1. The "~343 s" figure the A1 brief expected never existed in the corpus and is corrected by this ruling. Original unsigned frame follows: Which figure is the record's
+citable price (576.03 s at the D3 tree, or 318.71 s at the settled tree), and
+whether "priced, not optimized" is ACCEPTED as the disposition the A1
+activation review consumes under branch (a). This document supplies the
+measurement and the frame; it does not sign the ruling.
+
+**Drafted for the lane owner to lift into `GwzM5-8R2DSettledTuple.md` §11.1**
+(the "Added at the settled-dual round-2 remediation" block, whose row form
+this matches). The row is drafted, not inserted — the tuple document is the
+lane owner's:
+
+> | `root_fault_matrix` perf pricing — 576.03 s (D3 review tree) vs 318.71 s (release, `b91bdeb`) | PRICED-NOT-OPTIMIZED; the cost is `GwzM5-8DurableCursorAmendment.md` §8's crash matrix, accepted as evidence weight. A1-activation-review input per `GwzM5-8ThinA1Amendment.md:43-55` / L1-19. Record drafted at `GwzM5-8R4bG-Evidence.md` §8 item 3 addendum; RULING unsigned. The "~343 s" figure the A1 brief expects does not exist anywhere in the corpus. |
+
 ### Item 4 — the settled tuple's open-item register
 
 **PRESENT, complete and current at the round-2 remediation.**
@@ -633,13 +696,20 @@ passes on a developer's machine is not a gate" — holds at `b91bdeb`.
 6 exact duplicates deduped: O8≡2.3b, W1≡2.5b, W2≡2.6b, F5≡W3, S3≡W1+W3,
 S10≡2.7b).
 
-| Verdict | Count |
-| --- | --- |
-| **PASS** | **22** |
-| **FAIL** | **7** |
-| **RE-FRAMED** | **6** |
-| **DEFERRED-BY-AMENDMENT** | **2** |
-| **PENDING BY DESIGN** | **1** |
+| Verdict | Count (as executed 2026-08-23) | After the FAIL remediation (2026-08-24) |
+| --- | --- | --- |
+| **PASS** | **22** | **27** |
+| **FAIL** | **7** | **1** — F-1's underlying row 2.3b/O8, now measured rather than unknowable. F-6 is closed by the lane, not by this pass: gwz-dev `48ee7fe`, "run 22 green (1530/0/1) at the settled object `b91bdeb` — F-6 closed", recorded in `GwzWindowsMatrix-Classification.md`. Its §9.2 row is left as executed; updating it is the matrices lane's, and `CurrentProgramCheckpoint.md:641` still reads "dispatched". |
+| **RE-FRAMED** | **6** | 6 |
+| **DEFERRED-BY-AMENDMENT** | **2** | 2 |
+| **PENDING BY DESIGN** | **1** | 1 |
+
+**Remediation pass, 2026-08-24 (§13).** F-2, F-3, F-4, F-5 closed with
+executed evidence; F-7 drafted with its RULING left unsigned for the lane
+owner; F-1's work item (W4) discharged, and in discharging it the row it
+serves stays FAIL with a **measured** denominator — 13 of 39 M4 scenarios
+bound. Two residual findings are opened by that measurement, **R-1** and
+**R-2** (§12.6), and they are new inputs to this review, not closures.
 
 Every RE-FRAMED row has its thin-A1 equivalent named, and **five of the six
 have that equivalent in evidence** (F1/2.7a → the R2-D 5.2 settled dual,
@@ -652,13 +722,13 @@ equivalent is only half-evidenced** — see F-8.
 
 | ID | FAIL | Root | Owner under thin A1 |
 | --- | --- | --- | --- |
-| **F-1** | Row 2.3b / O8 — "every M4 scenario" byte-equivalence clause is **not checkable**: no enumeration of the M4 scenario set mapped to equivalence evidence exists. | W4 | R4b-G. Doc-only, unblocked, cheap. An R4b obligation quoted verbatim from `GwzM5-8Refactor.md:2265` cannot be confirmed today. |
-| **F-2** | Row 2.5b / W1 — no privacy compile probe. Visibility gives the property; **nothing proves it fails closed** the way 22 sibling probes do for the checked-artifact boundary. Battery source `TransitionDesign:1478-1479` is unmet. | W1 | R4b-G. Fits the ≤1,500 test/tool line budget. |
-| **F-3** | Row 2.6b / W2 — no mechanical assertion that v1 lifecycle modules contain no raw v0 persistence call. Battery source `TransitionDesign:1480-1481` is unmet. | W2 | R4b-G. Property is 0-hit clean today, so the pin is trivial to write and trivial to break silently without it. |
-| **F-4** | W5 — no aggregate gate driver. The **record** half is discharged by this document; the **mechanised** half (≤150 lines, `ChangeBudget.md:515`) is unspent. | W5 | R4b-G. This is literally the only material the R4b-G row's budget is for. |
-| **F-5** | Runbook step 5 — `CLIPPY_CONF_DIR=$PWD cargo clippy --workspace --all-targets --all-features -- -D warnings` **exits 101** with 7 `disallowed_methods` errors in gwz-cli: 2 production (`gwz-cli/src/pager.rs:127,131`, `io::Write::write_all`) and 5 test (`src/tests/g01/commands.rs:460`; `src/tests/m2c.rs:51,55,85,99`). | runbook command scope | R4b-G. **Not a gwz-core defect.** Either correct the runbook to `-p gwz-core` (matching CI) or make an explicit decision to extend the writer perimeter to gwz-cli. Do not silently drop the step. |
+| **F-1** | Row 2.3b / O8 — "every M4 scenario" byte-equivalence clause is **not checkable**: no enumeration of the M4 scenario set mapped to equivalence evidence exists. | W4 | R4b-G. Doc-only, unblocked, cheap. An R4b obligation quoted verbatim from `GwzM5-8Refactor.md:2265` cannot be confirmed today. **[CLOSED 2026-08-24 — §12 enumerates all 39 M4 scenarios from `GwzM5-8R0Inventory.md` §4/§5.2 and maps each to its tests; `check_m4_scenario_map.py` keeps the map honest. The clause is now checkable, and it **is not met**: 13/39 bound, 22 UNBOUND, 4 NO FIXTURE. F-1 is discharged; residual findings **R-1 (P2 candidate)** and **R-2 (P3 candidate)** at §12.6 are what it exposed, and they are the review's to rule on — not papered.]** |
+| **F-2** | Row 2.5b / W1 — no privacy compile probe. Visibility gives the property; **nothing proves it fails closed** the way 22 sibling probes do for the checked-artifact boundary. Battery source `TransitionDesign:1478-1479` is unmet. | W1 | R4b-G. Fits the ≤1,500 test/tool line budget. **[CLOSED 2026-08-24 — `scripts/checks/test_v1_lifecycle_privacy_probe.py`, 5/5 green, and demonstrated to FAIL when the visibility is widened. §13.1.]** |
+| **F-3** | Row 2.6b / W2 — no mechanical assertion that v1 lifecycle modules contain no raw v0 persistence call. Battery source `TransitionDesign:1480-1481` is unmet. | W2 | R4b-G. Property is 0-hit clean today, so the pin is trivial to write and trivial to break silently without it. **[CLOSED 2026-08-24 — masked-token scan in `check_checked_artifact_boundaries.py`, seam derived from `merge/mod.rs`'s own re-exports, covering test code too; inherits the checker's per-commit CI wiring. Load-bearing for J-1. §13.1.]** |
+| **F-4** | W5 — no aggregate gate driver. The **record** half is discharged by this document; the **mechanised** half (≤150 lines, `ChangeBudget.md:515`) is unspent. | W5 | R4b-G. This is literally the only material the R4b-G row's budget is for. **[CLOSED 2026-08-24 — `scripts/checks/run_r4bg_aggregate_gates.py`, 139 lines, seven batteries, executed. §13.2-§13.3. Note the "≤150 lines" reading is wrong — see §7.5 step 8's correction.]** |
+| **F-5** | Runbook step 5 — `CLIPPY_CONF_DIR=$PWD cargo clippy --workspace --all-targets --all-features -- -D warnings` **exits 101** with 7 `disallowed_methods` errors in gwz-cli: 2 production (`gwz-cli/src/pager.rs:127,131`, `io::Write::write_all`) and 5 test (`src/tests/g01/commands.rs:460`; `src/tests/m2c.rs:51,55,85,99`). | runbook command scope | R4b-G. **Not a gwz-core defect.** Either correct the runbook to `-p gwz-core` (matching CI) or make an explicit decision to extend the writer perimeter to gwz-cli. Do not silently drop the step. **[CLOSED 2026-08-24 — runbook step 5 is now two lines (`-p gwz-core` WITH the CONF_DIR; workspace-wide plain clippy as its own line), with the reason recorded in place: the perimeter is gwz-core's by design and the 7 gwz-cli hits are out-of-perimeter, verified not silently suppressed because the plain workspace line still compiles every one of those sites under `-D warnings`. The step was corrected, not dropped. J-3 is answered by choosing `-p gwz-core` (match CI); if the review prefers extending the perimeter to gwz-cli that is a scope decision it still owns.]** |
 | **F-6** | Runbook step 7 — **no Windows-matrix and no Platform-matrix run exists at the settled tuple.** Last is run 21 at `514f8e6`, three commits back (`d45458d`, `b91bdeb` uncovered). `linux-identity-probe` last ran at `f36d20d`. | dispatch not issued | R4b-G to decide: dispatch, or record the deferral with the risk named. The tuple already owes this as a round-2 ledger duty (`GwzM5-8R2DSettledTuple.md:663-665`) — scoped there to "the ten multi-component writer rows"; the CI record shows the gap is **the whole settled tree**, not ten rows. |
-| **F-7** | §8 item 3 — the **D3 perf pricing record does not exist.** No "~343 s release", no "priced not optimized", anywhere in the repo or its history. | record never written | The A1 activation review is expected to consume a figure that is not filed. This document supplies **318.71 s release at `b91bdeb`**; the nearest filed figure is **576 s release** (`GwzM5-8D3Impl-ReviewState.md:553`). |
+| **F-7** | §8 item 3 — the **D3 perf pricing record does not exist.** No "~343 s release", no "priced not optimized", anywhere in the repo or its history. | record never written | The A1 activation review is expected to consume a figure that is not filed. This document supplies **318.71 s release at `b91bdeb`**; the nearest filed figure is **576 s release** (`GwzM5-8D3Impl-ReviewState.md:553`). **[DRAFTED 2026-08-24 — §8 item 3 addendum carries both figures (576.03 s / 318.71 s), the priced-not-optimized frame with the D3 amendment §8 crash matrix as the cost, and the L1-19 routing; plus a one-row register addition drafted for `GwzM5-8R2DSettledTuple.md` §11.1. The **RULING line is unsigned** and the tuple row is **not inserted** — both are the lane owner's. F-7 moves from "record never written" to "record drafted, ruling open".]** |
 
 ### 9.3 Judgment calls
 
@@ -691,6 +761,14 @@ and pushed 2026-08-22, ahead of both R4b-G and the R2-D settle (2026-08-23).
   unreachability argument leans on R4b-G's call-graph gate (§6 item 4)" —
   and the call-graph gate's v1→v0 half (W2/F-3) **does not exist**. M5b's
   unreachability argument is currently leaning on an absent gate.
+  **[2026-08-24: reason (c) is now addressed. The gate exists — F-3's masked-
+  token scan in `check_checked_artifact_boundaries.py`, wired into the
+  per-commit CI lane. It lands as a **standing guard going forward**, not as a
+  retroactive claim about the merge that already happened; that is the exact
+  framing the lane owner's J-1 adjudication uses
+  (`CurrentProgramCheckpoint.md:653-656`). The guard's own comment says it is
+  load-bearing for J-1 and must not be weakened without the lane owner's
+  ruling. The ordering deviation itself is still the dual's to accept.]**
 - **The review must rule:** ratify the ordering as superseded (and have the
   lane strike `CurrentProgramCheckpoint.md:1092` and annotate the design's
   `:976-986`), or record it as a deviation under L1-16. Either way the
@@ -713,12 +791,24 @@ the class `clippy.toml`'s `io::Write::write*` entries exist to catch *inside
 gwz-core's merge tree*. gwz-cli is a CLI driver, not a durable-store owner.
 The cheap answer is almost certainly the right one, but it is a scope
 decision, not a typo fix, and the step must not be silently dropped.
+**[2026-08-24: the cheap answer is taken and recorded, not assumed. Runbook
+step 5 is now two lines — `-p gwz-core` with `CLIPPY_CONF_DIR` (matching CI's
+`checked-artifact-boundary.yml:30-35`), plus workspace-wide plain clippy as
+its own line — with a written reason in place. The step is corrected, not
+dropped, and the 7 gwz-cli hits are verified not silently suppressed: the
+workspace-wide line still compiles every one of those call sites under
+`-D warnings`. If the review prefers extending the writer perimeter to
+gwz-cli, that remains its call; nothing here forecloses it.]**
 
 **J-4 — W1's sequencing note is now moot.** The checklist says "Sequence
 after R3 (see churn note)" (`:661-662`). R3 is post-A1. **W1 no longer has a
 reason to wait**, and the R3 churn it was hedging against will not arrive
 before A1. If the review accepts that, W1 becomes plainly buildable now, and
-F-2 loses its only excuse.
+F-2 loses its only excuse. **[2026-08-24: W1 was built on that reading. If the
+review rejects J-4 and holds that W1 should have waited for R3, the probe is
+still correct today and its three seals are stated independently, so an R3
+reshuffle of the rollback-prefix seam changes W3's future gate, not this
+one.]**
 
 **J-5 — What R4b-G can even say about W3.** `RollbackPrefixIssuer` does not
 exist; R3 owns it; R3 is post-A1. R4b-G "verifies it" per the checklist
@@ -849,3 +939,440 @@ because this session's per-command budget is 600 s and the single-run figure
 is ~700 s; the arithmetic reconciliation is in §3.1. No git write operation
 was performed. `gwz-py/Cargo.lock` was transiently modified by the project's
 own harness and restored (§10.2). This document is the only file written.
+
+**Second pass, 2026-08-24 — the FAIL remediation.** §§12-13 were added by a
+later session on the same host and the same tree (gwz-core `b91bdeb`, clean at
+start). That pass is **not** an execution of the inventory; it closes the FAILs
+§9.2 recorded, and it does write files: five under `gwz-core/scripts/checks/`
+and this document plus `GwzM5-8R4bG-EvidenceInventory.md`. **Zero production
+lines.** No git write operation was performed by it either, and no digest pin
+was moved — pins are the lane owner's. Its own provenance, budget, and gate
+tails are §13. Everything in §§1-11 above is the 2026-08-23 record and is left
+as executed, annotated in place where a later fact bears on it.
+
+---
+
+## 12. The M4 scenario enumeration (F-1 / W4), added 2026-08-24
+
+**Status of this section: INVENTORY bound to an executed run (L1-16).** The
+tables below are a name-to-name map. They are not themselves an executed
+matrix. The run that executes them is recorded at §12.5 and is the g23 suite
+at `b91bdeb`; every test path named here is verified to exist by
+`scripts/checks/check_m4_scenario_map.py`, which is battery 3 of the §13
+driver.
+
+### 12.1 Which document defines the M4 scenario set
+
+`GwzM5-8Refactor.md:51` puts M4's characterization in R0: "R0-R1 characterize
+M4 and centralize current semantics without changing the …". The document that
+did it is **`GwzM5-8R0Inventory.md`** — "GWZ M5-M8 R0 Baseline and Lifecycle
+Inventory". Its §4 ("Closed v0 progress inventory mapped to §15.3.2",
+`:179-205`) enumerates the durable M4 progress shapes by name in rows A-M, and
+its §5.2 ("Observed terminal archive shapes", `:226-246`) enumerates the
+archive shapes by name. Between them they are the only by-name enumeration of
+the M4 durable scenario set in this corpus, and they are exactly the four
+output families O8 names — lock, candidate, root, archive.
+
+Two companion documents are consulted and neither supplies a competing
+enumeration: the **M4 acceptance record** (`GwzMergeM4-RemPlan.md` §8-§9,
+whose exit criteria are the M4 *feature* gate — prediction, `--ff-only`, the
+selection axis — carried at §12.4 below) and `GwzM5-8Refactor.md` §15.3.3
+(`:1456`, the archive projection design that §5.2's rows target).
+
+**29 progress shapes + 10 archive shapes = 39 named M4 scenarios.**
+
+### 12.2 How each row is dispositioned
+
+The v1 equivalence binding is the frozen predicate registry,
+`gwz-core/dev-docs/GwzM5-8I2CompatibilityPredicates.json`, which is
+`include_str!`-bound at `g23/compatibility_v0.rs:10` and machine-validated by
+`check_merge_compatibility_predicates.py`. It carries **7 `fixture_corpus`**
+rows and **6 `valid_unlisted_corpus`** rows, each naming an exact test and
+subcase.
+
+- **ADAPTED** — a `fixture_corpus` row. The scenario is adapted to v1 and
+  driven through `assert_i2_compatibility_fixture`
+  (`g23/compatibility_v0.rs:375`), which asserts the classification tuple, the
+  accepted-workspace byte identity `accepted.lock.exact_yaml ==
+  candidate.lock_yaml` (`:451`), and then `assert_upgrade_fixture`
+  (`g23/atomic_upgrade_v0.rs:21`) — per-case fault matrix, unknown-field
+  survival plus verifier, accepted-lock extension, and `assert_v1_restart`
+  (`:341`). **This is the full O8 property.**
+- **UNLISTED** — a `valid_unlisted_corpus` row. v1 refuses to adapt the
+  scenario for a recorded reason, so there is no v1 output to be equivalent
+  to; the obligation discharged is that the v0 bytes stay exact, driven
+  through `assert_i2_valid_unlisted_fixture` (`g23/compatibility_v0.rs:473`).
+- **UNBOUND** — the scenario has v0 pinning and/or scenario coverage but **no
+  registry row at all**: neither adapted nor recorded as deliberately
+  unlisted. **Residual finding.** §12.5 counts these.
+- **NO FIXTURE** — no independently injected durable fixture exists for the
+  shape at all. **Hard residual finding.**
+
+<!-- m4-map:begin -->
+
+### 12.3 Table A — the 29 durable progress shapes (`GwzM5-8R0Inventory.md` §4)
+
+Test paths are relative to `workspace_ops::tests::g23::` unless fully
+qualified.
+
+| R0 row | M4 shape | v0 pin / scenario evidence | Registry row | Disposition |
+| --- | --- | --- | --- | --- |
+| A | `A-EXECUTING` | `preserve::review_remediation::preserve_abort_accepts_exact_interrupted_executing_state`, `start::preflight_checks_every_member_before_mutating_an_earlier_member` | — | **UNBOUND** |
+| A | `A-AWAITING` | `open_operation_gate::open_awaiting_resolution_blocks_dry_run_and_real_starts_from_an_explicit_root`, `continue_merge::conflict_continues_to_later_member_and_status_recovers_with_baseline_lock` | — | **UNBOUND** |
+| A | `A-HALTED` | `open_operation_gate::open_halted_blocks_dry_run_and_real_starts_from_an_explicit_root`, `continue_merge::failed_and_unattempted_rows_retry_only_after_whole_operation_preflight` | — | **UNBOUND** |
+| A | `A-PRE-PRESERVE` | `preserve::preserving_abort_gate::plain_abort_rejects_interrupted_preservation_before_rollback`, `preserve::preserve_abort_failure_windows_never_begin_rollback_and_retry_converges` | — | **UNBOUND** |
+| A | `A-PRE-ROLLBACK` | `abort_recovery::abort_accepts_every_pre_candidate_finalization_fault_point` | — | **UNBOUND** |
+| B | `B-NO-PUBLICATION-ROW` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `finalizing_before_publication_record`, fault `AfterEnteringFinalizing`) | `changed/finalizing-before-publication-record` | **ADAPTED** |
+| B | `B-NOT-STARTED` | none — R0 §4 row B records "durable `NotStarted` post-rename window is not independently injected"; still true at `b91bdeb` | — | **NO FIXTURE** |
+| B | `B-VALIDATING` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `validating_before_candidate`, fault `BeforeCandidateCreation`) | `changed/validating-before-candidate` | **ADAPTED** |
+| B | `B-PREPARING-EMPTY` | none — no window injects `PreparingCandidate` with the candidate still absent; the nearest window (`candidate_persisted_before_evidence`) already carries the candidate | — | **NO FIXTURE** |
+| C | `C-CANDIDATE-PERSISTED` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `candidate_persisted_before_evidence`, fault `AfterCandidatePersistence`) | `changed/candidate-persisted` | **ADAPTED** |
+| D | `D-EVIDENCE-CREATED-UNRECORDED` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `evidence_created_before_recording`, fault `AfterEvidenceCommit`) | `changed/evidence-unrecorded` | **ADAPTED** |
+| E | `E-EVIDENCE-RECORDED` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `evidence_recorded_before_publication`, fault `AfterEvidencePersistence`) | `changed/evidence-recorded` | **ADAPTED** |
+| F | `F-BASELINE` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation` | — | **UNBOUND** |
+| F | `F-MARKER` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation`, `drift::status_detects_marker_and_boundary_drift_without_a_prior_recovery_mutation` | — | **UNBOUND** |
+| F | `F-LOCK` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation` | — | **UNBOUND** |
+| F | `F-BOUNDARY` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `candidate_published_before_recording`, fault `AfterLockPublication`) | `changed/prefix-boundary` | **ADAPTED** |
+| G | `G-VERIFYING` | `characterization_publication_v0::v0_verifying_publication_is_durable_for_born_and_unborn_roots` | — | **UNBOUND** |
+| G | `G-COMPLETE-PRE-ARCHIVE` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `completed_before_archive`, fault `BeforeArchive`), `characterization_v0::v0_terminal_completed_before_archive_is_read_only_and_closes_byte_exactly` | `terminal/completed` | **UNLISTED** ("terminal v0 archives byte-exact") |
+| H | `H-PRESERVING-PRE` | `characterization_preservation_v0::v0_preservation_restart_rebuilds_missing_stash_bundle_from_recorded_evidence` | `preserving/stash` | **UNLISTED** ("v0 has no lossless write-ahead reverse owner") |
+| H | `H-PRESERVING-CANDIDATE` | `preserve::preserve_abort_handles_post_composition_root_work_with_root_bundle_identity`, `preserve::review_remediation::member_only_merge_preserves_post_composition_root_work` | — | **UNBOUND** |
+| H | `H-PRESERVING-PREFIX` | `characterization_preservation_v0::v0_preserving_overlay_round_trips_every_recorded_root_prefix`, `preserve::review_remediation::preserve_retry_repairs_interrupted_root_publication_normalization` | — | **UNBOUND** |
+| I | `I-PARTICIPANT-ROLLBACK` | `characterization_preservation_v0::v0_participant_rollback_has_restartable_durable_reverse_prefixes` | `rollback/participant` | **UNLISTED** ("v0 has no lossless write-ahead reverse owner") |
+| I | `I-EVIDENCE-ROLLBACK` | `characterization_preservation_v0::v0_evidence_rollback_records_each_reverse_artifact_prefix`, `abort_recovery::born_root_evidence_abort_recovers_both_record_persistence_windows`, `abort_recovery::unborn_root_evidence_abort_recovers_both_record_persistence_windows` | — | **UNBOUND** |
+| J | `J-NO-PUBLICATION-BORN` | `characterization_v0::v0_no_publication_complete_before_terminal_write_is_read_only` (fault `AfterNoPublicationComplete`, the eighth variant, driven separately from the seven-window array) | `unchanged/no-publication-finalizing` | **ADAPTED** |
+| J | `J-NO-PUBLICATION-UNBORN` | `characterization_v0::v0_no_publication_completion_preserves_born_and_unborn_root_inputs`, `characterization_publication_v0::v0_publication_windows_have_born_and_unborn_root_twins` | — | **UNBOUND** |
+| K | `K-COMPLETED-CANDIDATE-OPEN` | `characterization_v0::v0_terminal_completed_before_archive_is_read_only_and_closes_byte_exactly` | `terminal/completed` (shared with `G-COMPLETE-PRE-ARCHIVE` — one durable object, two R0 rows) | **UNLISTED** |
+| K | `K-COMPLETED-NOPUB-OPEN` | `characterization_publication_v0::v0_no_publication_completed_open_record_closes_byte_exactly` — **this closes R0 §4 row K's "no-publication terminal-open byte-exact fixture missing" gap** | — | **UNBOUND** |
+| L | `L-RECOVERY-OVERLAY` | `characterization_v0::v0_recovery_required_overlays_preserve_candidate_and_no_publication_evidence` (subcases `candidate`, `no_publication`), `characterization_publication_v0::v0_recovery_required_overlays_keep_each_constructible_publication_row_byte_exact` | `recovery/candidate` + `recovery/no-publication` (two rows, one shape) | **UNLISTED** ("recovery origin is not uniquely owned") |
+| M | `M-ABORTED-OPEN` | `characterization_v0::v0_terminal_aborted_before_archive_is_read_only_and_closes_byte_exactly`; candidate-era variant `characterization_publication_v0::v0_candidate_aborted_open_record_closes_byte_exactly` — **closes half of R0 §4 row M's "candidate/evidence-era … terminal-open variants missing" gap; the preservation-bearing variant remains open** | `terminal/aborted` | **UNLISTED** |
+
+### 12.4 Table B — the 10 archive shapes (`GwzM5-8R0Inventory.md` §5.2)
+
+| Archive id | Fixture shape | Evidence | Registry row | Disposition |
+| --- | --- | --- | --- | --- |
+| `AC-CANDIDATE` | `av0_b` / `CompletedCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes` | — | **UNBOUND** |
+| `AC-NOPUB-BORN` | `av0_c` / `CompletedNoPublication` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes`, `characterization_archive_v0::id_qualified_gc_returns_the_validated_archived_record_projection` | — | **UNBOUND** |
+| `AC-NOPUB-UNBORN` | none — no archive-only projection with the live root later born or missing | `characterization_v0::v0_no_publication_completion_preserves_born_and_unborn_root_inputs` pins the live-side unborn twin only | — | **NO FIXTURE** |
+| `AA-PREACCEPTANCE` | `av0_e` / `AbortedPreAcceptance` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes` | — | **UNBOUND** |
+| `AA-CANDIDATE-COMPLETE` | `av0_f` / `AbortedCompleteCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes` | — | **UNBOUND** |
+| `AA-CANDIDATE-PARTIAL` | `av0_g` / `AbortedPartialCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes` | — | **UNBOUND** |
+| `AP-PRESERVED` | none — no stash-only / ref-only / combined **archive** fixture; the evidence is live-workspace GC | `characterization_preservation_v0::v0_gc_restarts_after_one_of_two_recorded_backup_refs_was_deleted`, `gc::explicit_gc_checked_deletes_only_backup_refs_and_archive_record` | — | **NO FIXTURE** |
+| `AL-OPTIONAL-MISSING` | `av0_d` / `CompletedEvidenceGap` | `characterization_archive_v0::archived_v0_optional_evidence_gaps_remain_readable_and_untouched` (the four named gaps `exact_lock_bytes`, `complete_member_audit`, `accepted_root_input`, `publication_evidence`) | — | **UNBOUND** |
+| `AL-UNKNOWN` | `unknown_retention` / `CompletedCandidate` | `characterization_archive_v0::archived_v0_unknown_fields_and_raw_bytes_survive_status_and_retention` — **closes R0 §5.2's "open-record unknown round-trip unit test only" gap** | — | **UNBOUND** |
+| `AR-C` | contradiction cases over `CompletedNoPublication` | `characterization_archive_v0::archived_v0_missing_optional_evidence_is_not_an_unreadable_contradiction` | — | **UNBOUND** |
+
+<!-- m4-map:end -->
+
+### 12.5 The M4 feature axis (the M4 acceptance record's own gate)
+
+`GwzMergeM4-RemPlan.md:412-418` exit criterion 6 — "member-only, root-only,
+and mixed prediction and `--ff-only` matrices pass" — is the M4 *feature*
+scenario axis, and it is orthogonal to the durable-shape axis above. It is
+IMPLEMENTED+TESTED and needs no new enumeration: `m4_matrix` carries the three
+mixed rows by name (`m4_matrix::mixed_member_root_dry_run_reports_clean_and_conflicted_predictions_without_mutation`,
+`m4_matrix::mixed_ff_only_rejects_later_root_true_merge_before_member_fast_forward`,
+`m4_matrix::mixed_ff_only_accepts_member_fast_forward_and_up_to_date_root`),
+with the member-only rows in `start::` (`ff_only_fast_forward_persists_its_durable_mode`,
+`ff_only_rejects_mixed_batch_before_an_earlier_fast_forward`,
+`dry_run_predicts_conflicts_without_changing_git_or_gwz_state`) and the
+root-only rows in `root_start::` (`explicit_root_ff_only_rejects_true_merge_before_mutation`,
+`explicit_root_dry_run_predicts_conflict_without_mutation`,
+`explicit_root_dry_run_is_visible_and_does_not_mutate`). This axis produces no
+durable v1 record of its own, so O8's byte-equivalence clause does not reach
+it; row 2.9/O9 already carries it.
+
+### 12.6 Verdict, and the residual findings this enumeration exposes
+
+**O8's "every M4" clause is now checkable. The answer is that it is not
+met — 13 of 39 scenarios carry a v1 equivalence binding.**
+
+| Disposition | Progress (§12.3) | Archive (§12.4) | Total |
+| --- | ---: | ---: | ---: |
+| **ADAPTED** — full O8 property proven | 7 | 0 | **7** |
+| **UNLISTED** — v1 declines to adapt, v0 bytes pinned | 6 | 0 | **6** |
+| **UNBOUND** — no registry row at all | 14 | 8 | **22** |
+| **NO FIXTURE** — no durable fixture either | 2 | 2 | **4** |
+| **Total named scenarios** | **29** | **10** | **39** |
+
+Registry-row arithmetic, since the map is not 1:1 in either direction: the 7
+`fixture_corpus` rows bind 7 shapes one-for-one; the 6 `valid_unlisted_corpus`
+rows bind 6 shapes, but `terminal/completed` binds two R0 rows
+(`G-COMPLETE-PRE-ARCHIVE` and `K-COMPLETED-CANDIDATE-OPEN` are one durable
+object seen from §4's progress axis and its terminal axis) while
+`L-RECOVERY-OVERLAY` consumes two rows (`recovery/candidate`,
+`recovery/no-publication`). 13 registry rows, 13 bound shapes.
+
+**Residual finding R-1 (P2 candidate).** 22 named M4 scenarios have **no
+registry row** — they are neither adapted-and-proven-equivalent nor recorded
+as deliberately unlisted. The registry is the only mechanism the tree has for
+stating either answer, and `check_merge_compatibility_predicates.py` only
+validates the rows that exist; it cannot notice a scenario nobody filed. The
+whole archive family (§12.4) is unbound: **not one of the ten M4 archive
+shapes has a v1 equivalence binding**, although O8 names archive output
+explicitly.
+
+**Residual finding R-2 (P3 candidate).** 4 scenarios have no durable fixture
+at all: `B-NOT-STARTED` and `B-PREPARING-EMPTY` (R0 §4 row B's own recorded
+gap, unchanged since R0), `AC-NOPUB-UNBORN`, and `AP-PRESERVED`
+(archive-side; the live-workspace evidence is not the archive projection R0
+§5.2 asks for). These cannot be dispositioned either way until a fixture
+exists.
+
+**What did close since R0**, recorded so the review does not re-open them:
+`K-COMPLETED-NOPUB-OPEN`, `AL-UNKNOWN`, and the candidate-era half of
+`M-ABORTED-OPEN` now have the fixtures R0 listed as missing.
+
+**Executed run binding this inventory (L1-16).** Tree gwz-core `b91bdeb`,
+clean; Darwin 25.5.0 / arm64; `cargo test --lib -p gwz-core
+workspace_ops::tests::g23::` -> **111 passed; 0 failed**, and
+`scripts/checks/check_m4_scenario_map.py` -> ok. Tails at §13.3. Unexecuted
+remainder: none for the named tests; the 21 UNBOUND and 4 NO FIXTURE rows are
+inventory gaps, not unexecuted tests.
+
+---
+
+## 13. R4b-G FAIL remediation — executed 2026-08-24
+
+Same tree, same host, later session: gwz-core **`b91bdeb`**, clean at start;
+Darwin 25.5.0 / arm64; Python **3.13.12** (`/opt/homebrew/bin/python3.13` —
+the host has moved on from §11's 3.13.7); every cargo invocation under a
+scratch `CARGO_TARGET_DIR` outside every repository. **No git write
+operation. No production line. No digest pin moved.**
+
+### 13.1 What landed, by FAIL
+
+| FAIL | Landed | Files | LOC |
+| --- | --- | --- | ---: |
+| **F-1** (W4) | §12 above — the 39-scenario M4 enumeration from `GwzM5-8R0Inventory.md` §4/§5.2, each scenario mapped to its tests and its registry binding — plus the script that keeps the map honest: every test it names must exist, every registry row must be claimed by exactly one scenario, every cited case id must exist. | `scripts/checks/check_m4_scenario_map.py` (new); §12 of this document | 144 |
+| **F-2** (W1) | Temp-copy compile probes for the sealed lifecycle perimeter, in the `run_compiler_probe` idiom but inverted: there the compiler accepts and the checker must reject, so the probe asserts returncode 0 first; here the compiler **is** the enforcement, so the negatives assert it rejects and a **positive control** compiles byte-identical probe text from inside the seal. Without the control a renamed or deleted item would make every negative pass for the wrong reason. Three seals proven separately, and the raw writer proven sealed **against the rest of the lifecycle** too, not merely against the outside. | `scripts/checks/test_v1_lifecycle_privacy_probe.py` (new) | 138 |
+| **F-3** (W2) | Masked-token scan over all **128** `v1_lifecycle/**/*.rs` (including the ten `#[path]`-mounted test files §7.3 warns about — they resolve inside the tree, so `rglob` reaches them), seam **derived** from `workspace_ops/merge/mod.rs`'s own `use store::{…}` re-exports — **9 names today**: `MergeStore`, `FileMergeStore`, `archive_merge_record`, `enter_finalizing`, `persist_merge_record`, `persist_operation_transition`, `AtomicUpgradeFault`, `AtomicUpgradeOutcome`, `upgrade_open_v0_for_r3_tests` — so a newly exported v0 persistence item is covered the day it is added, with a floor check that fails the derivation closed if that re-export is restructured away. Measured: `enter_finalizing` is **10 raw grep hits / 0 masked hits** in that tree. Four fail-closed tests, one of them a compiler probe proving the violation compiles before asserting the checker rejects it. Comment marks it **load-bearing for J-1**. | `scripts/checks/check_checked_artifact_boundaries.py` (+76), `scripts/checks/test_check_checked_artifact_boundaries.py` (+74) | 150 |
+| **F-4** (W5) | The seven-battery driver, each command carrying the output marker its green result must print. | `scripts/checks/run_r4bg_aggregate_gates.py` (new) | 150 |
+| **F-5** | Runbook step 5 corrected in place to two lines with the reason recorded. | `GwzM5-8R4bG-EvidenceInventory.md` §5 step 5 | doc |
+| **F-7** | Pricing record drafted at §8 item 3 addendum; register row drafted, **not inserted**, for `GwzM5-8R2DSettledTuple.md` §11.1; **RULING unsigned**. | §8 of this document | doc |
+| corrections | `clippy.toml` 19-not-21 and `FinalizationFault` eight-not-seven, as bracketed dated corrections in place (not silent rewrites); plus the `ChangeBudget.md:515` column transposition this document itself carried (§7.5 step 8). | `GwzM5-8R4bG-EvidenceInventory.md`, §7.5 here | doc |
+
+**Ledger.** 0 net production-bearing Rust, 0 moved, **1,177 net test/tool/doc
+LOC** (582 tool + 595 doc), **0 production files**, **7 test/tool/doc files**.
+Against `ChangeBudget.md:515` read correctly (§7.5 step 8): inside every
+column, at **78% of the ≤1,500 test/tool/doc ceiling** — the tightest column,
+and the reason the driver was held to 150 lines even though nothing required
+it. Doc lines dominate (595 of 1,177) because §12's enumeration and this
+section are the deliverable, not overhead.
+
+**F-6 is not this pass's** — the Windows/Platform matrices were dispatched
+separately (`CurrentProgramCheckpoint.md:640-641`, run 22 at `b91bdeb`).
+
+### 13.2 The driver, and why its end-to-end run is partitioned
+
+`run_r4bg_aggregate_gates.py` drives the seven gates
+`GwzM5-8Refactor.md:2243-2244` names. Two properties matter to the review:
+
+1. **A command that exits 0 while printing the wrong count still fails.**
+   Each command declares the marker its green result must contain — `254
+   passed`, `ok (11 sources, 147 assertions)`, `validated 7 migration rules
+   and 7 runtime bindings`. This is W5's "expected count on the settled tree",
+   mechanised rather than recited.
+2. **The seventh gate can never make it green.** `settled-tree-review` has no
+   commands; it prints REVIEW, and the exit code says only that *the
+   mechanical gates in the selection* pass.
+
+**On "executed end-to-end once":** the seven batteries need ~25 minutes of
+wall clock, of which the `fault` battery alone is **683 s** of pure test
+execution (355.9 s + 327.6 s) — more than this session's 600 s per-command
+budget, the same budget that forced §3.1's four-way partition of the lib
+suite. The driver therefore carries a `battery:index` selector, and a
+partitioned run prints **PARTIAL** and withholds the aggregate pass line so
+the reconciliation stays explicit. All seven batteries were executed, green,
+across **four invocations**, disjoint and exhaustive:
+
+| Invocation | Selection | Result |
+| --- | --- | --- |
+| 1 | `compatibility byte-equivalence unknown-field privacy` | 9 commands, all ok |
+| 2 | `fault:1` | ok, PARTIAL |
+| 3 | `fault:2` | ok, PARTIAL |
+| 4 | `call-graph settled-tree-review` | 3 commands ok + REVIEW |
+
+14 commands across 6 mechanical batteries + 1 review gate = the full set.
+
+### 13.3 Gate tails, verbatim
+
+```
+$ cargo check --all-targets                       # workspace
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 24.54s
+exit=0
+
+$ cargo fmt --all -- --check                      # gwz-core
+exit=0
+
+$ python3.13 -m unittest scripts/checks/test_v1_lifecycle_privacy_probe.py -v
+test_prepared_v1_rewrite_is_unnameable_outside_the_perimeter ... ok
+test_proof_tokens_are_unnameable_outside_the_perimeter ... ok
+test_raw_v1_writer_is_unnameable_from_the_rest_of_the_lifecycle ... ok
+test_raw_v1_writer_is_unnameable_outside_the_perimeter ... ok
+test_sealed_names_exist_and_compile_inside_the_perimeter ... ok
+Ran 5 tests in 96.953s
+OK
+
+  # and the same suite against a copy of the tree with the seal widened to
+  # `pub(crate) mod transition;` + `pub(crate) struct PreparedV1Rewrite`:
+  FAIL: test_prepared_v1_rewrite_is_unnameable_outside_the_perimeter
+  AssertionError: 0 == 0
+  Ran 5 tests in 99.443s
+  FAILED (failures=1)
+  # exactly one probe fails, the widened one; the positive control stays green.
+
+$ python3.13 scripts/checks/check_checked_artifact_boundaries.py
+checked-artifact boundary: ok (15 visible entries, 5 classified modules)
+exit=0                                                     (7.14s)
+
+$ python3.13 -m unittest scripts/checks/test_check_checked_artifact_boundaries.py
+Ran 69 tests in 703.295s
+OK
+exit=0
+  # 65 on 2026-08-23 (§3, gate 6) + F-3's four: the compiled-and-rejected
+  # persistence probe, the test-code probe, the seam-underivable probe, and
+  # the string-literal negative control.
+
+$ python3.13 -m unittest scripts/checks/test_release_boundary.py
+Ran 6 tests in 0.047s
+OK
+exit=0
+
+$ python3.13 scripts/checks/check_m4_scenario_map.py
+M4 scenario map: ok (39 scenario rows, 38 named tests, 13 registry rows all claimed)
+exit=0
+
+$ cargo test --lib -p gwz-core checked_artifact::
+test result: ok. 400 passed; 0 failed; 0 ignored; 0 measured; 1170 filtered out; finished in 38.68s
+
+$ cargo clean -p gwz-core
+$ CLIPPY_CONF_DIR="$PWD" cargo clippy -p gwz-core --all-targets --all-features -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.72s
+exit=0        (0 lines matching '^error')
+
+$ cargo clippy --workspace --all-targets --all-features -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.32s
+exit=0        (0 lines matching '^error')
+```
+
+**F-5's two verifications, executed rather than argued.** The runbook's OLD
+single line still reproduces exactly the recorded failure, and the hits are
+not suppressed:
+
+```
+$ CLIPPY_CONF_DIR="$PWD" cargo clippy --workspace --all-targets --all-features -- -D warnings
+exit=101      7 lines matching '^error: use of a disallowed method'
+--> gwz-cli/src/pager.rs:127:23
+--> gwz-cli/src/pager.rs:131:21
+--> gwz-cli/src/tests/g01/commands.rs:460:9
+--> gwz-cli/src/tests/m2c.rs:51:5
+--> gwz-cli/src/tests/m2c.rs:55:5
+--> gwz-cli/src/tests/m2c.rs:85:5
+--> gwz-cli/src/tests/m2c.rs:99:5
+
+$ grep -rn 'allow(clippy::disallowed_methods)\|expect(clippy::disallowed_methods)' gwz-cli/src/
+(no matches)
+$ ls gwz-cli/clippy.toml /Users/owebeeone/limbo/gwz-dev/clippy.toml
+(neither exists)
+```
+
+Same 7 sites, same order, as §3.3 recorded on 2026-08-23; **no `allow` or
+`expect` anywhere in gwz-cli**, and no `clippy.toml` in gwz-cli or at the
+workspace root. The perimeter is gwz-core's because gwz-core is where it is
+declared, and the corrected step's second line still compiles all 7 sites
+under `-D warnings`.
+
+**Driver invocations, verbatim:**
+
+```
+=== compatibility -- v0 compatibility gate (evidence row 2.2)
+    ok    frozen predicate registry (0.0s, 'validated 7 migration rules and 7 runtime bindings')
+    ok    registry checker suite (0.1s, 'OK')
+    ok    merge-doc assertions (0.2s, 'ok (11 sources, 147 assertions)')
+    ok    merge-doc checker suite (0.5s, 'OK')
+
+=== byte-equivalence -- byte-equivalence gate, both halves of O8 (rows 2.3a/2.3b, §12)
+    ok    M4 scenario map (0.3s, 'M4 scenario map: ok')
+    ok    g23 adapted-v0, characterization and upgrade suites (26.4s, '111 passed')
+
+=== unknown-field -- unknown-field gate (evidence row 2.4)
+    ok    record wire unknown/archive/decode (0.1s, '75 passed')
+    ok    exact unknown manifest per transition effect (1.2s, '1 passed')
+
+=== privacy -- privacy gate (row 2.5b / W1, TransitionDesign:1478-1479)
+    ok    sealed v1 lifecycle compile probes (77.9s, 'OK')
+
+=== R4b-G aggregate gate summary
+    ok      compatibility
+    ok      byte-equivalence
+    ok      unknown-field
+    ok      privacy
+AGGREGATE: this selection's mechanical gates pass; the settled-tree review is not.
+
+=== fault:1 -- aggregate fault/restart matrices (TransitionDesign:1469-1475)
+    ok    v1 lifecycle fault and restart matrices (355.9s, '254 passed')
+AGGREGATE: PARTIAL -- fault:1 ran one command only;
+reconcile the remaining commands across invocations before claiming a pass.
+
+=== fault:2 -- aggregate fault/restart matrices (TransitionDesign:1469-1475)
+    ok    root physical/successor boundary matrix (release profile) (327.6s, '1 passed')
+AGGREGATE: PARTIAL -- fault:2 ran one command only;
+reconcile the remaining commands across invocations before claiming a pass.
+
+=== call-graph -- call-graph gate, both halves (rows 2.6a/2.6b, TransitionDesign:1480-1481)
+    ok    structural boundary and v1->v0 persistence guard (5.7s, 'checked-artifact boundary: ok')
+    ok    boundary checker suite and compiler probes (516.9s, 'OK')
+    ok    release boundary suite (0.2s, 'OK')
+
+=== settled-tree-review -- two independent full-tree R4b reviews (AgentProcessRules.md:2006)
+    REVIEW -- not mechanisable; this driver's record is its input
+
+=== R4b-G aggregate gate summary
+    ok      call-graph
+    REVIEW  settled-tree-review
+AGGREGATE: this selection's mechanical gates pass; the settled-tree review is not.
+```
+
+**A fourth measurement of the D3 perf figure**, incidental but worth filing
+against §8 item 3: `fault:2` reports **327.6 s** wall for the release
+`root_fault_matrix` including cargo overhead, against §3.1's **318.71 s** of
+libtest time on the same tree. Consistent; neither is anywhere near 576 s.
+
+### 13.4 What this pass deliberately did not do
+
+- **Move no pin.** `PROTECTED_SOURCE_DIGESTS`, `PROTECTED_SOURCE_TREE_DIGESTS`
+  and `PROTECTED_COMPILER_ROOT_DIGESTS` are untouched; the checker still
+  prints its 2026-08-23 string, `ok (15 visible entries, 5 classified
+  modules)`. Pins are the lane owner's.
+- **Sign no ruling.** F-7's RULING line is unsigned and its
+  `GwzM5-8R2DSettledTuple.md` register row is drafted in a block quote, not
+  inserted. J-1, J-2, J-3, J-5, J-6, J-7 are untouched as judgments; J-1 and
+  J-3 gained facts, not verdicts.
+- **Paper over nothing.** F-1's enumeration made O8's clause checkable and the
+  answer came back **negative** — 13 of 39. Row 2.3b and O8 stay **FAIL**, and
+  §12.6 opens two new residual findings, R-1 and R-2, as inputs to the R4b-G
+  dual rather than as closures.
+- **Touch no member repo.** gwz-cli and gwz-py are unmodified; F-5 was a
+  runbook-scope defect, not a gwz-cli defect, and nothing in this pass needed
+  a change outside gwz-core's `scripts/checks/` and these two dev-docs.
+- **Wire nothing into CI.** Workflow files are untouched. What that means, per
+  gate, stated so the review does not have to derive it:
+  - **F-3 runs in CI today.** It lives inside
+    `check_checked_artifact_boundaries.py`, which
+    `checked-artifact-boundary.yml:30-35` already runs per commit, along with
+    its unit suite — so F-3's four fail-closed tests are in the push lane too.
+    That was the reason for choosing that home over a standalone script.
+  - **F-2 and F-4 do not.** Neither `test_v1_lifecycle_privacy_probe.py` nor
+    `run_r4bg_aggregate_gates.py` is named by any workflow. Adding a CI step
+    is a workflow change and belongs to the lane owner.
+  - **F-1's checker cannot run in CI as written** — a **J-7-class** limitation
+    and the sharpest of the three. The M4 map lives in the gwz-dev workspace's
+    `dev-docs/`, one level above the gwz-core checkout, so
+    `check_m4_scenario_map.py` resolves it exactly as `check_merge_docs.py`
+    resolves its workspace root, and inherits exactly that gate's weakness —
+    the one the tuple's §11.3(7) calls "a gate that only passes on a
+    developer's machine is not a gate". It is fail-closed rather than
+    vacuous (an absent map exits 1, never 0), and the map's natural CI-able
+    home would be `gwz-core/dev-docs/`, which this pass had no mandate to
+    create. **Flagged for the review, not worked around.**

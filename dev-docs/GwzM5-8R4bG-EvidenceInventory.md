@@ -164,7 +164,20 @@ What exists today, per checkpoint (suite → count):
 - v0 lifecycle (g23): `abort_recovery` (7), `root_recovery` (3),
   `continue_merge` (6), `finalization` (5, driving the seven-member
   `FinalizationFault` enumeration at
-  `src/workspace_ops/tests/g23/finalization.rs:4-13`), `gc` (5).
+  `src/workspace_ops/tests/g23/finalization.rs:4-13`
+  **[CORRECTION 2026-08-24: the enum has EIGHT variants, not seven —
+  `AfterEnteringFinalizing, BeforeCandidateCreation, AfterCandidatePersistence,
+  AfterEvidenceCommit, AfterEvidencePersistence, AfterLockPublication,
+  AfterNoPublicationComplete, BeforeArchive` at `g23/fixtures.rs:15-24`. The
+  cited line range does resolve, but it holds a seven-element ARRAY LITERAL
+  that omits `AfterNoPublicationComplete`; that eighth variant is driven
+  separately at `characterization_v0.rs:467`
+  (`v0_no_publication_complete_before_terminal_write_is_read_only`, the
+  scenario the frozen registry binds as `unchanged/no-publication-finalizing`
+  — see `GwzM5-8R4bG-Evidence.md` §12.3 row `J-NO-PUBLICATION-BORN`). Also
+  true at the drafting tree `43c37bc`, so this too was wrong at drafting
+  rather than drifted. Recorded at `GwzM5-8R4bG-Evidence.md` §7.1 item 2.]**),
+  `gc` (5).
 - checked-artifact: `checked_artifact::` — **244 tests**, including the
   24-key interruption/recovery matrix executed over both workspace and
   Git-directory target variants
@@ -345,7 +358,14 @@ What mechanically enforces call-graph discipline today:
   caller inventory with exact allowlist incl. alias/fn-pointer/bare-
   identifier counting, `CurrentProgramCheckpoint.md:206-210`).
 - The compiler-resolved writer boundary: `clippy.toml` `disallowed-methods`
-  (21 entries: `std::fs::write/rename/remove_file/create_dir*`,
+  (21 entries **[CORRECTION 2026-08-24: there are 19, not 21. `grep -c 'path
+  ='` returns 19 both at `b91bdeb` and at this document's own drafting tree
+  `43c37bc`, and `git diff 43c37bc b91bdeb -- clippy.toml` is empty, so this
+  was wrong at drafting rather than drifted. The enumeration that follows in
+  this same bullet itself sums to 19: 5 `std::fs` + `File::create` +
+  `OpenOptions::open` + 2 `io::Write` + 5 `cap_std` + 2 `git2` + 3 gwz-core.
+  Recorded at `GwzM5-8R4bG-Evidence.md` §7.1 item 1.]**:
+  `std::fs::write/rename/remove_file/create_dir*`,
   `File::create`, `OpenOptions::open`, `io::Write::write*`, `cap_std` raw
   ops, `git2::Index::write`, `git2::Reference::delete`, and the three
   gwz-core fall-through writers `artifact::write_atomic`,
@@ -574,9 +594,28 @@ noted.
    checked_artifact (244), record_wire (65), model::v1 (56), acceptance_v0
    (7) + transition_matrix_v0 (4) against the re-baselined post-R2-R6
    counts.
-5. **Format/lint** (~5-10 min): `cargo fmt --all -- --check`;
-   `CLIPPY_CONF_DIR=$PWD cargo clippy --workspace --all-targets
-   --all-features -- -D warnings`.
+5. **Format/lint** (~5-10 min), run from the gwz-core checkout:
+   - `cargo fmt --all -- --check`;
+   - `CLIPPY_CONF_DIR=$PWD cargo clippy -p gwz-core --all-targets
+     --all-features -- -D warnings` — the writer perimeter, gwz-core-scoped;
+   - `cargo clippy --workspace --all-targets --all-features -- -D warnings`
+     — the workspace-wide lint pass, with **no** `CLIPPY_CONF_DIR` override.
+
+   **[CORRECTION 2026-08-24 — why this step is now two lines.]** As drafted
+   the step was one line, `CLIPPY_CONF_DIR=$PWD cargo clippy --workspace …`,
+   and it **exits 101**: `CLIPPY_CONF_DIR` forces gwz-core's `clippy.toml`
+   onto every workspace member, and gwz-cli is not inside the checked-artifact
+   writer perimeter — it has no `clippy.toml`, and neither does the workspace
+   root. **The perimeter is gwz-core's by design.** It exists to catch raw
+   durable-store mutation inside the merge tree; gwz-cli is a CLI driver, not
+   a durable-store owner. Its 7 hits are therefore out-of-perimeter, and they
+   are verified **not silently suppressed** — the workspace-wide plain-clippy
+   line above still compiles every one of those call sites under
+   `-D warnings`, and gwz-core keeps both its own `clippy.toml` and
+   `#![forbid(clippy::disallowed_methods)]`. The two-line form matches the CI
+   invocation (`checked-artifact-boundary.yml:30-35`, run inside the gwz-core
+   checkout). Executed evidence for both lines and the 7 hits:
+   `GwzM5-8R4bG-Evidence.md` §3.3 and §9.2 F-5.
 6. **Protocol + parity** (~10-20 min): `protocol/regen.py` diff-clean;
    `protocol/d0_roundtrip_check.py`; gwz-py suite (33 test files, incl.
    `test_merge_cli_cross_driver.py`); gwz-cli tests.
@@ -660,10 +699,22 @@ only *missing* artifacts are W1-W5.**
   raw v1 writer (`store/rewrite.rs`). Battery source:
   `GwzM5-8R4bTransitionDesign.md:1313-1314`. Sequence after R3 (see churn
   note). Budget: fits R4b-G's ≤1,500 test/tool lines.
+  **[LANDED 2026-08-24: `gwz-core/scripts/checks/test_v1_lifecycle_privacy_probe.py`.
+  The "sequence after R3" hedge is moot — R3 is post-A1 (evidence §9.3 J-4).
+  The natural home turned out NOT to be the boundary checker's harness: those
+  probes assert the CHECKER rejects what the compiler accepts, and privacy is
+  the opposite shape, so the probes are a sibling suite in the same temp-copy
+  idiom with a positive control instead. Evidence §13.1.]**
 - **W2 — v1→v0 call-graph check.** Mechanically assert
   `src/workspace_ops/merge/v1_lifecycle/` production code contains no
   v0 persistence call (`MergeStore`/`FileMergeStore`/v0 writer seams) —
   today true by grep, unguarded. Battery source: `TransitionDesign.md:1315-1316`.
+  **[LANDED 2026-08-24: masked-token scan in
+  `check_checked_artifact_boundaries.py`, so it inherits that checker's
+  per-commit CI wiring; the scan covers TEST code too, which is the stronger
+  property the evidence run measured. Fail-closed tests, including a compiler
+  probe proving the violation compiles, are in the checker's own suite.
+  Evidence §13.1.]**
 - **W3 — rollback-prefix privacy/call-graph gate.** Owned by RemPlan-4 R3
   step 6 (`RemPlan-4:1087-1101`, exit criterion 12): `RollbackPrefixIssuer`
   visibility + compile-fail gate + the semantic call-graph assertion for the
@@ -674,10 +725,27 @@ only *missing* artifacts are W1-W5.**
   g25; confirm against the M4 acceptance record and
   `GwzM5-8Refactor.md` §15.3.3 archive rows) so O8's "every M4" clause is
   checkable. Doc-only.
+  **[LANDED 2026-08-24: `GwzM5-8R4bG-Evidence.md` §12, with
+  `gwz-core/scripts/checks/check_m4_scenario_map.py` as its machine half. The
+  defining document is `GwzM5-8R0Inventory.md` §4 + §5.2 (R0 is where
+  `GwzM5-8Refactor.md:51` puts M4's characterization), which enumerates 29
+  progress shapes + 10 archive shapes = 39 named scenarios; the candidate set
+  guessed here (g23 + g24 + g25 modules) is the evidence side of the map, not
+  the scenario side. NOT doc-only in its consequence: the clause is now
+  checkable and **is not met** — 13 of 39 scenarios carry a registry binding,
+  22 are unbound and 4 have no fixture. Residual findings R-1/R-2, evidence
+  §12.6.]**
 - **W5 — aggregate gate wiring.** The ≤150-line "aggregate gates and wiring
   only" artifact (`ChangeBudget.md:515`): a recorded checklist/driver that
   names every §2 gate, its command, and its expected count on the settled
   tree. §5 of this document is the seed.
+  **[LANDED 2026-08-24: `gwz-core/scripts/checks/run_r4bg_aggregate_gates.py`,
+  139 lines, driving the seven gates `GwzM5-8Refactor.md:2243-2244` names,
+  each command carrying the marker its green result must print. The seventh
+  (settled-tree review) reports REVIEW and is never counted green. Note that
+  "≤150-line" misreads `ChangeBudget.md:515`: that column is **net
+  production-bearing Rust**; the test/tool/doc column is ≤1,500. The driver
+  is held to 150 anyway. Evidence §13.1-§13.3.]**
 
 ---
 
