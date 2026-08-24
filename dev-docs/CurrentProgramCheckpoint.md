@@ -713,6 +713,34 @@ fable token only where it makes a difference." Recorded consequences:
   figures (2,028 uniform / 582 review-artifact) — the ruling is
   the operator's.
 
+  **THE PRE-A1 QUEUE IS COMPLETE — 2026-08-24. The A1 activation
+  review launches on the tuple gwz-core `26f48f5` / gwz-cli
+  `3cca145` / gwz-py `929efb0` / taut `f008419`.** (1) C-1 CLOSED
+  at `26f48f5`: all four live rows dispositioned FROM the frozen
+  contract with the derivations quoted, tested through the real
+  decode path; new finding surfaced and pinned — the enumeration's
+  J-twin labels were backwards (the contract's born-root exclusion
+  makes the UNBORN twin the adapted one); the driver's partition
+  off-by-one (1572 vs 1573) reported not silently fixed. (2) The
+  M5b-IMPL SETTLED REVIEW is GO (0 P0/P1, 1 P2, 3 P3) — the J-1
+  obligation discharged pre-A1 on its frozen tier; six trains of
+  drift accounted to the line. Its [P2-1] (T-5's no_ff envelope
+  pair absent) is CLOSED BY LANE-OWNER NARROWING per the finding's
+  own offered remedy, on structural grounds the closure lane
+  measured (envelope classification is header-keyed; the body
+  cannot participate); the built candidate pair is saved with
+  digests and rides any future evidence regeneration. Its [P3-1]
+  (the forged-action gate's ChangeBudget row) is FILED
+  existence-first with the commit named, numbers withheld under
+  the OPEN convention. (3) The A1 register, final: the ~3.5k
+  acceptance-debt named exception; the D3/D4 residual dispositions;
+  the signed perf pricing (318.71 s); C-1 closed; C-2 [P3]; the
+  T-5 narrowing (the review judges it); the PARTIAL
+  byte-equivalence statement; M5b settled GO. The activation
+  review's object: enable the v1 writer + --no-ff per thin-A1 §2,
+  with the §14 ninth-stop-clause post-A1 re-scope and the R2-F/R5
+  native-evidence RELEASE gates explicitly unmoved.
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
