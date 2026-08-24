@@ -685,6 +685,34 @@ fable token only where it makes a difference." Recorded consequences:
   M5b-IMPL), `GwzM5-8M5bNoFfDesign.md:976-986` (annotation),
   `GwzWindowsMatrix-Classification.md` (run-number header note).
 
+  **R4b-G IS ACCEPTED — 2026-08-24, both axes GO at round 2 within
+  the two-round cap; the round-1 conditional CONVERTED with its
+  condition satisfied on the record and verified, not waived. THE
+  ACCEPTED TUPLE, restated literally per the Evidence axis's close
+  ruling: gwz-core `1bd885f` / gwz-cli `3cca145` / gwz-py
+  `929efb0` / taut `f008419`.** Zero open P0/P1/P2 against the
+  gate object. The acceptance record carries: the byte-equivalence
+  battery is PARTIAL (7 proven + 6 refusal-pinned of 39) and must
+  not be cited as green (evidence §12.8); C-1 [P2, BLOCKING-FOR-A1
+  per L1-19, four live rows named] and C-2 [P3] are bound on the A1
+  input register; J-1 stands ratified with its leg 4 restated to
+  the D3 dual. CI at the tuple: retained-readers green at
+  `1bd885f`; boundary lane  at commit time (scripts-only delta
+  over the green `78badbc`; the close is not conditioned on it).
+  UNBLOCKED: the M5b-IMPL settled review (launching) and the
+  operator-escape implementation packages (second lane, still
+  BLOCKED ON OPERATOR HANDOFF — unchanged). PRE-A1 QUEUE, exact:
+  (1) the C-1 closure package — state and test the adaptation
+  dispositions for F-BASELINE/F-MARKER/F-LOCK and
+  J-NO-PUBLICATION-UNBORN; (2) the M5b-IMPL settled review per the
+  frozen dependency statement; then (3) THE A1 ACTIVATION REVIEW,
+  whose input register is complete (the acceptance-debt record,
+  the D3/D4 residual dispositions, the signed perf pricing,
+  C-1/C-2). OPERATOR ITEM (non-gating): the ChangeBudget
+  charging-convention row is filed OPEN with both reproducible
+  figures (2,028 uniform / 582 review-artifact) — the ruling is
+  the operator's.
+
   **Windows run 16 (32559979514, at `6c7c8f3`): 1399/4/1.** The
   share-delete fix HELD (os-32 extinct) and all 14 admission tests
   are green. The 4 failures are the namespace fault matrix — its
