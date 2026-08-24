@@ -643,3 +643,391 @@ binds them too, in its re-scoped form (§3 item 9).
 
 — Safety axis, round 1 of 2. Round 2 reviews the landed activation
 change against §2's enumeration and §7's conditions.
+
+---
+
+# Round 2 — focused re-verdict on the delivered package
+
+Date: 2026-08-25
+Axis: **Safety** (peer-blind held; no Completeness round-2 material read)
+
+Object: the activation package DELIVERED IN-TREE, UNCOMMITTED, over the
+accepted tuple — verified at review start: gwz-core `26f48f5` + **85 M /
+3 new = 88** dirty files (`model/version.rs`, `v1_lifecycle/start.rs`,
+`tests/g23/a1_activation.rs` the new three), gwz-cli `3cca145` + 3,
+gwz-py `929efb0` + 2. Builder's report:
+`GwzM5-8A1ActivationPackage-Report.md` — used as a map only; every
+ruling below is against the tree, and every gate quoted was re-run by
+me under the mandated scratch `CARGO_TARGET_DIR`.
+
+## R2.0 VERDICT
+
+**GO.** The delivered package implements the round-1 §2 enumeration
+faithfully — including the one place it deliberately stops short (R4's
+ordinary-start floor), which I rule an **accepted named residual**
+below. Conditions [P1-1], [P2-1], [P2-2] are MET as delivered ([P2-2]
+with a named L2-05 residue); [P2-3] is excluded from this round per the
+coordinator (landing-train records, operator reply pending). The
+must-not-flip table re-verified 9/9 with F-3 at 0 hits. Every gate the
+builder claims green I reproduced green: the full lib census **1583**
+(1582 passed / 0 failed / 1 ignored, in four partitions incl.
+`root_fault_matrix` 333.46 s release), gwz-cli **139/0**, gwz-py
+**330/0 against a native module I rebuilt from the dirty core myself**,
+clippy `-D warnings` clean, and the three A1-load-bearing checkers ok.
+
+Round-2 findings: **0 P0 · 0 P1 · 1 P2 · 5 P3.** The one P2 is a
+correction to the recorded expected-red ruling, not to the package: the
+11 probe-harness failures decompose into **four cure classes**, and the
+lane-owner ruling on record cures only one of them — applied alone, the
+landing tree stays red (§R2.7).
+
+## R2.1 §2.1 compile gates — SATISFIED, wider fall RULED IN SPEC
+
+All six verified in the tree: `merge/mod.rs:23` bare `mod v1_lifecycle;`
+(sentinel const gone — see §R2.7c); `model/mod.rs:7` bare
+`pub(crate) mod v1;`; `acceptance/mod.rs:2-3` bare; `record_wire/
+mod.rs:13-14` bare `mod open_v0; mod unknown_fields;`;
+`store/mod.rs:14` bare `mod atomic_upgrade;` with the production
+re-export `upgrade_open_v0` at `:25`. G6 is **REPLACED, not un-gated**:
+`_for_r3_tests` is extinct in code (one explanatory comment survives,
+`merge/mod.rs:41`); production names are `upgrade_open_v0`,
+`prepare_upgrade`, `decode_production{,_v0,_v1}`, `decode_archived`;
+the seam-type re-exports at `merge/mod.rs:46-50` and
+`record_wire/mod.rs:20-22` stay `#[cfg(test)]` as doors. Fault
+injectors (`fail_next_candidate_publication_after`,
+`fail_next_evidence_rollback_after` — re-exports cfg-gated at
+`merge/mod.rs:33-38`), `archived_fixture_for_test`, the managed test
+door, and `handle_merge_with_dependencies` all keep their cfg.
+
+**The wider fall (97 further `#[cfg(test)]` + 28
+`#[cfg_attr(test, derive(serde::Serialize))]`) is RULED within the
+enumeration, not scope creep.** I counted the diff myself: 124 removed
+`#[cfg(test)]` lines, 28 removed / 0 added `cfg_attr(test,
+derive(serde::Serialize))`. The 28 are logically part of G2 — a v1
+record cannot be *written* by production if its `Serialize` is
+test-only — and the 97 are the transitive closure my G6 instruction
+already implied ("test-only doors that remain test-only keep their
+cfg" defines the complement: v1-facing helpers consumed by the
+production surfaces fall with the gates). Behaviour-neutrality is
+evidenced at the final tree by my own executions (§R2.8), clippy
+clean, the privacy battery's sealed compile probes ok, and F-3 at 0
+hits.
+
+## R2.2 §2.2 runtime gates — R1/R2/R3 SATISFIED; R4 RULED
+
+- **R1+R2 in one edit, verified:** `validate.rs:12-25` carries the
+  T-1 inversion comment and the COUPLED paragraph naming §2.2 R2; the
+  NoFf refusal is gone. `runtime/dispatch.rs:256-262` carries the twin
+  COUPLED comment; the `mode != Some(NoFf)` exclusion is gone and
+  every start validates its message before creation. The designed M5b
+  marker is inverted and renamed:
+  `custom_messages_and_no_ff_both_validate_after_activation`
+  (`validate.rs:215`), and the end-to-end coupled-pair test rides in
+  `g23::a1_activation` (executed, §R2.8).
+- **R3 verified:** `classify_merge_record_header`
+  (`record_wire/header.rs:140`) over the closed five-row ALLOCATIONS
+  table (`:74-104`) — v0/v1 dispatch installed under
+  `InstalledMergeRecordVersions::PRODUCTION` (`:31`), v2-v4
+  `dispatch: None` with frozen waves A2/A3/A4, the
+  recognized-schema-wrong-number arm present
+  (`RecognizedSchemaVersionMismatch`, `:50-54`). `V0_ONLY` retained as
+  the v0 store's own set (`header.rs:36`, consumed at
+  `decode.rs:119` and `store/mod.rs:341`). **T-2 inverted at both
+  sites**: header dispatch (`decode.rs:97`) and the archive decoder
+  (`record_wire/archive/mod.rs:59`).
+- **R4 — THE RULING: the `V0` floor for ordinary starts is an
+  ACCEPTED NAMED RESIDUAL, not a hard A1 gate.** Verified in the
+  tree: `select_record_version = max(ACTIVE_WRITER_FLOOR, semantic)`
+  is production and wired at the creation site
+  (`start/record.rs:55-57`, replacing the hard-coded v0 envelope);
+  `RequestedSemantics::NoFf → V1` (`version.rs:71`), so `--no-ff`
+  writes v1 end-to-end today (executed:
+  `the_production_writer_floor_writes_a_v1_record_for_no_ff`,
+  `no_ff_start_publishes_a_two_parent_integration_commit`); v2-v4
+  reject before creation with their waves (executed); the floor is
+  `V0` at `version.rs:39` with the partial-engagement doc comment;
+  the `max` is pinned by
+  `raising_the_floor_to_v1_makes_every_installed_semantic_v1`.
+  Grounds for the ruling: (i) thin-A1's operative decision text — "A1
+  enables the v1 writer and `--no-ff` on the accepted R4b lifecycle"
+  — is delivered: the v1 writer exists in production (creation,
+  decode, dispatch, migration, projections, archive). (ii) The
+  under-flip is the conservative side of contract §2's A1 row: not
+  writing v1 for ordinary starts cannot regress any reader, whereas
+  the builder MEASURED the engaged-V1 alternative breaking every
+  ordinary start (no production v1 owner for root participants,
+  dry-run prediction, drift/conflict response, the v0 event stream) —
+  landing that would have been the unsafe act. (iii) The hybrid state
+  is per-record coherent: every reader dispatches on the envelope;
+  mixed stores are the retained-reader window's own model; a new v0
+  row crashing into a whitelisted shape migrates on resume (proven —
+  §R2.5, plus the builder's positive Boundary/Staging evidence); and
+  no new v0 *shape* is introduced (`NoFf→V1` means `mode: no_ff`
+  never serializes into a v0 record — T-3 guards it). (iv) The
+  remainder is a one-line constant behind a named blocking owner.
+  **Binding conditions attached to this ruling** (severity P2 if
+  missing at landing; they join the [P2-3] record set): (a) the
+  ordinary-start v1 owner becomes a first-class named milestone on
+  the register, and the floor raise lands WITH it as one reviewed
+  change — contract §9's "one reviewed change" discipline transfers
+  to the remainder; (b) a dated annotation lands on the frozen
+  contract §2 creation-matrix A1 row (or its errata ledger) recording
+  the partial engagement and pointing at `version.rs:39` — frozen
+  text must not diverge silently; (c) the release-time
+  retained-reader "A1 generation" manifest work describes the SHIPPED
+  behaviour (ordinary=v0, no-ff=v1), not the contract row.
+
+## R2.3 Round-1 conditions
+
+- **[P1-1] — MET.** `dispatch.rs:394-416 adapt_before_mutating`:
+  preflight only on `Resume|Abort`, only when the [P2-1] precheck says
+  `MayAdapt`, and **every non-`Upgraded` answer — `ValidUnlisted` and
+  `Err(_)` alike — returns `Ok(false)`, leaving the v0 lifecycle in
+  command**; the doc comment carries the [P1-1] reasoning. The test
+  `post_activation_resume_completes_the_refused_v0_crash_prefixes`
+  (`g23/a1_activation.rs:164-218`) drives F-MARKER and F-LOCK through
+  post-activation production dispatch, asserts `version==V0` and
+  `adaptation==MayAdapt` (so the refusal arm is genuinely traversed),
+  and requires `Completed` with no open record. Executed green;
+  `characterization_publication_prefix_v0` green inside g23 119/0.
+- **[P2-1] — MET via option (i).** `store/mod.rs:250-258 precheck`
+  reads exactly two scalar fields (state, mode) and calls no
+  validator; `classify_open_record` (`:206`) uses
+  `decode_production` — for v0 bodies the SAME strict decoder the v0
+  store already used at the tuple, so the skip path adds no new
+  refusal surface. The walk test
+  (`a1_activation.rs:233-302`) pins six non-Finalizing states plus
+  FfOnly/NoFf to `Skip` and Finalizing+Normal to `MayAdapt`.
+  B-NOT-STARTED / B-PREPARING-EMPTY cannot reach
+  `validate_v0_structure` through the new path; the two archive
+  shapes ride as named residual. A NoFf v0 open row Skips into the v0
+  path where the §3.5a forged-mode gate refuses it — T-6 executed
+  green (§R2.8), so the skip does not bypass that refusal.
+- **[P2-2] — MET in substance; L2-05 residue ACCEPTED as recorded.**
+  `checked-artifact-boundary.yml:+40-48` adds the push-lane step
+  running `check_m4_scenario_map.py` and
+  `run_r4bg_aggregate_gates.py privacy call-graph` — through the
+  runner, so counts are pinned. The L2-05 non-wiring comment
+  (`:+49-58`) records the true mechanical blocker (manifest resolves
+  `gwz-cli/docs/*` from the workspace root; the job checks out
+  gwz-core alone; cites tuple §11.3 item 7). RULED: satisfies [P2-2]
+  for this round because (i) the three gates activation made
+  load-bearing ARE wired, (ii) the highest-risk drift class for the
+  new public flag — stale CLI docs — is separately CI-guarded by
+  gwz-cli's own `g00` docs-match test (I ran the cli suite green),
+  and (iii) I executed `check_merge_docs.py` locally: "merge document
+  consistency: ok (11 sources, 147 assertions)". The L2-05 CI-wiring
+  item STAYS OPEN on the register ([P3-R2-3]) — accepted, not
+  discharged.
+- **[P2-3] — excluded from this round per the coordinator.** The
+  landing record set (subsumption statement, operator-signed D3/D4
+  disposition, PARTIAL restatement, archive-equivalence mechanism
+  decision, C-2 named-residual record) plus this round's additions:
+  the R4 ruling's conditions (a)-(c) above and the §R2.7 harness
+  cures.
+
+## R2.4 Must-not-flip — 9/9 RE-VERIFIED INDEPENDENTLY, F-3 at 0 hits
+
+1. `recover_or_create`: the entire `checked_artifact/` diff is ONE
+   file — `coordinator/identity.rs`, and the diff is exactly the
+   one-line `#[cfg(test)]` removal on the
+   `CheckedOwnerRecordVersion::V1 → OwnerVariantV1::MergeRecordV1`
+   match arm (G1-forced; the arm must exist once production can
+   observe v1 owner records). No new callers (grep re-run); the
+   `catalog.rs:10-16` R2-E allowance intact verbatim.
+2. D2 files (`git/gitbackend/recovery_support.rs`,
+   `merge_recovery.rs`): zero diff.
+3. `RecordVersion` still closed `{V0,V1}` (`model/v1/canonical.rs`);
+   v2-v4 reject before creation (executed).
+4. T-6 executed: `v0_resume_rejects_forged_no_ff_mode_row` and
+   `…_two_parent_action_over_fast_forwardable_pair` — verbatim tail:
+   "test result: ok. 2 passed; 0 failed" (0.30 s).
+5. `durable_fs.rs`: zero diff (no-op Windows `sync_dir` intact);
+   pid+sequence temp naming intact. The one added `fs::read` (the
+   envelope probe in `classify_open_record`) is the same unbounded
+   class as the v0 record read it precedes — rides [P3-3] unchanged.
+6. `observation.rs` and `preservation_root.rs`: zero diff; the
+   executable-Invalid classification and the durable-handoff refusal
+   stand at their round-1 coordinates.
+7. Release gates: `release.yml` and
+   `scripts/retained_readers/manifest.json` zero diff — no A1
+   generation named pre-release, R2-F/R5 unmoved.
+8. `protocol/generated.rs`: zero diff — no new wire.
+9. Census: `EXPECTED_KEY_COUNT: usize = 165` intact
+   (`fault_expected_keys.rs:174`); `checked_artifact::` partition
+   400/0.
+
+**F-3 at 0 hits, proven positively:** the boundary checker
+*accumulates* findings before exiting (`check(…)` collects, prints
+all, returns 1 — `check_checked_artifact_boundaries.py:1239-1244`).
+Its output on the delivered tree is exactly six lines — the header
+plus the five digest findings — with **zero** "v1 lifecycle names the
+v0 persistence seam" lines (violation message at `:991`), so the
+v1→v0 persistence scan ran and found nothing. The privacy battery's
+sealed compile probes: "ok … (105.4s, 'OK')".
+
+## R2.5 The moved behaviour pin — ACCEPTED, one compensating obligation NAMED
+
+`g23::finalization::resumed_finalization_persists_each_phase_before_a_nested_mutation_fault`:
+the rewritten final window is behaviour-truthful — the crash row is
+`CommittingEvidence`, one of the frozen seven whitelisted shapes, so
+post-activation production resume migrates it and the v1 lifecycle
+completes it; the v0 injector is a v0-finalizer seam the v1 path never
+consults. The new assertion (`source_version == V1` + no open record)
+pins whitelist eligibility, so a regression returns the row to the v0
+path and trips it. The premise that the test's first three windows
+keep their v0 coverage is verified in code: the DI seam
+(`handle_merge_with_dependencies`, `dispatch.rs:207-225`) routes
+through `AbsentV1Router`, which never migrates and fails closed
+(`dispatch.rs:98-101`), while only the production entries carry
+`AuthorityV1Router` → `adapt_before_mutating` (`:201`, `:66-73`).
+
+**The named compensating obligation:** the builder's consequence is
+real, and one arm is now uncovered — the **eligible-row
+upgrade-failure fallback**: on a whitelisted Finalizing row whose
+atomic upgrade FAILS (I/O, race), `adapt_before_mutating`'s
+`Err(_) → Ok(false)` puts the v0 lifecycle back in command, and no
+executed test drives that composed path ([P1-1]'s rows are
+refusal-class, never eligible). Fail-safe by construction and the v0
+completion of these shapes is proven through the DI windows, but the
+composed production path (eligible → upgrade fails → v0 completes)
+deserves one executed test. The production call hardcodes
+`AtomicUpgradeFault::None`, so the test needs a filesystem-level
+fault. **Carrier: R2-E** (or the landing train if cheap) —
+[P3-R2-2].
+
+## R2.6 [P3-1] tripwires — VERIFIED
+
+T-1 inverted at the gate (`validate.rs:12-25`) with the renamed marker
+(`custom_messages_and_no_ff_both_validate_after_activation`,
+`validate.rs:215`) and the end-to-end coupled-pair test. T-2 inverted
+at both sites (§R2.2). T-3 re-pinned 16→19 — I counted 19 entries in
+the live pin, the three additions annotated (`model/version.rs`,
+`v1_lifecycle/start.rs`, `tests/g23/a1_activation.rs`). T-4 executed
+by me: `force_merge_commit_construction_sites_stay_v1_lifecycle_only`
+— "ok. 1 passed; 0 failed" (construction still v1_lifecycle-only).
+T-6 untouched and executed green.
+
+## R2.7 Expected-red — CONFIRMED, with one attribution CORRECTION [P2-R2-1]
+
+- **The five boundary-checker digests: exact.** My run printed
+  precisely the five findings the report lists — compiler-root
+  manifest `merge/mod.rs`; protected sources `preserve/artifacts.rs`,
+  `preserve/plan.rs`; protected trees
+  `v1_lifecycle/authority/observe.rs`, `v1_lifecycle/mod.rs` — and
+  nothing else. Landing re-pins are the lane owner's recorded duty.
+- **The three driver count markers: reproduced.** 255
+  (v1_lifecycle−root_fault_matrix), 926 (remainder), 119 (g23) — all
+  green; only the expected strings are stale (254/917/114).
+- **The probe harness: 11/69 reproduced by name — but the recorded
+  single-cause ruling is INCOMPLETE.** The 11 decompose into FOUR
+  cure classes:
+  (a) **probe-compile dead-code** — the `run_compiler_probe` family
+  (`test_check_checked_artifact_boundaries.py:27-59` runs clippy
+  `-D warnings` on a mutated copy; the injected unused probe fns now
+  fail dead-code since G1's blanket allow expired). The recorded
+  lane-owner fix — emit `#[allow(dead_code)]` with the injected probe
+  text — cures exactly this class, and **does not weaken F-3**: the
+  allow silences only the lint on the injected item so the probe
+  compiles and the CHECKER remains the rejector; the checker's
+  textual seam scan ignores allow attributes, and for *used*
+  violations nothing changes.
+  (b) **stale-digest class** — `test_current_source_inventory_is_
+  classified` (`:63`), `test_compiler_root_manifest_allows_non_
+  target_metadata_change` (`:620`), `test_comments_and_strings_do_
+  not_create_false_references` (`:1208`) fail only because the
+  checker fails on the five stale digests; cured by the landing
+  re-pins, not by (a).
+  (c) **the sentinel** — `test_v1_compiler_root_has_a_positive_
+  sentinel` (`:668`) asserts the LITERAL lines
+  `const _: &str = v1_lifecycle::COMPILER_ROOT_SENTINEL;` and
+  `pub(super) const COMPILER_ROOT_SENTINEL…` — **G1 removed both**
+  (grep: zero hits in `src/`). Not cured by (a) or (b). My round-1
+  G1 coordinate listed the sentinel as falling with the cfg — the
+  enumeration was under-specified against the boundary checker's
+  witness contract, which I did not enumerate; the cure decision is
+  the boundary lane's. **Cheapest sound cure: reinstate the sentinel
+  un-gated** — a production `const _` reference costs nothing,
+  restores the positive-compile witness, and satisfies both my G1
+  (the cfg fell) and the harness verbatim. Amending the harness test
+  instead is a checker-contract change needing that lane's ruling.
+  (d) **harness string drift** — `test_v0_persistence_seam_inventory_
+  must_stay_derivable` (`:1177`) performs exact-string surgery on the
+  store re-export block, which the package reshaped
+  (`merge/mod.rs:81-85` now carries `AdaptationPrecheck`,
+  `OpenRecordEnvelope`, `classify_open_record`,
+  `discover_open_envelope_before_manifest`); the replace is a no-op,
+  the "underivable" message never fires, the test fails. Cure: update
+  the harness's surgery string (boundary lane's file).
+  **Consequence: applying only the recorded fix (a) leaves (c) and
+  (d) red at landing** — and the new CI step (§R2.3) runs this very
+  battery on every push, so the landing push itself would go red.
+  Graded **[P2-R2-1]**, landing-train class.
+
+## R2.8 Executions (verbatim tails, all under the mandated scratch target)
+
+```
+gwz-core lib, four partitions (census 1583 = 1582 + 1 ignored):
+  v1_lifecycle:: --skip root_fault_matrix   ok. 255 passed; 0 failed …  363.75s
+  root_fault_matrix (release)               ok. 1 passed; 0 failed; … 1582 filtered out; finished in 333.46s
+  checked_artifact::                        ok. 400 passed; 0 failed …  37.80s
+  remainder (--skip both)                   ok. 926 passed; 0 failed; 1 ignored …  53.03s
+g23::                                       ok. 119 passed; 0 failed …  39.78s
+g23::a1_activation (all five named)         ok. 5 passed; 0 failed …  0.99s
+T-6 forged-action pair                      ok. 2 passed; 0 failed …  0.30s
+T-4 construction-site scan                  ok. 1 passed; 0 failed …  0.05s
+clippy --all-targets --all-features -D warnings   Finished `dev` profile … in 19.68s   [clean]
+check_m4_scenario_map.py        M4 scenario map: ok (39 scenario rows, 41 named tests, 13 registry rows all claimed)
+check_merge_compatibility_...   validated 7 migration rules and 7 runtime bindings
+check_merge_docs.py             merge document consistency: ok (11 sources, 147 assertions)
+aggregate privacy               ok    sealed v1 lifecycle compile probes (105.4s, 'OK')
+aggregate call-graph            FAIL (expected-red: 5 digests + 11/69 probe harness; release boundary suite ok)
+boundary checker                6 lines: the 5 listed digests, zero persistence-seam findings (F-3 = 0 hits)
+gwz-cli                         80+26+25+4+2+2 = 139 passed; 0 failed
+gwz-py (native module REBUILT by me from the dirty core via maturin,
+        .so 2026-08-25 00:39)   330 passed in 24.18s
+LOC re-counted: gwz-core tracked +1109/−609, new files 743 (= +1852/−609, matching the report)
+```
+
+## R2.9 Round-2 findings
+
+**[P2-R2-1]** The probe-harness expected-red ruling on record is
+incomplete: four cure classes (§R2.7), of which the recorded
+allow-emit fix cures one; the sentinel (reinstate un-gated
+recommended) and the seam-surgery string need boundary-lane edits, and
+the digest class needs the landing re-pins — else the landing push
+goes red on the newly wired CI step. Landing-train duty; the F-3
+property itself is intact and the allow-emit fix is verified sound.
+
+**[P3-R2-1]** `AtomicUpgradeFault`'s injected variants are now
+production-compiled (`store/atomic_upgrade.rs:20-27`), inert — the
+single production caller passes `None` (`dispatch.rs:405-411`).
+Hygiene: a cfg-split signature or sealed constructor at R2-E.
+
+**[P3-R2-2]** The eligible-row upgrade-failure fallback (§R2.5) —
+one executed test, carrier R2-E.
+
+**[P3-R2-3]** L2-05 CI-wiring stays OPEN on the register with its
+blocker now recorded in the workflow comment; the multi-repo checkout
+(tuple §11.3 item 7) is the cure. Accepted for this round.
+
+**[P3-R2-4]** Record note: the builder's "gwz-py 330 passed" tail
+cannot be shown to have exercised the activated core — the imported
+`_gwz_core.abi3.so` predated the package (2026-08-24 11:10). Cured in
+this review: I rebuilt via maturin against the dirty core and
+reproduced 330/0. The landing train's own py gate should run against
+a fresh build as a matter of course.
+
+**[P3-R2-5]** Prose nits for the landing pass: `classify_open_record`'s
+doc comment says "without decoding its body" while the v0 arm fully
+decodes (same decoder as the store — behaviourally moot, textually
+wrong); the R4 ruling's conditions (a)-(c) (§R2.2) join the [P2-3]
+record set.
+
+## R2.10 Verdict line
+
+**GO — round 2, Safety axis: the delivered A1 activation package is
+accepted against the round-1 enumeration; R4's ordinary-start V0 floor
+is an accepted named residual with binding record conditions; 0 P0 ·
+0 P1 · 1 P2 (landing-train: the four-class probe-harness cure) ·
+5 P3.**

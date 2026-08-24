@@ -632,3 +632,280 @@ lands with §3's record is a closure; anything less re-opens this axis.
 Filed by the Completeness-axis reviewer, 2026-08-24, round 1 of 2, at
 the tuple gwz-core `26f48f5` / gwz-cli `3cca145` / gwz-py `929efb0` /
 taut `f008419`. This report is the review's only file write.
+
+---
+
+## Round 2 — 2026-08-24, focused re-verdict on the delivered activation package
+
+Axis: Completeness; peer-blind held (no Safety round-2 material read).
+Object verified at review start: the package IN-TREE, UNCOMMITTED, over
+the accepted tuple — gwz-core `26f48f5` **+88 dirty**, gwz-cli `3cca145`
+**+3**, gwz-py `929efb0` **+2**, taut `f008419` clean — matching the
+dispatch and the builder's report
+(`GwzM5-8A1ActivationPackage-Report.md:4-7`, committed at gwz-dev
+`0ac8f3e`). Discipline unchanged: scratch `CARGO_TARGET_DIR`, no git
+write, this appended section is the round's only file write. The
+EXPECTED-RED set (5 boundary digests, 3 driver count markers, 11/69
+probe-harness tests) is treated as landing-train duty, not defect, on
+the checkpoint's own record (`CurrentProgramCheckpoint.md:800-808`),
+which also carries the **lane-owner ruling authorizing the probe-harness
+minimal fix at landing** (`:804-807`) — discharging round 1's §3 item 11
+F-3-covenant concern.
+
+### R2.1 Condition 1 — [P2-1] T-5 artifact durability: **CLOSED, verified**
+
+- **Leg 1 (durable artifact):** `dev-docs/GwzM5-8T5CandidatePair.patch`
+  exists, 1,130 bytes, sha256 `ee8f58da…a806e5`-class digest
+  **byte-identical to the scratchpad original this axis hashed in round
+  1** (`ee8f58daf26945cf85631f360f33ee0342e532d937d2b036457afc7908d42ec6`),
+  content verbatim (same hunk, `generate_retained_reader_fixtures.py`
+  :368 region). Committed at gwz-dev `47bbd7a` — **before** the build
+  commit `0ac8f3e`, exactly as the dispatch stated.
+- **Leg 2 (owned carrier):** `GwzM5-8R2DSettledTuple.md` §11.2 now opens
+  (`:778-787`) with "**T-5 candidate pair — OWNED CARRIER: the R2-F
+  native-evidence regeneration (binding …)**", restating the pair
+  digests (`e4ea14de…`/`a1cb103c…`), the durable path, and the
+  provenance ("moved from session scratch at the A1 Completeness
+  review's [P2-1]").
+
+Both legs say what the condition required. **0 P2 remain on this axis.**
+
+### R2.2 Condition 2 — the report vs round 1's §3 enumeration, verified in-tree
+
+Every §3 item is either **delivered in the package (verified)** or
+**assigned to the landing record set (specified below)**. In-tree
+verification of the load-bearing claims:
+
+- §3.1/§3.2 (G1, adapter/re-export un-gating): `merge/mod.rs:23`
+  `mod v1_lifecycle;` bare — cfg and sentinel gone; G6 REPLACED with
+  production names (`adapt_open_v0`, `decode_production_v0/v1`,
+  `upgrade_open_v0` — `merge/mod.rs:40-55` with the renaming rationale
+  in-comment). VERIFIED.
+- §3.3 (decode.rs:86): **delivered at the production seam** — new
+  `decode_production` classifies with
+  `InstalledMergeRecordVersions::PRODUCTION` `{v0: true, v1: true}`
+  (`record_wire/header.rs:30`) and routes `MergeRecordDispatch::V1` to
+  `decode_v1_body` (`record_wire/decode.rs:92-108`). The old arm is
+  gone. One residue: finding [P3-7] below.
+- §3.4 (R1/R2): `validate.rs:8-20` — the NoFf refusal removed with the
+  T-1 inversion and the R2 coupling documented in place. VERIFIED.
+- §3.5 (renames + stay-gated check): fault injectors and
+  `archived_fixture_for_test` keep cfg (report §1 G6); sampled:
+  `abort/evidence.rs:497-498` `classify_v1_evidence_shape_for_test`
+  still `#[cfg(test)]`. VERIFIED (sampled).
+- §3.6 (version selection): `model/version.rs` —
+  `ACTIVE_WRITER_FLOOR = RecordVersion::V0` (`:39`, doc comment
+  stating the partial engagement), `NoFf → Ok(V1)` (`:71`),
+  A2/A3/A4 → typed `MergeRecordRequiredWave` **before record creation**
+  (`:72-74`). VERIFIED — R4 partial as reported; judged §R2.4.
+- §3.7 (stop conditions): v2-v4 rejected pre-creation (above); archive
+  projection V1-only (report must-not-flip 3); **no v0 writer can
+  write `mode: no_ff`** — structurally forced by `:71`'s V1 selection.
+  VERIFIED.
+- §3.8-3.10 (must-not-touch): `recover_or_create` — R2-E allowance
+  verbatim at `checked_artifact/catalog.rs:12`, no production caller;
+  `protocol/generated.rs` — **zero diff** (verified); census —
+  `fault_expected_keys.rs:174` `EXPECTED_KEY_COUNT: usize = 165`
+  intact. VERIFIED.
+- §3.11 (tripwires): T-1's renamed marker exists
+  (`validate.rs:215` `custom_messages_and_no_ff_both_validate_after_
+  activation`); T-3 re-pinned 16→19 with per-entry annotations
+  (`no_ff_wire.rs:189` + the annotated allowlist, e.g. "JOINED AT A1"
+  on `model/version.rs`); T-2 inverted at both sites (report §3);
+  F-3 covenant: lane-owner ruling recorded (checkpoint `:804-807`).
+  VERIFIED.
+- §3.12 (L3-09 inversion): **executed this round on the dirty tree** —
+  `workspace_ops::tests::g23::` → **119 passed / 0 failed** (114 + the
+  5-test `a1_activation` suite; 119+1,464 = **1,583**, the report's
+  census; T-6's `continue_v0_gate` rides green inside it); `no_ff`
+  population → **32/0**; `version` population → **15/0** (the
+  writer-floor/selection pins); `check_m4_scenario_map.py` → **ok
+  (39 scenario rows, 41 named tests, 13 registry rows all claimed)**.
+  All match the report's gate tails and driver-marker actuals
+  (fault 255/926, byte-equivalence 119). VERIFIED BY EXECUTION.
+- §3.13/§3.14/§3.15-19: landing-train — specified below.
+- [P2-2]'s package half: the workflow step "Run the gates A1 made
+  load-bearing" wires `check_m4_scenario_map.py` + the driver's
+  privacy/call-graph batteries, and records the L2-05 non-wiring
+  reason in-comment with the multi-repo-checkout blocker named
+  (`.github/workflows/checked-artifact-boundary.yml`, diff verified).
+  VERIFIED — round 1's [P3-4] is now HALF-delivered; residue in L7.
+
+**THE LANDING SPECIFICATION** — what the landing record set must
+restate; fold verbatim (L1-L14):
+
+- **L1.** The branch-(a) acceptance: this dual's settled-tree
+  acceptance of `v1_lifecycle` + the **operator-signed D3/D4
+  named-residual disposition over the current site set**
+  (`cursor.rs:283-308/:310-335` fallthroughs, `phase.rs:187,198`,
+  `finalization.rs:217`, **`cursor.rs:498`**), naming as members: the
+  service-level abandonment hole (L5), C-2's owner (L6), the perf
+  pricing consumed (318.71 s, no optimization owed), and the R4
+  partial-engagement scope (L2). The landing halts on this signature
+  (already recorded: checkpoint "THE LANDING HALTS ON THE OPERATOR
+  SIGNATURE").
+- **L2.** The gate-chain paragraph states the activation's true scope:
+  "A1 enables the v1 writer — `--no-ff` writes v1 end-to-end and the
+  seven-shape whitelist migration is live — with
+  `ACTIVE_WRITER_FLOOR = V0`; ordinary/custom starts continue on v0
+  until the production v1 ordinary-start owner lands (root
+  participants, dry-run prediction, drift/conflict surfaces, v0 event
+  stream); raising the floor is the one-line `version.rs:39` change,"
+  **plus the carrier milestone that owns that work, named** ([P3-8]).
+- **L3.** The PARTIAL byte-equivalence statement verbatim: "7 proven +
+  6 refusal-pinned of 39 … PARTIAL, not met … must not be cited as
+  green" (unchanged by the package — the map still binds 39/41/13,
+  re-verified this round).
+- **L4.** (round-1 [P3-1]) "The escape implementation packages follow
+  activation per `GwzM5-8A1DecisionPacket.md` §4 step 3 ('With/after
+  A1'), which is the controlling schedule for Q3's 'at or before A1';
+  they remain second-lane, BLOCKED ON OPERATOR HANDOFF."
+- **L5.** (round-1 [P3-2]) The abandonment witness: verified **absent
+  from the package** (no cross-mode service-level probe in
+  `a1_activation.rs` or `start.rs`) — the landing either commits the
+  probe (NotStarted action, Normal and NoFf, equal service-level
+  refusal shapes) or dispositions it inside L1's named-residual set
+  with the structural corroboration cited
+  (`M5bImpl-ReviewState.md:465-472`).
+- **L6.** (round-1 [P3-3]) Owners at register close: C-2's four
+  fixtures → the R2-F fixtures/native-evidence lane; the 18-UNBOUND
+  per-scenario record debt + the archive-equivalence mechanism
+  decision + the two archive shapes riding [P2-1] option (i) → one
+  named owner in the post-A1 archive/GC consumer work; cheap closure
+  (ii) declared satisfied-by-the-precheck-test or owned.
+- **L7.** (round-1 [P3-4] residue — **ADD to the fold list**) "L2-05
+  stays unwired with the multi-repo-checkout blocker recorded in the
+  workflow comment; owner: <named>; the driver's fault/byte-equivalence
+  batteries stay local/release-lane by recorded scope decision."
+- **L8.** (round-1 [P3-5] — **ADD to the fold list**) The landing is a
+  coordinated commit: `gwz.conf/gwz.lock.yml` re-pinned equal to member
+  HEADs; the checkpoint Exact-tuple table restated literally; the 5
+  boundary digests + 3 driver count markers applied (values as report
+  §6); the probe-harness minimal fix applied per the recorded
+  lane-owner ruling.
+- **L9.** (round-1 [P3-6]) The register-consumption sentence: "the
+  activation record consumes the A1 input register from
+  `GwzM5-8R2DSettledTuple.md` §11 + `GwzM5-8R4bG-Evidence.md`
+  §12.7-12.9 + `GwzM5-8M5bImplSettled-Review.md` §7 directly; the
+  checkpoint's eight-item summary is a pointer, not the register."
+- **L10.** F5 §9 one-line dispositions for items 2, 6, 7, 8, 10 —
+  item 2 explicitly: "`cargo fmt --check` remains release-lane only:
+  adopted-as-is / to-be-wired," whichever the lane owner records.
+- **L11.** `GwzWindowsMatrix-Classification.md:74-79` dated update (the
+  M5b class-membership note's "cfg(test)-only pre-A1" clause changes
+  truth-value at landing) + three-arm matrix dispatch at the landing
+  commit, with the +10 package tests and the C-1 closure's 3 tests
+  pre-attributed expected-green in the ledger.
+- **L12.** The activation package's ChangeBudget row (report §4
+  figures), filed under the OPEN charging convention with the
+  operator's convention row resurfaced beside it.
+- **L13.** ([P3-7]) `decode_production_v0`'s new `unreachable!` arm:
+  convert to the typed twin or record the one-line reasoned acceptance.
+- **L14.** ([P3-8]) The moved behaviour pin's consequence recorded in
+  the evidence map: v0-fault-injector coverage on the authority path
+  reduced for the seven whitelisted shapes; restoration-or-acceptance
+  owner named.
+
+### R2.3 Condition 3 — the fold list is INCOMPLETE as dispatched
+
+The dispatch lists P3-1, P3-2, P3-3, P3-6, F5. Round 1 also filed
+**[P3-4]** (CI-wiring owner — now half-delivered by the package;
+residue = L7) and **[P3-5]** (machine pins / coordinated-commit
+mechanics = L8; the dispatch's EXPECTED-RED covers the digests and
+markers but **not** the `gwz.lock.yml` re-pin or the tuple-table
+restatement). **Add L7 and L8 to the fold.** One-line contents for
+every fold: L4 (P3-1), L5 (P3-2), L6 (P3-3), L7 (P3-4), L8 (P3-5),
+L9 (P3-6), L10 (F5).
+
+### R2.4 The sweep re-run and the four named residuals, judged on this axis
+
+Against round 1's 364 routed phrases: every phrase judged
+DELIVERED-BY-A1 is covered by the package **as scoped by the corpus's
+own activation sentences** — `GwzM5-8Refactor-Review-8.md:103` ("A1
+activates the v1 writer, eligible v0 migration, and no-ff start
+surface") and L3-09's "activate together only in A1" (writer +
+migration dispatch + no-ff start) are each delivered and verified
+above; no routed phrase requires ordinary starts to write v1 at A1.
+Nothing else the register routed for package delivery is missing from
+the tree. The residuals:
+
+1. **R4 ordinary-start row — NOT A LEAK, conditional on L2.** The
+   blocking owner is named and measured in the report (`version.rs:39`
+   doc comment in-tree); what is missing is the **carrier milestone**
+   and the checkpoint scope statement — both mandatory (L2), because
+   without them the headline "A1 enables the v1 writer" silently
+   overstates the landed scope. With L2 + the operator signature (L1)
+   this axis accepts the partial engagement.
+2. **The moved behaviour pin — named, reasoned, evidence executed; the
+   coverage reduction needs an owner.** The rewritten window asserts
+   the migration (`source_version == V1`) so whitelist-eligibility
+   regressions still trip; the v0-fault-injector reduction for seven
+   whitelisted shapes is a permanent evidence-shape change → L14.
+3. **Positive evidence** (Boundary/Staging prefixes migrate and stay
+   green) — evidence, not residual; cite it in the landing record as
+   the contract-§4 continuation proof.
+4. **`gc_archived` no-production-caller allowance — verified**
+   (`v1_lifecycle/archive.rs:110-112`: the reason names the missing
+   route explicitly). Route named, carrier not → rides L6's archive/GC
+   owner. The two archive shapes riding [P2-1] option (i): same owner,
+   L6.
+
+### R2.5 Register consumption at landing
+
+**Consumed at landing:** C-1 (closed at `26f48f5`; the package makes
+its dispositions load-bearing through the preflight/precheck; map
+39/41/13 re-verified); the signed perf pricing (consumed round 1;
+nothing further owed); the T-5 narrowing (judged round 1; [P2-1] legs
+closed this round); the M5b settled GO (its tripwires re-pinned by the
+package, T-1 marker verified in-tree); the PARTIAL statement (survives
+unchanged; restated at landing per L3).
+
+**Open past landing, each with a carrier — the register closes clean
+only with these lines:** the D3/D4 operator signature (the recorded
+landing halt, L1); C-2 + the 18-UNBOUND record debt + the
+archive-equivalence decision + the two archive shapes (owners per L6);
+the T-5 pair (the §11.2 R2-F carrier row — **correctly** open post-A1
+by design); the L2-05 residue (L7); the abandonment witness (L5); the
+R4 floor-raise (L2's named carrier); F5 §9 item 2's fmt-in-CI
+disposition (L10).
+
+### R2.6 Findings and verdict
+
+- **[P2-1] — CLOSED** (§R2.1). No round-1 P2 remains.
+- **[P3-7] NEW:** `record_wire/decode.rs:123` — `decode_production_v0`
+  introduces a fresh `MergeRecordDispatch::V1 => unreachable!(…)` arm
+  behind the `V0_ONLY` classifier. Locally sound (a v1 envelope
+  errors typed as `UnsupportedRecordVersion` before the match), but it
+  is the exact shape `GwzM5-8PanicInvariantAudit.md` §2.1 condemned at
+  this site's family ("convert the `unreachable!` arm to the same
+  `unsupported(...)` error so a future dispatch-table edit cannot turn
+  it into a panic") — reintroduced by the very diff that discharged
+  the routed `decode.rs:86` item. One-line typed conversion or a
+  recorded reasoned acceptance (L13).
+- **[P3-8] NEW:** Named blockers without named carriers — the R4
+  floor-raise owner milestone (L2), the `gc_archived` route (L6), and
+  the moved-pin coverage restoration-or-acceptance (L14). Each is
+  named and reasoned in the package; none names who carries it. The
+  landing lines close all three.
+- Fold-list completeness: **add L7 ([P3-4] residue) and L8 ([P3-5])**
+  (§R2.3).
+- Root-tree note (unchanged from round 1's P4): `dev-docs/
+  GwxMergeFindingsDraft.md` remains untracked at review time.
+
+**VERDICT: GO — round 2, Completeness axis. 0 P0 / 0 P1 / 0 P2 /
+2 P3.** The round-1 P2 condition is closed and verified; the delivered
+package covers every routed obligation this axis judged
+package-deliverable, verified in-tree and by execution (g23 119/0,
+no_ff 32/0, version 15/0, map 39/41/13, census 1,583); the four named
+residuals are accepted as named-with-route subject to the landing
+lines; the EXPECTED-RED set is landing duty on the checkpoint's
+record. This GO is conditioned on the landing record set carrying
+**L1-L14 verbatim** — above all L1's operator-signed D3/D4
+disposition, which remains the recorded halt — and on L7/L8 joining
+the fold list. With those lines, the register closes as a closure,
+not a leak.
+
+Filed by the Completeness-axis reviewer, 2026-08-24, round 2 of 2,
+against the delivered package over gwz-core `26f48f5` (+88) /
+gwz-cli `3cca145` (+3) / gwz-py `929efb0` (+2) / taut `f008419`.
+This appended section is the round's only file write.
