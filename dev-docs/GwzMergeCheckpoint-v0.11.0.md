@@ -1,7 +1,7 @@
 # GWZ v0.11.0 release checkpoint
 
-Status: RC EVIDENCE COMPLETE, 2026-08-25 — awaiting the three
-operator actions (member pushes; the tag). This document is the
+Status: RC EVIDENCE COMPLETE AT `8008bf6`, 2026-08-25 — awaiting the
+operator's release-script runs (which push members and mint the tag). This document is the
 release record per the v0.10.5 convention; the tag line below is
 filled when the operator publishes.
 
@@ -52,9 +52,14 @@ All four RC-head runs GREEN: **Platform matrix** `32802563914`,
 `32802495545` (with the wired batteries), **Retained merge readers**
 `32802495544` — re-established at the taut-bump head `8008bf6`:
 Windows `32846951548`, Platform `32846954270`, boundary
-`32846765849`, retained-readers `32846765913` (results recorded in
-the checkpoint at completion; the a6ce8a8 evidence stands for the
-unchanged tree content, the re-run covers the workflow-pin change). Push CI green at every train commit
+`32846765849`, retained-readers `32846765913` — ALL GREEN at
+`8008bf6` (retained-readers on rerun: its windows harness leg first
+failed `test_timeout_kills_descendant_process`, a process-tree kill
+race in a file the bump's five-file diff provably does not touch;
+the rerun of the identical tree passed in 606s — environment flake,
+recorded, hardening chip filed). The a6ce8a8 evidence stands for
+the unchanged tree content; the re-run covers the workflow-pin
+change. Push CI green at every train commit
 (`a6ef094`/`bed072a`/`07e1ac1` boundary+readers all success).
 
 **G2-c1, discharged with both required tails** (windows run

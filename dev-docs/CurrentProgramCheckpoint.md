@@ -1579,6 +1579,25 @@ fable token only where it makes a difference." Recorded consequences:
   `git show --stat` after any commit whose preceding step
   errored.
 
+  **THE v0.11.0 RC EVIDENCE IS COMPLETE AT `8008bf6` —
+  2026-08-25.** Windows `32846951548` GREEN / Platform
+  `32846954270` GREEN / boundary `32846765849` GREEN /
+  retained-readers `32846765913` GREEN ON RERUN — its windows
+  harness leg first failed `test_timeout_kills_descendant_process`
+  (assertFalse(marker.exists()) — a descendant-kill race; ubuntu
+  leg green; the bump's five-file diff provably does not touch the
+  harness; the identical tree passed on rerun) — recorded as an
+  environment flake with a hardening chip filed for the operator
+  (bounded poll-until-absent instead of the immediate assert).
+  ALL GATES G1-G6 STAND DISCHARGED AT THE FINAL RC. THE RELEASE
+  IS HANDED TO THE OPERATOR: the three release scripts in order
+  (gwz-core, gwz-cli, gwz-py — each `v0.11.0 --push`; core takes
+  its already-at-version no-commit path; the member scripts
+  reconcile release branches against the pushed mains and mint
+  their tags), then the GitHub release from tag v0.11.0 with
+  `GwzReleaseNotes-v0.11.0.md` as the body, which fires the
+  release.yml verify on both legs.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
