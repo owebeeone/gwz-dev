@@ -1520,6 +1520,38 @@ fable token only where it makes a difference." Recorded consequences:
   release body (+ the member release-branch commits per the R3
   proposal); release.yml verify then runs on the published tag.
 
+  **THE TAUT-PROTO 0.9.1 BUMP — 2026-08-25, operator-directed
+  ("v0.9.1 was released just now - we should test against that
+  first"; option (b) chosen verbatim "b").** TESTED FIRST, all
+  read-only: 0.9.1 regenerates gwz-core's three committed outputs
+  + both corpora BYTE-IDENTICAL (scratch venv, tautc 0.9.1);
+  gwz-py api.py byte-identical; gwz.ir.json additively enriched
+  (per-interaction descriptors + unary entry) and green through
+  codec load, drift check under the wheel, protocol tests 5/5,
+  full suite 330/330. LANDED: gwz-core `8008bf6` (exact-ref
+  pushed; 3 workflow pins + publish_workflow.rs tripwire +
+  protocol/regen.py generator version; currency harness 29/29
+  under a 0.9.1 TAUT_PYTHON — also clearing the pre-existing
+  local red; retained-reader wheel refs DELIBERATELY UNMOVED,
+  frozen reader bootstraps); gwz-py `6e1d52f` (local; generator
+  guard + release-script pin + regenerated IR per the lock-step
+  doctrine). FOOTGUN RECORDED, not fixed (operator's tool-design
+  call): check_protocol_drift.py prefers the VENDORED ../taut/src
+  over the installed wheel — in the dev workspace it compares
+  against the taut dev head (987e4d14…, matching neither released
+  wheel) and reports drift, while the release flow's temp
+  worktree correctly checks the pinned wheel (OK d0c205c8…);
+  contradicts regen_protocol.py's own anti-shadowing defense.
+  RC RE-ESTABLISHED at `8008bf6`: matrices `32846951548` (win) /
+  `32846954270` (plat) dispatched + push CI `32846765849`/
+  `32846765913`, under watch; release record RC tables moved;
+  lock captured (core `8008bf6`, py `6e1d52f`). The release
+  scripts now run against 0.9.1 end-to-end (gwz-py release.py
+  installs 0.9.1 in its flow). TRAILER-CHIP NOTE: the operator
+  started the spawned "remove release.py trailer" session — that
+  work already landed at `07e1ac1`; the session should find a
+  clean tree and no-op.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer

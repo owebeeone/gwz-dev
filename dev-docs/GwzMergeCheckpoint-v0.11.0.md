@@ -9,18 +9,20 @@ filled when the operator publishes.
 
 | Repo | Commit | State |
 | --- | --- | --- |
-| gwz-core | `a6ce8a8` | pushed to main; version `0.11.0` |
+| gwz-core | `8008bf6` | pushed to main; version `0.11.0`; taut-proto pin 0.9.1 |
 | gwz-cli | `6b7e75a` | local main — OPERATOR PUSHES |
-| gwz-py | `3d19dcd` | local main — OPERATOR PUSHES |
+| gwz-py | `6e1d52f` | local main — OPERATOR PUSHES; taut-proto pin 0.9.1 + regenerated IR |
 | taut | `f008419` | unchanged |
 
-Tag: ⟨OPERATOR: `v0.11.0` at gwz-core `a6ce8a8`; the GitHub release
+Tag: ⟨OPERATOR: `v0.11.0` at gwz-core `8008bf6`; the GitHub release
 body is `GwzReleaseNotes-v0.11.0.md`; member release-branch commits
 per the R3 proposal (version + path→git-tag re-point) at the tag.⟩
 
 The train (all exact-ref pushed, each behind its filed review):
 `1a31851` A1 activation + `8e40fa8` corrective → `a6ef094` R1 →
-`bed072a` R2 → `07e1ac1` R3 → `a6ce8a8` precision micro-train.
+`bed072a` R2 → `07e1ac1` R3 → `a6ce8a8` precision micro-train → `8008bf6` taut-proto
+0.9.1 bump (operator-directed, tested-first: wire byte-identical;
+currency harness 29/29 under 0.9.1).
 gwz-cli: `cf0d16d` docs truth fix → `6b7e75a` R4 recovery guide.
 Reviews: `GwzM5-8A1ReleaseR{1,2}-ReviewState.md`,
 `GwzM5-8A1ReleaseR3-Review.md`, `GwzM5-8A1ReleaseR4-Review.md` — all
@@ -48,7 +50,11 @@ settled-tuple row states. Not a gate for this release.
 All four RC-head runs GREEN: **Platform matrix** `32802563914`,
 **Windows matrix** `32802562170`, **Checked-artifact boundary**
 `32802495545` (with the wired batteries), **Retained merge readers**
-`32802495544`. Push CI green at every train commit
+`32802495544` — re-established at the taut-bump head `8008bf6`:
+Windows `32846951548`, Platform `32846954270`, boundary
+`32846765849`, retained-readers `32846765913` (results recorded in
+the checkpoint at completion; the a6ce8a8 evidence stands for the
+unchanged tree content, the re-run covers the workflow-pin change). Push CI green at every train commit
 (`a6ef094`/`bed072a`/`07e1ac1` boundary+readers all success).
 
 **G2-c1, discharged with both required tails** (windows run
