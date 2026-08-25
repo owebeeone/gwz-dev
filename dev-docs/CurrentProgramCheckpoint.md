@@ -1353,6 +1353,42 @@ fable token only where it makes a difference." Recorded consequences:
   LANDING ORDER: R2 → R3 (makes the count pin live at R3's
   landing) → R4.
 
+  **R2 IS LANDED — 2026-08-25, gwz-core `bed072a` (exact-ref
+  pushed, main a6ef094 → bed072a; live fast-forwarded).** Four
+  files +513/−4 (one production touch, comment-only:
+  repository_support.rs precedence ordering per [P3-4]): the
+  G2-c2 guard fix (LF-normalized include_str! inputs per the
+  r2d_seam_freeze precedent, BOTH failure modes loud — the
+  relocated-pin mutation detected under both encodings, CRLF
+  false-positive control green); the sentinel converted to
+  #[should_panic] per item-7 (class-death probe proven: fails
+  loudly when the fixture's smudge source is disabled); the
+  crlf-sentinel job reshaped (both halves green-when-correct;
+  anti-vacuity on the two exact counts); [P3-1] is_test_source
+  cfg(test) fallback deleted; [P3-2] guard asserts both pinned
+  keys; [P3-5] closed by the conversion; [P3-9] → R2-F backlog.
+  Inventory RECONCILED: the reviewer's TWELVE-row table (E1-E13)
+  is the record — E13 (stash_apply/pop restore, filters active,
+  covered by birth pins, exercised g11:94-115) was missing and
+  the "only the funnel is filters-off" prose was wrong. Landing
+  verification: diff content byte-identical to insurance (stat
+  block appended explains the sha delta); combined-tree overlay
+  gates at a6ef094 green (git::tests 142/0, checker ok, clippy
+  clean); zero pins. Full lib at package base 1586/0/1 (the
+  sentinel leaving #[ignore] moves 2i→1i). **THE ANCHORS ARE
+  APPLIED** under the signing conditions: amendment header
+  status-correction [A-i], the dangling-citation correction
+  [A-ii], the tripwire discharge [C-i..C-iii + should_panic +
+  E13 cite], the classification update [same], and gate G2's
+  text restated from the reviewer's own signable form [G2-c4].
+  **G2-c1's RC obligation, corrected wording: at the RC the
+  crlf-sentinel lane must record pinned half `ok. 6 passed; 0
+  failed` AND sentinel half `ok. 1 passed; 0 failed` (no failing
+  half — the invariant moved into the counts).** G2 IS FULLY
+  DISCHARGED up to the RC-execution evidence item. R3's staged
+  Windows count-pin step is now LIVE-able (the six names exist on
+  main).
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer

@@ -11,6 +11,21 @@ The four amended contracts carry acceptance annotations dated 2026-08-16.
 The two OPEN DECISIONS in Clause A's scope limits (foreign-filter policy;
 real-Windows raw-byte satisfiability follow-up) remain tracked review debts —
 acceptance does not close them.
+
+*(Status correction, 2026-08-25, R2.3 anchor A [A-i] — the header
+above went stale against this document's own body. Both OPEN
+DECISIONS were closed at the landing commit `9939b02`, 2026-08-16:
+the foreign-filter policy DISCHARGED by adopted decision D2 (A′) and
+the raw-byte satisfiability follow-up by adopted decision D1 (Option
+B); the in-body closure annotations below are authoritative. The
+packet-mandated focused State reviews did NOT precede that landing —
+they were filed 2026-08-25 as `GwzM5-8A1ReleaseR1-ReviewState.md`
+(D2/A′, GO with conditions) and `GwzM5-8A1ReleaseR2-ReviewState.md`
+(D1/B, GO with conditions), each reviewing the landed object as new.
+What remains tracked is the narrowed residual, not the decisions:
+ADOPTED worktrees (the post-A1 `renormalize` command) and
+attribute-driven smudge (`eol=crlf`, `ident`, foreign `filter=`) on
+every OS, both permanent fail-closed doctrine.)*
 This revision applies, in one document-only round, State-axis remediation
 round 1 (findings F1-F6, `GwzM5-8ExactEvidenceAmendment-ReviewState.md`) and
 the Code-axis conditions (P2 + three P3 notes,
@@ -191,6 +206,17 @@ carries **pointer bytes** on disk after rollback — status stays clean, the
 worktree content is a surprise, and a porcelain re-checkout restores the
 filtered content.
 
+*(Citation correction, 2026-08-25, R2.3 [A-ii]: "the landing review
+(F6)" above, and the "Closure annotation" styling earlier in this
+clause, reference a review round that was never filed as an artifact
+— the F1-F6 findings were recorded in-body only, at the `9939b02`
+landing. The filed reviews now exist:
+`GwzM5-8A1ReleaseR1-ReviewState.md` re-verified the F6 mechanism
+empirically (the probe rollback proceeds and gwz's libgit2-based
+status stays clean) and carried it into the signed C2 named-residual
+text; `GwzM5-8A1ReleaseR2-ReviewState.md` is the D1 package's first
+filed review.)*
+
 **Native-stash residual (tripwire owed).** libgit2's `git_stash_save`
 internally resets stashed tracked files via its own checkout **with filters
 active**, and exposes no checkout options (diagnosis §3.A item 3, the
@@ -204,6 +230,31 @@ anywhere** — CI is structurally blind to it. A live tripwire is owed: a
 windows-matrix expected-fail sentinel or a classification-ledger entry. The
 lane owner is adding the `GwzWindowsMatrix-Classification.md` ledger entry;
 this amendment records that entry as the tracking record for the debt.
+
+*(Tripwire DISCHARGED 2026-08-25 — R2 release-train package, landed
+gwz-core `bed072a`, recorded under R2.3's signing conditions
+[C-i..C-iii]. The owed sentinel now exists AND rides every lane:
+`crlf_sentinel_unpinned_worktree_materializes_blob_exact` (g01) is
+`#[should_panic(expected = "CRLF-CLASS-SENTINEL: smudge source is
+LIVE")]` — green while the smudge class exists, failing loudly the
+day the class closes, so this text and the frozen ledger move with
+it; `windows-matrix.yml`'s `crlf-sentinel` job runs it beside the
+count-pinned six-test pinned half (both halves green-when-correct;
+anti-vacuity rests on the two exact counts, since libtest exits 0 on
+a zero-match filter). The gwz-BORN half of this exposure is closed by
+D1's birth pins — inside a born repo the crlf filter is identity, so
+`git_stash_save`'s internal reset is a byte no-op — **for the
+config-driven filter class only**: attribute-driven smudge
+(`eol=crlf`, `ident`, foreign `filter=`) still reaches `stash_save`
+inside a born repo and stays permanent fail-closed doctrine [C-i].
+Proof: `stash_round_trip_on_a_born_repo_is_a_filter_no_op` (g11)
+against a live CONTROL arm that measures the smudge on macOS —
+closed by construction, proven non-vacuously off-Windows; Windows
+execution rides the next matrix dispatch [C-iii]. The restore leg
+(`stash_apply`/`stash_pop`, edge E13 of R2.3's twelve-edge
+inventory) is exercised by g11:94-115. The ADOPTED-worktree half
+stays open, fail-closed, owner the post-A1 `renormalize` package
+[C-ii].)*
 
 ### Clause B — the checked-artifact private area is invisible to the preservation-image model everywhere
 

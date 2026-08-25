@@ -448,6 +448,32 @@ review. Do not read matrix-green as real-Windows exact-evidence closure
 for ADOPTED worktrees; the post-A1 `renormalize` command is the tracked
 follow-up.
 
+**Update 2026-08-25 (R2 landing `bed072a`, under R2.3
+[C-i..C-iii]):** exposure (1) is no longer sentinel-less. Its
+gwz-BORN, config-driven half is CLOSED by D1's birth pins —
+`git_stash_save`'s internal reset has no filter left to run in a
+repository born with `core.autocrlf=false` + `core.eol=lf` — proven
+non-vacuously by `stash_round_trip_on_a_born_repo_is_a_filter_no_op`
+(g11), whose live CONTROL arm measures the smudge ON MACOS,
+confirming the exposure was never Windows-only in practice; Windows
+execution of the proof rides the next matrix dispatch [C-iii].
+Attribute-driven smudge (`eol=crlf`, `ident`, foreign `filter=`) is
+NOT closed and remains fail-closed doctrine on every OS [C-i]; the
+ADOPTED half remains open, owner the post-A1 `renormalize` command
+[C-ii]. The F6-class "no failing sentinel anywhere" complaint is
+discharged CI-wide: the sentinel is `#[should_panic]` — it rides
+every lane that runs the suite (push CI, matrix, release verify) and
+pages the day the class closes — and `windows-matrix.yml`'s
+`crlf-sentinel` job adds the count-pinned pinned-half discipline
+(five unconditional tests + one `cfg(windows)` = 6 on a Windows
+runner). The creation-time-only property is executable:
+`filter_neutralization_pin_is_reachable_only_from_the_two_creation_time_sites`
+(g01) fails on any third pin call site, adjacency loss, containment
+widening, or second production `core.autocrlf` writer — CRLF-safe
+since the R2.3 [P2-1] fix (LF-normalized inputs, loud on missing
+terminator), red-proven under both encodings. The restore leg (edge
+E13) is exercised by g11:94-115.
+
 The 24 survivors are **exactly the predicted (b) cluster**, nothing
 else: 4 × g15/root_preservation (stash ×2 + mutation = class B anchor
 contamination; observation/marker_presence = the anchor-dirt preflight
