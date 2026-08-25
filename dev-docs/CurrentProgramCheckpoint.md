@@ -970,6 +970,43 @@ fable token only where it makes a difference." Recorded consequences:
   contention arises (G1 is the forbidden-ordering gate). R4
   (runbook) queues behind R1's final refusal surface.
 
+  **R1 DELIVERED WITH A MATERIAL DISCOVERY — 2026-08-25: Decision 2
+  A′ WAS ALREADY LANDED at origin/main**, by `9939b02` (2026-08-16,
+  "Land the filter-policy (D1+D2) and R2-F missing-tests packages",
+  + follow-up `90d3f8a`) — the same day the decision packet was
+  written. The code closed; THE LEDGER NEVER RECORDED IT (no dev-doc
+  mentions refuse_foreign_filtered_rewrites, 9939b02, or
+  filter-policy), which is exactly how the release plan came to
+  re-schedule R1.1/R2.1 as unstarted work. The R1 package reduced
+  to: the conformance audit (predicate matches the packet's four A′
+  clauses; both recovery sites refuse pre-mutation, verified against
+  the ref-transaction ordering; the clone-funnel disable_filters
+  site correctly excluded as creation-time); ONE missing test built
+  (+77, `checked_rollback_proceeds_when_the_configured_filter_is_
+  outside_the_rewrite_set` — the rewrite-set-scoping sentinel,
+  MUTATION-VERIFIED: widening the diff scope trips it); full gates
+  green in the r1 worktree (g12 21/0, lib 1584/1, checker ok, zero
+  pins moved). ONE REAL FINDING, empirically probed: the
+  `.gitattributes`-ASYMMETRY RESIDUAL — the attribute stack is read
+  pre-checkout (AttrCheckFlags::default), so when .gitattributes is
+  itself in the rewrite set and only the TARGET side carries the
+  coverage, the rollback proceeds and re-creates the exact wedge
+  precondition A′ refuses (probe: ref moved, raw bytes under
+  restored configured filter). Narrow (coverage must arrive WITH
+  the checkout) but real; the builder correctly did not widen scope.
+  **R1.2 FOCUSED STATE REVIEW DISPATCHED** on the landed object +
+  the test package, with the asymmetry decision, the provenance
+  question (was 9939b02's A′ share ever reviewed? if not this
+  review is the owed one per packet §4 step 1), and five
+  review-focus items in its mandate; report files as
+  `GwzM5-8A1ReleaseR1-ReviewState.md`. ADJACENT: R1 observed
+  Decision 1 B ALSO landed at 9939b02 (both pin edges +
+  cfg(windows) doctrine sentinel; the windows-matrix un-pinned CRLF
+  sentinel genuinely absent) — the R2 builder was RESCOPED
+  mid-flight to audit-plus-gaps, not re-implementation. Plan
+  correction pending both audits: R1.1/R2.1 were audit work, not
+  build work; the release-train estimate shrinks accordingly.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
