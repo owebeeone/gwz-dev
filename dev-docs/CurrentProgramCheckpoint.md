@@ -977,7 +977,25 @@ fable token only where it makes a difference." Recorded consequences:
   written. The code closed; THE LEDGER NEVER RECORDED IT (no dev-doc
   mentions refuse_foreign_filtered_rewrites, 9939b02, or
   filter-policy), which is exactly how the release plan came to
-  re-schedule R1.1/R2.1 as unstarted work. The R1 package reduced
+  re-schedule R1.1/R2.1 as unstarted work. **[CORRECTED 2026-08-25
+  per R1.2 [P2 F-1], condition C1: the preceding sentence is FALSE
+  as written. The ledger DID record the decisions — the D2/A′
+  discharge is annotated at
+  `GwzM5-8ExactEvidencePlatformAmendment.md:156-175`, D1's closure
+  at `:108-121` — and a State review DID run at the `9939b02`
+  landing (its commit message: "State review GO, F2 same-train
+  condition discharged"; findings F1/F2/F3/F5/F6 traceable by
+  content in the amendment landed in the same commit — including
+  the `.gitattributes` asymmetry itself, recorded as State F1 [P3]
+  at `:117-121`). What was never produced is the REPORT ARTIFACT —
+  the D1+D2 package is the sole landing of that week with none —
+  and `GwzM5-8A1ReleaseR1-ReviewState.md` is now that artifact.
+  The true failure mode: the amendment recorded it, the searchable
+  program surfaces (checkpoint, review inventory, plan) did not,
+  so both the release plan and the R1 builder's grep-scoped search
+  missed it. Decision ledger annotation per C1: decided A′, landed
+  `9939b02`, reviewed-at-landing (report unfiled), re-reviewed and
+  GO at `8e40fa8` (`GwzM5-8A1ReleaseR1-ReviewState.md`).]** The R1 package reduced
   to: the conformance audit (predicate matches the packet's four A′
   clauses; both recovery sites refuse pre-mutation, verified against
   the ref-transaction ordering; the clone-funnel disable_filters
@@ -1093,6 +1111,42 @@ fable token only where it makes a difference." Recorded consequences:
   + the cf0d16d fix verification + the notes' claims checked
   against the tree; report files as `GwzM5-8A1ReleaseR3-Review.md`;
   its evidence-digest ruling is the load-bearing one).
+
+  **R1.2 VERDICT — 2026-08-25: GO WITH CONDITIONS; GATE G1
+  SATISFIED at `8e40fa8` + the R1 test package; the §4 forbidden
+  ordering CLEARED — v0.11.0 may proceed past G1.** Report
+  `GwzM5-8A1ReleaseR1-ReviewState.md` (0 P0/P1; 4 P2 = F-1
+  checkpoint falsehood [corrected above, C1 DONE], F-2 the packet's
+  fix premise is FALSE — git2 0.21/libgit2-sys 0.18.7 bind no
+  git_attr_get_ext/INCLUDE_COMMIT, the amendment's "~15-LOC
+  hardening" is unimplementable at this pin [C4], F-3 the
+  recovery_support.rs:24-29 comment overstates the harm — the
+  reviewer's own probe shows NO in-gwz wedge (libgit2 status runs
+  no config-command drivers; realized harm = real-git-visible
+  divergence, porcelain re-checkout remedy) [C2-notes; comment fix
+  rides R6], F-4 the asymmetry itself; P3s: F-5 the Delta::Deleted
+  exclusion is UNTESTED (mutation M2 flips nothing), F-8 plan
+  :62-63 phrasing stricter than the packet's boundary).
+  Adjudications: (a) **ACCEPTED AS A NAMED RESIDUAL** — already
+  found at landing as State F1 [P3], not closable at the current
+  dependency pin, mild realized harm, common direction over-refuses
+  safely — SHIPS NAMED AND TRIPWIRED: C2 (verbatim residual text
+  §3(a) → checkpoint register + G6 notes, by message shape not
+  error code), C3 (doctrine sentinel in g12 per the house ritual,
+  ~40 test-only lines converting the builder's probe, red means
+  someone closed the residual and the frozen texts move), owner
+  §R6 renormalize; (b) abort bound CONFIRMED over eight cases,
+  guard-tying recommended; (c) FILE_THEN_INDEX intended,
+  INCLUDE_HEAD does not exist in this git2; (d) lfs
+  allowlist-by-name acceptable-with-record (CI fixture hermeticity
+  load-bearing); (e) lock-before-preflight CONFORMS (the packet's
+  boundary is set_target, not lock_ref). Reviewer's independent
+  mutation matrix: M1 sole-detector confirms the builder's
+  sentinel; M3/M4 each detected; M2 exposed F-5. Gates reproduced:
+  g12 25/0, lib 1584/0/1, checker ok, zero pins. R1 LANDING
+  PACKAGE: the +77 test + C3 sentinel + F-5 test (recommended,
+  taken) in the r1-aprime worktree; C2/C4/F-8 dev-docs
+  applications at landing (lane owner).
 
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
