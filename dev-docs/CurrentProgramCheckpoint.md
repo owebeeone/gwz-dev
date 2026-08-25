@@ -1313,6 +1313,16 @@ fable token only where it makes a difference." Recorded consequences:
   error code, per F6's mechanism not the stale code comment)
   lands with the notes finalization in R5. G1 IS FULLY DISCHARGED.
 
+  **R4 LAUNCHED — 2026-08-25, on R1's discharge (branch (i),
+  docs-only).** The runbook builder drafts the v0.11.0
+  wedge-and-refusal runbook in a gwz-cli worktree at `cf0d16d`:
+  classes A (A′ refusal, by message shape), B (the named residual,
+  porcelain re-checkout), C (adopted-CRLF availability), D (the
+  §4.2/§4.4 quarantine + manual surgery made documented), E (LFS
+  pointer bytes), F (stop-and-collect-evidence); truthful to
+  `a6ef094`/`cf0d16d`, no tooling promised, escape design stays
+  DRAFT and un-referenced in user text. Single-axis review next.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
