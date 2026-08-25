@@ -1552,6 +1552,33 @@ fable token only where it makes a difference." Recorded consequences:
   work already landed at `07e1ac1`; the session should find a
   clean tree and no-op.
 
+  **THE VENDORED TAUT SNAPPED TO v0.9.1 — 2026-08-25,
+  operator-directed ("../taut/src should be snapped at the v0.9.1
+  release tag").** `git checkout --detach v0.9.1` → taut at
+  `5cd26a1`; the old pin `f008419` proven an ANCESTOR — the member
+  was simply BEHIND the release, which is why its IR export
+  matched neither released wheel. CONSEQUENCE: the drift-checker
+  footgun of the previous entry is DISSOLVED in practice —
+  `check_protocol_drift.py` in the live workspace now prints OK
+  `d0c205c8…` (vendored == wheel); the local-preference stays as
+  designed and is harmless while the snap discipline holds.
+  RITUAL: a taut-proto release bump has THREE legs — the pins
+  (workflows/tripwire/guards), the regenerated gwz-py IR, and the
+  member snap to the same tag. RECORD-KEEPING SLIP, corrected
+  here: root commit `5120219` carries this entry's message but
+  only the lock capture — the record edits had silently failed on
+  a drifted cwd before it; this commit applies them, plus TWO
+  omissions found in the same inspection: the four release review
+  reports (`GwzM5-8A1ReleaseR{1,2}-ReviewState.md`,
+  `GwzM5-8A1ReleaseR{3,4}-Review.md`) had been UNTRACKED since
+  filing — cited everywhere, committed nowhere — and the root
+  `Cargo.lock` still recorded gwz-core 0.10.4 (the 0.11.0
+  coherence refresh rides here). Lesson: `gwz add` of nonexistent
+  relative paths + a chained commit produced an Ok/Ok that
+  committed something other than the named intent — inspect
+  `git show --stat` after any commit whose preceding step
+  errored.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer

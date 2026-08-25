@@ -12,7 +12,7 @@ filled when the operator publishes.
 | gwz-core | `8008bf6` | pushed to main; version `0.11.0`; taut-proto pin 0.9.1 |
 | gwz-cli | `6b7e75a` | local main — OPERATOR PUSHES |
 | gwz-py | `6e1d52f` | local main — OPERATOR PUSHES; taut-proto pin 0.9.1 + regenerated IR |
-| taut | `f008419` | unchanged |
+| taut | `5cd26a1` | snapped at the taut v0.9.1 release tag (operator-directed; was `f008419`, an ancestor — the old pin was behind the release) |
 
 Tag: ⟨OPERATOR: `v0.11.0` at gwz-core `8008bf6`; the GitHub release
 body is `GwzReleaseNotes-v0.11.0.md`; member release-branch commits
