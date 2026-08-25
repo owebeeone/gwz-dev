@@ -1107,6 +1107,22 @@ fable token only where it makes a difference." Recorded consequences:
   contradicting the shipped headline feature, uncovered by the
   docs checker's 147 assertions (gap recorded); fixed at gwz-cli
   `cf0d16d` (synopsis + accurate --no-ff section), g00 3/0 green.
+  **[CORRECTED 2026-08-25 per the R3 review's [P1-1]: "uncovered
+  … (gap recorded)" is FALSE. The checker's assertions COVER that
+  prose with four required statements
+  (merge_command_deferred_heading, …_ff_only_and_message_current,
+  …_no_ff_deferred, …_no_ff_unsupported_is_typed) — they were
+  PINNING THE STALE PROSE: the assertions should have moved at the
+  `3000916` unhide and did not, and L2-05's non-wiring is why the
+  red was never seen. The R3 builder's "checker passes so its
+  assertions do not cover this" was true only of the pre-fix tree,
+  and the lane owner propagated the negative claim into this
+  record without verifying it at the pinning surface — the same
+  failure class as the C1 correction above, same day. `cf0d16d`
+  therefore leaves the cross-repo docs gate RED (4 findings) until
+  the four assertions are updated in gwz-core's
+  merge_docs_manifest.json — the prose is now TRUE and stays; the
+  checker aligns in the R3 landing.]**
   **R3 INTERIOR SINGLE-AXIS REVIEW DISPATCHED** (the 8 focus items
   + the cf0d16d fix verification + the notes' claims checked
   against the tree; report files as `GwzM5-8A1ReleaseR3-Review.md`;
@@ -1197,6 +1213,46 @@ fable token only where it makes a difference." Recorded consequences:
   conversion + windows-matrix adjustment + package-level P3s;
   the release.yml Windows count-pin step folds into R3's landing
   package on its review's return.
+
+  **R3 REVIEW VERDICT — 2026-08-25: NO-GO AS FILED ([P1-1] + 3
+  P2); G3 GO-with-conditions, G4 GO, G6-versions GO,
+  G6-notes/companion NO-GO; with conditions 1-4 closed G3/G4/G6
+  are satisfied — none require new code.** Report
+  `GwzM5-8A1ReleaseR3-Review.md`. [P1-1] = the lane owner's
+  `cf0d16d` broke the green docs gate (corrected in the R3
+  delivery record above); cure = four assertion updates in
+  gwz-core `merge_docs_manifest.json` + checkpoint correction
+  [DONE]. [P2-1] the generation description omits that an
+  ordinary v0 record MIGRATES to v1 on resume (whitelisted
+  Finalizing+Normal, store/mod.rs:254-262 MayAdapt) — a v1 record
+  can exist with NO --no-ff start; add the migration clause.
+  [P2-2] the decode-generations register has a HOLE at
+  v0.10.3/4/5 — v0.10.4/5 are materially NOT the v0.10.2
+  generation (PRODUCTION_R3 {v0:true,v1:false}, typed
+  Unsupported+required_wave, not record_unreadable); constrain
+  the entry's stated meaning or add the missing generation.
+  [P2-3] the notes' "v0.10.2–v0.10.5 → record-unreadable" claim
+  is wrong for two of four releases and unevidenced for a third
+  (harness pins only v0.9.2/v0.10.2); narrow or split it.
+  MECHANICS ALL CONFIRMED: byte-equivalence:1 IS the m4 checker;
+  the runner's failed-before-partial ordering verified by
+  execution; the version convention holds at all eight tags;
+  v0.10.5 lives on origin/hotfix/v0.10.5, NOT an ancestor of
+  HEAD, carries NO code main lacks — v0.11.0 STRICTLY SUPERSEDES
+  it (the notes should state this). THE EVIDENCE-DIGEST RE-PIN
+  RULED SOUND, verified eight ways (reader-keyed result set;
+  manifest deliberately not in EVIDENCE_SOURCE_NAMES), with
+  [P3-7] narrowing the RULE: artifacts are embedded-not-rederived,
+  so "readers didn't change" suffices only because the delta is
+  confined to decode_generations. OUT-OF-SCOPE FIND, ROUTED TO
+  THE R3 LANDING: **`release.py:527-530` HARD-CODES an AI
+  co-author trailer into release commits** — violates the
+  standing attribution order (settings enforce it only for the
+  lane's own commits, not tooling-authored ones); v0.11.0 dodges
+  via the pre-bump no-commit path, later releases would not;
+  one-line removal rides R3 with this record. R3 BUILDER RESUMED
+  with conditions 1-4 + the R2.3 item-7 release.yml Windows
+  count-pin step + the trailer removal.
 
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
