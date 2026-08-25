@@ -1294,6 +1294,17 @@ fable token only where it makes a difference." Recorded consequences:
   > config-command drivers; see F6,
   > `GwzM5-8ExactEvidencePlatformAmendment.md`:167-172); the
   > remedy is a porcelain re-checkout of the affected paths.
+  > **[Precision, 2026-08-25, per the R4 review's [P0-1] executed
+  > evidence: "porcelain re-checkout" must be read as FORCE
+  > re-materialization — delete the affected paths, then
+  > `git checkout -- <paths>`. A bare `git checkout --` is
+  > silently insufficient: after the filters-off rewrite the
+  > index carries the raw file's stat, `git status` prints
+  > nothing, and the checkout skips the paths as up-to-date while
+  > the divergence persists. The runbook carries the working
+  > sequence; the g12 doctrine sentinel's doc comment saying
+  > "porcelain re-checkout" gains the same precision in the next
+  > gwz-core train.]**
   > Reaching it requires the coverage to arrive WITH the checkout
   > (e.g. rolling back across a merge that deleted the covering
   > `.gitattributes`); the common direction — rolling back a
@@ -1413,6 +1424,43 @@ fable token only where it makes a difference." Recorded consequences:
   at the RC with G2-c1's sentinel-lane evidence (pinned `6
   passed` + sentinel `1 passed`) and the T-5 pair regeneration on
   its §11.2 carrier, the release record — and THE TAG (operator).
+
+  **R4 REVIEW VERDICT — 2026-08-25: NO-GO as drafted; six local
+  edits convert to GO; the page's structure, what-was-mutated
+  discipline, and message-first diagnosis "the best this program
+  has produced — ship unchanged" apart from the edits.** Report
+  `GwzM5-8A1ReleaseR4-Review.md`. TWO P0s FOUND BY EXECUTION, not
+  reasoning: [P0-1] the porcelain-re-checkout remedy (class A
+  follow-up + class B's ONLY remedy) FAILS SILENTLY AND CERTIFIES
+  ITS OWN SUCCESS — after a filters-off rewrite the index carries
+  the raw stat, status prints nothing, `git checkout --` skips as
+  up-to-date, and the runbook's "expect no output" verification
+  passes on the unrepaired worktree (proven on size-preserving AND
+  size-changing filters); the working form is delete-then-checkout
+  (force re-materialization). PROPAGATED beyond the page: the
+  release notes corrected, the C2 residual register text given a
+  bracketed precision note, and the g12 doctrine-sentinel doc
+  comment queued for the same precision in the next gwz-core
+  train. [P0-2] the class-C paste block DESTROYS a mid-conflict
+  member — `git rm --cached -r .` refuses non-zero but the
+  `reset --hard` on the next line runs anyway, wiping hand
+  resolutions, MERGE_HEAD, and stages; the fence must be in-block
+  and fail-stop. P1s: the class-C block ineffective for the
+  attribute-driven triggers its own section names; the armed
+  intermediate state (clean -fdx becomes whole-tree delete)
+  unexplained; "ordinary merges are not affected" FALSE (the
+  migration truth again — Normal Finalizing v0 rows migrate on
+  abort and reach the comparator). RULINGS: force-abandon silence
+  WRONG — one sentence added ("there is deliberately no
+  force-abandon; parked IS the end state"); the sidecar-less
+  restore SHIPS with two instruments (literal diff vs the
+  evidence copy; `ls .gwz/merge/*.yaml` empty-check); the
+  `quarantine/` DIRECTORY name ships ([Q7] is open over CLI
+  surface only; never name a flag; "park" settled as the verb).
+  Confirmed true by the reviewer: class D invisibility, the gate
+  sets exact, all message texts byte-exact, the v1_rollback
+  bound, indexing ships as-is, g00 3/3 and the docs gate 147
+  green WITH the R4 edits. R4 BUILDER RESUMED on the edit list.
 
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding

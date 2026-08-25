@@ -114,10 +114,14 @@ may show the covered paths as modified: they hold raw blob bytes
 under a now-active clean filter. Reaching this requires rolling back
 across a change that *deleted* the covering `.gitattributes`; the
 common direction — rolling back a change that added coverage —
-refuses safely. The remedy is a porcelain re-checkout of the affected
-paths (the recovery guide covers it). Closing the gap outright needs
-a libgit2 capability our current dependency does not expose; it is
-tracked with the planned `renormalize` work.
+refuses safely. The remedy is to force re-materialization of the
+affected paths — delete them, then check them out again (the recovery
+guide gives the exact sequence). A bare `git checkout -- <paths>` is
+**not** sufficient here: git's index considers the raw files current
+and silently skips them, so the command reports success while
+changing nothing. Closing the gap outright needs a libgit2 capability
+our current dependency does not expose; it is tracked with the
+planned `renormalize` work.
 
 ## New: line-ending pins at repository birth
 
