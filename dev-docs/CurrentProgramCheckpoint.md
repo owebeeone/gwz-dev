@@ -1389,6 +1389,31 @@ fable token only where it makes a difference." Recorded consequences:
   Windows count-pin step is now LIVE-able (the six names exist on
   main).
 
+  **R3 IS LANDED — 2026-08-25, gwz-core `07e1ac1` (exact-ref
+  pushed, main bed072a → 07e1ac1; live fast-forwarded). R1+R2+R3
+  ARE ALL ON MAIN.** Eight files +194/−19: the v0.11.0 generation
+  with the resume-migration clause + the two tag-verified
+  register-hole generations (digest re-derived, tuples hold 24);
+  the docs gate re-pinned to post-A1 truth at the held count 147
+  with the forbidden-regex regression guard; release.yml's
+  Linux-only battery step + the Windows CRLF count-pin step (LIVE
+  now that R2's six names are on main; FIRST-DISPATCH-EXPECTED);
+  version 0.11.0 per the tag-history convention (--locked green);
+  the release.py Co-Authored-By trailer REMOVED. Overlay gates at
+  bed072a all green (checker; docs gate against live gwz-cli
+  cf0d16d; harness 86/OK; L2-04 24/24; check --locked; fmt;
+  YAML). Lock captured to `07e1ac1`. Push CI at the landing sha
+  under watch. GATES G3/G4/G6 DISCHARGED per the R3 review's
+  close ("with 1-4 closed, G3, G4 and G6 are satisfied for
+  v0.11.0"). REMAINING TO THE TAG: R4 (runbook draft in flight →
+  single-axis review → gwz-cli landing), the notes FINALIZATION
+  (R3's corrected draft + C2's user-facing leg + the runbook
+  pointer — reconciliation caveats now resolvable against landed
+  surfaces), then R5: member pushes (operator), three-arm matrix
+  at the RC with G2-c1's sentinel-lane evidence (pinned `6
+  passed` + sentinel `1 passed`) and the T-5 pair regeneration on
+  its §11.2 carrier, the release record — and THE TAG (operator).
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
