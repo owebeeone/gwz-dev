@@ -1462,6 +1462,42 @@ fable token only where it makes a difference." Recorded consequences:
   bound, indexing ships as-is, g00 3/3 and the docs gate 147
   green WITH the R4 edits. R4 BUILDER RESUMED on the edit list.
 
+  **R4 IS LANDED + THE PRECISION MICRO-TRAIN — 2026-08-25. THE
+  v0.11.0 TRAIN'S BUILD PHASES ARE COMPLETE.** R4: gwz-cli
+  `6b7e75a` (local; docs/MergeRecovery.md 665 lines/4,121 words +
+  4 indexing files, +692 total) — the review's two executed P0s
+  fixed and RE-EXECUTED on three fixture shapes (the
+  delete-then-checkout remedy with touch-sweep detection since
+  status is blind; the class-C block now && -chained and
+  guard-led, proven to halt at the refusal even when the human
+  skips the guard; the attribute-vs-config router; the
+  force-abandon closing sentence; the parked-restore instruments;
+  "park" the verb, `quarantine/` the directory); g00 3/3;
+  links/anchors validated; landing verification: page sha
+  byte-exact vs insurance (166555d9…), diff +27 across the 4
+  indexing files. Micro-train gwz-core `a6ce8a8` (exact-ref
+  pushed, 07e1ac1 → a6ce8a8): R4 [P2-5] — the recovery guide is
+  now a docs-gate SOURCE pinning the recovery-path bound
+  paragraph (so M5c cannot silently invert the page); the marker
+  moved to the EXECUTED count "ok (12 sources, 155 assertions)"
+  (the derived guess of 148 was wrong — a new source inherits the
+  7 global forbidden; the gate's own output is the pin source,
+  today's lesson applied); the g12 sentinel comment's remedy
+  corrected per [P0-1]. Docs gate/checker/fmt/g12 green at the
+  landing. Lock captured (core `a6ce8a8`, cli `6b7e75a`, py
+  `3d19dcd`). NOTE: the settled "147 assertions" figures in
+  historical records remain true OF THEIR TREES; 155 is the
+  figure from `a6ce8a8` forward. GATES: G1-G4 + G6 DISCHARGED;
+  G2-c1 and G5 are the RC evidence items. **REMAINING = R5
+  ONLY:** operator pushes gwz-cli (`6b7e75a`) and gwz-py
+  (`3d19dcd`); three-arm matrix at the RC (first Windows
+  execution of the CRLF proofs + the count-pin confirmation +
+  G2-c1's two-half sentinel evidence); the T-5 pair regeneration
+  on its §11.2 carrier; the release record; THE TAG (operator;
+  release.yml verify green on both legs at the published tag).
+  The notes (`GwzReleaseNotes-v0.11.0.md`) are FINAL as of the
+  P0-1 correction, pending only the RC evidence stamp.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
