@@ -269,7 +269,16 @@ currently modified/conflicted set — and query the `filter` attribute per
 path via git2 0.21's `Repository::get_attr`/`get_attr_bytes`
 (`repo.rs:1112/:1132`, wrapping `git_attr_get_ext`; attribute stacks are
 cached by libgit2, so cost is O(rewrite set) lookups on top of a tree diff
-the checkout does anyway). Refuse with a typed pre-mutation error naming
+the checkout does anyway). **[Corrected 2026-08-25 per R1.2 F-2
+(`GwzM5-8A1ReleaseR1-ReviewState.md`, C4): git2 0.21's
+`get_attr_bytes` wraps `git_attr_get`, NOT `git_attr_get_ext`
+(git2 `repo.rs:1142`), and `libgit2-sys 0.18.7+1.9.6` binds no
+`git_attr_get_ext`, no `git_attr_options`, no
+`ATTR_CHECK_INCLUDE_COMMIT` — reading attributes from an arbitrary
+target tree is NOT implementable at this dependency pin. The
+target-side-coverage shape this implies is the accepted named
+residual of R1.2 §3(a), pinned by the g12 doctrine sentinel and
+owned by the §R6 renormalize package.]** Refuse with a typed pre-mutation error naming
 the filter and path when any value outside the allowlist (`lfs`) is set.
 False positives: filter attribute present but no driver configured (git
 treats it as pass-through — no wedge would have occurred), and genuinely

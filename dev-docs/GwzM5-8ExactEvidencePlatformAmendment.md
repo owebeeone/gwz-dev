@@ -118,7 +118,20 @@ ends CI blindness for this half of the residual. A post-A1 operator
 `renormalize` command for adopted worktrees remains the tracked follow-up.
 Known spec residual of the D2 probe (State F1, P3): the attribute stack is
 read pre-checkout, so attribute coverage introduced by the target state
-itself escapes the gate; ~15-LOC hardening recorded as a candidate.)* The
+itself escapes the gate; ~15-LOC hardening recorded as a candidate.)*
+*(Corrected 2026-08-25 per R1.2 F-2/C4
+(`GwzM5-8A1ReleaseR1-ReviewState.md`): the "~15-LOC hardening"
+candidate is UNACHIEVABLE AS WRITTEN — reading attributes from the
+target tree needs `git_attr_get_ext`/`git_attr_options.attr_commit_id`,
+which `libgit2-sys 0.18.7+1.9.6` does not bind and git2 0.21's
+`AttrCheckFlags` does not expose. F1 is instead ACCEPTED AS A NAMED
+RESIDUAL at R1 (re-confirmed empirically; realized harm is
+real-git-visible divergence with a porcelain re-checkout remedy —
+gwz's libgit2-based status runs no config-command drivers, per F6
+below), pinned by the g12 doctrine sentinel
+`doctrine_sentinel_target_side_attribute_coverage_escapes_the_foreign_filter_gate`
+landed at gwz-core `a6ef094`, and owned by the post-A1 renormalize
+package.)* The
 raw-byte observations are **full-tree**
 (`observe_v1_participant_rollback`, `verify_v1_no_mutation_participant`,
 `terminal_v1_participant_is_exact` —

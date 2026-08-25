@@ -59,8 +59,11 @@ ordering binds every release from a tree carrying the amendment's
   recovery-grade checkout would rewrite is covered by an attribute
   filter whose value is outside the allowlist (`lfs`) AND whose
   `filter.<name>.clean` (or `.process`) is present in effective config.
-  Refuse with a typed error naming filter+path BEFORE the ref
-  transaction. Built once, consumed at the call sites the packet names
+  Refuse with a typed error naming filter+path before any ref MOVES
+  (the packet's boundary is `set_target`/`commit`, not `lock_ref` —
+  R1.2 F-8 correction: a held ref lock with no target set is "no
+  mutation" under the packet's contract). Built once, consumed at
+  the call sites the packet names
   (the two recovery checkouts; §R6's renormalize command reuses it).
   Tests: configured non-passthrough → refusal pre-mutation; unconfigured
   attribute → proceeds; `lfs` → proceeds; refusal fires before any ref

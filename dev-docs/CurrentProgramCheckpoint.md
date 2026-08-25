@@ -1254,6 +1254,65 @@ fable token only where it makes a difference." Recorded consequences:
   with conditions 1-4 + the R2.3 item-7 release.yml Windows
   count-pin step + the trailer removal.
 
+  **R1 IS LANDED — 2026-08-25, gwz-core `a6ef094` (exact-ref
+  pushed, main 8e40fa8 → a6ef094; live tree fast-forwarded
+  clean).** One file, +299/−0, test-only (`src/git/tests/g12.rs`):
+  the rewrite-set scoping test (M1 sole detector), F-5's
+  deletion-clause test (M2 sole detector, built + red-proven this
+  round), and C3's doctrine sentinel
+  `doctrine_sentinel_target_side_attribute_coverage_escapes_the_foreign_filter_gate`
+  (g12:1211; pins TODAY'S behaviour — the rollback proceeds, the
+  ref moves, raw bytes under now-live coverage, and
+  `!status.is_dirty` pinning the F-3 fact that gwz's status cannot
+  see it; 45-line doc comment carries the full ritual incl. the
+  red-means-frozen-texts-move clause). Lane-owner verification at
+  landing: diff sha matched insurance
+  (`6a915aa3…`), checker green, g12 23/0 re-run. Builder gates:
+  lib 1586/0/1, clippy from clean. Zero pins. RECORD APPLICATIONS
+  LANDED WITH THIS ENTRY: C4 (packet :269-271 bracketed
+  correction — get_attr wraps git_attr_get, target-tree attribute
+  read unimplementable at this pin; amendment :117-121 correction
+  — the "~15-LOC hardening" unachievable as written, F1 accepted
+  as named residual with the sentinel + R6 owner), F-8 (plan R1.1
+  boundary phrasing aligned to set_target). **C2 — THE RESIDUAL
+  REGISTER ENTRY, verbatim per R1.2 §3(a):**
+
+  > **A′ NAMED RESIDUAL — target-side attribute coverage
+  > (`.gitattributes` asymmetry).** The Decision 2 A′
+  > foreign-filter refusal (`refuse_foreign_filtered_rewrites`,
+  > `src/git/gitbackend/recovery_support.rs`:46-95) reads the
+  > *pre-checkout* attribute stack (`git2::AttrCheckFlags::default()`
+  > = `FILE_THEN_INDEX`). When `.gitattributes` is itself inside
+  > the rewrite set and the foreign `filter` coverage exists ONLY
+  > on the target side — i.e. the recovery checkout restores the
+  > coverage together with the bytes — the gate does not fire: the
+  > recovery-grade rollback or abort proceeds, the ref moves, and
+  > the covered path is left holding raw blob bytes under a
+  > now-active configured clean driver. The reachable harm is
+  > divergence visible to real `git` on those paths (gwz's own
+  > libgit2-based status cannot see it — it does not run
+  > config-command drivers; see F6,
+  > `GwzM5-8ExactEvidencePlatformAmendment.md`:167-172); the
+  > remedy is a porcelain re-checkout of the affected paths.
+  > Reaching it requires the coverage to arrive WITH the checkout
+  > (e.g. rolling back across a merge that deleted the covering
+  > `.gitattributes`); the common direction — rolling back a
+  > change that ADDED coverage — over-refuses and is safe. **Not
+  > closable at the current dependency pin:** reading attributes
+  > from an arbitrary tree needs `git_attr_get_ext` /
+  > `git_attr_options.attr_commit_id`, which `libgit2-sys
+  > 0.18.7+1.9.6` does not bind and `git2 0.21`'s
+  > `AttrCheckFlags` does not expose. First recorded as State F1
+  > [P3] at landing (`9939b02`, 2026-08-16); re-confirmed
+  > empirically and re-accepted at R1
+  > (`GwzM5-8A1ReleaseR1-ReviewState.md` §3(a)). Owner: the §R6
+  > `gwz repair --renormalize` package, which already shares this
+  > predicate and is the natural place to harden it.
+
+  C2's user-facing leg (the release notes, by message shape not
+  error code, per F6's mechanism not the stale code comment)
+  lands with the notes finalization in R5. G1 IS FULLY DISCHARGED.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
