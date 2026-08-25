@@ -1048,6 +1048,52 @@ fable token only where it makes a difference." Recorded consequences:
   `GwzM5-8A1ReleaseR2-ReviewState.md`; its item-7 ruling decides
   whether crlf-sentinel also rides release.yml via R3's G4).
 
+  **R3 DELIVERED — 2026-08-25 (r3-release worktree, 6 files
+  +106/−4).** Leg A (G3): generation
+  `v0-v1-dual-decode-v0-writer-floor` for v0.11.0, shipped-behaviour
+  description (v0+v1 decode; --no-ff→v1; ordinary v0, floor V0,
+  M5c named); tuple_count CORRECTLY UNMOVED at 24 (generations add
+  no reader rows — reasoning pinned in-comment beside the
+  assertion); the brief's "manifest is unpinned" guess was WRONG
+  and the verify-first order caught it —
+  `evidence-macos-aarch64.json` `inputs.manifest_sha256` re-pinned
+  (old 9b1af0e3… → dacdb187…), soundness argued (result set is
+  reader-keyed; validate_result_set re-ran green) and flagged to
+  review as the one possible rubber stamp. Leg B (G4): topology
+  audit found `byte-equivalence`'s FIRST command IS
+  check_m4_scenario_map.py — wiring the battery whole would have
+  reproduced run 32749489320's sibling failure exactly; wired
+  selection `fault byte-equivalence:2 unknown-field privacy`
+  (~27 min measured upper-bound), the runner printing PARTIAL for
+  the partitioned selector so the gap stays legible; call-graph
+  EXCLUDED on verified redundancy (the existing boundary step runs
+  its three commands verbatim; markers exit-code-equivalent; ~21
+  min for zero signal, re-add trigger recorded); LINUX-ONLY on
+  evidence (Windows counts differ by cfg-gating and were NEVER
+  MEASURED — an unmeasured count pin is §17's lesson in a new
+  dress); blocker comments extended to release.yml naming both
+  workspace-root checkers, owner R2-F §11.3 item 7. Leg C (G6):
+  version convention ESTABLISHED FROM HISTORY (crate == tag minus
+  v, standalone 2-line chore commit; the v0.10.4/v0.10.5 anomaly is
+  the narrow-branch release BY DESIGN — v0.10.4 not an ancestor of
+  v0.10.5); 0.10.4→0.11.0 applied on the dev line (1+/1− each
+  file); member proposal CORRECTS THE PLAN — gwz-cli `0.2.0-dev` /
+  gwz-py `0.0.0` are dev placeholders the release-branch commit
+  overwrites (version + path→git-tag re-point at the tag, operator
+  R5 territory; gwz-py wheel version derives from the tag via
+  dynamic versioning, no pyproject edit); full release-notes draft
+  delivered with an R1/R2-reconciliation caveat. OUT-OF-PACKAGE
+  G6 DEFECT found and FIXED by the lane owner: gwz-cli
+  `docs/commands/merge.md:374-377` still claimed --no-ff "not yet
+  available"/typed-unsupported and the synopsis omitted it —
+  contradicting the shipped headline feature, uncovered by the
+  docs checker's 147 assertions (gap recorded); fixed at gwz-cli
+  `cf0d16d` (synopsis + accurate --no-ff section), g00 3/0 green.
+  **R3 INTERIOR SINGLE-AXIS REVIEW DISPATCHED** (the 8 focus items
+  + the cf0d16d fix verification + the notes' claims checked
+  against the tree; report files as `GwzM5-8A1ReleaseR3-Review.md`;
+  its evidence-digest ruling is the load-bearing one).
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
