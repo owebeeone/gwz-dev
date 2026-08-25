@@ -1148,6 +1148,56 @@ fable token only where it makes a difference." Recorded consequences:
   taken) in the r1-aprime worktree; C2/C4/F-8 dev-docs
   applications at landing (lane owner).
 
+  **R2.3 VERDICT — 2026-08-25: GO WITH CONDITIONS; GATE G2
+  SATISFIED at `8e40fa8` + the R2 gap package (0 P0/P1 · 3 P2 ·
+  9 P3).** Report `GwzM5-8A1ReleaseR2-ReviewState.md`. The landed
+  B code correct AS NEW: pins the right two keys repo-local
+  (verified against libgit2 level ordering), STRUCTURALLY unable to
+  go mid-life (no_reinit(true) makes re-pinning an existing repo an
+  error; RepoBuilder::clone materializes before config can exist —
+  disable_filters is the only pre-pin-window mechanism);
+  pub(super) holds; the 9939b02 test proven non-vacuous by the
+  reviewer's own mutation. FRAMING CORRECTED: the production
+  worktree-writer inventory is TWELVE rows, not nine (the stash
+  RESTORE edge stash.rs:31-61 was omitted — default
+  StashApplyOptions ⇒ filters active, covered by birth pins), and
+  "only the clone funnel is filters-off" is false (the two Clause A
+  recovery edges are too). [P2-1] MEASURED DEFECT in R2's guard:
+  function_slice terminates on literal "\n}\n" and silently
+  falls back to whole-file on CRLF working trees — the guard
+  degrades EXACTLY ON WINDOWS (proven: a real relocated-pin defect
+  fails on LF, passes on CRLF); fix = the in-tree precedent
+  r2d_seam_freeze.rs:219-223 (G2-c2). [P2-3] provenance hardened:
+  the amendment CITES a review that does not exist (:168 "the
+  landing review (F6)"; the :108-121 closure annotation) — the
+  citations dangle even though R1.2 traced the review's findings;
+  condition on anchor A. Fixture argument STRENGTHENED: libgit2
+  ignores GIT_CONFIG_GLOBAL on gwz's open path (repository.c
+  use_env gating) — an env-var fixture would have been INERT;
+  repo-local hostile is the only correct form. CONDITIONS: G2-c1
+  the sentinel lane executes at the RC (pinned half "6 passed",
+  un-pinned red — R5 evidence item); G2-c2 the CRLF-normalization
+  guard fix; G2-c3 anchors only with the §7 conditions; G2-c4
+  restate gate G2's text (its literal "filters-off at every edge"
+  would break the porcelain parity the amendment preserved).
+  **ITEM-7 RULING: YES [P2-2], routed to R3/G4, before the tag** —
+  the CRLF class must ride release.yml; PREFERRED FORM: convert the
+  un-pinned sentinel to #[should_panic] (rides every existing lane;
+  pages when the residual is closed) leaving only the Windows-leg
+  count-pinned exact-name step to add to release.yml's verify job
+  (NOT a duplicate windows job). ANCHOR SIGNING: A signed subject
+  to A-i (date closures to 9939b02; assert the traceable facts,
+  not an unfiled review's existence) + A-ii (repair the dangling
+  citations same pass); B unsigned text-unseen — §7 of the report
+  carries the restatement the reviewer WOULD sign (use it); C/D
+  signed subject to C-i (attribute-driven residual qualifier
+  MANDATORY), C-ii (scope to gwz-BORN), C-iii ("proven
+  non-vacuously off-Windows" — g11:48 has never run on Windows).
+  ROUTED: R2 builder resumed for G2-c2 + the #[should_panic]
+  conversion + windows-matrix adjustment + package-level P3s;
+  the release.yml Windows count-pin step folds into R3's landing
+  package on its review's return.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
