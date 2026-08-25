@@ -948,6 +948,28 @@ fable token only where it makes a difference." Recorded consequences:
   `32749441866` at `1a31851`; boundary at the corrective
   `8e40fa8`.
 
+  **THE v0.11.0 RELEASE TRAIN IS CHARTERED AND LAUNCHED —
+  2026-08-25.** Plan: `GwzM5-8A1ReleasePlan.md` (gates G1-G6, phases
+  R1-R6). Operator decisions on record: **vNEXT = v0.11.0**
+  (verbatim "v0.11.0"); **R4 = branch (i)** (verbatim "branch (i)")
+  — the narrow §4.4 wedge-runbook slice is handed off to the lane
+  (docs only; escape implementation packages remain second-lane
+  blocked); R6 timing and the R5 member-push/tag scheduling remain
+  OPEN. On "launch R1/R2/R3": three parallel Opus builders launched
+  in isolated gwz-core worktrees at `8e40fa8` — R1 (Decision 2 A′
+  pre-mutation foreign-filter refusal, ~350 LOC, focused State
+  review to follow), R2 (Decision 1 B birth-time CRLF pins + the
+  un-pinned matrix sentinel + decided-annotation texts delivered
+  not applied, ~200 LOC, focused State review to follow), R3
+  (retained-reader A1 generation + release-lane battery wiring
+  behind the §17 topology audit + version reconciliation to
+  v0.11.0 + release-notes draft, interior single-axis). Shared-file
+  discipline: builders write only their own worktrees; every
+  dev-docs edit is the lane owner's at landing. Landing order:
+  each phase lands as its own reviewed train, R1 first if
+  contention arises (G1 is the forbidden-ordering gate). R4
+  (runbook) queues behind R1's final refusal surface.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer

@@ -191,11 +191,25 @@ rewrites worktree bytes; never automatic. ~1 command + tests + docs;
 1. **vNEXT number** — lane recommends `v0.11.0` (new user-visible
    capability + new refusal classes ⇒ minor bump; `v0.10.6` if the
    operator prefers the patch line).
+   **DECIDED 2026-08-25, operator verbatim "v0.11.0".** vNEXT =
+   v0.11.0 throughout this plan.
 2. **§R4 branch** — (i) narrow runbook handoff (recommended) / (ii)
    operator-authored / (iii) signed gap acceptance.
-3. **§R6 timing** — renormalize with vNEXT or after.
+   **DECIDED 2026-08-25, operator verbatim "branch (i)"** — the
+   narrow §4.4 runbook slice is HANDED OFF to the implementation
+   lane (documentation only; the escape implementation packages
+   remain second-lane, blocked). R4 unblocks; the lane schedules it
+   after R1's refusal surface is final, since the runbook documents
+   those remedies.
+3. **§R6 timing** — renormalize with vNEXT or after. OPEN.
 4. **Member pushes + the tag** — operator actions inside R5; schedule
-   at will.
+   at will. OPEN.
+
+**Launch record:** R1, R2, and R3 launched 2026-08-25 on the
+operator's "launch R1/R2/R3", as three parallel builders in isolated
+gwz-core worktrees at `8e40fa8`; all dev-docs edits (the R2.2
+decided-annotations, the R3 release-notes placement) reserved to the
+lane owner at landing.
 
 ## 9. Non-goals of this train
 
