@@ -1323,6 +1323,36 @@ fable token only where it makes a difference." Recorded consequences:
   `a6ef094`/`cf0d16d`, no tooling promised, escape design stays
   DRAFT and un-referenced in user text. Single-axis review next.
 
+  **R3 CONDITIONS 1-6 APPLIED — 2026-08-25 (r3-release worktree,
+  now 8 files +194/−19; all gates green incl. docs gate restored
+  to "ok (11 sources, 147 assertions)").** [P1-1] closed with the
+  COUNT HELD AT 147 — the figure is settled-tree evidence carried
+  in 12 dev-docs files, so merge_command restructured to 3
+  required + 1 FORBIDDEN (regex verified both directions: misses
+  the true prose, CAUGHT the pre-fix stale sentence — the class
+  cannot return silently). [P2-1] migration clause added
+  (whitelist-eligible Finalizing/Normal v0 rows migrate on
+  resume/abort — v1 records without --no-ff, stated). [P2-2]
+  closed via option (b) with tag-level re-verification: v0.10.2/3
+  carry ZERO record_wire files (no dispatcher at all!); two new
+  generations (v0-strict-envelope-typed-unsupported{,-narrow})
+  added; evidence digest re-derived AGAIN (→ b35699c4…); tuples
+  still 24, L2-04 86. [P2-3] the older-reader table rebuilt with
+  per-row evidence tiers (harness-pinned vs source-derived) —
+  v0.10.4/5 give the BEST diagnostic of any older release. Item 5:
+  the Windows count-pin step added with the count DERIVED from
+  source (5 plain + 1 cfg(windows) = 6), FIRST-DISPATCH-EXPECTED,
+  source-presence guard closing the libtest zero-match vacuity;
+  goes live when R2 lands (skip-safe until). Item 6: the
+  release.py Co-Authored-By trailer REMOVED with an in-comment
+  rationale; repo swept, no other occurrence. Two notes
+  corrections forced by evidence: the refusal is NOT a new error
+  code (DirtyMember + message shape, matching R1.2 §2.5) and
+  CRLF is NOT Windows-only (R2's macOS measurement). Base moved
+  to a6ef094 — zero overlap with R3's 8 files, applies cleanly.
+  LANDING ORDER: R2 → R3 (makes the count pin live at R3's
+  landing) → R4.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
