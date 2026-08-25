@@ -1007,6 +1007,47 @@ fable token only where it makes a difference." Recorded consequences:
   correction pending both audits: R1.1/R2.1 were audit work, not
   build work; the release-train estimate shrinks accordingly.
 
+  **R2 DELIVERED — 2026-08-25 — and the provenance finding
+  hardened: NO FILED REVIEW EXISTS for `9939b02`'s D1 OR D2 share.**
+  The commit message self-reports "State review GO"; the dev-docs
+  inventory has a review file for every comparable package and none
+  for filter-policy/D1/D2 — only secondary liveness checks (M5b
+  settled §5 bookkeeping; A1 Completeness item 11 inheriting it).
+  The packet-mandated focused State reviews were never filed; the
+  R1.2/R2.3 reviews now running are the FIRST FILED REVIEWS of that
+  landed production code, scoped to the whole objects. R2's package
+  (r2-crlf worktree, 418 lines, ZERO production): the landed-B
+  audit (pins content/placement correct; complete NINE-EDGE
+  inventory of production worktree writers with per-edge coverage —
+  the disable_filters/pins division of labour is by-design, gate
+  G2's "filters-off at every edge" phrasing imprecise, restate at
+  landing); funnel claim verified (all four clone sites route
+  through; two notes: default-trait-impl inheritance for future
+  backends, partial un-pinned dir on failed clone); THE THREE GAP
+  TESTS (stash round-trip with live CONTROL arm — NEW EVIDENCE:
+  the stash_save filtered-reset smudge measured ON MACOS, the
+  exposure is non-Windows-only in practice; the creation-time-only
+  STRUCTURAL GUARD, red-proven against an injected mid-life pin;
+  the un-pinned sentinel test, red CRLF-vs-LF); and the
+  `crlf-sentinel` windows-matrix job — TWO HALVES MUST DIFFER
+  (pinned lane count-pinned green under hostile GIT_CONFIG_GLOBAL;
+  #[ignore] expected-fail sentinel inverted — if it ever passes
+  the lane fails loudly as vacuous), §17 topology audit recorded
+  in-workflow, REHEARSED end-to-end locally (lane exit 0).
+  Baseline moves +2 passed +1 ignored (1585/2i); checker green,
+  zero pins. Pre-existing (proven on pristine 8e40fa8, not R2's):
+  tests/protocol.rs 2 failures from local taut-proto!=0.8.1 (CI
+  installs it). Annotation DELIVERY with a correction: the
+  amendment's OPEN DECISION entries were ALREADY closed in-body on
+  2026-08-16 — but the HEADER (:11-13) is STALE against its own
+  body; four anchor texts (A-D) delivered for lane-owner
+  application after R2.3's GO, incl. the tripwire-discharge and
+  classification updates. **R2.3 FOCUSED STATE REVIEW DISPATCHED**
+  (first filed review of the landed object + the gap package + the
+  ten focus items + the four anchor texts; report files as
+  `GwzM5-8A1ReleaseR2-ReviewState.md`; its item-7 ruling decides
+  whether crlf-sentinel also rides release.yml via R3's G4).
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
