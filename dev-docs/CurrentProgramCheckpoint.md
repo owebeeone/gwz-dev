@@ -1498,6 +1498,28 @@ fable token only where it makes a difference." Recorded consequences:
   The notes (`GwzReleaseNotes-v0.11.0.md`) are FINAL as of the
   P0-1 correction, pending only the RC evidence stamp.
 
+  **THE v0.11.0 RC EVIDENCE IS COMPLETE — 2026-08-25. ALL FOUR
+  RC-HEAD RUNS GREEN at `a6ce8a8`** (Platform `32802563914`,
+  Windows `32802562170`, boundary `32802495545` with the wired
+  batteries, retained-readers `32802495544`; push CI green at
+  every train commit). **G2-c1 DISCHARGED with both verbatim
+  tails** (pinned `ok. 6 passed; 0 failed`; sentinel
+  `- should panic ... ok` + `ok. 1 passed; 0 failed`). BOTH
+  FIRST-DISPATCH CONFIRMATIONS HELD: the Windows count pin at
+  exactly 6 (the cfg derivation confirmed on the runner) and the
+  stash proof's FIRST WINDOWS EXECUTION green — the C-iii
+  evidence caveat is CLOSED (born-repo stash closure now proven
+  ON Windows). G1-G6 ALL DISCHARGED. Plan G5's T-5 clause
+  corrected in place (over-eager; T-5 stays on the R2-F carrier).
+  Release record filed: `GwzMergeCheckpoint-v0.11.0.md` (RC
+  tuple, gate ledger, evidence verbatim, named residuals with
+  owners, post-tag resume order; tag slot open). **THE TRAIN IS
+  COMPLETE. REMAINING = THE THREE OPERATOR ACTIONS:** push
+  gwz-cli `6b7e75a`, push gwz-py `3d19dcd`, tag `v0.11.0` at
+  gwz-core `a6ce8a8` with `GwzReleaseNotes-v0.11.0.md` as the
+  release body (+ the member release-branch commits per the R3
+  proposal); release.yml verify then runs on the published tag.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
