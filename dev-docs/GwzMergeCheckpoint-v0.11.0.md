@@ -180,3 +180,20 @@ installers, checksums, attestations); py Publish GREEN (wheels).
 The aligned dispatch verify (`32954473899`, ubuntu-24.04 leg) was
 still in flight at this record; its result appends to the program
 checkpoint on completion. v0.11.0 IS FULLY SHIPPED.
+
+**Aligned-verify remediation round (2026-08-26):** verify-2
+(`32954473899`, ubuntu-24.04) CONFIRMED the environment ruling — the
+admission class green on 24.04, Windows green — and then caught a
+SECOND truth: the R4b-G fault battery's count pins were
+host-divergent AND stale. checked_artifact:: counts 410 on Linux vs
+the Darwin-measured 400 (ten `cfg(target_os = "linux")` tests), and
+the 926 remainder pin was stale on BOTH hosts — R1/R2 landed
+remainder-partition tests without moving the battery marker (a
+ritual-5 miss by those trains: the driver's markers are count
+companions too; the landing gates ran partitions directly, so
+nothing local caught it). Cure at gwz-core `1bcb925`: per-OS
+expected counts for exactly the two divergent partitions, every
+value executed (darwin 400/932 re-run and confirmed exactly; linux
+410 measured / 933 derived-from-the-run, FIRST-DISPATCH-EXPECTED),
+unmeasured hosts failing loudly. Verify-3 dispatched at the tag:
+`32960235595`, under watch.
