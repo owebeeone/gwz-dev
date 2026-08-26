@@ -173,3 +173,10 @@ Documentation, py Publish (wheels), core's event verify (from the
 tag's workflow copy — its ubuntu-22.04 leg re-failing is EXPECTED and
 pre-recorded; the aligned dispatch verify `32954473899` continues as
 additional evidence). Artifact pipelines under watch.
+
+**Artifact pipelines complete (2026-08-26):** cli dist GREEN — 16
+assets attached to the gwz-cli release (platform binaries,
+installers, checksums, attestations); py Publish GREEN (wheels).
+The aligned dispatch verify (`32954473899`, ubuntu-24.04 leg) was
+still in flight at this record; its result appends to the program
+checkpoint on completion. v0.11.0 IS FULLY SHIPPED.
