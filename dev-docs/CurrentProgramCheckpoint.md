@@ -1676,6 +1676,31 @@ fable token only where it makes a difference." Recorded consequences:
   E4 step. NEXT: E0.2 drafts the semantics amendment against this
   note; E0.3 dual #1 follows.
 
+  **R2-E E0.2 DRAFTED — 2026-08-26; filed
+  `GwzM5-8R2E-SemanticsAmendment-DRAFT.md` (1,392 lines); E0.3
+  DUAL #1 DISPATCHED.** All 38 keys with per-key semantics and
+  real sites (EXISTS/NEW@ convention); §5 blast-radius DECIDED
+  option (ii) — probe only at catalog consumption (option (i)
+  would refuse NINE production sites incl. repo creation that
+  never touches the catalog); §3 O6 RESOLVED — OBSERVE both facts
+  via an owner-minted RoamingAnchorHomeWitnessV1 + one typed
+  REFUSE (anchor stranded), the Step-4.3 pattern, E2.2-before-E4
+  quoted; §6 the O8 mechanism decided; §7 all five §11.3 rows
+  accounted; twelve §4.3 annotation targets. **TWO BLOCKING OPEN
+  ROWS — genuine design defects found by the drafting, same
+  class (a completion predicate written before the catalog had a
+  lifecycle): OPEN-B1 completed_record requires the roaming
+  anchor RESIDENT (interior.rs:350) so the anchor cannot roam —
+  a crash in the window leaves a catalog no process can retain;
+  OPEN-T1 completed_record requires an EMPTY RetiredActions root
+  (interior.rs:349) so the FIRST terminal retirement un-completes
+  the catalog, contradicting MAX_RETIRED_ACTION_DIRS=64 and the
+  occupancy retirement-credit model.** The dual is asked to rule
+  them together as one precondition package. Also found: +19-line
+  citation drift between R4b-G's contract cites and the current
+  contract (the A1-era annotations shifted lines) — E5.2 inherits
+  whichever numbers the record blesses; the dual verifies.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
