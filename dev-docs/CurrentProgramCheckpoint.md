@@ -1633,8 +1633,28 @@ fable token only where it makes a difference." Recorded consequences:
   END-TO-END. Remaining watch: the artifact pipelines' completion.
   Post-release queue: R2-E first, per the release checkpoint.
 
+  **THE R2-E PLAN IS DRAFTED — 2026-08-26, on the operator's
+  "draft the R2-E plan": `GwzM5-8R2E-Plan.md`.** Twelve-row
+  obligation ledger consolidated from the charter sources (the §10
+  conversion table, the 38 re-reserved keys — census CORRECTED
+  from the checkpoint's unsourced "67" — the BINDING
+  BarrierIntentV1::issue obligation, the archive/GC sub-package,
+  the review-donated riders O9-O12, the DurableObjectIdentity
+  reach question). Phases E0-E7: E0 freezes the object (reach
+  traces + the §3.5 semantics amendment + dual #1), E1-E3 install
+  the three families (parallel-friendly), E4 executes the
+  conversion table row-by-row (incl. recover_or_create's first
+  production caller gated by §11.3 and the O3 legacy-writer
+  expiry), E5 the archive/GC evidence package, E6 the hardening
+  riders, E7 the settled dual + three-platform acceptance + the
+  ledger's row-by-row close. Two duals max, interior single-axis,
+  gates-not-LOC scheduling. Three operator decisions open
+  (parallelism width; the executable-template policy;
+  quota-vs-schedule). First action on "go": E0.1's read-only
+  reach traces.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
-  post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
+  post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
   sub-package, BarrierIntentV1::issue observe-or-refuse), R2-F
   (native evidence, the T-5 pair carrier, C-2's four fixtures, the
