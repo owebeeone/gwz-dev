@@ -1809,6 +1809,37 @@ fable token only where it makes a difference." Recorded consequences:
   native-measure; B8; R1 BLOCKING for whichever lane owns
   relocation); B3 strengthened (catalog-legal leaf names).
 
+  **E0.3 ROUND 2, CODE AXIS: GO CONDITIONAL — 2026-08-26 (1 P2 ·
+  4 P3; §Round 2 appended to its report). THE OVERRIDE RATIFIED
+  on independent re-derivation** — and found WORSE than the
+  addendum stated: macos.rs:77/:88 makes the macOS durable
+  identity BE ATTR_CMN_OBJPERMANENTID; the executed doctrine test
+  pins per-hard-link allocation with second-link re-homing; even
+  the retained-handle loop (completed.rs:204-217, fgetattrlist
+  live from the vnode) breaks. The round-1 hard-link sub-shape
+  WITHDRAWN; B-5 fresh-independent-copy DOUBLY RATIFIED (the
+  addendum's second reason also verified: BarrierIntentV1 binds
+  no alias-identity field — the sub-shape was over-stated even
+  on Linux/Windows); the essential ruling STANDS (completed_record
+  untouched; E2.1 authorized to edit no catalog predicate). All
+  four Appendix-C items CONFIRMED (T-B′ Class 1 correct per the
+  freeze's own enum terms, checker boundary-clean over all 1,254
+  lines; T-C′ exactly one forward; read-side placement provably
+  right — protocol/ never imports cap_std; rows #6-#13 no recheck
+  arms). The reviewer withdrew one of its own round-1 findings
+  (B-6 contamination cost) and downgraded another
+  (retired-root bound safe only by two constants both being 64 —
+  P3). **[P2-R1] the one condition: a THIRD machine-enforced
+  inventory absent from all three convergence obligations —
+  CATALOG_PUBLICATION_CALL_COUNTS (E3 moves 2→3, the seventh
+  deliberate extension) and PROTECTED_SOURCE_TREE_DIGESTS (trips
+  on EVERY converging commit; the reviewer reimplemented
+  source_tree_digest and reproduced both pinned digests to
+  confirm) — fold into §2.5/§3.6/§4.5 + four P3 clauses.**
+  Awaiting State round 2 (the premise attack + census recount);
+  on its verdict the [P2-R1] fold lands and the ripened
+  sequencing decision goes to the operator.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
