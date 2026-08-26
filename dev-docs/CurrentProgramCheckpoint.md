@@ -1701,6 +1701,38 @@ fable token only where it makes a difference." Recorded consequences:
   contract (the A1-era annotations shifted lines) — E5.2 inherits
   whichever numbers the record blesses; the dual verifies.
 
+  **E0.3 STATE AXIS: NO-GO, ROUND-2 REMEDIABLE — 2026-08-26 (2
+  P1 · 6 P2 · 8 P3; report `GwzM5-8R2E-E03-ReviewState.md`).**
+  THE AGGREGATE CATCH, AGAIN, AND IT IS THE LANE'S: [P1-2] —
+  E0.1(b) restated §11.1's five rows UNDER THE LABEL §11.3; the
+  real §11.3 has eight items sharing none of them, and its item 1
+  (SettledTuple:800-802) is the A1 COEXISTENCE GATE: no
+  production catalog activation until the relocation lands —
+  and relocation is PINNED TO R2-F (§11.2:791). E4.1's gate was
+  lost in a three-hop handoff; "relocation"/"quarantine" appear
+  ZERO times in the plan, E0.1, and the draft. [P1-1]: the
+  injection-source file count wrong in two places AND
+  self-disagreeing (truth: nine → TEN, one new file at E2; the
+  draft says nine→ten as an E1.2 duty and nine→eleven in §8 —
+  the freeze's own inventory-defect class recurring inside the
+  object). CLEAN/SUSTAINED: the census machine-verified (165;
+  38 rows exact order; zero minted/omitted/retired); the §5
+  doctrine sustained on the axis's own nine-site enumeration
+  (no corpus ruling binds fail-closed at acquisition; option
+  (ii) is what makes "runtime bootstrap only" mean something).
+  B1/T1 VERIFIED REAL independently — one defect class — with
+  the process ruling: the dual rules, THE LANE AUTHORS E0.2b
+  (one addendum, both cures: Class-2/C-3 mechanism, candidate
+  (i) for B1), round 2 reviews it under the two-round cap;
+  fallback = partial GO unblocking E1 only. The +19 drift
+  adjudicated: commit `4b9f078`'s 19 insertions; drift is
+  +19-below-the-annotation only; the draft's numbers RIGHT;
+  stale cites in SIX documents; ruling = content-anchored
+  citing, no re-pointing of dated records, one corpus-wide
+  drift note naming the commit. REMEDIATION HOLDS for the Code
+  axis (running) — merged round per house pattern; the E0.1(b)
+  mislabel correction lands with it.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
