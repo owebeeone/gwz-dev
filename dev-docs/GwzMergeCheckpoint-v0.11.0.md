@@ -10,13 +10,21 @@ filled when the operator publishes.
 | Repo | Commit | State |
 | --- | --- | --- |
 | gwz-core | `8008bf6` | pushed to main; version `0.11.0`; taut-proto pin 0.9.1 |
-| gwz-cli | `6b7e75a` | local main — OPERATOR PUSHES |
-| gwz-py | `6e1d52f` | local main — OPERATOR PUSHES; taut-proto pin 0.9.1 + regenerated IR |
+| gwz-cli | `6b7e75a` | main pushed; release branch + tag pushed |
+| gwz-py | `5f6689a` | main pushed (incl. the completed four-site 0.9.1 bump); release branch + tag pushed |
 | taut | `5cd26a1` | snapped at the taut v0.9.1 release tag (operator-directed; was `f008419`, an ancestor — the old pin was behind the release) |
 
-Tag: ⟨OPERATOR: `v0.11.0` at gwz-core `8008bf6`; the GitHub release
-body is `GwzReleaseNotes-v0.11.0.md`; member release-branch commits
-per the R3 proposal (version + path→git-tag re-point) at the tag.⟩
+**TAGGED 2026-08-25, via the three release scripts run by the lane
+on the operator's "go ahead and run the release scripts":**
+gwz-core `v0.11.0` → `8008bf67b7` (main+tag atomic); gwz-cli
+`v0.11.0` → `dec5e3bd47` (release branch reconciled: version +
+path→git-tag re-point, pushed atomic); gwz-py `v0.11.0` →
+`f53a7c64c6` (release reconciled; Cargo.lock verified pinning
+gwz-core via git+tag=v0.11.0#8008bf6). Two failures en route, both
+cured and recorded below. REMAINING FOR THE OPERATOR: publish the
+GitHub release from tag v0.11.0 with `GwzReleaseNotes-v0.11.0.md`
+as the body (the verify workflow was lane-dispatched at the tag,
+run `32946137285`, result recorded at completion).
 
 The train (all exact-ref pushed, each behind its filed review):
 `1a31851` A1 activation + `8e40fa8` corrective → `a6ef094` R1 →
@@ -107,3 +115,23 @@ escape implementation packages (second lane, still blocked on
 operator handoff) — R6 renormalize (shares A′'s predicate; owns two
 residuals above). Program state authority remains
 `CurrentProgramCheckpoint.md`.
+
+## Release-execution incidents (2026-08-25, both cured)
+
+1. **ENOSPC at the core script's full-suite gate** — the disk hit
+   2.3Gi free (the session's ~20GB of accumulated per-agent cargo
+   caches); two fault-matrix tests failed with os error 28 after
+   1587 passed. Cured by deleting the rebuildable caches and landed
+   worktrees (47Gi free); the idempotent re-run went green
+   end-to-end and minted the tag.
+2. **The truncated-inventory pin miss** — the py script failed at
+   run_tests.py: `maturin develop` installs the project's RUNTIME
+   dependency `taut-proto==0.8.1` from pyproject.toml, silently
+   uninstalling the release venv's 0.9.1 and tripping the version
+   guard. Root cause of the miss: the original pin inventory was a
+   `head`-truncated grep presented as complete — pyproject's two
+   entries and two gwz-py workflow installs were the cut-off rows.
+   Cured at gwz-py `5f6689a` (all four sites; untruncated residual
+   sweep clean); re-run green. LESSON MINTED: an inventory produced
+   through a head/limit pipe is not an inventory — pin sweeps run
+   untruncated and end with a residual grep proving zero matches.

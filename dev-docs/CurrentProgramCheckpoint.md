@@ -1598,6 +1598,28 @@ fable token only where it makes a difference." Recorded consequences:
   `GwzReleaseNotes-v0.11.0.md` as the body, which fires the
   release.yml verify on both legs.
 
+  **v0.11.0 IS TAGGED — 2026-08-25. The three release scripts run
+  by the lane on the operator's verbatim "go ahead and run the
+  release scripts": gwz-core `v0.11.0`→`8008bf67b7` (main+tag
+  atomic, full gate stack green in the script's standalone
+  worktree incl. regen-venv-on-0.9.1 "committed protocol
+  artifacts are current"), gwz-cli `v0.11.0`→`dec5e3bd47`
+  (release branch reconciled+pushed), gwz-py
+  `v0.11.0`→`f53a7c64c6` (lock verified pinning
+  git+tag=v0.11.0#8008bf6). Member mains pushed (cli `6b7e75a`,
+  py `5f6689a`). TWO EXECUTION INCIDENTS, cured+recorded in the
+  release checkpoint: ENOSPC at the core gate (session cargo-cache
+  bloat; cleaned 20GB, re-run green) and THE TRUNCATED-INVENTORY
+  PIN MISS (maturin develop downgraded the venv to 0.8.1 from
+  pyproject's runtime dep — one of four sites a head-truncated
+  grep cut from the original inventory; fixed at py `5f6689a`,
+  untruncated sweep clean; lesson: pin sweeps run untruncated and
+  end with a zero-match residual grep). Release verify dispatched
+  at the tag (`32946137285`, under watch). REMAINING FOR THE
+  OPERATOR: publish the GitHub release page from tag v0.11.0 with
+  `GwzReleaseNotes-v0.11.0.md` as the body. Post-release queue
+  per the release checkpoint: R2-E first.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
