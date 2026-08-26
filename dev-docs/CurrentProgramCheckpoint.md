@@ -1840,6 +1840,40 @@ fable token only where it makes a difference." Recorded consequences:
   on its verdict the [P2-R1] fold lands and the ripened
   sequencing decision goes to the operator.
 
+  **E0.3 ROUND 2, STATE AXIS: CONDITIONAL GO — 2026-08-26 (2 new
+  P2 · 4 new P3; §Round 2 appended). GO ON THE SEMANTICS OBJECT
+  — both round-1 P1s cured at every hop, all six P2s dispositioned,
+  CENSUS CLEAN over the amended pair (165, 38 accounted, zero
+  minted; T-B′ mints an enum variant not a fault key, Class 1
+  verbatim-correct), §11 restatements LINE-EXACT (no second
+  labeling error), T-D survives its deletion — E1-E3 ARE
+  UNBLOCKED. NO-GO ONLY on §7.6-§7.8 as operator
+  decision-support:** the premise ruled TRUE BUT NOT COMPLETE —
+  the axis attacked it four ways, could not break the
+  catalog-dependency of any mapped row (re-testing the lock row's
+  ordering clause at all five production sites), BUT §7.6 mapped
+  EIGHT of the table's NINE rows. **[P2-R1]: the missing row
+  (:280, "v1 checked store/root/bundle paths — test-gated until
+  A1; no legacy raw writer") is the one whose gate ALREADY FIRED:
+  v1_lifecycle's store is a PRODUCTION RAW WRITER post-A1
+  (rewrite.rs:6 durable_fs; zero checked_artifact references) —
+  catalog-free, currently unmet, absent from plan O1, owned by no
+  step.** [P2-R2]: O3 has a catalog-free discharge route the
+  table denies — the legacy private parent has EXACTLY ONE
+  non-test owner (policy.rs:33-42 → observation.rs:93); relocate
+  that one function and O3 is literally true with zero catalog;
+  the blocked pair is O1+O2, not O1+O2+O3 — §7.6 understates
+  option (b)'s benefit AND §7.8(a) overstates option (a)'s cost.
+  Ground 4 HOLDS, strengthened to breakable circularity. BOTH
+  ROUND-2 VERDICTS ARE CONDITIONAL-GO CLASS; the conditions are
+  the reviewers' own prescriptions = lane-owner folds, not a
+  third round (the two-round cap holds). FOLD DISPATCHED to the
+  drafter: Code's two-inventory convergence fold + 4 P3; State's
+  nine-row map with row :280's NEW OBLIGATION surfaced for
+  ownership (plan O13 candidate), the O3 route correction, the
+  census-clause verbatim fix, the family-scope cite. THE
+  SEQUENCING DECISION REACHES THE OPERATOR ON THE CORRECTED MAP.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
