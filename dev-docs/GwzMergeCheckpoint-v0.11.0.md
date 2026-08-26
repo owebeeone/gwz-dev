@@ -158,3 +158,18 @@ whether this is a user-facing environment sensitivity to document
 or a test-environment-only fact. THE GITHUB RELEASE PUBLICATION IS
 HELD until the operator rules on the gate (align the verify's Linux
 leg to ubuntu-24.04 / investigate production reach first / other).
+
+## PUBLISHED — 2026-08-26
+
+The three GitHub releases were created together on the existing tags
+(the operator waived the redundant CI re-verify: the release script's
+own gate stack had run the full suite at the tag commit before
+minting): gwz-core `v0.11.0` (full notes body, internal preamble
+stripped), gwz-cli `v0.11.0` (seed body; the dist workflow replaces
+it with the generated installer/binary tables), gwz-py `v0.11.0`
+(pointer body: pins core v0.11.0, verifies the cli v0.11.0 contract,
+taut-proto 0.9.1). Event machinery confirmed firing: cli dist build +
+Documentation, py Publish (wheels), core's event verify (from the
+tag's workflow copy — its ubuntu-22.04 leg re-failing is EXPECTED and
+pre-recorded; the aligned dispatch verify `32954473899` continues as
+additional evidence). Artifact pipelines under watch.

@@ -1620,6 +1620,19 @@ fable token only where it makes a difference." Recorded consequences:
   `GwzReleaseNotes-v0.11.0.md` as the body. Post-release queue
   per the release checkpoint: R2-E first.
 
+  **v0.11.0 IS PUBLISHED — 2026-08-26.** Three GitHub releases
+  created together on the immutable tags (v0.10.5 convention;
+  operator waived the redundant pre-publication CI wait — the
+  release script's own gates were the full suite at the tag).
+  Event machinery fired: cli dist (binaries/installers), py
+  Publish (wheels), core event-verify (tag-copy 22.04 leg re-fail
+  EXPECTED, recorded; aligned dispatch verify continues as extra
+  evidence). Version lock verified before publication: all three
+  tags v0.11.0; both member release branches pin
+  gwz-core git+tag=v0.11.0. THE RELEASE PLAN IS EXECUTED
+  END-TO-END. Remaining watch: the artifact pipelines' completion.
+  Post-release queue: R2-E first, per the release checkpoint.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
