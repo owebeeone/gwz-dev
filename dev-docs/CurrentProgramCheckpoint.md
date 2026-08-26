@@ -1776,6 +1776,39 @@ fable token only where it makes a difference." Recorded consequences:
   identity checks, the T-B re-resolution, both axes' P2/P3
   lists, and the corpus-wide drift note naming `4b9f078`.**
 
+  **E0.2b DELIVERED — 2026-08-26; filed
+  `GwzM5-8R2E-SemanticsAmendment-E02b-DRAFT.md` (1,327 lines);
+  ROUND 2 DISPATCHED to both axes.** All eight merged-mandate
+  items dispositioned. ONE GROUNDED OVERRIDE of a round-1 ruling,
+  flagged first for round-2 Code: the hard-link sub-shape of
+  copy-not-move is MACOS-FATAL — the tree's own doctrine test
+  (anchor/tests.rs:278-324,
+  hard_link_identity_sharing_is_what_the_retirement_rows_assume)
+  proves per-hard-link ATTR_CMN_OBJPERMANENTID re-homes the FIRST
+  link's identity when the second is created; hard-linking the
+  home would break completed_record on every subsequent
+  observation. B-5 fresh-independent-copy adopted; the essential
+  ruling (predicate untouched) survives; #12 no longer
+  catalog-fatal. T-B′ = a NEW DestinationRecheckV1 variant in
+  CLASS 1 (the freeze's enum criterion — E0.2 had applied the
+  struct half); OPEN-C1 closed; O6 gains the read-side identity
+  refusal AND a framing correction (the right precedent shape is
+  the observe/retain inverse, not AuthorityFactsIssuerV1); counts
+  nine→ten-once-at-E2; §11.1/§11.3 fully restated with verified
+  boundaries. **THE SEQUENCING ANALYSIS: the catalog-free E4 set
+  is EMPTY (every §10 row reaches the catalog via admission
+  execution.rs:141 or managed bootstrap :199) — option (c)
+  collapses; the A1 coexistence gate blocks ALL of E4. PROPOSAL:
+  option (b), pull quarantine/relocation INTO R2-E as its own
+  phase (relocation is catalog-free and self-contained; R2-F's
+  deletion charter is DOWNSTREAM of it; leaving it cross-lane is
+  circular via E4.7). This is a CHARTER CHANGE contradicting
+  three standing assignments → the operator's ruling once round
+  2 verifies the premise; fallback = option (a) taken explicitly
+  with a cross-lane dependency row.** Three new OPEN rows (B7
+  native-measure; B8; R1 BLOCKING for whichever lane owns
+  relocation); B3 strengthened (catalog-legal leaf names).
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
