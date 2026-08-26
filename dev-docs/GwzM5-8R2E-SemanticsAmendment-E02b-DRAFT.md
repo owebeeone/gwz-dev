@@ -1,13 +1,25 @@
 # R2-E E0.2b — semantics amendment addendum (DRAFT, 2026-08-27)
 
-Status: **DRAFT for E0.3 round 2.** Author: the implementation lane (E0.2
-drafter). Object: the E0.2 amendment
+Status: **FINAL DRAFT — round-2 conditions folded, for the E0 landing.** Author:
+the implementation lane (E0.2 drafter). Object: the E0.2 amendment
 (`GwzM5-8R2E-SemanticsAmendment-DRAFT.md`), amended here rather than rewritten.
+The pair — E0.2 + this addendum, **addendum controlling** — is the E0 deliverable.
 
-**Ruling sources consumed in full:** `GwzM5-8R2E-E03-ReviewCode.md` (NO-GO,
-3×P1 / 8×P2 / 12×P3), `GwzM5-8R2E-E03-ReviewState.md` (NO-GO, 2×P1 / 6×P2 /
-8×P3), and the corrected `GwzM5-8R2E-E01ReachTraces.md` (whose (b) now carries
-the §11.3/§11.1 correction block this addendum discharges).
+**Ruling sources consumed in full.** Round 1: `GwzM5-8R2E-E03-ReviewCode.md`
+(NO-GO, 3×P1 / 8×P2 / 12×P3) and `GwzM5-8R2E-E03-ReviewState.md` (NO-GO,
+2×P1 / 6×P2 / 8×P3). **Round 2:** the same two files' appended re-verdicts —
+Code **GO conditional on [P2-R1]** (+4 P3), with the addendum's macOS override
+**independently re-derived and RATIFIED** (`ReviewCode.md` §R1, which found it
+"strictly worse than the defect it cures" and withdrew the hard-link
+sub-shape); State **CONDITIONAL GO** — GO on the semantics object with E1-E3
+unblocked and the census re-counted clean, **NO-GO on §7.6-§7.8 as operator
+decision-support** on [P2-R1] and [P2-R2] (+4 P3), with §7.2/§7.3's restatements
+verified **line-exact** and the premise ruled **"TRUE for what it maps, NOT
+COMPLETE"**. Plus the corrected `GwzM5-8R2E-E01ReachTraces.md` (whose (b) now
+carries the §11.3/§11.1 correction block this addendum discharges).
+
+**Both round-2 condition sets are applied in this file.** Appendix C maps every
+one to the section that carries it. Nothing else changed.
 
 **Discipline:** the E0.2 draft's own house rules stand — quote-preserving,
 every code claim cited at a `file:line` opened and read for **this** document,
@@ -45,9 +57,9 @@ what forces §1's new refusal and §7's sequencing analysis.
 | 3 | **T-B re-resolved** — field generalization unimplementable | §4.2 DECISION T-B, §4.3 row #7, §8 row 6 | **§3** — replaced by DECISION **T-B′** (a new `DestinationRecheckV1` variant carrying a second observation input; Class **1**, not Class 2). |
 | 4 | **OPEN-C1 CLOSED** — `RecordScratch` has zero write paths | §2.2 DECISION C-3, §2.3 row #1, Appendix A | **§4** — simplified; the E1 proof obligation struck. |
 | 5 | **O6 COMPLETED** — precedent part (ii) missing | §3.2, §3.4 row #5 | **§5** — read-side identity refusal added. |
-| 6 | **Injection-source count** — nine → ten, one new file at E2 | §2.5, §8 row 11 | **§6** — corrected everywhere. |
-| 7 | **§11.1 / §11.3 restatement + A1 coexistence gate + E4 sequencing** | §5.3, §7 title, §9 item 4 | **§7** — full verified restatement of both sections; the gate added; sequencing proposed. |
-| 8 | Both axes' remaining P2/P3 | throughout | **§8** — dispositioned line by line. |
+| 6 | **The three machine-enforced inventories** — injection sources nine → ten; the publication caller registry; the protected source-tree digests | §2.5, §3.6, §4.5, §5.2, §8 row 11 | **§6** — §6.1 corrects the first; §6.2 adds the two Code round-2 [P2-R1] named; **§6.3 rewrites all three convergence obligations verbatim**; §6.4 banks a fifth ground for §5.2. |
+| 7 | **§11.1 / §11.3 restatement + A1 coexistence gate + the NINE-row E4 map + sequencing** | §5.3, §7 title, §9 item 4 | **§7** — full verified restatement of both sections; the gate added; **§7.6 is nine rows (row `:280` added, O13 proposed); §7.6.2 corrects O3's row**; sequencing proposed with the accounting corrected. |
+| 8 | Both axes' remaining P2/P3, rounds 1 **and 2** | throughout | **§8** — dispositioned line by line, four tables. |
 
 ---
 
@@ -212,12 +224,30 @@ the matrix's own claim (`admission/tests_fault_matrix.rs`).
 buys one file per barrier and pays with six keys' worth of cross-platform
 evidence.
 
+**Why B-6's cost is bounded — the line the decision must carry** (Code
+[P3-R3]). A reader meets freeze `:778-781` — landing the anchor inside an
+admitted action directory "requires teaching admission's `extra_children: 0`
+grammar the reserved target leaf, which is the very contamination class the
+E10/E14 annotation records as diagnosed and fixed" — and concludes that B-6
+reopens that class on every platform. **It does not.** The barrier-time path is
+`validate_operation` → `RetainedActionNamespaceV1::revalidate`
+(`namespace_mutation.rs:202-230`), which checks binding and durable identity and
+**counts no children**. The `extra_children: 0` gate lives solely in the
+admission classifier (`protocol/admission/owner.rs:29-38`, `has_exact`), i.e. at
+`resume_or_admit` — which is already unreachable after the first published row
+and is docketed as Phase 3 settle item 6 (`namespace/tests_fault_matrix.rs:20-35`,
+`:27-33`). So the alias adds one child to an already-non-exact directory and
+breaks nothing new.
+
 ### 1.5 The rewritten §3.4 rows
 
-Rows #1-#5, #9, #14, #15, #16 are unchanged from the E0.2 draft except where
-§5 (O6) adds to #5. Rows **#6, #7, #8, #10, #11, #12, #13** are replaced in
-full. Site file unchanged: `capability/pre_catalog/provider/barrier_mutation.rs`
-(`NEW@E2.1`).
+Rows **#6, #7, #8, #9, #10, #11, #12, #13** are restated below — **eight rows,
+not seven** *(State [P3-R4]: the preamble previously said #9 was unchanged; the
+table alters it, correctly, by dropping the E0.2 row's "and the anchor's
+residency" clause, which under DECISION B-5 names a state that no longer
+exists — the home anchor never travels)*. Rows #1-#5, #14, #15 and #16 are
+unchanged from the E0.2 draft except where §5 (O6) extends #5. Site file
+unchanged: `capability/pre_catalog/provider/barrier_mutation.rs` (`NEW@E2.1`).
 
 | # | Key | **Rewritten semantic** | Function (status) | Note |
 | --- | --- | --- | --- | --- |
@@ -362,10 +392,16 @@ catalog `census.retired == 2`, a constant.
 
 1. The three gates above, widened together, plus `staging_plan`'s arm preserved
    by name.
-2. A **bounded** reading of the retired root under `RETIRED_ROOT_BUDGET_V1`,
-   accepting only children that classify `RootEntryNameV1::ActiveAction`
-   (DECISION T-A, which both axes sustain — `RootEntryNameV1::parse` classifies
-   `action-<hex>-v1` as `Valid` at `slots.rs:444`, parent-independently).
+2. A **bounded** reading of the retired root, accepting **only** children that
+   classify `RootEntryNameV1::ActiveAction` — i.e. the observation's `rows` must
+   be **empty**, because an infrastructure-slot name planted in the retired root
+   would otherwise be classified into `rows` rather than refused
+   (`interior.rs:99-115`) — with the count checked **explicitly against
+   `MAX_RETIRED_ACTION_DIRS`** (`bounds.rs:2`) and **not** inherited from
+   `interior::observe`'s own caps (Code [P3-R1]; the constants are enumerated at
+   §3.2). DECISION T-A supplies the name and both axes sustain it —
+   `RootEntryNameV1::parse` classifies `action-<hex>-v1` as `Valid` at
+   `slots.rs:444`, parent-independently.
 3. The first production caller of `CatalogOccupancyV1`, discharging
    `admission/driver.rs:104-110`'s note.
 4. Its own rows: a retired-root-populated catalog recovers, revalidates and
@@ -419,10 +455,13 @@ single-component no-follow throughout.
 > Shape: `DestinationRecheckV1::TerminalRetiredRoot { catalog_root: &Dir,
 > catalog_identity: &DurableObjectIdentityV1, expected: &CatalogBootstrapRecordV1,
 > absent_child: RootEntryNameV1 }`, whose arm (a) observes `destination_dir` —
-> the retired root — bounded under `RETIRED_ROOT_BUDGET_V1`, proving the child
-> row free and the root within its bound, and (b) observes `catalog_root`,
-> proving `completed_record` still holds under T1's widened reading, both
-> **inside the acquisition window**.
+> the retired root — proving the named child row **free**, every resident child
+> a `RootEntryNameV1::ActiveAction` row (i.e. the observation's `rows` are
+> **empty**, so an infrastructure-slot name planted in the retired root refuses
+> rather than being classified into `rows`), and the count **within
+> `MAX_RETIRED_ACTION_DIRS`, checked explicitly**; and (b) observes
+> `catalog_root`, proving `completed_record` still holds under T1's widened
+> reading — both **inside the acquisition window**.
 
 **Grounds.**
 - It is **Class 1's own sanctioned shape for an enum.** Freeze `:1362-1364`
@@ -439,8 +478,22 @@ single-component no-follow throughout.
   and dropped" (`publication.rs:50-53`).
 - The retired-root half can reuse `interior::observe`: `exact_row` classifies
   `action-<hex>-v1` children as `ActiveAction` and returns them in `action_rows`
-  (`interior.rs:84-91`, `:410-413`), and `MAX_INTERIOR_ENTRIES = 74`
-  (`interior.rs:40`) comfortably exceeds `MAX_RETIRED_ACTION_DIRS = 64`.
+  (`interior.rs:84-91`, `:410-413`), and refuses every other child outright
+  (`:414-417`).
+  **But the arm must NOT inherit that reader's bound** (Code [P3-R1], accepted;
+  the E0.2b round-1 text cited the wrong constant twice). Reused,
+  `interior::observe`'s effective caps are `MAX_INTERIOR_ENTRIES = MAX_ROOT_ENTRIES
+  = 74` (`interior.rs:40`, enforced `:79-81`), `MAX_ACTIVE_ACTION_DIRS = 64`
+  on the action rows (`interior.rs:85-87`; `bounds.rs:1`), and the name budget's
+  `MAX_CATALOG_PARENT_ENTRIES_V1 = 4_096` (`catalog/enumeration.rs:8`) — **none
+  of them `MAX_RETIRED_ACTION_DIRS`, and none of them
+  `RETIRED_ROOT_BUDGET_V1`'s `(64, 16_320, 16_384)`** (`bounds.rs:62-67`). The
+  reused reader is numerically safe today **only because `bounds.rs:1` and `:2`
+  are both 64**, which silently couples the retired-root bound to the active
+  one. **E3.1 owes an explicit `MAX_RETIRED_ACTION_DIRS` count check in the arm,
+  and a stated sentence that the arm does not inherit its bound from
+  `interior::observe`** — otherwise a future edit to either constant decouples
+  them without any check failing.
 
 **Rejected alternatives.**
 - *Move the recheck out of `publish_verified_no_replace`* — refused: the
@@ -605,7 +658,15 @@ anchor not at home. Two corrections:
 
 ---
 
-## 6. The injection-source file count — NINE → TEN, one move, at E2
+## 6. The machine-enforced inventories the converging commits must move
+
+The E0.2 draft named **one** — `FAULT_INJECTION_SOURCES` — and got its
+arithmetic wrong. There are **three**, all machine-enforced, and the other two
+were absent from all three convergence obligations (Code [P2-R1]). §6.1 corrects
+the first; §6.2 adds the other two; **§6.3 gives the amended text of §2.5, §3.6
+and §4.5 verbatim**; §6.4 banks one further ground for §5.
+
+### 6.1 `FAULT_INJECTION_SOURCES` — NINE → TEN, one move, at E2
 
 **The truth, re-verified for this addendum.** `FAULT_INJECTION_SOURCES`
 (`interface_tests/fault_expected_keys.rs:419`+) declares **nine** files:
@@ -643,6 +704,128 @@ Corrections, both of which enter frozen or commit-binding text:
   exhaustive at each landing."*
 - **§9 item 1 gains the count trace**, so the aggregate is stated once:
   *"the declared-source count moves 9 → 10 across E1-E3, once, at E2."*
+
+### 6.2 The two further inventories — the sealed-publication caller registry and the protected source-tree digests
+
+Both live in `gwz-core/scripts/checks/check_checked_artifact_boundaries.py`,
+both fail closed, and **neither the E0.2 draft nor E0.2b round 1 mentioned
+either.** Verified live for this pass.
+
+**(a) `CATALOG_PUBLICATION_CALL_COUNTS`** (`:726-746`) pins the sealed
+primitive's callers by file **and exact count**. The dict as it stands, matching
+the tree:
+
+```
+mutation.rs 1 · directory_mutation.rs 5 · admission_mutation.rs 2
+namespace_mutation.rs 1 · managed_mutation.rs 2 · authority_record_binding.rs 2
+```
+
+`check()` additionally asserts set equality between the dict's keys and every
+production file under `provider/` that calls the primitive, so a new caller file
+fails closed. **This is not a routine digest bump.** The dict carries four dated
+comments, each recording a deliberate extension by a named step and quoting the
+freeze's own rule — *"The caller count stays at six production sites until a
+phase deliberately extends it"* (`:720-725` Step 1.2, `:730-732` Step 2.2,
+`:734-738` Step 2.3, `:740-744` Step 2.4).
+
+- **E1 — no move.** Cleanup's retirements route through
+  `RetainedActionNamespaceV1::execute_edge`, which already holds
+  `namespace_mutation.rs`'s single counted call site
+  (`namespace_mutation.rs:280-288`).
+- **E2 — no move, and the amendment must say so explicitly.** DECISION B-1 mints
+  a **new file under `provider/`**, so a reader will assume the dict moves. It
+  does not: rows #10/#12 retire the alias through `execute_edge` — a
+  same-directory rename passing `&self.handle` for both source and destination
+  (`namespace_mutation.rs:280-283`) — and `barrier_mutation.rs` opens no sealed
+  primitive of its own. **Banking this negative is part of the obligation**,
+  because the set-equality check would otherwise be the first thing to tell E2.
+- **E3 — MOVES.** T-B′'s terminal retirement is catalog root → **retired root**,
+  and `execute_edge` is same-directory only, so it needs its own
+  `publish_verified_no_replace` call in `admission_mutation.rs`: **2 → 3**.
+  Named as the Code axis names it, **the seventh deliberate extension of a
+  freeze-governed caller count** — and, so the number is checkable rather than
+  inherited: the freeze's base is **six** sites (`mutation.rs` 1 +
+  `directory_mutation.rs` 5); four dated extensions have added seven more, for
+  **thirteen** today; E3's is the **fourteenth** production call site and the
+  **fifth** dated extension of this dict. E3.2 owes the edit **and** its
+  justifying dated comment in the dict's own established form.
+
+**(b) `PROTECTED_SOURCE_TREE_DIGESTS`** (`:156-164`) pins whole module trees by
+path-and-byte manifest; the comment is explicit that "a nested helper, **a new
+source file**, or a changed module edge fails closed" (`:153-155`). The two
+entries R2-E disturbs, both reproduced by the Code axis against the live tree:
+
+- `checked_artifact/capability/pre_catalog.rs` = `4e06f84d…` (`:159`) — its
+  descendant root is `pre_catalog/`, covering `provider/interior.rs`,
+  `completed.rs`, `publication.rs`, `namespace_mutation.rs`,
+  `admission_mutation.rs` and any new `barrier_mutation.rs`. **Trips at E1, E2
+  and E3 — every converging commit.**
+- `checked_artifact/platform.rs` = `febdc28b…` (`:161`) — **trips at E2**,
+  because DECISION B-3 adds the third `DirentBarrierClass` variant to that file
+  (`platform.rs:363-374`).
+
+### 6.3 The three convergence obligations, amended verbatim
+
+The following replace the closing duty lists of E0.2 §2.5, §3.6 and §4.5. Each
+is the full list the converging commit owes; the additions are the last two or
+three bullets.
+
+> **§2.5 — E1.2 owes, in the converting commit:** `CLEANUP_MATRIX: [Fault; 11]`,
+> every key interrupted+restarted+converged on both target variants; twelve-round
+> repeated-boundary rows over a declared subset; single-crossing classification
+> declared per row, driven by `run_single_crossing_probe`
+> (`bootstrap/managed/tests_provider.rs:564`), on a **one-alias** row; the
+> matrix-to-fixture reconciliation in the `reconcile_executed_keys` shape; the
+> `FAULT_FAMILY_ACTIVATION` row edit `Reserved(…)` → `Executed(…)`
+> (`fault_expected_keys.rs:380-384`); the `FAULT_INJECTION_SOURCES`
+> **doc-comment** extension (`:397-418`) recording that `namespace_mutation.rs`
+> now holds cleanup sites — **and no inventory count move (§6.1)**; the
+> Git-directory route statement (§7.7); the R4b-G driver's per-OS fault markers;
+> **`PROTECTED_SOURCE_TREE_DIGESTS["checked_artifact/capability/pre_catalog.rs"]`
+> re-pinned**; and **a stated confirmation that
+> `CATALOG_PUBLICATION_CALL_COUNTS` does not move**, because cleanup retirements
+> route through `execute_edge`.
+>
+> **§3.6 — E2.3 owes, in the converting commit:** `BARRIER_MATRIX: [Fault; 16]`
+> on both target variants with the same interruption/restart/convergence,
+> repeated-boundary and single-crossing discipline; the Windows arm of
+> `barrier.target_barrier` **executed natively, not skipped**, in the Step-4.2
+> standard's shape (`hard_link_identity_sharing_is_what_the_retirement_rows_assume`,
+> freeze `:836-838`) — which is also OPEN-B7's probe; the
+> `FAULT_FAMILY_ACTIVATION` row edit (`fault_expected_keys.rs:385-389`); the
+> `FAULT_INJECTION_SOURCES` **count move 9 → 10** with `barrier_mutation.rs`
+> declared and its doc-comment entry; the §3.5 inventory addendum's file count
+> (freeze `:525-532`, "nine" → **ten**); the Git-directory route statement;
+> the R4b-G per-OS markers; **`PROTECTED_SOURCE_TREE_DIGESTS` re-pinned for BOTH
+> `…/pre_catalog.rs` and `…/platform.rs`** (the latter because DECISION B-3 adds
+> the third `DirentBarrierClass` variant); and **a stated confirmation that
+> `CATALOG_PUBLICATION_CALL_COUNTS` does not move**, notwithstanding the new
+> file under `provider/`, because the alias retirements route through
+> `execute_edge`.
+>
+> **§4.5 — E3.2 owes, in the converting commit:** `TERMINAL_MATRIX: [Fault; 10]`
+> — ten, not eleven, per §4.3's determination — on both target variants with the
+> same discipline; the
+> `PartiallyExecuted("…", TERMINAL_EXECUTED_KEYS)` fixture row with its
+> key-by-key siteless proof for `terminal.authority_release`
+> (`fault_expected_keys.rs:187-222`, `:390-394`); the `FAULT_INJECTION_SOURCES`
+> doc-comment extension for the T-C′ split across two already-declared files —
+> **and no count move (§6.1)**; the Git-directory route statement; the R4b-G
+> per-OS markers;
+> **`PROTECTED_SOURCE_TREE_DIGESTS["checked_artifact/capability/pre_catalog.rs"]`
+> re-pinned**; and
+> **`CATALOG_PUBLICATION_CALL_COUNTS["…/provider/admission_mutation.rs"] 2 → 3`,
+> with the dated deliberate-extension comment the freeze's caller-count rule
+> requires** — the fourteenth production call site (§6.2(a)).
+
+### 6.4 One further ground for DECISION §5.2, banked
+
+`operation/workspace_mutator_lock.rs` is itself **byte-pinned**:
+`PROTECTED_SOURCE_DIGESTS["operation/workspace_mutator_lock.rs"]` =
+`0d9b034e…` (`check_checked_artifact_boundaries.py:57`). So option (i) — probing
+the durable identity at lock acquisition — would edit a **byte-pinned file** for
+a proof nothing at that point uses. That is a fifth, previously unstated ground
+for §5.2's option (ii), and E0.2 §5.2 gains it as one clause beside Grounds 1-4.
 
 ---
 
@@ -779,7 +962,16 @@ lands.*"
 > **E4.1's `WorkspaceMutatorLock` half may land without it. `recover_or_create`'s
 > first production caller may not.**
 
-### 7.6 Which E4 rows truly require catalog activation — the analysis
+### 7.6 Which E4 rows truly require catalog activation — the NINE-row analysis
+
+**Correction first, on the record.** The E0.2b round-1 table mapped **eight**
+rows. `GwzM5-8R4bR2ConsumerCheckpoint.md` §10 has **nine** consumer rows,
+`:272-280`. The missing row is `:280`, and **the plan's O1
+(`GwzM5-8R2E-Plan.md:41`) enumerates the same eight and drops the same one**, so
+the table inherited the gap rather than creating it. It is corrected below, in
+the form plan §0 used for 67 → 38 and §8 uses for 18 → 10: *the §10 table is
+nine rows; O1's enumeration is eight; the ninth is row `:280` and it is
+addressed by no plan step.*
 
 Every §10 row's *converted* form reaches the catalog through one of exactly two
 doors, both of which consume `OpaqueRetainedCatalogV1`:
@@ -799,22 +991,133 @@ doors, both of which consume `OpaqueRetainedCatalogV1`:
 | terminal archive source-only — `MergeArchive` when missing | E4.4 | **YES** | managed-parent bootstrap |
 | ordinary/merge stash bundle; commit/merge marker | E4.5 | **YES** | managed-parent bootstrap |
 | workspace marker/lock checked mutation; `.git/info/exclude` | E4.6 | **YES** | admission |
-| O3 close-out — legacy writers retire behind the converted paths | E4.7 | **YES, transitively** | requires E4.2-E4.6 landed |
+| **`:280` — v1 checked store/root/bundle paths** — "same purposes and artifact actions \| test-gated until A1; no legacy raw writer" | **NO STEP OWNS IT** | **SPLIT: the substantive half YES; the "no legacy raw writer" half NO** | §7.6.1 |
+| O3 close-out — legacy writers stop mutating inside `.gwz/checked-artifacts` | E4.7 as planned | **the plan's E4.7 mechanism: YES, transitively. O3 *as an obligation*: NO** | §7.6.2 |
 
-**Finding: the "boundary-only, catalog-free" set is empty in substance.** It
-contains E4.1's lock half — which is already landed — and the §5.3 UX work,
-which is documentation and typed-message work. Option (c) as posed therefore
-collapses; it is not a partition of E4 but a description of work E4 already
-presumes done.
+**Finding, corrected: the catalog-free set is NOT empty.** It contains two
+things the round-1 table denied, both of which cut *for* option (b):
 
-**Two reliefs worth stating, because they bound the damage:**
+1. **Row `:280`'s "no legacy raw writer" clause** — catalog-free, its gate
+   already fired, currently unmet in production, owned by no step (§7.6.1).
+2. **O3's relocation-discharge route** — catalog-free, single-owner (§7.6.2).
+
+What *does* collapse is option (c) **as a partition of the substantive §10
+conversions**: for all eight rows the round-1 table mapped, the catalog
+dependency is real, and the State axis attacked it four ways without breaking
+it (`.git/info/exclude`'s "never bootstrap `.git/info`" ordering; the
+`WorkspaceMutatorLock` row's ordering half, which already holds at all five
+merge sites; the two "existing parent" rows; and a census of the doors, which
+found no third). Neither of the two catalog-free items above is a *conversion* —
+one is a raw-writer prohibition, the other a relocation — so neither revives
+option (c).
+
+#### 7.6.1 Row `:280` — the row no step owns, and the obligation it implies
+
+The row, verbatim (`GwzM5-8R4bR2ConsumerCheckpoint.md:280`):
+
+> | v1 checked store/root/bundle paths | same purposes and artifact actions | test-gated until A1; no legacy raw writer |
+
+Three facts, each verified for this pass:
+
+1. **Its gate has already fired.** "Test-gated until A1", and **A1 shipped
+   2026-08-25** (gwz-dev `4b9f078`; the activation record's landing). Every
+   other §10 row's precondition is still ahead of it; this one's is behind it.
+2. **Its second clause is catalog-free, and it is not met.**
+   `v1_lifecycle/store/rewrite.rs:6` is
+   `use crate::durable_fs::{rename_durable, sync_dir};` — a **raw** durable
+   writer — and `v1_lifecycle/` holds **zero non-test `checked_artifact`
+   references** (the single tree-wide hit is a doc comment at `start.rs:15`).
+   Post-A1, `no-ff → v1` is live end-to-end
+   (`GwzM5-8I2CompatibilityContract.md:86`, the dated A1 annotation), so this is
+   a **production** raw writer on the v1 path — precisely what the row forbids
+   once its test-gate expires.
+3. **O1 cannot be reported DISCHARGED without it**, under any sequencing option,
+   and no plan step owns it: `relocation`/`quarantine` aside, neither
+   `GwzM5-8R2E-Plan.md` §1's O1 enumeration nor any E4 step names the v1 store.
+
+> **PROPOSED NEW PLAN OBLIGATION — O13: the v1 store's raw-writer clause.**
+> *Convert the v1 checked store/root/bundle paths per §10 row `:280`'s frozen
+> ordering — "same purposes and artifact actions" — and discharge its "no legacy
+> raw writer" clause, whose test-gate expired at A1.* Added to
+> `GwzM5-8R2E-Plan.md` §1's ledger, and to O1's enumeration on the record, in
+> plan §0's correction form.
+
+**Ownership analysis, in one paragraph.** O13 has two halves with different
+owners and they should not be bundled. The **substantive** half — routing the v1
+store's writes through checked artifact actions for the same purposes — is
+catalog-bound like every other §10 row, so it belongs in Phase E4 and is gated
+exactly as its siblings are; and because `v1_lifecycle/store` is the *same
+store* that E4.2 (first merge record, `MergeStore` + `PreservationBundles`) and
+E4.3 (merge record rewrite, "exact existing `MergeStore`") convert, giving it
+its own parallel E4 row would put two steps on one store and invite the drift
+the §10 table's frozen ordering exists to prevent. **Recommendation: the
+substantive half rides E4.2/E4.3 as an explicit scope clause rather than
+becoming a tenth E4 row** — E4.2 owns the store's creation path and E4.3 its
+rewrite path, which is exactly the `rewrite.rs` surface the raw writer sits on.
+The **"no legacy raw writer"** half, by contrast, is catalog-free, already due,
+and is a *pin*, not a conversion: it should land **now**, as a precondition
+pin on E4.2 — a boundary-checker assertion that `v1_lifecycle/` names no
+`durable_fs` raw writer once the converted path exists, with a **dated
+accepted-residual record covering the interval** between A1 (gate fired) and
+E4.2 (clause met), so the corpus stops carrying an expired gate silently. If the
+lane prefers not to pin it, the honest alternative is the same dated
+accepted-residual record with an explicit expiry named — but not silence, which
+is the status quo.
+
+**How row `:280` changes the §7.8 balance: it cuts for option (b).** It is a
+**second** catalog-free obligation that is due *now* and blocked by nothing,
+sitting beside relocation. Under option (a) both wait on another lane's schedule
+while an expired gate stands unrecorded; under option (b) R2-E holds the whole
+catalog-free critical path — relocation, O3, and O13's pin — and can land them
+in one ordered run before E4 opens. It also removes the last reading on which
+option (c) looked attractive: the catalog-free set is real, but it is *not
+E4 conversion work*, so "partial E4" remains the wrong frame even now that the
+set is non-empty.
+
+#### 7.6.2 O3's row, corrected — it has a catalog-free discharge route
+
+The round-1 table rowed O3 as "**YES, transitively** — requires E4.2-E4.6
+landed". That is true of the **plan's E4.7 mechanism** and false of **O3 as an
+obligation**, and the distinction matters because it is the fact that makes
+§7.8's ground 4 breakable rather than merely true.
+
+O3's ledger text is a **location** property, not a conversion property —
+`GwzM5-8R2E-Plan.md:43`: "Legacy writers stop mutating **inside**
+`.gwz/checked-artifacts`."
+
+And the legacy private parent has **exactly one non-test owner**, verified
+tree-wide:
+
+- `checked_artifact/policy.rs:33-42` — `CheckedArtifactPolicy::private_parent()`,
+  the definition;
+- `checked_artifact/observation.rs:93` — `let quarantine_parent =
+  policy.private_parent();`, **the only consumer**.
+
+(Every other `private_parent` hit in the subsystem is a different function — the
+catalog owner's own `create_git_private_parent` / `has_private_parent` /
+`require_create_private_parent` — not the legacy policy's.)
+
+> **Corrected O3 row.** Relocating that one function moves every legacy write
+> out of `.gwz/checked-artifacts`, and **O3 becomes literally true with zero
+> conversion, zero admission, zero catalog.** Under option (b), relocation
+> **discharges** O3 directly rather than merely unblocking E4.7. Under option
+> (a), O3 is **discharged by R2-F's relocation package and re-owned** — it is
+> not *blocked*. The plan's E4.7 step remains the mechanism for retiring the
+> legacy writers *entirely* (which is R2-F's deletion charter's neighbourhood),
+> but that is a stronger property than O3's text asks for.
+
+**Three reliefs worth stating, because they bound the damage:**
 1. **E1, E2 and E3 are NOT gated.** The fault families' matrices are `cfg(test)`
    and build their catalogs through test-only construction; plan §5 item 2's ban
-   is on *production* activation. The relocation gate blocks E4, not E1-E3.
+   is on *production* activation. E1-E3 land production-unreachable code exactly
+   as R2-D's Phases 1-4 did. The relocation gate blocks E4, not E1-E3.
 2. **E5 is only half gated.** E5.1 (registry rows + the parametric `adapt_open`
    refusal test) and E5.2 (archive-corpus rows) touch the merge-record
    compatibility surface, not the checked-artifact catalog; only `gc_archived`'s
    production route (E4.4's rider) is gated.
+3. **Two obligations are catalog-free and due now** — O13's raw-writer pin
+   (§7.6.1) and O3's relocation route (§7.6.2). Neither waits on the gate;
+   both wait only on an owner.
 
 ### 7.7 §11.3 item 2 — what it requires, and its consumption
 
@@ -852,16 +1155,26 @@ workspace root is fixture-placed today.
 
 ### 7.8 The sequencing proposal
 
-Three options were posed. Measured against §7.6:
+Three options were posed. Measured against §7.6 **as corrected**:
 
 - **(a) E4.1 waits on R2-F's relocation as a cross-lane dependency.** Because
-  the catalog-free set is empty, this does not gate E4.1 alone — it gates
-  **E4.1 through E4.7 entire**, and with them O1, O2 and O3. R2-E would close
-  with three of its twelve ledger obligations undischarged and re-owned to a
-  lane it does not control. Honest, cheap, and it makes the plan's largest phase
-  externally blocked.
+  every substantive §10 conversion is catalog-bound, this does not gate E4.1
+  alone — it gates **E4.1 through E4.7 entire**. **The blocked pair is O1 and
+  O2**, and O1's close must additionally carry §10 row `:280` (§7.6.1), which no
+  option discharges by itself. **O3 is not blocked by relocation — it is
+  *satisfied* by it** (§7.6.2), so under (a) O3 is **discharged by R2-F's
+  package and re-owned**, not stalled. *(The round-1 text said "O1, O2 and O3";
+  overstating the rejected option's cost is a defect in decision-support even
+  when the recommendation is right, and it is corrected here.)* R2-E would close
+  with two of its ledger obligations undischarged and re-owned to a lane it does
+  not control, a third discharged elsewhere, and a fourth — O13 — newly minted
+  and unowned. Honest, cheap, and it makes the plan's largest phase externally
+  blocked.
 - **(b) The relocation is pulled forward into R2-E as its own phase.**
-- **(c) Partial E4.** Collapses (§7.6).
+- **(c) Partial E4.** Collapses **as a partition of the substantive conversions**
+  (§7.6). The catalog-free set is *not* empty — it holds O13's raw-writer pin and
+  O3's relocation route — but neither is E4 conversion work, so "partial E4"
+  remains the wrong frame.
 
 > **PROPOSAL (E0.2b): option (b) — pull the quarantine/relocation execution into
 > R2-E as a new phase, ordered before E4 and parallel to E1-E3. Recommended, with
@@ -875,27 +1188,42 @@ Three options were posed. Measured against §7.6:
    owner of the legacy private parent, consumed once at `observation.rs:93` —
    plus a durable migration of resident residue. It depends on nothing in R2-E
    and nothing in R2-F. It can start the day E0 closes.
-2. **It is the critical path for everything E4 owns.** Every §10 row is gated on
-   it (§7.6). Leaving it cross-lane converts R2-E's largest phase into a blocked
-   set and makes O1/O2/O3 undischargeable inside the lane.
+2. **It is the critical path for everything E4 owns.** Every substantive §10
+   conversion is gated on it (§7.6). Leaving it cross-lane converts R2-E's
+   largest phase into a blocked set and makes **O1 and O2** undischargeable
+   inside the lane — and, because relocation is also O3's discharge route
+   (§7.6.2), it exports a third obligation the lane could have closed itself.
 3. **R2-F's charter is downstream of it, not upstream.** R2-F is "closure —
    remove legacy successful paths" (`ConsumerCheckpoint:304-305`), and the
    Phase-4 closure records that relocation is what makes that deletion "remove a
    directory rather than un-widen a frozen grammar"
    (`GwzM5-8R2DPhase4Closure.md:124-126`). Relocation enables R2-F; it does not
    need R2-F.
-4. **R2-E already owns relocation's necessary condition.** O3 — "legacy writers
-   stop mutating inside `.gwz/checked-artifacts`" — is plan §1's E4.7 row. You
-   cannot durably relocate a directory that live writers keep writing into, so
-   the two are one problem seen from two ends. Splitting them across lanes
-   creates the circularity §7.6 exposes: E4.7 retires the writers *behind the
-   converted paths*, the converted paths need the catalog, and the catalog needs
-   relocation. **The circularity breaks only if relocation lands as a
-   legacy-only change before conversion** — which is precisely option (b).
+4. **R2-E already owns relocation's necessary condition — and the circularity
+   it exposes is BREAKABLE, by a single-owner edit.** O3 — "legacy writers stop
+   mutating inside `.gwz/checked-artifacts`" — is plan §1's E4.7 row, and the
+   plan's mechanism for it is circular: **(i)** E4.7 retires the writers *behind
+   the converted paths* (plan `:146-148`); **(ii)** the converted paths need the
+   catalog (§7.6, sustained under four independent attacks); **(iii)** the
+   catalog needs relocation (§11.3 item 1, mechanism verified at
+   `interior.rs:414-417` via `slots.rs:434-436`). All three legs are real.
+   **The fourth leg is what breaks it, and it is a fact about the tree, not a
+   preference:** the legacy private parent has **exactly one non-test owner** —
+   `policy.rs:33-42` defines it, `observation.rs:93` is its only consumer — so
+   relocation is a **single-owner, legacy-only** edit that needs no conversion,
+   no admission and no catalog (§7.6.2). Landing it before conversion breaks the
+   cycle at leg (iii) and **discharges O3 outright** at the same time. That is
+   precisely option (b), and it is why ground 4 is the ground that turns a
+   preference into a structural argument.
 5. **It banks the MAX_PATH retirement a release earlier**
    (`CurrentProgramCheckpoint.md:1022-1024`; `GwzM5-8R2DPhase4Closure.md:127-131`),
    which is the product benefit that decided the coexistence direction in the
    first place.
+6. **It gives the lane the whole catalog-free critical path in one run.**
+   Relocation, O3's discharge, and O13's raw-writer pin (§7.6.1) are all
+   catalog-free and all due now; under (b) they land in one ordered sequence
+   before E4 opens, under (a) they are split across two lanes with an expired
+   §10 gate standing unrecorded in the interval.
 
 **Costs and risks, stated.** It is "a durable relocation of live production
 state, needing its own package" (`GwzM5-8R2DPhase4Closure.md:132-133`) — a
@@ -906,12 +1234,15 @@ assignments — freeze §5 decision 2, plan §5 item 7, and
 `GwzM5-8R2DPhase4Closure.md` §2.7 — which is why it is a ruling, not a decision.
 
 **Fallback if (b) is declined:** option (a), taken explicitly rather than by
-default — the plan's §1 ledger gains a cross-lane dependency row on O1/O2/O3
-naming R2-F's relocation package as the blocker, E4 is re-scheduled after it,
-and R2-E's E7 acceptance closes those three rows as *re-owned with a named
-carrier* rather than DISCHARGED. **What must not happen is the status quo**, in
-which the plan schedules E4 with no mention of the gate and the lane discovers
-it at E4.1.
+default — with four elements, two of them corrected this round:
+(i) the plan's §1 ledger gains a **cross-lane dependency row on O1 and O2**
+naming R2-F's relocation package as the blocker; (ii) **O3 is recorded as
+discharged by that package and re-owned, not blocked** (§7.6.2); (iii) E4 is
+re-scheduled after it; and (iv) R2-E's E7 acceptance closes those rows as
+*re-owned with a named carrier* rather than DISCHARGED — with **O1's close
+additionally carrying §10 row `:280`** (§7.6.1), which no sequencing option
+discharges on its own. **What must not happen is the status quo**, in which the
+plan schedules E4 with no mention of the gate and the lane discovers it at E4.1.
 
 **A note the operator may want:** under either option the *sequence* is the
 same — relocation, then activation, then conversion, then legacy retirement.
@@ -919,7 +1250,7 @@ Only the owning lane differs.
 
 ---
 
-## 8. Both axes' remaining P2/P3 — disposition table
+## 8. Both axes' remaining P2/P3 — disposition tables, rounds 1 and 2
 
 **Code axis.**
 
@@ -1011,16 +1342,35 @@ head of `revalidate` — the separate gates are at `:227-249`;
 (g) `RETIRED_ROOT_BUDGET_V1` is `:62-67` in both places (E0.2 §4.1 and §4.4
 disagreed);
 (h) `CatalogOccupancyV1::validate` is `:118-142`;
-(i) **T-D's evidence is corrected**: the five idle keys' hits are `:191`,
-`:199`, `:410`, `:418`, `:431`; `:296`/`:307` are `AdmissionFinalPublish` /
-`AdmissionFinalReobserve`, a different edge, and are struck from the
-determination's evidence;
+(i) **T-D's evidence is corrected, and the two cite senses are now
+distinguished** (State round-2 [P3-R3], which found a third set of numbers and
+asked which sense is meant). `:296`/`:307` are `AdmissionFinalPublish` /
+`AdmissionFinalReobserve` — a different edge — and are **struck**. Of the
+replacements: `admission_mutation.rs:191`, `:199`, `:410`, `:418`, `:431` are
+the **`hit()` call sites**, and they are *parameterized* (`hit(faults[N])`,
+`hit(install[N])`), so they name no key on their own; the **key references** —
+where the five idle keys are actually named — are `:359-361` (`write_faults`'s
+`Idle` arm: `AdmissionIdleScratchCreate` / `Write` / `Flush`) and `:381-382`
+(`install_faults`'s idle arm: `AdmissionIdlePublish` / `AdmissionIdleReobserve`).
+**T-D cites the key references**, because what the determination must show is
+that five existing keys already name the return-to-idle edge — not where a
+fault fires;
 (j) §7's header — fixed at §7.1;
 (k) §1.4's `EXISTS` marker has an **empty domain** — all 37 activated rows are
 `NEW@`; §1.4 gains one sentence saying so, since it is the correct consequence
 of the families being re-reserved precisely because their edges do not exist;
 (l) §5.2's nine call sites span **eight files** (`archive.rs` supplies `:97` and
 `:126`).
+
+**Code axis — round 2.**
+
+| Id | Finding | Disposition |
+| --- | --- | --- |
+| [P2-R1] | A third machine-enforced inventory is missing from every convergence obligation | **FIXED** — §6.2 (the two inventories) and **§6.3** (the three obligations rewritten verbatim); §6.4 banks the extra §5 ground |
+| [P3-R1] | The retired root's bound would be the *active* constant | **FIXED** — §3.2 ground 3 rewritten with the three real constants and an explicit `MAX_RETIRED_ACTION_DIRS` check made E3.1's duty; §2.4 item 2 aligned |
+| [P3-R2] | T-B′'s arm text should repeat the non-`ActiveAction` refusal | **FIXED** — stated in both places, §3.2's shape (`rows` empty) and §2.4 item 2 |
+| [P3-R3] | B-6 should carry one line on why its cost is bounded | **FIXED** — §1.4's closing paragraph (`namespace_mutation.rs:202-230` counts no children; the gate is `owner.rs:29-38` at `resume_or_admit`, already unreachable and docketed) |
+| [P3-R4] | Cross-parent retirement is latent behind OPEN-B2 | **FIXED** — OPEN-B2 gains the coupling clause (§10 / Appendix B) |
 
 **State axis.**
 
@@ -1036,12 +1386,23 @@ of the families being re-reserved precisely because their edges do not exist;
 | [P2-6] | §1.1's fixture cite covers 22 of 38 keys | **FIXED** — below |
 | [P3-1..8] | Assorted | **FOLDED** — below |
 
+**State axis — round 2.**
+
+| Id | Finding | Disposition |
+| --- | --- | --- |
+| [P2-R1] | §7.6 maps eight of the §10 table's nine rows; row `:280` dropped | **FIXED** — §7.6 is now the nine-row map; §7.6.1 states the finding in full and proposes **O13**, with the ownership analysis and the §7.8 balance effect |
+| [P2-R2] | O3's row denies its catalog-free discharge route; §7.8(a) overstates its cost | **FIXED** — §7.6.2 (corrected row), §7.8(a) (**O1 + O2** blocked, O3 re-owned), §7.8 ground 4 (the single-owner fact promoted in as the fourth leg) |
+| [P3-R1] | The census clause is stated, not written verbatim | **FIXED** — the three headers are written out in full below |
+| [P3-R2] | T-D's demotion of reading (b) is interpretive; frozen text closes it | **FIXED** — freeze `:795-797` added below |
+| [P3-R3] | Which sense do T-D's replacement cites name? | **FIXED** — Code [P3] fold-in (i) above now distinguishes `hit()` call sites from key references and states which T-D cites |
+| [P3-R4] | §1.5's preamble contradicts its own table on #9 | **FIXED** — §1.5's preamble now says eight rows restated, with #9's alteration named |
+
 **[P2-2] cure — O8's denominators, stated once.**
 
-> **§6.1 gains this paragraph.** The live per-scenario debt is **18 rows**, and
-> §12.9(d) states the partition in terms: "**18 UNBOUND rows remain** (10
-> progress + 8 archive)" (`GwzM5-8R4bG-Evidence.md:1473`). Under DECISION §6.3
-> (no registry rows for archive shapes):
+> **E0.2 §6.1 gains this paragraph.** The live per-scenario debt is **18 rows**,
+> and §12.9(d) states the partition in terms: "**18 UNBOUND rows remain** (10
+> progress + 8 archive)" (`GwzM5-8R4bG-Evidence.md:1473`). Under E0.2 DECISION
+> §6.3 (no registry rows for archive shapes):
 > - **E5.1 owes 10 registry rows** — the progress shapes — not "the 18 registry
 >   rows" the plan carries (`GwzM5-8R2E-Plan.md:155-156`, and O8's row at `:48`).
 >   §12.7 closure (i)'s "**14** unbound progress shapes" is the **pre-§12.9**
@@ -1075,9 +1436,19 @@ and silent on the other. And DECISION C-1 does the opposite thing three times.
 > write, flush, publish, retire, or reobserve occurs at either" (freeze
 > `:697-698`).
 > **Reading (b) is demoted from "a candidate rejected on one-boundary-one-name"
-> to a mis-reading of the key's name:** the return-to-idle edge is
-> `admission.*`'s and is fully executed at five keys (`fault_v1.rs:92-96`);
-> `terminal.authority_release` does not name it.
+> to a mis-reading of the key's name, and FROZEN TEXT closes the demotion**
+> (State [P3-R2]; without this cite the demotion would rest on interpretation).
+> The `terminal.*` non-activation record's own scope sentence, freeze
+> `:795-797`, reads: *"Every key of the family names the admitted action
+> directory's terminal retirement into the catalog's retired root — §4.4's 'E7's
+> Phase-4 half and the terminal retirement edges' — and each needs an
+> `AdmittedActionV1` and a production catalog."* The admission record's return
+> to `Idle` is the **catalog's re-admission capacity**, not the action
+> directory's retirement, so reading (b) is **outside the family's frozen scope
+> by the freeze's own words**. That edge is `admission.*`'s and is fully executed
+> at five keys, named at `admission_mutation.rs:359-361` and `:381-382`
+> (`fault_v1.rs:92-96` for the vocabulary); `terminal.authority_release` does
+> not name it.
 > **The sentence "One boundary must have one name" is DELETED.** It was inferred
 > from a precedent that does not hold it, and it contradicts DECISION C-1 and
 > cleanup keys #8/#9. If the lane wants that doctrine it must be minted as a new
@@ -1085,13 +1456,42 @@ and silent on the other. And DECISION C-1 does the opposite thing three times.
 > addendum does not mint it.
 > Census sentence corrected: "census stays 165/11, **no key retired**."
 
-**[P2-4] cure — the census clause completed.** The three record headers and
-T-D's census sentence gain "**no key retired**", which the house form carries
-(the `runtime.*` annotation, freeze `:476`: "165 total, unchanged; no key
-minted, none retired"; the Phase-3 determination, `:702`: "census stays 165/30,
-no key retired"). §4's header additionally gains the clause its two siblings
-carry: "**`terminal.*` stays 0/11 until E3.2 lands**". §8 row 12 then becomes
-true as written.
+**[P2-4] cure — the census clause completed, and the three headers WRITTEN OUT
+VERBATIM.** The house form carries the full clause (the `runtime.*` annotation,
+freeze `:476`: "165 total, unchanged; no key minted, none retired"; the Phase-3
+determination, `:702`: "census stays 165/30, no key retired"), and the three
+activation-record headers are the strings that actually enter freeze §3.5 — the
+package's primary deliverable — so they are given here in final form rather than
+left to reconstruction (State [P3-R1]). **These three paragraphs replace the
+E0.2 draft's §2, §3 and §4 record headers as written.**
+
+> **`cleanup.*` activation record (2026-08-27, R2-E Step E0.2 semantics
+> amendment as amended at E0.2b; annotates the Step-4.1 non-activation record
+> above, which is left as written since this annotation is the sanctioned
+> mechanism).** This record binds semantics; the flip to `Executed` is R2-E
+> **Phase E1**'s, in the commit that converts the edges, per RemPlan §10's duty.
+> **Counts. 165 total, unchanged; no key minted, none retired; `cleanup.*` stays
+> 0/11 until E1.2 lands.**
+
+> **`barrier.*` activation record (2026-08-27, R2-E Step E0.2 as amended at
+> E0.2b; annotates the Step-4.2 non-activation record above, left as written).**
+> This record binds semantics; the flip to `Executed` is R2-E **Phase E2**'s, in
+> the commit that converts the edges. **Counts. 165 total, unchanged; no key
+> minted, none retired; `barrier.*` stays 0/16 until E2.3 lands.**
+
+> **`terminal.*` activation record (2026-08-27, R2-E Step E0.2 as amended at
+> E0.2b; annotates the Step-4.2 non-activation record above and its §4.4
+> arm-table resolution, both left as written).** Proposed outcome: **10 of 11
+> executed, 1 reserved with a determination** — the family lands as
+> `FaultFamilyActivationV1::PartiallyExecuted`
+> (`interface_tests/fault_expected_keys.rs:209`), whose per-key siteless proof
+> keeps the `Reserved` arm's guarantee for the eleventh. **Counts. 165 total,
+> unchanged; no key minted, none retired; `terminal.*` stays 0/11 until E3.2
+> lands.**
+
+With these, **§8 row 12 is true as written** — "Unchanged, and restated in each
+activation record: 165 total, no key minted, no key retired" — and T-D's own
+census sentence reads "census stays 165/11, no key retired."
 
 **[P2-5] cure — §5.3 gains a sixth condition.**
 
@@ -1147,7 +1547,14 @@ quoted too. [P3-8] the §12.4 pointer is added (see [P2-2] cure).
    accounted; all three families still `Reserved`
    (`fault_expected_keys.rs:380-394`) at E0 close. Every decision above was
    checked against this, and §1's B-5, §3's T-B′ and §8's T-C′ were each chosen
-   partly because they move no census.
+   partly because they move no census. **The three machine-enforced inventories
+   move as follows, stated once so the aggregate is not reconstructed:** the
+   declared-source count moves **9 → 10 across E1-E3, once, at E2**;
+   `CATALOG_PUBLICATION_CALL_COUNTS` moves **once, at E3** (`admission_mutation.rs`
+   2 → 3, the fourteenth production call site) and **not at E1 or E2**; and
+   `PROTECTED_SOURCE_TREE_DIGESTS` re-pins at **every** converging commit
+   (`…/pre_catalog.rs` at E1, E2 and E3; `…/platform.rs` additionally at E2).
+   Details and the per-commit duty lists are §6.
 2. **No production code.** No injection site, no `DirentBarrierClass` variant,
    no `DestinationRecheckV1` variant, no `completed_record` edit. §2 *authorizes*
    the T1 widening; it does not write it, and the authorization is scoped to
@@ -1161,14 +1568,19 @@ quoted too. [P3-8] the §12.4 pointer is added (see [P2-2] cure).
    re-reservation quotes, ten of the twelve §8 targets, the §5 blast-radius
    decision's doctrine and availability grounds, the O8 two-tier mechanism, the
    PARTIAL statement's preservation, and the 38 key-semantic rows other than
-   §1.5's seven all stand as drafted.
+   §1.5's eight all stand as drafted.
 6. **It does not close OPEN-B2 or OPEN-B3.** Both remain open, non-blocking,
-   owned by E2.1 — and OPEN-B3 is **strengthened** by the Code axis's hazard 1:
-   the reserved target leaf must be **catalog-legal** wherever the target parent
-   is catalog-owned, because `interior::exact_row` classifies `.ca1-*` as
-   `Foreign` and refuses the whole interior (`interior.rs:414-417`) — a stronger
-   constraint than "a dotted name in a user-visible directory".
-7. **It resolves no new open question silently.** §10 lists the three it opens.
+   owned by E2.1 — and both are **strengthened** at round 2. OPEN-B3: the
+   reserved target leaf must be **catalog-legal** wherever the target parent is
+   catalog-owned, because `interior::exact_row` classifies `.ca1-*` as `Foreign`
+   and refuses the whole interior (`interior.rs:414-417`) — stronger than "a
+   dotted name in a user-visible directory". OPEN-B2 gains the coupling clause
+   at §10.
+7. **It does not own O13.** §7.6.1 *proposes* it as a new plan obligation with
+   an ownership analysis; minting a ledger row is the lane owner's edit to
+   `GwzM5-8R2E-Plan.md` §1, not the addendum's.
+8. **It resolves no new open question silently.** §10 lists the three it opens
+   and the one clause it adds to a standing row.
 
 ---
 
@@ -1179,6 +1591,22 @@ quoted too. [P3-8] the §12.4 pointer is added (see [P2-2] cure).
 | **OPEN-B7** | Does the Windows P5 round trip deliver the same dirent ordering when it renames a **freshly created** alias rather than a long-resident anchor? `anchor::round_trip` (`platform/anchor.rs:183-204`) renames a resident file and back; the roaming arm renames a file created moments earlier in the same drive. *Evidence that would settle it:* a native Windows probe in E2.1's own matrix, in the shape of `hard_link_identity_sharing_is_what_the_retirement_rows_assume` (`anchor/tests.rs:308-324`) — measure the platform, do not read a `cfg`. | non-blocking; E2.1 must measure | E2.1 |
 | **OPEN-B8** | Under DECISION B-4, are #10 and #12 distinguishable in code at the point of retirement, or does the drive reach one helper with no durable signal of which entry it took? *Evidence:* whether the intent record's resident row (`BarrierIntentActive(ordinal)` vs `BarrierIntentRetired(ordinal)`) plus the in-memory write-handle identity partition the two entries. If not, #12 becomes the restart observation and #10 the edge. | non-blocking; reopens B-4 if negative | E2.1 |
 | **OPEN-R1** | Does the relocation need to *move* resident legacy residue, or may it leave it and relocate only future writes? On Unix `finish()` clears the residue (`cleanup.rs:86-94`, `:131-139`, `:166-174`), but Windows retains the permanent durability anchor and accumulating `.ca1-anchor-retired-<n>` names, so a leave-in-place relocation would keep the catalog unobservable on Windows. *Evidence:* whether any Windows workspace can be proved anchor-free before activation — the Phase-4 closure says it cannot (`GwzM5-8R2DPhase4Closure.md:180-190`). Recorded so whoever owns the relocation package inherits the question rather than re-deriving it. | **blocking for whichever lane owns the relocation** | operator's routing (§7.8) |
+
+**And one clause added to a standing row (Code [P3-R4]):**
+
+> **OPEN-B2 gains this coupling clause.** Rows #10 and #12 are same-directory
+> renames **only because the target parent is currently pinned to the action
+> directory** (`namespace/host.rs:165-171`, `:746-753`), which is what lets them
+> route through `RetainedActionNamespaceV1::execute_edge`
+> (`namespace_mutation.rs:280-283`, `&self.handle` for both source and
+> destination) and is why §6.2(a) can bank "E2 moves no publication caller
+> count". **If OPEN-B2 widens the target to a retained managed parent, #10 and
+> #12 become cross-parent renames**, `execute_edge` no longer serves them, and
+> three things open at once: `CATALOG_PUBLICATION_CALL_COUNTS` moves at E2 after
+> all, a new sealed-primitive call site appears in `barrier_mutation.rs`, and the
+> rename-domain question (`namespace_mutation.rs:158`) applies to a pair of
+> parents rather than one. **E2.1 must see this coupling before it answers
+> OPEN-B2**, because the answer changes E2.3's convergence obligation (§6.3).
 
 ---
 
@@ -1249,7 +1677,7 @@ content is the State axis's §6.1 adjudication, which I re-verified.
 | ~~OPEN-B1~~ | **CLOSED at E0.2b** — cure is DECISION B-5; `completed_record` unchanged | — | no | — |
 | ~~OPEN-C1~~ | **STRUCK** — premise refuted (`authority_record_binding.rs:486`) | — | no | — |
 | **OPEN-T1** | **AUTHORIZED at E0.2b** — Class-2 widening at three gates (§2); implementation is E3.1's precondition step | design | E3.1's own precondition, no longer a phase blocker | E3.1 |
-| **OPEN-B2** | The barrier target is pinned to the action directory (`namespace/host.rs:165-171`) | scope | no | E2.1 |
+| **OPEN-B2** | The barrier target is pinned to the action directory (`namespace/host.rs:165-171`) — **carries the §10 coupling clause: widening it makes #10/#12 cross-parent, moves `CATALOG_PUBLICATION_CALL_COUNTS` at E2, and changes E2.3's convergence obligation** | scope | no | E2.1 |
 | **OPEN-B3** | The reserved target leaf's grammar — **strengthened**: must be catalog-legal wherever the target is catalog-owned (`interior.rs:414-417`) | hygiene / correctness | no | E2.1 |
 | **OPEN-B7** | Windows round trip over a freshly created alias (§10) | evidence | no; E2.1 must measure | E2.1 |
 | **OPEN-B8** | #10 / #12 distinguishability (§10) | design | no; reopens B-4 | E2.1 |
@@ -1265,63 +1693,54 @@ content is the State axis's §6.1 adjudication, which I re-verified.
 | **T-B′** | a new `DestinationRecheckV1` variant carrying a second observation input (Class 1) | **NEW** — §3 |
 | ~~T-C~~ | all terminal sites in `admission_mutation.rs` | **REPLACED by T-C′** |
 | **T-C′** | terminal sites split by capability: #1-#5 → `namespace_mutation.rs`, #6-#10 → `admission_mutation.rs` + one retired-root forward | **NEW** — §8 |
-| T-D | `terminal.authority_release` reserved with determination | **RE-GROUNDED on reading (a)**; "one boundary must have one name" deleted |
+| T-D | `terminal.authority_release` reserved with determination | **RE-GROUNDED on reading (a)**; "one boundary must have one name" deleted; the demotion of reading (b) now closed by frozen text (freeze `:795-797`) |
 | **B-4** | #10 and #12 are two boundaries sharing one helper | **NEW** — §1.5 |
 | **B-5** | the target alias is a fresh independent copy; not a hard link, not a move | **NEW** — §1.3 |
 | **B-6** | the alias is created on every platform | **NEW** — §1.4 |
 | A-1 | the `authority_name` weigh | **RE-FRAMED** — the checked path replaces rather than consumes; trigger does not fire in R2-E |
 | O6 | observe-or-refuse | **COMPLETED** — read-side refusal added; witness shape corrected to the `observe_admission` inverse |
-| E4.1 blast radius | option (ii) | **UNCHANGED**; precondition set grows from five to **seven** |
+| E4.1 blast radius | option (ii) | **UNCHANGED**; precondition set grows from five to **seven**; a fifth ground banked at §6.4 (`workspace_mutator_lock.rs` is byte-pinned) |
 | O8 | two-tier mechanism | **UNCHANGED**; denominators now stated (10 / 8 / 2 / 2) |
+
+**Proposed ledger addition (not minted here — §9 item 7):**
+
+| Id | Proposed obligation | Source | Proposed owner |
+| --- | --- | --- | --- |
+| **O13** | *The v1 store's raw-writer clause* — convert the v1 checked store/root/bundle paths per §10 row `:280`'s frozen ordering, and discharge its "no legacy raw writer" clause, whose test-gate expired at A1 | `ConsumerCheckpoint:280`; State round-2 [P2-R1] | **substantive half → E4.2/E4.3 as a scope clause** (same store); **raw-writer pin → an E4.2 precondition pin, landing now**, with a dated accepted-residual record covering A1 → E4.2 (§7.6.1) |
 
 ---
 
-## Appendix C — focused round-2 verification list, per axis
+## Appendix C — round-2 conditions, closed; and what the E0 landing verifies
 
-**Code axis — five items.**
+**Round 2 closed GO-conditional (Code: 1 P2, 4 P3) and CONDITIONAL GO (State: GO
+on the semantics object, NO-GO on §7.6-§7.8 as decision-support; 2 P2, 4 P3).
+Every condition of both sets is applied above. The map, for the landing check:**
 
-1. **§1.2's macOS finding, re-derived.** This is the only place E0.2b overrides
-   a Code-axis ruling. Re-read `platform/anchor/tests.rs:278-302` and `:308-324`
-   and `provider/platform/macos.rs:88`, and confirm that hard-linking
-   `roaming-anchor-home-v1` re-homes the home object's
-   `ATTR_CMN_OBJPERMANENTID`. If it does not, DECISION B-5 should revert to the
-   hard-link shape and §1.5's rows #7/#11 regain their identity proofs.
-2. **DECISION T-B′'s shape.** Confirm a `&Dir` field inside
-   `DestinationRecheckV1` crosses no boundary the checker enforces
-   (`check_checked_artifact_boundaries.py`'s module rules), and that
-   `interior::observe` on a retired root holding ≤64 `ActiveAction` children
-   returns without refusing (`interior.rs:79-91`, `:410-413`, `MAX_INTERIOR_ENTRIES`
-   at `:40`).
-3. **DECISION T-C′'s single forward.** Confirm keys #6-#10 need exactly one new
-   capability forward (the retired-root handle) and not two, given #9's catalog
-   barrier and #10's `completed_record` re-proof both run against the catalog
-   root `admission_mutation.rs` already holds.
-4. **§5.2's read-side placement.** Confirm the identity comparison belongs with
-   the owner and not inside `read_and_bind_barrier_intent` — i.e. that
-   `protocol/barrier.rs` has and should have no capability to re-mint a witness.
-5. **§1.5's rows #6-#13 against the P2/P1 families.** Each row names a primitive
-   family; confirm the alias creation is P2-only and its retirement P1-only, and
-   that no row silently needs a recheck arm.
+| Condition | Applied at |
+| --- | --- |
+| Code [P2-R1] — the third machine-enforced inventory in all three convergence obligations | **§6.2** (the two inventories, with the E1/E2/E3 movement analysis) and **§6.3** (§2.5 / §3.6 / §4.5 rewritten verbatim); **§6.4** banks the extra §5 ground; the aggregate is stated once at **§9 item 1** |
+| Code [P3-R1] — the retired root's bound would be the active constant | **§3.2** ground 3 (three real constants named; explicit `MAX_RETIRED_ACTION_DIRS` check made E3.1's duty) and **§2.4** item 2 |
+| Code [P3-R2] — repeat the non-`ActiveAction` refusal in T-B′'s arm | **§3.2** shape (`rows` empty) and **§2.4** item 2 — said once in each place |
+| Code [P3-R3] — B-6's bounded cost | **§1.4** closing paragraph |
+| Code [P3-R4] — cross-parent retirement latent behind OPEN-B2 | **§10** coupling clause; **Appendix B** OPEN-B2 row |
+| State [P2-R1] — the nine-row map, row `:280`, O13 | **§7.6** (nine rows) and **§7.6.1** (the finding in full, O13 proposed, the ownership analysis, the §7.8 balance effect) |
+| State [P2-R2] — O3's row, §7.8(a)'s cost, ground 4 | **§7.6.2** (corrected row), **§7.8(a)** (O1 + O2 blocked; O3 re-owned), **§7.8 ground 4** (the fourth leg promoted in) |
+| State [P3-R1] — the census clause verbatim | **§8**, the [P2-4] cure — three headers written out in full |
+| State [P3-R2] — close T-D's demotion with frozen text | **§8**, the [P2-3] cure — freeze `:795-797` quoted |
+| State [P3-R3] — which sense do T-D's cites name | **§8**, Code fold-in (i) — `hit()` call sites vs key references, and which T-D uses |
+| State [P3-R4] — §1.5's preamble vs its table on #9 | **§1.5** preamble — eight rows restated, #9's alteration named |
 
-**State axis — six items.**
+**What the E0 landing verifies, in order.** (1) The three convergence
+obligations at §6.3 name every inventory each converging commit must move —
+this is the one condition that would red CI rather than corrupt semantics.
+(2) The three activation-record headers at §8 are the strings that enter freeze
+§3.5; they are now final text, not instructions. (3) §7.6 is nine rows and §7.8's
+accounting is O1 + O2 blocked with O3 re-owned. (4) The census is unmoved: 165,
+zero minted, zero retired, 38 accounted, three families still `Reserved`.
+(5) Nothing in the pair authorizes a `completed_record` edit for B1, and the T1
+authorization is scoped to E3.1's own reviewed precondition step.
 
-1. **§7.2 and §7.3's restatements**, line by line, against
-   `GwzM5-8R2DSettledTuple.md:636-828`. These are the sections E0.1(b) got
-   wrong; a second error here would propagate further than the first.
-2. **§7.6's "catalog-free set is empty" claim.** It is the load-bearing premise
-   of the sequencing proposal. Test it adversarially: is there any §10 row whose
-   converted form reaches neither `ActionAdmissionOwnerV1::from_retained_catalog`
-   nor `RetainedManagedParentProviderV1::from_retained_catalog`?
-3. **§7.8's charter argument.** Options (a) and (b) are both defensible; the
-   axis should test whether ground 4 (the O3/relocation circularity) really
-   holds, since it is the ground that turns a preference into a structural
-   argument.
-4. **The census clause completion** ([P2-4] cure): three record headers + T-D
-   now carry "no key retired"; §4's header carries "stays 0/11 until E3.2
-   lands"; §8 row 12 is now true as written.
-5. **§6's count arithmetic** (9 → 9 → 10 → 10) against
-   `FAULT_INJECTION_SOURCES` as it stands, including T-C′'s split, which touches
-   two already-declared files and must not move the count.
-6. **§8's O8 denominators** (10 / 8 / 2 / 2 = 18 + 4) against
-   `GwzM5-8R4bG-Evidence.md:1473` and §12.4's Table B, and the "corrected on the
-   record" form against plan §0's 67 → 38 precedent.
+**The three things this pair hands the operator as decisions, not findings:**
+the §7.8 charter question (option (b) vs (a)); O13's minting and its ownership
+(§7.6.1); and OPEN-R1's routing, which follows whichever lane takes the
+relocation.

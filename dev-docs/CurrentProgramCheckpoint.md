@@ -1874,6 +1874,32 @@ fable token only where it makes a difference." Recorded consequences:
   census-clause verbatim fix, the family-scope cite. THE
   SEQUENCING DECISION REACHES THE OPERATOR ON THE CORRECTED MAP.
 
+  **THE E0 FOLD IS COMPLETE AND VERIFIED — 2026-08-26; the
+  addendum re-filed at 1,746 lines (FINAL DRAFT, both round-2
+  verdicts named).** All eleven conditions applied and
+  lane-verified (the two inventories in all three convergence
+  obligations with the arithmetic shown — thirteen publication
+  call sites today, E3's the fourteenth and fifth dated
+  extension; the NINE-row §7.6 map with row :280 and §7.6.1's
+  O13; §7.6.2's O3 correction; O1+O2 as the true blocked pair;
+  the seven verbatim record headers with "none retired"; the
+  T-D family-scope closure). O13 OWNERSHIP ANALYSIS: split — the
+  substantive conversion RIDES E4.2/E4.3 as a scope clause (same
+  store, two-steps-one-store drift avoided); the "no legacy raw
+  writer" half is a PIN landing at the next opportunity + a
+  dated accepted-residual record covering the A1-to-E4.2
+  interval ("not silence, which is the status quo"). THE
+  SEQUENCING DECISION IS RIPE, on six grounds with the corrected
+  accounting: option (b) pull relocation into R2-E (ground 4
+  structural and BREAKABLE — the legacy private parent's single
+  non-test owner makes relocation a single-owner legacy-only
+  edit discharging O3 outright, handing the lane the whole
+  catalog-free critical path in one run) vs option (a) explicit
+  cross-lane dependency on O1+O2 with O3 re-owned and E4
+  rescheduled. PRESENTED TO THE OPERATOR. On the ruling: the E0
+  LANDING (freeze application + plan reshape incl. O13 + the
+  drift note, one coordinated train), then E1-E3 launch.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
