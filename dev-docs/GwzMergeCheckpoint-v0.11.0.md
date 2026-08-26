@@ -135,3 +135,26 @@ residuals above). Program state authority remains
    sweep clean); re-run green. LESSON MINTED: an inventory produced
    through a head/limit pipe is not an inventory — pin sweeps run
    untruncated and end with a residual grep proving zero matches.
+
+## Release verify at the tag — RED on a first-execution class (2026-08-26, run `32946137285`)
+
+**Windows leg GREEN** (incl. the CRLF count-pin step's first
+release-context execution). **ubuntu-22.04 leg FAILED at Test**: the
+`checked_artifact::admission` class uniformly panics with
+`Unsupported { capability: DurableObjectIdentity, detail:
+"Inappropriate ioctl for device (os error 25)" }` — the Linux
+durable-identity probe (`identity.rs:267`, `name_to_handle_at`
+persistent file handles) refused by the filesystem backing the test
+temp root (fixtures root at `std::env::temp_dir()`,
+admission/tests.rs:43). FIRST-EXECUTION CLASS: the platform matrix's
+Linux leg is ubuntu-24.04-ARM only and the boundary workflow (24.04
+x86) runs checker+harness, not the full suite — this verify is the
+FIRST x86-Linux full-suite execution the admission machinery has
+ever had; v0.10.5's verify predates the machinery entirely. The
+failure is the capability refusing FAIL-CLOSED, by design; the open
+sub-question is whether any production v0.11.0 path (the --no-ff v1
+store) reaches the durable-identity probe on Linux, which decides
+whether this is a user-facing environment sensitivity to document
+or a test-environment-only fact. THE GITHUB RELEASE PUBLICATION IS
+HELD until the operator rules on the gate (align the verify's Linux
+leg to ubuntu-24.04 / investigate production reach first / other).
