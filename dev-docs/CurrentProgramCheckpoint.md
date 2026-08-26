@@ -1653,6 +1653,29 @@ fable token only where it makes a difference." Recorded consequences:
   quota-vs-schedule). First action on "go": E0.1's read-only
   reach traces.
 
+  **R2-E IS OPEN — E0.1 COMPLETE, 2026-08-26 (operator "go").**
+  The reach traces filed as `GwzM5-8R2E-E01ReachTraces.md`,
+  read-only, at main `94da3e5`. (a) **DurableObjectIdentity is NOT
+  production-reached in v0.11.0**: every merge mutation acquires
+  the checked runtime bootstrap (WorkspaceMutatorLock wraps
+  try_acquire_workspace_runtime — locks/dirs/revalidation ONLY, no
+  probes), while every identity/rename-domain probe sits in the
+  catalog lease behind catalog_mutation_lease() →
+  recover_or_create = zero production callers; v1_lifecycle has
+  zero non-test checked_artifact references (its checked store is
+  its own durable_fs module). The 22.04 verify failure was
+  fixture-only exposure, confirmed. **The exposure arrives at
+  E4.1** — two bindings minted: the capability-refusal UX is an
+  E4.1 HARD PRECONDITION, and the probe blast radius
+  (every-mutation vs catalog-consuming-only) is an explicit E0.2
+  amendment decision. (b) §11.3's activation gate restated row by
+  row — incl. the ORDERING CONSTRAINT made explicit: E2.2
+  (BarrierIntentV1::issue observe-or-refuse) strictly precedes any
+  E4 row admitting roaming-anchor actions; the authority_name
+  weigh is taken in E0.2 or explicitly deferred to its consuming
+  E4 step. NEXT: E0.2 drafts the semantics amendment against this
+  note; E0.3 dual #1 follows.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer
