@@ -197,3 +197,19 @@ value executed (darwin 400/932 re-run and confirmed exactly; linux
 410 measured / 933 derived-from-the-run, FIRST-DISPATCH-EXPECTED),
 unmeasured hosts failing loudly. Verify-3 dispatched at the tag:
 `32960235595`, under watch.
+
+**THE VERIFY CHAIN CLOSES GREEN (2026-08-26):** verify-4
+(`32965339595`) SUCCESS on both legs under the tag-frozen-driver
+guard (gwz-core `94da3e5`): the verify checks out the TAG's tree, so
+a tag's battery driver and count pins are frozen with the release —
+main-side fixes can never retroactively cure an existing tag's
+verify. The guard detects a driver predating per-OS pins (no
+`_fault_count`) and withholds ONLY the fault battery, loudly, with
+the reason (the same convention as the pre-driver presence guard);
+everything else ran and counted. The v0.11.0 verify of record:
+Windows leg green ×4 consecutive runs (incl. the CRLF count-pin and
+sentinel steps); ubuntu-24.04 Test step green (full suite 1600/0/1);
+batteries green (byte-equivalence:2, unknown-field, privacy; fault
+withheld per the frozen-driver rule, its partitions covered by the
+Test step). Tags from `1bcb925` forward run the full selection with
+per-OS executed pins. **THE v0.11.0 RELEASE ARC IS CLOSED.**
