@@ -1733,6 +1733,49 @@ fable token only where it makes a difference." Recorded consequences:
   axis (running) — merged round per house pattern; the E0.1(b)
   mislabel correction lands with it.
 
+  **E0.3 CODE AXIS: NO-GO, REVISE-AND-REFREEZE — 2026-08-26 (3
+  P1 · 8 P2; report `GwzM5-8R2E-E03-ReviewCode.md`). ROUND 1
+  CLOSES NO-GO/NO-GO WITH BLIND CONVERGENCE ON THE DEFECTS AND A
+  GROUNDED DIVERGENCE ON THE CURE.** Both B1/T1 derivations
+  CONFIRMED independently pre-reading — and one level DEEPER:
+  the chain terminates in `Ambiguous` (classifier→bootstrap),
+  which has NO recovery arm — the failure is "no process can
+  EVER RECOVER this catalog", permanent loss. Code P1s: (1) the
+  draft's B1 mechanism (i) is UNIMPLEMENTABLE (completed_record
+  sees bare ActionDigestV1s, no interiors; BarrierIntentV1
+  carries no roaming-anchor identity field) — REFUSED; adopt
+  (ii) COPY-NOT-MOVE in the hard-link shape, which touches
+  completed_record/retain_file/require_named_file_identity NOT
+  AT ALL; (2) DECISION T-B unimplementable (one observation of
+  destination_dir reused; a retired-root interior can never
+  satisfy completed_record — §8 would freeze the wrong arm-table
+  resolution); (3) OPEN-C1 REFUTED at source — RecordScratch has
+  ZERO write paths tree-wide (the authority scratch is
+  AuthorityScratch): the feared sharing does not exist, C-3
+  simplifies. P2 spine: each precondition package is THREE
+  gates not one; the amendment's own key #12 destroys the
+  catalog permanently under any move-based roam (reinforcing
+  copy-not-move); O6 applies precedent parts (i)/(iii) but not
+  (ii) — the callee's read side re-checks five facts and none of
+  the three identities. VERIFIED CORRECT: the nine sites
+  (counted), §5 whole, §6 + the drift catch, C-1, B-3 Windows,
+  census-vs-green-fixture; "the drafter's citation discipline is
+  the best I've audited here." PACKAGE RULING (diverges from
+  State): RULE B1/T1 SEPARATELY — T1 is §4.4-Class-2-sanctioned
+  observer-reading widening (three gates, census.retired
+  evidence struck); B1's correct fix needs no widening at all.
+  **MERGED REMEDIATION ADOPTED: the State axis's PROCESS (lane
+  authors E0.2b; round 2 re-verdicts under the two-round cap)
+  carrying the Code axis's CURES (B1 copy-not-move; T1
+  three-gate Class-2; ruled separately inside the addendum),
+  plus State P1-1 (file count 9→10 once, at E2), State P1-2
+  (the REAL §11.3: E4.1 gated on the R2-F-pinned relocation —
+  the addendum analyzes which E4 rows truly need catalog
+  activation and PROPOSES the sequencing options; likely an
+  operator plan-shape decision), O6 part-(ii) read-side
+  identity checks, the T-B re-resolution, both axes' P2/P3
+  lists, and the corpus-wide drift note naming `4b9f078`.**
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer

@@ -132,7 +132,13 @@ ordering couples them:
 
 - **E4.1** — `WorkspaceMutatorLock` runtime bootstrap (the O2
   activation rides here: `recover_or_create`'s first production
-  caller, gated by the E0.1(b) §11.3 restatement).
+  caller, gated by the E0.1(b) §11.3 restatement). *(Corrected
+  2026-08-26, E0.3 State [P1-2]: the operative gate is the REAL
+  §11.3 item 1 — the A1 coexistence gate: no production catalog
+  activation until the R2-F-pinned relocation lands. E0.2b
+  analyzes which E4 rows truly require catalog activation and
+  proposes the sequencing; a cross-lane dependency or pull-forward
+  decision may fall to the operator.)*
 - **E4.2** — first merge record (`MergeStore` + `PreservationBundles`
   bootstrap ordering).
 - **E4.3** — merge record rewrite (exact store; unknown fields and

@@ -65,6 +65,19 @@ capability refusal wherever the catalog lease is taken.
 
 ## (b) The §11.3 gate on first production catalog activation — restated
 
+**[CORRECTED 2026-08-26 per the E0.3 State axis [P1-2]: the rows
+below are §11.1's, restated under the wrong label — the section
+extraction matched the first "11.3" occurrence without verifying
+the boundary. The REAL §11.3 ("Settle caveats the 5.2 dual should
+weigh", SettledTuple:798+) has eight items, and its item 1
+(:800-802) is the A1 COEXISTENCE GATE: no production catalog
+activation until the relocation lands — relocation being PINNED TO
+R2-F (§11.2:791). E4.1 is therefore gated on R2-F's relocation
+execution (or an explicit re-sequencing decision); the E0.2b
+addendum carries the full, verified restatement of both §11.1 and
+§11.3 and the sequencing analysis. The rows below remain true AS
+§11.1 CONTENT and their consumptions stand on that basis.]**
+
 `GwzM5-8R2DSettledTuple.md` §11.3 ("Settle caveats the 5.2 dual
 should weigh", :798+) binds the activation as follows; E0.2 consumes
 each row:
