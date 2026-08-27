@@ -1,0 +1,85 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a04121-ff7a-72d4-af6d-a6cc3b7242bc
+workspace_id: ws_default
+origin_url_hash: sha256:e35341f4b797aa8e57a066bf78413f40c277b3985e757118ca9aea8d390fbb9c
+created_at: unix-ms:1787799142289
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 7ee517ed1762e472e058409c8230b1b9b6572730
+  branch: main
+selected_targets:
+- '@root'
+- mem_gwz_cli
+- mem_gwz_core
+- mem_taut
+- mem_gwz_py
+- mem_taut_shape
+- mem_taut_shape_rs
+- mem_taut_shape_py
+committed_targets:
+- '@root'
+members:
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: 6b7e75a13f23fc6af215efccfc81a7f184c6cf7c
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: 8597d3249b1985f408144a2f138fab186165ce43
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 5f6689a30741f35c943839a6ead36582e6452a4b
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 5cd26a16f44cf8ae3a44b1ac334553d2765e3dab
+    detached: true
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 389c867010a7cb474c03960ba3420308ed2bd64a
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: 7e7d5a7fc27635b152e10815503f1b456ae6a960
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: 7e50457391489d5a2628a60c0462f07f53baf021
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true

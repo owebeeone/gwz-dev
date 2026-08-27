@@ -1943,8 +1943,10 @@ fable token only where it makes a difference." Recorded consequences:
   set-equality BOTH directions, both probes executed RED in the
   overlay before commit (growth → "gained a raw durable_fs writer";
   stale entry → "must be retired deliberately"), checker green on
-  pristine+pin, exact-ref pushed 94da3e5..8597d32, boundary-CI
-  watch open. (5) E1-E3 LAUNCHED IN PARALLEL (three Opus builders,
+  pristine+pin, exact-ref pushed 94da3e5..8597d32. [CI CLOSED
+  2026-08-27: Checked-artifact boundary run 33032497893 SUCCESS
+  (~39m); Retained merge readers 33032497890 SUCCESS (8m15s) —
+  both push legs green at 8597d32.] (5) E1-E3 LAUNCHED IN PARALLEL (three Opus builders,
   isolated gwz-core worktrees e1-cleanup/e2-barrier/e3-terminal,
   briefs binding the amendment pair addendum-controlling, no-push
   no-tags no-trailers; lane owner lands sequentially with pins
