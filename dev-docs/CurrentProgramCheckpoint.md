@@ -2131,7 +2131,15 @@ fable token only where it makes a difference." Recorded consequences:
   c11c5ef: Windows 33044834867, Platform 33044836558 (these
   measure linux 456 and are the FIRST Windows compile of the
   roaming-anchor code — WINDOWS-ARM-OWED discharges on their
-  green). NEXT IN R2-E: E5 (archive/GC sub-package, parallel-safe)
+  green). [CI CLOSED 2026-08-27: ALL FOUR LEGS GREEN at c11c5ef —
+  Windows 33044834867 (the roaming-anchor code's first Windows
+  compile+execution: WINDOWS-ARM-OWED discharged; the
+  barrier.target_barrier native arm executed), Platform
+  33044836558, boundary 33044832498 (the per-commit lane gate
+  green on the squashed landing — ritual 7 validated; the E3-range
+  red healed), retained readers 33044832501. The linux 456 marker
+  stays derived-and-marked until the next Linux r4bg battery
+  executes it, per the docstring's measured-number-wins rule.] NEXT IN R2-E: E5 (archive/GC sub-package, parallel-safe)
   and E6 residue; E4 remains gated on R2-F's relocation per the
   operator's ruling (a).
 
