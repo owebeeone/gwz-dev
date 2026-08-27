@@ -525,11 +525,17 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > Inventory addendum (2026-08-23, appended to the §3.5 injection-site
 > inventory; the round-2 paragraph above is left as written as the Phase-0
 > statement it is): on the settled tree `d45458d` the declared-and-anchored
-> production source list is **nine** files — the three `catalog_bootstrap.*`
-> sources above, `admission_mutation.rs` (19), `leaf_observation.rs` (11),
-> `namespace_mutation.rs` (11), `protocol/authority_record.rs` (4),
-> `authority_record_binding.rs` (9), `managed_mutation.rs` (28) — pinned
-> tree-complete by the round-2 completeness anchor exactly as designed.
+> production source list is **ten** files *(nine until the R2-E E2 landing,
+> 2026-08-27 — this count is edited in place per the E0.2 amendment pair's
+> §6.3 E2.3 duty, the single R2-E count move)* — the three
+> `catalog_bootstrap.*` sources above, `admission_mutation.rs` (19),
+> `leaf_observation.rs` (11), `namespace_mutation.rs` (11 + the eleven
+> `cleanup.*` sites since E1), `protocol/authority_record.rs` (4),
+> `authority_record_binding.rs` (9), `managed_mutation.rs` (28), and since
+> the E2 landing `barrier_mutation.rs` (16) — pinned tree-complete by the
+> round-2 completeness anchor exactly as designed, with the declared-list
+> length machine-pinned at ten (`fault_expected_keys.rs`, the `len() == 10`
+> assertion landed at E2.3).
 | `managed_bootstrap.*` | 30 | R2-D **Phase 3** | **partially executed** (see annotation) |
 
 > `managed_bootstrap.*` activation annotation (2026-08-22, Step 2.3 landing;

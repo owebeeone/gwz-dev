@@ -2095,6 +2095,46 @@ fable token only where it makes a difference." Recorded consequences:
   be landed SQUASHED to one commit citing the reviewed worktree
   shas. E2's landing will be squashed.**
 
+  **E2 IS LANDED — 2026-08-27; gwz-core main 1d50e59 → `c11c5ef`.
+  THE BARRIER FAMILY IS EXECUTED 16/16 WITH THE O6 WITNESS, AND
+  WITH IT THE R2-E E1-E3 SPAN IS COMPLETE: ALL 38 RE-RESERVED KEYS
+  ARE BOUND AND EXECUTED (cleanup 11/11 + barrier 16/16 + terminal
+  10/11-with-determination), THE CENSUS HOLDS AT 165, AND THE
+  ACTIVATION VOCABULARY'S `Reserved` ARM IS UNCONSTRUCTED FOR THE
+  FIRST TIME — annotated as retained frozen vocabulary per the
+  map's carried re-reservation clause (clippy's dead-variant error
+  at the squash was the milestone announcing itself).** E2 round 2
+  GO (report appended, filed with this commit): [P2-1] cured by
+  the builder's OWN re-derivation — prepare_roaming_target owning
+  both names, compiler-exhaustive four-row table, atomicity walked,
+  no unlink window, the reviewer WITHDREW its recommended
+  refuse-shape; wedge argument sound (the .roundtrip grammar can
+  never classify Valid, so no ordinal can reserve a colliding
+  leaf); anchor.rs byte-identical to base (round-1 delegation
+  unwound); checker-suite anomaly closed authoritatively 69/69;
+  three new P3s → [R2-P3-1] settled-does-not-imply-barriered (an
+  E4 scope clause + E7-dual item), [R2-P3-2] the unannounced
+  return rename / 17th-key question (E7-dual), [R2-P3-3] wording.
+  LANDED SQUASHED per the minted lesson (one commit, the four
+  reviewed worktree shas cited; per-commit lane gate green by
+  construction). Landing reconciliation executed: forwarder-file
+  unions with E1/E3 (two dropped-brace junctions caught by cargo
+  check and repaired); digests re-executed (pre_catalog 5c65d5a2,
+  catalog cc845e20, platform 2f938dd9); darwin partition EXECUTED
+  446 = 400 + 8 + 17 + 21, linux 456 derived
+  FIRST-DISPATCH-EXPECTED; full battery direct-exit green
+  (checker, fmt, check, clippy, 446/932+1/256 — lib 1636
+  accounted). THE FREEZE §3.5 INVENTORY ADDENDUM'S COUNT IS MOVED
+  IN PLACE nine → ten with dated provenance (the amendment §6.3
+  E2.3 duty, the single R2-E count move; barrier_mutation.rs (16)
+  listed; len()==10 machine pin cited). Matrices dispatched at
+  c11c5ef: Windows 33044834867, Platform 33044836558 (these
+  measure linux 456 and are the FIRST Windows compile of the
+  roaming-anchor code — WINDOWS-ARM-OWED discharges on their
+  green). NEXT IN R2-E: E5 (archive/GC sub-package, parallel-safe)
+  and E6 residue; E4 remains gated on R2-F's relocation per the
+  operator's ruling (a).
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

@@ -977,3 +977,614 @@ Recorded, not required.
 
 *Filed 2026-08-27 by the R2-E Phase E2 interior reviewer (single-axis,
 peer-blind). Object: `e2-barrier` @ `ae4228f` over base `94da3e5`.*
+
+---
+---
+
+# Round 2 — the remediation, 2026-08-27 (final round under the two-round cap)
+
+**Verdict: GO. Land it.**
+
+**[P2-1] is cured, and cured better than I proposed.** I recommended a
+refuse-on-resident guard; the builder declined it on a stronger bar than mine —
+*no reachable crash window may leave a name no later drive returns* — and
+observed correctly that my shape leaves the orphan permanent and merely makes
+the refusal tidier. What it built instead moves the entry decision to the owner
+of both names. That is the right cure, and I withdraw my recommendation in
+favour of it.
+
+**All seven P3s are taken**, several of them beyond what I asked. Two further
+tightenings were volunteered, both real. Three new P3s below, **none a landing
+blocker**: two are E7-dual items, one is landing-optional wording.
+
+- **Object:** `9ba6e24` appended to `e2-barrier` (12 files, +712/−121).
+- **Round 1 is left as written above**, including the [P2-1] statement the
+  remediation falsifies — that is the record of what was found, and this section
+  is the record of what happened to it.
+- **Scope note the coordinator supplied and I have honoured:** E1 and E3 are
+  landed on `main` (`1d50e59`); this train lands **squashed** onto that tip with
+  pins re-executed by the lane owner, so per-commit pin staleness inside the
+  branch is not a finding. I gate the **content**. Everything below was measured
+  on `9ba6e24` over base `94da3e5`, and §R2.8 lists what the rebase itself owes.
+
+---
+
+## R2.0 Round-2 findings register
+
+| Id | Grade | Disposition |
+| --- | --- | --- |
+| **[P2-1]** | **CLOSED** | Cured at the entry decision, disclosed truthfully, driven on both target variants |
+| [P3-1] … [P3-7] | **ALL TAKEN** | Spot-checked one by one at §R2.4 |
+| **[R2-P3-1]** | P3 | "Ordinal settled" does **not** imply "its physical barrier ran" — sharpened by the new row three. Charter-compliant; **E7-dual item + E4 scope clause** |
+| **[R2-P3-2]** | P3 | Row three's return rename is a durable edge in the barrier family that **no fault key announces**, on a path where no P5 key is announced at all. Forced by the frozen 16-key record. **E7-dual item** |
+| **[R2-P3-3]** | P3 | `prepare_roaming_target`'s cost claim "two `symlink_metadata` calls" understates it — `leaf_is_resident` is a full bounded observation (stat + no-follow open + identity re-check + read). **Landing-optional wording** |
+
+No new P0/P1/P2. No regression found in the +712/−121.
+
+---
+
+## R2.1 [P2-1] re-verified — against the code and by execution
+
+### The cure, traced
+
+`platform::prepare_roaming_target` (`platform.rs:481`) surveys **both** names and
+answers create-or-resume; `barrier_mutation::converge_target_anchor_alias` is its
+owner-side entry; `ActionNamespace::converge_target_anchor_alias` its consumer
+seam. `drive_ordinal`'s branch is now:
+
+```rust
+let entry = match namespace.converge_target_anchor_alias(&slots)? {
+    TargetAnchorAliasStateV1::Stranded => AliasRetirementEntryV1::Stranded,
+    TargetAnchorAliasStateV1::Absent => {
+        namespace.create_target_anchor_alias(&slots)?;
+        namespace.barrier_target_parent(&slots, &bound)?;
+        AliasRetirementEntryV1::OwnDrive
+    }
+};
+```
+
+The old `scheduled_row_is_resident(&reserved)` test is gone from the alias phase.
+**The wrong question is no longer askable**: `TargetAnchorAliasStateV1` is the
+only thing the seam returns, and it is produced only by the owner of both names.
+`round_trip_supplied` calls `prepare_roaming_target` too, so a caller entering
+the arm directly is equally covered — verified in the diff and by the surviving
+`an_outbound_roaming_alias_is_returned_when_the_arm_is_entered_directly` row.
+
+### Is the enumeration total?
+
+Yes, and structurally so. The match is on `(alias_resident, outbound_resident)`:
+
+```rust
+(false, false) => Absent
+(true,  _)     => Resident
+(false, true)  => { verify → publish_verified_leaf_no_replace → verify } Resident
+```
+
+Three arms over a `(bool, bool)` domain with a wildcard covering the two
+`true`-first cases: **exhaustive by the compiler**, not by inspection. There is
+no `_ =>` catch-all hiding an unconsidered state, and no `Option`/`Result`
+smuggling a fifth outcome.
+
+### "Both renames are atomic, so every crash lands in row two or three" — TRUE
+
+I checked the actual sequence rather than the claim.
+
+**The round trip's order of operations** (`round_trip_supplied`, post-remediation):
+
+```
+prepare_roaming_target(…)            ← converge first
+guard: alias resident && !outbound
+verify_leaf_bytes(alias)
+publish_bytes(alias → roundtrip)     ← rename #1
+verify_leaf_bytes(roundtrip)
+publish_bytes(roundtrip → alias)     ← rename #2
+verify_leaf_bytes(alias)
+identity equality across the trip
+```
+
+So the reachable name-states are: before #1 → *(resident, absent)* = row two;
+between #1 and #2 → *(absent, resident)* = row three; after #2 → *(resident,
+absent)* = row two. **Rows one and four are never produced by this sequence.**
+
+**Both renames are genuinely atomic.** Each is
+`publish_verified_leaf_no_replace` → `rename_open_source` →, on Windows,
+a single `SetFileInformationByHandle(FILE_RENAME_INFO, ReplaceIfExists=false)`
+(`platform.rs:105-150`); off Windows a `rename_relative`. One kernel rename: at
+every instant exactly one of the two names exists. There is no copy-then-unlink
+anywhere on the path — I grepped the whole new roaming region for
+`remove_file`/`remove_dir`/`unlink` and it is **empty**. So no crash can land in
+row one (neither) or row four (both). The claim holds.
+
+**And the converge itself is crash-safe under the same property.** Row three's
+return is one atomic rename: a crash during it leaves either row three again
+(the next drive converges again) or row two (settled). Idempotent, self-
+converging.
+
+### Does the seeded state match what a real crash leaves?
+
+| | real crash between the two renames | what `assert_mid_round_trip_residue_converges` seeds |
+| --- | --- | --- |
+| reserved leaf | absent | absent (`prepared()` strands **ordinal 1** at `AuthorityScratch`; ordinal 0's `GoalScratch` is untouched) |
+| `<leaf>.roundtrip` | resident | resident, via `place_bytes(…, &outbound)` |
+| which object carries the anchor bytes | the outbound one | the outbound one — `place_bytes` writes `ROAMING_ANCHOR_BYTES` |
+| durable identity | the alias's original inode | a fresh inode |
+
+**Faithful on names, bytes and which object carries them.** The identity
+difference is immaterial by construction: DECISION B-5's stated cost is that the
+intent binds **no** alias identity, so nothing on any path compares it — the two
+alias reobservations are residency-and-bytes proofs, which is exactly what round
+1 verified. The seed reproduces every fact the code actually consumes.
+
+The outbound name is derived in the fixture as `format!("{leaf}.roundtrip")`,
+matching `platform::roundtrip_name`'s `push(ROUNDTRIP_SUFFIX)` with
+`ROUNDTRIP_SUFFIX = ".roundtrip"`. Duplicating the derivation in the test rather
+than importing it is right here — a test that imported the production
+derivation could not catch the production derivation changing.
+
+### Does anything persist after row three's return? Census-exact — yes, really
+
+```rust
+let rows = fixture.action_children(variant, action);
+assert_eq!(rows, settled_census(action), "…did not settle to the ordinary census");
+assert!(!rows.contains(&outbound), "…the outbound name survived the converge");
+```
+
+`action_children` is the **full sorted child list** of the action directory and
+`settled_census` is exactly five names. So the first assertion alone is
+census-exact — an orphan of any name would fail it. The second is a redundant,
+better-messaged restatement. And the attempt is run **once**, unwrapped: if the
+pre-remediation behaviour survived, that unwrap would panic on the refusal. **The
+row is its own discriminator.**
+
+### Row four's toleration does not mask a foreign-bytes state
+
+The refusal still fires, in both the places it should:
+
+- **Inside the arm** —
+  `a_roaming_alias_resident_under_both_names_is_refused_inside_the_arm`
+  (`platform/anchor/tests.rs`): places both names, calls `round_trip_supplied`,
+  asserts the refusal and `names(&root.0).len() == 2` ("a refused barrier mutates
+  nothing"). Body unchanged from round 1; only the name and doc moved. **Executed
+  green.**
+- **Foreign bytes under the reserved leaf** —
+  `foreign_bytes_under_the_reserved_leaf_are_refused_before_the_edge`, unchanged
+  and still green. I re-traced it against the new code: row two returns
+  `Resident` without inspecting bytes, the guard passes, and then
+  `verify_leaf_bytes(alias)` refuses with **"roaming anchor alias bytes are
+  invalid"** — which still satisfies the test's `contains("bytes are invalid")`.
+- **Foreign bytes under the outbound name in row three** — refused before the
+  return, by `verify_leaf_bytes(&outbound, …)` *preceding* the publish. So an
+  object under this protocol's own outbound name carrying something else is
+  **never adopted**.
+- **Foreign bytes at the reserved leaf on the drive path** — `require_alias_resident`
+  on the retirement row refuses after the no-replace rename, preserving the
+  object as evidence, which is B-4's own stated reason for retirement over
+  removal.
+
+**Row four does not verify either object's bytes**, and the disclosure does not
+claim it does — it scopes the foreign-bytes refusal to "the third row", verbatim.
+That scoping is precise and I checked it word by word. The principle underneath
+is sound and worth stating: **verification is exactly where adoption happens.**
+Row three adopts the outbound object (returns it and then lends it as the
+anchor), so it must prove it. Row four never touches, reads or renames the
+outbound object — it is inert. Verifying an object you will never use would be
+ceremony, and refusing on it is the wedge §R2.2 rules out.
+
+---
+
+## R2.2 Grading the wedge-class argument for row four
+
+**Ruling: not-refusing is SOUND. The argument holds, and the tolerated object
+cannot be misread by a later ordinal.**
+
+**(1) The wedge argument itself is correct on its own terms.** Row four is
+reachable only on a tree a pre-remediation binary wrote. Refusing there would be
+a *permanent typed refusal on a reachable state*, and the only convergence
+available is a removal — which Step 4.2 deliberately replaced with durable
+retirement, and for which there is exactly one `RetiredRoamingAnchorAlias`
+retirement slot per ordinal, already spoken for by the alias itself. That is the
+`Ambiguous`-dead-end class the whole E0.2b analysis is built to avoid ("a wrong
+reading here bricks a user's catalog permanently, with no in-code exit"). Choosing
+toleration over a wedge is the same call the corpus has made every time it has
+faced this shape.
+
+**(2) The reserved-leaf grammar interaction — I checked it, and it closes the
+misreading question completely.** `<leaf>.roundtrip` **cannot** be a reserved
+leaf and **cannot** be read as a slot:
+
+- `ActionSlotV1::parse` requires `strip_suffix(PROTOCOL_VERSION_SUFFIX)` where
+  `PROTOCOL_VERSION_SUFFIX = "-v1"` (`protocol/slots.rs:9`). A name ending
+  `.roundtrip` fails that strip and returns `RecognizedInvalid(UnsupportedVersion)`
+  — never `Valid(_)`.
+- OPEN-B3's gate (`require_reserved_target_leaf`) admits **only** `Valid(_)`. So
+  **no ordinal of any action can ever reserve a leaf equal to a `.roundtrip`
+  name.** Collision is impossible by grammar, not by convention.
+- Every other lookup in the family is on a derived, `Valid` name
+  (`active`/`retired`/`retired_anchor_alias` from `action_destination`), so no
+  slot lookup can resolve to it.
+
+**(3) It cannot trip a bound or a predicate.** `observe_action_interior`
+(`interior.rs:553-594`) counts an unparseable child as `extra_children += 1` and
+refuses only on `seen > MAX_ACTION_SLOTS` (261) or the name budget — one extra
+~35-byte child is far inside both. And the `extra_children: 0` gates are
+admission-only, which round 1 verified independently (`protocol/admission/owner.rs:101-107`
+and `publication.rs:204`'s `AdmissionStaging` directory-source recheck), neither
+reachable from a barrier edge.
+
+**(4) It is driven, not asserted.**
+`a_legacy_both_names_tree_settles_with_a_tolerated_orphan_*` seeds both names,
+asserts the ordinal settles, asserts the census is **exactly** the settled five
+**plus** the orphan and nothing else, and then re-settles to assert a later drive
+neither removes it nor trips over it. Both target variants. Executed green.
+
+So the toleration is bounded, ungrowable on this tree, grammatically unreachable
+as a slot, invisible to every predicate that could refuse, and behaviourally
+pinned. **Sound.**
+
+---
+
+## R2.3 The disclosure rewrite — states exactly what the code does
+
+I read the rewritten paragraphs against the code clause by clause. **No residual
+false claim.** Specifically:
+
+| Claim | Verified |
+| --- | --- |
+| "the converging caller is `prepare_roaming_target`, **not** this function" | ✓ — the converge block was removed from `round_trip_supplied` and replaced by a call |
+| "One attempt was lost, and the outbound name was then left **permanently**" | ✓ — this is round 1's trace, restated correctly, including *why* (a settled ordinal is never barriered again) |
+| "unreachable on this tree, because the entry decision runs before anything is created" | ✓ — `converge_target_anchor_alias` precedes `create_target_anchor_alias` in the only branch that creates |
+| "a rename, never a removal, and nothing is left behind" | ✓ — `publish_verified_leaf_no_replace`; zero removal calls in the region |
+| "exactly one thing persists, and only from the past: a `<leaf>.roundtrip` written by a **pre-remediation** binary" | ✓ — no post-remediation path produces it and survives |
+| "it parses as no scheduled action slot" | ✓ — `RecognizedInvalid(UnsupportedVersion)`, §R2.2(2) |
+| "this refusal … covers the case it is actually for: a foreign object appearing after that decision" | ✓ — the only way to reach the arm's both-names guard now |
+| "Off Windows … the survey is two `symlink_metadata` calls" | **✗ imprecise — [R2-P3-3]** |
+
+**The renamed tests are honest, and the renames are the right ones.**
+
+- `an_outbound_roaming_alias_is_returned_by_the_next_barrier` →
+  `..._when_the_arm_is_entered_directly`. The old name asserted the very thing
+  round 1 found false; the new one is exactly what the body proves, and the doc
+  now says the drive does *not* reach the arm in that state and points at the row
+  that does. Body unchanged.
+- `a_roaming_alias_resident_under_both_names_is_refused` →
+  `..._is_refused_inside_the_arm`. The old doc's justification ("not a window
+  this protocol can produce") is not merely deleted — it is **quoted, attributed
+  to the review, and replaced** with the case the refusal is now for, plus a
+  cross-reference to the drive-level row. Body unchanged.
+
+That is the correct disposition for a falsified justification: fix it in place
+with its provenance, rather than quietly restating.
+
+---
+
+## R2.4 The seven P3 dispositions, the two volunteered tightenings, and a regression audit
+
+| Id | Taken? | Spot-check |
+| --- | --- | --- |
+| [P3-1] | **Yes, well** | `require_reserved_target_leaf`'s doc now says the gate is *action-scoped, not family-scoped*, names the exact hazard (base slots the authority record / payload writers / cleanup worklist own), names the fixture's own `GoalScratch`/`AuthorityScratch` as the demonstration, and **binds E4** to reserve a leaf no other family writes *and to say which it picked*. The matrix header carries the matching warning ("a real consumer must not copy the choice"). Stronger than I asked. |
+| [P3-2] | **Yes** | "both `ExactInterior` call sites" → "the tree's **one** … site", with the miscount's provenance recorded beside it (inherited from E0.2 §3.3 rather than opened and read) and the substance re-verified. I re-confirmed: `grep -rn DirentBarrierClass` finds exactly one `ExactInterior` construction, at `namespace_mutation.rs:328`. |
+| [P3-3] | **Yes** | `WINDOWS-ARM-OWED (R2-E E2)` sits beside `LINUX-COUNT-OWED` in `run_r4bg_aggregate_gates.py`, naming what discharges it by construction, why darwin cannot prove it, and that the Windows leg is the **first Windows compile of that code**. |
+| [P3-4] | **Yes** | Label `"long-resident"` → `"aged-directory"`; the doc now says what it builds (one sibling written and unlinked), calls it a proxy, and adds "a true long-residency shape is not constructible in a unit test". |
+| [P3-5] | **Yes** | The allow's reason string itself is edited to "entry-point reachability is **Phase E4, itself sequenced behind R2-F's relocation**", with a doc block re-anchoring the expiry and handing E7 a dated re-owning duty if E4 has not landed. Editing the machine-visible `reason=` string, not only the prose, is the right half to change. |
+| [P3-6] | **Yes** | Recorded on `barrier_target_parent`, with the distinction I drew (the row dropped a clause about the **home** anchor, which does not travel; this proves the **alias**, which does) and one added justification of its own — it turns "a barrier that silently lost its lent object" into a typed refusal. |
+| [P3-7] | **Yes, exceeded** | The loop becomes three named `#[test]`s — `a_resident_barrier_intent_is_refused_when_the_{catalog_anchor_identity,home_parent_identity,home_name}_disagrees` — **plus a positive control**, `a_resident_barrier_intent_binds_against_the_witness_the_owner_re_minted`. The control is the part I did not ask for and is the part that matters: it proves the three refusals are about *disagreement* and not about the witness being universally rejected. |
+
+**Volunteered tightening 1 — the refused state named beside the converged ones.**
+The disclosure now states the one state that is **not** a row of the table and
+**does** block: foreign bytes under either name. Correct and correctly scoped
+(§R2.1). The reasoning offered — *"no reachable crash window leaves a name a
+later drive does not return" is only honest beside "and this one state blocks
+until it is cleared"* — is exactly the standard round 1 applied to the original
+paragraph. Good.
+
+**Volunteered tightening 2 — `outbound_residue` dropped.** `RoamingTargetStateV1`
+is now a two-variant enum with no unread field. I checked: nothing reads or
+constructs a third state, and the toleration is pinned behaviourally by the
+legacy row's census assertion, which is strictly stronger than a flag no caller
+inspects. Removing it is right, and the stated reason ("an unread field on a new
+seam is exactly the kind of drift this train was graded for") is the correct
+reading of round 1.
+
+### Regression audit of the +712/−121
+
+**The `anchor.rs` → `platform.rs` moves are clean, and one of them is a
+restoration.** Extracting each brace-balanced function from `94da3e5` and from
+`HEAD` and hashing:
+
+```
+verify        IDENTICAL=True   (13 lines)   ← restored byte-for-byte to base
+round_trip    IDENTICAL=True   (22 lines)
+prepare       IDENTICAL=True   (51 lines)
+establish     IDENTICAL=True   (36 lines)
+survey        IDENTICAL=True   (78 lines)
+publish       differs          (delegates to publish_bytes; behaviour-preserving)
+```
+
+**`verify`'s semantics did not change — they were put back.** Round 1's landing
+had `verify` delegating to a generic `verify_bytes`; the remediation deletes
+`verify_bytes` from `anchor` and restores `verify` to its own single-purpose
+body, **byte-identical to base**, including both of its error strings
+("private durability anchor bytes are invalid", "private durability anchor lacks
+identity"). The resident anchor protocol's observable surface is now closer to
+base than it was after round 1. The roaming arm gets its own
+`platform::verify_leaf_bytes` with its own messages ("roaming anchor alias bytes
+are invalid" / "… lacks identity"), so the two arms no longer share a message —
+an improvement over round 1, and it keeps
+`foreign_bytes_under_the_reserved_leaf_are_refused_before_the_edge`'s
+`contains("bytes are invalid")` satisfied.
+
+`anchor::is_resident` → `platform::leaf_is_resident`: body identical, moved.
+`anchor::roundtrip_name` → `platform::roundtrip_name`: body identical, moved.
+The move is **necessary**, not stylistic — `prepare_roaming_target` is portable
+and `mod anchor` is `#[cfg(any(windows, test))]` (`platform.rs:11`), so a
+non-test non-Windows build could not call a derivation that stayed in `anchor`.
+The stated reason ("the residue has to be classifiable on every platform") is
+accurate: `prepare_roaming_target` *is* that classifier and it runs everywhere.
+
+**The byte-pinned callers are untouched.** `residue.rs`, `transition.rs`,
+`cleanup.rs` and `namespace_mutation.rs` appear in **no** hunk of `9ba6e24`; all
+eight existing `DirentBarrierClass` call sites remain textually unchanged; and
+`PROTECTED_SOURCE_DIGESTS["checked_artifact/residue.rs"]` /
+`["…/transition.rs"]` are not in the diff. The passing checker is the proof
+against live bytes. `ROUNDTRIP_SUFFIX` has no consumer outside `platform.rs`, so
+moving it broke no pinned reader.
+
+**Full removed-line audit of `9ba6e24` — 117 non-header removed lines**: 2
+digests, 7 driver docstring/marker lines, 5 import re-wraps, 20 the
+`schedule_records` loop (→ four named tests), 1 `dead_code` reason string, 6
+`drive_ordinal`'s leaf-only branch (→ the converge match), 9 the inline census
+`vec` (→ the shared `settled_census()` helper), 4 the corrected `ExactInterior`
+doc, 12 the false residual paragraph, ~19 the three moved `anchor` helpers, 8
+`round_trip_supplied`'s old converge block, ~10 `anchor/tests.rs` renames and
+helper re-pointing.
+
+**Zero assertions deleted or weakened.** Every apparent removal is re-added
+stronger: the census `assert_eq!(rows, want)` becomes
+`assert_eq!(rows, settled_census(action))` over the identical five names, now
+shared with two new rows; the three looped refusal assertions become three named
+tests plus a control; the two renamed anchor tests keep their bodies verbatim.
+
+---
+
+## R2.5 The transient checker-suite failure — nailed down
+
+**Authoritative evidence, run once by me on the frozen worktree tree at
+`9ba6e24`:**
+
+```
+$ python3.13 -m unittest scripts/checks/test_check_checked_artifact_boundaries.py
+.....................................................................
+----------------------------------------------------------------------
+Ran 69 tests in 548.138s
+
+OK
+[exited with code 0]
+```
+
+**69/69 OK, exit 0, 9m08s.** The builder's `failures=3` does **not** reproduce on
+the frozen tree. It was a mid-edit artifact, exactly as reported.
+
+**What I can and cannot say about the three.** I cannot name them from a run I
+did not observe, and I will not guess three specific names into the record. What
+I *can* state from the suite's structure is the mechanism: a large fraction of
+these 69 tests materialise the **live source tree** — copying it, hashing module
+trees, and reclassifying the source inventory (e.g.
+`test_current_source_inventory_is_classified` at `:77`, and the tree-digest
+rejection tests at `:260`, `:284`, `:439`, `:458`, `:473`). Those are precisely
+the tests that fail if a file changes underneath a 9-minute run, and they fail
+*closed* — which is the design. A concurrent edit producing exactly three such
+failures and none after freezing is fully consistent with that mechanism and
+with nothing else in the suite.
+
+**Conclusion: no finding.** The suite is green on the object being landed, which
+is what the gate is for.
+
+---
+
+## R2.6 Round-2 gates — all green. Verbatim tails.
+
+```
+$ cargo fmt --all -- --check
+(no output)
+FMT_EXIT=0
+```
+
+```
+$ cargo clippy --all-targets --all-features
+    Checking gwz-core v0.11.0 (…/e2-worktree)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 14.18s
+```
+
+```
+$ cargo test --lib -p gwz-core namespace::tests_barrier_matrix
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 1599 filtered out; finished in 8.39s
+```
+
+```
+$ cargo test --lib -p gwz-core platform::anchor
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 1589 filtered out; finished in 0.09s
+```
+
+```
+$ cargo test --lib -p gwz-core interface_tests::fault_expected_keys
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 1605 filtered out; finished in 0.03s
+```
+
+```
+$ cargo test --lib -p gwz-core interface_tests::schedule_records
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 1600 filtered out; finished in 0.00s
+```
+
+```
+$ cargo test --lib -p gwz-core checked_artifact::
+test result: ok. 421 passed; 0 failed; 0 ignored; 0 measured; 1190 filtered out; finished in 43.28s
+```
+
+```
+$ python3.13 scripts/checks/check_checked_artifact_boundaries.py
+checked-artifact boundary: ok (15 visible entries, 5 classified modules)
+```
+
+The four remediation rows, run by name:
+
+```
+$ cargo test --lib -p gwz-core -- a_mid_round_trip_roaming_residue_converges \
+      a_legacy_both_names_tree_settles_with_a_tolerated_orphan \
+      an_outbound_roaming_alias_is_returned_when_the_arm_is_entered_directly \
+      a_roaming_alias_resident_under_both_names_is_refused_inside_the_arm --nocapture
+running 6 tests
+test …::a_roaming_alias_resident_under_both_names_is_refused_inside_the_arm ... ok
+test …::an_outbound_roaming_alias_is_returned_when_the_arm_is_entered_directly ... ok
+test …::a_mid_round_trip_roaming_residue_converges_on_a_workspace_target ... ok
+test …::a_legacy_both_names_tree_settles_with_a_tolerated_orphan_on_a_workspace_target ... ok
+test …::a_mid_round_trip_roaming_residue_converges_on_a_git_directory_target ... ok
+test …::a_legacy_both_names_tree_settles_with_a_tolerated_orphan_on_a_git_directory_target ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 1605 filtered out; finished in 0.42s
+```
+
+**The 421 count reconciles.** Round 1 measured 413; the remediation adds eight
+rows — four in `tests_barrier_matrix` (8 → 12) and four in `schedule_records`
+(7 → 11) — and 413 + 8 = **421 measured**, matching the driver's darwin pin
+exactly. The linux 431 stays DERIVED and marked OWED. The driver additionally
+states, correctly, that both numbers are base-relative and must be **re-measured
+at the rebase**, not added up on paper.
+
+---
+
+## R2.7 New findings
+
+**[R2-P3-1] — "the ordinal settled" does not imply "its physical barrier ran".
+E7-dual item + an E4 scope clause.**
+
+After any crash in the alias window, the restart takes `Stranded`, which retires
+the alias and never calls `barrier_target_parent` — so key #8 is never announced
+for that ordinal and, on Windows, the dirent barrier never happens. Row three
+sharpens this: a mid-round-trip crash is now *converged* — the drive proves the
+returned object carries the frozen bytes and holds it at the reserved leaf — and
+then retires it without barriering, even though at that moment it could barrier.
+
+This is **charter-compliant**: §1.5's row #12 designs the restart path as "retire
+the stranded alias", full stop, and the analogous property has existed since the
+first landing. It is not a defect in this train. But the consequence is a
+statement about the family's guarantee that no document currently makes: **a
+settled barrier ordinal does not prove its target parent's dirents were ever
+ordered.** E4's first consumer must not assume otherwise, and the E7 dual should
+decide whether the family's contract says so explicitly or whether the restart
+path should re-barrier a converged alias.
+
+**[R2-P3-2] — row three's return rename is a durable edge that no fault key
+announces, on a path where no P5 key is announced at all. E7-dual item.**
+
+`converge_target_anchor_alias` performs a real, durable, no-replace rename from
+inside `barrier_mutation.rs` — the file whose own header states *"every durable
+barrier edge is announced from here"* — and announces nothing. The builder's
+defence is the resident protocol's `AnchorState::NeedsReturn`, which also
+announces no key. **The precedent is real but imperfect**: `NeedsReturn`'s return
+happens *inside* `private_barrier`, under the umbrella of the key that names
+"`private_barrier` has returned"; this one runs *before* the barrier and, on the
+`Stranded` path, on a drive where `private_barrier` is never called at all — so
+no P5 key covers it, even loosely.
+
+Mitigations I verified, which are why this is P3 and not higher: the rename is
+atomic (§R2.1) and idempotent, so an interruption row would assert exactly what
+the seeded-state row already asserts; the resulting state is census-pinned on
+both variants; `grep -c "fault_v1::hit"` is **0** in both `anchor.rs` and
+`platform.rs`, so this is the module's uniform convention rather than an
+exception carved for this edge; and minting a seventeenth `barrier.*` key is
+outside E2's authorization — the frozen §3.5 record is sixteen and the census is
+165. The builder could not have fixed this without moving a frozen count.
+
+**Owed at E7:** either the §3.5 barrier record gains a key for P5's roaming
+recovery rename at a later phase, or it states in terms that the roaming arm's
+recovery rename is a named, deliberate exception to "every durable barrier edge
+is announced".
+
+**[R2-P3-3] — the cost claim understates the survey. Landing-optional.**
+
+`prepare_roaming_target`'s doc says: *"Off Windows nothing renames the alias, so
+the survey is two `symlink_metadata` calls that always answer the first two
+rows."* `leaf_is_resident` calls `observe_leaf_exact`
+(`observation.rs:193-275`), which does `symlink_metadata`, then a no-follow
+open, then an opened-vs-named identity comparison, then `read_to_end`, then a
+re-`symlink_metadata` and a five-way consistency check. For a 22-byte alias the
+real cost is still negligible and the *conclusion* ("always answer the first two
+rows") is correct — but this is a cost claim written in the same commit that
+fixed a doc-accuracy P2, and the round's own standard is that every claim is
+opened and read. One-word fix: "two bounded leaf observations".
+
+*(Inherited, not a finding against this train: `observe_leaf_exact`'s
+`read_to_end` is unbounded. That is pre-existing and shared with `transition.rs`,
+`classification.rs` and the resident anchor protocol, which use it on the same
+class of names; the target parent here is an owner-private action directory. I
+record it only so a future reader does not attribute it to E2.)*
+
+---
+
+## R2.8 Verdict, and what the landing owes
+
+**GO. Land it.**
+
+[P2-1] is closed: the defect is cured at the only place it could be cured — the
+entry decision — the fix is total over the state space and atomic under crash,
+the disclosure now says what the code does, the falsified test justification is
+corrected with its provenance, and both the converged and the legacy states are
+**driven on both target variants**. All seven P3s are taken, two of them beyond
+what I asked, and two further tightenings were volunteered and are right. No
+regression in the +712/−121; the resident anchor protocol is closer to base than
+it was after round 1. Every gate is green, and the checker suite is 69/69 OK on
+the frozen tree.
+
+### Landing conditions — the lane owner owes these at the squash
+
+1. **Re-measure, do not add up.** `421` (darwin `checked_artifact::`) and `431`
+   (linux, derived) are relative to base `94da3e5`. E1 and E3 have landed on
+   `1d50e59` and both add lib tests under that partition, so **both values are
+   wrong on the tip**. The driver says so; the landing must execute the two
+   partitions on the rebased tip rather than arithmetic.
+2. **Three predictable rebase conflicts, all of which must be resolved by
+   *adding*, never by taking a side.**
+   - `FAULT_FAMILY_ACTIVATION`'s executed-family literal
+     (`fault_expected_keys.rs:800-815`) is currently seven entries including
+     `"barrier"`; E1 adds `"cleanup"` and E3 adds `"terminal"`. The landed
+     literal must be **nine**.
+   - `run_r4bg_aggregate_gates.py`'s two `_fault_count` pins and their docstring
+     — three steps edit the same lines.
+   - `PROTECTED_SOURCE_TREE_DIGESTS["checked_artifact/capability/pre_catalog.rs"]`
+     — E1, E2 and E3 all trip this tree (E0.2b §6.2(b)), so the digest must be
+     **re-executed** post-rebase, never merged.
+   `FAULT_INJECTION_SOURCES` and its `declared.len() == 10` pin do **not** move:
+   §6.1's routing puts E1's and E3's sites in already-declared files, so ten
+   stays ten across the rebase. I checked this rather than assuming it.
+3. **The freeze §3.5 inventory-addendum edit, "nine" → "ten"** — still owed, in
+   gwz-dev, correctly not attempted from the gwz-core worktree.
+4. **`LINUX-COUNT-OWED` and `WINDOWS-ARM-OWED` discharged at the three-platform
+   dispatch.** The Windows leg is the first Windows compile of
+   `round_trip_supplied`, `prepare_roaming_target` and the third
+   `DirentBarrierClass`; treat a Windows failure there as expected work, not as
+   a surprise.
+5. **The B-4 grounds correction** to `GwzM5-8R2E-SemanticsAmendment-E02b-DRAFT.md`
+   §1.5, per round 1 §4.3 — one dated line, plus OPEN-B8 closed *answered
+   positive on the conjunction, durable half struck*.
+
+### E7-dual items — not landing blockers
+
+- **[R2-P3-1]** the family's contract on "settled ⇒ barriered", and whether the
+  restart path should re-barrier a converged alias. Carries an **E4 scope
+  clause**: E4's consumer must not rely on the implication.
+- **[R2-P3-2]** the unannounced P5 roaming recovery rename — a key at a later
+  phase, or a named exception written into the §3.5 record.
+- **[R2-P3-3]** the one-word cost-claim fix, landing-optional; fold it into
+  whichever commit next touches `platform.rs` if it is not worth a rebase.
+
+### What this round did not do
+
+It did not run the Windows or Linux legs; it did not review E1 or E3 as landed
+on `1d50e59`, and therefore did not verify this branch **against that tip** —
+only against its own base. It edited no tracked file in the object and ran no git
+operation.
+
+---
+
+*Round 2 filed 2026-08-27 by the R2-E Phase E2 interior reviewer. Object:
+`e2-barrier` @ `9ba6e24` over base `94da3e5`. Round 1 above is left as written.*
