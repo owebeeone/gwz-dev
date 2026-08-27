@@ -1999,6 +1999,41 @@ fable token only where it makes a difference." Recorded consequences:
   lane owner's records duty. E1 review in flight; E2 builder in
   flight.
 
+  **E1 IS LANDED — 2026-08-27; gwz-core main 8597d32 → `4a0b01a`.
+  THE CLEANUP FAMILY IS EXECUTED: 11/11, matrix-green both target
+  variants.** Review GO (GwzM5-8R2E-E1-Review.md, six P3s, none
+  blocking; the C-2-vs-§6.1 conflict RULED for the train — all
+  eleven sites stay in namespace_mutation.rs at 697 lines, under
+  the 1,000-line program trigger; the fallback would have forced a
+  false 9→10 inventory move at E1). Landing ritual executed by the
+  lane owner in a pristine worktree at `4a0b01a`: checker ok, fmt,
+  check, clippy, and the three disjoint lib partitions with DIRECT
+  exit codes (0/0/0) — 408 checked_artifact / 932+1 remainder /
+  256 v1_lifecycle, matching the commit's own darwin pins (the
+  first partition run piped cargo through tail and was DISCARDED
+  as evidence — the piped-gate class, caught by its own blank
+  output). Exact-ref push. MATRIX DISPATCHES OPEN at `4a0b01a`:
+  Windows matrix 33039208104 + Platform matrix 33039209950 (the
+  §11.1 row-d ten-writer-rows native ledger debt discharges on
+  their green; E1's derived Linux fault marker 418 measures on the
+  Linux leg), plus push CI (boundary 33039190896, retained readers
+  33039190893). E1 residuals owned at this landing: the 16 KiB
+  alias-retirement bound is an E4 input; the two-place bound
+  constant and the docstring self-contradiction (E1 review F1/F3,
+  P3) queue for the next train touching those files. E2 DELIVERED
+  (three commits, full lib 1602/0/1, O6 witness with wire surface
+  zero-diff, OPEN-B2/B3/B8 answered, B-4 grounds correction
+  flagged) — review in flight. E3 REMEDIATION DELIVERED
+  (`a31e118` + `7f23484`: F1 fixed structurally with driven
+  depth-1024 refusal rows; F3 row #3 binds the real classifier
+  over real observed fingerprints, row #2's dated determination
+  taken for the freeze record; F5 cured by observation; F6
+  deviation eliminated) — round-2 re-verdict in flight. Host
+  hygiene note minted by the E3 lane: killed runs of the
+  deep-chain test leave temp fixtures plain `rm -rf` cannot
+  delete on macOS (fts depth give-up); clear with an O(depth)
+  lift-and-remove walk.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
