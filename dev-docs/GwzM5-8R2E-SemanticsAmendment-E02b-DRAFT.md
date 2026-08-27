@@ -270,7 +270,13 @@ They share one helper but differ in durable pre-state: #10 is entered by the
 drive holding its own write handle's identity in memory and its intent row at
 `BarrierIntentActive(ordinal)`; #12 is entered by a fresh process that cannot
 prove the resident alias is its own. A restart distinguishes them from the
-intent record alone. This is the E15-install / E15-restart split the corpus
+intent record alone. **[CORRECTED 2026-08-27, E2 review ratified at the
+lane-owner escalation: the last sentence is FALSE as stated —
+`BarrierIntentActive(ordinal)` is resident at BOTH entries, because the
+intent retires at key #14, after the alias is gone. The partition is the
+conjunction OPEN-B8's own evidence row names: the resident intent row PLUS
+the in-memory this-drive-created-the-alias fact. B-4's substance — two
+boundaries, one helper — stands on that conjunction.]** This is the E15-install / E15-restart split the corpus
 already keys separately (`managed_bootstrap.marker_retire` vs
 `component_reobserve`, freeze `:544-551`), not the `staging_directory_flush`
 one-key-two-sites case.
@@ -768,6 +774,16 @@ entries R2-E disturbs, both reproduced by the Code axis against the live tree:
 - `checked_artifact/platform.rs` = `febdc28b…` (`:161`) — **trips at E2**,
   because DECISION B-3 adds the third `DirentBarrierClass` variant to that file
   (`platform.rs:363-374`).
+
+**[CORRECTED at the E1/E3 landings, 2026-08-27: the machine-enforced
+inventory census is FIVE, not three — execution found two more, both
+failing closed as designed. (c) `PROTECTED_SOURCE_TREE_DIGESTS
+["checked_artifact/catalog.rs"]` trips at E2 AND E3 (the O6 witness and
+the terminal retirement both forward through `catalog/bootstrap.rs`,
+under that root). (d) The Rust twin of the caller count —
+`interface_tests/capability_permit.rs`'s `publish_verified_no_replace`
+aggregate — moved 13 → 14 at E3 with the same dated-extension record as
+the Python dict. E4/E5 inherit all five.]**
 
 ### 6.3 The three convergence obligations, amended verbatim
 

@@ -691,3 +691,451 @@ capability split with a driver holding zero sites and exactly one new forward,
 T-D's siteless key with the census at 165, the ten-row matrix on both variants
 with its repeated-boundary and machine-checked single-crossing classifications,
 and every companion inventory — I verified and found sound.
+
+---
+
+# Round 2 — remediation re-verification, 2026-08-27
+
+**VERDICT: GO for landing**, subject to three landing conditions the lane owner
+discharges in the landing commit (§R2.9). Round 1's [P1] and both [P2]s are
+**cured and re-verified by execution**; all five [P3]s are dispositioned; one new
+[P3] nit (F9) is introduced by the remediation. Nothing is escalated to the E7
+dual as a defect; §R2.9 names the one item that becomes an E7-dual question *if*
+the lane owner declines this review's F2 ruling.
+
+**Object.** Two remediation commits appended to `e3-terminal`:
+
+- `a31e118` — remediation [P1 F1]: bound the retired-root reading by
+  construction, not by recursion.
+- `7f23484` — remediation [P2 F3, P2 F2, P3 F4-F7]: bind what the rows announce.
+
+Round 1's section above is left as written. Both remediation commits were diffed
+in full; my probes were run in a fresh byte-clone (`scratchpad/probe-tree2`),
+never in the object, and are written independently of the object's own helpers.
+
+---
+
+## R2.1 F1 [P1] — **CURED**
+
+### The code
+
+`interior::read_retired_root` is a dedicated single-level reader: one
+`directory.entries()` pass, each name charged to the budget, capped, then
+classified flat through `CatalogRootRowClassV1::classify`. Every property the
+round-2 duty names checks out.
+
+**It calls neither `observe` nor `observe_slot` — grep-exhaustive.** The whole
+of `interior.rs` now contains exactly three relevant lines:
+
+```
+64:pub(super) fn observe(              <- definition
+109:        let fact = observe_slot(    <- the only call to observe_slot, inside observe
+453:fn observe_slot(                    <- definition
+495:            let retired = read_retired_root(&child)?;   <- the only call to read_retired_root
+575:fn read_retired_root(               <- definition
+```
+
+There is **no call to `observe(` anywhere except its own definition**. The
+mutual recursion is gone as a structural fact, not as a guarded one. And
+`read_retired_root` is file-private with a single call site, so no sibling can
+reintroduce a second entry into it: a tree-wide grep for `read_retired_root`
+outside `interior.rs` returns only two doc-comment mentions.
+
+**No other recursion path survives.** `observe_slot`'s directory arm now has
+exactly two outcomes for the retired root — `EmptyDirectory` or
+`RetiredActionRoot` — and neither re-enters an interior observation.
+`observe_action_interior` and `observe_managed_component_interior` are flat
+loops; neither calls `observe`.
+
+**The entry cap is on the ENTRY count, before classification cost accrues.** The
+loop body is `budget.charge_os_str(&name)?` → `if budget.entry_count() >
+MAX_RETIRED_ACTION_DIRS { return Err(unsupported(…)) }` → `match classify(…)`.
+`CatalogNameBudgetV1::charge` increments `entry_count` exactly once per charged
+name (`catalog/enumeration.rs:243`), so `entry_count()` is a count of *entries*,
+not of accepted rows, and the refusal precedes the classifier. The cap is
+`MAX_RETIRED_ACTION_DIRS` itself — not `MAX_INTERIOR_ENTRIES`, not
+`MAX_ACTIVE_ACTION_DIRS`, and not the name budget's `MAX_CATALOG_PARENT_ENTRIES_V1`
+(4 096, which the retired cap now pre-empts at 65). The not-inherited paragraph
+moved with the reader and still names the three real constants. E0.2b §2.4 item 2
+and §3.2 ground 3 are discharged more directly than before.
+
+**`observe`'s duplicate-row refusal is preserved.** `read_retired_root` sorts the
+collected digests and refuses `"multiple native entries resolve to one retired
+action row"` on any adjacent pair — the same shape as `observe`'s `action_rows`
+check. (`observe`'s *infrastructure*-slot duplicate check has no counterpart, and
+needs none: any infrastructure name in the retired root is an unaccepted row and
+the predicate refuses the whole root on `unaccepted_rows != 0`.)
+
+**`infrastructure_rows` → `unaccepted_rows` is an honest rename, and a widening
+of what is counted**, not a narrowing: infrastructure-slot names, scheduled and
+retired slot names, malformed-recognized names, non-ASCII names and foreign names
+all land in it, and all three consumers (`retired_root_identity`,
+`retired_action_dirs`, and the T-B′ arm through them) still require it to be zero.
+
+### The behaviour change I checked for, and cleared
+
+A foreign or malformed child of the retired root used to make `observe` return
+`Err` via `exact_row`; it now increments `unaccepted_rows`, and the refusal comes
+from the predicate instead. I traced whether that could turn a hard refusal into
+a soft classification anywhere:
+
+- `retain_completed_catalog` runs `completed_record` **before** `retain_directory`
+  (gate 2), so gate 2's `RetiredActionRoot { identity, .. }` match — which does
+  not itself check `unaccepted_rows` — is only ever reached behind the check.
+- `revalidate` runs `require_named_directory_identity` (gate 3) at `:355-359` and
+  then `completed_record` at `:361-366` **in the same frame**, so a retired root
+  with unaccepted rows passes gate 3 and is refused four lines later. `revalidate`
+  as a whole refuses.
+- `staging_plan` refuses `RetiredActionRoot` by name, unchanged and still pinned.
+
+Both round-1 refusal rows (`…_holding_an_infrastructure_slot_name_still_refuses`,
+`…_holding_a_foreign_child_still_refuses`) are green, so the end-to-end refusal is
+preserved in fact and not only in argument.
+
+**One reduction in analysis depth, examined and cleared (no finding).**
+`read_retired_root` classifies by exact bytes and no longer consults
+`platform.parent_mode()`, so `exact_row`'s platform-equivalent-alias refusal
+("infrastructure alias is noncanonical") does not apply inside the retired root.
+It cannot produce a false accept: `classify` admits only exact
+`action-<lowercase-hex>-v1`, every other spelling becomes an unaccepted row, and
+duplicate digests are refused. Worth one guard sentence for whoever ever widens
+the acceptance clause — the collision analysis would have to come back with it.
+
+### The probes (executed, independent of the object's helpers)
+
+Both planted and torn down by my own `chdir` walk, so nothing here shares code
+with `plant_nested_retired_chain` / `remove_nested_retired_chain`.
+
+```
+running 2 tests
+test ...probe_r2_a_full_retired_root_at_the_bound_still_recovers ... PROBE-B entries=64 outcome=Ok(())
+ok
+test ...probe_r2_nested_chain_refuses_typed_and_never_aborts ... PROBE-A depth=3000 outcome=Err(Ambiguous { fact: "catalog bootstrap owner", detail: "aggregate catalog facts are ambiguous" })
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 1607 filtered out; finished in 22.81s
+```
+
+- **PROBE A** is round 1's reproduction, re-run at **depth 3000** — more than four
+  times the 700 that aborted the pre-remediation tree. Typed refusal, no abort.
+  The [P1] is cured.
+- **PROBE B** is the cap's *other* side, which the object's own rows do not cover:
+  they prove 65 entries refuse, but not that **64 still recovers**. If the entry
+  cap were off by one in the refusing direction, a legitimately full retired root
+  would be unobservable and OPEN-T1 would be back at the boundary. It recovers:
+  `Ok(())`. The cap sits in exactly the right place, and it composes with the
+  T-B′ arm's `>= MAX_RETIRED_ACTION_DIRS` (which refuses adding a 65th).
+
+The object's own new rows are the right ones and are green: a nested chain at
+depth 1024 on **both** target variants, and a past-the-bound refusal at 65.
+
+---
+
+## R2.2 F3 [P2] — **CURED**, both halves
+
+### Row #3 — the code strengthened to the announced rule
+
+`require_completed_cleanup_worklist` now supplies two `CleanupPhysicalFactV1`
+values per row and requires
+`worklist.classify(index, &source, &destination) == Some(CleanupResolutionV1::Complete)`.
+The rule is `protocol/cleanup.rs`'s own `classify_cleanup_row`, unchanged and
+uncopied, so the announced semantic and the code are now literally the same
+sentence — which is what the round-1 finding asked for. The residency
+restatement is gone.
+
+**The facts are observed through the production identity provider.**
+`cleanup_physical_fact` opens the alias no-follow, takes
+`super::HostPlatform.file_identity(&file)` — the same provider the rest of the
+owner uses — and builds `DurableLeafFingerprintV1::new(durable_identity, length,
+streamed_digest)`. `Complete` requires `value == row.expected()`, i.e. identity
+**and** length **and** digest, so a green matrix is now real evidence rather than
+a residency check dressed as one.
+
+**The fixture no longer invents anything.** `place_completed_action_rows` writes
+each alias and then calls `observed_alias_fingerprint`, which opens the file
+through `cap_std` and takes its durable identity from the same `HostPlatform`.
+The fabricated `DurableObjectIdentityV1::linux_ext4([7;16], 1, vec![9;8])` and
+`[5;32]` digest that made the round-1 matrix green are deleted. (Small prose
+inaccuracy, not a finding: the commit says the alias is "observed for its durable
+identity, its length and its content digest" — the identity is observed; the
+length and digest are computed from the bytes the fixture just wrote. They are
+provably equal to a read-back, and the classifier's `Complete` arm returning true
+is the proof that they match what production streams.)
+
+### The length bounding is sound, and its overflow arm is right
+
+`let limit = expected.length();` — the length recorded on the **bound** worklist
+row, i.e. a field of a protocol record already read under
+`ProtocolRecordKindV1::CleanupWorklist`'s own byte bound and already bound to the
+resident reservation by `read_and_bind_cleanup_worklist`. Never a length the
+object under inspection supplies. That keeps ConsumerCheckpoint §8's
+"a payload's length is never a protocol-record bound" rule intact: the payload is
+never read *into* a record-sized buffer at all.
+
+The stream is a fixed `[u8; 8192]` buffer, so memory is constant regardless of
+object size. Three exit arms, all checked:
+
+- `length > limit` mid-stream → `Other` (refusal), with at most one chunk of
+  overshoot;
+- EOF with `length != limit` (a short object) → `Other`;
+- EOF with `length == limit` → `Exact(fingerprint)`.
+
+`Other` classifies `Ambiguous`, which is a refusal — so both the overrun and the
+underrun fail closed. Accepted cost, recorded not charged: a worklist row whose
+recorded length is enormous makes the digest pass O(object size) in time (still
+O(1) in memory) before returning `Other`; the worklist is bound to the
+reservation, and the alias is a leaf the action itself wrote, so this is the same
+cost profile as any content digest in this owner.
+
+### Row #2 — the determination is precise and honest
+
+The amended semantic is stated at the site, dated, attributed to the review, and
+matches the code **exactly**: "the source and goal payload rows are resident in
+exactly one of their two scheduled homes, each a canonical regular file, read not
+at all." That is `require_single_scheduled_home(..., bound: None, ...)`
+line-for-line — one-of-two residency, `is_file() && !is_symlink()`, no read.
+
+Its two grounds are cited, and I checked both rather than accepting them:
+
+- *"a payload's length is never a protocol-record bound"* — ConsumerCheckpoint §8
+  :236-237, the same ground the round-1 comment gave, and the reason no frozen
+  record budget can size a payload read.
+- *"the digest relation the row names is the authority record's"* —
+  `require_leaf_digest` (`coordinator/execution.rs:296-310`) takes a
+  `CheckedLeafFactV1` and its own error text says "the authority observation binds
+  a different expected content", so the relation is proved against a
+  `CheckedAuthorityObservationV1` (real, `authority_record_binding.rs:588`) that a
+  terminal retirement does not hold. `record.binding_validate` is a real key
+  (`fault_v1.rs:100`). The citations hold.
+
+The determination is **flagged for the lane owner to carry into the freeze §3.5
+activation record in place of row #2's drafted text**. That flag is the right
+disposition and becomes landing condition R2.9(b) — the code and the record now
+agree only if the record is actually amended.
+
+---
+
+## R2.3 F2 [P2] — disposition accepted
+
+No code change, per this review's ruling. The arm's doc now records, two-way,
+that freeze §4.4's arm table is owed its row at the E3 landing and quotes the row
+text this review drafted. The overclaim is corrected precisely: "the narrowest arm
+that can exist" becomes "the narrowest arm that reuses the admission arm's own
+reader", and the narrower arm that *could* exist is named (requiring the extra
+children to be exactly the completed row set). Honest.
+
+Residual: **landing condition R2.9(a)** — the table row itself still has to be
+written into the freeze.
+
+---
+
+## R2.4 F4 [P3] — cured
+
+The forward's doc now splits the two halves correctly: the *shape* (a `&Dir`
+between siblings of `provider/`) is credited to
+`RetainedActionNamespaceV1::handle`'s precedent, with the note that this accessor
+is tighter (no visibility modifier, private to its file, the handle crossing only
+as a call argument); the *never a path* half quotes
+`retain_action_namespace`'s sentence and explicitly says that sentence "is about a
+typed capability return and does not itself sanction a sibling `&Dir`". That is
+exactly the correction asked for, and it goes one better by naming E0.2b §8's own
+"the retired-root **handle**" as the authorising text.
+
+---
+
+## R2.5 F5 [P3] — cured, and the new code is sound
+
+`reserve_retired_slot` now takes an `admission` parameter, supplied by
+`observed_admission_occupancy(&observed)` — read from the catalog root's own
+`ActionAdmissionActive` row, from the observation `retire_admitted_action`
+already takes.
+
+I checked the new function against `admission_record_row`'s real return shape
+(`Missing` when the row is absent; `Other` for a non-regular-file, an unbounded
+byte fact, **or** a decode failure):
+
+- `Ok(Missing)` → `Idle`
+- `Ok(Exact(record))` where `record == ActionDirectoryAdmissionV1::idle()` → `Idle`
+- everything else, including `Other` and any `Err` → `PreparingWithoutFinal`
+
+The catch-all is the **conservative** arm, and the doc says why correctly:
+`PreparingWithoutFinal` *adds* one to `validate`'s
+`outstanding = active + (admission == PreparingWithoutFinal)`, so it can only make
+the retirement refuse, never let it consume a credit. Choosing
+`PreparingWithFinal` would charge one *less* and would additionally engage
+`validate`'s `PreparingFinalMissing` rule, so it would need a second observation —
+the doc states that too, and it is right. `PreparingFinalMissing` is unreachable
+from this call site because that variant is never passed. Net effect: the
+retirement now refuses exactly one case more than before (`R + A == 64` with a
+pending admission), which is the case the frozen credit rule exists to reserve.
+
+**F9 [P3] NEW — the `#[allow(clippy::too_many_arguments)]` reason is now stale.**
+`retire_action_directory` took seven arguments and now takes eight, but the
+`reason` string still enumerates the old set ("two retained parents, two
+identities, the frozen bootstrap record, the reservation, and both observed
+occupancy terms") and does not mention the observed admission term — and its "two
+identities" was already one more than the function's single identity parameter.
+The lint suppression still functions; this is a documentation-accuracy nit for the
+landing commit, graded [P3] because the coordinator asked for regressions the
+remediation introduced and this is one.
+
+---
+
+## R2.6 F6 [P3] — cured, literally
+
+`Fixture::admit` now returns the `AdmittedActionV1` that
+`ActionAdmissionOwnerV1::resume_or_admit` issued, and `attempt` takes it directly.
+`admit_observed_action` survives in the file **only inside a doc comment** — a
+grep finds one hit, at line 211, in prose. The test-only issuer is gone from the
+matrix's code path entirely, and with it the inherited
+`namespace/tests_fault_matrix.rs:25-34` deviation, so E0.2b §8's corrected [P2-4]
+duty is met on its own terms rather than by inheritance. The restart still
+reconstructs the *capability* (`retain_action_namespace` re-proves the resident
+directory's identity against this handoff) but never the admission decision,
+which is the right split and is stated at the site.
+
+All ten matrix rows, the twelve-round repeated rows and the single-crossing probe
+are green against the real token on both target variants (§R2.8), so this is a
+strengthening of the evidence, not just of the prose.
+
+---
+
+## R2.7 F7 [P3] / F8 [P3] — dispositions
+
+**F7.** The converged-restart early return now cites both corpus precedents
+(`bootstrap/managed/provider.rs`'s `installed_resident` skip and
+`namespace/tests_fault_matrix.rs`'s resident-row return) and states the
+consequence the terminal family is first to carry, including the reachable-state
+enumeration ("rename discarded → re-enter the edge", or "rename durable with
+either or both parents unflushed → this branch"). That is the disclosure round 1
+asked for. The underlying property is corpus-wide and outside this train's scope;
+if the lane ever wants the idiom itself re-examined, the E7 dual is the venue —
+**optional, not a condition of this landing.**
+
+**F8.** Unchanged and still open: the third protected tree
+(`checked_artifact/catalog.rs`) is correctly pinned and dated in the dict, but
+E0.2b §6.2(b)'s two-tree inventory — which E1's and E2's duty lists quote — still
+understates it. **Landing condition R2.9(c).**
+
+---
+
+## R2.8 Gates — verbatim tails (round 2, at `7f23484`)
+
+**`cargo check --all-targets`**
+```
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+```
+
+**`cargo fmt --all -- --check`** — no output, exit 0.
+
+**`CLIPPY_CONF_DIR="$PWD" cargo clippy --all-targets --all-features -- -D warnings`**
+```
+    Checking gwz-core v0.11.0 (/private/tmp/.../scratchpad/e3-worktree)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.87s
+```
+
+**Terminal matrix — `cargo test --lib -p gwz-core tests_terminal_fault_matrix`**
+```
+test ...terminal_interruption_restart_convergence_matrix_on_a_workspace_target ... ok
+test ...terminal_interruption_restart_convergence_matrix_on_a_git_directory_target ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 1599 filtered out; finished in 6.26s
+```
+
+**`cargo test --lib -p gwz-core tests_retired_root`**
+```
+running 9 tests
+test ...the_bootstrap_staging_plan_still_refuses_a_populated_retired_root ... ok
+test ...a_retired_root_holding_a_malformed_action_name_still_refuses ... ok
+test ...a_retired_root_holding_a_foreign_child_still_refuses ... ok
+test ...a_retired_root_holding_an_action_row_still_recovers_and_revalidates ... ok
+test ...a_retired_root_holding_an_infrastructure_slot_name_still_refuses ... ok
+test ...a_retired_root_past_the_frozen_retired_bound_refuses ... ok
+test ...an_admission_publishes_into_a_retired_root_populated_catalog ... ok
+test ...a_nested_retired_root_chain_is_a_typed_refusal_on_a_git_directory_target ... ok
+test ...a_nested_retired_root_chain_is_a_typed_refusal_on_a_workspace_target ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 1598 filtered out; finished in 2.57s
+```
+
+**`cargo test --lib -p gwz-core interface_tests::fault_expected_keys`**
+```
+test ...reserved_fault_families_have_no_injection_sites_before_their_package ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 1601 filtered out; finished in 0.03s
+```
+
+**`cargo test --lib -p gwz-core interface_tests::capability_permit`**
+```
+test ...catalog_preflight_surface_has_no_path_plus_lease_or_callback_seam ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 1596 filtered out; finished in 0.00s
+```
+
+**The R4b-G fault partition, re-measured — `cargo test --lib -p gwz-core checked_artifact::`**
+```
+test result: ok. 417 passed; 0 failed; 0 ignored; 0 measured; 1190 filtered out; finished in 64.23s
+```
+Exactly the builder's re-pinned darwin value. The +17 delta reconciles:
+`tests_retired_root.rs` now holds **9** `#[test]`s (6 + the two nested-chain
+variants + the past-the-bound row) and `tests_terminal_fault_matrix.rs` holds
+**8**; 9 + 8 = 17. The linux value `427` remains **DERIVED** and is still marked
+FIRST-DISPATCH-EXPECTED for re-measurement on the Linux leg at landing — the
+correct treatment, unchanged.
+
+**`python3.13 scripts/checks/check_checked_artifact_boundaries.py`**
+```
+checked-artifact boundary: ok (15 visible entries, 5 classified modules)
+```
+Both re-pinned tree digests (`…/pre_catalog.rs` = `588b105f…`,
+`…/catalog.rs` unchanged from E3's own re-pin) are therefore verified against the
+actual tree bytes, and no other protected tree moved.
+
+**`python3.13 -m unittest scripts/checks/test_check_checked_artifact_boundaries.py`**
+```
+.....................................................................
+----------------------------------------------------------------------
+Ran 69 tests in 533.193s
+
+OK
+```
+
+**Reviewer probes** — §R2.1, run in `scratchpad/probe-tree2`, tails quoted there.
+
+---
+
+## R2.9 Verdict and residuals
+
+**GO for landing.** Round 1's [P1] F1 and [P2] F3 are cured and re-verified by
+execution; [P2] F2 was ruled in the train's favour and its residual is a
+mechanical freeze edit; F4, F5, F6 are cured; F7 is dispositioned; F8 and the new
+F9 are documentation items.
+
+**Landing conditions — the lane owner discharges these in the landing commit:**
+
+- **(a) [from F2]** Write the freeze §4.4 arm-table row for the terminal
+  source-interior arm, by the same dated-annotation mechanism the 2026-08-27 E0
+  annotations use: *terminal source-interior (the retiring action directory's
+  interior is a lived-in action directory, not a staged one) | E7's Phase-4 half |
+  R2-E E3.1*. The arm's doc already promises this row; landing the code without it
+  leaves the table describing a surface it no longer covers. **If the lane owner
+  declines this review's ruling that the row is owed, that disagreement — and only
+  that — is the item for the E7 dual.**
+- **(b) [from F3]** Carry row #2's dated determination into the freeze §3.5
+  `terminal.*` activation record, replacing E0.2 §4.3 row #2's drafted text. The
+  code and the record agree only once this is done; the train flags it and cannot
+  do it itself.
+- **(c) [from F8]** Fold the third protected tree
+  (`checked_artifact/catalog.rs`) into E0.2b §6.2(b)'s inventory, so E1 and E2
+  expect three re-pins rather than rediscovering the third.
+
+**Landing-time nits, no gate:** F9's stale `#[allow(clippy::too_many_arguments)]`
+reason string on `retire_action_directory`, and the commit-prose claim that the
+fixture "observes" the alias length and digest when it observes only the identity.
+
+**Optional E7-dual item, not a condition:** F7's corpus-wide convergence idiom —
+a converging process reporting a durable edge complete on the strength of another
+process's unflushed rename. Correctly disclosed here; out of this train's scope.
+
+**Re-measure at landing:** the linux fault-partition value `427`, as the driver's
+own docstring instructs.

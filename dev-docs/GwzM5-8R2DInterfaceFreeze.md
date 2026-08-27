@@ -966,6 +966,18 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > `GwzM5-8R2E-SemanticsAmendment-DRAFT.md` §4 as amended by
 > `GwzM5-8R2E-SemanticsAmendment-E02b-DRAFT.md` §2/§3/§6.3/§8 (addendum
 > controlling).)*
+> *(E3 landing determination, 2026-08-27, per the E3 review round 2,
+> condition (b): the amendment's §4.3 row #2 semantic is REPLACED —
+> `terminal.payload_reobserve` names: each payload row
+> (`SourcePayload`/`GoalPayload`) is resident in exactly ONE of its two
+> scheduled homes and is a canonical regular file, READ NOT AT ALL; a
+> payload's length is never a protocol-record bound (ConsumerCheckpoint §8
+> :236-237), and the derived-over digest relation the drafted row named is
+> the authority record's, requiring a `CheckedAuthorityObservationV1` no
+> terminal retirement holds. Row #3 lands STRENGTHENED over its remediated
+> code: the worklist re-read bounded, bound to the resident reservation,
+> and every row classifying `Complete` over facts observed through the
+> production identity provider.)*
 
 Total 165 keys, equal to `EXPECTED_KEY_COUNT`
 (`interface_tests/fault_expected_keys.rs:174`; the key list ends `:172`).
@@ -1521,6 +1533,20 @@ variant on two enums inside `publication.rs`"):
 > must NOT inherit `interior::observe`'s bounds — E3.1 owes an explicit
 > `MAX_RETIRED_ACTION_DIRS` count check inside the arm, stated as its own
 > sentence.
+
+> R2-E E3 landing annotation (2026-08-27; the table is left as written): the
+> arm table gains a row it did not assign, found STRUCTURALLY FORCED at E3.1
+> — a terminal retirement's source is a directory, and this class's own
+> closing paragraph states `PublicationSourceV1::Directory` has no
+> "no interior recheck" form — and ruled owed by the E3 interior review (F2,
+> ratified at the lane-owner escalation): *terminal source-interior (the
+> retiring action directory's interior is a lived-in action directory, not a
+> staged one) | E7's Phase-4 half | R2-E E3.1*. Shape as landed:
+> `DirectoryInteriorExpectationV1::TerminalActionDirectory` — the admission
+> arm's own bounded reader with the same `Exact` resident-reservation
+> requirement, dropping only `extra_children == 0` (true of a freshly staged
+> directory, never of one that has run an action). Second-axis scrutiny
+> rides dual #2 (E7.1) per the deferred-escalation design.
 
 The managed rows are not optional: `PublicationSourceV1::Directory` has no
 "no interior recheck" form, amendment §8.13 (:656-659) structurally rejects raw

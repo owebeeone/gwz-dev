@@ -2034,6 +2034,44 @@ fable token only where it makes a difference." Recorded consequences:
   delete on macOS (fts depth give-up); clear with an O(depth)
   lift-and-remove walk.
 
+  **E3 IS LANDED — 2026-08-27; gwz-core main 4a0b01a → `1d50e59`.
+  THE TERMINAL FAMILY IS EXECUTED: 10/11 PartiallyExecuted with the
+  T-D determination; THE T1 WIDENING IS LIVE at its three gates.**
+  Round-2 review GO (report's Round 2 section filed with this
+  commit): F1's cure re-verified by the reviewer's own probes
+  (typed refusal at depth 3000; 64 legitimate rows still recover —
+  no off-by-one in the refusing direction); F3 cured both halves
+  (row #3 binds the real classifier over production-observed
+  fingerprints, length-bounded by the bound worklist row's own
+  recorded field; row #2's dated determination taken); checker
+  suite 69/69. LANDING TRAIN: the four e3-terminal commits
+  cherry-picked onto landed E1 (conflict resolutions = unions;
+  pin conflicts deliberately deferred) + the reconcile commit
+  `1d50e59` re-executing every pin on the final tree (pre_catalog
+  digest 4e942331 recomputed TWICE — the F9 comment fix moved it
+  after the first computation, the stale-digest class caught
+  in-flight; darwin partition EXECUTED 425 = 400+8+17; linux 435
+  derived FIRST-DISPATCH-EXPECTED; F9's allow-reason corrected).
+  Gates at the reconciled tree, direct exits: checker ok, fmt,
+  check, clippy, 425/932+1/256 (lib total 1615 accounted).
+  LANDING CONDITIONS DISCHARGED IN THIS COMMIT: (a) freeze §4.4
+  arm table gains the terminal source-interior row (dated
+  annotation; E7.1 second-axis scrutiny); (b) the terminal
+  activation record carries row #2's replacement determination
+  and row #3's strengthened form; (c) the addendum §6.2 census
+  corrected to FIVE machine-enforced inventories (catalog.rs
+  tree; the capability_permit Rust twin); plus the B-4 grounds
+  clause corrected in the addendum per the E2 review's ratified
+  finding. Matrices dispatched at 1d50e59: Windows 33040773113,
+  Platform 33040774620 (these measure linux 435; the E1-tip
+  dispatches 33039208104/33039209950 still complete for E1's own
+  ledger entry). E2 REMEDIATION IN FLIGHT ([P2-1] the Windows
+  roundtrip-orphan converge arm unreachable from the drive path —
+  reviewer-traced, Fable-confirmed; fix + truthful residual
+  restatement; seven P3 dispositions). Host-hygiene note: killed
+  deep-chain test runs leave temp fixtures plain rm -rf cannot
+  delete on macOS; clear with an O(depth) lift-and-remove walk.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
