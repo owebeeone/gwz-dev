@@ -1956,6 +1956,49 @@ fable token only where it makes a difference." Recorded consequences:
   landings; the freeze inventory-addendum "nine"→"ten" edit rides
   E2's landing commit.
 
+  **E1+E3 TRAINS DELIVERED; E3 ROUND 1 NO-GO/ESCALATED; FABLE
+  RULINGS ISSUED — 2026-08-27.** E1 (`4a0b01a`, one commit, rebased
+  onto 8597d32): eleven cleanup.* sites + [Fault; 11] matrix green
+  both variants, checker suite 69/69 OK, no count move; flags: C-2's
+  ~250-line fallback tripped at 285 lines and deliberately NOT taken
+  (taking it moves FAULT_INJECTION_SOURCES 9→10 at E1 against
+  controlling addendum §6.1 — the pair's one internal inconsistency,
+  reviewer adjudicates); the 16 KiB alias-retirement bound stated
+  (E4 input); Linux marker 418 derived, landing re-measure. E3
+  (`b9cb795` precondition + `04c8a66`): T1 widening at exactly three
+  gates, T-B′/T-C′/T-D landed, matrix [Fault; 10] green both
+  variants. LANE-OWNER CROSS-CHECK EXECUTED AND PASSED: E1's
+  completion (classify==Complete: live Missing + retired
+  Exact-fingerprint) and E3's terminal precondition (live gone,
+  retired resident, per bound worklist row) implement the IDENTICAL
+  slot pairing; E3's exactly-one-of-two-homes keys dissolve the
+  §2-vs-§4.3 ordering tension E1 flagged; nuance recorded: E3
+  residency-level vs E1 fingerprint-level (see F3). E3 REVIEW
+  (GwzM5-8R2E-E3-Review.md, filed with this commit): NO-GO, 1 P1 /
+  2 P2 / 5 P3. [P1 F1] the widening's observe_slot↔observe
+  re-entry is DEPTH-UNBOUNDED — reviewer REPRODUCED stack-overflow
+  SIGABRT at nested retired-actions-v1 depth 700 (200 → typed
+  refusal), reachable from recover_or_create; contradicts the
+  authorization's 'bounded reading'. [P2 F2] the forced
+  source-interior arm (train deviation D-1) — FABLE RULING:
+  existence forced, shape minimal-acceptable; freeze §4.4 arm table
+  GAINS THE ROW as a dated annotation at landing (lane owner's
+  edit); second-axis scrutiny rides dual #2 (E7.1) per the
+  deferred-escalation design. [P2 F3] §4.3 rows #2/#3 announce
+  fingerprint-depth binding the code does not perform (residency
+  only; matrix green DEPENDS on fixture's fabricated fingerprints)
+  — FABLE RULING: disclosure-integrity class; remediation must
+  bind-what-the-row-says (real fingerprints in fixture; classify at
+  #3 if right-layered) OR amend the rows' announced semantics as
+  dated determinations (T-D's honesty pattern), never keep the gap.
+  REMEDIATION ROUND DISPATCHED to the E3 builder (round 2 = final
+  under the two-round cap): F1 fix = dedicated single-level bounded
+  retired-root reader, no re-entry, plus the nested-chain refusal
+  row at would-have-overflowed depth; F3 per ruling; P3s F4-F7 per
+  report; F8 (FIVE machine-enforced inventories, not three) is the
+  lane owner's records duty. E1 review in flight; E2 builder in
+  flight.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
