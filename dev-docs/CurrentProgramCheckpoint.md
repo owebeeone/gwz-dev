@@ -2072,6 +2072,29 @@ fable token only where it makes a difference." Recorded consequences:
   deep-chain test runs leave temp fixtures plain rm -rf cannot
   delete on macOS; clear with an O(depth) lift-and-remove walk.
 
+  **DEVIATION RECORD + LESSON — the E3 landing range is per-commit
+  RED, 2026-08-27.** The boundary workflow at `1d50e59`
+  (33040764671) failed at the per-commit lane gate: the four
+  cherry-picked intermediates of the E3 landing (6848109, d36c725,
+  06616f8, 88829c7) carry their original in-train pin values, wrong
+  on their rebased trees — the reconcile deliberately deferred pin
+  re-execution to the tip, and the gate (built for exactly this
+  class; its header cites 95d292f/b923109) fired correctly on the
+  choice. The TIP is fully gated green (checker, fmt, check,
+  clippy, three partitions direct-exit) and the other three legs at
+  `1d50e59` are green (Platform 33040774620, Windows 33040773113,
+  retained readers 33040764606); the E1-tip set is 4/4 green after
+  the known kill-race flake's rerun (33039190893 → success;
+  Platform 33039209950, Windows 33039208104, boundary 33039190896).
+  The four red intermediates are immutable, recorded here as the
+  gate's own precedent prescribes, and sit behind every future
+  push's base — the branch is not blocked and the visible red heals
+  at the next push. NO floor advance is needed or taken. **LESSON
+  MINTED: a multi-commit landing train must be per-commit
+  gate-green — re-pin at every intermediate during the rebase — or
+  be landed SQUASHED to one commit citing the reviewed worktree
+  shas. E2's landing will be squashed.**
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
