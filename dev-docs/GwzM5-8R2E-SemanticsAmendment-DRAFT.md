@@ -1,7 +1,10 @@
 # R2-E E0.2 — the semantics amendment (DRAFT, 2026-08-27)
 
-Status: **DRAFT for E0.3 dual #1.** Author: the implementation lane (E0.2
-drafter). Object: `GwzM5-8R2DInterfaceFreeze.md` §3.5 and §4.3.
+Status: **LANDED 2026-08-27 at the E0 close — read WITH the E0.2b addendum
+(`GwzM5-8R2E-SemanticsAmendment-E02b-DRAFT.md`), which is CONTROLLING over this
+file wherever they differ.** *(Was: DRAFT for E0.3 dual #1.)* Author: the
+implementation lane (E0.2 drafter). Object: `GwzM5-8R2DInterfaceFreeze.md`
+§3.5 and §4.3.
 Plan: `GwzM5-8R2E-Plan.md` §3 phase E0, step E0.2.
 Inputs consumed: `GwzM5-8R2E-E01ReachTraces.md` (both answers),
 `GwzM5-8R2DSettledTuple.md` §11.1/§11.3, `GwzM5-8R4bG-Evidence.md`

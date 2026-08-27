@@ -1900,6 +1900,117 @@ fable token only where it makes a difference." Recorded consequences:
   LANDING (freeze application + plan reshape incl. O13 + the
   drift note, one coordinated train), then E1-E3 launch.
 
+  **THE OPERATOR RULED: OPTION (a) — 2026-08-27, one-line reply
+  verbatim "a".** Relocation STAYS R2-F's; the addendum's option-(b)
+  pull-forward proposal is DECLINED. The §7.8 fallback executes in
+  full at `GwzM5-8R2E-Plan.md` §1.1: the CROSS-LANE DEPENDENCY ROW
+  (O1+O2 blocked on R2-F's quarantine/relocation package); O3
+  recorded DISCHARGED-BY-THAT-PACKAGE-AND-RE-OWNED, not blocked;
+  Phase E4 re-scheduled after it (E1-E3 and E5.1/E5.2 NOT gated —
+  the addendum §7.6.2's reliefs); the E7 close form set (O1/O2
+  close *re-owned with a named carrier* if relocation hasn't landed
+  by then, O1's close carrying §10 row :280); O13 MINTED with its
+  split ownership; OPEN-R1 ROUTED TO R2-F with the relocation
+  package (blocking for that package's owner).
+
+  **THE E0 LANDING TRAIN EXECUTED — 2026-08-27. R2-E E0 IS CLOSED;
+  E1-E3 ARE LAUNCHED.** (1) FREEZE APPLICATION:
+  `GwzM5-8R2DInterfaceFreeze.md` gained the THREE §3.5 activation
+  records (the addendum [P2-4] cure's final headers, verbatim, each
+  with a dated filing note naming the amendment pair) and the ELEVEN
+  further E0 annotations (E0.2 §8's rows as amended: E7 with the
+  T1-widening authorization; E12/E13 C-1; E14 B-3; the E10/E14
+  ground gaining the borrow case under B-5; P5's three Windows arms;
+  Class 1's last row resolving to T-B′; Class 2 naming T1's widening
+  its precedent and B-5 needing NO sanction; the E4-retire clause
+  scoped; E22's reclamation DECLINED; the inventory nine→ten-at-E2
+  statement; the total-165 restatement) — grep-verified 3 records +
+  11 annotations, table rows intact, freeze 1,798 → 1,950 lines.
+  (2) PLAN RESHAPE: status ADOPTED; §1.1 E0 amendments block (O13
+  with the DATED ACCEPTED-RESIDUAL RECORD covering A1→E4.2/E4.3;
+  the cross-lane row with the ruling verbatim; O3/O8/O11/O6/O12
+  rows; E6.3 VOID; OPEN-C1 STRUCK); the E4 gate note (SEVEN
+  preconditions; the load-bearing "runtime bootstrap only"
+  statement; E2.2-before-E4 ordering); E4.2/E4.3 O13 scope clauses;
+  §5 items 1/3 exercised. (3) AMENDMENT PAIR: both statuses →
+  LANDED (addendum controlling); §7.8 carries the dated RULED line.
+  (4) THE O13 RAW-WRITER PIN LANDED — gwz-core `8597d32`
+  (checker-only micro-train, authorized by the dual-reviewed
+  addendum §7.6.1 "landing now"): `V1_LIFECYCLE_RAW_DURABLE_WRITER_FILES`
+  pins the complete executed non-test `durable_fs` surface
+  (archive.rs, store/archive.rs, store/rewrite.rs — the addendum
+  cited one file; the executed sweep found THREE, pinned all),
+  set-equality BOTH directions, both probes executed RED in the
+  overlay before commit (growth → "gained a raw durable_fs writer";
+  stale entry → "must be retired deliberately"), checker green on
+  pristine+pin, exact-ref pushed 94da3e5..8597d32, boundary-CI
+  watch open. (5) E1-E3 LAUNCHED IN PARALLEL (three Opus builders,
+  isolated gwz-core worktrees e1-cleanup/e2-barrier/e3-terminal,
+  briefs binding the amendment pair addendum-controlling, no-push
+  no-tags no-trailers; lane owner lands sequentially with pins
+  re-executed at each landing) — §5 item 1 exercised per the
+  standing recommendation; operator may override. NEXT: builder
+  reports → interior reviews (E1.3/E2.3/E3.2) → sequential
+  landings; the freeze inventory-addendum "nine"→"ten" edit rides
+  E2's landing commit.
+
+  **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
+  Appendix A — the lane owner's filing choice is THIS checkpoint,
+  the corpus's resolution index; the compatibility contract itself
+  is NOT annotated with it, precisely because a ~50-line insertion
+  there would re-drift every line cite below `:82` a second time).**
+  The note, verbatim:
+
+  > **Citation-drift note (2026-08-27, R2-E lane, filed at E0.2b).**
+  >
+  > **Mechanism.** gwz-dev commit **`4b9f078`** ("A1 activation commit:
+  > operator-signed record set lands", 2026-08-25 02:13:43 +1000) inserted a
+  > single dated annotation into `dev-docs/GwzM5-8I2CompatibilityContract.md` —
+  > one blank line plus an 18-line dated blockquote — for a diffstat of exactly
+  > **+19** on that file and no other. Frozen §4 text ends at `:81`; what was
+  > `:83` is now `:102`.
+  >
+  > **Extent.** The drift is **+19 for every line below the 2026-08-25 annotation
+  > and ZERO for lines `:1-:82`.** It is *not* a uniform whole-file offset, and
+  > the E0.2 draft's "uniform +19-line drift" is true only of the two passages at
+  > issue.
+  >
+  > **Corrected current line numbers**, verified directly rather than by
+  > arithmetic:
+  > - the whitelist passage ("A1 deliberately whitelists only seven
+  >   one-member-workspace…" … "…are not A1 migration rules.") — **`:136-144`**
+  >   (9 lines, matching R4b-G's 9-line `:117-125`);
+  > - the "Zero whitelist matches is not an error…" passage — **`:178-184`**
+  >   (7 lines, matching R4b-G's 7-line `:159-165`).
+  >
+  > **Six documents still carry the stale pair**, one of them on R2-E's own
+  > inherited register:
+  > - `GwzM5-8R2DSettledTuple.md:702` **and `:706`** (the C-1 row);
+  > - `GwzM5-8R4bG-Evidence.md` §12.7 (`:1298-1305`), **§12.9(d) (`:1469`)**, and
+  >   `:1187` (which cites `:123`, now **`:142`**);
+  > - `GwzM5-8R4bG-ReviewEvidence.md:119`;
+  > - `GwzM5-8R4bG-ReviewCorrectness.md:546`;
+  > - `GwzM5-8M5bNoFfDesign.md:112`, `:166`, `:234`, `:321`, `:375`;
+  > - `GwzM5-8M5bNoFf-ReviewCode.md:58`, `:79` (citing `:145` → now **`:164`**,
+  >   and `:163-165` → now **`:182-184`**).
+  >
+  > **THE CITING RULE, binding on E5.2 and on any lane citing the compatibility
+  > contract: cite content-anchored, not line-anchored.** Give the § number plus a
+  > quoted anchor phrase, with the line number offered as a convenience and marked
+  > as of a stated date — e.g. *"`GwzM5-8I2CompatibilityContract.md` §5, 'Zero
+  > whitelist matches is not an error … byte-preserving archival' (`:178-184` as of
+  > 2026-08-27)"*. The contract is a **live annotatable frozen document**: its own
+  > annotation mechanism inserts dated blockquotes above frozen text and shifts
+  > every line below them, so a bare line cite decays by construction at the next
+  > annotation.
+  >
+  > **What must NOT be done:** silently re-pointing R4b-G's, the settled tuple's,
+  > or M5b's existing cites. Those are dated records and are **left as written**,
+  > under the same "left as written / this annotation is the sanctioned mechanism"
+  > discipline the R2-E amendment applies to the freeze. This note is the
+  > resolution mechanism: a reader meeting a stale number resolves it here rather
+  > than re-deriving it.
+
   **THIN-A1 IS DELIVERED — M5's activation gate is closed.** The
   post-A1 queue as chartered: R2-E (67 re-reserved keys [CORRECTED 2026-08-26 at the R2-E plan: the freeze's records and the Completeness bucket (c) say THIRTY-EIGHT — cleanup 11 + barrier 16 + terminal 11; the 67 was a lane-introduced figure with no source]; binding
   obligations incl. [P3-R2-1], [P3-R2-2], the archive/GC consumer

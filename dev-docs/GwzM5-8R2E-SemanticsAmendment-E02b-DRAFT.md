@@ -1,6 +1,11 @@
 # R2-E E0.2b — semantics amendment addendum (DRAFT, 2026-08-27)
 
-Status: **FINAL DRAFT — round-2 conditions folded, for the E0 landing.** Author:
+Status: **LANDED 2026-08-27 at the E0 close — CONTROLLING over the E0.2 base
+draft.** The operator's §7.8 sequencing ruling: **option (a)** (one-line reply
+"a", 2026-08-27) — relocation stays R2-F's; the fallback's four elements and
+O13's minting are executed at `GwzM5-8R2E-Plan.md` §1.1; the freeze application
+(three §3.5 records, eleven annotations) landed the same day. *(Was: FINAL
+DRAFT — round-2 conditions folded, for the E0 landing.)* Author:
 the implementation lane (E0.2 drafter). Object: the E0.2 amendment
 (`GwzM5-8R2E-SemanticsAmendment-DRAFT.md`), amended here rather than rewritten.
 The pair — E0.2 + this addendum, **addendum controlling** — is the E0 deliverable.
@@ -1180,6 +1185,12 @@ Three options were posed. Measured against §7.6 **as corrected**:
 > R2-E as a new phase, ordered before E4 and parallel to E1-E3. Recommended, with
 > the explicit note that this is a CHARTER CHANGE and therefore the operator's or
 > lane owner's ruling, not this addendum's to take.**
+
+*(RULED 2026-08-27: **option (a)** — the operator, one-line reply verbatim
+"a". The proposal above is declined; the fallback below is executed at
+`GwzM5-8R2E-Plan.md` §1.1 — the cross-lane dependency row on O1+O2, O3
+re-owned, E4 re-scheduled, the E7 close form with O1 carrying row `:280`,
+O13 minted with its split ownership, and OPEN-R1 routed to R2-F.)*
 
 **Grounds.**
 

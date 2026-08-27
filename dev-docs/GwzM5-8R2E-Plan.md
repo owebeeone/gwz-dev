@@ -1,6 +1,11 @@
 # GwzM5-8 R2-E Plan — checked-artifact consumer conversion and the re-reserved semantics
 
-Date: 2026-08-26. Author: the implementation lane. Status: PROPOSED.
+Date: 2026-08-26. Author: the implementation lane. Status: **ADOPTED — E0
+closed 2026-08-27** (dual #1 both axes GO-class with every round-2 condition
+folded and lane-verified; the semantics authority is the E0.2 amendment pair
+— `GwzM5-8R2E-SemanticsAmendment-DRAFT.md` +
+`GwzM5-8R2E-SemanticsAmendment-E02b-DRAFT.md`, addendum controlling; the
+operator's sequencing ruling is recorded at §1.1).
 First post-v0.11.0 lane per the release checkpoint's resume order.
 
 ## 0. Object, charter sources, and one census correction
@@ -58,6 +63,95 @@ v1 owner + floor raise (M5c); the escape implementation packages
 (second lane, operator handoff); renormalize (R6); the per-predicate
 rejection names (F5 §9 item 6 — unowned candidate, not adopted
 here).
+
+### 1.1 E0 amendments to this ledger (2026-08-27 — the E0.3 round-2 verdicts, the E0.2b addendum, and the operator's sequencing ruling)
+
+Authority: the E0.2 amendment pair (addendum controlling), dual #1
+closed GO-conditional (Code) / conditional-GO (State) with every
+round-2 condition folded and lane-verified; and the operator's ruling
+below. The §1 table above is left as written; these dated rows amend
+it.
+
+- **O13 — MINTED: the v1 store's raw-writer clause** (source:
+  `ConsumerCheckpoint:280`, surfaced at E0.3 State round-2 [P2-R1];
+  addendum §7.6.1). *Convert the v1 checked store/root/bundle paths
+  per §10 row `:280`'s frozen ordering — "same purposes and artifact
+  actions" — and discharge its "no legacy raw writer" clause, whose
+  test-gate expired at A1 (2026-08-25).* Split ownership, per the
+  addendum's analysis: the **substantive half rides E4.2/E4.3 as an
+  explicit scope clause** (E4.2 owns the store's creation path, E4.3
+  its rewrite path — the same store; no tenth E4 row); the **"no
+  legacy raw writer" half is a pin, landed now** — a boundary-checker
+  inventory of `v1_lifecycle/`'s non-test `durable_fs` writer files
+  (executed surface at the pin: `store/rewrite.rs`,
+  `store/archive.rs`, `archive.rs`), failing closed on growth,
+  retired to empty in E4.2/E4.3's own commits. **Dated
+  accepted-residual record (2026-08-27): between A1 — the gate's
+  expiry, 2026-08-25 — and the E4.2/E4.3 conversions, v0.11.0-lineage
+  trees carry the v1 store as a production raw durable writer on the
+  no-ff path, in breach of row `:280`'s second clause; the residual
+  is accepted, bounded to that interval, pinned against growth by the
+  checker inventory, and expires with E4.2/E4.3's landings.** O1
+  cannot close DISCHARGED without O13.
+- **O1 enumeration corrected, in §0's correction form:** the §10
+  table is NINE consumer rows (`ConsumerCheckpoint:272-280`); O1's
+  row above enumerates eight and drops row `:280` — the ninth is
+  O13's, and O1's close carries row `:280` via O13.
+- **CROSS-LANE DEPENDENCY ROW — O1 and O2 are blocked on R2-F's
+  quarantine/relocation package** (settled tuple §11.3 item 1, the A1
+  coexistence gate; §11.2 `:791` pins relocation to R2-F; mechanism
+  verified at `interior.rs:414-417`). **Operator ruling, 2026-08-27,
+  one-line reply verbatim: "a" — option (a): relocation STAYS
+  R2-F's; the dependency is taken explicitly, declining the
+  addendum's option-(b) pull-forward proposal.** Consequences, per
+  addendum §7.8's fallback four: (i) this row; (ii) O3 below; (iii)
+  **Phase E4 is re-scheduled after R2-F's relocation package lands**
+  — E1-E3 and E5.1/E5.2 are NOT gated (addendum §7.6.2's reliefs);
+  (iv) if relocation has not landed by E7, the acceptance closes
+  O1/O2 as *re-owned with a named carrier* (R2-F relocation → this
+  lane's E4 resumption), not DISCHARGED, with O1's close additionally
+  carrying row `:280`.
+- **O3 — re-owned, not blocked:** O3's text is a location property,
+  and the legacy private parent has exactly one non-test owner
+  (`policy.rs:33-42` defines it; `observation.rs:93` is its only
+  consumer). R2-F's relocation package **discharges O3 directly**;
+  E4.7 remains this plan's stronger full-retirement mechanism. Under
+  ruling (a), E7 records O3 as *discharged by R2-F's relocation,
+  re-owned there* unless E4.7 has also landed by then.
+- **OPEN-R1 routed to R2-F** with the relocation package, per the
+  ruling: must the relocation *move* resident legacy residue, or only
+  relocate future writes? Blocking for that package's owner; the
+  Windows permanent-anchor evidence says leave-in-place keeps the
+  catalog unobservable there (`GwzM5-8R2DPhase4Closure.md:180-190`).
+  Recorded so R2-F inherits the question rather than re-deriving it.
+- **O8 denominators corrected** (E0.3 State [P2-2]; addendum §8):
+  E5.1 owes **10** registry rows (the progress shapes) — this plan's
+  "18 registry rows" is right as a debt count and wrong as a
+  registry-row count; E5.2 owes **8** archive-corpus rows + **2**
+  PENDING-FIXTURE rows (carrier R2-F); 10 + 8 = 18; the other two
+  NO-FIXTURE scenarios (`B-NOT-STARTED`, `B-PREPARING-EMPTY`) are
+  not R2-E's at all.
+- **O11 — CLOSED NEGATIVE at E0.1** (no v0.11.0 production path
+  reaches the identity probe; the exposure arrives at E4.1), and its
+  capability-refusal UX **folded into E4.1's precondition set**,
+  which is now SEVEN items (E0.2 §5.3's five + item 0, the
+  coexistence gate + item 6, refusal-ordering/restart legality).
+- **O6 — COMPLETED at E0.2b §5**: the read-side identity refusal
+  (the owner re-mints the witness on every resume and refuses on
+  disagreement) joins the mint-side mechanism; key #5's semantic is
+  extended accordingly.
+- **O12 re-routed:** three riders consumed at E0.2 (A-1 re-framed —
+  the checked path *replaces* `authority_name`, so the settle's
+  trigger does not fire in R2-E; the `unsupported.rs` nit moved into
+  E4.1's preconditions; the 481-item reconciliation stays E7.2's,
+  against both denominators); the fourth rider — the abort
+  rewrite-set bound guard tie (g12:737-739) — is **E6.2's**, named
+  at E0.2b [P3-5].
+- **E6.3 — VOID** (both branches empty: reach negative, UX moved to
+  E4.1); closes with a dated no-work record at E7.2.
+- **OPEN-C1 — STRUCK** (premise refuted:
+  `authority_record_binding.rs:486` takes `AuthorityScratch`);
+  E1.1/E1.2 owe no interleaving proof.
 
 ## 2. Review tiering (the adopted process, applied)
 
@@ -130,6 +224,17 @@ converting that consumer onto the checked boundary with its frozen
 ordering; the rows are parallel-friendly except where the table's
 ordering couples them:
 
+*(E0 gate, 2026-08-27, under the operator's ruling (a): this phase
+opens only after R2-F's quarantine/relocation package lands — §1.1's
+cross-lane dependency row. E4.1's precondition set is SEVEN (§1.1's
+O11 row). The `WorkspaceMutatorLock` §10 row's declared purpose —
+"runtime bootstrap only" — is load-bearing at E4.1: the runtime lease
+is bootstrap-only and identity-probe-free; the catalog lease is where
+the durable-identity capability is required and where its absence is
+refused (E0.2 §5.2, with E0.2b §6.4's fifth ground —
+`workspace_mutator_lock.rs` is byte-pinned). E2.2 strictly precedes
+any E4 row that admits actions touching the roaming anchor.)*
+
 - **E4.1** — `WorkspaceMutatorLock` runtime bootstrap (the O2
   activation rides here: `recover_or_create`'s first production
   caller, gated by the E0.1(b) §11.3 restatement). *(Corrected
@@ -140,9 +245,14 @@ ordering couples them:
   proposes the sequencing; a cross-lane dependency or pull-forward
   decision may fall to the operator.)*
 - **E4.2** — first merge record (`MergeStore` + `PreservationBundles`
-  bootstrap ordering).
+  bootstrap ordering). *(E0: + O13's substantive half, creation path;
+  and the §11.3-item-2 duties — the `retain_managed_parent_at_for_test`
+  door's disposition and the Git-directory workspace-root binding —
+  answered in this commit, addendum §7.7.)*
 - **E4.3** — merge record rewrite (exact store; unknown fields and
-  exact reread preserved).
+  exact reread preserved). *(E0: + O13's substantive half, rewrite
+  path — `v1_lifecycle/store/rewrite.rs`'s raw writer converts here;
+  the O13 checker inventory retires to empty across E4.2/E4.3.)*
 - **E4.4** — terminal archive source-only (+ the O8 `gc_archived`
   production route lands with the archive consumer).
 - **E4.5** — stash bundles + markers (two rows, one package if they
@@ -177,7 +287,9 @@ conversion surface).
 - **E6.3** — O11's consequence IF reach is real: the
   capability-refusal UX (typed message naming the filesystem
   capability) + runbook/notes lines; if reach is not real, a dated
-  no-work record closes O11.
+  no-work record closes O11. *(E0, 2026-08-27: VOID — reach answered
+  negative at E0.1 and the UX moved into E4.1's precondition set;
+  closes with the dated no-work record at E7.2 — §1.1.)*
 
 ### Phase E7 — the settled gate (milestone: R2-E accepted)
 
@@ -203,14 +315,18 @@ plan's completion or the operator's call).
 1. **Parallelism width** — run E1/E2/E3 as three parallel lanes
    (faster, three worktrees + the shared-driver ritual load) or
    sequentially (calmer). Lane recommendation: parallel, the
-   R2-D interior proved the discipline.
+   R2-D interior proved the discipline. *(Exercised 2026-08-27 at
+   the E1-E3 launch per this recommendation, standing since the
+   plan's presentation: parallel, three isolated worktrees, the lane
+   owner lands sequentially. The operator may override.)*
 2. **The executable-template policy** (recorded post-A1 operator
    question): if decided, its typed refusal lands as an E4 rider;
    if not, it stays an open operator item.
 3. **Scheduling vs quota** — E0 is cheap (one read-only trace + one
    docs train + one dual); the E1-E7 implementation spend is
    R2-D-interior scale. If this week's pool is tight, E0 now and
-   the implementation lanes after the Friday reset.
+   the implementation lanes after the Friday reset. *(2026-08-27:
+   E0 closed and E1-E3 launched pre-reset, on the operator's "a".)*
 
 ## 6. First action on approval
 

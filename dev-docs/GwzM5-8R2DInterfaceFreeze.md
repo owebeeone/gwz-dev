@@ -760,6 +760,20 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > reserved. The `capability_permit.rs` caller inventory holds at **13** and
 > `CATALOG_PUBLICATION_CALL_COUNTS` is unchanged: this step adds zero
 > `publish_verified_no_replace` call sites.
+>
+> **`cleanup.*` activation record (2026-08-27, R2-E Step E0.2 semantics
+> amendment as amended at E0.2b; annotates the Step-4.1 non-activation record
+> above, which is left as written since this annotation is the sanctioned
+> mechanism).** This record binds semantics; the flip to `Executed` is R2-E
+> **Phase E1**'s, in the commit that converts the edges, per RemPlan §10's duty.
+> **Counts. 165 total, unchanged; no key minted, none retired; `cleanup.*` stays
+> 0/11 until E1.2 lands.**
+> *(Filed at the E0 landing, 2026-08-27: the full record — the eleven key
+> semantics, DECISIONS C-1/C-2/C-3 and the E1.2 convergence obligation — is
+> `GwzM5-8R2E-SemanticsAmendment-DRAFT.md` §2 as amended by
+> `GwzM5-8R2E-SemanticsAmendment-E02b-DRAFT.md` §4/§6.3/§8 (addendum
+> controlling; OPEN-C1 struck there — no interleaving proof is owed); this
+> header is the §3.5-entering string per the addendum's §8 [P2-4] cure.)*
 | `barrier.*` | 16 | R2-D **Phase 4** (step 4.2 Windows retirement closure) | reserved |
 > `barrier.*` non-activation record (2026-08-23, Step 4.2 landing; records the
 > disposition of the plan's "activate `barrier.*` … with rows" clause):
@@ -788,6 +802,21 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > R2-E**, the lane that gives the roaming anchor its first admitted action.
 > RemPlan §10's duty is not deferred by this record — it never attached, because
 > Step 4.2 converts no `barrier.*` edge.
+>
+> **`barrier.*` activation record (2026-08-27, R2-E Step E0.2 as amended at
+> E0.2b; annotates the Step-4.2 non-activation record above, left as written).**
+> This record binds semantics; the flip to `Executed` is R2-E **Phase E2**'s, in
+> the commit that converts the edges. **Counts. 165 total, unchanged; no key
+> minted, none retired; `barrier.*` stays 0/16 until E2.3 lands.**
+> *(Filed at the E0 landing, 2026-08-27: the full record — the sixteen key
+> semantics as rewritten at E0.2b §1.5, the O6 RESOLUTION completed with the
+> read-side identity refusal (E0.2b §5), DECISIONS B-1 through B-6, and the
+> E2.3 convergence obligation — is `GwzM5-8R2E-SemanticsAmendment-DRAFT.md` §3
+> as amended by `GwzM5-8R2E-SemanticsAmendment-E02b-DRAFT.md` §1/§5/§6.3
+> (addendum controlling), which also records the OPPOSITE of a predicate
+> authorization: E2.1 must land the alias lifecycle with `completed_record`,
+> `retain_file` and `require_named_file_identity` **unchanged** (DECISION B-5,
+> fresh-copy alias).)*
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
 > `terminal.*` non-activation record (2026-08-23, Step 4.2 landing; resolves the
 > plan's own conditional, "and `terminal.*` if its edges convert here"): **0 of
@@ -918,9 +947,35 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > `BeforeGoalPublication`, `BeforeDetachPublication`,
 > `BeforeManagedPublication`. The three legacy restart matrices carry 9 rows in
 > place of 3, each flow driving exactly the sealed leaf edges it crosses.
+>
+> **`terminal.*` activation record (2026-08-27, R2-E Step E0.2 as amended at
+> E0.2b; annotates the Step-4.2 non-activation record above and its §4.4
+> arm-table resolution, both left as written).** Proposed outcome: **10 of 11
+> executed, 1 reserved with a determination** — the family lands as
+> `FaultFamilyActivationV1::PartiallyExecuted`
+> (`interface_tests/fault_expected_keys.rs:209`), whose per-key siteless proof
+> keeps the `Reserved` arm's guarantee for the eleventh. **Counts. 165 total,
+> unchanged; no key minted, none retired; `terminal.*` stays 0/11 until E3.2
+> lands.**
+> *(Filed at the E0 landing, 2026-08-27: the full record — the ten activated
+> key semantics, the `terminal.authority_release` determination (T-D as
+> re-grounded at E0.2b §8 on reading (a) alone, its demotion of reading (b)
+> closed by the non-activation record's own scope sentence above), DECISIONS
+> T-A / T-B′ / T-C′, the OPEN-T1 widening authorization at three gates, and
+> the E3.2 convergence obligation — is
+> `GwzM5-8R2E-SemanticsAmendment-DRAFT.md` §4 as amended by
+> `GwzM5-8R2E-SemanticsAmendment-E02b-DRAFT.md` §2/§3/§6.3/§8 (addendum
+> controlling).)*
 
 Total 165 keys, equal to `EXPECTED_KEY_COUNT`
 (`interface_tests/fault_expected_keys.rs:174`; the key list ends `:172`).
+
+> R2-E E0 annotation (2026-08-27, per the E0.2 amendment pair, addendum
+> controlling; the statement above is left as written): unchanged by the R2-E
+> semantics amendment, and restated in each of the three activation records
+> above — 165 total, no key minted, no key retired; the three families stay
+> `Reserved` (0/11, 0/16, 0/11) until E1.2 / E2.3 / E3.2 flip them in their
+> converting commits.
 
 Two clauses the map carries forward verbatim from the plan:
 
@@ -967,6 +1022,17 @@ the "machine-checked" property claimed in the RemPlan §10 annotation is
 delivered, not merely asserted. Every reserved family still has zero sites, by
 design, which the fixture asserts (§8, D3).
 
+> R2-E E0 annotation (2026-08-27, per the E0.2 amendment pair as corrected at
+> E0.2b §6.1; this inventory and the round-2 inventory addendum at the
+> `record.*` row above are left as written): the declared-and-anchored
+> production source list moves **nine → ten**, the single move landing at
+> **E2** with `barrier_mutation.rs`; E1 and E3 add sites to already-declared
+> files (`namespace_mutation.rs`, `admission_mutation.rs`) and move no count.
+> The inventory addendum's "nine" is edited to **ten** in E2.3's own converting
+> commit, not before. The completeness anchor
+> (`fault_expected_keys.rs:414-418`) proves the list exhaustive at each
+> landing.
+
 ## 4. Track P — physical primitive inventory, per platform
 
 ### 4.1 The already-proven primitive families
@@ -978,6 +1044,15 @@ design, which the fixture asserts (§8, D3).
 | P3 | No-follow open + durable identity compare | `platform::open_dir_share_delete` `platform.rs:159-163` / `:165-194`; `HostPlatform` identity at `capability/pre_catalog/provider/platform.rs:23-33`; encoding at `provider/retained.rs:417-427` | per-OS children `provider/platform/linux.rs`, `provider/platform/macos.rs` selected by the `#[path]` edges at `provider/platform.rs:8-13` (macOS: `getattrlist` persistent object/volume identity, `fpathconf(_PC_CASE_SENSITIVE)`) | `provider/platform/windows.rs` via `provider/platform.rs:14-16`; `open_dir_share_delete` `platform.rs:165-194` adds the `FILE_SHARE_DELETE` recipe so the directory open does not collide with the retained rename-source handle |
 | P4 | Bounded interior / global enumeration | `provider/interior.rs:50-91` with `MAX_INTERIOR_ENTRIES = 10` (`interior.rs:27`); global catalog grammar budgets `catalog/enumeration.rs:8-12` (4 096 parent entries, 255 native name units, 510 encoded bytes) | portable; identical code path | portable; identical code path |
 | P5 | Dirent barrier | `platform::private_barrier`; production callers today are the legacy `cleanup.rs:89/:129/:159`, `residue.rs:407/:500/:529`, `transition.rs:427`, plus the Windows anchor internals, owned since Step 4.2 by `platform/anchor.rs` | `platform.rs:271-274` (`cfg(not(windows))`, directory handle fsync) | two arms, selected by the caller's `DirentBarrierClass` (`platform.rs:364`): the durability-anchor round trip, owned since Step 4.2 by `platform/anchor.rs` (`round_trip` `:183`, `ANCHOR_BYTES` `:74`, `ANCHOR_PREFIX` `:76`, `prepare` `:129`, `survey` `:284`, `roundtrip_name` `:388`, `verify` `:394`; retirement `RETIRED_PREFIX` `:100`), for `AnchoredPrivateArea` callers, and the documented no-op `platform.rs:526` for `ExactInterior` callers (see the E10/E14 activation annotation) |
+
+> R2-E E0 annotation (2026-08-27, per the E0.2 amendment pair; the row above is
+> left as written): the Windows column becomes **three** arms at E2.1 — the
+> resident-anchor round trip (`AnchoredPrivateArea`), the documented no-op
+> (`ExactInterior`), and the supplied-anchor round trip
+> (`RoamingAnchoredTarget`, DECISION B-3), whose Windows arm round-trips the
+> **supplied** alias by its reserved leaf rather than surveying for a resident
+> anchor; off Windows all three remain the same directory `fsync`
+> (`platform.rs:377-384`).
 
 ### 4.2 Spike executed for this freeze
 
@@ -1081,6 +1156,16 @@ primitive, not a new one.
 | E5 | post-publish reobservation of identity and exact record | 1 | P3 + P4 | `provider/platform/macos.rs` | `provider/platform/windows.rs` | `provider/platform/linux.rs` | no |
 | E6 | bounded global classification of interior action rows | 1 | P4 | `interior.rs:50`, `enumeration.rs:8-12` | identical | identical | no |
 | E7 | action directory retirement into the retired root | 1/4 | P1 with destination recheck | `publication.rs:157-173` | same + `windows_destination_path` `platform.rs:196` | as mac | no — spiked §4.2 (mac+win); **needs the admission destination arm, §4.4 class, Phase 1 (C-2)** |
+> R2-E E0 annotation (2026-08-27, per the E0.2 amendment pair; the row is left
+> as written): its Phase-4 half is R2-E's — the eleven `terminal.*` keys bind
+> to this edge (amendment §4: ten activated + one determined), the destination
+> child name is the already-derived `RootEntryNameV1::ActiveAction` name under
+> the retired root (DECISION T-A), and the edge is blocked on OPEN-T1 until
+> `completed_record`'s empty-retired-root predicate is widened — a widening
+> **AUTHORIZED at E0.2b §2** at three gates (`interior.rs:349`;
+> `completed.rs:310`; `completed.rs:383`), owned by E3.1 as its own reviewed
+> precondition step, with `staging_plan`'s bootstrap-refusal arm preserved by
+> name.
 | E8 | bounded/streamed leaf read through one retained handle | 2.1 | P3 + P2 | `platform.rs:159` no-follow | `platform.rs:165` share-delete | as mac | no |
 | E9 | leaf flush | 2.1 | P2 | `sync_all` | documented no-op (see annotation) | `sync_all` | no |
 
@@ -1104,7 +1189,21 @@ primitive, not a new one.
 | E11 | same-parent reobserve; two-sided durable-absence proof | 2.1 | P3 + P4 | identical | identical | identical | no |
 | E12 | backend `publish_exact` over scheduled roles | 2.2 | P1 | `platform.rs:23/:78` | `platform.rs:48/:98` | as mac | no |
 | E13 | backend `retire_exact` over scheduled roles | 2.2 | P1 | as E12 | as E12 | as E12 | no |
+> R2-E E0 annotation (2026-08-27, E12/E13 jointly, per the E0.2 amendment pair;
+> the rows are left as written): the shared `execute_edge` helper
+> (`namespace_mutation.rs:250-305`) gains cleanup, barrier and terminal
+> callers; the renames keep announcing the four `namespace.*` keys and **no
+> `namespace.*` key is re-keyed or silenced**, per the Step-3.1b routing
+> precedent (`managed_mutation.rs:1018-1027`) — DECISION C-1.
 | E14 | backend `barrier` | 2.2 | P5 | `platform.rs:271` | `platform.rs:526` documented no-op (see the E10/E14 activation annotation) | as mac | no |
+> R2-E E0 annotation (2026-08-27, per the E0.2 amendment pair; the row is left
+> as written): `barrier.target_barrier` is a **distinct P5 caller** at a
+> *target* parent with a **supplied** roaming anchor, taking a third
+> `DirentBarrierClass` (DECISION B-3); the E10/E14 annotation's "E10 and E14
+> both pass `ExactInterior` and can never take the other arm" is untouched,
+> because both of its hardcoded sites (`namespace_mutation.rs:328`;
+> `namespace/host.rs:741-756`) are in a different file from this family's.
+
 > **E10/E14 activation annotation** (2026-08-22, the Windows anchor-readiness
 > repair over the Step 2.2 and Step 2.3 landings, gwz-core `6b8b76e`;
 > discharges the `GwzWindowsMatrix-Classification.md` run-16 class — all four
@@ -1197,6 +1296,17 @@ primitive, not a new one.
 > ledger): the next full Windows matrix run must return the legacy
 > `AnchoredPrivateArea` suites green, since the trimmed probe run that
 > validated this arm (`32569434565`) executed none of them.
+
+> R2-E E0 annotation (2026-08-27, on the E10/E14 activation annotation above,
+> left as written): its Windows negative space is unchanged; but its ground —
+> only the checked-artifact private area is permitted to *retain* an anchor —
+> gains the roaming case: a directory may **borrow** an anchor for one barrier
+> without retaining one, which is what the sixteen `barrier.*` keys buy. Under
+> DECISION B-5 (E0.2b §1) the borrowed object is a **fresh independent copy**
+> carrying `ROAMING_ANCHOR_BYTES` — never a hard link and never a rename of
+> the catalog's `roaming-anchor-home-v1` row; the per-hard-link macOS identity
+> facts recorded in the Step-4.2 platform-fact paragraph (§3.5 above,
+> `anchor/tests.rs:308-324`) are exactly why.
 | E15 | managed component install (staged dir → final) | 2.3/3 | P1 + P2 + P3 | as E3 | as E3 | as E3 | no — but **needs a managed source-interior arm, §4.4 class, Phase 2.3/3** |
 | E16 | managed ownership-marker retirement | 2.3/3 | P1 | as E13 | as E13 | as E13 | no — leaf-shaped today; **needs a destination arm only if the marker retires as a directory, §4.4 class, Phase 2.3/3** |
 > E16 activation annotation (2026-08-22, Step 2.3 landing; discharges the
@@ -1243,6 +1353,15 @@ primitive, not a new one.
 | E20 | legacy leaf edge `residue.rs:393` | 4.1 | P1 (same) | as E18 | as E18 | as E18 | no |
 | E21 | legacy leaf edge `residue.rs:486` | 4.1 | P1 (same) | as E18 | as E18 | as E18 | no |
 | E22 | legacy Windows durability anchor retirement | 4.2 | P1 + P5 | n/a (`cfg(windows)`) | `platform.rs:380-604`; random scratch at `:420` is the R2 stop-clause violation this step removes | n/a | no |
+
+> R2-E E0 annotation (2026-08-27, per the E0.2 amendment pair; the row and the
+> Step-4.2 record's optional-item clause in §3.5 above are left as written):
+> the legacy nonce-orphan reclamation the Step-4.2 record calls "an optional
+> R2-E item, not a debt of this step" is **DECLINED by R2-E** and stays
+> optional — the count is bounded by past crashes and cannot grow,
+> `legacy_nonce_orphans_are_tolerated_and_block_nothing` pins it, and the
+> natural carrier is R2-F's legacy-path removal. Recorded so the option does
+> not silently lapse.
 
 **Activation record 2026-08-22 — E4's retire half, a first-of-kind removal
 edge.** Recorded in the §3.5 activation-record form rather than by reshaping the
@@ -1324,6 +1443,15 @@ minting a key moves the frozen census from **19/165 to 20/166** (§3.5,
 the implementation lane may take silently. The re-verdict owns the decision: if
 the settle wants route (i), the count change is the reviewed edit it asks for.
 
+> R2-E E0 annotation (2026-08-27, on the activation record above, left as
+> written): its clause "`completed_record` requires an **empty**
+> `RetiredActions` root, so no in-vocabulary target exists" stays true **of
+> the admission record slot it was written about**; for the *action directory*
+> an in-vocabulary name already exists (DECISION T-A) and the empty-root half
+> was OPEN-T1's object — now an authorized widening (E0.2b §2, owner E3.1).
+> Its "Open question carried to the re-verdict — the fault key, deliberately
+> not minted" is **not reopened**: R2-E mints no key.
+
 ### 4.4 Verdict, and the two in-seam extension classes the R2-D phases own
 
 **New platform primitive required: NO.** Every edge E1-E22 names an admitted
@@ -1380,6 +1508,19 @@ variant on two enums inside `publication.rs`"):
 | managed source-interior (a staged managed component's interior is neither record type) | E15, E17 | **Phase 2.3 / Phase 3** |
 | managed destination (marker/generation retirement) | E16, E17 | **Phase 2.3 / Phase 3** |
 | any further retirement-destination arm | E7's Phase-4 half and the terminal retirement edges | **Phase 4** |
+
+> R2-E E0 annotation (2026-08-27, per the E0.2 amendment pair as corrected at
+> E0.2b §3; the row is left as written): the last row resolves to **a new
+> `DestinationRecheckV1` variant carrying a second observation input**
+> (`TerminalRetiredRoot` — the catalog root's retained handle alongside the
+> retired root arriving as `destination_dir`), owned by **R2-E E3.1**, on this
+> class's own struct-vs-enum criterion above (`DestinationRecheckV1` **is** an
+> enum, "so its arm genuinely is a new variant"); the field-generalization
+> reading is refuted by `publication.rs:239`'s single observation of
+> `destination_dir` (DECISION T-B′, replacing the E0.2 draft's T-B). The arm
+> must NOT inherit `interior::observe`'s bounds — E3.1 owes an explicit
+> `MAX_RETIRED_ACTION_DIRS` count check inside the arm, stated as its own
+> sentence.
 
 The managed rows are not optional: `PublicationSourceV1::Directory` has no
 "no interior recheck" form, amendment §8.13 (:656-659) structurally rejects raw
@@ -1448,6 +1589,17 @@ Track-W event and needs no new durable record, slot, purpose, action, or phase �
 the admission triad is already in the frozen vocabulary and the record binding
 already pins it (§3.1). What Phase 1 must extend is the *provider's reading* of
 that vocabulary, not the vocabulary.
+
+> R2-E E0 annotation (2026-08-27, per the E0.2 amendment pair; the ruling above
+> is left as written): its rule — extend the provider's *reading*, not the
+> vocabulary — is the named precedent for **OPEN-T1's authorized widening**
+> (E0.2b §2: three gates — `interior.rs:349`, `completed.rs:310`,
+> `completed.rs:383` — owner E3.1, census unchanged), one further reading of
+> the same closed grammar (the populated retired root), minting no vocabulary.
+> OPEN-B1's cure takes **no** Class-2 sanction: DECISION B-5 (fresh-copy
+> alias, E0.2b §1) touches no catalog predicate, and E2.1 holds no
+> authorization to edit `completed_record`, `retain_file` or
+> `require_named_file_identity`.
 
 #### Why this is recorded rather than executed here
 
