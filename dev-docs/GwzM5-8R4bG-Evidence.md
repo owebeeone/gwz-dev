@@ -1161,11 +1161,11 @@ qualified.
 
 | R0 row | M4 shape | v0 pin / scenario evidence | Registry row | Disposition |
 | --- | --- | --- | --- | --- |
-| A | `A-EXECUTING` | `preserve::review_remediation::preserve_abort_accepts_exact_interrupted_executing_state`, `start::preflight_checks_every_member_before_mutating_an_earlier_member` | — | **UNBOUND** |
-| A | `A-AWAITING` | `open_operation_gate::open_awaiting_resolution_blocks_dry_run_and_real_starts_from_an_explicit_root`, `continue_merge::conflict_continues_to_later_member_and_status_recovers_with_baseline_lock` | — | **UNBOUND** |
-| A | `A-HALTED` | `open_operation_gate::open_halted_blocks_dry_run_and_real_starts_from_an_explicit_root`, `continue_merge::failed_and_unattempted_rows_retry_only_after_whole_operation_preflight` | — | **UNBOUND** |
-| A | `A-PRE-PRESERVE` | `preserve::preserving_abort_gate::plain_abort_rejects_interrupted_preservation_before_rollback`, `preserve::preserve_abort_failure_windows_never_begin_rollback_and_retry_converges` | — | **UNBOUND** |
-| A | `A-PRE-ROLLBACK` | `abort_recovery::abort_accepts_every_pre_candidate_finalization_fault_point` | — | **UNBOUND** |
+| A | `A-EXECUTING` | `preserve::review_remediation::preserve_abort_accepts_exact_interrupted_executing_state`, `start::preflight_checks_every_member_before_mutating_an_earlier_member`; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `A-EXECUTING`) | `open/executing` | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
+| A | `A-AWAITING` | `open_operation_gate::open_awaiting_resolution_blocks_dry_run_and_real_starts_from_an_explicit_root`, `continue_merge::conflict_continues_to_later_member_and_status_recovers_with_baseline_lock`; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `A-AWAITING`) | `open/awaiting-resolution` | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
+| A | `A-HALTED` | `open_operation_gate::open_halted_blocks_dry_run_and_real_starts_from_an_explicit_root`, `continue_merge::failed_and_unattempted_rows_retry_only_after_whole_operation_preflight`; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `A-HALTED`) | `open/halted` | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
+| A | `A-PRE-PRESERVE` | `preserve::preserving_abort_gate::plain_abort_rejects_interrupted_preservation_before_rollback`, `preserve::preserve_abort_failure_windows_never_begin_rollback_and_retry_converges`; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `A-PRE-PRESERVE`) | `preserving/pre-acceptance` | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
+| A | `A-PRE-ROLLBACK` | `abort_recovery::abort_accepts_every_pre_candidate_finalization_fault_point`; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `A-PRE-ROLLBACK`) | `rollback/pre-acceptance` | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
 | B | `B-NO-PUBLICATION-ROW` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `finalizing_before_publication_record`, fault `AfterEnteringFinalizing`) | `changed/finalizing-before-publication-record` | **ADAPTED** |
 | B | `B-NOT-STARTED` | none — R0 §4 row B records "durable `NotStarted` post-rename window is not independently injected"; still true at `b91bdeb` | — | **NO FIXTURE** |
 | B | `B-VALIDATING` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `validating_before_candidate`, fault `BeforeCandidateCreation`) | `changed/validating-before-candidate` | **ADAPTED** |
@@ -1177,34 +1177,40 @@ qualified.
 | F | `F-MARKER` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation`, `drift::status_detects_marker_and_boundary_drift_without_a_prior_recovery_mutation`; adaptation disposition `compatibility_residue_v0::v0_mid_publication_prefixes_are_not_a1_migration_rules` (subcase `F-MARKER`) | — (typed refusal, not a corpus row; §12.9) | **DISPOSITIONED-REFUSED** |
 | F | `F-LOCK` | `characterization_publication_prefix_v0::v0_candidate_publication_prefixes_are_restartable_at_every_mutation`; adaptation disposition `compatibility_residue_v0::v0_mid_publication_prefixes_are_not_a1_migration_rules` (subcase `F-LOCK`) | — (typed refusal, not a corpus row; §12.9) | **DISPOSITIONED-REFUSED** |
 | F | `F-BOUNDARY` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `candidate_published_before_recording`, fault `AfterLockPublication`) | `changed/prefix-boundary` | **ADAPTED** |
-| G | `G-VERIFYING` | `characterization_publication_v0::v0_verifying_publication_is_durable_for_born_and_unborn_roots` | — | **UNBOUND** |
+| G | `G-VERIFYING` | `characterization_publication_v0::v0_verifying_publication_is_durable_for_born_and_unborn_roots`; adaptation disposition by clause, executed inside `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (the `G-VERIFYING` arm, plain fn `g_verifying_is_dispositioned_by_clause`) | — (no corpus vocabulary; §12.9(c), ground corrected at §12.9(e)) | **DISPOSITIONED-UNLISTED** *(E5.1, 2026-08-28)* |
 | G | `G-COMPLETE-PRE-ARCHIVE` | `characterization_v0::v0_changed_merge_windows_have_named_exact_durable_shapes` (window `completed_before_archive`, fault `BeforeArchive`), `characterization_v0::v0_terminal_completed_before_archive_is_read_only_and_closes_byte_exactly` | `terminal/completed` | **UNLISTED** ("terminal v0 archives byte-exact") |
 | H | `H-PRESERVING-PRE` | `characterization_preservation_v0::v0_preservation_restart_rebuilds_missing_stash_bundle_from_recorded_evidence` | `preserving/stash` | **UNLISTED** ("v0 has no lossless write-ahead reverse owner") |
-| H | `H-PRESERVING-CANDIDATE` | `preserve::preserve_abort_handles_post_composition_root_work_with_root_bundle_identity`, `preserve::review_remediation::member_only_merge_preserves_post_composition_root_work` | — | **UNBOUND** |
-| H | `H-PRESERVING-PREFIX` | `characterization_preservation_v0::v0_preserving_overlay_round_trips_every_recorded_root_prefix`, `preserve::review_remediation::preserve_retry_repairs_interrupted_root_publication_normalization` | — | **UNBOUND** |
+| H | `H-PRESERVING-CANDIDATE` | `preserve::preserve_abort_handles_post_composition_root_work_with_root_bundle_identity`, `preserve::review_remediation::member_only_merge_preserves_post_composition_root_work`; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `H-PRESERVING-CANDIDATE`) | `preserving/candidate` | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
+| H | `H-PRESERVING-PREFIX` | `characterization_preservation_v0::v0_preserving_overlay_round_trips_every_recorded_root_prefix`, `preserve::review_remediation::preserve_retry_repairs_interrupted_root_publication_normalization`; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `H-PRESERVING-PREFIX`) | `preserving/root-prefix` | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
 | I | `I-PARTICIPANT-ROLLBACK` | `characterization_preservation_v0::v0_participant_rollback_has_restartable_durable_reverse_prefixes` | `rollback/participant` | **UNLISTED** ("v0 has no lossless write-ahead reverse owner") |
-| I | `I-EVIDENCE-ROLLBACK` | `characterization_preservation_v0::v0_evidence_rollback_records_each_reverse_artifact_prefix`, `abort_recovery::born_root_evidence_abort_recovers_both_record_persistence_windows`, `abort_recovery::unborn_root_evidence_abort_recovers_both_record_persistence_windows` | — | **UNBOUND** |
+| I | `I-EVIDENCE-ROLLBACK` | `characterization_preservation_v0::v0_evidence_rollback_records_each_reverse_artifact_prefix`, `abort_recovery::born_root_evidence_abort_recovers_both_record_persistence_windows`, `abort_recovery::unborn_root_evidence_abort_recovers_both_record_persistence_windows`; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `I-EVIDENCE-ROLLBACK`) | `rollback/evidence` | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
 | J | `J-NO-PUBLICATION-BORN` | `characterization_v0::v0_no_publication_complete_before_terminal_write_is_read_only` (fault `AfterNoPublicationComplete`, the eighth variant, driven separately from the seven-window array) | `unchanged/no-publication-finalizing` | **ADAPTED** *[twin-label correction 2026-08-24, §12.9: the corpus fixture named here builds an **unborn** root, and `GwzM5-8I2CompatibilityContract.md:123` excludes "born root" by name, so the adapted case is the UNBORN twin. The born twin at this same window is valid-unlisted, pinned by `compatibility_residue_v0::v0_no_publication_finalizing_twins_split_on_the_born_root_exclusion`. The count is unaffected — one J twin is adapted either way — but the label is on the wrong row.]* |
 | J | `J-NO-PUBLICATION-UNBORN` | `characterization_v0::v0_no_publication_completion_preserves_born_and_unborn_root_inputs`, `characterization_publication_v0::v0_publication_windows_have_born_and_unborn_root_twins`; adaptation disposition `compatibility_residue_v0::v0_no_publication_finalizing_twins_split_on_the_born_root_exclusion` and `compatibility_residue_v0::v0_no_publication_terminal_twins_stay_v0_for_born_and_unborn_roots` | `unchanged/no-publication-finalizing` (finalizing twin; §12.9) | **ADAPTED** (finalizing twin) + **DISPOSITIONED-UNLISTED** (R0 terminal shape) |
 | K | `K-COMPLETED-CANDIDATE-OPEN` | `characterization_v0::v0_terminal_completed_before_archive_is_read_only_and_closes_byte_exactly` | `terminal/completed` (shared with `G-COMPLETE-PRE-ARCHIVE` — one durable object, two R0 rows) | **UNLISTED** |
-| K | `K-COMPLETED-NOPUB-OPEN` | `characterization_publication_v0::v0_no_publication_completed_open_record_closes_byte_exactly` — **this closes R0 §4 row K's "no-publication terminal-open byte-exact fixture missing" gap** | — | **UNBOUND** |
+| K | `K-COMPLETED-NOPUB-OPEN` | `characterization_publication_v0::v0_no_publication_completed_open_record_closes_byte_exactly` — **this closes R0 §4 row K's "no-publication terminal-open byte-exact fixture missing" gap**; adaptation drive `compatibility_unbound_v0::v0_unbound_progress_shapes_are_refused_by_adapt_open` (arm `K-COMPLETED-NOPUB-OPEN`) | `terminal/completed-no-publication` (its durable object also carries `J-NO-PUBLICATION-UNBORN`'s R0-terminal DISPOSITIONED-UNLISTED record — one durable object, two R0 rows, the terminal/completed pattern; §12.9(e)) | **UNLISTED** *(E5.1 registry row, 2026-08-28)* |
 | L | `L-RECOVERY-OVERLAY` | `characterization_v0::v0_recovery_required_overlays_preserve_candidate_and_no_publication_evidence` (subcases `candidate`, `no_publication`), `characterization_publication_v0::v0_recovery_required_overlays_keep_each_constructible_publication_row_byte_exact` | `recovery/candidate` + `recovery/no-publication` (two rows, one shape) | **UNLISTED** ("recovery origin is not uniquely owned") |
 | M | `M-ABORTED-OPEN` | `characterization_v0::v0_terminal_aborted_before_archive_is_read_only_and_closes_byte_exactly`; candidate-era variant `characterization_publication_v0::v0_candidate_aborted_open_record_closes_byte_exactly` — **closes half of R0 §4 row M's "candidate/evidence-era … terminal-open variants missing" gap; the preservation-bearing variant remains open** | `terminal/aborted` | **UNLISTED** |
 
 ### 12.4 Table B — the 10 archive shapes (`GwzM5-8R0Inventory.md` §5.2)
 
+*(E5.2, 2026-08-28: the ten shapes are recorded in the standalone archive
+corpus of GwzM5-8I2CompatibilityPredicates.json — not the migration registry,
+which has no vocabulary for them. Tier 1 = byte-SHA256 across the production
+archival act, executed on the eight fixtured rows over five distinct durable
+bases; tier 2 is owed on all ten, carrier E4.4, R2-F-encumbered. §12.9(e).)*
+
 | Archive id | Fixture shape | Evidence | Registry row | Disposition |
 | --- | --- | --- | --- | --- |
-| `AC-CANDIDATE` | `av0_b` / `CompletedCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes` | — | **UNBOUND** |
-| `AC-NOPUB-BORN` | `av0_c` / `CompletedNoPublication` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes`, `characterization_archive_v0::id_qualified_gc_returns_the_validated_archived_record_projection` | — | **UNBOUND** |
-| `AC-NOPUB-UNBORN` | none — no archive-only projection with the live root later born or missing | `characterization_v0::v0_no_publication_completion_preserves_born_and_unborn_root_inputs` pins the live-side unborn twin only | — | **NO FIXTURE** |
-| `AA-PREACCEPTANCE` | `av0_e` / `AbortedPreAcceptance` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes` | — | **UNBOUND** |
-| `AA-CANDIDATE-COMPLETE` | `av0_f` / `AbortedCompleteCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes` | — | **UNBOUND** |
-| `AA-CANDIDATE-PARTIAL` | `av0_g` / `AbortedPartialCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes` | — | **UNBOUND** |
-| `AP-PRESERVED` | none — no stash-only / ref-only / combined **archive** fixture; the evidence is live-workspace GC | `characterization_preservation_v0::v0_gc_restarts_after_one_of_two_recorded_backup_refs_was_deleted`, `gc::explicit_gc_checked_deletes_only_backup_refs_and_archive_record` | — | **NO FIXTURE** |
-| `AL-OPTIONAL-MISSING` | `av0_d` / `CompletedEvidenceGap` | `characterization_archive_v0::archived_v0_optional_evidence_gaps_remain_readable_and_untouched` (the four named gaps `exact_lock_bytes`, `complete_member_audit`, `accepted_root_input`, `publication_evidence`) | — | **UNBOUND** |
-| `AL-UNKNOWN` | `unknown_retention` / `CompletedCandidate` | `characterization_archive_v0::archived_v0_unknown_fields_and_raw_bytes_survive_status_and_retention` — **closes R0 §5.2's "open-record unknown round-trip unit test only" gap** | — | **UNBOUND** |
-| `AR-C` | contradiction cases over `CompletedNoPublication` | `characterization_archive_v0::archived_v0_missing_optional_evidence_is_not_an_unreadable_contradiction` | — | **UNBOUND** |
+| `AC-CANDIDATE` | `av0_b` / `CompletedCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes`; tier-1 archival byte-preservation `archive_equivalence_v0::archived_v0_shapes_are_byte_preserved_from_their_open_records` (subcase `av0_b`) | — | **TIER-1 BYTE-PRESERVED** *(v0-origin; tier 2 owed — E5.2, 2026-08-28)* |
+| `AC-NOPUB-BORN` | `av0_c` / `CompletedNoPublication` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes`, `characterization_archive_v0::id_qualified_gc_returns_the_validated_archived_record_projection`; tier-1 archival byte-preservation `archive_equivalence_v0::archived_v0_shapes_are_byte_preserved_from_their_open_records` (subcase `av0_c`) | — | **TIER-1 BYTE-PRESERVED** *(v0-origin; tier 2 owed — E5.2, 2026-08-28)* |
+| `AC-NOPUB-UNBORN` | none — no archive-only projection with the live root later born or missing | `characterization_v0::v0_no_publication_completion_preserves_born_and_unborn_root_inputs` pins the live-side unborn twin only | — | **NO FIXTURE** *(PENDING-FIXTURE both tiers in the archive corpus, machine-enforced as exactly this pair; carrier R2-F fixtures/native-evidence lane — E5.2, 2026-08-28)* |
+| `AA-PREACCEPTANCE` | `av0_e` / `AbortedPreAcceptance` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes`; tier-1 archival byte-preservation `archive_equivalence_v0::archived_v0_shapes_are_byte_preserved_from_their_open_records` (subcase `av0_e`) | — | **TIER-1 BYTE-PRESERVED** *(v0-origin; tier 2 owed — E5.2, 2026-08-28)* |
+| `AA-CANDIDATE-COMPLETE` | `av0_f` / `AbortedCompleteCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes`; tier-1 archival byte-preservation `archive_equivalence_v0::archived_v0_shapes_are_byte_preserved_from_their_open_records` (subcase `av0_f`) | — | **TIER-1 BYTE-PRESERVED** *(v0-origin; tier 2 owed — E5.2, 2026-08-28)* |
+| `AA-CANDIDATE-PARTIAL` | `av0_g` / `AbortedPartialCandidate` | `characterization_archive_v0::archived_v0_b_through_g_status_uses_only_archive_bytes`; tier-1 archival byte-preservation `archive_equivalence_v0::archived_v0_shapes_are_byte_preserved_from_their_open_records` (subcase `av0_g`) | — | **TIER-1 BYTE-PRESERVED** *(v0-origin; tier 2 owed — E5.2, 2026-08-28)* |
+| `AP-PRESERVED` | none — no stash-only / ref-only / combined **archive** fixture; the evidence is live-workspace GC | `characterization_preservation_v0::v0_gc_restarts_after_one_of_two_recorded_backup_refs_was_deleted`, `gc::explicit_gc_checked_deletes_only_backup_refs_and_archive_record` | — | **NO FIXTURE** *(PENDING-FIXTURE both tiers in the archive corpus, machine-enforced as exactly this pair; carrier R2-F fixtures/native-evidence lane — E5.2, 2026-08-28)* |
+| `AL-OPTIONAL-MISSING` | `av0_d` / `CompletedEvidenceGap` | `characterization_archive_v0::archived_v0_optional_evidence_gaps_remain_readable_and_untouched` (the four named gaps `exact_lock_bytes`, `complete_member_audit`, `accepted_root_input`, `publication_evidence`); tier-1 archival byte-preservation `archive_equivalence_v0::archived_v0_shapes_are_byte_preserved_from_their_open_records` (subcase `av0_d` — the tier-1 base is the pre-overlay archival act; the named evidence-gap overlay is byte-pinned by the characterization test) | — | **TIER-1 BYTE-PRESERVED** *(v0-origin; tier 2 owed — E5.2, 2026-08-28)* |
+| `AL-UNKNOWN` | `unknown_retention` / `CompletedCandidate` | `characterization_archive_v0::archived_v0_unknown_fields_and_raw_bytes_survive_status_and_retention` — **closes R0 §5.2's "open-record unknown round-trip unit test only" gap**; tier-1 archival byte-preservation `archive_equivalence_v0::archived_v0_shapes_are_byte_preserved_from_their_open_records` (subcase `unknown_retention` — the tier-1 base is the pre-overlay archival act; unknown-field survival is byte-pinned by the characterization test) | — | **TIER-1 BYTE-PRESERVED** *(v0-origin; tier 2 owed — E5.2, 2026-08-28)* |
+| `AR-C` | contradiction cases over `CompletedNoPublication` | `characterization_archive_v0::archived_v0_missing_optional_evidence_is_not_an_unreadable_contradiction`; tier-1 archival byte-preservation `archive_equivalence_v0::archived_v0_shapes_are_byte_preserved_from_their_open_records` (subcase `ar_c` — the tier-1 base is the pre-overlay archival act; the contradiction overlays are byte-pinned by the characterization test) | — | **TIER-1 BYTE-PRESERVED** *(v0-origin; tier 2 owed — E5.2, 2026-08-28)* |
 
 <!-- m4-map:end -->
 
@@ -1248,6 +1254,20 @@ forward: **18 UNBOUND** (10 progress + 8 archive), and the four rows now carry
 an executed per-scenario answer. The 13-registry-row arithmetic below is
 unchanged — none of the four gained a registry row, and §12.9(c) records why
 none can.]*
+
+*[E5 closure movement, 2026-08-28 — read forward from the C-1 note above: the
+18 UNBOUND rows are now 0. The 10 progress rows landed as 9 new
+`valid_unlisted_corpus` registry rows plus G-VERIFYING's clause-cited
+disposition on §12.9(c)'s own ground (§12.9(e) — the "10 registry rows"
+denominator was a 9+1 partition); the 8 fixtured archive rows carry executed
+tier-1 byte-preservation in the standalone archive corpus with tier 2 owed on
+all ten (carrier E4.4, ratified with its R2-F encumbrance named). The
+registry-row arithmetic below becomes: 22 rows bind 22 shape labels; the
+durable-object count is lower — `terminal/completed` is one object for two R0
+rows, and `terminal/completed-no-publication`'s object also carries
+J-NO-PUBLICATION-UNBORN's R0-terminal clause record (§12.9(e), the [P2-1]
+determination). §12.8's byte-equivalence verdict stays **PARTIAL** — tier 2 is
+executed nowhere.]*
 
 Registry-row arithmetic, since the map is not 1:1 in either direction: the 7
 `fixture_corpus` rows bind 7 shapes one-for-one; the 6 `valid_unlisted_corpus`
@@ -1480,6 +1500,50 @@ operations *finishing under v1* against v0's, which does not exist); **C-2
 [P3]** is untouched. §12.8's byte-equivalence verdict therefore stays
 **PARTIAL** and must still not be cited as green: the four rows gain an
 executed adaptation disposition, which is not the O8 byte-equivalence property.
+
+**(e) E5 landing corrections and the K/J(ii) record (added 2026-08-28 at the
+R2-E E5 landing; interior review adjudication A and findings
+[P1-1]/[P2-1]/[P2-4]; lane-owner determination).**
+
+- **(d)'s "10 progress" is a 9+1 partition.** Nine of the ten UNBOUND
+  progress rows gained `valid_unlisted_corpus` registry rows at E5.1
+  (`open/executing`, `open/awaiting-resolution`, `open/halted`,
+  `preserving/pre-acceptance`, `preserving/candidate`,
+  `preserving/root-prefix`, `rollback/pre-acceptance`, `rollback/evidence`,
+  `terminal/completed-no-publication`), each driven through the real
+  `decode -> adapt_open -> atomic upgrade` path by the one parametric test
+  the L6 ruling required. The tenth, `G-VERIFYING`, is (c)'s own case
+  arriving one row later: it is a `Finalizing` shape (R0 §4 row G, the
+  pairing `VerifyingPublication`↔`Finalizing`), so the corpus cannot hold it
+  without deleting the load-bearing closure assertion, and its disposition is
+  DISPOSITIONED-UNLISTED, recorded by clause with an executed arm of the same
+  test — §12.7's second branch, the F-BASELINE mechanism. E0.2b §8 [P2-2]'s
+  "10 registry rows" is therefore right as a shape count and off by one as a
+  registry-row count, for (c)'s own reason.
+- **(c)'s ground, corrected.** Its Finalizing-inexpressibility argument
+  reaches the three F rows and now `G-VERIFYING` — four `Finalizing` rows.
+  It never grounded `J-NO-PUBLICATION-UNBORN`: part (i) is ADAPTED at its
+  `Finalizing` window through the whitelist (Finalizing-ness is what makes it
+  adaptable, not what excluded it), and part (ii) is a terminal `Completed`
+  shape — a state the corpus could already express on the day (c) was
+  written (`terminal/completed`, `terminal/aborted` existed). J(ii)'s
+  DISPOSITIONED-UNLISTED record stands on its executed test and its contract
+  clauses (`:162-163`, `:125`), not on inexpressibility.
+- **The K/J(ii) same-object determination ([P2-1]).** E5.1's
+  `terminal/completed-no-publication` row binds `K-COMPLETED-NOPUB-OPEN`,
+  and its durable object is the object of J(ii)'s R0-terminal shape: the
+  corpus fixture is the identical construction to `compatibility_residue_v0`'s
+  unborn no-publication twin (measured by the E5 review, byte-for-byte, and
+  by construction the unborn one). One durable object, two R0 rows — the
+  same sanctioned pattern §12.6 records for `terminal/completed`. Both
+  records stand, because they answer different ledger questions: J(ii)'s
+  clause record answers R0 row J's per-case adaptation disposition
+  (2026-08-24); the registry row answers Table A row K's binding obligation
+  (E5.1, 2026-08-28). Registry-row arithmetic in §12.6's form: 22 rows bind
+  22 shape labels; the durable-object count is lower — `terminal/completed`
+  is one object for two R0 rows, and `terminal/completed-no-publication`'s
+  object also carries J(ii)'s clause record. This determination rides the E7
+  dual for second-axis scrutiny.
 
 **Executed run binding.** Tree gwz-core `1bd885f` plus this package, clean
 otherwise; Darwin 25.5.0 / arm64. `cargo test --lib -p gwz-core

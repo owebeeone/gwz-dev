@@ -2200,6 +2200,77 @@ fable token only where it makes a difference." Recorded consequences:
   checker skip-loudly or fail in a standalone CI clone), and
   opinions on the tier-2 questions.
 
+  **R2-E E5 IS LANDED — 2026-08-28; gwz-core main c11c5ef →
+  `221cd89` (E5.1) → `cf4213a` (E5.2) → `0a17e48` (landing
+  reconcile) → `fc0bb22` (the a6ce8a8 stale-pin fix). THE UNBOUND
+  SCENARIO SPACE IS MACHINE-RECORDED: 18 UNBOUND → 0 — nine new
+  valid_unlisted registry rows plus G-VERIFYING's clause-cited
+  disposition (the "10 registry rows" denominator was a 9+1
+  partition, §12.9(c)'s own ground — RATIFIED by the review;
+  Evidence §12.9(e)), and the eight fixtured archive rows tier-1
+  byte-preserved across the production archival act in the
+  standalone archive corpus (two PENDING-FIXTURE, carrier R2-F;
+  tier 2 owed on all ten).** Interior review GO-WITH-CONDITIONS
+  (GwzM5-8R2E-E5-Review.md, filed verbatim and committed): 1 P1,
+  4 P2 (two escalating), 6 P3; all six landing conditions
+  executed. [P1-1]: the forward map pin was short by one — E5.2's
+  own companion adds a second named test; pinned 43 and MEASURED
+  green against the real Evidence doc ("M4 scenario map: ok (39
+  scenario rows, 43 named tests, 22 registry rows all claimed)").
+  [P2-1] RULED (lane owner, escalation): the K/J(ii) same-object
+  fact is the sanctioned one-object-two-R0-rows pattern — both
+  records stand, they answer different ledger questions; §12.9(c)'s
+  ground corrected (it reaches the three F rows + G-VERIFYING —
+  four Finalizing rows, not five — and never grounded J(ii)); all
+  at §12.9(e); RIDES THE E7 DUAL for second-axis scrutiny. [P2-3]
+  RULED: E4.4 RATIFIED as tier-2 carrier WITH the R2-F encumbrance
+  named in the eight corpus carrier strings and at the plan's E4.4
+  entry (E4 gated on R2-F's relocation per ruling (a) — tier 2 is
+  transitively R2-F-dependent). TIER-2 SUB-SURFACE QUESTION
+  (review adjudication G(iii); builder flag 4 CONFIRMED): tier 2
+  as written in amendment §6.3 is NOT SATISFIABLE — two of
+  ArchivedMergeProjection's three fields differ by construction
+  between v1- and v0-produced archives — so a comparable
+  sub-surface must be minted BY AMENDMENT WITH DUAL REVIEW before
+  E4.4 executes tier 2; deliberately unminted (plan E4.4 entry;
+  E7-dual item). Corrections to the delivery record above: [P2-2]
+  "six distinct durable bases" is FIVE (module doc fixed); [P3-1]
+  "seven removed lines" was eight (the benign rollback/participant
+  re-add). Companion edits landed in THIS repo: Table A's ten rows
+  (registry ids + G-VERIFYING DISPOSITIONED-UNLISTED, each citing
+  the parametric test; the plain fn NOT cited as a test path, per
+  [P3-6]); Table B's ten rows (eight TIER-1 BYTE-PRESERVED + two
+  PENDING-FIXTURE); the §12.6 E5 closure-movement bracket (22 rows
+  bind 22 shape labels; durable-object count lower per the [P2-1]
+  note); §12.9(e); plan §1.1's 9+1 bracket + the E4.4
+  determinations. Landing gates all direct-exit green at 0a17e48
+  (fmt/check/clippy; 446 / 935+1 pre-existing ignored / 256;
+  boundary ok 15/5 + 69/69; compat 7/7/10 + 23/23) — lib total
+  1639. THE FIRST REAL-WORKSPACE BATTERY RUN SINCE THE v0.11.0
+  TRAIN EXPOSED A LATENT RED: a6ce8a8 added the manifest's twelfth
+  source (the recovery guide) and moved the driver marker but
+  missed the merge-docs unit-suite pin (11 vs 12) — the J-7 blind
+  spot's cost, invisible to worktrees and CI alike; fixed at
+  fc0bb22 with the provenance in the commit, and both
+  real-workspace batteries then GREEN (byte-equivalence: map 43/22
+  + g23 122; compatibility: 7/7/10 + 23/23 + merge-docs "ok (12
+  sources, 155 assertions)" + suite 3/3). Markers: lib remainder
+  darwin 935 EXECUTED, linux 936 DERIVED FIRST-DISPATCH-EXPECTED
+  (the dispatched Platform matrix measures it). Matrices
+  dispatched at fc0bb22: Windows 33138727062, Platform
+  33138728650; the boundary lane gate is green by construction at
+  each of the four new commits (boundary surface untouched).
+  E7-DUAL QUEUE ADDS: the K/J(ii) determination; the tier-2
+  sub-surface amendment question. E6 QUEUE ADDS: [P3-2] (execute
+  the structural publication_step claim over the whitelist),
+  [P3-3] (weaken-and-raise coverage for VALID_UNLISTED_STATES —
+  including a finalizing-rejected probe — and the new
+  ARCHIVE_DISPOSITIONS/TIER_STATUSES closed sets). [P3-4] recorded
+  (six of ten shapes reach their windows by disclosed field
+  re-statement); [P3-5]'s ground sentence fixed at the reconcile.
+  NEXT IN R2-E: E6 residue, then the E7 settle; E4 stays gated on
+  R2-F's relocation per the operator's ruling (a).
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

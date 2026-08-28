@@ -130,7 +130,11 @@ it.
   registry-row count; E5.2 owes **8** archive-corpus rows + **2**
   PENDING-FIXTURE rows (carrier R2-F); 10 + 8 = 18; the other two
   NO-FIXTURE scenarios (`B-NOT-STARTED`, `B-PREPARING-EMPTY`) are
-  not R2-E's at all.
+  not R2-E's at all. *[E5 landing, 2026-08-28: the 10 progress-shape
+  debts execute as **9 registry rows + 1 clause-cited disposition** —
+  `G-VERIFYING` is a `Finalizing` shape, so §12.9(c)'s own ground
+  applies and a tenth row would weaken the registry; ratified by the
+  E5 interior review (adjudication A). Evidence §12.9(e).]*
 - **O11 — CLOSED NEGATIVE at E0.1** (no v0.11.0 production path
   reaches the identity probe; the exposure arrives at E4.1), and its
   capability-refusal UX **folded into E4.1's precondition set**,
@@ -254,7 +258,21 @@ any E4 row that admits actions touching the roaming anchor.)*
   path — `v1_lifecycle/store/rewrite.rs`'s raw writer converts here;
   the O13 checker inventory retires to empty across E4.2/E4.3.)*
 - **E4.4** — terminal archive source-only (+ the O8 `gc_archived`
-  production route lands with the archive consumer).
+  production route lands with the archive consumer). *(E5 landing,
+  2026-08-28 — two lane-owner determinations, review [P2-3] and
+  adjudication G: (1) E4.4 is RATIFIED as carrier of the owed tier-2
+  archive-equivalence executions for the eight
+  byte-preserved-v0-origin corpus rows — transitively R2-F-dependent,
+  since E4 opens only after R2-F's relocation under the operator's
+  ruling (a); the corpus carrier strings name the encumbrance.
+  (2) Tier 2 as written in amendment §6.3 is NOT SATISFIABLE against
+  the whole frozen projection surface — a v1-produced and a
+  v0-produced archive of the same scenario differ by construction in
+  `source_version` and the acceptance discriminant — so before E4.4
+  executes tier 2, a comparable sub-surface must be minted BY
+  AMENDMENT WITH DUAL REVIEW, not by the implementing step;
+  deliberately unminted at E5 per §6.3's rejected-alternative
+  warning. Queued for the E7 dual.)*
 - **E4.5** — stash bundles + markers (two rows, one package if they
   share the parent-durability seam).
 - **E4.6** — workspace checked mutation + `.git/info/exclude`.
