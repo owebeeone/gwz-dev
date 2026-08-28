@@ -2478,6 +2478,26 @@ fable token only where it makes a difference." Recorded consequences:
   green. **v0.11.1 releases from this tip once CI closes, per
   the operator's charter.**
 
+  **CONF-INTEGRITY CI: WINDOWS FIRST-DISPATCH RED, FIXED FORWARD
+  (2026-08-29).** At 9a64ce9 the Platform matrix (33184770319),
+  boundary (33183463215) and retained-readers (33183463144) legs
+  were green, but the Windows matrix (33184767171) failed: ALL
+  TEN `conf_gate::tests` failed their shared fixture with os
+  error 267 (NotADirectory, "The directory name is invalid") —
+  the module's hand-rolled temp_dir embedded SystemTime's Debug
+  rendering in the directory name, which carries braces, spaces,
+  and a COLON, and a colon is not a legal Windows filename
+  character. Every other conf-lane module used the crate's
+  TempDir helper and passed (1632/1642 with only this module
+  red); darwin and linux never see it because those are legal
+  unix filename bytes — a pure first-dispatch-on-Windows class.
+  Fixed forward at `cc7c625` (test-fixture-only: nanos since the
+  epoch, like every other unique-name site in the crate; no
+  production change, no count move; darwin gates re-run green,
+  remainder re-measured 979). Both matrices + push legs
+  re-dispatched at cc7c625 (Windows 33188777003, Platform
+  33188779600); v0.11.1 cuts from cc7c625 on their green.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
