@@ -2441,6 +2441,43 @@ fable token only where it makes a difference." Recorded consequences:
   batteries, CI. The release train now waits only on the
   conf-integrity lane (remediation r1 in flight).
 
+  **CONF-INTEGRITY IS LANDED (2026-08-29) — gwz-core main afbc25d
+  → `9a64ce9`; the release tip is assembled.** The standalone lane
+  (operator-chartered defense of gwz.conf against agent hand
+  edits) landed as TWO commits per ritual 7's squash arm — the
+  rebase onto afbc25d invalidates per-commit green transfer, so
+  `2c305d7` squashes the five reviewed commits citing their shas
+  (b23a68e/3aa48ab/0523f0e/cf4f308/2508343, reviews
+  GwzConfIntegrity-Review.md GO-WITH-CONDITIONS +
+  -Review-2.md verification) with the compile triad run on the
+  squash itself, and `9a64ce9` is the landing reconcile. The
+  verification pass discharged every round-1 condition EXCEPT
+  P1-1's dry-run clause, finding NF-1 (P2): handle_branch and
+  handle_stash wrapped the gate in `if _guard.is_some()`, so
+  `branch --create --dry-run` / `stash push --dry-run` returned
+  Ok over a real hand edit. CURED AT THE RECONCILE in the
+  reviewer's own shape — gate on the op, not the guard (List
+  stays ungated for damaged-workspace inspectability; a mutate
+  dry run refuses and cannot write, since reconcile_authority
+  stays None) — with a regression test that also pins the
+  ungated List reaching PAST the gate to ordinary id validation.
+  NF-2 (P3) cured: the round-trip comment no longer claims the
+  unresolvable-exponent case ends Skipped; the 1e400 string
+  retype is PINNED by assertion. NF-3 (match-arm classification
+  ≠ chain membership) and NF-4 (guard root-equality assert)
+  recorded as BACKLOG per the verification's grading, alongside
+  the two merge-lane follow-ups the round-1 review accepted (the
+  lock banner blocked by render_complete_lock's comment-stripping
+  byte-compare; the composition commit not carrying the marker —
+  now harmless, the gate reconciles). Pins: lib remainder 937 →
+  979 darwin-MEASURED / 938 → 980 linux-DERIVED (+42,
+  cfg-independent; dated driver block); CA 447 and v1_lifecycle
+  256 re-measured unchanged; g23 124 unchanged; boundary ok
+  15/5. Gates at the tip all direct-exit green. Real-workspace
+  batteries running at 9a64ce9; matrices dispatch on their
+  green. **v0.11.1 releases from this tip once CI closes, per
+  the operator's charter.**
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
