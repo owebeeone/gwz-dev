@@ -2367,6 +2367,64 @@ fable token only where it makes a difference." Recorded consequences:
   peer-blind, checklist A–L) LAUNCHED at `a593dbd` in a detached
   review worktree; adjudication and landing follow its report.
 
+  **R2-E E6 IS LANDED (2026-08-28) — gwz-core main fc0bb22 →
+  `afbc25d`, batteries green, matrices dispatched.** The pushed
+  chain: `8c59521` (operator agents-template edit, riding the
+  train per its standing ruling) → `d73abe8` E6.1 → `e1e043f`
+  E6.2 → `a593dbd` E6.2b → `afbc25d` (landing reconcile). The
+  interior review (GwzM5-8R2E-E6-Review.md) returned GO — no
+  P0/P1/P2, seven P3 record-only — and independently reproduced
+  all three probe claims (O10 negative build E0599; anchor
+  guard-removal failure at tests.rs:532; the driver's win32
+  import refusal) and recomputed all seven protected digests from
+  the git objects (exactly one moved; its diff exactly the two
+  anchor edits). The reconcile folded the reviewer's offered
+  cures: [F-1] the closed-grammar table row corrected to
+  `.ca1-anchor-retired-<ordinal>`; [F-2] the refusal test now
+  asserts the whole directory listing unchanged across the
+  refusal; [F-3] the survey comment states the trade
+  (slot-wastage exchanged for a recoverable fail-closed refusal
+  on the foreign shape — the lane owner reads this as the step's
+  own authorization, NOT a semantics move needing E0.2b); [F-4]
+  the driver baseline claim distinguishes executed lib totals
+  from subtraction-derived remainder values — with a SECOND dated
+  platform.rs digest re-pin (comments and one test assertion
+  only). LEDGER-CLOSURE WORDINGS ([F-5]): O10 closes as
+  "cfg(test)-gated variants — a third shape, strictly stronger
+  than both named options (production compiles no constructor at
+  all; negative compile probe verified twice)". E7-DUAL QUEUE ADD
+  ([F-6]): anchor nit 1 (the unbounded read in the SHARED
+  `observe_leaf_exact`, observation.rs:249, twenty-one call sites
+  across six modules) travels WITH the in-tree cure template the
+  reviewer found — platform.rs:219-234's bounded verification
+  read (try_reserve_exact + take(len+1)) — narrowing E7's
+  decision to "reuse this shape or bound the shared reader".
+  [F-7]: the Phase E6 plan heading is annotated this same commit
+  — the review-debt ledger empties at E7, not E6 (nit 1 and
+  E6.3's dated no-work record both spill by ruling).
+  REAL-WORKSPACE BATTERIES ALL GREEN at afbc25d (the J-7 ritual,
+  no latent red this round): fault 256 / root_fault_matrix
+  RELEASE 1 passed (665.5s — re-measured after two skipped
+  rounds) / census 447 / remainder 937; compatibility 7/7/10 +
+  suite OK + merge-docs 12 sources 155 assertions + suite OK;
+  byte-equivalence map ok (39 scenario rows, 43 named tests, 22
+  registry rows all claimed) + g23 124. Pins at the tip: CA
+  447 darwin-MEASURED / 457 linux-DERIVED; remainder 937
+  darwin-MEASURED / 938 linux-DERIVED (NOT cfg-independent — the
+  two O9 tests are cfg(unix); first such delta, recorded in the
+  driver both places); g23 124. Matrices dispatched at afbc25d
+  with a background watcher. NEXT: the conf-integrity lane
+  (standalone, operator-chartered): its interior review returned
+  GO-WITH-CONDITIONS (GwzConfIntegrity-Review.md — P1-1 dry-run
+  marker write without guard, P1-2 --force blesses an unparseable
+  lock, plus the settings-JSON round-trip cluster); remediation
+  round 1 dispatched with lane-owner rulings on all ten
+  actionable findings; verification pass then landing (rebase
+  onto afbc25d; remainder pin will move 937→967 measured at that
+  landing), THEN v0.11.1 IS OPERATOR-CHARTERED from that tip
+  ("let's cut v0.11.1 on E6 and conf integrity fixes",
+  2026-08-28). E7 follows the release; E4 stays gated on R2-F.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

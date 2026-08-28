@@ -297,6 +297,14 @@ conversion surface).
 
 ### Phase E6 — donated hardening riders (milestone: the review-debt ledger empty)
 
+*[E6 landed 2026-08-28 at `afbc25d` (review GO; its F-7): the milestone is met
+except two rows that spill by lane-owner ruling — anchor nit 1, re-routed to
+the E7 dual because its deferral terms no longer describe the tree (the
+unbounded read lives in the shared `observe_leaf_exact`, observation.rs:249;
+E7 inherits the in-tree bounded-read template at platform.rs:219-234 per
+review F-6), and E6.3's VOID, closing with its dated no-work record at E7.2.
+The review-debt ledger therefore empties at E7, not E6.]*
+
 - **E6.1** — O9: the composed-path upgrade-failure test (fs-level
   fault injection; reuses E1-E3's injection machinery — schedule
   after any one of them lands).
