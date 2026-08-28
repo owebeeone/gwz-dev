@@ -2533,6 +2533,24 @@ fable token only where it makes a difference." Recorded consequences:
   481-item reconciliation + ledger close); E4 stays gated on
   R2-F's relocation.
 
+  **v0.11.1 RELEASE ADDENDUM (2026-08-29) — THE THIRD CHANNEL:
+  PyPI IS AT 0.11.1.** The initial cut missed the gwz-py channel
+  (the operator caught pypi.org/project/gwz still at 0.11.0):
+  gwz-py's RELEASE.md points backward at core and cli, but
+  nothing pointed forward. Completed: gwz-py released via its own
+  scripts/release.py v0.11.1 --push (release branch reconciled at
+  `e0a8210`, gwz-py 0.11.1 pinning gwz-core v0.11.1; the script's
+  full check env passed — protocol drift/regen, cargo check,
+  python tests, wheel build + installed-command smoke); GitHub
+  release published; publish.yml run 33212835859 SUCCESS (five
+  platform wheels + sdist, each smoke-tested, PyPI trusted
+  publishing); pypi.org reports latest = 0.11.1. THE RUNBOOK GAP
+  IS CLOSED AT THE SOURCE: gwz-cli RELEASE.md step 6 ("the
+  release is not done until PyPI moves too") forward-points at
+  gwz-py's process, committed and pushed (`11bca66`). v0.11.1 is
+  now complete across all three channels: gwz-core `be693bd`,
+  gwz-cli `3e6f974` (16 dist assets), gwz-py `e0a8210` (PyPI).
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
