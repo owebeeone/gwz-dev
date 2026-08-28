@@ -2498,6 +2498,41 @@ fable token only where it makes a difference." Recorded consequences:
   re-dispatched at cc7c625 (Windows 33188777003, Platform
   33188779600); v0.11.1 cuts from cc7c625 on their green.
 
+  **v0.11.1 IS RELEASED (2026-08-29) — both repos tagged,
+  published, verified; THE LINUX PINS ARE NOW EXECUTED.** CI
+  closed green at cc7c625 (Windows 33188777003 with the fixture
+  fix, Platform 33188779600, boundary 33188777639;
+  retained-readers path-filtered out legitimately, its 9a64ce9
+  green covering the untouched surface). gwz-core released via
+  scripts/release.py v0.11.1 --push: full local gate in a clean
+  worktree, then `be693bd` (chore(release): gwz-core 0.11.1) +
+  tag v0.11.1 pushed atomically. gwz-cli released via its
+  scripts/release.py v0.11.1 --push: release branch reconciled at
+  `3e6f974` (gwz-cli 0.11.1, pins gwz-core v0.11.1), built and
+  tested against the pinned tag, tag pushed atomically (cli main
+  177f25d carries the v0.11.1 compatibility notes; docs gate
+  re-verified 12 sources / 155 assertions after the edit). Both
+  GitHub releases PUBLISHED (core with the hand-written notes per
+  the v0.11.0 precedent — conf-integrity defense with named
+  accepted residuals, the anchor tightening WITH its remedy line,
+  the verification expansion, not-in-this-release; cli notes
+  point at core). Pipelines: cli dist Release SUCCESS — 16
+  assets; core Release verify SUCCESS on windows-2022 AND
+  ubuntu-24.04. Runbook verification executed: sha256 checksum
+  OK, gh attestation verify OK, released binary reports gwz
+  0.11.1 with correct help, and the unix installer smoke test
+  from releases/latest installs and runs 0.11.1. **MARKER
+  DISCHARGE: the release verify's ubuntu leg ran the fault
+  battery against the pinned counts — checked_artifact 457,
+  lib remainder 980, v1_lifecycle 256, root_fault_matrix 1, all
+  EXECUTED on linux — so every FIRST-DISPATCH-EXPECTED linux
+  marker in the driver is discharged by direct execution, not
+  sum-confirmation; E7.2's per-OS re-measurement obligation for
+  the current pin set is met by this run (E7 should cite run
+  33196576270).** NEXT: E7 settle (dual #2 + acceptance +
+  481-item reconciliation + ledger close); E4 stays gated on
+  R2-F's relocation.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
