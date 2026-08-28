@@ -2425,6 +2425,22 @@ fable token only where it makes a difference." Recorded consequences:
   ("let's cut v0.11.1 on E6 and conf integrity fixes",
   2026-08-28). E7 follows the release; E4 stays gated on R2-F.
 
+  **R2-E E6 CI CLOSURE (2026-08-29) — all four legs green at
+  afbc25d, linux pin set sum-confirmed again.** Checked-artifact
+  boundary 33173532231 + Retained merge readers 33173532235
+  (push-triggered) and Windows matrix 33175382330 + Platform
+  matrix 33175385033 (dispatched) all completed `success`. The
+  Platform sums hold to the digit on both hosts: darwin `1641
+  passed + 1 ignored` = 447 + 937 + 256 + 1 (the four measured
+  pins); linux `1652 passed + 1 ignored` = 457 + 938 + 256 + 1
+  (the driver's derived linux set — SUM-CONFIRMED, per-partition
+  linux execution still owed at E7's three-platform acceptance).
+  The cfg(unix) O9 pair is correctly PRESENT on linux (+2 inside
+  the 938) and absent only on Windows, whose matrix leg is green.
+  THE E6 CYCLE IS FULLY CLOSED — build, review, landing,
+  batteries, CI. The release train now waits only on the
+  conf-integrity lane (remediation r1 in flight).
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
