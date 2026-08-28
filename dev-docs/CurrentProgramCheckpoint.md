@@ -2143,6 +2143,63 @@ fable token only where it makes a difference." Recorded consequences:
   and E6 residue; E4 remains gated on R2-F's relocation per the
   operator's ruling (a).
 
+  **R2-E E5 IS DELIVERED — 2026-08-28; branch `e5-archive`
+  (worktree e5-worktree), TWO commits off c11c5ef: `221cd89`
+  (E5.1) + `cf4213a` (E5.2). Builder reports all gates
+  direct-exit green (446/935+1/256; boundary ok + 69/69; compat
+  checker "validated 7 migration rules, 7 runtime bindings, and
+  10 archive shapes" + 23/23; g23 119→122), lib-remainder marker
+  moved 932→935 darwin-MEASURED / 933→936 linux-DERIVED
+  FIRST-DISPATCH-EXPECTED, no fault-key/census/wire/production
+  surface touched, and the only removed lines in the range the
+  seven pin/marker strings.** E5.1 is ONE commit per L6 (the
+  rows + the parametric `adapt_open` refusal test together; no
+  precheck-walk call in the file — the walk discharges nothing
+  here). FIVE FLAGS RAISED FOR ADJUDICATION: (1) NINE registry
+  rows + ONE clause-cited disposition, not ten — G-VERIFYING is
+  a `Finalizing` shape (R0 §4 row G), so §12.9(c) binds by its
+  own reason: the E0.2b §8 [P2-2] "10 registry rows" denominator
+  is claimed off by one, and §12.9(c)'s four-row Finalizing list
+  really five; the disposition is DISPOSITIONED-UNLISTED in
+  §12.7's second form (executed test
+  `g_verifying_is_dispositioned_by_clause` — the registry's
+  closed publication_step enum lacks verifying_publication, so
+  zero rules can match). (2) Corpus state vocabulary widened by
+  three NON-Finalizing tokens (executing / awaiting_resolution /
+  halted), dated; the Finalizing exclusions untouched and still
+  panicking. (3) TIER 2 IS OWED ON ALL TEN ARCHIVE ROWS — no
+  v1-finished archive fixture exists on this tree (the v1
+  archive tests are synthetic-bytes only; nothing reads back
+  .gwz/merge/done/ after a real run); builder proposes E4.4 as
+  carrier (lane-owner ruling owed). (4) OPEN DESIGN QUESTION:
+  tier 2 as literally stated may be UNSATISFIABLE — a
+  v1-produced vs a v0-produced archive of the same scenario
+  differ by construction across the WHOLE frozen projection
+  surface (SupportedPersisted vs LegacyComplete, plus
+  source_version), so tier 2 additionally needs a defined
+  comparable sub-surface; deliberately NOT minted by the builder
+  (the amendment §6.3 rejected-alternative warning against
+  narrowing a comparison to make the clause look met). (5) Eight
+  tier-1 rows over six distinct durable bases (three fixtures
+  are post-archive overlays; byte-preservation claimed as a
+  property of the archival act), disclosed in the module doc.
+  The E0.2b §8 denominators are machine-enforced in the checker
+  (exactly 8 tier-1-executed; the PENDING-FIXTURE pair exactly
+  AC-NOPUB-UNBORN + AP-PRESERVED, carrier R2-F); the §12.8
+  PARTIAL statement untouched. LANE-OWNER LANDING DUTIES QUEUED:
+  the Evidence-doc §12.3 Table A / §12.4 Table B companion edits
+  (this repo) — the M4 map checker carries the forward pin "(39
+  scenario rows, 42 named tests, 22 registry rows all claimed)"
+  DOC-PENDING and is RED by construction until they land — plus
+  the §12.9(c)/(d) dated corrections if the review ratifies flag
+  (1), and the tier-2 carrier ruling. INTERIOR SINGLE-AXIS
+  REVIEW LAUNCHED 2026-08-28 (Opus, peer-blind; report files
+  verbatim to GwzM5-8R2E-E5-Review.md); the review carries the
+  ratify/overturn ruling on flag (1), the CI-impact analysis of
+  the DOC-PENDING pin (landing-order load-bearing: does the map
+  checker skip-loudly or fail in a standalone CI clone), and
+  opinions on the tier-2 questions.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
