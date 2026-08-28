@@ -2271,6 +2271,41 @@ fable token only where it makes a difference." Recorded consequences:
   NEXT IN R2-E: E6 residue, then the E7 settle; E4 stays gated on
   R2-F's relocation per the operator's ruling (a).
 
+  **R2-E E5 CI CLOSURE (2026-08-28) — ALL SIX LEGS GREEN, AND THE
+  LINUX PIN SET IS SUM-CONFIRMED.** The six dispatched legs all
+  completed `success`: Checked-artifact boundary + Retained merge
+  readers at 0a17e48 (33138567559 / 33138567560) and at fc0bb22
+  (33138695320 / 33138695324), Windows matrix 33138727062, Platform
+  matrix 33138728650. The Platform run measures the FULL lib suite
+  per platform, not the partitions, so condition 6 discharges at
+  sum level, and the identities land to the digit on both hosts:
+  darwin `1638 passed + 1 ignored` = 446 + 935 + 256 + 1 (the four
+  darwin pins, each already partition-measured on this tree); linux
+  `1649 passed + 1 ignored` = 456 + 936 + 256 + 1 (the aggregate
+  driver's four linux pins as a set — the FIRST measured linux
+  touchpoint since that derived chain's root). Within the linux
+  sum, the root-fault-matrix release leg is per-partition measured
+  by its own log line (`1 passed; 1649 filtered out`, which also
+  fixes the linux lib census at 1650 = 1649 executed + 1 ignored);
+  the other three linux addends (456 / 936 / 256) remain
+  individually DERIVED, jointly sum-confirmed, and their
+  per-partition linux execution is OWED AT THE E7 THREE-PLATFORM
+  ACCEPTANCE, which should rewrite the driver's linux pins as
+  measured numbers. Marker movement: lib remainder linux 936
+  DERIVED FIRST-DISPATCH-EXPECTED → SUM-CONFIRMED at the fc0bb22
+  Platform dispatch. One premise-check made during closure, for the
+  record: the one ignored test
+  (`operation::workspace_mutator_lock::tests::
+  child_process_observes_lock_contention`) carries a BARE
+  unconditional `#[ignore]` (workspace_mutator_lock.rs:279), so it
+  is ignored on every platform — both hosts showing exactly 1
+  ignored is consistent, and the darwin/linux remainder offset
+  (935 vs 936) is a baseline platform delta predating R2-E, not
+  that test executing on linux. No live pin is wrong; no code
+  change. THE E5 CYCLE IS FULLY CLOSED — build, interior review,
+  landing, and CI, with nothing owed forward except what the E6/E7
+  queues already carry.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
