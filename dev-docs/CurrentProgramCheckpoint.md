@@ -2306,6 +2306,67 @@ fable token only where it makes a difference." Recorded consequences:
   landing, and CI, with nothing owed forward except what the E6/E7
   queues already carry.
 
+  **R2-E E6 DELIVERED (2026-08-28) — three commits on 8c59521,
+  review launched.** Builder (Opus) delivered `d73abe8` (E6.1) →
+  `e1e043f` (E6.2) → `a593dbd` (E6.2b), each lane-gate green with
+  measured partitions. E6.1/O9: the composed-path upgrade-failure
+  fallback EXECUTED with no production seam — the builder first
+  PROVED no permission-class fault can isolate the upgrade leg
+  (both stagers use the same create_new primitive into the same
+  directory; the composed entry crosses ZERO fault-key boundaries,
+  probed) and then used the staging-name window: the upgrade's
+  temp name is exactly 8 bytes (`.upgrade`) longer than the
+  store's, so a crafted id length drives the upgrade over the
+  255-byte component cap while the v0 leg fits — a genuine open(2)
+  refusal with `AtomicUpgradeFault::None` untouched; id supplied
+  at the start via the existing cfg(test) IdProvider (patching
+  later breaks the GWZ-Merge-ID trailer — measured). Control arm
+  (ordinary id migrates to V1) plus an isolation-guard second test
+  pinning the refusal as IoError, not a compatibility verdict —
+  TWO tests, both cfg(unix): the FIRST non-cfg-independent lib
+  delta in R2-E (Windows totals now legitimately differ; noted in
+  the driver). O10: `#[cfg(test)]` on the four injected variants —
+  stronger than sealing (production compiles NO constructor;
+  negative compile probe verified, then reverted). Riders: the
+  abort-bound guard tie executed test-side (dirtied path required
+  OUTSIDE the reported conflict set); E5 [P3-2] executed as
+  assertions joining `g_verifying_is_dispositioned_by_clause` (no
+  count move, deliberately); E5 [P3-3] four weaken-and-raise tests
+  (compat suite 23→27, incl. the finalizing-rejected probe); E1 F3
+  `_fault_count` docstring CURED — NOT absorbed by E5 (the
+  unqualified "never derived" sentence still contradicted three
+  derived blocks below it; now scoped to its v0.11.0 baseline).
+  LANE-OWNER RULINGS (the brief's own contradiction, owned): the
+  charter said both "O10 is the only production change" and
+  "execute the two anchor nits" (production edits in anchor.rs) —
+  builder correctly held the restrictive reading and stopped.
+  Ruled: ANCHOR NIT 2 AUTHORIZED and executed at `a593dbd` — the
+  retired-ordinal parse now requires `retired_name(parsed) ==
+  text` else Invalid, implemented against retired_name's REAL
+  unpadded rendering (the amendment's "canonical two-digit parse"
+  phrasing misdescribes it — corrected in the commit); negative
+  check performed (guard reverted → test fails at the first
+  rejected rendering). ANCHOR NIT 1 NOT IMPLEMENTED — RE-ROUTED TO
+  THE E7 DUAL with the builder's finding as the record: the
+  deferral's ":394 one-line take() cure" no longer describes the
+  tree; the unbounded read lives in the SHARED
+  `observe_leaf_exact` (observation.rs:249) every leaf observation
+  uses, so the cure is a design decision (bounded observation
+  entry vs cap on the shared reader). PINS (measured/derived per
+  convention, dated docstring blocks appended): remainder
+  935→937 darwin-MEASURED / 936→938 linux-DERIVED; g23 marker
+  122→124 MEASURED; checked_artifact 446→447 darwin-MEASURED /
+  456→457 linux-DERIVED; `PROTECTED_SOURCE_TREE_DIGESTS
+  ["checked_artifact/platform.rs"]` RE-PINNED on the E2 precedent
+  — all seven digests recomputed, EXACTLY ONE moved (the evidence
+  the edit stayed inside the anchor protocol) — the SECOND
+  deliberate lowering of that fail-closed guard in R2-E, flagged
+  to the review by name; root_fault_matrix release leg not re-run
+  by the builder (nothing touches v1_lifecycle) — runs at the
+  landing's fault battery. Interior single-axis review (Opus,
+  peer-blind, checklist A–L) LAUNCHED at `a593dbd` in a detached
+  review worktree; adjudication and landing follow its report.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
