@@ -823,6 +823,27 @@ This is the frozen map; RemPlan §10 is annotated to point here (§8, D4).
 > authorization: E2.1 must land the alias lifecycle with `completed_record`,
 > `retain_file` and `require_named_file_identity` **unchanged** (DECISION B-5,
 > fresh-copy alias).)*
+>
+> **Named-exception annotation (2026-08-29, E7.2 — discharging dual #2's
+> condition C2; [R2-P3-2]'s disposition, both peer-blind axes convergent).**
+> One durable edge on the barrier drive path is announced by no `barrier.*`
+> key, deliberately: **primitive family P5's roaming recovery return rename**
+> — the converge of a stranded outbound alias (`prepare_roaming_target` row
+> three), which runs *before* the family's drive proper and, on the
+> `Stranded` path, on a drive where `private_barrier` is never called. It is
+> one atomic no-replace rename, idempotent and self-converging (a crash
+> before it re-presents row three; a crash after it presents row two), and
+> the seeded-state row already asserts census-exactly everything an
+> interruption row could assert, on both target variants. A seventeenth key
+> would move the frozen sixteen-key record and the 165 census to buy zero
+> new distinguishable crash-window evidence — the 17th key is refused on
+> substance. "Every durable barrier edge is announced" is true of the
+> family's own boundaries and carries this named exception for P5-recovery
+> convergence; the `barrier_mutation.rs` module header's universal reads as
+> "all `barrier.*` announcements live in this file" (Code axis F1/Q2; State
+> axis queue item 3; the optional in-code qualifying clause rides the C1
+> carrier train, declined at E7.2 to avoid a comment-only protected-tree
+> digest move).
 | `terminal.*` | 11 | R2-D **Phase 4** (step 4.2, terminal retirement edges) | reserved |
 > `terminal.*` non-activation record (2026-08-23, Step 4.2 landing; resolves the
 > plan's own conditional, "and `terminal.*` if its edges convert here"): **0 of

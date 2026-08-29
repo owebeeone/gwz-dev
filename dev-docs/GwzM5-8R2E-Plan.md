@@ -239,6 +239,25 @@ refused (E0.2 §5.2, with E0.2b §6.4's fifth ground —
 `workspace_mutator_lock.rs` is byte-pinned). E2.2 strictly precedes
 any E4 row that admits actions touching the roaming anchor.)*
 
+*(E7.2 annotation, 2026-08-29 — the [R2-P3-1] scope clause written
+where E4's builder will read it, discharging the E7.1 State axis's
+[P2 F1]: **a settled barrier ordinal does not imply its target
+parent's dirents were ever ordered; E4 consumers must not rely on
+the implication** ([R2-P3-1], E2 review round 2). The dual's
+disposition of the underlying contract fork: the non-implication is
+stated explicitly rather than widening the restart path to
+re-barrier a converged alias — re-barriering would be an
+E0.2b-class semantics move on the frozen 16-key record, for a
+property no current consumer needs; E4 consumers that need ordering
+must barrier for themselves. Its terminal sibling clause, same
+authority (dual #2 Code axis F4/Q4, disposing E3 F7): **the terminal
+converged-restart return — converged-by-observation — does not imply
+key #8's retired-root flush or key #9's catalog-root barrier ran on
+that drive; converged does not imply flushed.** E4's first consumers
+must not assume either implication; any corpus-wide re-flush
+tightening is a hardening-lane decision (R2-F class), not a consumer
+assumption.)*
+
 - **E4.1** — `WorkspaceMutatorLock` runtime bootstrap (the O2
   activation rides here: `recover_or_create`'s first production
   caller, gated by the E0.1(b) §11.3 restatement). *(Corrected

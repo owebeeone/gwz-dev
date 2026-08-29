@@ -2551,6 +2551,69 @@ fable token only where it makes a difference." Recorded consequences:
   now complete across all three channels: gwz-core `be693bd`,
   gwz-cli `3e6f974` (16 dist assets), gwz-py `e0a8210` (PyPI).
 
+  **R2-E IS ACCEPTED — E7 CLOSED, 2026-08-29 (operator: "proceed with
+  E7").** Dual #2 ran peer-blind Fable×2 at `be693bd`: **Code
+  GO-WITH-CONDITIONS (0 P0/P1/P2, 4 P3)** — all gates direct-exit green
+  in its own worktree (447/979+1/256 matching darwin pins), all five
+  machine-enforced inventories perturbation-probed RED-and-reverted,
+  digest re-pin archaeology 8597d32..be693bd clean, E3-F1 cure ratified
+  with an independent 64-recover/65-refuse probe, E2-P2-1 wedge
+  re-derived from slots.rs, O9's window arithmetic re-derived — and
+  **State GO-WITH-CONDITIONS (0 P0/P1, 1 P2, 7 P3)** — all fourteen
+  ledger close forms viable, pin chain re-derived to the digit, K/J(ii)
+  SUSTAINED, citation-drift PASS, wire zero-diff re-verified over the
+  whole span. Zero escalations; round 1 complete both axes; the
+  two-round cap never engaged; every condition a lane-owner fold
+  (E0-precedent), executed same-day: [P2 F1] the settled≠barriered
+  clause now a dated annotation AT THE PLAN'S E4 GATE NOTE with F4's
+  terminal sibling (converged≠flushed) beside it; C2 the freeze §3.5
+  barrier record's dated NAMED-EXCEPTION sentence for the P5 roaming
+  recovery rename (both axes converged independently; 17th key refused
+  on substance; the optional barrier_mutation.rs:19 clause DECLINED to
+  avoid a comment-only digest re-pin, riding the C1 train); C1 anchor
+  nit 1 closed RE-OWNED with named carrier = the next production train
+  touching checked_artifact/, carrying the Code axis's full Q1 shape
+  (bound observe_leaf_exact itself: cap from the identity-checked
+  opened.len() fstat, try_reserve_exact + take(len+1), signature
+  unchanged, 18 call sites untouched; [R2-P3-3]'s wording fix + F3's
+  stat-level family-gate reorder ride as one class; ':394' terms
+  retired); O3 close re-tensed per State F8; O8 close carries §12.9(e)
+  as denominator authority + the two-part tier-2 encumbrance; OPEN-
+  B2/B3/B7/B8 closed by citation; the ten-writer-rows entry written in
+  Step-4.2 form (E1-tip 4/4 + 1d50e59 + c11c5ef run ids), resolving
+  tuple :665 and §7.3's re-verify clause; E1-F1 16-KiB + E1-F2 carried;
+  E6.3's four-ingredient dated no-work record filed. **E7.2 EXECUTED:**
+  matrix acceptance by citation at the settled tree (Release run
+  33196576270 at be693bd — ubuntu job 98935133025 EXECUTED 457/980/
+  256/1, windows job 98935132771; darwin = the release's local gate;
+  boundary checker re-executed ok 15/5 at the acceptance); the 481-item
+  reconciliation EXECUTED against both denominators (blanket-hidden
+  481/50 → **337/54** via the twelve heir attributes; subsystem sweep
+  1657/85 → **998/82**; crate-wide 1154/141 recorded as context; −144
+  items = E1-E3's measured consumption, entry 14→0 fully consumed,
+  protocol ~144→66; residue = the E4-awaiting frozen surface, falling-
+  count expectation transferred to the E4 resumption); the driver's
+  linux pins converted DERIVED→MEASURED at gwz-core **`8e18403`**
+  (scripts-only +18, proportionate gates py_compile/--list/boundary all
+  0, pushed be693bd..8e18403; push legs fire routinely). **THE LEDGER
+  IS CLOSED row-by-row in GwzM5-8R2E-E7-Acceptance.md**: O4-O10, O12
+  DISCHARGED (O10 with the F-5 wording; O12 with this acceptance's own
+  acts); O11 closed-negative; O1/O2 RE-OWNED to R2-F-relocation→E4-
+  resumption (O1 carrying row :280 via O13); O3 RE-OWNED to the
+  relocation package (discharges on landing); O13 pin-half discharged /
+  substantive-half re-owned; E6.3 VOID with its dated record. THE
+  REVIEW-DEBT LEDGER IS EMPTY (F-7's terms met). Artifacts committed
+  with this record: GwzM5-8R2E-E7-ReviewCode.md + -ReviewState.md
+  (verbatim), GwzM5-8R2E-E7-Acceptance.md (status CLOSED), the plan's
+  E4-gate dated annotation, the freeze's named-exception annotation.
+  Worktree hygiene: both review worktrees + targets removed at lane
+  close. NEXT: **R2-E is done; the lane idles.** E4 resumes only after
+  R2-F's relocation package (operator's scheduling item, ruling "a");
+  R2-F also carries OPEN-R1, the PENDING-FIXTURE pair, C-2 fixtures,
+  T-5, multi-repo CI, MAX_PATH, native power-loss; M5c owns ordinary/
+  custom-message v1 starts; the C1 carrier train owns the nit-1 shape +
+  wording + gate-reorder class; conf-integrity backlog stands recorded.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
