@@ -2595,7 +2595,17 @@ fable token only where it makes a difference." Recorded consequences:
   count expectation transferred to the E4 resumption); the driver's
   linux pins converted DERIVED→MEASURED at gwz-core **`8e18403`**
   (scripts-only +18, proportionate gates py_compile/--list/boundary all
-  0, pushed be693bd..8e18403; push legs fire routinely). **THE LEDGER
+  0, pushed be693bd..8e18403; push legs CLOSED GREEN same day —
+  boundary 33230315908, retained readers 33230315940, both success;
+  nothing in flight anywhere on the program). PAUSE RECORD
+  (2026-08-29, operator: quota at 6%): the lane pauses AT THIS CLEAN
+  BOUNDARY until the Fable pool resets; resume step 1 = draft the
+  R2-F plan (ledger + phases + OPEN-R1 as the owner's first decision,
+  R2-E-plan shape); the remaining pool is reserve for emergencies
+  only. Non-Fable work may proceed during the pause: the gwz log
+  project (gwz-cli/dev-docs/GwzLogRequirements.md +
+  GwzLogAmbiguityRezo.md) implements on a non-Fable agent once the
+  operator's Rezo comments land. **THE LEDGER
   IS CLOSED row-by-row in GwzM5-8R2E-E7-Acceptance.md**: O4-O10, O12
   DISCHARGED (O10 with the F-5 wording; O12 with this acceptance's own
   acts); O11 closed-negative; O1/O2 RE-OWNED to R2-F-relocation→E4-

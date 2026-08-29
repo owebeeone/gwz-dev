@@ -1,0 +1,85 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a04ba4-8862-7092-ad29-ee8ec4a16c3c
+workspace_id: ws_default
+origin_url_hash: sha256:e35341f4b797aa8e57a066bf78413f40c277b3985e757118ca9aea8d390fbb9c
+created_at: unix-ms:1787975469176
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: f7ac2e6dd90e03f544a3c66c18cbd635ba36b243
+  branch: main
+selected_targets:
+- '@root'
+- mem_gwz_cli
+- mem_gwz_core
+- mem_taut
+- mem_gwz_py
+- mem_taut_shape
+- mem_taut_shape_rs
+- mem_taut_shape_py
+committed_targets:
+- '@root'
+members:
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: 11bca6672a91be7a7c6c98d4b97a384d444b829f
+    branch: main
+    detached: false
+    dirty: true
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: 8e18403ed4e46ecc892c6386bca50bf5bab92d6b
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 5f6689a30741f35c943839a6ead36582e6452a4b
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 5cd26a16f44cf8ae3a44b1ac334553d2765e3dab
+    detached: true
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 9a752094dbede65babcc6c44185f64cef4c6e974
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: 4154bb7953c30c3695f125d15268de3d37980d4d
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
