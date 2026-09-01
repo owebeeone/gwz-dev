@@ -135,8 +135,21 @@ matrix leg as the named first-dispatch obligation.
   directory each arm measures — commondir for the catalog,
   per-worktree `repo.path()` for the legacy git-dir arm — [P3-2]
   completed).
-- **R1.2 — the A1 activation tripwire** *(gwz-core; cap 60; its own
-  step per round-2's P1-3 disposition — a distinct feature, not a
+- **R1.2 — the A1 activation tripwire** *(gwz-core; HARD cap 130 —
+  ruled 2026-09-01 at the R1.2 round-1 review's counting-basis P2: the
+  R2-F cap basis is WHOLE handwritten lines including comments,
+  generated excluded, per the sibling convention; the original "60"
+  was a code-lines figure, and the mandated dated comments plus the
+  driver provenance block are the difference — reset recorded, not
+  waived. R1.1's cap, same ruling applied at its delivery: the mandated
+  dated-prose volume (ordering ground, ALL-placement ground, ASCII at
+  three sites, scratch-stem note, two exemption grounds, three-arm
+  MAX_PATH statement, driver provenance) makes whole-line 250 jointly
+  unsatisfiable with the charter — R1.1's HARD cap RESET to 420 whole
+  lines, code-substance expectation ~200; the delivery's
+  flag-not-trim was the stop-and-report behaving correctly, and its
+  reviewer verifies nothing beyond mandate rides in the prose. Its
+  own step per round-2's P1-3 disposition — a distinct feature, not a
   rider)*. The test asserting `recover_or_create`'s production caller
   count is exactly zero, dated comment naming E4.1 as the step that
   deliberately moves it to one.
