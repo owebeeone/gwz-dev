@@ -209,7 +209,12 @@ matrix leg as the named first-dispatch obligation.
   alternative without carrying — binds E4.1). Checkpoint position
   block written. §4 CI legs: Windows matrix 33478175102 + Platform
   matrix 33478177517 dispatched at `027da5b`, in flight at commit
-  time.
+  time — **CLOSED GREEN same day**: Windows SUCCESS (the split's
+  first Windows compile — first-dispatch obligation DISCHARGED);
+  Platform SUCCESS both jobs, linux full-lib 1817+1i = 462 + 1098 +
+  256 + 1 to the digit (derived set SUM-CONFIRMED, E5 precedent);
+  darwin 1806+1i exact; push legs green. **§4 EXIT CRITERIA ALL MET —
+  E4 open on every criterion.**
 
 ## 4. Exit criteria
 

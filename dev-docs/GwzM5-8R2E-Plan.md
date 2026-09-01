@@ -285,7 +285,21 @@ rewrite it in the caller-adding commit); (3) the R1.2 review's
 matcher-edge notes for the tripwire file ([P3-6] message wording free
 improvement; [P3-8]'s residual habit — a `// was:` comment — is closed
 by the landed comment-strip but stays the named shape to not
-reintroduce).]** E4.1's precondition set is SEVEN (§1.1's
+reintroduce); (4) **the path-constant second-authority pin** (operator
+skim, 2026-09-01, mechanics verified): the catalog leaf is owned by
+`CatalogPrivateNameV1::Final` but spelled AGAIN as
+`preservation_image.rs:20` `CATALOG_PRIVATE_PATH = ".gwz/catalog-final"`
+(the legacy twin at `:8` has the same relationship) — the dirt
+exemption and preservation blindness compile against the strings, not
+the enum, so a future leaf rename moves the catalog while merge
+silently keeps exempting the OLD path. Fixtures are fail-loud; the two
+production constants are the silent pair. Neither side can see the
+other (`pub(in crate::checked_artifact)` vs `pub(super)`), so the pin
+is the source-scan idiom IN `contracts.rs` beside the `leaf_bytes`
+pins it already holds (`:212`): read `preservation_image.rs`, assert
+both `= ".gwz/…"` literals byte-adjacent to their constant names —
+~6 lines, carried when E4.1 is already in `contracts.rs` moving the
+member pins.]** E4.1's precondition set is SEVEN (§1.1's
 O11 row). The `WorkspaceMutatorLock` §10 row's declared purpose —
 "runtime bootstrap only" — is load-bearing at E4.1: the runtime lease
 is bootstrap-only and identity-probe-free; the catalog lease is where

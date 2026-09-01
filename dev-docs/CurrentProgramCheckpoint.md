@@ -2676,9 +2676,22 @@ fable token only where it makes a difference." Recorded consequences:
   Platform matrix run 33478177517 DISPATCHED at `027da5b`, in flight
   at commit time** — conclusions recorded on completion; the linux
   leg is the 462/1098 DERIVED→MEASURED touchpoint (driver rewrite at
-  next lane touch per convention). NEXT: matrix conclusions → E4 (on
-  the operator's word) → M5c; escape lane still blocked on operator
-  handoff; GwzWt + GwzAi await operator direction.
+  next lane touch per convention). *[CLOSED GREEN same day: Windows
+  matrix 33478175102 SUCCESS — the split's first Windows compile, the
+  named first-dispatch obligation DISCHARGED; Platform matrix
+  33478177517 SUCCESS both jobs (macos-14; ubuntu-24.04-arm), linux
+  full-lib **1817 passed + 1 ignored = 462 + 1098 + 256 + 1 TO THE
+  DIGIT** — the derived pin set SUM-CONFIRMED per the E5 precedent
+  (per-partition x86 execution rides the next release verify; the
+  driver's DERIVED→MEASURED rewrite at next lane touch); darwin
+  1806+1 matches the measured set exactly; push legs
+  33477442748/33477442852 green. **R2-F plan §4 exit criteria: ALL
+  MET. E4 is open on every criterion.**]* E4.1's attention set gains
+  rider (4), the path-constant second-authority pin (operator skim
+  2026-09-01, mechanics verified — see the E4 gate note; carried when
+  E4.1 is already in `contracts.rs`). NEXT: E4 (on the operator's
+  word) → M5c; escape lane still blocked on operator handoff; GwzWt +
+  GwzAi await operator direction.
 
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
