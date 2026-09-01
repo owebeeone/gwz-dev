@@ -135,6 +135,28 @@ matrix leg as the named first-dispatch obligation.
   directory each arm measures — commondir for the catalog,
   per-worktree `repo.path()` for the legacy git-dir arm — [P3-2]
   completed).
+  **LANDED 2026-09-01 at gwz-core `027da5b`** (squashed per ritual 7,
+  citing candidate `4ba9071` — round 1 GO-WITH-CONDITIONS, 0 P0 / 1 P1
+  / 1 P2 / 6 P3 — plus condition fold `3d417f7` and digest companion
+  `1e2a106` — round 2 verification GO, probes A–F). The no-anchor
+  guarantee went spelling-blind ([R1.1-P1-1], the R1.2 precedent
+  mirrored: production namers of `prepare_private` ==
+  `[platform.rs, residue.rs]`); the decisive row's mechanism record is
+  platform-split ([R1.1-P2-1]: the `ca1-*` interior refusal is the
+  Windows arm; the disjointness assertion discriminates darwin/linux);
+  the FLAG-1 semantic-vector regeneration ruled LEGITIMATE — forced by
+  `catalog_bootstrap_record.rs:242`, round-trip validated
+  independently, the reviewed derivation recorded in the vectors' own
+  header. CAP RE-RULED 420 → 427-MEASURED: the +33 over the delivered
+  394 is entirely round-1-condition cure, reviewer rider-audit "none"
+  — a cap must never punish review conditions. Reconciled pins landed:
+  checked_artifact:: 448 → 452 darwin MEASURED / 458 → 462 linux
+  DERIVED FIRST-DISPATCH-EXPECTED; remainder 1097/1098 UNMOVED; six
+  checker digests moved (four delivery + two following the fold);
+  merge-docs battery from the real workspace ok (12 sources, 155
+  assertions); lane gate ok. [P3-2] (the trace's stale §7.6) and
+  [P3-5]'s capture-full-output note ride R1.3. Review verbatim:
+  `GwzM5-8R2F-R1.1-Review.md`, both rounds.
 - **R1.2 — the A1 activation tripwire** *(gwz-core; HARD cap 130 —
   ruled 2026-09-01 at the R1.2 round-1 review's counting-basis P2: the
   R2-F cap basis is WHOLE handwritten lines including comments,
@@ -153,6 +175,14 @@ matrix leg as the named first-dispatch obligation.
   rider)*. The test asserting `recover_or_create`'s production caller
   count is exactly zero, dated comment naming E4.1 as the step that
   deliberately moves it to one.
+  **LANDED 2026-09-01 at gwz-core `bb52dc0`**: candidate `3c6fdee`
+  (round 1 NO-GO — [P1-1] call-site prefix evasion, remediated to the
+  ALT-4 file-set contains scan; round 2 GO final, 0 P0 / 0 P1 / 0 P2)
+  ff-merged, plus the review fold (P3-8: the premise assertion reads
+  through the scan's own comment strip; P3-7: the aliased-caller
+  residual holds for either owner file). CA pin 447 → 448 darwin
+  MEASURED / 457 → 458 linux DERIVED. Review verbatim:
+  `GwzM5-8R2F-R1.2-Review.md`, both rounds.
 - **R1.3 — the records train** *(docs-only; after R1.1/R1.2 land)*.
   The MAX_PATH rider's dated falsification at ALL FIVE homes
   (Phase4Closure §2.4 + §2.7, evidence-map F-5, settled tuple `:792`,
