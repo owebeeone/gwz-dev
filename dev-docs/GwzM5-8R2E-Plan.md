@@ -484,7 +484,18 @@ assumption.)*
   (2026-09-01); the E4-train standing order (land on GO; lane rules
   escalations; terminal NO-GO returns to the operator). Carriers out
   of this step: [P3-1] release-notes line → the release train (E7
-  ledger); [P3-2] renderer row (~10 lines, pub(super) — NOT
+  ledger) *[2026-09-02: E4.1's line as written — "`gwz merge --abort`,
+  which needs no such filesystem" — is an OVER-CLAIM (three checked-
+  door abort paths probe today); its on-disk home is HERE, per
+  `GwzM5-8R2E-CapabilityFreeAmendment.md` §6 and the pins review
+  [P2-2]. The corrected sentence, verbatim: "an abort that touches no
+  checked artifact needs no such filesystem; aborts that must
+  re-verify checked artifacts — preservation bundles, a selected
+  root's manifest and lock, or the merge's published evidence,
+  re-verified through the checked boundary — need persistent file
+  handles and a mount identity." Carrier: the release train (the E7
+  ledger's release-notes line); the pins package's fold commit
+  restates it in its message.]*; [P3-2] renderer row (~10 lines, pub(super) — NOT
   pub(crate), clippy private_interfaces) + [P3-3] identity.rs Windows
   bare-errno arm + [P3-4] entry.rs scan-hole record → E4.2; [P3-C1]
   R2 unpinned against E4.4's terminal-archive arm regaining

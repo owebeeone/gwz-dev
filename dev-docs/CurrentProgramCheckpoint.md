@@ -2918,6 +2918,41 @@ fable token only where it makes a difference." Recorded consequences:
   E4.5/6-B; E4.7 re-scoped; DR-1 chartered once the operator names its
   home.
 
+  *[2026-09-02 (later): E4.3-B LANDED — gwz-core `0dae0d5` (E4.3-B
+  `60072a7` rebased + the landing nit), root `3351895` (both
+  amendments' records) + `e7b744f` (the three charter preps + the
+  GC fix's round-1 review). Matrices at `0dae0d5` GREEN: Platform
+  `33562252461`, Windows `33562249876`. PIN ERRATUM, recorded here:
+  the aggregate driver's g23 base pin read 124 where the tree
+  measures 126 — E4.1(c) `6688f34` added the two `a1_activation`
+  rows while its dated block claimed "and only it"; confirmed by
+  measurement in the GC fix's review; the driver corrects it in the
+  GC fix's dated block at that landing.]*
+
+  *[2026-09-02 (later still): GC fix commit (d) `c0c9ac5` delivered
+  (100/100; the `cfg(test)` mask DELETED, retention row ablation-
+  proven, the builder's false "strictly stronger" claim withdrawn in
+  its message) — round 2 in flight. **PINS PACKAGE ROUND 1: NO-GO**
+  (1 P1, 2 P2, 10 P3; `GwzM5-8R2E-E4.4-6B-Review.md`). The P1: the
+  shared masker's `quoted` flag is declared outside the per-line
+  loop, so a `'"'` char literal (`merge_support.rs:177,:236`) blanks
+  everything to the next stray quote or EOF — 178 live blinded lines
+  where the strip it replaced blinded 5, and the E4.3-B door
+  declared in that file leaves the tripwire GREEN. P2-1: a twentieth
+  carved row, `store/archived.rs::archive` (`:275`, reached from
+  ordinary v0 merge and both aborts), pinned by nothing and named
+  by no record — the amendment's fourth §1 omission. P2-2: §6's
+  release-train restatement undischarged. **Lane-owner ruling** (the
+  review's §12, under the E4 standing order): all three CONFIRMED by
+  mechanism and MUST CURE — a faithful `mask_non_code` port + fail-
+  loud belt + masker self-test + M-live re-drive; the twentieth row;
+  the sentence in the fold's message; [P3-5] ruled IN (flat digest on
+  `artifact/mod.rs`); the fold delivered on top of the rebase onto
+  `0dae0d5`; cap ≤ 589 measured. Round 2 = the same reviewer. Root-
+  side (mine, at landing): amendment bracket (9) + the `:458` cite
+  (done), the g12/catalog_names pair into E4.7's brief (done), the
+  abort sentence's on-disk home in the plan's release-notes rider.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

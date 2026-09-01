@@ -494,7 +494,7 @@ home the tables missed: `workspace_ops/handle_stash/commands.rs` — six
 `stash::write_bundle` calls under `guarded_workspace_root(StashMutate)`
 (`handle_stash.rs:43`), the mutation guard's broad reading — pinned as
 the inventory's 19th row. (3) Further carved sites cited by neither
-cell: a third `write_lock` in `pull_head_member_preflight.rs:457`, and
+cell: a third `write_lock` in `pull_head_member_preflight.rs:458` *[:457 as adopted; corrected 2026-09-02, the pins review [P3-7]]*, and
 the `:278` manifest/lock writers (`write_manifest_and_lock`/`write_lock`)
 in `handle_create_repo.rs`, `handle_materialize.rs`,
 `handle_repo_lifecycle.rs`, `handle_branch.rs`,
@@ -515,7 +515,24 @@ counted with `#[cfg(test)]` modules dropped first (`stash/mod.rs` would
 otherwise pin 11 references of which 8 are its own tests'), a stated
 departure from O13's scan. (8) The "E4.3-B +1-line `--abort` content
 pin" named in §7 does not exist; the remedy's content pins are
-`interface_tests/contracts.rs:158,:181`, both kept green.]*
+`interface_tests/contracts.rs:158,:181`, both kept green. (9) *[2026-09-02,
+the pins review [P2-1], lane-owner ruling CONFIRMED by mechanism]* A
+TWENTIETH carved row that §1, the E4.4 charter prep and both axes of this
+amendment's dual all missed: `workspace_ops/merge/store/archived.rs::archive`
+— row `:275`'s "`MergeArchive` when missing" bootstrap on the v0 path
+(`create_dir_all:39`, `remove_file:47`, `rename_durable:49`, `sync_dir:51,:52`),
+reached through `archive_merge_record` from ordinary v0 merge finalization
+(`finalize_dispatch.rs:34`, `finalize_support.rs:99`) and BOTH abort forms
+(`abort/mod.rs:111,:189,:218`) — the two operations E0.2 §5.2 names first. It
+was pinned by nothing (no inventory row, no O13 row, no digest, no scan, no
+annotation) while its two same-directory siblings `store/gc.rs` and
+`store/retention.rs` had all four. The pins package's fold adds the row, the
+`:275` site annotation, the `PURE_CARVED_FILES` entry and the new key-set
+digest; §3's inventory is twenty rows, not nineteen, and (4)'s "3 of the 19"
+reads "3 of the 20". The same review's [P3-5] adds a flat digest on
+`artifact/mod.rs` (the `write_atomic` family's home), because converting the
+family's implementation would convert every carved `:277`/`:278`/`:279`
+caller while moving no count in any row.]*
 
 *[E4.5/6-B DISPOSITION 2026-09-02, from the read-only charter prep
 (`GwzM5-8R2E-E45-6B-CharterPrep.md`, every claim cited at main `0dae0d5`; the third prep this
