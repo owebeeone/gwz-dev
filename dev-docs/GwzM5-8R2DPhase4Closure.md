@@ -129,6 +129,16 @@ catalog Final directory).
   candidate for R2-F scope`, checkpoint :1022-1024). Step 4.2 did **not** widen
   that exposure: the longest name is still the 173-byte `.source`, and 4.2's
   deterministic staging name is 152.
+  *[FALSIFIED 2026-09-01, R2-F R1.3 records train (trace
+  `GwzM5-8R2F-RelocationTrace.md` §5.2; constants pinned at R1.1, gwz-core
+  `027da5b`): the relocation does NOT retire this exposure. Under `.git/` the
+  same leaf is four characters LONGER (197 → 201 beyond root); 160 of the 173
+  name characters are the 64+64+32 hex triple, so retirement can only come
+  from shortening the names, not from moving them. The landed relocation
+  moved only the CATALOG's name (`catalog-final`); the legacy area holding
+  the `ca1-*` names keeps `.gwz/checked-artifacts` by design (one new name,
+  two directories). The checkpoint anchor has also drifted: the tracked text
+  now sits at checkpoint :3192-3194.]*
 - *Cost:* the move is a durable relocation of live production state, needing its
   own package.
 - *Where it executes:* **not here.** Freeze §5 decision 2 already settles this:
@@ -204,6 +214,14 @@ Both record variants are drafted below so the landing lifts the chosen one.
 > under `.git/` would retire it"). Step 4.2 did not widen it: the longest name
 > is still the 173-byte `.source`, and the deterministic staging name Step 4.2
 > introduced is 152.
+
+*[The retirement clause of the record above is FALSIFIED — 2026-09-01, R2-F
+R1.3, same note as §2.4: measured at the R1.1 landing (gwz-core `027da5b`),
+the relocation retires nothing here (+4 chars under `.git/`; 160 of 173 chars
+are hex), and the landed design deliberately left the `ca1-*`-bearing legacy
+area at `.gwz/checked-artifacts`. The exposure is live product surface owned
+by the name-shortening class, not by relocation. The rest of the record —
+grammar separation, the A1 gate — stands and executed as written.]*
 
 ### 2.8 Record variant B — convert-in-place (the fallback, if ruled)
 

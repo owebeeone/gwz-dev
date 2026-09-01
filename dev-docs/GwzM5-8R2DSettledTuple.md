@@ -789,7 +789,7 @@ companion-class and were fixed in the step.
 | item | record |
 | --- | --- |
 | **Quarantine/relocation execution** — the legacy private area moves out of the catalog Final directory | `GwzM5-8R2DPhase4Closure.md` §2.7; freeze §5 decision 2; plan §5 item 7 |
-| MAX_PATH product exposure (~173-char `ca1-*` names), retired *by* that relocation | checkpoint :1022-1024 |
+| MAX_PATH product exposure (~173-char `ca1-*` names), retired *by* that relocation *[FALSIFIED 2026-09-01, R2-F R1.3: the relocation landed (gwz-core `027da5b`) and retires nothing here — trace §5.2's arithmetic (+4 under `.git/`; 160/173 chars are hex) plus the landed one-name-two-directories design, which keeps the `ca1-*`-bearing legacy area in place. See Phase4Closure §2.4's dated note. Anchor re-pointed: the checkpoint text drifted from :1022-1024 to :3192-3194.]* | checkpoint :3192-3194 (was :1022-1024) |
 | Legacy-path removal / dead-code allowances | plan §5 item 3 |
 | Native power-loss semantics (the dirent-barrier residual's companion) | `DirentBarrier-ReviewState.md:393-395` |
 | Native Windows/Linux fault evidence as a release gate | plan §5 item 4 |
@@ -800,6 +800,14 @@ companion-class and were fixed in the step.
 1. **The A1 coexistence gate.** No production catalog activation at
    `.gwz/checked-artifacts` until the relocation lands. Fail-closed in code today:
    `recover_or_create` has no production caller (re-verified at this tuple).
+   *[SATISFIED 2026-09-01 (R2-F R1.3): the relocation LANDED — R1.1 at
+   gwz-core `027da5b` (the catalog composes `catalog-final`; the legacy
+   writer keeps `checked-artifacts` under its own variant, inside the
+   collision domain). The fail-closed property outlived the prose: the R1.2
+   activation tripwire (`interface_tests/catalog_activation_pin.rs`,
+   `bb52dc0`) pins the production caller count at ZERO until E4.1 moves it
+   deliberately, in the same reviewed commit as the caller it adds. Gate
+   LIFTED — production catalog activation is now Phase E4's to take.]*
 2. **The test-door dependency.** Step 3.2's Git-directory purpose-policy arm
    places the managed prefix under that target's own retained root because the
    Step-2.3 door (`retain_managed_parent_at_for_test`) stages with `fs::write`

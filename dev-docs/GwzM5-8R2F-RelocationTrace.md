@@ -769,6 +769,18 @@ or `checked-artifacts`. The relocation is not a semantic-vector event. The
 `historical_collision_digest` coupling in §4.2 item 1 is a *durable-record*
 event and is separate from these.
 
+*[FALSIFIED at R1.1 (2026-09-01, R2-F R1.3): the relocation IS a
+semantic-vector event. Three `catalog_bootstrap` vectors encode `final_name`
+(CBOR key 8) and its dependent `record_id` (key 11) — as CBOR text INSIDE the
+hex column, which the plain-text grep above cannot see; that is the method
+error. `catalog_bootstrap_record.rs:242` refuses any record whose
+`final_name` ≠ `Final`, so the byte change forced the vector move. The
+re-derivation was reviewed and ruled LEGITIMATE (R1.1 review §4, FLAG-1:
+round-trip validated independently, header clauses all still true) and is
+recorded in `vectors.txt`'s own header. This section's conclusion is
+retired; the mechanism lesson — verify by decoding, not by grepping the
+encoding — joins the package's three-strikes record.]*
+
 ---
 
 ## What the plan must decide

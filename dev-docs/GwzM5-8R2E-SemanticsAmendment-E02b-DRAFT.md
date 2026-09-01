@@ -1114,6 +1114,17 @@ tree-wide:
 - `checked_artifact/observation.rs:93` — `let quarantine_parent =
   policy.private_parent();`, **the only consumer**.
 
+*[R1.3 note 2026-09-01: the fact's SCOPE is parent-composer location
+ownership, and it survived the landed relocation (R2-F R1.1, gwz-core
+`027da5b`): `policy.rs` now pins the legacy VARIANT (leaf
+`checked-artifacts`) while the catalog composes `catalog-final` — still one
+definition, one consumer. Separately, the checked-artifacts NAME FAMILY has
+THREE production spellings — the legacy variant's leaf bytes, the bootstrap
+marker stem, the scratch stem (`catalog/scratch.rs:6`) — recorded per the
+R2-F plan's [P3-7] so "single owner" is never read as "single spelling".
+O3 is DISCHARGED; the full record with this section's fact quoted verbatim
+sits at the R2-E plan's O3 row.]*
+
 (Every other `private_parent` hit in the subsystem is a different function — the
 catalog owner's own `create_git_private_parent` / `has_private_parent` /
 `require_create_private_parent` — not the legacy policy's.)

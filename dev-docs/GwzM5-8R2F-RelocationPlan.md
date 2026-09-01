@@ -197,6 +197,19 @@ matrix leg as the named first-dispatch obligation.
   unblocking O1/O2's named carrier (O1's close still carrying §10 row
   `:280` via O13) and closing O3 with its E7-Acceptance §4 row quoted
   VERBATIM at the record site; E4's gate note marked open.
+  **EXECUTED 2026-09-01 (the commit carrying this line)**: all five
+  MAX_PATH falsifications + the `:1022-1024` → `:3192-3194` re-point;
+  trace §7.6 retired (the relocation IS a semantic-vector event); O3
+  discharged with the verbatim quote at the R2-E plan's O3 row +
+  single-owner three-spellings scope note at both §7.6.2 homes;
+  OPEN-R1's §2 resolution recorded verbatim at the R2-E plan and
+  E7-Acceptance routing rows (operator veto open); tuple §11.3 item 1
+  satisfied; **E4's gate note marked OPEN**, carrying E4.1's attention
+  set incl. the anchor-nit-1 carrier deviation (R1.1 fired the R2-F
+  alternative without carrying — binds E4.1). Checkpoint position
+  block written. §4 CI legs: Windows matrix 33478175102 + Platform
+  matrix 33478177517 dispatched at `027da5b`, in flight at commit
+  time.
 
 ## 4. Exit criteria
 

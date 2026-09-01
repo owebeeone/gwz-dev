@@ -111,6 +111,11 @@ it.
   O1/O2 as *re-owned with a named carrier* (R2-F relocation → this
   lane's E4 resumption), not DISCHARGED, with O1's close additionally
   carrying row `:280`.
+  *[LANDED 2026-09-01 (R2-F R1.3 record): the relocation is live on
+  gwz-core main — R1.1 `027da5b` (the split) with the R1.2 activation
+  tripwire at `bb52dc0`. The named-carrier condition is met: O1/O2
+  UNBLOCK at this phase's E4 resumption, O1's close still carrying
+  row `:280` via O13. Phase E4 is OPEN — see its gate note.]*
 - **O3 — re-owned, not blocked:** O3's text is a location property,
   and the legacy private parent has exactly one non-test owner
   (`policy.rs:33-42` defines it; `observation.rs:93` is its only
@@ -118,12 +123,47 @@ it.
   E4.7 remains this plan's stronger full-retirement mechanism. Under
   ruling (a), E7 records O3 as *discharged by R2-F's relocation,
   re-owned there* unless E4.7 has also landed by then.
+  *[DISCHARGED 2026-09-01 (R2-F R1.3 record): the relocation landed at
+  gwz-core `027da5b`. The location property now holds by construction —
+  the catalog composes `catalog-final`, so the legacy writers'
+  `.gwz/checked-artifacts` is no longer inside the catalog's directory;
+  the two grammars no longer share one (disjointness asserted per
+  persisted field; the decisive test drives a real legacy write after
+  bootstrap and re-observes the catalog recoverable). E7-Acceptance §4's
+  row, quoted verbatim per the R1.3 charter: "O3 | **RE-OWNED to R2-F's
+  quarantine/relocation package, which discharges O3 directly on
+  landing** (§7.6.2's single-owner fact: `policy.rs:33-42` defines the
+  legacy private parent, `observation.rs:93` its only consumer); E4.7
+  remains this lane's stronger full-retirement mechanism at the E4
+  resumption; OPEN-R1 rides with the package (blocking for its owner).
+  *[Tense per State [P3 F8]: nothing has discharged O3 yet — the package
+  discharges it on landing.]*" — the landing has now happened. Scope
+  note (the [P3-7] single-owner correction): that fact is a
+  location-ownership property of the parent COMPOSER and stays true;
+  the checked-artifacts NAME FAMILY separately has THREE production
+  spellings — the legacy variant's leaf bytes, the bootstrap marker
+  stem, and the scratch stem (`catalog/scratch.rs:6`) — counted here so
+  "single owner" is never misread as "single spelling". E4.7 remains
+  the stronger full-retirement mechanism.]*
 - **OPEN-R1 routed to R2-F** with the relocation package, per the
   ruling: must the relocation *move* resident legacy residue, or only
   relocate future writes? Blocking for that package's owner; the
   Windows permanent-anchor evidence says leave-in-place keeps the
   catalog unobservable there (`GwzM5-8R2DPhase4Closure.md:180-190`).
   Recorded so R2-F inherits the question rather than re-deriving it.
+  *[RESOLVED BY DESIGN, recorded 2026-09-01 (R2-F R1.3; adopted plan
+  `GwzM5-8R2F-RelocationPlan.md` §2, verbatim): "resolved by design:
+  neither — the relocation relocates the CATALOG'S name; residue is
+  not a category this package creates." Nothing moved, nothing
+  orphaned; the legacy area remains the legacy writer's live directory
+  until E4.7 retires the legacy writers — where the retire-the-area
+  question already lives on its own row. The Windows permanent-anchor
+  hazard this row cites is exactly why the round-1 leave-in-place-
+  same-leaf design was killed: the review proved presence-refusal
+  (`directory_mutation.rs:179-185`) plus never-removed directories
+  brick bootstrap in every used workspace — the split is the design
+  that makes "neither" safe. The operator's veto stands open in the
+  adoption record (gwz-dev `d2e5636`).]*
 - **O8 denominators corrected** (E0.3 State [P2-2]; addendum §8):
   E5.1 owes **10** registry rows (the progress shapes) — this plan's
   "18 registry rows" is right as a debt count and wrong as a
@@ -230,7 +270,22 @@ ordering couples them:
 
 *(E0 gate, 2026-08-27, under the operator's ruling (a): this phase
 opens only after R2-F's quarantine/relocation package lands — §1.1's
-cross-lane dependency row. E4.1's precondition set is SEVEN (§1.1's
+cross-lane dependency row. **[GATE LIFTED 2026-09-01 — THIS PHASE IS
+OPEN.** The relocation landed: R1.1 at gwz-core `027da5b`, the R1.2
+activation tripwire at `bb52dc0` (production caller count pinned at
+ZERO; E4.1 moves it to one in the same reviewed commit as the caller).
+E4.1's attention set additionally carries, recorded at the R1.3
+records train: (1) **anchor nit 1's Q1 shape** — the R2-F alternative
+carrier fired without implementing it (see E7-Acceptance's carrier-row
+deviation note); E4's first production train implements, not
+re-decides; (2) the stale `#[allow]` reason at `catalog.rs:10-16`
+("gains its first production caller in R2-E" — E4.1 is the mover and
+the tripwire is the enforcement; both R2-F builders flagged it;
+rewrite it in the caller-adding commit); (3) the R1.2 review's
+matcher-edge notes for the tripwire file ([P3-6] message wording free
+improvement; [P3-8]'s residual habit — a `// was:` comment — is closed
+by the landed comment-strip but stays the named shape to not
+reintroduce).]** E4.1's precondition set is SEVEN (§1.1's
 O11 row). The `WorkspaceMutatorLock` §10 row's declared purpose —
 "runtime bootstrap only" — is load-bearing at E4.1: the runtime lease
 is bootstrap-only and identity-probe-free; the catalog lease is where

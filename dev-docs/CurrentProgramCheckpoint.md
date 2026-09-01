@@ -2624,6 +2624,62 @@ fable token only where it makes a difference." Recorded consequences:
   custom-message v1 starts; the C1 carrier train owns the nit-1 shape +
   wording + gate-reorder class; conf-integrity backlog stands recorded.
 
+  **POSITION 2026-09-01 — THE R2-F RELOCATION IS LANDED; E4 IS OPEN
+  (matrix legs in flight).** Since the pause: **gwz log SHIPPED as
+  v0.12.0** (all three channels; side project, non-Fable
+  implementation, settle S4.1 GO), then **v0.12.1 released and fully
+  verified** same-day for the pull ahead-only fix (strictly-ahead
+  root/member misclassified DivergedMember/MergeRecoveryRequired; fix
+  gwz-core `8ce9281`, tags core `ea3a924` / cli `68a888a` / py
+  `ed25230`; core verify run 33465789854 EXECUTED linux remainder
+  1098). Release-script incidents fixed at cli `5555c41` (path-shaped
+  lock cure; the hardcoded AI trailer REMOVED — audit commit-writing
+  scripts, not just session config). **M5c TRAIN Stage 1 = the R2-F
+  relocation**: read-only trace (the tree had outgrown the E0
+  records), then plan ADOPTED at gwz-dev `d2e5636` after a FULL
+  three-round loop (r1 NO-GO — my OPEN-R1 recommendation inverted the
+  trace; r2 NO-GO terminal — renaming shared `Final` marched the
+  legacy writer into the catalog's new home; re-charter GO-WC). THE
+  DESIGN: one new name, two directories — `Final`'s bytes →
+  `catalog-final`, the legacy writer keeps `checked-artifacts` under
+  its own NEW variant inside the collision domain (member pins 4→5);
+  de-recognition solely via Final's byte change; nothing orphaned.
+  **R1.2 LANDED** gwz-core `bb52dc0` (A1 activation tripwire, caller
+  count pinned ZERO until E4.1; 2 rounds, r1 NO-GO P1 spelling
+  evasion → file-set contains; CA 448). **R1.1 LANDED** gwz-core
+  `027da5b` (squashed citing reviewed `4ba9071` + folds `3d417f7`/
+  `1e2a106`; r1 GO-WC 0 P0/1 P1/1 P2/6 P3, r2 verification GO,
+  probes A–F; the no-anchor guarantee spelling-blind; decisive-row
+  mechanism platform-split — ca1-* refusal is the WINDOWS arm,
+  disjointness discriminates darwin/linux; three semantic vectors
+  re-derived, ruled LEGITIMATE-forced, derivation in the vectors'
+  header; CAP RE-RULED 420→427-MEASURED, overage entirely
+  review-condition cure, rider-audit none). Pins on the landed tree:
+  CA 452 darwin MEASURED / 462 linux DERIVED; remainder 1097/1098;
+  v1_lifecycle 256; six checker digests; merge-docs 12/155; lane gate
+  ok. **R1.3 RECORDS EXECUTED (this commit)**: the MAX_PATH rider
+  FALSIFIED at all five homes + the drifted `:1022-1024` anchor
+  re-pointed (`:3192-3194`); trace §7.6 retired (the relocation IS a
+  semantic-vector event — decode, don't grep the encoding); **O3
+  DISCHARGED** (verbatim-quoted at the R2-E plan's O3 row;
+  single-owner scope note: three production spellings); **OPEN-R1
+  RESOLVED BY DESIGN** ("neither — the relocation relocates the
+  CATALOG'S name"; operator veto open at `d2e5636`); **O1/O2
+  UNBLOCKED** at the E4 resumption (O1 carrying row `:280` via O13);
+  settled-tuple §11.3 item 1 SATISFIED; **THE E4 GATE IS LIFTED**
+  (R2-E plan gate note). DEVIATION RECORDED: anchor nit 1's R2-F
+  alternative carrier fired without carrying (R1.1 un-routed by my
+  charter) — the Q1 shape now BINDS E4.1, written into the gate note
+  with the rest of E4.1's attention set (stale `catalog.rs:10-16`
+  allow-reason; tripwire matcher-edge notes). §4 exit legs: push CI
+  green-or-running at `027da5b`; **Windows matrix run 33478175102 +
+  Platform matrix run 33478177517 DISPATCHED at `027da5b`, in flight
+  at commit time** — conclusions recorded on completion; the linux
+  leg is the 462/1098 DERIVED→MEASURED touchpoint (driver rewrite at
+  next lane touch per convention). NEXT: matrix conclusions → E4 (on
+  the operator's word) → M5c; escape lane still blocked on operator
+  handoff; GwzWt + GwzAi await operator direction.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
@@ -3191,7 +3247,12 @@ worktrees remain outside the satisfiable set — ledger tripwire in
 resolver Publication-arm diagnosability (`execution.rs:16-21` masks
 publication failure causes); MAX_PATH product exposure (~173-char
 `ca1-*` names; the private-area relocation option under `.git/` would
-retire it — candidate for R2-F scope); rollback preflight anchor-dirt
+retire it — candidate for R2-F scope *[FALSIFIED 2026-09-01 at the
+landed R2-F relocation, R1.3: +4 chars under `.git/`, 160 of the 173
+are the hex triple, and the landed split deliberately leaves the
+`ca1-*`-bearing legacy area at `.gwz/checked-artifacts` — retirement
+belongs to the name-shortening class, not relocation; see
+`GwzM5-8R2DPhase4Closure.md` §2.4's dated note]*); rollback preflight anchor-dirt
 (in the amendment lane's scope addition).
 
 ## Next ordered actions
