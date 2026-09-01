@@ -147,9 +147,11 @@ v0 rows the eventual plan implements land with named tests.
   touch live or dirty trees — plus removal of intent records whose
   composites no longer exist.
 - **W-CMD-6 (v0).** Every existing verb MUST behave inside a linked
-  materialization as it does in a primary. This is **scope, not an
-  audit** (round-1 F1): it holds only once the W-CMP rows below are
-  implemented, and the parity battery then proves it verb-by-verb.
+  materialization as it does in a primary — with ONE named exception:
+  structural merge refuses (W-CMP-4). This is **scope, not an audit**
+  (round-1 F1): it holds only once the W-CMP rows below are
+  implemented, and the parity battery then proves it verb-by-verb,
+  the verb list derived from W-CMP-1's own blast-radius enumeration.
 - **W-CMD-7 (v0).** Three channels: `gwz-cli` AND `gwz-py`, same flags,
   refusals, machine output, over an additive-only protocol extension
   (the L-PRO-1 discipline; drift check green in both repos).
@@ -191,6 +193,17 @@ v0 rows the eventual plan implements land with named tests.
   `worktree add`/`remove` is NEW code (the existing materialize
   preflight is first-error; push's aggregation is the model) — W-LIF-1
   and W-CMD-2 depend on it and this row owns it.
+- **W-CMP-4 (v0; added 2026-09-01 at the P0.1 plan review's F4).**
+  Structural MERGE operations REFUSE inside a linked materialization
+  with a typed teaching refusal ("run merges in the primary; this
+  materialization shares the primary's merge-evidence surface").
+  Ground: merge finalize/abort hash the shared `info/exclude` as
+  evidence; inside a composite that file is the PRIMARY'S, which the
+  primary's own ordinary boundary sync may rewrite at any moment — a
+  cross-materialization evidence-invalidation window that cannot be
+  closed without cross-materialization locking this design forbids.
+  Refusal is the honest v0; W-CMD-6 carries this as its ONE named
+  exception. Read-only merge inspection remains available.
 
 ### Lifecycle and crash behavior
 
@@ -365,8 +378,11 @@ and re-created by re-add when lost.
    git floor probe. Collect EVERY refusal; refuse whole on any.
 3. Write the intent record; create the ROOT worktree first (its own
    path, as clone does); then members under the jobs bound, per-repo
-   results reported; configure each constituent's worktree-scoped
-   exclude per W-CMP-2.
+   results reported. No exclude configuration of any kind occurs
+   (W-CMP-2's inherit rule; a stale instruction to configure
+   worktree-scoped excludes survived the round-2 fold here and was
+   removed at the P0.1 plan review's F2 — the add executor NEVER
+   reaches the boundary-sync surface, by construction).
 4. Failures leave the partial composite in place (W-LIF-3); resume =
    re-add; completeness derives from intent vs disk (W-LIF-2).
 
@@ -441,3 +457,15 @@ reviewer's probe also verified W-CMD-2's tri-state fully buildable
 against git's two conflict errors. Both round-1 P0 cures graded
 "cured properly rather than papered over"; no settled decision was
 reopened.
+
+**Post-adoption corrections (2026-09-01, from the P0.1 PLAN review,
+executed under this design's governs-rule):** [P0.1 F2] §5.5 step 3's
+stale instruction to configure worktree-scoped excludes — a remnant the
+round-2 F19 withdrawal missed — removed; the add executor never reaches
+the boundary-sync surface. [P0.1 F4] **W-CMP-4 minted**: structural
+merge REFUSES inside linked materializations (typed, teaching), closing
+the cross-materialization evidence-invalidation window (a composite's
+merge hashes the PRIMARY'S shared `info/exclude` as evidence, which the
+primary's ordinary boundary sync may rewrite mid-flight — neither
+document had named it); W-CMD-6 carries this as its one named
+exception.
