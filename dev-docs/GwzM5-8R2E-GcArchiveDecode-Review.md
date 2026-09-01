@@ -662,12 +662,22 @@ re-measured — it needs a release build and the diff cannot reach it.
 
 Three compile-probe suites — `test_check_checked_artifact_boundaries.py`,
 `test_release_boundary.py`, `test_v1_lifecycle_privacy_probe.py` — each drive
-several full `cargo clippy --all-targets --all-features` builds of a copied
-crate and did not complete inside this review's window on a heavily contended
-host. They are **not decision-bearing here**: the diff's only checker change is
-a single digest string literal, which I recomputed independently (§7.1), and
-`check_checked_artifact_boundaries.py` itself — the gate those suites test —
-passes. They should be run at the landing dispatch as usual.
+several full `cargo clippy --all-targets --all-features` builds of a whole
+copied crate. On this heavily contended host they did not complete inside the
+review window and I terminated the first of the three. **Partial result, worth
+recording:** `test_check_checked_artifact_boundaries.py` had emitted
+
+```
+..........................................................
+```
+
+— **58 consecutive passes, no `F` and no `E`** — before the SIGTERM. So nothing
+in that suite had gone red; it was simply still running.
+
+These are **not decision-bearing here** in any case: the diff's only checker
+change is a single digest string literal, which I recomputed independently
+(§7.1), and `check_checked_artifact_boundaries.py` itself — the gate those
+suites test — passes clean. Run all three at the landing dispatch as usual.
 
 **Environmental, identical at base, NOT findings:**
 
@@ -898,6 +908,343 @@ Probe modules were compiled into materialized copies of each revision
 * `tests/protocol.rs` re-run on a materialized `7f28907` to classify its three
   failures as pre-existing.
 
-**Exit state:** review worktree byte-clean at `98f5f90`
-(`git status --porcelain` empty). All reviewer target dirs and materialized
-trees removed.
+**Exit state:** review worktree left byte-clean at `98f5f90`
+(`git status --porcelain` empty, verified twice — at 08:0x and again after
+cleanup). All reviewer target dirs and materialized trees removed.
+
+---
+
+# 12. ADDENDUM — a fold began in the worktree while this report was being filed
+
+**Recorded for the audit trail, not reviewed.** At 08:20 a final check of
+`gc-wt` found it no longer clean. The edits are **not mine** — this review never
+wrote to that worktree, and every probe and ablation ran in separate
+materialized trees. `HEAD` is still `98f5f90` and both reviewed commits are
+byte-identical, so **nothing in §§1-11 is affected**; the working tree simply
+now carries uncommitted round-2 work by another actor, timestamped 08:10-08:16,
+alongside a `.gate-snapshot/lib-under-test` binary.
+
+```
+ M scripts/checks/check_checked_artifact_boundaries.py   1 / 1
+ M scripts/checks/run_r4bg_aggregate_gates.py           15 / 4
+ M src/workspace_ops/merge/store/retention.rs           18 / 12
+ M src/workspace_ops/merge/v1_lifecycle/tests/no_ff_wire.rs  3 / 1
+ M src/workspace_ops/tests/g23/gc.rs                    53 / 1
+?? .gate-snapshot/
+```
+
+The shape is responsive to this report: the [P3-4] reach disclosure lands at
+`retention::enforce`, `g23/gc.rs` gains ~53 lines (the [P2-1] row), and the
+`#[cfg(test)] validated_future_cleanup` twin — the mask [P2-1] identified — is
+**deleted**, leaving only the shipped `None` arm so tests drive production
+behaviour. That is a stronger remedy than any of the three [P2-1] offered.
+
+**One caveat for whoever reviews the fold** (round 2; out of this review's
+scope, and stated as an open question rather than a finding, because I did not
+drive it). The fold's new comment justifies deleting the twin with:
+
+> `decode_archived` is strictly stronger than the shared decoder, so nothing
+> reaching this arm can be classified by it
+
+That containment is **not** something §§2-5 established, and there is a visible
+asymmetry in the other direction: `decode_archived_common` runs
+`UnknownFieldManifest::extract_v0` / `extract_v1` (`decode.rs:195-200`,
+`:242-247`) which `decode_archived` does **not**. So a shape that fails only the
+unknown-field manifest would reach the `Err` arm while `decode_archived` still
+succeeded — the exact case the sentence rules out. Whether such a shape is
+constructible after the serde decode that precedes it (an unknown enum
+discriminant fails `serde_yaml::from_value` first, which may empty the set) I
+did not test. Either confirm the set is empty and say so, or soften the
+sentence to what the deletion actually needs — that production always answered
+`None`, so removing the test-only twin makes tests match the shipped binary,
+which is true regardless of containment.
+
+---
+
+# §13 — ROUND 2 (2026-09-02)
+
+**Candidate:** commit (d) `c0c9ac504a627e73c7e495d517b1252435b93a62`, "test: pin
+the retention site, and unmask it", on `98f5f90`. Second and last round under
+the two-round cap.
+
+**Scope:** only what round 1 left open. §§1-11 stand and were not re-reviewed.
+§12's caveat is closed here.
+
+**Method:** `gc-wt` was byte-clean at `c0c9ac5` on entry and **never written to**
+— every probe and every ablation ran in a materialized copy
+(`git archive c0c9ac5 | tar -x`). Own target dirs, deleted at close. Checker
+`/opt/homebrew/bin/python3.13`. Direct exit codes.
+
+**(d) at a glance:** 5 files, **100 insertions / 19 deletions** — measured, and
+exactly the 100 cap. `git interpret-trailers --parse` returns empty; grepping
+the message for `co-authored|claude|anthropic|noreply|generated with` finds
+nothing.
+
+## 13.1 [P2-1] — DISCHARGED, and better guarded than reported
+
+The new row is `g23::gc::ordinary_retention_sweeps_a_v1_archive_once_it_can_be_classified`
+(+61). It plants one real completed `--no-ff` v1 archive plus twenty v0 fillers
+so `ORDINARY_RETENTION` (20) is filled exactly, then drives the id-less sweep
+through production dispatch (`MergeOp::Gc`, `merge_id: None`) and asserts the v1
+archive is the one row retired. The v1 archive is both oldest (written first)
+and first by path (`merge_op_…` sorts before `merge_z00`-`merge_z19`, so it is
+last under `sort_by(|l, r| r.cmp(l))` and is what `.skip(20)` retires) — the
+selection is over-determined, which is the right way to write it.
+
+The row is also self-validating on its own fixture: if any filler failed to
+classify, `ordinary` would hold fewer than 21 rows, `.skip(20)` would retire
+nothing, and the assertion would fail. So a green row proves all 21 archives
+classified, not just the v1 one.
+
+**Ablation, on my own build** — retention hunk reverted
+(`read_seam_record(&path, RecordLocation::Archived, true)` →
+`read_record(&path, RecordLocation::Archived)`), everything else at (d):
+
+```
+--- g23::gc under ablation ---
+    workspace_ops::tests::g23::gc::ordinary_retention_sweeps_a_v1_archive_once_it_can_be_classified
+test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured
+
+--- store:: under ablation ---
+    workspace_ops::merge::store::tests::retention_treats_stash_only_v0_and_no_ref_v1_as_ordinary
+test result: FAILED. 19 passed; 1 failed; 0 ignored; 0 measured
+
+########## RESTORED (byte-exact against `git show c0c9ac5:…`) ##########
+--- g23::gc restored --- test result: ok. 9 passed; 0 failed
+--- store:: restored --- test result: ok. 20 passed; 0 failed
+```
+
+**Confirmed: 8 passed / 1 failed ablated, 9/9 restored, that row and only that
+row within `g23::gc`.** The site is pinned; [P2-1] is discharged.
+
+The ablation also reddens a **second** row the builder did not report —
+`store::tests::retention_treats_stash_only_v0_and_no_ref_v1_as_ordinary`, 19
+passed / 1 failed. Deleting the mask converted that pre-existing row into a
+real guard of the same site. The site is now double-guarded, which is a better
+outcome than (d)'s message claims (see [R2-P3-1]).
+
+## 13.2 The mask deletion
+
+**(a) Was the deleted arm cfg(test)-only at base?** Yes. At `98f5f90` the file
+contained exactly two `cfg` attributes — `#[cfg(test)]` at line 50 (the
+`decode_archived` classifier) and `#[cfg(not(test))]` at line 61 (`None`). No
+other gating. A shipped (non-test) build compiled only the `None` arm, so the
+deleted code **never existed in any shipped binary**. The builder's premise
+holds.
+
+**(b) Is the shipped arm byte-identical in behaviour?** Yes. Body unchanged:
+
+```rust
+fn validated_future_cleanup(_root: &Path, _path: &Path) -> Option<bool> {
+    None
+}
+```
+
+The only edits are the removal of the now-unnecessary `#[cfg(not(test))]`
+attribute and an added doc comment. No production behaviour moves.
+
+**(c) The two former consumers — were they silently masked evidence?**
+This is where the builder's account is true but incomplete. They are **not
+alike**:
+
+| row | ablated (cure reverted, mask gone) | was it masked evidence? |
+| --- | --- | --- |
+| `retention_treats_stash_only_v0_and_no_ref_v1_as_ordinary` | **FAILS** | **YES.** It asserts the v1 archive is *swept*. Pre-cure that outcome came from the mask (v0-only read fails → mask decodes → classified). Post-cure it comes from the cured read. Remove both and it goes red. |
+| `retention_exempts_a_valid_v1_archive_that_owns_a_backup_ref` | **passes** | **NO.** It asserts the v1 archive is *retained*, and "unreadable → retain" produces the same outcome by a different mechanism. It passes with the mask, without the mask, with the cure and without it. |
+
+So of the two, one was carrying evidence that only the mask made true, and it
+is now carried by the cure — and is a guard. The other never distinguished
+anything and still does not. "Both still pass" is accurate; "both were
+evidence" would not have been, and (d) does not claim it. Recorded because the
+second row's green should not be read as confirming anything about this site.
+
+`workspace_ops::merge::store::` measures **20 passed**, as the builder reports.
+
+## 13.3 §12's caveat — closed
+
+The round-1 caveat was that the fold's draft justified deleting the twin with
+"`decode_archived` is strictly stronger than the shared decoder", which §§2-5
+had not established.
+
+**The claim is gone from the tree.** `grep -rn "strictly stronger" src/ scripts/`
+returns exactly one hit, `src/git/tests/g01.rs:111`, about hostile filter hosts
+— pre-existing and unrelated. The phrase survives only in (d)'s commit message,
+as an explicit withdrawal:
+
+> The archive it plants carries an UNKNOWN FIELD. That is the one shape where
+> the two decoders genuinely differ: the shared decoder extracts an
+> unknown-field manifest that `decode_archived` does not, so neither is
+> strictly stronger than the other. An earlier draft of this commit claimed it
+> was; that claim is false and is not relied on anywhere.
+
+**The message says what the tree does.** Nothing in (d) relies on the withdrawn
+containment: the deletion now rests on the cfg(test)-only premise (§13.2(a)),
+which is independently true.
+
+**Does the row exercise the shape, or merely name it?** It exercises it. The
+row inserts `unknown_rider: "from a newer writer"` into the archive's top-level
+mapping and writes the bytes back with `serde_yaml::to_string`, so the field is
+in the planted file. On the read side `decode_archived_common` → `decode_v1_body`
+runs `serde_yaml::from_value::<MergeOperationRecordV1>` (the field flattens into
+`extensions`), then `validate_v1_record`, then **`UnknownFieldManifest::extract_v1(&raw)`
+(`decode.rs:242-247`)** — the step `decode_archived` does not have. The row's
+green therefore pins that the shipped read tolerates a top-level unknown field
+and classifies the archive rather than retaining it.
+
+One scoping note, in the row's favour: the comment does **not** claim the two
+decoders disagree on this archive's fate — only that this is where their code
+paths differ and that the shipped read classifies it. That is exactly what the
+row shows. (`decode_archived` would also have accepted it; the fillers carry the
+same rider through the v0 arm and `extract_v0`, and all 21 classify.)
+
+## 13.4 Item 4 — the residual, characterised and now concrete
+
+**The characterisation is accurate.** `UnknownFieldManifest` extraction has
+seven failure modes in `unknown_fields/support.rs` — not a mapping (`:18`), not
+a sequence (`:28`), a missing identity field (`:40`), a non-scalar identity
+(`:52`), a non-string named field (`:74`), a non-string unknown key (`:104`),
+and a duplicated identity (`:140`). Any of them makes the shared decoder refuse,
+which lands the archive on `Err → validated_future_cleanup → None → continue` —
+retained, never classified, never deleted.
+
+**I constructed the shape the brief asked for**, so the limit is no longer
+hypothetical. `extract_v1` identity-walks `operation_drift`
+(`extract/common.rs:422-435` → `identity::operation_drift` →
+`require_unique`), while `decode_archived`'s v1 arm (`v1::project` +
+`cleanup::from_v1`) never inspects `operation_drift` at all. Two drift rows
+sharing a `kind` therefore split the decoders. Driven on the real archive
+fixture:
+
+```
+R2PROBE baseline(unmutated):        shared=Ok  projection=Ok
+R2PROBE duplicated operation_drift: decode_archived_common=Err(UnknownFields {
+        header: MergeRecordHeader { schema: "gwz.merge-operation/v1",
+        record_schema_version: 1 },
+        error: UnknownFieldManifestError { detail: "operation drift identity is duplicated" } })
+                                    decode_archived=Ok(ACCEPTED)
+```
+
+**Grade: [R2-P3-3], a disclosed limit — not a regression.** The brief frames it
+as "a regression in what ordinary retention can classify relative to the
+cfg(test) arm", and that is the wrong yardstick: the cfg(test) arm never
+shipped, so it is not a behaviour anything can regress *from*. Measured against
+the only yardstick that exists — the shipped binary — base `7f28907` production
+retained **every** v1 archive forever, and (d) retains this one. The
+retained-forever set strictly shrinks. Retention is fail-closed and
+contract-§7-consistent ("Unsupported or corrupt archives are never deleted or
+rewritten"), and the treatment is uniform: `handle_gc` uses the same decoder at
+`merge/gc.rs:188`, so `gwz merge --gc <id>` refuses the same archive with
+`ArchivedRecordUnreadable`. No site deletes what another refuses.
+
+Worth adding to the disclosure at the site: the failing class is not only
+malformed YAML but **identity duplication in the unknown-field walk**, which a
+future or buggy writer could emit from well-formed YAML.
+
+## 13.5 The P3 folds — each checked in the tree
+
+| fold | landed? | evidence |
+| --- | --- | --- |
+| [P3-1] "before any ref is **deleted**" | YES | `g23/gc.rs:349` doc comment on `explicit_gc_refuses_an_unreadable_v1_archive_and_retains_every_ref`, and (d)'s message states the correction against (b). |
+| [P3-2] "the only door a **FRESH START** has" | YES | `no_ff_wire.rs:232-235`, and it names the second door: "E4.1(c)'s `adapt_open` upgrade is the second door, and it needs no mention of this variant." |
+| [P3-3] appositive under-count | YES | (d)'s message: "the leading clause was general and correct; the appositive was not", naming `adapt_open`. (b) stands as committed, which is right — the record is dated. |
+| [P3-4] reach disclosure at `retention::enforce` | YES (site) / **NO (release line)** | See below. |
+| [P3-5] nine not ten | YES | (d)'s message; and I re-counted at (d): **9** `read_record` call sites under `merge/store/`. |
+
+**[P3-4] in detail.** The site comment lands and is accurate. Against the three
+claims the release line is said to make:
+
+1. *more than 20 archives → the oldest v1 archives begin retiring on the next
+   ordinary merge that archives* — **stated**, at `retention::enforce`.
+2. *no backup ref, stash, or bundle deleted* — **stated as** "such an archive
+   owns no backup ref, no ref or stash is deleted". "Bundle" is not named;
+   contract §7 treats "native stashes and stash bundles" as one clause, so the
+   omission is cosmetic.
+3. *unreadable never deleted* — **stated**, but at the *other* site, on
+   `validated_future_cleanup`: "An archive this binary cannot read may own
+   preservation evidence, so it is retained rather than classified." Same file,
+   ~50 lines apart. Collectively the file says all three.
+
+What is **missing** is the release-notes line itself. This lane's own convention
+is a `RELEASE-NOTES LINE, verbatim:` block in the commit message — E4.1(c)
+`6688f34` carries one. (d) has none; its message only says the reach "belongs in
+the release notes", and `git diff --name-only 7f28907..c0c9ac5` touches no
+release-notes file. A release engineer reading the landing commit would not find
+the sentence. Filed as **[R2-P3-2]**, foldable at landing.
+
+## 13.6 Pins and companions
+
+Measured from a `--list`-verified snapshot of my own build,
+sha256 `6519ae8706549beb9d7542f47dbe1d8b7bcc0d2029f286787da95145b5117947`,
+**1833 tests** (1832 at (c), +1).
+
+| battery | pinned at (d) | MEASURED |
+| --- | --- | --- |
+| lib remainder | 1114 passed (darwin) | **1114 passed; 0 failed; 1 ignored** ✓ |
+| checked-artifact census | 457 passed | **457 passed; 0 failed** ✓ unmoved |
+| v1 lifecycle (skip `root_fault_matrix`) | 260 passed | **260 passed; 0 failed** ✓ unmoved |
+| g23 marker | 130 passed | **130 passed; 0 failed** ✓ |
+| `merge::store::` (not a pinned battery) | — | **20 passed; 0 failed** |
+
+Inventory cross-check: 1833 − 457 − 261 listed = 1115 = 1114 passed + 1 ignored,
+which is the darwin pin. The linux 1114 → 1115 stays DERIVED /
+FIRST-DISPATCH-EXPECTED, correctly labelled.
+
+**Protected tree digests.** All seven recomputed independently with
+`source_tree_digest`'s own algorithm (mod.rs → parent dir, else stem dir;
+sha256 over `len(rel)‖rel‖len(bytes)‖bytes` in posix-relative order). All seven
+match, including the re-pinned entry that `no_ff_wire.rs` moved:
+
+```
+workspace_ops/merge/v1_lifecycle/mod.rs:
+  b8901962d534133555f41e4e655f56dfb6c43bed3ded7aa43fe5441e32ba4126   MATCH
+```
+
+**The g23 provenance text is TRUE, not merely plausible.** Re-verified from
+history rather than restated: E4.1(c) is `6688f34`; its numstat shows
+`g23/a1_activation.rs` `148 / 0` adding exactly two `#[test]` functions; its own
+block says it "moves the LIB REMAINDER **and only it** … by two rows in
+`workspace_ops::tests::g23::a1_activation`" — rows that are under
+`workspace_ops::tests::g23::` and so should have moved this marker too. Round 1
+measured base `7f28907` g23 = **126** against a pin of **124**: two short, as
+claimed. The arithmetic now closes: 124 + 2 (erratum) + 2 (b) + 1 (c) + 1 (d) =
+**130**, and 130 is what I measure.
+
+**Cap.** `git show --numstat` gives **100 insertions** — exactly the 100 cap,
+measured, not asserted.
+
+**Trailers.** None on `c0c9ac5`; no AI attribution anywhere in its message.
+
+## 13.7 Gates on `c0c9ac5`
+
+| gate | result |
+| --- | --- |
+| `cargo fmt --check` | exit 0, no output |
+| `cargo check --all-targets` | `Finished dev profile` — no warnings |
+| `cargo clippy --all-targets -- -D warnings` | `Finished dev profile`, exit 0 |
+| `check_checked_artifact_boundaries.py` | `checked-artifact boundary: ok (18 visible entries, 8 classified modules)`, exit 0 |
+| `check_merge_compatibility_predicates.py` | `validated 7 migration rules, 7 runtime bindings, and 10 archive shapes`, exit 0 |
+| `check_merge_docs.py` | `source_missing` for the sibling `gwz-cli/` and workspace `dev-docs/` trees — environmental, as recorded in §7.5 |
+
+The three compile-probe suites were not run, per the brief; the landing dispatch
+owns them.
+
+## 13.8 Round-2 findings
+
+No P0, no P1, no P2. **[P2-1] is discharged.**
+
+| id | grade | finding |
+| --- | --- | --- |
+| [R2-P3-1] | P3 | (d)'s message says the ablation gives "8 passed, 1 failed — that row and only that row". True **within `g23::gc`**; read as a global claim it is not, because the same ablation also reddens `store::tests::retention_treats_stash_only_v0_and_no_ref_v1_as_ordinary` (19/1). The sentence under-sells the guard. Scope it to the module, or state both. |
+| [R2-P3-2] | P3 | The [P3-4] fold lands the site comment but **not** a release-notes line. The lane's convention is a `RELEASE-NOTES LINE, verbatim:` block in the commit message (E4.1(c) `6688f34`); (d) has none and touches no release-notes file. Add the sentence at landing. |
+| [R2-P3-3] | P3 | The unknown-field residual is real and I constructed it (duplicated `operation_drift` identity: shared decoder `Err`, `decode_archived` `Ok`). It is a **disclosed limit, not a regression** — the cfg(test) arm never shipped, and against the shipped binary the retained-forever set strictly shrinks. Optionally name the identity-duplication class in the site comment, since it is reachable from well-formed YAML. |
+| [R2-obs-1] | obs | Of the two former mask consumers only `retention_treats_stash_only_v0_and_no_ref_v1_as_ordinary` was masked evidence and is now a guard; `retention_exempts_a_valid_v1_archive_that_owns_a_backup_ref` passes in every configuration and distinguishes nothing. |
+| [R2-obs-2] | obs | The g23 comment rewrap in `run_r4bg_aggregate_gates.py` leaves a ragged `# short: R2-E` line. Cosmetic. |
+
+All three P3s are comment- or message-level and foldable by the lane owner at
+landing. None requires a code change; none requires a third round.
+
+**Exit state:** `gc-wt` byte-clean at `c0c9ac5` (`git status --porcelain`
+empty), never written to during round 2. Reviewer target dirs and the
+materialized tree removed.
+
+## VERDICT: GO-WITH-CONDITIONS — fold [R2-P3-1], [R2-P3-2] and optionally [R2-P3-3] at landing; no third round.

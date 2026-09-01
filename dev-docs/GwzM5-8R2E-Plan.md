@@ -571,7 +571,23 @@ assumption.)*
   `gc_archived` route re-owns to DR-1 conditional on (C), the dead family
   dispositioned by E4.7 (§5); tier 2 EXPLICITLY DEFERRED to DR-1 (§5);
   the shipped un-GC-able v1-archive defect is fixed standalone, read-side
-  (§7).]* *(E5 landing,
+  (§7).]* *[2026-09-02, LANDED: the standalone GC fix — gwz-core
+  `0dccd3e` (the shared `record_wire::decode_archived_common`, three
+  decode sites cured: `merge/gc.rs`, `store/gc.rs`, `store/retention.rs`),
+  `c39f6d4` (a completed `--no-ff` archive collected end to end),
+  `b5ff7fc` (the retention site pinned; its `cfg(test)` mask DELETED —
+  test-only, never shipped — so the row drives the shipped arm), and the
+  landing fold `3c632ec`; Opus interior review
+  `GwzM5-8R2E-GcArchiveDecode-Review.md`, round 1 GO-WC ([P2-1] the
+  unpinned retention site), round 2 GO-WC (three message/comment P3s,
+  folded at landing). GC stays capability-free: no probe on any of the
+  three sites, verified by chain. The disclosed limit: a well-formed
+  archive whose `operation_drift` identity is duplicated is refused by
+  the shared decoder and retained forever, uniformly with `--gc <id>` —
+  fail-closed and contract-§7-consistent; the retained-forever set
+  strictly shrinks against the shipped base, which retained EVERY v1
+  archive. Reach: ordinary retention now sweeps v1 archives too (release-
+  notes line in `b5ff7fc`'s message; carrier the release train).]* *(E5 landing,
   2026-08-28 — two lane-owner determinations, review [P2-3] and
   adjudication G: (1) E4.4 is RATIFIED as carrier of the owed tier-2
   archive-equivalence executions for the eight

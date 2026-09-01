@@ -2953,6 +2953,35 @@ fable token only where it makes a difference." Recorded consequences:
   (done), the g12/catalog_names pair into E4.7's brief (done), the
   abort sentence's on-disk home in the plan's release-notes rider.]*
 
+  *[2026-09-02: **THE GC FIX IS LANDED** — gwz-core main `3c632ec`
+  (`0dccd3e` the shared `decode_archived_common` over three decode
+  sites; `c39f6d4` the completed-`--no-ff` row; `b5ff7fc` the retention
+  row with the `cfg(test)` mask DELETED — test-only, never shipped;
+  `3c632ec` the landing fold: the identity-duplication class named at
+  the site, the re-measured pins recorded). Rebased from `7f28907`
+  onto `0dae0d5` (the `v1_lifecycle/mod.rs` tree digest recomputed
+  twice, per the checker's own algorithm); the pre-rebase shas the
+  review cites (`4686c54`/`98f5f90`/`c0c9ac5`) stay reachable on the
+  LOCAL branch `gc/v1-archive-decode`. Round 2 GO-WC (§13): [P2-1]
+  discharged — the retention row reddens under hunk ablation AND the
+  mask deletion turned a pre-existing `store::tests` row into a second
+  guard; [R2-P3-1]/[R2-P3-2] folded into `b5ff7fc`'s message at the
+  rebase (the ablation scoped; the RELEASE-NOTES LINE block);
+  [R2-P3-3] the landing fold. Landing verification on the rebased
+  tree from a `--list`-verified snapshot (1835 tests): CA 457, v1 262,
+  remainder 1114 + 1 ignored, g23 130 — every pin matched; fmt/check/
+  clippy/boundary/M4 map/merge-docs green; per-commit lane gate ok at
+  all four. Dispatched: Windows `33569807177`, Platform `33569810180`;
+  push CI boundary `33569807827`, retained readers `33569807792`.
+  Release-notes line (carrier: the release train), verbatim in
+  `b5ff7fc`: "`gwz merge --gc` now collects merges archived under the
+  v1 record envelope — every `--no-ff` merge, and any ordinary merge
+  that an interrupted-finalization upgrade adapted to v1 — which
+  previously could never be collected. Ordinary retention now applies
+  to them too … an archive this build cannot read is still never
+  deleted." NEXT: the pins package's fold → round 2 → land (rebase
+  over this landing: the `store/gc.rs` hunk + digest); E4.5-B.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
