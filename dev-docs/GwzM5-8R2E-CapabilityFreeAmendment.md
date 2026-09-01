@@ -485,6 +485,139 @@ E4.3-B (the record-root pins) is unaffected and lands on its own review;
 its builder is told the `managed.rs:44-47` range wording and the
 digest-backstop sentence (§3) so its landing is not stale on arrival.
 
+*[Post-adoption corrections 2026-09-02, from the pins package's own
+enumeration (E4.4-6-B builder, `b99bfb7`, each verified in the tree and
+recorded here so §1/§3 are not read as exhaustive): (1) `:275`'s
+`store/archive.rs` carries THREE raw `std::fs` mutations, not four
+(`create_dir_all:61`, `remove_file:54,:77`). (2) A SECOND carved `:276`
+home the tables missed: `workspace_ops/handle_stash/commands.rs` — six
+`stash::write_bundle` calls under `guarded_workspace_root(StashMutate)`
+(`handle_stash.rs:43`), the mutation guard's broad reading — pinned as
+the inventory's 19th row. (3) Further carved sites cited by neither
+cell: a third `write_lock` in `pull_head_member_preflight.rs:457`, and
+the `:278` manifest/lock writers (`write_manifest_and_lock`/`write_lock`)
+in `handle_create_repo.rs`, `handle_materialize.rs`,
+`handle_repo_lifecycle.rs`, `handle_branch.rs`,
+`handle_init_from_sources.rs` — all under their guards or the bare
+lock, all pinned. (4) Digest coverage, MEASURED: 3 of the 19 carved
+files are pinned — `preserve/artifacts.rs` (flat), `v1_lifecycle/archive.rs`
+and `store/archive.rs` (the `v1_lifecycle/mod.rs` tree root, which also
+covers `store/rewrite.rs`); the other 16 are unpinned; the count map is
+their only pin, as §3 chose. (5) The `_checked(` seam spelling is
+UNUSABLE as a negative-scan needle (40+ production hits: `split_at_checked`,
+`merge_upstream_checked`, `preflight_checked`, …), so the scans use
+`checked_artifact` + `artifact_facts` and the git seam needs no
+exclusion. (6) Two allowance-class members §4's list omits:
+`interface_tests/catalog_activation_pin.rs:43,136` ("E4.2-E4.6") and
+`src/git/tests/g12.rs:834` ("still live until E4.7") — E4.7's charter
+sweeps for the STRINGS, not this enumeration. (7) Pin references are
+counted with `#[cfg(test)]` modules dropped first (`stash/mod.rs` would
+otherwise pin 11 references of which 8 are its own tests'), a stated
+departure from O13's scan. (8) The "E4.3-B +1-line `--abort` content
+pin" named in §7 does not exist; the remedy's content pins are
+`interface_tests/contracts.rs:158,:181`, both kept green.]*
+
+*[E4.5/6-B DISPOSITION 2026-09-02, from the read-only charter prep
+(`GwzM5-8R2E-E45-6B-CharterPrep.md`, every claim cited at main `0dae0d5`; the third prep this
+phase to falsify a premise before a build): reachability HOLDS — all
+three `finalization/execute.rs` sites are reached under
+`acquire_activated` and under nothing else (four joins re-driven). But
+the durability half of §7's "one small step" premise fails: `:48` (lock)
+and `:51` (boundary) are `Bytes → Bytes` replacements, so the boundary's
+`replace_exact` DETACHES before publishing and the leaf is briefly
+absent — an absence the shipped FORWARD observer refuses to classify
+(`live.rs:110-112` `Ok(None)` → `Ambiguous` → RecoveryRequired) and the
+shipped ABORT refuses too (`abort/evidence.rs:299-304` `classify_file`
+missing-is-not-baseline → `Other` → the evidence preflight errors). That
+is RR §1a's observation-dead window in the observers, on two more
+leaves; the cure is observer-side reconciliation — DR-1's class (option
+(a)'s), forbidden inside E4 by the ruling. THEREFORE `:48` and `:51`
+STAY RAW as the DATED RESIDUAL this amendment's §3 provided for ([R2-P3-1]:
+"a v1 FORWARD arm that stays raw … needs its own dated residual record"),
+on the stronger ground: *the detach-then-publish shape opens an
+observation-dead window on two leaves whose absence the shipped forward
+and reverse observers both refuse to classify; the raw `write_atomic`
+rename is atomic and opens none.* E4.6-B does not open as a build; its
+in-tree residual sentence at `execute.rs:48,:51` rides E4.5-B's commit
+(the same file); O1's re-scoped text reads these two arms as
+"carved-as-v1-forward-arm residual", not "converted", per §7's own
+clause. RECORDED WITH IT: row `:279`'s frozen cell 2 ("checked
+Git-directory artifact action") ALREADY contradicts the shipped v1
+REVERSE writer, which reconciles `.git/info/exclude` through the
+WORKSPACE door (`abort/evidence.rs:148-153` → `boundary_relative` →
+`entry.rs:159-166`, `CheckedArtifactPolicy::workspace`) — a discrepancy
+predating E4; a git-directory replace door is feasible (the root kind
+exists, `CheckedArtifact::acquire` is root-kind agnostic and already
+acquires `<git-dir>/info/exclude` at `preservation_root/files.rs:28-35`)
+but would be the first production write under `<git-dir>/gwz/`,
+falsifying `policy.rs:41-45`, and would resolve a different path than
+the reverse arm on linked worktrees — the cell-2 wording question goes
+to DR-1 as a frozen-text item. `:45` (the marker) is CLEAR of the window
+(`WriteMarker` issues only from the `Baseline` prefix, which requires
+`marker_absent`, so the expected fact is `Missing` — the `MissingReplace`
+shape that never detaches). Its parent, `gwz.conf/markers`, is a declared
+managed purpose (`RootPreservationMarkers`) that NOTHING bootstraps on the
+v1 forward path — E4.2's start session is sealed to `[MergeStore,
+PreservationBundles]` and today's raw `write_atomic` creates the
+directory by construction — so refuse-when-missing would regress a fresh
+workspace's first `--no-ff` publication (the prep's stop-trigger 1
+fires at charter time). E4.5-B is therefore CHARTERED AS ONE STEP in
+E4.2's shape: bootstrap the marker's parent at merge start through a
+`DurableMerge` door (`ManagedParentRequestAuthorityV1::DurableMerge`,
+`managed.rs:132-147`, permits exactly `{PreservationBundles,
+RootPreservationMarkers}`; zero production callers, no door today) in a
+second admission/execution session under the activated start lease, then
+convert `execute.rs:45` with refuse-when-missing now safe; cap 500;
+stop-and-report if the freeze's "one reproducible pre-record request"
+doctrine (`managed.rs:119-128`) forbids a second sealed start-time
+request, or if the marker's expected fact is ever not `Missing`. It
+sequences after the pins package and the GC fix land, on a main whose
+inventory (which must NOT list `finalization/execute.rs` — verified: the
+19 rows exclude it) and pins are settled.]*
+
+*[E4.7 CHARTER CORRECTIONS 2026-09-02, from the read-only charter prep
+(`GwzM5-8R2E-E47-CharterPrep.md`, every claim at main `0dae0d5`): (1) §4's allowance-class
+NEEDLE SET misses its own §5 member — `v1_lifecycle/archive.rs:110`
+(the `gc_archived` allowance) contains none of the prescribed strings,
+and neither does its byte-identical, previously unnamed twin at
+`merge/gc.rs:31-34`; the prep's corrected needle set governs E4.7's
+sweep. (2) Six actionable allows no authority names, now in scope:
+`coordinator/mod.rs:23-28`, `capability/pre_catalog/provider.rs:15,25,41`,
+`namespace/mod.rs:20-23`, `merge/gc.rs:31-34` — and `namespace/mod.rs:10-19`,
+whose own doc says "if E4 has not landed by the R2-E settle, E7 owes this
+allow a dated re-owning rather than letting it become permanent by
+silence": E7 never discharged it and E4 has now landed; E4.7 discharges
+it. (3) Two allows ALREADY suppress nothing — `workspace_mutator_lock.rs:44-47`
+(four production callers: `dispatch.rs:453`, `checked.rs:161,179,180`)
+and `namespace/mod.rs:47-51` (both names consumed via
+`bootstrap/managed/provider.rs:75-78`) — their removal will not fail
+`cargo check`; `checked_artifact/mod.rs:27-32` is a third candidate
+(all thirteen `entry.rs` doors have production callers) to be MEASURED,
+not assumed. The full disposition: 23 actionable sites — 2 expire
+(proven), 1 expiry candidate, 18 re-reasoned permanent, 2
+delete-or-permanent — plus 12 prose/checker rewrites; 23 "A1
+activation: reached only by this tree's own suites" allows swept and
+dispositioned NO CHANGE. (4) E0.2 §7.1's `finish()`-reachability record:
+the A-1 decision does NOT reopen — E4.1's activation and E4.2's parent
+bootstrap take the checked retirement (`namespace_mutation.rs:301`),
+E4.2's record creation and E4.5-B's marker arm reach `finish()`
+(`entry.rs:390` → `transition.rs:106` → `cleanup.rs:15`), and
+`cleanup.rs:146-158` runs unconditionally in `finish()`; no consumer
+bypasses both. Cite drift: the reopen condition lives at E7-Acceptance
+`:181` (the O12 row), not `:179` (now O10). (5) The dead `gc_archived`
+family is SEVEN functions and one struct across two files
+(`v1_lifecycle/archive.rs` + `merge/gc.rs`'s `preflight_archived_cleanup`
+/ `delete_preflighted_backup_refs` / `require_backup_refs_absent` /
+`PreparedArchivedCleanup`), not §5's three; deleting it drops
+`archive.rs`'s `sync_dir` count 2 → 0 and fires the O13 inventory's
+fail-closed SHRINKAGE arm — an amendment-tier event under §3 — and moves
+the `v1_lifecycle/mod.rs` tree digest. E4.7 therefore KEEPS it with a
+permanent-pending-DR-1 reason; the delete option is a named DR-1
+sub-item. (6) SEAM SETTLED: the pins package (E4.4-6-B, `b99bfb7`)
+already writes `archive.rs:108-111`, `catalog_names.rs:44` and the
+checker's O13 block; E4.7 builds on that landed text and does not
+re-write those three sites.]*
+
 ## 8. Review record
 
 **Round 1 (2026-09-02), peer-blind, Fable×2.** Code axis: NO-GO — 2 P1

@@ -584,7 +584,16 @@ assumption.)*
   only sites in `v1_lifecycle/finalization/execute.rs` (`:45` marker,
   `:48` lock, `:51` boundary — the last needs a git-directory replace
   door), chartered as ONE small step E4.5/6-B after the pins package
-  E4.4-6-B, each arm with its own reachability proof.]*
+  E4.4-6-B, each arm with its own reachability proof.]* *[Re-dispositioned
+  2026-09-02 on the charter prep (`GwzM5-8R2E-E45-6B-CharterPrep.md`): `:48`/`:51` hit the
+  observation-dead window in the forward and abort observers and STAY
+  RAW as the [R2-P3-1] dated residual (E4.6-B does not open); `:45`'s
+  parent is bootstrapped by nothing on the v1 path, so E4.5-B is ONE
+  step in E4.2's shape — a `DurableMerge` parent door at merge start,
+  then the marker conversion — cap 500; row `:279`'s cell-2 wording
+  ("Git-directory artifact action") already contradicts the shipped
+  reverse writer's workspace door → DR-1 frozen-text item.
+  `GwzM5-8R2E-CapabilityFreeAmendment.md` §7's post-adoption note carries the full record.]*
 - **E4.7** — O3 close-out: the legacy in-place writers inside
   `.gwz/checked-artifacts` retire behind the converted paths; the
   A1-era allowances (`catalog.rs:10-16` class) expire with dated
@@ -603,7 +612,19 @@ assumption.)*
   reachability record, the A-1 rider's reopen check, the dead
   `gc_archived` family's disposition, O1's DISCHARGED close against its
   re-scoped text (O14 cited as RE-OWNED to DR-1), and the phase
-  close-out records.]*
+  close-out records.]* *[Charter prep 2026-09-02 (`GwzM5-8R2E-E47-CharterPrep.md`): 23
+  actionable allow sites (2 expire proven; 1 candidate to measure; 18
+  re-reasoned permanent; 2 delete-or-permanent) + 12 prose/checker
+  rewrites, with byte-exact texts in the report; the prescribed needle
+  set corrected (it missed `archive.rs:110` and `merge/gc.rs:31-34`); six
+  unnamed allows added incl. `namespace/mod.rs:10-19`'s undischarged
+  E7 re-owning; A-1 does NOT reopen (reopen condition at E7-Acceptance
+  `:181`); `gc_archived` KEPT permanent-pending-DR-1 (deletion fires O13's
+  shrinkage arm); the pins package owns `archive.rs:108-111` /
+  `catalog_names.rs:44` / the O13 block — E4.7 builds on them. Shape:
+  one docs+allowances step (Opus builder for the gwz-core edits +
+  digests; the lane owner for the close record in the E7-Acceptance
+  form), after E4.5-B lands; its record IS the phase close, then DR-1.]*
 - **DR-1** — the phase-end design round (minted by the operator's ruling
   `GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md` point 5; chartered at `GwzM5-8R2E-CapabilityFreeAmendment.md` §5; its own dual on the
   amendment-tier line). Opens AFTER the pins package and E4.7 land, never
