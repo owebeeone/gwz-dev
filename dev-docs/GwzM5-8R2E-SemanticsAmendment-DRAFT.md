@@ -933,7 +933,14 @@ layer down: `CatalogLeaseTargetWitnessV1::facts` calls
 `CatalogTargetV1::finish`/`revalidate` do the same
 (`catalog_lease/target.rs:142-143`, `:154-156`, `:216-217`, `:222`, `:227-228`)
 — which reach `name_to_handle_at` (`identity.rs:267`) and the statx `MNT_ID`
-rename domain (`identity.rs:304-316`). Notably `witness.rs:31-35`'s `try_new`
+rename domain (`identity.rs:304-316`). *[Cite corrected 2026-09-01, E4.1
+review flag 1 (confirmed by the reviewer, decides precondition 1's true
+module): `dir_identity`/`rename_domain` resolve to the CATALOG's own
+providers — `capability/pre_catalog/provider/platform/{linux,macos,windows,
+unsupported}.rs` — which implement the same syscall class themselves;
+`checked_artifact/identity.rs` is the LEGACY writer's module and is NOT on
+the catalog-lease path. E4.1's capability cure was therefore applied to
+both modules.]* Notably `witness.rs:31-35`'s `try_new`
 calls only `revalidate()`, which for the workspace-runtime source delegates to
 `runtime.revalidate_catalog_target()` (`witness.rs:38-41`) — i.e. **even
 constructing the witness does not probe**; `facts()` does.
@@ -942,7 +949,11 @@ constructing the witness does not probe**; `facts()` does.
 not just the checked ones.**
 `WorkspaceMutatorLock::acquire`/`try_acquire`
 (`operation/workspace_mutator_lock.rs:14-38`) has **nine** production call
-sites: `workspace_ops/handle_create_repo.rs:35`,
+sites *[census moved to TEN at E4.1(c), 2026-09-01: dispatch's
+`forward_lifecycle_viability_window` (`runtime/dispatch.rs`) acquires the
+lock for the activate-before-upgrade window on the A1 adaptation path —
+review round 2 verified deadlock-freedom three ways; the ground's
+availability argument is unchanged]*: `workspace_ops/handle_create_repo.rs:35`,
 `workspace_ops/handle_init_from_sources.rs:91`,
 `workspace_ops/merge/gc.rs:167`, `workspace_ops/merge/abort/mod.rs:44`,
 `workspace_ops/merge/runtime/mutation_guard.rs:44`,

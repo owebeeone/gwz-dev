@@ -180,6 +180,17 @@ it.
   capability-refusal UX **folded into E4.1's precondition set**,
   which is now SEVEN items (E0.2 §5.3's five + item 0, the
   coexistence gate + item 6, refusal-ordering/restart legality).
+  *[Record corrected 2026-09-01 (E4.1 builder flag 2, reviewer
+  CONFIRMED): the negative holds only for the CATALOG-LEASE probe.
+  The LEGACY identity module is production-reachable at v0.11.0 —
+  `observation.rs`'s `observe()` calls `parent_is_current` →
+  `identity::object_identity` on every legacy checked observation and
+  `observe_leaf_exact` calls `identity::file_identity` on every
+  `Bytes` observation, with ordinary-merge production callers — so on
+  Linux `name_to_handle_at` was already executed by shipped code.
+  E4.1's typed-capability cure covers both modules; the closed-
+  negative CONCLUSION (no UX work owed pre-E4.1) was right for the
+  wrong denominator.]*
 - **O6 — COMPLETED at E0.2b §5**: the read-side identity refusal
   (the owner re-mints the witness on every resume and refuses on
   disagreement) joins the mint-side mechanism; key #5's semantic is
@@ -336,6 +347,46 @@ assumption.)*
   analyzes which E4 rows truly require catalog activation and
   proposes the sequencing; a cross-lane dependency or pull-forward
   decision may fall to the operator.)*
+  **LANDED 2026-09-01 at gwz-core `e56124b`** (ff-merge of the
+  four-commit train, per-commit lane-gate green: (a) `7f2862d`
+  hygiene riders 148 — Q1 bounded read verbatim + [R2-P3-3]/F3 +
+  the path-constant pin; (b) `1f3ba71` activation 472 — the
+  `activate_workspace_catalog` door in `entry.rs`,
+  `PlatformCapability::PersistentFilesystemIdentity`, all seven
+  preconditions, tripwire 0→1; (c) `6688f34` the [P1-1]/[P2-1] cure
+  331, cap RE-RULED 300→331-MEASURED — round 1 was NO-GO on the
+  reviewer's driven wedge: the refusal sat BEHIND dispatch's durable
+  v0→v1 upgrade, permanently wedging an interrupted ordinary merge
+  on a non-admitted filesystem; the ruled contract R1-R7 cures it at
+  the adapter (activate-before-upgrade viability window, Resume-only;
+  declined viability → the v0 lifecycle completes per the adapter's
+  own [P1-1] doctrine) and splits the lease (`acquire` plain for
+  abort — capability-free end to end — vs `acquire_activated` for the
+  forward paths); (d) `e56124b` the round-2 fold — [P2-C1] Windows
+  compile gate (one-line cfg deletion, real-platform proof = the
+  landing dispatch), [P3-C2]/[P3-C3] staleness cures. Round 2: GO;
+  R1-R7 discharged and driven, rider audit clean, 331 exact. R4
+  residual DISCLOSED: post-upgrade non-capability obstruction refuses
+  with `--abort` as the exit — narrowed, driven, not a wedge. Pins
+  landed: CA 456 / v1 257 / remainder 1099+1 darwin MEASURED; linux
+  466/1100 DERIVED FIRST-DISPATCH-EXPECTED at Windows 33498089904 +
+  Platform 33498092726 (dispatched at the landing; the Windows leg is
+  the split's first compile of the activation AND [P2-C1]'s proof;
+  [P3-7]'s note stands — the v1 partition now needs a
+  catalog-admitted dispatch filesystem, ext4/APFS/NTFS). Operator
+  rulings recorded: ext4-only Linux posture "fine for now"
+  (2026-09-01); the E4-train standing order (land on GO; lane rules
+  escalations; terminal NO-GO returns to the operator). Carriers out
+  of this step: [P3-1] release-notes line → the release train (E7
+  ledger); [P3-2] renderer row (~10 lines, pub(super) — NOT
+  pub(crate), clippy private_interfaces) + [P3-3] identity.rs Windows
+  bare-errno arm + [P3-4] entry.rs scan-hole record → E4.2; [P3-C1]
+  R2 unpinned against E4.4's terminal-archive arm regaining
+  capability-dependence for abort → E4.4's charter; [P3-5]
+  workspace_mutator_lock stale allow + catalog.rs allowances →
+  E4.7; [P3-8] catalog-mutation invisibility in reverse_rollback
+  rows → E4.2-E4.6 as consumers arrive. Review verbatim, both
+  rounds: `GwzM5-8R2E-E4.1-Review.md` (1051 lines).**
 - **E4.2** — first merge record (`MergeStore` + `PreservationBundles`
   bootstrap ordering). *(E0: + O13's substantive half, creation path;
   and the §11.3-item-2 duties — the `retain_managed_parent_at_for_test`

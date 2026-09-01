@@ -2693,6 +2693,40 @@ fable token only where it makes a difference." Recorded consequences:
   word) → M5c; escape lane still blocked on operator handoff; GwzWt +
   GwzAi await operator direction.
 
+  **POSITION 2026-09-01 (later) — E4 IS IN EXECUTION; E4.1 LANDED.**
+  Operator rulings, verbatim class: "proceed with E4"; "land on GO,
+  then start e4.2"; "same standing order for the rest of the e4
+  train" (GO lands immediately, GO-WC lands after lane-owner folds +
+  focused verification, the lane rules escalations as the Fable
+  tier, terminal NO-GO returns to the operator, each landing
+  auto-launches the next step); "ext4-only is fine for now" (the
+  Linux catalog posture, ratified). **E4.1 LANDED at gwz-core
+  `e56124b`** — the first production catalog activation. The train:
+  hygiene riders (Q1 bounded read + the path-constant pin) →
+  activation (the `entry.rs` door, `PersistentFilesystemIdentity`
+  capability with an actionable remedy sentence, seven preconditions,
+  tripwire 0→1) → the [P1-1] cure (round 1 NO-GO: the refusal sat
+  behind dispatch's durable v0→v1 upgrade and wedged interrupted
+  ordinary merges on non-admitted filesystems, driven on real FAT32
+  by the reviewer; ruled contract: the adapter's viability window
+  declines the upgrade and the v0 lifecycle completes; abort
+  capability-free via the acquire/acquire_activated split; cap
+  re-ruled 300→331-MEASURED on the R1.1 precedent) → the round-2
+  fold ([P2-C1] Windows compile gate, one line). Round 2 GO, every
+  clause driven. Pins: CA 456 / v1 257 / remainder 1099+1 darwin
+  MEASURED; linux 466/1100 DERIVED — Windows matrix 33498089904 +
+  Platform 33498092726 dispatched at the landing (the Windows leg =
+  the activation's first Windows compile and [P2-C1]'s real proof).
+  THREE record corrections landed with this entry: O11's closed-
+  negative narrowed to the catalog-lease probe (legacy identity was
+  already production-reachable at v0.11.0); amendment §5.2 Ground
+  1's probe cite moved to the pre_catalog providers (identity.rs is
+  the legacy module); Ground 2's lock-site census 9→10 (the
+  viability window). NEXT: E4.2 (first merge record; launches now
+  under the standing order — its brief carries [P3-2]/[P3-3]/[P3-4]
+  + the §11.3-item-2 duties + O13's creation half), then E4.3-E4.7
+  the same loop, then M5c.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
