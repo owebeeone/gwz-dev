@@ -1198,6 +1198,9 @@ corpus of GwzM5-8I2CompatibilityPredicates.json — not the migration registry,
 which has no vocabulary for them. Tier 1 = byte-SHA256 across the production
 archival act, executed on the eight fixtured rows over five distinct durable
 bases; tier 2 is owed on all ten, carrier E4.4, R2-F-encumbered. §12.9(e).)*
+*[2026-09-02: carrier E4.4 → DR-1, which mints the comparable sub-surface by
+amendment with its own dual and names the execution carrier; the R2-F
+encumbrance is satisfied — `GwzM5-8R2E-CapabilityFreeAmendment.md` §5.]*
 
 | Archive id | Fixture shape | Evidence | Registry row | Disposition |
 | --- | --- | --- | --- | --- |
@@ -1261,7 +1264,7 @@ none can.]*
 disposition on §12.9(c)'s own ground (§12.9(e) — the "10 registry rows"
 denominator was a 9+1 partition); the 8 fixtured archive rows carry executed
 tier-1 byte-preservation in the standalone archive corpus with tier 2 owed on
-all ten (carrier E4.4, ratified with its R2-F encumbrance named). The
+all ten (carrier E4.4 *[2026-09-02: → DR-1, `GwzM5-8R2E-CapabilityFreeAmendment.md` §5]*, ratified with its R2-F encumbrance named). The
 registry-row arithmetic below becomes: 22 rows bind 22 shape labels; the
 durable-object count is lower — `terminal/completed` is one object for two R0
 rows, and `terminal/completed-no-publication`'s object also carries

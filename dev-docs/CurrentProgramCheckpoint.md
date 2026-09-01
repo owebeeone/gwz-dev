@@ -2769,6 +2769,155 @@ fable token only where it makes a difference." Recorded consequences:
   store/rewrite.rs's commit pair, [P3-3]'s Windows-arm disposition
   precedent), then E4.4-E4.7 → M5c.
 
+  **POSITION 2026-09-02 — E4.3 CARVED OUT BY AMENDMENT; E4.2's CI
+  CLOSED; E4.4 GATED ON THE NEW CLAUSE.** E4.2's landing matrices went
+  GREEN first dispatch at `7f28907` (Windows 33511535235; Platform
+  33511538719 sum-confirmed to the digit: darwin 1828+1i, linux
+  1839+1i = 467+1111+260+1) — the --target snapshot's first
+  Windows/ARM suite evidence, all green. **E4.3:** the conversion as
+  chartered was built and REJECTED at delivery by its own builder's
+  driven P0 (candidate `c9a7303`, preserved at gwz-core
+  `probe/e4-3-detach-window-evidence`): the boundary's
+  detach-then-publish replacement opens a crash window in which the
+  open merge record vanishes from discovery with no shipped
+  reconciler — the record is the root of reconciliation, the one leaf
+  nothing recovers — and the shared `commit` put the identity probe
+  on every abort (the [P3-C1] class arriving at E4.3); the lane owner
+  verified both mechanisms and owned the charter's contradictory
+  clause pair. Decision packet put to the operator with three
+  options; **operator ruling, verbatim: "proceed with (c)"** — the
+  documented RECORD-ROOT CARVE-OUT. Executed as
+  `GwzM5-8R2E-RecordRootAmendment.md`: one dated exception to row
+  `:280` (commit keeps `rename_durable`; the second cell's "artifact
+  actions" read through it for that one path), pins P-1 (the O13 row
+  PERMANENT-DOCUMENTED, fail-closed BOTH directions incl. shrinkage)
+  and P-2 (the negative tripwire, CRLF-normalized), the new BINDING
+  PLAIN-LEASE PROBE CLAUSE for E4.4–E4.6 (enumerate lease-reachability
+  BEFORE building; `archive_terminal`-on-plain named), option (a)
+  routed to O14's E4.6 fork. **Tier recording:** dual Code+State,
+  peer-blind, Fable×2, on the refined tier policy's amendment-tier
+  line (2026-08-22) — this dual sits OUTSIDE plan §2's two-dual
+  budget on that line's authority (precedent: the E5-era "minted by
+  amendment with dual review" determination). Round 1: Code
+  GO-WITH-CONDITIONS (1 P2 — the §2 ground overstated "no reconciler
+  CAN close", re-scoped to the shipped tree; 34 claims verified, 0
+  refuted; its battery line UNFILLED at a harness restart, recorded
+  not fabricated), State GO-WITH-CONDITIONS (3 P2: the second-cell
+  disposition, §6's archive overreach, six unnamed §7 records; 3 P3);
+  all folds executed 2026-09-02; State waived round 2; Code's round-2
+  text-diff confirmation in flight. **E4.3-B** (the pins package,
+  Opus builder, cap 250, no production conversion) in flight; lands
+  with the amendment and the six root-side records (plan O13/O14/
+  preamble/gate-note/E4.3 step; E7-Acceptance O13+O1 brackets; this
+  entry). NEXT: E4.4 charters under the plain-lease probe clause and
+  the record-root analysis duty; E4.5/E4.6 (O14 fork decides
+  convert-vs-amend, record-root re-examined); E4.7; M5c.
+
+  **POSITION 2026-09-02 (later) — THE CAPABILITY-FREE LIST STANDS; THE
+  REMAINING E4 ROWS CARVE OUT; E4.3-B DELIVERED; DR-1 MINTED.** E4.4's
+  charter prep (`GwzM5-8R2E-E4.4-CharterPrep.md`, read-only, run BEFORE
+  any build per the record-root amendment's §4 clause) found no record-
+  root wall for the archive (the move is atomic) but THE structural
+  wall: every raw write site in the two archive files runs only from
+  abort/preserve on the PLAIN lease or from GC under no v1 lease — and
+  §7 of the prep verified the same for EVERY remaining §10 row (`:279`
+  is written by `repo create`/`init-from-sources` and ~14 more listed
+  callers; `:276`–`:278` by ordinary merge, commit, abort). The R2-D
+  conversion table and R2-E §5.2's capability-free decision were in
+  direct structural tension, unrecorded by any adopted record; E4.3 was
+  the first symptom. Decision packet put to the operator (A amend the
+  list / B carve out / C degraded boundary mode / D = B now + C routed).
+  **Operator ruling, verbatim:**
+
+  > D), with FAT32 out of product and out of the lab.
+  > Closed. (A) — Ground 2 stands. Ordinary merge / commit / create / abort / GC stay capability-free. Ext4-only was for the checked feature, not "gwz dies on Fedora." Do not amend the list to put those operations on the catalog probe.
+  > Now. One dual-tier amendment, not four more conversion deliveries:
+  >
+  > 1. Record the tension: R2-D "production writes go through the boundary" vs R2-E §5.2 capability-free list. E4.3 was the first symptom.
+  > 2. Capability-free list stands. Rows `:275–:279` whose writers are on that list are carved out — raw durable writers stay, documented and pinned (generalize the E4.3-B / O13 inventory shape). Convert only arms already on `acquire_activated`.
+  > 3. Re-scope O1, the R2-D milestone, and E4.7: checked-feature writes go through the boundary; capability-free arms are a dated exception, not unfinished work. E4.7 does not retire those writers.
+  > 4. Mint or explicitly defer the tier-2 archive sub-surface (do not invent it in E4.4).
+  > 5. Route (C) (non-identity / degraded boundary), reader-side record reconciliation, and O14 (convert `authorize_write` vs amend freeze) to one phase-end design round. Not four builders hitting the wall at delivery. Do not start (C) inside E4.
+  >
+  > FAT32. Not a supported filesystem. No FAT32 volume drive required. Do not spend a row or a dispatch on it.
+  > Abort sentence. Settle from the tree: post-publication v1 abort already reaches `write_checked` → `observation.rs` identity. If that path is real, the E4.1 "`--abort` needs no such filesystem" line is over-claim. Fix the sentence (scope it to the activated-lease / capability-free abort you actually shipped, or date the residual). A Linux non-ext4 drive is optional and only if you already have one.
+  > Launch now (standalone, either way):
+  >
+  > * GC: `gc.rs` `decode_production_v0` on archive bytes — completed `--no-ff` since 0.11.0 is un-GC-able. Read-side, no probe. Fix it.
+  > * E4.3-B continues (record-root carve-out + tripwire). Unaffected.
+  >
+  > Do not start E4.4–E4.6 as originally chartered. After the amendment GO: pins package + any remaining activated-lease forward arms only. Park the E4.4 conversion candidate if it assumes archive rides the boundary from abort/GC.
+  > Quote this ruling in the amendment and in the E4.3-B / GC briefs. Terminal NO-GO on a different scoping comes back to me; do not pick (A) or start (C) to unblock a step.
+
+  **Executed:** ruling recorded verbatim on disk
+  (`GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md`); the consolidated
+  amendment `GwzM5-8R2E-CapabilityFreeAmendment.md` drafted and taken
+  through its dual — **tier recording:** peer-blind Code+State, Fable×2,
+  on the refined tier policy's amendment-tier line (2026-08-22), outside
+  plan §2's two-dual budget on that line's authority (the third such
+  dual: record-root, this, DR-1 to come; plan §2 annotated). Round 1:
+  Code NO-GO (2 P1 / 5 P2 / 7 P3 — the prep's `:279` "solely
+  create/init" refuted: `finalization/execute.rs:51` is reached ONLY
+  under `acquire_activated`, the conversion the ruling ORDERS, which the
+  draft had carved; the abort sentence false for two more ungated
+  plain-lease paths; the abort's legacy probe strictly WEAKER than the
+  catalog's ext4 gate; `:275`'s GC writer a dead arm with the live one
+  elsewhere and THREE v0-only decode sites; per-file scans unsound for
+  mixed files; the digest backstop absent) and State GO-WC (1 P1 — the
+  lane owner had WIDENED the ruling on E4.7, dropping its legacy-writer
+  clause; narrowed back; 7 P2 / 8 P3; §6's abort scoping ruled NOT
+  list-amendment-by-stealth; corpus sweep 50 hits, 34 unowned homes all
+  now annotated). Round 2: BOTH GO, terminal; zero unverified claims;
+  **ADOPTED 2026-09-02.** THE AMENDMENT: (1) the tension recorded; (2)
+  the list stands, (A) closed, FAT32 out; rows `:275`–`:279`'s listed-
+  operation writers CARVED OUT permanently under a generalized
+  fail-closed inventory (three primitive classes: `durable_fs`,
+  `std::fs`, the `write_atomic` family; both-directions; per-ARM scans
+  for mixed files) with every row's frozen cells dispositioned; ONLY the
+  three `acquire_activated`-only sites in `finalization/execute.rs`
+  convert (E4.5/6-B, one small step); (3) O1 re-scoped a second time and
+  closes DISCHARGED at E4.7 citing O14 RE-OWNED to DR-1; the Phase-E4
+  milestone re-scoped to checked-feature writes; **E4.7 narrowed by
+  exactly the ruling's sentence — and a consequential re-own the
+  operator should see: the LEGACY IN-PLACE-WRITER RETIREMENT (E4.7's
+  first clause) is re-owned to DR-1 as O14's outcome, because the legacy
+  writer IS the pre-catalog `CheckedArtifact` every converted path still
+  rides; OPEN-R1's retire-the-area question travels with it; E4.7 keeps
+  the named allowance-expiry class, E0.2 §7.1's `finish()` record, the
+  A-1 reopen check, O1's close and the close-out records;** (4) tier 2
+  EXPLICITLY DEFERRED — DR-1 mints the comparable sub-surface BY
+  AMENDMENT WITH ITS OWN DUAL; O8's `gc_archived` route re-owns to DR-1
+  conditional on (C), the dead family dispositioned by E4.7; (5) **DR-1
+  minted — SCOPING NOTE (not a request):** its agenda = the ruling's
+  three items ((C) degraded boundary mode; reader-side reconciliation;
+  O14's `authorize_write`-vs-amend fork) + lane-routed items with hooks
+  (tier-2 minting, ruling point 4; the record-root re-examination, which
+  rides O14; the §6 abort narrowing, a sub-item of (C); the legacy-
+  writer retirement; O8's checked-archive route). ONE QUESTION NAMED FOR
+  THE OPERATOR, not decided: DR-1 opens after E4.7, outside Phase E4 —
+  R2-E's phase E8, or a new lane? (6) **the wider abort fact, for the
+  operator:** the shipped abort is capability-free on FEWER paths than
+  the ruling's premise assumed — three checked-door paths probe today
+  (post-publication evidence; `--preserve` with an integrated
+  participant; a selected `@root`), two independent of publication, all
+  shipped with A1's v1 reverse path; the E4.1 sentence class is re-scoped
+  BY PATH at six in-tree homes and OperationModel's three sentences
+  ("an abort that touches no checked artifact needs no such filesystem
+  …"), dated as a residual cured only by DR-1's (C); no FAT32 anywhere.
+  **Standalone, launched on the ruling:** the GC decode fix (three
+  v0-only sites; read-side; GC stays capability-free; NOT O8's route) —
+  in flight; **E4.3-B delivered** `60072a7` (249/250; P-1 generalized
+  into a per-row reason/authority map — each future carve-out one data
+  row; P-2 two belts; item 5 declined as structurally undrivable) — in
+  interior review. LESSON filed: two builders sharing one target dir on
+  different trees is UNSOUND (same test-binary path; cargo runs the
+  other tree's binary) — snapshot-binary protocol when forced by disk.
+  NEXT: E4.3-B lands (with the record-root amendment's six records and
+  all of this amendment's annotations in one root commit); GC fix
+  lands; the pins package E4.4-6-B (charter = the amendment's §7);
+  E4.5/6-B; E4.7 re-scoped; DR-1 chartered once the operator names its
+  home.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

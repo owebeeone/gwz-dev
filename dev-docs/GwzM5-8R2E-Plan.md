@@ -43,14 +43,14 @@ exist unbound; R2-E binds them without moving the census.
 
 | # | Obligation | Source | Phase |
 | --- | --- | --- | --- |
-| O1 | The §10 consumer conversion table, executed: WorkspaceMutatorLock, first merge record, merge record rewrite, terminal archive source-only, stash bundles, markers, workspace checked mutation, `.git/info/exclude` | ConsumerCheckpoint §10; R2-D plan §5 item 1 | E4 |
+| O1 | The §10 consumer conversion table, executed: WorkspaceMutatorLock, first merge record, merge record rewrite, terminal archive source-only, stash bundles, markers, workspace checked mutation, `.git/info/exclude` | ConsumerCheckpoint §10; R2-D plan §5 item 1 | E4 *[2026-09-02: obligation text RE-SCOPED (the SECOND re-scope, after ruling "a"): "executed as far as E0.2 §5.2 permits — every row dispositioned by name: converted (E4.1, E4.2, the `finalization/execute.rs` forward arms), carved by dated exception (`GwzM5-8R2E-CapabilityFreeAmendment.md`; the record-root amendment), or already-converted-and-dated (its §6)"; closes DISCHARGED at E4.7 against this text, citing O14 as RE-OWNED to DR-1 — `GwzM5-8R2E-CapabilityFreeAmendment.md` §4.]* |
 | O2 | First production catalog activation — `recover_or_create` gains its production caller (gated by settled tuple §11.3) | R2-D plan §5 item 2; bucket (c) | E4 |
 | O3 | Legacy writers stop mutating inside `.gwz/checked-artifacts` | thin-A1 §2's accepted residual, expiring here | E4 |
 | O4 | cleanup.* semantics + injection, 11 keys (all need `AdmittedActionV1` — the duty attaches now that admission is production) | freeze :727-728; checkpoint Phase-5 record | E1 |
 | O5 | barrier.* semantics + injection, 16 keys | freeze :787 | E2 |
 | O6 | **BINDING**: `BarrierIntentV1::issue` observe-or-refuse — the last shape of the caller-supplied-restatement class, production-unreachable at the settle | settled dual Code round 1; bucket (c) | E0 decide, E2 implement |
 | O7 | terminal.* semantics + injection, 11 keys (terminal retirement edges) | freeze :794/:880 | E3 |
-| O8 | The archive/GC consumer sub-package: the 18-UNBOUND per-scenario registry rows + cheap closures (i)+(ii) landing TOGETHER (registry rows + one parametric `adapt_open` refusal test over every non-whitelisted scenario); the archive-equivalence mechanism decision; the two archive shapes riding A1 [P2-1] option (i); the `gc_archived` production route | Evidence §12.7; L6 ruling; A1 record §6 | E0 decide, E5 |
+| O8 | The archive/GC consumer sub-package: the 18-UNBOUND per-scenario registry rows + cheap closures (i)+(ii) landing TOGETHER (registry rows + one parametric `adapt_open` refusal test over every non-whitelisted scenario); the archive-equivalence mechanism decision; the two archive shapes riding A1 [P2-1] option (i); the `gc_archived` production route | Evidence §12.7; L6 ruling; A1 record §6 | E0 decide, E5 *[2026-09-02: the `gc_archived` production route's carrier (E4.4) dissolved — the route RE-OWNS to DR-1 conditional on (C); the dead family behind `archive.rs:108-111` is dispositioned by E4.7; the un-GC-able v1-archive defect is fixed standalone through the LIVE `store/gc.rs`/`retention.rs` path, which is NOT this route — `GwzM5-8R2E-CapabilityFreeAmendment.md` §5/§7.]* |
 | O9 | [P3-R2-2] the eligible-row upgrade-failure fallback: one executed composed-path test (whitelisted Finalizing row, atomic upgrade `Err(_)` → v0 completes; needs a filesystem-level fault — production hardcodes `AtomicUpgradeFault::None`) — also the moved-pin coverage restoration (both axes converged on this arm) | R2.3 report; A1 record §14 | E6 |
 | O10 | [P3-R2-1] `AtomicUpgradeFault` hygiene: cfg-split signature or sealed constructor (injected variants production-compiled but inert) | R2.3 report | E6 |
 | O11 | The `DurableObjectIdentity` production-reach question: does the v0.11.0 `--no-ff` v1 store hit the identity probe on Linux? (decides whether capability-refusal UX and docs work exist) + the capability-refusal UX if reach is real | release verify diagnosis, memory note | E0 answer, E6 if real |
@@ -99,7 +99,29 @@ it.
   conversion is measured even when it empties nothing. The dated
   accepted-residual record below is UNTOUCHED by this correction: it
   is scoped to the v1 STORE on the no-ff path, and E4.2/E4.3 do
-  complete that store's conversion.]* **Dated
+  complete that store's conversion.]* *[Amended 2026-09-02,
+  `GwzM5-8R2E-RecordRootAmendment.md` (dual GO-WC both axes, folds executed): the
+  record's REWRITE path — `store/rewrite.rs::commit` — is CARVED OUT
+  and keeps `rename_durable` permanently as the RECORD-ROOT EXCEPTION
+  (the record is the root of reconciliation; the boundary's
+  detach-then-publish shape opens a discovery-dead window no shipped
+  reconciler closes — driven at probe/e4-3-detach-window-evidence
+  `c9a7303`). Read the two bracketed sentences above accordingly: the
+  inventory empties across E4.2/E4.4 for the CONVERTIBLE files while
+  `store/rewrite.rs` stays as a PERMANENT-DOCUMENTED row, fail-closed
+  both directions (P-1); and "E4.2/E4.3 do complete that store's
+  conversion" reads: creation converted (E4.2), rewrite carved out
+  (E4.3-B), the archive files E4.4's. The accepted residual's expiry
+  is re-scoped at the amendment's §6.]* *[Amended again 2026-09-02,
+  `GwzM5-8R2E-CapabilityFreeAmendment.md` (ADOPTED, dual GO×2): the two ARCHIVE files are
+  CARVED OUT too — every `store/archive.rs` writer runs from a listed
+  operation on the PLAIN lease and `archive.rs::remove_archive` is a
+  dead arm — so the O13 inventory is now PERMANENT-DOCUMENTED in ALL
+  THREE rows (creation converted at E4.2; rewrite carved by the record-
+  root amendment; archive carved by the capability-free amendment) and
+  NEVER EMPTIES. Read every "empties across …" and "E4.4's" phrase in
+  the two brackets above accordingly; the retire-on-conversion marker
+  survives on no row.]* **Dated
   accepted-residual record (2026-08-27): between A1 — the gate's
   expiry, 2026-08-25 — and the E4.2/E4.3 conversions, v0.11.0-lineage
   trees carry the v1 store as a production raw durable writer on the
@@ -124,12 +146,25 @@ it.
   claims are amended to the landed architecture (a frozen-text move
   needing its own review tier). OWNER: the fork is DECIDED at E4.6's
   chartering, when every converted shape exists; the decision
-  escalates to the operator if it amends frozen text. Until decided,
+  escalates to the operator if it amends frozen text. *[Moved
+  2026-09-02 to DR-1, the phase-end design round minted by the operator's
+  ruling (`GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md`) and chartered by `GwzM5-8R2E-CapabilityFreeAmendment.md` §5 — E4.6 as a
+  conversion step dissolves under that amendment; O14's fork, the
+  record-root re-examination that rides it, and the legacy in-place-
+  writer retirement (now O14's outcome) all decide at DR-1.]* Until decided,
   every E4 conversion states at its execution seam which gate it
   opens (durability) and which stays closed (authority) — the E4.2
   C1(iii) pattern, binding on E4.3–E4.6's charters. Row `:280` is NOT
   breached by the interim state (the E4.2 review's flag-6 judgment);
-  O1's close must cite O14's disposition.
+  O1's close must cite O14's disposition. *[Agendum added
+  2026-09-02, `GwzM5-8R2E-RecordRootAmendment.md` §2/§5: the RECORD-ROOT EXCEPTION is
+  re-examined AT THIS FORK — option (a), reader-side residue
+  reconciliation, is the named candidate; if converted leaf writes
+  move onto the write authority with it, the record root converts
+  there or the exception is re-affirmed there, deliberately. O1's
+  close cites the amendment alongside O14.]* *[2026-09-02: the fork's home
+  is DR-1 (above); O1 closes DISCHARGED at E4.7 against its re-scoped
+  text citing O14 as RE-OWNED to DR-1 — `GwzM5-8R2E-CapabilityFreeAmendment.md` §4.]*
 - **O1 enumeration corrected, in §0's correction form:** the §10
   table is NINE consumer rows (`ConsumerCheckpoint:272-280`); O1's
   row above enumerates eight and drops row `:280` — the ninth is
@@ -157,7 +192,10 @@ it.
   and the legacy private parent has exactly one non-test owner
   (`policy.rs:33-42` defines it; `observation.rs:93` is its only
   consumer). R2-F's relocation package **discharges O3 directly**;
-  E4.7 remains this plan's stronger full-retirement mechanism. Under
+  E4.7 remains this plan's stronger full-retirement mechanism *[2026-09-02:
+  that mechanism — the legacy in-place-writer retirement — is RE-OWNED
+  to DR-1 as O14's outcome, `GwzM5-8R2E-CapabilityFreeAmendment.md` §4; E4.7 keeps its
+  allowance-expiry and close-out duties]*. Under
   ruling (a), E7 records O3 as *discharged by R2-F's relocation,
   re-owned there* unless E4.7 has also landed by then.
   *[DISCHARGED 2026-09-01 (R2-F R1.3 record): the relocation landed at
@@ -171,7 +209,8 @@ it.
   quarantine/relocation package, which discharges O3 directly on
   landing** (§7.6.2's single-owner fact: `policy.rs:33-42` defines the
   legacy private parent, `observation.rs:93` its only consumer); E4.7
-  remains this lane's stronger full-retirement mechanism at the E4
+  remains this lane's stronger full-retirement mechanism *[2026-09-02:
+  RE-OWNED to DR-1, `GwzM5-8R2E-CapabilityFreeAmendment.md` §4]* at the E4
   resumption; OPEN-R1 rides with the package (blocking for its owner).
   *[Tense per State [P3 F8]: nothing has discharged O3 yet — the package
   discharges it on landing.]*" — the landing has now happened. Scope
@@ -181,7 +220,8 @@ it.
   spellings — the legacy variant's leaf bytes, the bootstrap marker
   stem, and the scratch stem (`catalog/scratch.rs:6`) — counted here so
   "single owner" is never misread as "single spelling". E4.7 remains
-  the stronger full-retirement mechanism.]*
+  the stronger full-retirement mechanism *[2026-09-02: RE-OWNED to DR-1,
+  `GwzM5-8R2E-CapabilityFreeAmendment.md` §4]*.]*
 - **OPEN-R1 routed to R2-F** with the relocation package, per the
   ruling: must the relocation *move* resident legacy residue, or only
   relocate future writes? Blocking for that package's owner; the
@@ -194,7 +234,9 @@ it.
   not a category this package creates." Nothing moved, nothing
   orphaned; the legacy area remains the legacy writer's live directory
   until E4.7 retires the legacy writers — where the retire-the-area
-  question already lives on its own row. The Windows permanent-anchor
+  question already lives on its own row *[2026-09-02: that retirement and
+  the retire-the-area question TRAVEL TO DR-1 with O14,
+  `GwzM5-8R2E-CapabilityFreeAmendment.md` §4]*. The Windows permanent-anchor
   hazard this row cites is exactly why the round-1 leave-in-place-
   same-leaf design was killed: the review proved presence-refusal
   (`directory_mutation.rs:179-185`) plus never-removed directories
@@ -249,7 +291,12 @@ it.
 
 Two duals maximum: **dual #1 at the E0 semantics amendment** (it
 extends the frozen §3.5/§4.3 surface — the same class as R2-D's
-Phase 0), **dual #2 at the E7 settled tree**. Every interior step:
+Phase 0), **dual #2 at the E7 settled tree**. *[Budget superseded
+2026-09-02: the refined tier policy's amendment-tier line (checkpoint
+2026-08-22) carries three further duals on its own authority — the
+record-root amendment, the capability-free amendment, and DR-1's
+design object — each recorded at its own header; this line's "two"
+is R2-E's plan-time budget, not a cap on amendment-tier duals.]* Every interior step:
 single-axis peer-blind with automatic escalation on P0/P1/P2;
 two-round remediation cap; reports filed verbatim to dev-docs as
 `GwzM5-8R2E<Step>-Review*.md`. Schedule in gates and review rounds,
@@ -309,12 +356,19 @@ owner files) with the shared-driver duty split observed; if run in
 parallel, isolated worktrees per lane and the lane owner lands
 sequentially.
 
-### Phase E4 — the consumer conversion (milestone: production writes go through the boundary)
+### Phase E4 — the consumer conversion (milestone: production writes go through the boundary — *re-scoped 2026-09-02 by `GwzM5-8R2E-CapabilityFreeAmendment.md` §4: CHECKED-FEATURE writes go through the boundary; capability-free arms are a dated exception, not unfinished work*)
 
 One step per §10 table row, each a reviewed <500-LOC package
 converting that consumer onto the checked boundary with its frozen
 ordering; the rows are parallel-friendly except where the table's
-ordering couples them:
+ordering couples them *[one recorded exception to the universal,
+2026-09-02: the merge record's rewrite path keeps its atomic raw
+publication — `GwzM5-8R2E-RecordRootAmendment.md` §2, the record-root exception; and that
+amendment's §4 PLAIN-LEASE PROBE CLAUSE binds every remaining
+conversion, pointer at the gate note below; and 2026-09-02,
+`GwzM5-8R2E-CapabilityFreeAmendment.md` §3: rows `:275`–`:279`'s listed-operation writers are
+CARVED OUT permanently, only the three `finalization/execute.rs`
+forward arms convert (E4.5/6-B), E4.4–E4.6 as chartered do not start]*:
 
 *(E0 gate, 2026-08-27, under the operator's ruling (a): this phase
 opens only after R2-F's quarantine/relocation package lands — §1.1's
@@ -347,7 +401,22 @@ is the source-scan idiom IN `contracts.rs` beside the `leaf_bytes`
 pins it already holds (`:212`): read `preservation_image.rs`, assert
 both `= ".gwz/…"` literals byte-adjacent to their constant names —
 ~6 lines, carried when E4.1 is already in `contracts.rs` moving the
-member pins.]** E4.1's precondition set is SEVEN (§1.1's
+member pins.]** **[E4.4–E4.6 BINDING — POINTER (2026-09-02; the
+AUTHORITY is `GwzM5-8R2E-RecordRootAmendment.md` §4): the PLAIN-LEASE PROBE CLAUSE — no E4
+conversion may place the durable-identity probe on a path reachable
+from the PLAIN `V1MutationLease` (the abort/reverse arms) without an
+explicit dispositive record in its own charter (split by lease, or
+reverse-arm reach proven absent, or the capability-free list amended
+at the amendment tier); charter authors enumerate lease-reachability
+of every converted function BEFORE the build. E4.4 is the first
+bound step: `archive_terminal` is reached from abort's `respond()` on
+the plain lease. *[2026-09-02: E4.4 as a conversion step is GONE — the
+archive is carved out entirely by `GwzM5-8R2E-CapabilityFreeAmendment.md` §3 — and the clause's
+option "the capability-free list amended at the amendment tier" is
+CLOSED by the operator's ruling (`GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md`); the clause otherwise
+survives and binds E4.5/6-B's three forward arms.]* Also binding from that amendment: every charter
+carries the RECORD-ROOT ANALYSIS duty — any leaf that is its own
+discovery root gets the §1a analysis before conversion.]** E4.1's precondition set is SEVEN (§1.1's
 O11 row). The `WorkspaceMutatorLock` §10 row's declared purpose —
 "runtime bootstrap only" — is load-bearing at E4.1: the runtime lease
 is bootstrap-only and identity-probe-free; the catalog lease is where
@@ -419,10 +488,14 @@ assumption.)*
   pub(crate), clippy private_interfaces) + [P3-3] identity.rs Windows
   bare-errno arm + [P3-4] entry.rs scan-hole record → E4.2; [P3-C1]
   R2 unpinned against E4.4's terminal-archive arm regaining
-  capability-dependence for abort → E4.4's charter; [P3-5]
+  capability-dependence for abort → E4.4's charter *[2026-09-02: E4.4
+  dissolved; the carrier is the pins package's pin that an abort touching
+  no checked door stays capability-free, `GwzM5-8R2E-CapabilityFreeAmendment.md` §7]*; [P3-5]
   workspace_mutator_lock stale allow + catalog.rs allowances →
   E4.7; [P3-8] catalog-mutation invisibility in reverse_rollback
-  rows → E4.2-E4.6 as consumers arrive. Review verbatim, both
+  rows → E4.2-E4.6 as consumers arrive *[2026-09-02: CLOSED — nothing
+  further converts on those rows' paths, no snapshot exclusion grows,
+  `GwzM5-8R2E-CapabilityFreeAmendment.md` §7]*. Review verbatim, both
   rounds: `GwzM5-8R2E-E4.1-Review.md` (1051 lines).**
 - **E4.2** — first merge record (`MergeStore` + `PreservationBundles`
   bootstrap ordering). *(E0: + O13's substantive half, creation path;
@@ -457,9 +530,37 @@ assumption.)*
   path — `v1_lifecycle/store/rewrite.rs`'s raw writer converts here;
   the O13 checker inventory retires to empty across E4.2/E4.3.
   [Corrected 2026-09-01, E4.2 review C2: across E4.2–E4.4 — the two
-  archive files are E4.4's; E4.3 empties `store/rewrite.rs`.])*
+  archive files are E4.4's; E4.3 empties `store/rewrite.rs`.] [2026-09-02:
+  the archive files are CARVED OUT by `GwzM5-8R2E-CapabilityFreeAmendment.md` §3; the inventory never
+  empties.])*
+  **E4.3 OUTCOME 2026-09-02 — CARVED OUT, not converted.** The
+  conversion as chartered was built (candidate `c9a7303`, full battery
+  green, preserved at gwz-core `probe/e4-3-detach-window-evidence`)
+  and REJECTED at delivery by its own builder's driven P0: the
+  boundary's detach-then-publish replacement opens a crash window in
+  which the open record vanishes from discovery with no reconciler
+  (the record is the root of reconciliation), and the shared `commit`
+  put the identity probe on every abort. The lane owner verified both,
+  the charter's contradictory clause pair was owned, and the operator
+  ruled option (c): the RECORD-ROOT EXCEPTION,
+  `GwzM5-8R2E-RecordRootAmendment.md` (dual Code+State Fable×2, both
+  GO-WITH-CONDITIONS, folds executed 2026-09-02). E4.3-B lands the
+  pins — P-1 the permanent O13 row fail-closed both directions, P-2
+  the negative tripwire — with NO production conversion;
+  `store/rewrite.rs` does NOT empty. The rejected alternative (reader-
+  side residue reconciliation) is the named candidate at O14's E4.6
+  fork.** *[2026-09-02: at DR-1, where O14's fork now lives —
+  `GwzM5-8R2E-CapabilityFreeAmendment.md` §5.]*
 - **E4.4** — terminal archive source-only (+ the O8 `gc_archived`
-  production route lands with the archive consumer). *(E5 landing,
+  production route lands with the archive consumer). *[2026-09-02: DOES
+  NOT START as chartered — every `store/archive.rs` writer runs from a
+  listed operation on the plain lease and `remove_archive` is a dead arm
+  (charter prep `GwzM5-8R2E-E4.4-CharterPrep.md` §1, corrected by the
+  amendment's dual); the archive is CARVED OUT by `GwzM5-8R2E-CapabilityFreeAmendment.md` §3; O8's
+  `gc_archived` route re-owns to DR-1 conditional on (C), the dead family
+  dispositioned by E4.7 (§5); tier 2 EXPLICITLY DEFERRED to DR-1 (§5);
+  the shipped un-GC-able v1-archive defect is fixed standalone, read-side
+  (§7).]* *(E5 landing,
   2026-08-28 — two lane-owner determinations, review [P2-3] and
   adjudication G: (1) E4.4 is RATIFIED as carrier of the owed tier-2
   archive-equivalence executions for the eight
@@ -477,10 +578,43 @@ assumption.)*
 - **E4.5** — stash bundles + markers (two rows, one package if they
   share the parent-durability seam).
 - **E4.6** — workspace checked mutation + `.git/info/exclude`.
+  *[Both re-scoped 2026-09-02, `GwzM5-8R2E-CapabilityFreeAmendment.md` §3/§7: the listed-operation
+  writers of rows `:276`–`:279` are CARVED OUT; `:276` has no forward
+  writer at all; what converts is exactly the three `acquire_activated`-
+  only sites in `v1_lifecycle/finalization/execute.rs` (`:45` marker,
+  `:48` lock, `:51` boundary — the last needs a git-directory replace
+  door), chartered as ONE small step E4.5/6-B after the pins package
+  E4.4-6-B, each arm with its own reachability proof.]*
 - **E4.7** — O3 close-out: the legacy in-place writers inside
   `.gwz/checked-artifacts` retire behind the converted paths; the
   A1-era allowances (`catalog.rs:10-16` class) expire with dated
   annotations.
+  *[Re-scoped 2026-09-02, `GwzM5-8R2E-CapabilityFreeAmendment.md` §4 — by exactly the operator's
+  sentence "E4.7 does not retire those writers" (the carved
+  capability-free arms) and no further: the legacy in-place-writer
+  RETIREMENT is RE-OWNED to DR-1 as O14's outcome (the legacy writer is
+  the pre-catalog `CheckedArtifact` every converted path still rides),
+  with OPEN-R1's retire-the-area question travelling; E4.7 KEEPS the
+  A1-era allowance expiry — the class NAMED at the amendment §4
+  (`catalog.rs`, `coordinator/mod.rs:16`, `entry.rs:299-300`,
+  `bootstrap/managed.rs`, `checked_artifact/mod.rs`, checker `:358`,
+  `workspace_mutator_lock.rs:44-47`), each expiring or re-reasoned as
+  permanent — plus E0.2 §7.1's per-converted-consumer `finish()`-
+  reachability record, the A-1 rider's reopen check, the dead
+  `gc_archived` family's disposition, O1's DISCHARGED close against its
+  re-scoped text (O14 cited as RE-OWNED to DR-1), and the phase
+  close-out records.]*
+- **DR-1** — the phase-end design round (minted by the operator's ruling
+  `GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md` point 5; chartered at `GwzM5-8R2E-CapabilityFreeAmendment.md` §5; its own dual on the
+  amendment-tier line). Opens AFTER the pins package and E4.7 land, never
+  inside E4. Agenda: (C) the non-identity / degraded boundary mode;
+  reader-side record reconciliation; O14's fork (`authorize_write`
+  consumers vs amending §8/§9); the tier-2 comparable sub-surface (minted
+  BY AMENDMENT WITH ITS OWN DUAL, naming the execution carrier); the
+  record-root exception's re-examination; §6's already-shipped abort
+  narrowing; the legacy in-place-writer retirement; O8's checked-archive
+  route (conditional on (C)). NAMED for the operator, not decided: is
+  DR-1 R2-E's phase E8 or a new lane?
 
 Each step: single-axis review, matrix at the landing, T-6-class
 tripwires re-verified.

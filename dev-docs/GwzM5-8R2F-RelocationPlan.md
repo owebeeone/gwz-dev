@@ -78,7 +78,10 @@ bootstrap). The whole design is the split:
 Under §1 nothing is moved and nothing is orphaned: the legacy area
 remains the legacy writer's live directory until E4.7 retires the legacy
 writers — which is where the eventual retire-the-area question already
-lives, on its own recorded row. OPEN-R1 ("must the relocation move
+lives, on its own recorded row *[2026-09-02: the legacy-writer retirement
+and the retire-the-area question TRAVEL TO DR-1 with O14, per
+`GwzM5-8R2E-CapabilityFreeAmendment.md` §4; this ruling is unchanged — the area stays live until that
+decision]*. OPEN-R1 ("must the relocation move
 resident residue, or only relocate future writes?") is therefore
 **resolved by design: neither — the relocation relocates the CATALOG'S
 name; residue is not a category this package creates.** Recorded

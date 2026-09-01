@@ -916,6 +916,22 @@ The frozen §10 row (`GwzM5-8R4bR2ConsumerCheckpoint.md:272`):
 > ORDINARY merge, `gwz repo create`, `init-from-sources`, abort, GC and the
 > mutation guard continue to work; a checked-artifact action refuses, typed.
 
+*[Two READINGS recorded 2026-09-02 at this home, per `GwzM5-8R2E-CapabilityFreeAmendment.md` §2 and the
+operator's ruling `GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md` — neither moves an operative word: (a) "the
+mutation guard" is read BROADLY, as the operations executed under it
+(`gwz commit`, `stage`, `materialize`, `branch`, repo lifecycle, `pull`,
+`stash`) — the operator's reading, resolved by naming `commit` in the ruling;
+so the list stands and the §10 rows whose writers run from those operations
+are carved out rather than converted. (b) "a checked-artifact action refuses,
+typed" already governs the three v1 ABORT paths that must re-verify checked
+artifacts they reconcile — published evidence (`abort/evidence.rs:148-165`),
+a preservation bundle under `--preserve` (`preservation/entry.rs:102-104`),
+a selected root's manifest/lock (`validate/journal.rs:253-258`) — all shipped
+with A1's v1 reverse path, so the shipped abort is capability-free exactly
+when it touches no checked door; this is a narrowing of the first clause's
+reach that the tree already carried, dated as a residual at the amendment's
+§6, cured only by DR-1's degraded boundary mode.]*
+
 **Ground 1 — the code already separates them, and option (ii) is the reading
 that costs nothing.**
 `try_acquire` (`bootstrap/runtime/mod.rs:106-149`) performs path resolution,
@@ -1172,7 +1188,12 @@ Their reachability is settled and unchanged
 allowance whose text names the missing route (`:108-111`). It rides **E4.4**
 with the terminal-archive consumer, per the plan's O8 row; when it lands, the
 `allow(dead_code)` and its reason expire with a dated annotation, exactly as
-E4.7 does for the `catalog.rs:10-16` class.
+E4.7 does for the `catalog.rs:10-16` class. *[2026-09-02: E4.4 does not start
+and the archive is carved out (`GwzM5-8R2E-CapabilityFreeAmendment.md` §3), so the consumer this route was
+to ride never arrives; the route RE-OWNS to DR-1 conditional on (C), and E4.7
+dispositions the dead family (delete, or re-reason its allowance as permanent
+pending DR-1) — §5 of that amendment. The un-GC-able v1-archive defect is
+fixed standalone through the live `store/gc.rs`/`retention.rs` path.]*
 
 ---
 
@@ -1236,7 +1257,10 @@ scheduled for deletion.
 observation continuing to run wherever the legacy `finish()` still executes.
 E4.7 must record, per converted consumer, whether `cleanup.rs`'s `finish()` is
 still reachable for it; if any converted consumer bypasses both the checked
-retirement and the legacy recheck, this decision reopens.
+retirement and the legacy recheck, this decision reopens. *[2026-09-02: this
+duty SURVIVES E4.7's re-scope (`GwzM5-8R2E-CapabilityFreeAmendment.md` §4) — E4.7 keeps it; the converted
+consumers are E4.1, E4.2 and the E4.5/6-B forward arms; the legacy writer's
+own retirement is DR-1's, not E4.7's.]*
 
 ### 7.2 Row 3 — the anchor nits, split
 

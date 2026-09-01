@@ -285,6 +285,29 @@ rely on its recursive parent creation. `CheckedArtifact::prepare_parent`,
 random checked-artifact scratch names, and family-prefix-only enumeration have
 no successful converted caller and are removed after parity tests pass.
 
+*[Dated brackets on the table above, 2026-09-02, `GwzM5-8R2E-CapabilityFreeAmendment.md` (ADOPTED, dual
+GO×2, on the operator's ruling `GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md`): (1) rows `:275`–`:279` — every
+writer that runs from an operation on E0.2 §5.2's capability-free list is
+CARVED OUT permanently (raw publication primitives stay, documented and
+pinned by a generalized fail-closed inventory); their second/third cells are
+dispositioned row by row, cell by cell, at the amendment's §3 table
+(satisfied / accepted-unmet as part of the exception / owed by the
+convertible forward arm) — `:275` carved entirely (the archive move is
+atomic; no record-root window), `:276` carved entirely (no forward writer
+exists), `:277`/`:278`/`:279` carved except the three `acquire_activated`-
+only sites in `finalization/execute.rs`, which convert at E4.5/6-B; (2) row
+`:280`'s second and third cells carry two recorded exceptions — the record
+root (`GwzM5-8R2E-RecordRootAmendment.md` §2) and the v1 archive arms
+(`store/archive.rs`, the dead `remove_archive`) — read through those
+amendments for exactly those arms; the non-v1 rows are governed by their own
+cells above; (3) this paragraph's removal promise for
+`CheckedArtifact::prepare_parent` is UNREACHABLE under the carve-out: it keeps
+its v0 store caller permanently (`store/mod.rs:131` →
+`entry::prepare_merge_store_parents`). The Phase-E4 milestone this table
+premised — "production writes go through the boundary" — is re-scoped to
+checked-feature writes; the capability-free arms are a dated exception, not
+unfinished work.]*
+
 ## 11. Implementation packages and ownership
 
 R2 is implemented in dependency order:
