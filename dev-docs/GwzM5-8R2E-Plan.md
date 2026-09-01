@@ -85,7 +85,21 @@ it.
   inventory of `v1_lifecycle/`'s non-test `durable_fs` writer files
   (executed surface at the pin: `store/rewrite.rs`,
   `store/archive.rs`, `archive.rs`), failing closed on growth,
-  retired to empty in E4.2/E4.3's own commits. **Dated
+  retired to empty in E4.2/E4.3's own commits. *[Corrected 2026-09-01
+  (E4.2 review C2, file ownership measured against the tree): the
+  inventory empties across E4.2–E4.4, not E4.2/E4.3 — `archive.rs`
+  (`remove_archive`'s sync_dir) and `store/archive.rs`
+  (`MergeArchive`'s raw bootstrap) belong to the terminal-archive §10
+  row, E4.4's. E4.2 retires NO file: it converted `create_open`'s
+  writers and `store/rewrite.rs` stays with reduced counts until
+  E4.3's `commit` pair — which is exactly why the pin widened at
+  E4.2 from a file SET to a per-file COUNT map
+  (V1_LIFECYCLE_RAW_DURABLE_WRITER_FILES now maps each file to its
+  remaining raw-call counts, red-probed in three directions), so a
+  conversion is measured even when it empties nothing. The dated
+  accepted-residual record below is UNTOUCHED by this correction: it
+  is scoped to the v1 STORE on the no-ff path, and E4.2/E4.3 do
+  complete that store's conversion.]* **Dated
   accepted-residual record (2026-08-27): between A1 — the gate's
   expiry, 2026-08-25 — and the E4.2/E4.3 conversions, v0.11.0-lineage
   trees carry the v1 store as a production raw durable writer on the
@@ -93,6 +107,29 @@ it.
   is accepted, bounded to that interval, pinned against growth by the
   checker inventory, and expires with E4.2/E4.3's landings.** O1
   cannot close DISCHARGED without O13.
+- **O14 — the §8 `:239-240` / §9 `:264-266` write-authority gate
+  (MINTED 2026-09-01, E4.2 review C1, the §7.6.1/O13 precedent:
+  unowned frozen clause → minted obligation).**
+  `authorize_write`/`RetainedWriteAuthorityV1` have ZERO production
+  consumers while every converted §10 leaf write rides a path-based
+  `CheckedArtifact` action — which §9 `:264-266` names as NOT parent
+  authority — and the type's own doc promises R2-E consumers take it.
+  E4.2 is where this became demonstrable rather than latent: it mints
+  the first production `AdmittedCheckedActionV1` and
+  `ManagedParentFacadeV1`s, revalidates them (§9 `:266`'s facade
+  operation), then discards them and writes the leaf from a path.
+  Unowned before this record; no E4 step's charter names the
+  conversion. THE FORK, explicit: either converted leaf writes route
+  through the write authority (a real conversion package), or §8/§9's
+  claims are amended to the landed architecture (a frozen-text move
+  needing its own review tier). OWNER: the fork is DECIDED at E4.6's
+  chartering, when every converted shape exists; the decision
+  escalates to the operator if it amends frozen text. Until decided,
+  every E4 conversion states at its execution seam which gate it
+  opens (durability) and which stays closed (authority) — the E4.2
+  C1(iii) pattern, binding on E4.3–E4.6's charters. Row `:280` is NOT
+  breached by the interim state (the E4.2 review's flag-6 judgment);
+  O1's close must cite O14's disposition.
 - **O1 enumeration corrected, in §0's correction form:** the §10
   table is NINE consumer rows (`ConsumerCheckpoint:272-280`); O1's
   row above enumerates eight and drops row `:280` — the ninth is
@@ -392,10 +429,35 @@ assumption.)*
   and the §11.3-item-2 duties — the `retain_managed_parent_at_for_test`
   door's disposition and the Git-directory workspace-root binding —
   answered in this commit, addendum §7.7.)*
+  **LANDED 2026-09-01 at gwz-core `7f28907`** (no-ff merge of the
+  reviewed train: candidate `7214010` — round 1 GO-WITH-CONDITIONS,
+  0 P0 / 0 P1 / 1 P2 / 5 P3, cap EXACTLY 500 with no rider — plus
+  condition fold `1f47d6e` and round-2 fix `3717249`, which reverts
+  the reviewer's own round-1 conflation to the true pre-fold text,
+  owned by the review on the record; round 2: GO). The when-missing
+  bootstrap rides the managed-parent door under row `:273`'s frozen
+  ordering, driven both clauses; `create_open` refuses an
+  unbootstrapped parent (the adapted route structurally never reaches
+  it — the E4.1 wedge class is not reborn); O13's creation-path
+  writers converted with the pin widened to per-file counts; both
+  §11.3-item-2 duties answered with tree evidence (the test door
+  SURVIVES dated; the Git-directory prefix binds to the target's own
+  root, no production parent on that variant); the E4.1 [P3-2]
+  renderer row landed `pub(super)`; tripwire UNMOVED at 1. [P2-1]
+  became O14 (above) with the C1(iii) opened-vs-closed gate statement
+  at the execution seam, binding E4.3–E4.6. Pins at the landing
+  (which also reconciles the --target handoff snapshot `c201a01`,
+  baseline-measured ALL GREEN on bare darwin): CA 457 / v1 260 /
+  remainder 1110+1 darwin MEASURED; linux 467/1111 DERIVED
+  FIRST-DISPATCH-EXPECTED at Windows 33511535235 + Platform
+  33511538719. Review verbatim, both rounds:
+  `GwzM5-8R2E-E4.2-Review.md` (997 lines).**
 - **E4.3** — merge record rewrite (exact store; unknown fields and
   exact reread preserved). *(E0: + O13's substantive half, rewrite
   path — `v1_lifecycle/store/rewrite.rs`'s raw writer converts here;
-  the O13 checker inventory retires to empty across E4.2/E4.3.)*
+  the O13 checker inventory retires to empty across E4.2/E4.3.
+  [Corrected 2026-09-01, E4.2 review C2: across E4.2–E4.4 — the two
+  archive files are E4.4's; E4.3 empties `store/rewrite.rs`.])*
 - **E4.4** — terminal archive source-only (+ the O8 `gc_archived`
   production route lands with the archive consumer). *(E5 landing,
   2026-08-28 — two lane-owner determinations, review [P2-3] and

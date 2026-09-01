@@ -2727,6 +2727,48 @@ fable token only where it makes a difference." Recorded consequences:
   + the §11.3-item-2 duties + O13's creation half), then E4.3-E4.7
   the same loop, then M5c.
 
+  **POSITION 2026-09-01 (later still) — E4.2 LANDED; O14 MINTED; the
+  --target handoff rode through.** Mid-train events: E4.1's Windows
+  leg went red on ONE test (the Q1 pin's multi-line needle vs CRLF
+  checkout — include_str! hands working-tree bytes; .gitattributes
+  pins eol=lf only for retained_readers/protocol) → hotfix `f715ddf`
+  (the r2d_seam_freeze normalize idiom) → redispatch 33502328880
+  GREEN; E4.1's CI story closed on every leg. THE --TARGET HANDOFF:
+  on the operator's instruction the other lane's in-flight fix was
+  snapshotted AS-IS and pushed (core `c201a01` +914/−55, cli
+  `4791eb6`, py `94378b9`, root `f01be3e` w/ the diagnosis doc;
+  labeled WIP/unreviewed/suites-unrun; committed with the RELEASED
+  gwz 0.12.1 — the workspace debug binary is contaminated by the
+  in-flight handle_commit edits); the operator completes it in a
+  fresh gwz-dev workspace; incidental find for that lane: gwz commit
+  -m refuses a hyphen-leading message value. Baseline on bare
+  c201a01: ALL GREEN darwin (CA 456 / v1 257 / remainder 1110+1 —
+  the snapshot's 11 remainder tests, zero cfg gates in +646 lines).
+  **E4.2 LANDED at gwz-core `7f28907`** (no-ff merge; reviewed
+  7214010 + fold 1f47d6e + round-2 fix 3717249 — the fix reverts the
+  REVIEWER's own round-1 conflation, owned by the review; rounds:
+  GO-WC 1 P2 → GO). The P2 minted **O14 — the §8/§9 write-authority
+  gate**: authorize_write/RetainedWriteAuthorityV1 have zero
+  production consumers while converted leaf writes are path-based
+  (§9 :264-266: not parent authority); THE FORK (convert vs amend
+  frozen text) is DECIDED AT E4.6's CHARTERING, escalating to the
+  operator if frozen text moves; until then every conversion states
+  its opened (durability) vs closed (authority) gate — binding
+  E4.3–E4.6. Also landed: the O13 ownership correction (inventory
+  empties across E4.2–E4.4; E4.2 retires no file — the pin is now a
+  per-file count map), the four stale allow-reason cures, the
+  proof-only inherited-vs-established scope. Pins: CA 457 / v1 260 /
+  remainder 1110+1 darwin MEASURED (the landing reconciles the
+  snapshot's +11 the other lane could not know to pin); linux
+  467/1111 DERIVED at Windows 33511535235 + Platform 33511538719 (in
+  flight). Disk incident: builder hit ENOSPC at 95% — 4.3G of stale
+  R1.2-era targets (lane-owner hygiene debt) + 1.4G anonymous target
+  reclaimed; 6.3G free; NOTE the operator's fresh workspace build
+  will want ~10G+. NEXT: E4.3 (merge record rewrite — launches now;
+  carries O14's interim pattern, row :274's frozen ordering,
+  store/rewrite.rs's commit pair, [P3-3]'s Windows-arm disposition
+  precedent), then E4.4-E4.7 → M5c.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
