@@ -3111,6 +3111,26 @@ fable token only where it makes a difference." Recorded consequences:
   the ruling. E4.7 waits on the answer (its charter changes under (a));
   the E4.5-B worktree and warm target are kept until then.
 
+  **OPERATOR RULING, 2026-09-02, verbatim:**
+
+  > (a). E4.5-B does not open. The marker write at execute.rs:45 joins lock and boundary in the dated residual, on the directional-residue ground (interrupted checked publication strands gwz merge --abort). Do not convert it. Do not lift "no (C) inside E4" for an observer cure.
+  >
+  > E4.7 carries the three residual sentences and the amendment corrections. DR-1's agenda gains: directional-residue class, classifier widening, preservation-bundle audit (same hazard). Phase E4 conversions are E4.1 and E4.2; the rest is carve-out, pins, GC, and close-out.
+  >
+  > Tear down the E4.5-B worktree after the record lands. Do not start DR-1 until E4.7 closes. DR-1's home (R2-E E8 vs new lane) comes back to me as a one-line question after E4.7, not inside this step.
+
+  Executed: `:45` joins `:48`/`:51` in the [R2-P3-1] dated residual on
+  the directional-residue ground (no conversion; no observer cure in
+  E4); E4.7's charter gains the three residual sentences at
+  `execute.rs:45,:48,:51`, the in-tree echoes of the amendment
+  corrections and flag 6's stale allow; DR-1's agenda gains the
+  directional-residue class, the classifier widening and the
+  preservation-bundle audit; Phase E4's conversions are E4.1 and E4.2.
+  The E4.5-B worktree is torn down with this record (its warm target is
+  re-used by E4.7, same base `f563446`); E4.7 launches now; DR-1 does
+  not start until E4.7 closes, and its home goes to the operator as a
+  one-line question after E4.7.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

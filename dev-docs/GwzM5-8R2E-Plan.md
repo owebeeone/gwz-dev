@@ -657,6 +657,17 @@ assumption.)*
   scoping → the operator (checkpoint packet; recommended: `:45` joins
   the [R2-P3-1] residual, E4.7 carries the three residual sentences,
   DR-1 gains the directional-residue class). E4.7 waits on the ruling.]*
+  *[RULED (a), 2026-09-02, operator verbatim: "E4.5-B does not open. The
+  marker write at execute.rs:45 joins lock and boundary in the dated
+  residual, on the directional-residue ground (interrupted checked
+  publication strands gwz merge --abort). Do not convert it. Do not
+  lift 'no (C) inside E4' for an observer cure. E4.7 carries the three
+  residual sentences and the amendment corrections. DR-1's agenda
+  gains: directional-residue class, classifier widening, preservation-
+  bundle audit (same hazard). Phase E4 conversions are E4.1 and E4.2;
+  the rest is carve-out, pins, GC, and close-out." E4.5/6-B is CLOSED
+  without a build; the residual is the phase's final word on rows
+  `:277`–`:279`'s forward arms until DR-1.]*
 - **E4.7** — O3 close-out: the legacy in-place writers inside
   `.gwz/checked-artifacts` retire behind the converted paths; the
   A1-era allowances (`catalog.rs:10-16` class) expire with dated

@@ -553,6 +553,27 @@ before `create_open`). The operator's packet (checkpoint, position 2026-09-02
 E4.5-B) recommends `:45` join `:48`/`:51` in the [R2-P3-1] dated residual on
 the directional-residue ground; §7's text is NOT rewritten until that ruling.]*
 
+*[RULED (a) by the operator, 2026-09-02, verbatim: "E4.5-B does not open. The
+marker write at execute.rs:45 joins lock and boundary in the dated residual,
+on the directional-residue ground (interrupted checked publication strands
+gwz merge --abort). Do not convert it. Do not lift 'no (C) inside E4' for an
+observer cure. E4.7 carries the three residual sentences and the amendment
+corrections. DR-1's agenda gains: directional-residue class, classifier
+widening, preservation-bundle audit (same hazard). Phase E4 conversions are
+E4.1 and E4.2; the rest is carve-out, pins, GC, and close-out." CORRECTIONS
+TO THIS AMENDMENT, by this bracket (the sanctioned mechanism; the adopted
+text is left as written): §7's "one small step" E4.5/6-B and the disposition
+above read as follows — NONE of the three `finalization/execute.rs` arms
+converts; all three stay raw as the [R2-P3-1] dated residual, `:48`/`:51` on
+the observation-dead-window ground and `:45` on the directional-residue
+ground; the "fresh workspace regresses" premise is withdrawn (the parent is
+installed at workspace creation); O1's re-scoped text reads the three arms as
+"carved-as-v1-forward-arm residual". §5's DR-1 agenda gains the
+directional-residue class (abort-side observer reconciliation), the
+`classify_write`/`classify_remove` Missing-expected widening, and the
+preservation-bundle leaves audit for the same hazard. The three in-tree
+residual sentences ride E4.7.]*
+
 *[E4.5/6-B DISPOSITION 2026-09-02, from the read-only charter prep
 (`GwzM5-8R2E-E45-6B-CharterPrep.md`, every claim cited at main `0dae0d5`; the third prep this
 phase to falsify a premise before a build): reachability HOLDS — all
