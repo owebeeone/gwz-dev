@@ -702,6 +702,7 @@ not change it.**
 **R3, the directional residue** (`GwzM5-8R2E-E4-Close.md:44`;
 `GwzM5-8R2E-E45B-Report.md:35`). `classify_remove` returns `Ambiguous` because
 `classification.rs:175-177` sees an authority record whose `matches_request` was
+*[LAYER CORRECTED 2026-09-03, DR-1 S1 (`GwzM5-8DR1-Reconciliation-Design.md` §1.4; gwz-core `a7adc95`, pin `checked_artifact::tests::removal_recovery::a_counterpart_forward_family_refuses_as_foreign_before_the_authority_check`): the refusal fires at `classification.rs:141-143` on `residue.foreign`, set by name inside `inspect_family` (`residue.rs:179-181`, `:205-206`) because residue files are keyed on the ACTION, one frame BEFORE the `:175-177` authority-current check this text names — that frame is never entered for a counterpart residue (`residue.authority` is `None`), though it is live for same-direction classifies. Instrumented out of tree on the E4.5-B row (`scratchpad/s1-red1.log`). Left as written; this bracket is the correction.]*
 minted for the FORWARD pair while the abort asks the REVERSE pair
 (`authority.rs:101-119` pairs `family_key`, `action_key`,
 `canonical_path_identity`, `artifact_root_identity`, `expected`, `goal`,

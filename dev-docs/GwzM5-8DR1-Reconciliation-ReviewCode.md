@@ -380,3 +380,154 @@ NOT FOLDED: 0.
 drive-and-record and is untouched by any of the above). Carry into S3's
 charter: *the `reconcile_counterpart` pre-pass runs on every leaf `file_states`
 acquires, the marker included, as a retire-only act where nothing detached.*
+
+---
+
+# S1 review
+
+Date: 2026-09-03. Reviewer: single-axis code/mechanism review of the S1
+candidate, hard 15-minute time-box. Subject: gwz-core `a7adc95` on
+`dr1/s1-mechanism-pin`, base main `d6830cd`. Charter:
+`GwzM5-8DR1-Reconciliation-Design.md` §1.4 and §7 row S1. Method: reading, plus
+exactly one test compiled and run (`a_counterpart_forward_family_refuses_as_
+foreign_before_the_authority_check`), the boundary checker, `cargo fmt --check`,
+and `--list` enumerations (which do not execute tests). No suite run. Worktree
+left byte-clean.
+
+## Verdict
+
+**GO.** 146/18 across 5 files; the charter is met on every axis checked. No
+production behaviour change, the new pin is a genuine tripwire, every re-pointed
+line number is true at `a7adc95`, and every driver pin reconciles against an
+independent enumeration. Two cosmetic nits below, neither blocking.
+
+## 1. Production-code surface — CLEAN
+
+Every added or changed line outside `src/checked_artifact/tests/removal_
+recovery.rs` is comment text, with exactly two data exceptions, both explicitly
+allowed by the charter:
+
+- `check_checked_artifact_boundaries.py:282` — the `v1_lifecycle/mod.rs` tree
+  digest `451bc77d…` → `d4cbe25d…`.
+- `run_r4bg_aggregate_gates.py:555` — `_fault_count("457 passed", "467 passed")`
+  → `("458 passed", "468 passed")`.
+
+`execute.rs` and `cleanup.rs` are comment-only: the three arm statements at
+`:79`/`:88`/`:98` are byte-identical to base, and `cleanup.rs`'s hunk touches
+only `//` lines. The new test lands under `#[cfg(test)] mod tests`
+(`checked_artifact/mod.rs:153-155`), so it is not production code by
+construction. Mechanically: one `#[test]` added, zero removed.
+
+## 2. NEW-1 — the pin does what the charter specifies, and it trips
+
+It plants a REAL forward-pair family: `fail_next_checked_artifact_at(
+CheckedArtifactFault::BeforeManagedPublication)` then
+`replace_exact(&Missing, b"goal")`, asserting the leaf is absent and that the
+family holds both a `.authority` and a `.goal`. It then asks the counterpart
+reverse question `classify_remove(&Bytes(b"goal"))` and asserts `Ambiguous`;
+it re-derives the residue with `inspect_family(&expected, None)` — the SAME
+arguments `classify_exact` passes internally at `classification.rs:140` — and
+asserts `residue.foreign`, `residue.authority.is_none()`, and
+`source/goal.is_none()`. Run once at `a7adc95`: **passes** (0.04s; 1844
+filtered out).
+
+That the `.authority` carries the FORWARD name, not the reverse one, is proven
+rather than assumed: `residue.rs:166-177` is the branch for an authority named
+by the CURRENT `action_key`, and it would bind `authority` (or set `foreign`
+via a decode failure). Reaching `foreign == true` WITH `authority == None`
+therefore forces the fallback at `:179-181` — an `.authority` whose name is not
+the reverse `action_key`. The pin's own cause claim is self-supporting.
+
+Tripwire quality: the pin does trip on the cure, but not by all three
+assertions. Retiring the counterpart family (S2b's reconciler / S3's pre-pass)
+empties the family, so `residue.foreign` goes false (trips) and `classify_remove`
+stops returning `Ambiguous` (trips) — while `residue.authority.is_none()` and
+`source/goal.is_none()` are equally true of an EMPTY family and survive the
+cure unchanged. **NIT-1:** those two assertions document the reason
+`classification.rs:175-177` is unreachable, but they do not discriminate the
+diseased state from the cured one; the charter's "all three flip together" is
+not literally true. The pin remains a genuine, deliberate-flip tripwire on the
+strength of the first two.
+
+## 3. The residual sentence and the footnote — TRUE at `a7adc95`
+
+- Residual occupies `execute.rs:71-78` — exactly eight lines, unchanged in
+  count, so the arms stay at `:79` (marker), `:88` (lock), `:98` (boundary).
+  All three verified by direct read at `a7adc95`.
+- It now names the true layer: "`inspect_family` sets `foreign` BY NAME
+  (`residue.rs:179-181`, `:205-206`) and `classification.rs:141-143` returns
+  it, one frame BEFORE the `:175-177` check this sentence used to name".
+  Verified line-for-line: `residue.rs:179-181` is the `.ends_with(".authority")`
+  → `foreign = true` arm; `:205-206` is the trailing `else { foreign = true }`;
+  `classification.rs:141-143` is `if residue.foreign { return Ambiguous }`;
+  `:175-177` is `if residue.authority.is_some() && !authority_current` —
+  unreachable on a `None` authority, exactly as claimed.
+- Header note `:17-19` is true: the arms are `:79`/`:88`/`:98` at this tree,
+  and the operator's verbatim quote at `:9` correctly keeps `execute.rs:45` as
+  a quotation of the ruling at base sha `f563446`.
+- The `[DR-1 S1]` footnote sits at `:112-137`, BELOW all three arms, so it
+  cannot move them. Its cites check out: `authority.rs:196-202` (`family_key`,
+  direction-free — no `expected`/`goal` in the hash) and `:204-223`
+  (`action_key`, which hashes both `expected` and `goal`).
+- **NIT-2:** the footnote's "`merge/abort/evidence.rs:307-311` maps `Ambiguous`
+  to `FileState::Other`" is one frame off. `:307-311` is the
+  `transition_file(artifact_facts::classify_remove(…))` call site; the actual
+  `Ambiguous => FileState::Other` arm is `evidence.rs:330`, inside
+  `transition_file` (`:325-332`). The claim is true, the line cite names the
+  caller rather than the mapping. Cosmetic.
+
+## 4. Drift re-pointing — content-preserving, numbers true
+
+`:45`/`:48`/`:51` → `:79`/`:88`/`:98` at all three in-tree homes, each keeping
+the base sha `f563446` provenance in parentheses:
+
+- `cleanup.rs:189-190` — the E4.5-B vacated-row sentence; surrounding verdict
+  text unchanged.
+- `check_checked_artifact_boundaries.py:255-256` — the tree-digest rationale.
+- `check_checked_artifact_boundaries.py:579-582` — the `ENTRY_REFERENCES`
+  E4.7 bracket. (The charter cited this site as `:566-567`, its position at
+  `d6830cd`; the earlier +13-line provenance paragraph shifted it. Not a
+  finding — the re-pointed numbers themselves are correct.)
+
+The operator's quoted `:45` at `execute.rs:9` is untouched, as required.
+
+## 5. Driver pins and the tree digest — INDEPENDENTLY RECONCILED
+
+`--list` enumeration on this tree (no tests executed) gives: whole lib **1845**,
+`checked_artifact::` **458**, `workspace_ops::merge::v1_lifecycle::` **267**,
+one ignored row lib-wide (`operation::workspace_mutator_lock::tests::
+child_process_observes_lock_contention`).
+
+- `checked_artifact::` darwin 457 → **458**: MEASURED claim CONFIRMED directly.
+  The docstring's "`--list` 1845" is confirmed twice over (the enumeration, and
+  the test run's "1844 filtered out" + 1).
+- `checked_artifact::` linux 467 → **468**: DERIVED, marked
+  FIRST-DISPATCH-EXPECTED inside a dated `DR-1 Phase R1 Step S1 (2026-09-03)`
+  block. The derivation is sound: the new row carries no `cfg` attribute (the
+  file's other gates, `:73` `cfg(not(windows))` and `:128`
+  `cfg(target_os = "linux")`, are pre-existing and untouched), and
+  `fail_next_checked_artifact_at` is `#[cfg(test)]` with no OS gate
+  (`fault.rs:95-96`). +1 on every platform.
+- `v1_lifecycle::` **266** UNMOVED: reconciles — the driver's row
+  (`run_r4bg_aggregate_gates.py:535`) filters with `--skip root_fault_matrix`,
+  so 267 − 1 = 266.
+- lib remainder **1119 / 1120** UNMOVED: reconciles — 1845 − 458 − 267 = 1120
+  listed, minus the single ignored row = 1119 passed on darwin, 1120 on linux
+  where that row runs. The four partitions are exactly disjoint and total.
+- `check_checked_artifact_boundaries.py` exit **0**: "checked-artifact boundary:
+  ok (18 visible entries, 8 classified modules)" — the `v1_lifecycle/mod.rs`
+  tree digest was recomputed correctly, and its comment-only cause is recorded
+  in a dated provenance paragraph (`:262-273`).
+
+## 6. Hygiene
+
+`cargo fmt --check` exit **0**. No `Co-Authored-By` or any AI-attribution
+trailer on `a7adc95`. Worktree `git status --porcelain` empty before and after.
+Python line lengths in the two scripts are unremarkable against the files'
+pre-existing norm.
+
+## S1 verdict
+
+**GO** — the charter is discharged as written; NIT-1 (two of the four
+assertions do not discriminate the cure) and NIT-2 (`evidence.rs:307-311`
+should be `:330`) are cosmetic and may be folded into S2's package or left.

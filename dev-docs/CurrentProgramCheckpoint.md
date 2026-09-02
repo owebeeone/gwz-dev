@@ -3060,6 +3060,8 @@ fable token only where it makes a difference." Recorded consequences:
   `classify_remove` asks the REVERSE pair (`Bytes → Missing`) but the
   residue's authority was minted for the FORWARD pair (`Missing →
   Replace`); `classification.rs:175-177` returns `Ambiguous` when an
+  *[layer corrected by DR-1 S1, 2026-09-03: the refusal fires one frame
+  earlier, at `:141-143` on `residue.foreign` — see the E8.3 entry below]*
   authority exists and is not current for the requested transition;
   `abort/evidence.rs:306-311` maps it to `Other`; the evidence shape
   stops being exact; the record enters recovery. This is NOT a detach
@@ -3472,6 +3474,26 @@ fable token only where it makes a difference." Recorded consequences:
   build steps beyond it, and the marker's conversion, wait on the
   operator's answers (the combined packet: E8.1's nine, the 0.13.1
   question, E8.3's twelve).]*
+
+  *[2026-09-03: **S1 LANDED** — gwz-core main `a7adc95` (146/18 vs
+  ~150): RED-1 reproduced out of tree with the refusing frame
+  instrumented (`classification.rs:141-143` on `residue.foreign`; the
+  `:175-177` frame never entered for a counterpart residue, live for
+  same-direction classifies); NEW-1 the permanent pin
+  `checked_artifact::tests::removal_recovery::a_counterpart_forward_family_refuses_as_foreign_before_the_authority_check`
+  (asserts `Ambiguous`, `foreign`, `authority` unbound — the cure must
+  flip it deliberately); the marker's in-tree residual sentence
+  re-pointed to the true layer in exactly its eight lines (the arms stay
+  at `:79/:88/:98`); the `:45/:48/:51` drift re-pointed at four homes;
+  `checked_artifact::` 457→458 darwin MEASURED / 467→468 linux DERIVED;
+  the `v1_lifecycle/mod.rs` digest re-pinned. Review (S1 section of
+  `GwzM5-8DR1-Reconciliation-ReviewCode.md`): GO, two cosmetic nits
+  left for S2's package. Lane gate ok; `check_pins.py` green; no
+  production change, so no matrix dispatch — the next tag's verify
+  covers. The five record homes citing the old layer (the E4.5-B
+  report, the E4 close record, the DR-1 charter, the E8.1 design, this
+  checkpoint's E4.5-B entry) carry dated correction brackets, left as
+  written. The lane now IDLES on the operator's eighteen answers.]*
 
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
