@@ -3204,6 +3204,28 @@ fable token only where it makes a difference." Recorded consequences:
   RELEASE.md runbooks (core → cli release branch → gwz-py → publish →
   PyPI). DR-1 waits behind the release.
 
+  *[2026-09-02 (later): THE DRY-RUN CLASS FIX LANDED — gwz-core `22f388d`
+  (stash apply/pop/drop and workspace-create gated; the mutation-guard
+  seam takes `dry_run` and returns `WorkspaceMutationAccess`
+  `Mutating|PlanOnly`, all seven callers updated across both repos; g20
+  behavioural tests) + fold `5ae6df7`; gwz-cli `d26ce35` (`forall`
+  refuses to spawn under dry-run and prints the plan; the `all` id
+  collision split — `--all` is the `@all` selector under every verb,
+  `-A`/`-a` short-only, since clap refuses two owners of one long name;
+  a recursive id-collision test with an empty allow-list; end-to-end
+  tests in both flag positions; CLI.md regenerated) + fold `69f2723`
+  (the `commit --all` stderr note; rustfmt). Review
+  `GwzDryRunClassFix-Review.md` (Opus, 20-min box): GO-WC — the five
+  probes broken before and closed after in both positions; P2-1 the
+  silent `commit --all` meaning change → the note; P3s folded; DR-11
+  (pre-existing `init --update` dry-run message) filed. Lane gate ok at
+  both core commits; CLI suite green; reference check green. Pushed
+  both mains. The matrices are NOT dispatched at this landing: the
+  release cut runs `cargo test --locked` in full and the release-verify
+  workflow runs the three-platform matrix at the tag. **v0.13.0 CUT
+  STARTED** (gwz-core `scripts/release.py v0.13.0 --push`); release
+  notes FINAL at `GwzReleaseNotes-v0.13.0.md`.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

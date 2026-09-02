@@ -681,3 +681,13 @@ and for dry-run a **negative** assertion over concrete state (stash list, index
 digest, HEAD, file existence), and (b) a CLI test through the parser in **both**
 flag positions. The g01 tests added by F1 cover one direction of the `all`
 collision; the mirror direction (DR-5) has none.
+
+
+---
+
+## Addendum 2026-09-02 (lane owner, at the fix's landing)
+
+- **DR-1..DR-5 FIXED** on gwz-core `22f388d`+`5ae6df7` and gwz-cli `d26ce35`+`69f2723` (review `GwzDryRunClassFix-Review.md`, GO-WITH-CONDITIONS, conditions folded). The seam now carries `dry_run` by type (`WorkspaceMutationAccess`); the `all` id collision is closed with `--all` the selector under every verb and `-A`/`-a` short-only; a recursive collision test with an empty allow-list keeps the class extinct.
+- **§8's "only the id needs to change" was wrong**: clap propagates the global `--all` into a subcommand whose own argument has a different id and then refuses two owners of one long name (`Long option names must be unique … '--all' is in use by both 'stage_all' and 'all'`). One spelling, one owner.
+- **DR-11 (new, from the review's P3-3, pre-existing):** `gwz --dry-run init --update` prints `status: Ok` / "created workspace agent bootstrap files" while creating nothing — the message is not dry-run-aware. Low. Deferred with DR-6..DR-10.
+- DR-6..DR-10 remain open; the fix shape is §8's "reject, don't absorb" validator, a separate package.
