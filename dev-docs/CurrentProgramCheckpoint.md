@@ -3362,6 +3362,37 @@ fable token only where it makes a difference." Recorded consequences:
   E8.3's design investigation (the reconciliation class and the rest of
   the agenda) is in flight.]*
 
+  **v0.13.0 RELEASE-VERIFY: THE UBUNTU LEG IS RED, ON A PIN, NOT A
+  TEST (2026-09-03).** Run `33639413040`: the Test step passed the full
+  linux suite (1854 passed, 1 ignored — identical to the ARM platform
+  matrix's 1854 at `e15b3a4`); the R4b-G batteries then FAILED the
+  `lib remainder` partition — "expected '1115 passed' absent". Root
+  cause, established by a name-level diff of the verify's test list
+  against the darwin `--list` at `f563446`: the dry-run class fix
+  (`22f388d`) added FIVE lib tests to the remainder (`g20` ×3 stash
+  dry-run rows, `g02::dry_run_create_workspace_creates_nothing`,
+  `merge::runtime::tests::mutation_guard::a_dry_run_acquisition_yields_no_write_authority`)
+  and the aggregate driver's pins were NOT moved — the builder's charter
+  ran only touched partitions, the lane owner's landing verification was
+  the focused set (fmt/clippy/boundary/`--list` count), the lane gate does
+  not run the driver, and gwz-core's release script runs `cargo test
+  --locked` but not the driver. Nothing measured the driver between the
+  fix's landing and the tag. Correct pins: darwin 1119 (MEASURED at
+  `e15b3a4`), linux 1120 (the verify's full suite 1854+1 minus CA 467
+  minus v1 267, and the name-level diff: one linux-only row
+  `git::tests::g15::root_preservation::stash::exact_handoff_boundary_controls_raw_ignored_or_untracked_membership`,
+  one macOS-only row `git::tests::g01::crlf_sentinel_unpinned_worktree_materializes_blob_exact`).
+  CONSEQUENCE: the verify checks out the TAG, so v0.13.0's ubuntu leg
+  can never go green — the pin is corrected on main and rides the next
+  tag; whether that is a pin-only 0.13.1 or the next feature release is
+  the operator's. The Windows leg was still running at this record.
+  LESSON, filed as a landing rule: every landing that adds or removes a
+  `#[test]` re-measures the aggregate driver's pins, and every landing
+  runs the cheap `--list`-per-partition count against the driver's pins
+  (seconds) — the full partition run stays the lane owner's once-only
+  belt. gwz-py's CI on main is GREEN after the lock refresh
+  (`33642798539`).
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
