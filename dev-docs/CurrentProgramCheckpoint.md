@@ -3460,6 +3460,19 @@ fable token only where it makes a difference." Recorded consequences:
   axes. Revision 2 in flight (45-min box); confirmation pass follows;
   the combined packet to the operator after adoption.]*
 
+  *[2026-09-03 (later): E8.3 REVISION 2 filed and BOTH AXES CONFIRMED
+  (zero NOT FOLDED) — **THE RECONCILIATION DESIGN IS ADOPTED** (plan
+  E8.3). The third component is a named retirement pre-pass under the
+  caller's held lease, so no classifier variant or table pin moves; the
+  marker's reconciled state is `After ⇒ Baseline`; the one converging
+  carry-over (the marker still needs the pre-pass in retire-only mode,
+  since the writer's direction-bound gate cannot see `After` while the
+  forward family is on disk — E4.5-B's ablation is the proof) is folded
+  at adoption. S1 (drive-and-re-record, ~150 LOC) is chartered next; the
+  build steps beyond it, and the marker's conversion, wait on the
+  operator's answers (the combined packet: E8.1's nine, the 0.13.1
+  question, E8.3's twelve).]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

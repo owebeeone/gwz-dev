@@ -728,7 +728,29 @@ assumption.)*
   lands on green with no dual (both axes: behaviour-preserving).
 - **E8.2 — the build steps of the chosen sequencing** — chartered after the
   answers, each < 500 LOC, foundational-first.
-- **E8.3 — the rest of DR-1's agenda** (`GwzM5-8DR1-Charter.md` §2: reader-side
+- **E8.3 — the reconciliation class, designed once** — ADOPTED 2026-09-03
+  after a Code+State dual (both GO-WC round 1, both CONFIRMED round 2):
+  `GwzM5-8DR1-Reconciliation-Design.md` REVISION 2. Finding: the three
+  windows the phase named separately (detach-then-publish absence, discovery
+  dead, directional residue) are ONE defect — the boundary's residue fully
+  describes an interrupted publication and no observer reads it, because
+  residue names are keyed on the action, so the reverse-direction survey
+  marks forward residue foreign (`classification.rs:141-143` via
+  `residue.rs:179-181,:205-206` — the layer the E4.5-B report mis-cited).
+  The cure, three components: a direction-free family survey; observer-side
+  reconciliation in `abort/evidence.rs::file_states`,
+  `publication/live.rs::snapshot`, `root/abort.rs` and `abort/preflight.rs`
+  with the root-artifact doors widened to an optional expected fact; and a
+  named retirement pre-pass under the caller's held lease (converge +
+  retire the counterpart family before returning; retire-only on the
+  marker). Converts `:277`/`:278`/`:279` afterwards (the marker on the
+  operator's word, Q12); the record root stays carved unless S5 (discovery
+  reconciliation + a `commit` lease split) is chartered. Steps S1 ~150 →
+  S2 ~350 ∥ S2b ~450 (~700 if a table variant is forced) → S3 ~450 ∥ S4
+  ~450 → R4; off-path S5, I1 (`gc_archived` deletion, amendment-tier), I2
+  (O14), I3, I4. Twelve one-line questions for the operator. **S1 is GO
+  now** on both axes.
+- **E8.3 (as chartered) — the rest of DR-1's agenda** (`GwzM5-8DR1-Charter.md` §2: reader-side
   record reconciliation incl. the directional-residue class and the classifier
   widening; O14's fork; the tier-2 sub-surface; the record-root re-exam; the
   legacy in-place-writer retirement; O8's `gc_archived` route; row `:279`'s

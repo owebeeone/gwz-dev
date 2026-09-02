@@ -291,3 +291,40 @@ window (i)) are sound because the retry is same-direction and the boundary's own
 
 S1 (drive RED-1, pin NEW-1, correct the four record homes + one in-tree comment) is
 GO now under the design's own drive-first rule (Q10) — nothing in S1 depends on [P1-1].
+
+---
+
+## Round 2 — 2026-09-03 — confirmation of REVISION 2's folds (text diff only; 15-min box)
+
+Method: REVISION 2 read against round 1's findings. No new tree reads; every code
+cite below is one round 1 verified at `d6830cd`.
+
+| Finding | Status | Where / how |
+| --- | --- | --- |
+| **[P1-1]** third component | **FOLDED DIFFERENTLY — acceptable with ONE text fold** | §0 headline; §2.5 `reconcile_counterpart` pre-pass: survey → converge (restore the detached `.source`, `transition.rs:290-301` inverted) → retire the counterpart family via `cleanup.rs` `:87/:89`, `:132/:134`, `:222/:224`, all-or-nothing, on the caller's already-held lease; invoked from `file_states` (once, up front), `abort/preflight.rs:110-118`, `root/abort.rs:123-145`, `preservation_root.rs:207`; restorer named per leaf; retirement timing "before it returns" (the next-merge regression row added at §2.4(A)); I2 and I10 corrected (the `Before`-only claim withdrawn; `After` for a never-published goal); I4 explicitly does not subsume the retirement. Abort-side cells filled with the user-visible outcome and the producing component. **The one untruthful cell — the driven row.** §2.4(A) L2 pending==Marker says `After` "with the `foreign` gate bypassed" and "survey + observer. No reconciler needed — no detach happened"; §2.5 fact 1 repeats "No reconciler, no writer arm". But nothing in the design bypasses `classification.rs:141-143` for the marker: the forward family (authority + staged `.goal`) is still on disk, `classify_remove` → `inspect_family` → `foreign` → `Ambiguous` → `Other` → `RecoveryRequired`, exactly today's RED-1 — and E4.5-B's ablation is the proof that the residue must GO. The mechanism that clears the gate exists in the design — the reconciler's **retire half** — and the reconciler's own contract ("converge to an endpoint if … exact counterpart; converge AND retire, or neither") already covers it with converge = no-op. **Fold owed (lane owner, before S3 charters):** the reconciler runs for `MissingReplace` counterparts in *retire-only* mode; the L2 row and §2.5 fact 1 read "reconciler (retire-only) + observer", and the per-leaf restorer line keeps "nobody restores" for L2/L1-create while saying who *retires*. Nit: the same cell says `execute_v1_evidence_rollback` "then calls `remove_exact`, which classifies `After`" — `execute_v1_evidence_rollback` refuses unless the observation is `Before` (`abort/evidence.rs:131-136`); on `After` the lifecycle advances without calling it. The user outcome (`Ok(Aborted)`) holds either way. |
+| **[P1-2]** Q1 / S5 | **FOLDED AS STATED** | §3.3 gains the lease ground (RR §1b; `service.rs:119-124`; RR §4's two live routes, the third closed by (A)); "the reverse arm's rewrite stays RAW in every outcome"; S5 = discovery reconciliation + `commit` lease split, two stop-triggers; UNVERIFIED 10 records the sizing. Q1 re-phrased verbatim to that. |
+| **[P2-1]** marker conversion vs ruling (a) | **FOLDED AS STATED (and extended)** | §6 Q12, quoting the letter, CapFree §7 `:565-568`, charter `:76-77`; extended to `:88`/`:98`. Correct extension: the same "none of the three arms converts" bracket covers them. |
+| **[P2-2]** I1 exclusion proof | **FOLDED AS STATED** | I1 rewritten as the three-part proof (survey-enforced bound; classifier-enforced counterpart; E16 same-user scope), quoting `provider.rs:58-61`'s re-litigation sentence; L3/L6 one family in I1 and in the matrix L6 row; §5.1 "K1 carries an INVARIANT" — (c) P2's charter must re-state and re-prove I1. |
+| **[P2-3]** abort sentence | **FOLDED AS STATED** | §3.4 rewritten as E8.1 §4.7's tiered sentence + an addendum scoped "within the tier at which it re-verifies"; the filesystem/legacy-probe parenthetical and the drifted `linux.rs` cite dropped; "at any point" qualified; tier-degraded vs foreign folded into S2's charter and K1; K2 re-based on E8.1 as owner of the base text. Nits, no re-review: §3.4 labels E8.1's sentence "adopted, unchanged" but paraphrases it ("needs no such filesystem" for "needs no filesystem capability at all"; "within the session" for "within the session that minted the evidence") — the ten-homes edit must quote E8.1 §4.7 verbatim; a duplicated heading fragment ("Three further consequences … :Three further consequences …"); Q5 still reads as if §3.4 lands first and E8.1 folds it, whereas K2 now says E8.1 lands the sentence and the addendum lands with S4 — align Q5 to K2. |
+| **[P2-4]** four silences | **FOLDED AS STATED** | (i) None arms: the pre-pass, `observe` untouched (§2.3 last paragraph, §2.4(A) row, S3); (ii) `abort/preflight.rs:110-118` row (and matrix L5/L6); (iii) L11 row — read-only, downstream of the pre-pass, S3 guarantees ordering; (iv) every (A) row carries "→ user" and "by which component". |
+| **[P2-5]** tier-2 | **FOLDED AS STATED** | §4.2 re-grounded: a re-deferral of CapFree §5's / charter §4 item 3's assignment, conditional on Q9, dated brackets at both homes. Q9 re-phrased. |
+| **[P3-1]** I6 wording | FOLDED AS STATED | "every **post-publication** v1 abort", `abort/evidence.rs:39-41` cited. |
+| **[P3-2]** §4.4 read dependency | FOLDED AS STATED (sharpened) | Reads it already; the new dependency is that the abort becomes a *writer* of the area (restore-rename + foreign-family retirement) — correct, and the better ground for the binding order. Q8 updated. |
+| **[P3-3]** §4.5 homes | FOLDED AS STATED | Plan §1.1 O13; CapFree §3 `:275` row; CapFree §5 O8; RR §6 bracket; plan `:53`/`:512-513`. (§5.3's §4.5 row still names only "O13 + the two allowances" — harmless; §4.5 governs.) |
+| **[P3-4]** §4.6 homes | FOLDED AS STATED | ConsumerCheckpoint §10 `:279` (frozen) + CapFree §3's `:279` dispositions row; one dual. (§5.3's §4.6 row not updated — harmless.) |
+| **[P3-5]** `load_archived` | FOLDED AS STATED | UNVERIFIED 9; "settle it before deleting". |
+| **[P3-6]** I4 trigger site | FOLDED AS STATED | Inside `v1_write_bundle_checked`'s `finish()` path (already-probing plain-lease path, CapFree §6 (ii)); never from `gwz stash` / v0 preserve; plus the correct note that I4's predicate does not fire on a counterpart residue. |
+| **[P3-7]** L7 home | FOLDED AS STATED | §4.7: no adopted home (register lists raw arms only); dated bracket at E4-Close §2 (or CapFree §6); Q7 answered "now". |
+| **[P3-8]** S5 amendment set | FOLDED DIFFERENTLY — acceptable | The `commit` lease split is named in §3.3, Q1 and UNVERIFIED 10; §5.3's S5 row is unchanged (RR §2, §6, O13 row, P-2). Add RR §1b/§4 to that row when S5 is chartered, if ever. |
+
+One further nit for S2b's charter, not a condition: I2's "all-or-nothing" needs a
+crash-consistency table — a crash between the restore-rename and the retirement
+leaves the leaf at the forward action's `expected` with the family's `.source`
+gone and its authority + `.goal` present; the reconciler's re-entry must classify
+that as "converge = no-op, retire" (NEW-2b should pin re-entrancy).
+
+**Round 2 verdict: CONFIRMED — adopt REVISION 2 as E8.3's answer; S1 is
+charterable now.** One lane-owner text fold is owed before S3's charter (the
+[P1-1] marker cell: retire-only reconciler for `MissingReplace` counterparts);
+it changes no component, no size and no invariant — the reconciler's stated
+contract already implies it — so it is not a re-review.

@@ -289,3 +289,94 @@ rule 2; I6 no new acquisition; `service.rs:121` lease split;
 2. Add `abort/preflight.rs:110-118` to the L5/L6 rows and to S3.
 3. Fix the P3 counts (§2.3, §7 I1, shape literals) in the same revision.
 4. S1 as chartered — drive-and-record only — is unaffected and may start now.
+
+---
+
+## Round 2 — confirmation of REVISION 2 (2026-09-03, code/mechanism axis)
+
+Method: text diff of REVISION 2 (`GwzM5-8DR1-Reconciliation-Design.md`, 1488
+lines, header "REVISION 2, 2026-09-03, folds the dual") against the findings
+above. No new probe, build or tree read beyond the lines already cited at
+`d6830cd` in Round 1. Time-box 15 min.
+
+| Finding | Where folded (rev 2) | Status |
+| --- | --- | --- |
+| **P1-1** writer half + direction + retirement | §0 `:55-66`; §2.4(A) rows `:387-394`; **§2.5 `:422-532`** (new "THIRD COMPONENT — the reconciler"); I2 `:552`; I10 `:560`; S2b `:1308`; S3 `:1314`; stop-triggers `:1360-1373` | **FOLDED DIFFERENTLY — acceptable, with one S3 charter line (below)** |
+| **P2-1** `:253` already answers `After` | §1.4 `:255-262`; §2.5 item 1 `:441-446` | FOLDED AS STATED |
+| **P2-2** `abort/preflight.rs:110-118` | matrix L5 `:178`, L6 `:179`; transitions row `:391`; §2.5 `:526`; S3 `:1314` | FOLDED AS STATED |
+| **P3-1** 9 moving sites, not 13 | §2.3 `:353-357` (names the eight `observe` calls as non-moving); S2b `:1308` "nine" | FOLDED AS STATED |
+| **P3-2** cite `provider.rs:58-61` | I1 `:551`, rewritten jointly with State [P2-2] as a three-part exclusion proof; "untouched" withdrawn | FOLDED AS STATED (and beyond — the guarantee axis owns the proof's sufficiency) |
+| **P3-3** 29 literals | `:1355-1358` with the per-predicate breakdown | FOLDED AS STATED |
+| **P3-4** I1 = 12 fns / ≈350 | `:1330` | FOLDED AS STATED |
+| **P3-5** `gc.rs:53` (doc `:31`), `store/mod.rs:216` | `:890`; `:420`, `:625`, `:1329` | FOLDED AS STATED (a leftover `:211-241` survives in the UNVERIFIED list at `:1429` — cosmetic) |
+
+### P1-1, judged on the three questions asked
+
+**(a) Does the pre-pass resolve the RED-1 analysis?** Yes for the driven fault
+point. The direction is corrected to `After ⇒ FS::Baseline` for a
+never-published leaf (`:387`, `:441-446`, I10 `:560` withdrawing REVISION 1's
+"only ever converts to Before/Recoverable"); that matches
+`classification.rs:253` and `evidence.rs:356` as Round 1 required.
+`marker_after` (`evidence.rs:254-256`) then matches and the Marker step reads
+`After`.
+
+**(b) Does retirement-before-return resolve the permanent-wall regression?**
+Yes. §2.5 `:498-505` times retirement *inside* `reconcile_counterpart` before
+it returns, through the existing `cleanup.rs` primitives, all-or-nothing, on
+the caller's already-held lease; the new §2.4 row `:394` ("the NEXT merge after
+a reconciled abort") states the regression and its cure explicitly. For L3-L7
+(path-stable families) this is the fix Round 1 asked for. (The `cleanup.rs`
+line cites `:87/:89`, `:132/:134`, `:222/:224` are the design's §4.4 inventory,
+not independently re-read in this box.)
+
+**(c) Is "no `ExactTransition` variant, no `classify_table` row, no pin move"
+honest?** Yes — because the reconciler runs *before* classification and leaves
+the family empty, every existing row is correct verbatim; the writer's
+direction-bound `inspect_family` stays as the writer's guard. The fallback
+(option (a): variant + rows + re-pin) is named as S2b's stop-trigger and
+budgeted at ~700 (`:1308`, `:1368-1373`) rather than assumed away. Honest.
+
+**The one place the fold over-claims, and the charter line that closes it.**
+§2.5 says the **marker class needs no reconciler** (`:447-451`; §0 `:62-63`;
+"L2 marker … — nobody, because nothing detached" `:528-531`), and row `:387`
+says `remove_exact` "classifies `After` and returns `Ok(())` without writing"
+(`transition.rs:119-120`). The second sentence is not reachable as written:
+`remove_exact`'s own `classify_remove_exact` re-runs the direction-bound
+`inspect_family` on the still-present forward `.authority` + staged `.goal`,
+takes `residue.rs:179-181`/`:204-206`, and returns `Ambiguous` at
+`classification.rs:141-143` ⇒ `Err` at `transition.rs:121-127` — `:253`'s
+`After` is only reached once the counterpart family is **gone**. Two
+consequences: (1) if the abort planner skips execution on an observed `After`
+(likely, but not traced here — UNVERIFIED), RED-1 goes GREEN and the marker's
+forward residue is simply **stranded** in `.gwz/checked-artifacts` (harmless
+for a per-id path, but permanent — I4's predicate does not fire because the
+absent leaf *equals* the forward `Missing` endpoint); (2) the sibling fault
+point — crash **after** `publish_goal`, before `finish_replace` (leaf =
+`marker_yaml`, forward authority still present) — is the reverse op's *pre*
+state, reads `Before ⇒ Candidate ⇒ marker_before`, routes into `remove_exact`,
+and dead-ends exactly as Round 1's P1-1 described. Both vanish if S3 runs the
+same per-leaf pre-pass on the marker's `CheckedArtifact` too — a
+**retire-only** invocation (nothing to converge). S3 `:1314` already says
+`file_states` calls the reconciler "once, up front, before computing any arm";
+it only needs to say *for all three leaves*, and §2.5's "who restores … L2 —
+nobody" should read "nobody restores; the reconciler still retires". This is a
+two-line charter fold, not a design change; the component exists.
+
+**One line for the guarantee axis, not judged here:** a crash between §2.5's
+step 2 (restore-rename of `.source`) and step 3 (retire) leaves leaf-restored +
+authority-present; "all-or-nothing" needs the re-entry rule for that state
+named in NEW-2b.
+
+### Round 2 tally
+
+FOLDED AS STATED: 7 (P2-1, P2-2, P3-1, P3-2, P3-3, P3-4, P3-5).
+FOLDED DIFFERENTLY, acceptable: 1 (P1-1 — pre-pass + retirement instead of a
+writer arm; carries the marker retire-only condition into S3's charter).
+NOT FOLDED: 0.
+
+### Round 2 verdict
+
+**CONFIRMED** — adopt REVISION 2 as E8.3's answer; S1 is charterable now (S1 is
+drive-and-record and is untouched by any of the above). Carry into S3's
+charter: *the `reconcile_counterpart` pre-pass runs on every leaf `file_states`
+acquires, the marker included, as a retire-only act where nothing detached.*

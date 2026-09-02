@@ -1,7 +1,7 @@
 # GwzM5-8 DR-1 E8.3 — the observer/record RECONCILIATION class, and the rest of the round's agenda
 
 Date: 2026-09-03. Author: the implementation lane (E8.3 investigator).
-Status: **REVISION 2, 2026-09-03, folds the dual.** Both axes GO-WITH-CONDITIONS
+Status: **ADOPTED 2026-09-03 as E8.3's answer** — REVISION 2 folded the dual; both axes CONFIRMED (adopt; S1 charterable) in round 2 with zero NOT FOLDED items; the one converging carry-over (the marker's row: reconciler in retire-only mode + observer) is folded at adoption by the lane owner. Nits carried into the charters: §3.4 quotes E8.1 §4.7 verbatim at the ten homes; Q5 aligned to K2's order; S2b pins the reconciler's re-entrancy after a crash between restore and retirement. Previously: **REVISION 2, 2026-09-03, folds the dual.** Both axes GO-WITH-CONDITIONS
 (`GwzM5-8DR1-Reconciliation-ReviewCode.md`, `GwzM5-8DR1-Reconciliation-ReviewState.md`);
 every condition is folded in place below. Base re-pointed to gwz-core main
 **`d6830cd`** (see the verification notes: no mechanism-cited file differs from
@@ -59,7 +59,11 @@ the caller's already-held lease. Two corrections make it smaller than either
 reviewer assumed: the reconciled direction was **inverted** (for a never-published
 leaf the truthful state is `After`, which `classify_table` already answers at
 `classification.rs:253` and which short-circuits both writers with `Ok(())` and no
-write at `transition.rs:44`/`:119`), so the **marker class needs no reconciler at
+write at `transition.rs:44`/`:119`) — BUT only once the forward family is gone: the
+writer's own `inspect_family` is direction-bound and returns `foreign ⇒ Ambiguous ⇒ Err`
+while the forward `.authority`/`.goal` still sit on disk (`transition.rs:121-127`), so the
+**marker class needs the reconciler in RETIRE-ONLY mode** (converge is a no-op: nothing
+was detached) and **no reconciler for convergence at
 all**; and keeping the reconciler as a pre-pass **outside** `classify_table` costs
 no new `ExactTransition` variant, no new table row, and no move of the 232-line
 pin. The retirement half is load-bearing: without it a stale forward family stays
@@ -259,7 +263,10 @@ Absent, Missing)` = **`After`** (`classification.rs:247-253`) — *the reverse
 operation is already complete*, which for a never-published marker is the
 truthful answer. So the classifier is not missing a rule; it is being prevented
 from reaching one it already has. That fact fixes the direction of the whole
-cure (§2.4(A), §2.5) and is why the marker class needs no reconciler at all.
+cure (§2.4(A), §2.5) and is why the marker class needs no CONVERGENCE — the reconciler
+still runs on it in retire-only mode, because the writer's direction-bound gate cannot
+see `After` until the forward family is retired (lane-owner fold at adoption, both
+axes' round-2 carry-over).
 
 **Status of this correction: measured by reading, twice, at `ffd4f95`; NOT
 re-driven** (the round is read-only and the RED row is out of tree). Step S1 of
@@ -384,7 +391,7 @@ produces the outcome, and what the USER sees* (State [P2-4](iv)).
 | Leaf & arm | Today → user | After the cure → user | By which component |
 | --- | --- | --- | --- |
 | L2 marker, abort **non-pending** (`evidence.rs:313-318`) | `observe` ⇒ `Missing`; `classify_file(…, missing_is_baseline=true)` ⇒ `FS::Baseline` (`:356`) — already tolerant → **`Ok(Aborted)`** on this cell | unchanged — **the non-pending arm was never the wall** | — |
-| L2 marker, abort **pending == Marker** (`evidence.rs:307-311`) | `classify_remove` ⇒ `inspect_family` ⇒ `foreign` (`residue.rs:179-181`, `:205-206`) ⇒ `Ambiguous` (`classification.rs:141-143`) ⇒ `transition_file` ⇒ **`FS::Other`** ⇒ shape not exact ⇒ `preflight_v1_evidence` `Err` → user sees **`Ok(RecoveryRequired)`**, then **`Err(RecoveryEvidenceMismatch)`** on the second `--abort` | survey reports one action `(Missing → marker_yaml, Replace)`; the abort asks `(Bytes(marker_yaml) → Missing, Remove)` — **the exact counterpart**. The marker was **never published**, so the reverse operation's *post* state already holds ⇒ **`RFT::After` ⇒ `FS::Baseline`** ⇒ shape exact. `execute_v1_evidence_rollback` then calls `remove_exact`, which classifies `After` and **returns `Ok(())` without writing** (`transition.rs:119-120`) → **`Ok(Aborted)`** | **survey + observer.** No reconciler needed — no detach happened |
+| L2 marker, abort **pending == Marker** (`evidence.rs:307-311`) | `classify_remove` ⇒ `inspect_family` ⇒ `foreign` (`residue.rs:179-181`, `:205-206`) ⇒ `Ambiguous` (`classification.rs:141-143`) ⇒ `transition_file` ⇒ **`FS::Other`** ⇒ shape not exact ⇒ `preflight_v1_evidence` `Err` → user sees **`Ok(RecoveryRequired)`**, then **`Err(RecoveryEvidenceMismatch)`** on the second `--abort` | survey reports one action `(Missing → marker_yaml, Replace)`; the abort asks `(Bytes(marker_yaml) → Missing, Remove)` — **the exact counterpart**. The marker was **never published**, so the reverse operation's *post* state already holds ⇒ **`RFT::After` ⇒ `FS::Baseline`** ⇒ shape exact. `execute_v1_evidence_rollback` then calls `remove_exact`, which classifies `After` and **returns `Ok(())` without writing** (`transition.rs:119-120`) → **`Ok(Aborted)`** | **reconciler (RETIRE-ONLY) + survey + observer.** No convergence — no detach happened — but the forward family MUST be retired by the pre-pass before `remove_exact` runs, or its direction-bound `inspect_family` returns `foreign ⇒ Ambiguous ⇒ Err` (`transition.rs:121-127`): that is today's RED-1, and E4.5-B's ablation (delete the residue ⇒ `Aborted`) is the proof. S3 runs the per-leaf pre-pass on the marker too, retire-only. |
 | L3 lock, L4 boundary (after S4), abort **pending == Lock/Boundary** (`:277-282`, `:292-297`) | same chain ⇒ `Ambiguous` ⇒ **`FS::Other`** ⇒ `Err` → **`Ok(RecoveryRequired)`** then **`Err`** | **the leaf is genuinely mid-flight**: absent, with the baseline bytes alive only as the detached `.source`. Neither `Before` nor `After` is true. The **reconciler** (§2.5) restores `.source` onto the leaf and retires the counterpart family; the observer then re-classifies on a clean slate and gets the ordinary `FS::Candidate` ⇒ shape exact ⇒ **`Ok(Aborted)`** | **survey + reconciler + observer** |
 | L3, L4, abort **pending == None** (`:284-289`, `:299-304`) | `evidence_shape_is_exact` runs `file_states(root, record, None)` **first** (`:390-393`), so this arm is reached before any pending arm; `observe` ⇒ `Missing` ⇒ `classify_file(…, false)` ⇒ **`Other`** ⇒ `preflight_v1_evidence` `Err` (`:34-55`) → **`Ok(RecoveryRequired)`** | **`artifact_facts::observe` returns `RegularFileFact` (`Missing｜Bytes｜Invalid`, `artifact_facts.rs:8-13`) — it has no residue channel, and I9 forbids a new door.** Resolution: the None arms do **not** grow a survey call. Instead `file_states` calls the **reconciler once, up front**, before computing any arm (§2.5); after it returns, the leaf is at an endpoint and the existing `classify_file` is correct unchanged → **`Ok(Aborted)`** | **reconciler (pre-pass), then today's observer verbatim** |
 | L5 root manifest, L6 root lock (`root/abort.rs:123-130`, `:137-144`) | `Ambiguous` ⇒ `transition_state` ⇒ refusal → **`Err`** | reconciler pre-pass in the same place, then the existing `Before` handling → **`Ok`** | **reconciler + observer** |
@@ -399,7 +406,7 @@ produces the outcome, and what the USER sees* (State [P2-4](iv)).
 | --- | --- | --- | --- |
 | L3 lock (after conversion) | crash inside the detach window; lock **absent** | `regular_digest` ⇒ `FileDigest::Missing`; the `let (FileDigest::Regular(lock), …) else { return Ok(None) }` at `live.rs:110-112` ⇒ `snapshot` `None` ⇒ `resolve_candidate(_, None)` ⇒ `_ => PR::Ambiguous` (`live.rs:90`) ⇒ `ambiguity(current)` ⇒ **RECOVERY origin** | before the `else`-return, `snapshot` surveys the lock's family. One action, `expected = baseline_lock`, `goal = candidate_lock`, `source_present` (the detached original), `goal_present` or not. **⇒ normalise the absent lock to its `expected` digest** and continue: prefix `Marker`/`Baseline` as the other two leaves dictate ⇒ `resolve_candidate` re-issues `WriteLock` ⇒ `replace_exact`'s own `RecoverableDetached` convergence runs ⇒ **publication completes** |
 | L4 boundary (after conversion) | crash inside the detach window; boundary **absent**, baseline non-empty | `live.rs:118-122` maps `Missing → None`; `classify_candidate_parts` (`acceptance/publication.rs:81-100`) accepts a `None` boundary as baseline **only when `candidate.baseline_boundary_text.is_empty()`** (`:95`) ⇒ no prefix ⇒ `None` ⇒ `PR::Ambiguous` ⇒ recovery | same normalisation in `snapshot`, **before** `CandidatePublicationObservation::new` at `live.rs:123` ⇒ prefix resolves ⇒ `WriteBoundary` re-issued |
-| L2 marker | n/a — expected `Missing`, no detach | — | unchanged |
+| L2 marker | n/a for convergence — expected `Missing`, no detach; the pre-pass runs RETIRE-ONLY on it (S3) | — | unchanged |
 | L8 bundle, members ≥ 2 | crash inside the detach window; bundle **absent**; the SAME v1 preserving arm retries | `observe_merge_preservation_bundle` ⇒ `false`; `classify_merge_preservation_bundle` ⇒ `inspect_family` **matches** (same direction) ⇒ `Recoverable` ⇒ `checked_bundle.rs:85` treats it as "not yet after" and re-issues `replace_exact`. **This one already converges** | unchanged — L8 is the proof that (i) alone is survivable **when the direction does not change**. It is (iii) that kills, not (i). |
 | L8 bundle | crash inside the detach window, then a **raw** sibling writer runs (`stash::write_bundle`, or any `gwz stash` command) | the raw writer neither observes nor classifies the residue; it `write_atomic`s over the leaf, leaving an orphaned staged goal, quarantined source and authority record in `.gwz/checked-artifacts` | **unchanged by S1-S4 — and deliberately so.** The raw siblings are carved (`:276`) and may not be put on a probe. §4.7 records this as a *residue-orphaning* exposure, distinct from the reconciliation class, and routes it to a cleanup sweep rather than a conversion |
 | L5/L6/L7 | crash inside the detach window, **same** direction retried | as L8 — `inspect_family` matches, `Recoverable` | unchanged |
