@@ -3434,6 +3434,32 @@ fable token only where it makes a difference." Recorded consequences:
   ORDER to the first check that fires, not confirming that a cited
   check exists.]*
 
+  *[2026-09-03 (later): E8.3's dual returned — Code axis
+  (`GwzM5-8DR1-Reconciliation-ReviewCode.md`, 31 verified) GO-WC; State
+  axis (`GwzM5-8DR1-Reconciliation-ReviewState.md`) GO-WC. CONVERGING
+  P1, verified by the lane owner: the cure as drafted CLASSIFIES the
+  interruption but nothing EXECUTES the reconciliation — after the
+  observers report a reconcilable state, `execute_v1_evidence_rollback`
+  calls the writer doors whose own classify gates (`transition.rs`) run
+  the direction-bound survey, see the counterpart residue as foreign and
+  return a typed Err; the marker's reconciled state is inverted (an
+  absent leaf is the reverse op's POST state — the table already answers
+  `After` at `classification.rs:253` once the foreign gate is bypassed,
+  and the abort's non-pending arm maps it to Baseline at
+  `evidence.rs:356`); and nothing retires the counterpart residue, so on
+  path-stable leaves a stale forward family would make the NEXT merge's
+  publication refuse — a regression against today's raw path. Required:
+  a third component — reconciling convergence plus retirement under the
+  writer's held lease — with the sizes and S2b's stop-trigger moved.
+  Also: Q1's "convert `rewrite.rs::commit`" is barred (shared with the
+  plain-lease reverse arms; only a lease split); the marker's conversion
+  after the cure needs the operator's word again (ruling (a)'s "do not
+  convert it" is unqualified) — added as a §6 question; an unlisted
+  observer at `abort/preflight.rs:110-118`; tier-2's deferral re-defers
+  what §5 assigned to DR-1. S1 (drive-and-re-record) is GO now on both
+  axes. Revision 2 in flight (45-min box); confirmation pass follows;
+  the combined packet to the operator after adoption.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
