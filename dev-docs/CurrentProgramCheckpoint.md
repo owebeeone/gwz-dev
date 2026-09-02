@@ -3403,6 +3403,37 @@ fable token only where it makes a difference." Recorded consequences:
   green. The release is COMPLETE on all three channels, with the one
   recorded red leg and its cause.]*
 
+  *[2026-09-03: **E8.3 DRAFT FILED** —
+  `GwzM5-8DR1-Reconciliation-Design.md` (the observer/record
+  reconciliation class designed once; the rest of DR-1's agenda
+  dispositioned). Its load-bearing correction, VERIFIED BY THE LANE
+  OWNER by reading the evaluation order: the directional-residue refusal
+  fires at `classification.rs:141-143` (`residue.foreign`), set inside
+  `inspect_family` (`residue.rs:179-181`, `:205-206`) because residue
+  file names are keyed on the ACTION (`action_key` hashes `expected` and
+  `goal`), so a reverse-direction survey cannot recognise
+  forward-direction residue and marks it foreign — BEFORE the
+  authority-current check at `:175-177` that the E4.5-B report, the E4
+  close record, the charter and the in-tree residual sentence at
+  `execute.rs:71-78` all cite. The site cited was real but not the one
+  that fires first; a cure that widened only `matches_request` would not
+  have fixed the driven wall. The one cure: a direction-free family
+  survey (`family_key` already hashes only root identity and path,
+  `authority.rs:196-202`) plus observer-side reconciliation in
+  `abort/evidence.rs::file_states`, `publication/live.rs::snapshot` and
+  `root/abort.rs`, with the four root-artifact doors widened to an
+  optional expected fact. It converts `:277`/`:278`/`:279`; the record
+  root `:280` stays carved unless a conditional ~200-LOC step is
+  chartered; no probe on any listed operation. Three record corrections
+  besides: the `gc_archived` family is twelve functions (adds
+  `merge/gc.rs::cleanup_error`); the preservation audit's hazard sits at
+  the preservation-ROOT leaves; the `CatalogOwnerV1` cite is
+  `catalog.rs:51-60`. Steps S1–S4 on the critical path, none over 450
+  LOC; eleven one-line questions. Dual (Code + State, 30-min boxes) in
+  flight. LESSON: verifying a mechanism means reading the EVALUATION
+  ORDER to the first check that fires, not confirming that a cited
+  check exists.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
