@@ -706,6 +706,38 @@ assumption.)*
   `GwzM5-8R2E-E4.7-Review.md` GO-WC (1 P2, 7 P3, all folded). The phase
   close record is `GwzM5-8R2E-E4-Close.md`; Phase E4's conversions are
   E4.1 and E4.2. DR-1 opens on the operator's home answer.]*
+### Phase E8 — DR-1, the phase-end design round (opened 2026-09-03; milestone: the identity/reconciliation design adopted and its build steps chartered)
+
+- **E8.1 — the filesystem-identity design (the operator's lead item).** ADOPTED
+  2026-09-03 after a Code+State dual (both GO-WC round 1, both CONFIRMED round
+  2): `GwzM5-8DR1-FilesystemIdentity-Design.md` REVISION 2. Finding: the catalog's
+  UUID *requirement*, not the ext4 magic number, is the gate (btrfs never
+  publishes its UUID to the VFS; the legacy per-leaf probe has no filesystem
+  test and already admits btrfs/xfs/zfs on the abort path). Ranked: (a0) delete
+  the two gratuitous `require_ext4` calls (~30 LOC with three doc fixes) →
+  (b) the catalog bound to a gwz-minted second nonce with the volume fact as
+  corroboration, admission = what the persistent-handle probe admits, behind a
+  locality/volatility capability (~950-1100 LOC, three steps incl. the
+  dual-tuple migration of v0.13.0 ext4 catalogs; Track-W dual on the wire) →
+  (c) graded evidence (~2680 LOC, six phases). Declined: (a) alone, (d) an
+  override flag. **Pending the operator's §6 answers** (Q2 sequencing three-way;
+  Q3/Q4 blocking on (b); Q5–Q9).
+- **E8.1a — (a0)** — in flight: gwz-core branch `dr1/a0-gratuitous-ext4-gates`
+  `e15b3a4`; Linux identity probe `33644792520` + Platform matrix
+  `33644795635` dispatched on the branch (the provider only compiles on Linux);
+  lands on green with no dual (both axes: behaviour-preserving).
+- **E8.2 — the build steps of the chosen sequencing** — chartered after the
+  answers, each < 500 LOC, foundational-first.
+- **E8.3 — the rest of DR-1's agenda** (`GwzM5-8DR1-Charter.md` §2: reader-side
+  record reconciliation incl. the directional-residue class and the classifier
+  widening; O14's fork; the tier-2 sub-surface; the record-root re-exam; the
+  legacy in-place-writer retirement; O8's `gc_archived` route; row `:279`'s
+  cell-2 text; the preservation-bundle audit; E4.7's ownerless allowances and the
+  `CatalogOwnerV1` narrowing) — a second design document after E8.1's build is
+  chartered; the observer-reconciliation class is designed ONCE for the marker,
+  lock, boundary and record root (the design's §7 item 4 orders it before or
+  with (c) P3).
+
 - **DR-1** — *[OPENED 2026-09-03 as R2-E PHASE E8 (lane-owner default home)
   on the operator's "run the DR to see what we can do to work-around the
   filesystem type checks"; charter `GwzM5-8DR1-Charter.md`; lead item the

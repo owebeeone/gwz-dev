@@ -112,3 +112,41 @@ says" = whether the draft states the same; "silent" where it does not.
 ---
 
 **Verdict, one line:** GO-WITH-CONDITIONS — adopt the direction and (a0); (b) not charterable until [P1-1]–[P1-3] fold and Q3/Q4 are answered as blocking; sequencing (a0)+(b)→(c) acceptable only with [P2-4]'s cost stated or its reorder taken.
+
+---
+
+## Round 2 — confirmation of the folds (2026-09-03, State/Guarantee axis)
+
+Object: REVISION 2 of `GwzM5-8DR1-FilesystemIdentity-Design.md` (944 lines,
+"REVISION 2, 2026-09-03, folds the dual"). Method: text diff of each round-1
+finding against the revision's fold-marked text; no new tree reads (no folded
+claim contradicted a cite verified in round 1). Time-box: 15 minutes.
+
+| Finding | Where folded | Status |
+|---|---|---|
+| [P1-1] migration cannot ignore a UUID folded into a SHA-256; crash-safety; one-way | §3.2.2 "DUAL-TUPLE ACCEPTANCE": the five-way `matches_attempt` conjunction quoted; the digest's framed tuple and the scratch-name blast radius stated; option (i) of my report chosen explicitly (recompute the legacy tuple where `FS_IOC_GETFSUUID` answers; legacy scratch name regenerated); the "two regimes converge" claim qualified (new catalogs from day one; existing ext4 only after re-issue); re-issue as a publish-then-retire ADMITTED ACTION under the catalog lease with fault rows (§3.2.6) and the three crash rows named, the both-resident row routed to the migration arm and not `merge_record`'s equality rule; one-way-ness stated with the release-notes obligation and the fail-closed decode kept UNVERIFIED pending a corpus row; six test rows; own step | **FOLDED AS STATED** |
+| [P1-2] the shipped `bootstrap_ownership_token`; its boundary; corroboration "gates" vs "never gates" | §3.2.3: the instance id is a SECOND nonce; the token's boundary (`provider.rs:51-62`) STANDS, not re-litigated (also §5 item 11, §6 Q9); role/boundary/lifetime/where table; round-1 "scratch name minted from the instance id" withdrawn; the contradiction resolved as "never gates ADMISSION of a fresh catalog; gates RE-BINDING of an existing one", refusing through the `Unsupported` arm with a remedy (not `Ambiguous`/`IoError`); the same-handle cross-volume image named as the release-notes residual; G4 row matches | **FOLDED AS STATED** — the "second nonce" branch of my either/or was taken, which is the branch that needs no re-litigation; acceptable. One-line note for the implementing charter: the re-binding rule speaks of "both present and disagree" and of "either side absent"; the class-differs case (record `Uuid`, live `FsId`, or the reverse) should be assigned explicitly — evaluate by class-fold where derivable, else treat as the lower class. Not a condition |
+| [P1-3] (b) admits tmpfs/NFS; Q3/Q4 deferred to (c) | §0 point 4; §3.2.4 restated admission set (both `name_to_handle_at` AND `FS_IOC_GETFLAGS`; tmpfs admitted; NFS/FUSE refused by accident with a remedy-less sentence); §6 Q3/Q4 marked "BLOCKING ON (b)"; §7 "Not charterable until Q3 and Q4 are answered"; the locality/volatility capability ships WITH (b) in the `RuntimeAdvisoryLock` class as property attempts, never a magic-number list (§5 item 4); §3.5 table implied by §3.2.4 | **FOLDED AS STATED** (and sharpened by the Code axis's `parent_mode` finding, which I did not verify and do not need to — it only narrows (b)'s set further) |
+| [P2-1] "never refuses" over-claim; tiered abort sentence; amendment §6 / `capability.rs` brackets | §4.7 "TIERED, not collapsed": probe vs operation distinguished; the tiered sentence written for `capability.rs:53-65`, `OperationModel.md:150-161`, release notes; §3.2.7 table row "The abort clause's dated brackets" naming `capability.rs:59-62` and amendment §6 `:397-403`; G6 row | **FOLDED AS STATED** |
+| [P2-2] no wire home for which corroborator was recorded | §3.2.3 `VolumeFactV1 = Uuid(bytes[16]) \| FsId(bytes[8]) \| Absent`, decoder rejects inconsistent pairs in the I8 pattern; §3.2.7 allocation row; G7 row | **FOLDED AS STATED** |
+| [P2-3] the authority record's own name / `family_key` omitted from the naming rebase | §4.2 table: `family_key`, `family_prefix`/`authority_name`, `matches_request` (over the nonce; `artifact_root_identity` no longer a comparison key), goal/source, anchor; §4.4 rule 2 restated at the prefix filter `residue.rs:127` (enumerable, then degrade, never foreign, never invisible); §4.6 row for enumerability across a forced T3→T2; §4.8 P2a | **FOLDED AS STATED** — folded at a sharper site than I cited (the Code axis's `residue.rs:127`), which subsumes mine; acceptable |
+| [P2-4] the second migration / second dual unstated; three-way Q2 | §0 sequencing note; §4.5 "the second migration is real and is (c)'s cost if (b) ships first"; §6 Q2 three-way with the trade; §7 lane recommendation (ii) with (i)'s cost to be written into the charter if taken | **FOLDED AS STATED** |
+| [P2-5] wrong frozen clause | §3.2.7: `GwzM5-8R2DInterfaceFreeze.md` §6 Track-W (`:1711-1722`) quoted; settled tuple §3/§4.5 inherited; the I2 CompatibilityContract cite withdrawn with the envelope-registry reason; §3.2.6 the census expected to move, one Track-W dual covering wire + census | **FOLDED AS STATED** |
+| [P2-6] the G1–G7 ledger | §3.2.5 adopted "verbatim in substance"; checked row by row against my §1 — G1–G7 match, including the zfs UNVERIFIED and tmpfs-vacuous caveats on G2 and "LOST at T1 — therefore refuse" on G3 | **FOLDED AS STATED** |
+| [P3-1] tier derived, not stored | §4.1 rule 4 (`tier()` from facts; decoder rejects a contradicting summary); §5 item 10; §3.2.3 general rule | **FOLDED AS STATED** |
+| [P3-2] substitution seam absence pin; hard-refusal rows | §4.6: `cfg(test)`-gated, pinned absent in the `catalog_activation_pin.rs:81-84` idiom; rows for the anchor at each tier and the rename-domain gate's tier-independence; plus the enumerability row | **FOLDED AS STATED** |
+| [P3-3] Q3/Q4 blocking; Q9 | §6 Q3/Q4 "BLOCKING ON (b)"; Q9 the instance id; Q2 three-way; Q5 answered "minor — confirm?" | **FOLDED AS STATED** |
+| [P3-4] the two passing doc/comment defects at (a0) | §1.5 (now three defects, the third from the Code axis); §3.0, §4.8 P0, §7 item 1 | **FOLDED AS STATED** |
+
+Operator constraints re-checked on the revision: FAT32 out (§4.6, §5 item 8);
+no FAT32 drive; ordinary path untouched (§5 items 1-2; §3.2.7 "Capability-free
+list — NOT amended"; RR §4 enumeration per implementing charter); no
+per-filesystem branches (§3.2.4's capability is by property attempt; §5 item 4).
+All four honoured.
+
+NOT FOLDED items: none.
+
+**CONFIRMED (adopt)** — every State-axis condition is folded as stated or at a
+sharper site; the verdict stands as GO-WITH-CONDITIONS with the conditions now
+discharged in the text. What remains is the operator's: Q1, Q2 (the three-way),
+Q3/Q4 (blocking on (b)), Q5–Q9.

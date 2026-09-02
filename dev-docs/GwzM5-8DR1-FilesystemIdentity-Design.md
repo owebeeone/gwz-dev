@@ -1,5 +1,7 @@
 # GwzM5-8 DR-1 — filesystem identity: inventory, work-arounds, and the graded-evidence design
 
+> **ADOPTED 2026-09-03 as DR-1's answer to the operator's ask** — dual on the amendment-tier line: Code axis GO-WC (37 verified / 6 refuted / 6 unverified) and State axis GO-WC in round 1; REVISION 2 folded all twenty-nine conditions; both axes CONFIRMED (adopt) in round 2 with zero NOT FOLDED items (`GwzM5-8DR1-FilesystemIdentity-ReviewCode.md`, `-ReviewState.md`). The lane owner's verdict: (a0) lands now (branch `dr1/a0-gratuitous-ext4-gates`, CI-verified); (b) and (c) are chartered only after the operator answers §6 — Q2 (sequencing) and the two blocking questions Q3/Q4 first. Adoption changes no adopted text elsewhere; the records this design will amend when built are listed in §3.2.7 and §7.
+
 Date: 2026-09-03. Author: the implementation lane. Status: **REVISION 2,
 2026-09-03, folds the dual.** Round 1 was DRAFT (2026-09-03); the peer-blind
 dual is filed at `dev-docs/GwzM5-8DR1-FilesystemIdentity-ReviewCode.md`

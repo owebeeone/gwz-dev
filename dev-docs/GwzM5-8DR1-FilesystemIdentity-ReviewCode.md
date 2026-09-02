@@ -323,3 +323,34 @@ is the destination and P2-3 is the one structural hole in it.
    nonce rebase; C1/C2 T2 cells and §4.4 rule 2 re-pointed at `residue.rs:127`.
 
 P3 items are editorial and may land with (a0)'s doc fixes.
+
+---
+
+## Round 2 — confirmation against REVISION 2 (2026-09-03, 00:58-01:00 AEST; 15-minute box, 2 used)
+
+Method: text diff of revision 2 (944 lines, "REVISION 2 … folds the dual"
+header, `(fold: …)` markers) against §1 and §5 above. No probes, no kernel
+fetches — no folded cite contradicts one verified in round 1.
+
+| Round-1 item | Revision-2 site | Disposition |
+|---|---|---|
+| **P1-1** migration mechanism (five conjuncts; target digest is a hash; collision digest; scratch name) | §3.2.2 `:305-360` — names the five-way conjunction verbatim, the three changed conjuncts, `digests.rs:108-135` frame-by-frame incl. `profile_code` `:120`, `historical_collision_digest` `:137-139`, `scratch.rs:25-39`; dual-tuple acceptance (recompute legacy identity + profile code + target digest + collision digest when the ioctl answers; regenerate the legacy scratch name); re-issue as an admitted action; own step ~250 LOC; six test rows `:381-391` incl. record fixture and scratch-name fixture (row 5) and the interrupted-bootstrap scratch case (row 2); the unqualified "two regimes converge" claim withdrawn `:355-360` | **FOLDED AS STATED** |
+| **P2-1** tmpfs answers at v6.9 (`shmem.c:4405`), v6.12 (`:4696`) | §0 point 4 `:65-72`; I1 `:100` ("the only thing refusing tmpfs today"); I2 `:101`; §3.1 table `:266` with all three tags; Q4 (and Q3) made BLOCKING preconditions of (b) `:72`, `:487`, `:597`, `:893` | **FOLDED AS STATED** |
+| **P2-2** parent_mode/`fileattr_get` admission set; `PathEquivalence` has no remedy; ext4 error strings | §3.2.4 `:459-511` — admission restated as `name_to_handle_at` AND `FS_IOC_GETFLAGS`; the nine `parent_mode` sites listed in I4 `:103`; `vfs_fileattr_get` `fs/ioctl.c:526-534`/`:705-713` cited; NFS/FUSE sentence reproduced; item 3 `:502-505` = attempt-based `Sensitive` default OR a `PathEquivalence` remedy; `linux.rs:59,161,167,199` listed in scope `:507-511` | **FOLDED AS STATED** — plus a locality/volatility capability in front of the catalog (`:487-501`), which goes beyond the condition; acceptable (it is the §4.3 split pulled forward into (b)) |
+| **P2-3** `family_key` invisibility at `residue.rs:127`; C1/C2 T2 cells; §4.4 rule 2 re-pointed | C1/C2 `:190-191` rewritten to "breaks by INVISIBILITY, not by `foreign`" with `residue.rs:116`/`:127` and the `authority == false` arms `classification.rs:247-253`/`:275`; §2.2 made trimodal `:212-225`; §4.2 table `:641-651` adds `family_key`, `family_prefix`/`authority_name`, and `matches_request` to the nonce rebase; §4.4 rule 2 `:714-726` re-pointed at `residue.rs:127` with the corrected rule ("enumerable … then degrade"); coverage row `:757` | **FOLDED AS STATED** — `matches_request` made nonce-keyed as well (`:647`), beyond the condition; acceptable |
+| **P3-1** kernel line drift, tag per cite | §0 `:46-47`, §3.1 `:262-264`, uapi `:75`/`:237` at `:101`/`:173`; Verification notes `:924-928` | **FOLDED AS STATED** |
+| **P3-2** `uuid_to_fsid` XOR fold, not truncation | §1.2 `:134-142` (`statfs.h:55-59`, `ext4/super.c:6829`, btrfs/xfs derivation UNVERIFIED); §5 item 7 `:835-838` | **FOLDED AS STATED** |
+| **P3-3(i)** legacy Windows probe | new row I12w `:127` (`identity.rs:551-575`, no `require_ntfs`); "differs on all three OSes" `:131-132` | **FOLDED AS STATED** |
+| **P3-3(ii)** `platform.rs:184` doc comment | doc-defect item 3 `:175-177` | **FOLDED AS STATED** |
+| **P3-3(iii)** script path prefix | `scripts/checks/check_checked_artifact_boundaries.py` at `:248`, `:553` with `:63`, `:71`, `:263`, `:265`, `:266` | **FOLDED AS STATED** |
+| **P3-4** C8's T1 cell vs §4.3 | C8 row `:197` = "n/a — not an identity consumer"; §4.3 `:682-685` | **FOLDED AS STATED** |
+| **P3-5** LOC re-price | §3.2 heading `:277` "~950-1100 LOC, THREE steps"; ranking table `:597` | **FOLDED AS STATED** |
+
+Round-1 UNVERIFIED items are carried forward as UNVERIFIED in revision 2's
+Verification notes (`:929-935`), including the two this axis raised
+(`interior.rs:72`/`alias.rs:21` retained-first; the R0-L `mode_query_failure`
+row) — correctly not claimed as verified.
+
+NOT FOLDED items: none.
+
+**CONFIRMED (adopt).**

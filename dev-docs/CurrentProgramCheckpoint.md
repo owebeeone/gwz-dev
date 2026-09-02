@@ -3339,6 +3339,17 @@ fable token only where it makes a difference." Recorded consequences:
   Revision 2 in flight (45-min box). The decision packet is with the
   operator.]*
 
+  *[2026-09-03 (later): REVISION 2 filed (944 lines, 29 folds) and BOTH
+  AXES CONFIRMED in round 2 with zero NOT FOLDED items — **THE DESIGN IS
+  ADOPTED as DR-1's answer** (plan phase E8, step E8.1). The drafter's
+  and the lane owner's recommendation on sequencing: land (c) P1's
+  protocol shape first as (b)'s vehicle — one Track-W allocation, one
+  catalog migration, one dual — unless the operator judges the Fedora
+  block urgent enough to pay for two. (a0) is on CI. NEXT: the
+  operator's nine one-line answers (Q2 sequencing; Q3/Q4 blocking on
+  (b); Q5–Q9) → E8.2 build steps chartered (< 500 LOC each,
+  foundational-first) → E8.3 the remaining agenda's design.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
