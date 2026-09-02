@@ -3226,6 +3226,37 @@ fable token only where it makes a difference." Recorded consequences:
   STARTED** (gwz-core `scripts/release.py v0.13.0 --push`); release
   notes FINAL at `GwzReleaseNotes-v0.13.0.md`.]*
 
+  **v0.13.0 RELEASED — 2026-09-03, all three channels.** gwz-core
+  `ffd4f95` tag `v0.13.0` (off main; the cut's first attempt refused at
+  `cargo fmt --check` — the fix builder's core commit was unformatted
+  and the lane gate does not run fmt — formatting-only `d8c98a7` landed,
+  cut relaunched: `cargo test --locked` 1843 passed, clippy clean);
+  gwz-cli `afa78a6` tag `v0.13.0` (release branch, pins core v0.13.0;
+  suite green; `docs/CLI.md` current); gwz-py `80538fe` tag `v0.13.0`
+  (release branch, pins core v0.13.0; 576 Python tests, wheel built and
+  smoke-tested). THE PY CUT NEEDED FIVE ATTEMPTS: `cargo update -p
+  gwz-core` refused ("did not match any packages") because `do_merge`
+  resolves a `Cargo.lock` conflict toward main, whose entry has no git
+  source — RELEASE-SCRIPT FIX gwz-py `5bc5819` (`cargo update
+  --workspace` before the re-pin, mirroring gwz-cli's cargo-build
+  refresh); then two attempts refused "branch 'release' is checked out
+  in another worktree" — the `--keep-worktree` diagnosis worktree at
+  `/private/var/folders/…` survived two removal loops (wrong cwd; a
+  `/var` vs `/private/var` path grep) until removed by exact path.
+  GitHub releases PUBLISHED: gwz-core (body = `GwzReleaseNotes-v0.13.0.md`),
+  gwz-cli (dist rewrote the body: 16 assets, Release run `33639415374`
+  GREEN), gwz-py (Publish run `33640038038` → PyPI trusted publishing).
+  Core release-verify `33639413040`, cli Docs `33639415391`, py CI
+  `33639376425`: closure appended below. INSTALLED locally via the
+  release installer: `gwz --version` = 0.13.0; the audit's five probes
+  and the two original defects re-driven against it — all fixed
+  (`--target` leaves the root untouched; `--dry-run` writes nothing on
+  add/commit/stash/forall/init; `--all` before commit no longer acts as
+  `-a`). The gwz skill (`~/.claude/skills/gwz/SKILL.md`) rewritten to
+  the 0.13.0 state (the 0.12.1 warning retired; the `--no-ff`
+  filesystem admission noted; `--all`/`-A`/`-a` semantics). DR-1 is
+  now unblocked, pending the operator's home answer.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
