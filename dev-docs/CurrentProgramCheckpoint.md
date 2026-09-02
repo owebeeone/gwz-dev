@@ -3350,6 +3350,18 @@ fable token only where it makes a difference." Recorded consequences:
   (b); Q5–Q9) → E8.2 build steps chartered (< 500 LOC each,
   foundational-first) → E8.3 the remaining agenda's design.]*
 
+  *[2026-09-03: **E8.1a (a0) LANDED** — gwz-core main `e15b3a4`: the
+  two gratuitous `require_ext4` calls in `parent_mode` and
+  `rename_domain` removed (nothing newly admitted; `identity` remains
+  the one gate), the kernel-version comment corrected to 6.9, the
+  self-contradicting admission sentence in `OperationModel.md` rewritten;
+  the `pre_catalog.rs` tree digest re-pinned. Verified on CI, since the
+  Linux provider does not compile on this host: Linux durable identity
+  probe `33644792520` GREEN, Platform matrix `33644795635` GREEN;
+  boundary checker, merge-docs and M4 map green locally; lane gate ok.
+  E8.3's design investigation (the reconciliation class and the rest of
+  the agenda) is in flight.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
