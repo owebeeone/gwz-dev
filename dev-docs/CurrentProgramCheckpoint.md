@@ -3281,6 +3281,32 @@ fable token only where it makes a difference." Recorded consequences:
   refusal attaches to claims; coverage by injecting "tier unavailable"
   on ext4 — no FAT32 lab.
 
+  *[2026-09-03 (later): the design DRAFT is filed —
+  `GwzM5-8DR1-FilesystemIdentity-Design.md` (684 lines) — and its dual
+  (Code + State, peer-blind, 30-min boxes, verify by reading) is in
+  flight. THE DRAFT'S CORRECTION to the lane owner's concept, verified
+  by the lane owner against the kernel source: `FS_IOC_GETFSUUID` is
+  generic VFS code that returns `ENOTTY` when the superblock's
+  `s_uuid_len` is zero; ext4, xfs and f2fs publish through
+  `super_set_uuid`, **btrfs does not** — so attempt-based UUID
+  detection alone admits xfs and f2fs and leaves Fedora refused. The
+  real gate is the catalog's UUID REQUIREMENT, not the magic number; the
+  shipped legacy per-leaf probe (`identity.rs:312-346`) has no
+  filesystem test and already admits btrfs/xfs/zfs on the abort path.
+  RANKING: (a0) delete the two gratuitous `require_ext4` calls in
+  `parent_mode`/`rename_domain` (~10 LOC, no guarantee change); (b) bind
+  the catalog to a gwz-minted instance id with the volume fact as
+  corroboration and admit what the legacy probe admits (~600-750 LOC,
+  amendment-tier on the protocol allocation; the v0.13.0-catalog
+  migration is the risk) — THE ANSWER TO THE ASK; (c) graded evidence
+  (~2130 LOC, five phases) — the destination; (d) an override flag —
+  wrong shape; (a) attempt-based UUID alone — does not answer the ask.
+  Two additions the tree forces: tier 1 is LEAF-ONLY (directories have
+  no digest); locality is not an identity fact (belongs in the
+  `RuntimeAdvisoryLock` capability). Both open observer classes are
+  unaffected by tiering. Eight one-line questions for the operator in
+  §6; the decision packet follows the dual.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
