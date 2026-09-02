@@ -3041,6 +3041,74 @@ fable token only where it makes a difference." Recorded consequences:
   launches now from the staged brief at base `f563446`; then E4.7; then
   DR-1 once the operator names its home.]*
 
+  **POSITION 2026-09-02 (E4.5-B) — STOP-TRIGGER (5) FIRED; A DIFFERENT
+  SCOPING RETURNS TO THE OPERATOR.** The E4.5-B builder (Opus, base
+  `f563446`, report filed verbatim as `GwzM5-8R2E-E45B-Report.md`; no
+  commit; the demonstration diff preserved out of tree) measured that
+  converting `execute.rs:45` — the marker write, the one activated-lease
+  forward arm §7 said converts — STRANDS `gwz merge --abort` after an
+  interrupted marker publication: crash inside the checked publication
+  (after the authority record and staged goal, before the leaf) → abort
+  returns `RecoveryRequired` (raw path: `Aborted`); a second abort
+  `RecoveryEvidenceMismatch`; resume `MergePhaseUnsupported`. Ablation:
+  delete the `.gwz/checked-artifacts/ca1-*` residue and the same
+  interruption aborts cleanly. **Mechanism, verified by the lane owner
+  by reading and by re-running the row on the applied diff (FAILED,
+  `left: RecoveryRequired / right: Aborted`, 0.9s):** the abort's
+  `classify_remove` asks the REVERSE pair (`Bytes → Missing`) but the
+  residue's authority was minted for the FORWARD pair (`Missing →
+  Replace`); `classification.rs:175-177` returns `Ambiguous` when an
+  authority exists and is not current for the requested transition;
+  `abort/evidence.rs:306-311` maps it to `Other`; the evidence shape
+  stops being exact; the record enters recovery. This is NOT a detach
+  window (`MissingReplace` never detaches — the prep's §2.1 is true) but
+  the prep's OWN §2.4 hazard — directional residue — which its §2.5
+  table failed to apply to `:45` (marked CLEAR). The lane owner owns
+  that contradiction, as it owned E4.3's. Cure class: abort-side
+  observer reconciliation in `abort/evidence.rs::file_states` (prep
+  §2.2 cure (ii) / §7.1 option (i), 450–600 LOC, plain lease) — the
+  ruling routes exactly that to DR-1 ("Do not start (C) inside E4").
+  ALSO FALSIFIED BY MEASUREMENT (the lane owner read the path): brief
+  item A's premise that the raw write is what creates `gwz.conf/markers`
+  — workspace creation's `refresh_conf_integrity_marker`
+  (`artifact/mod.rs:383,:392` → `conf_integrity.rs:178-202`, via
+  `write_atomic`'s `create_dir_all`) installs it before any merge, so
+  refuse-when-missing regresses nothing and the parent bootstrap was
+  unnecessary machinery on a false premise; and the bootstrap's
+  prescribed placement is unbuildable (`DurableMerge` requires a record-
+  derived owner, `identity.rs:112-130`, and `acquire_for_merge_start`
+  runs before `create_open`). Verified green before the wall:
+  reachability at `f563446` identical to prep §1.2 (acquire_activated
+  and nothing else); expected fact Missing proved; no inventory/O13/pin
+  at risk. Builder flags 1–12 stand as filed; flag 6
+  (`observation.rs:155-158`'s stale `dead_code` allow on
+  `parent_is_canonical`) → E4.7's sweep; flags 7, 9, 10 → DR-1's agenda.
+
+  **DECISION PACKET, put to the operator (the lane idles on it — the
+  ruling's "a different scoping comes back to me"):**
+  - **(a) RECOMMENDED — `:45` joins `:48`/`:51` in the [R2-P3-1] dated
+    residual on its own stronger ground (the directional-residue
+    window); E4.5-B closes as "does not open as a build"; the
+    capability-free amendment's §7 E4.5/6-B disposition is corrected by
+    dated bracket (the fresh-workspace premise false; `:45` not CLEAR);
+    the three residual sentences at `execute.rs:45,:48,:51` and the
+    amendment corrections' in-tree echoes are carried by E4.7 (already
+    a docs+allowances step); DR-1's agenda gains the directional-residue
+    class with its observer cure, `classify_write`'s Missing-expected
+    widening, the preservation-bundle audit and the fixture seeding
+    note. Phase E4's conversions are then exactly E4.1 (catalog) and
+    E4.2 (the first merge record) — the two the ruling's premise never
+    questioned — and everything else is carved, pinned or dated.
+  - **(b)** lift "do not start (C) inside E4" for the abort-side observer
+    reconciliation alone, then re-open E4.5-B. Against the ruling, ~500
+    LOC on the reverse path, and it pre-empts DR-1's one design round
+    by cutting the reconciliation shape for one leaf before the marker,
+    lock, boundary and record root are designed together.
+  - **(c)** another scoping — the operator's.
+  Not chosen by the lane: (a) and (c) are amendment-tier; (b) contradicts
+  the ruling. E4.7 waits on the answer (its charter changes under (a));
+  the E4.5-B worktree and warm target are kept until then.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

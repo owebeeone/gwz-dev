@@ -534,6 +534,25 @@ reads "3 of the 20". The same review's [P3-5] adds a flat digest on
 family's implementation would convert every carved `:277`/`:278`/`:279`
 caller while moving no count in any row.]*
 
+*[E4.5-B OUTCOME 2026-09-02 (later), recorded pending the operator's
+disposition — `GwzM5-8R2E-E45B-Report.md`, verified by the lane owner: the
+build of `:45` STOPPED on its trigger. (i) Converting the marker write strands
+`gwz merge --abort` after an interrupted checked publication — the residue's
+authority is minted for the forward pair and the shipped reverse classifier
+refuses it (`classification.rs:175-177` → `Ambiguous`; `abort/evidence.rs:306-311`
+→ `Other`; the record enters recovery) — the charter prep's §2.4 hazard, which
+its §2.5 table did not apply to `:45`. The cure class (abort-side observer
+reconciliation) is what the ruling routes to DR-1. (ii) The disposition below
+and §7's "one small step" rest on a FALSE premise: `gwz.conf/markers` is not
+created by the raw marker write but by workspace creation
+(`refresh_conf_integrity_marker`, `artifact/mod.rs:383,:392`), so a
+refuse-when-missing conversion regresses no fresh workspace and the parent
+bootstrap was unnecessary — and its prescribed placement is unbuildable
+(`DurableMerge` needs a record-derived owner; `acquire_for_merge_start` runs
+before `create_open`). The operator's packet (checkpoint, position 2026-09-02
+E4.5-B) recommends `:45` join `:48`/`:51` in the [R2-P3-1] dated residual on
+the directional-residue ground; §7's text is NOT rewritten until that ruling.]*
+
 *[E4.5/6-B DISPOSITION 2026-09-02, from the read-only charter prep
 (`GwzM5-8R2E-E45-6B-CharterPrep.md`, every claim cited at main `0dae0d5`; the third prep this
 phase to falsify a premise before a build): reachability HOLDS — all

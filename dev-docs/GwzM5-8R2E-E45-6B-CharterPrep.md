@@ -297,7 +297,7 @@ directional, and the charter cannot assume the abort's existing
 
 | Leaf | Own discovery root? | Detach window under `replace_exact`? | Forward observer on the window | Abort observer on the window | Verdict |
 | --- | --- | --- | --- | --- | --- |
-| `:45` marker | No (record-derived) | **None** — expected `Missing` | absent = `Baseline` → re-issue | absent = `Baseline` (`:356`) | **CLEAR** |
+| `:45` marker | No (record-derived) | **None** — expected `Missing` | absent = `Baseline` → re-issue | absent = `Baseline` (`:356`) | **CLEAR** *[FALSIFIED 2026-09-02 by the E4.5-B build (`GwzM5-8R2E-E45B-Report.md`): this table applied only the detach-window axis; §2.4's OWN directional-residue hazard strands `--abort` after an interrupted checked marker publication (forward-pair authority vs reverse-pair `classify_remove` → `Ambiguous` → `Other` → `RecoveryRequired`), measured and ablation-proven. The lane owner owns the omission. Disposition: the operator's (checkpoint packet).]* |
 | `:48` lock | No for discovery; yes for observation | **Yes** | `None` → `Ambiguous` → recovery | `Other` → preflight `Err` | **WALL** |
 | `:51` boundary | No (regenerable) | **Yes** (except empty-baseline case) | `None` → `Ambiguous` → recovery | `Other` → preflight `Err` | **WALL** |
 

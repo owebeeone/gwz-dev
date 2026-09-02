@@ -647,6 +647,16 @@ assumption.)*
   ("Git-directory artifact action") already contradicts the shipped
   reverse writer's workspace door → DR-1 frozen-text item.
   `GwzM5-8R2E-CapabilityFreeAmendment.md` §7's post-adoption note carries the full record.]*
+  *[2026-09-02 (later): **E4.5-B STOPPED on its trigger (5)** — no
+  commit (`GwzM5-8R2E-E45B-Report.md`, verified by the lane owner):
+  converting `:45` strands `--abort` after an interrupted checked
+  publication (directional residue — the prep's §2.4 hazard its §2.5
+  table missed); the parent premise above is FALSE (`gwz.conf/markers`
+  is created at workspace creation) and the `DurableMerge` door at
+  merge start is unbuildable (record-derived owner). A different
+  scoping → the operator (checkpoint packet; recommended: `:45` joins
+  the [R2-P3-1] residual, E4.7 carries the three residual sentences,
+  DR-1 gains the directional-residue class). E4.7 waits on the ruling.]*
 - **E4.7** — O3 close-out: the legacy in-place writers inside
   `.gwz/checked-artifacts` retire behind the converted paths; the
   A1-era allowances (`catalog.rs:10-16` class) expire with dated
