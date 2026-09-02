@@ -3307,6 +3307,38 @@ fable token only where it makes a difference." Recorded consequences:
   unaffected by tiering. Eight one-line questions for the operator in
   §6; the decision packet follows the dual.]*
 
+  *[2026-09-03 (later): THE DUAL RETURNED — Code axis
+  (`GwzM5-8DR1-FilesystemIdentity-ReviewCode.md`, 37 verified / 6
+  refuted / 6 unverified) GO-WC; State axis
+  (`GwzM5-8DR1-FilesystemIdentity-ReviewState.md`) GO-WC. CONVERGING
+  P1, verified by the lane owner in the tree: option (b)'s migration of
+  existing v0.13.0 ext4 catalogs cannot work as written —
+  `matches_attempt` is a five-way conjunction and
+  `durable_target_digest` is a SHA-256 over four directories' canonical
+  durable identities (UUID inside each) plus the profile code; a hash
+  field cannot be ignored; every existing catalog would go `Ambiguous`.
+  The fix shape is dual-tuple acceptance (the ioctl still answers on
+  ext4, so the legacy digest can be recomputed), crash-safe and one-way
+  — feasible, not cheap: (b) re-prices to ~950-1100 LOC. REFUTED kernel
+  fact: tmpfs publishes its UUID from v6.9 (`mm/shmem.c:4405`), not only
+  master — so (b) would admit tmpfs unconditionally and the tmpfs
+  question is a PRECONDITION of (b). Further conditions: a gwz-minted
+  nonce already exists (`bootstrap_ownership_token`) with an adopted
+  boundary saying it is not an adoption proof — the instance id must be
+  a distinct nonce; (b) needs a locality/lock capability in front of
+  the catalog (NFS/FUSE would otherwise refuse without a remedy at
+  `parent_mode`, tmpfs would be admitted); a wire field must record
+  which corroborator was seen; (c)'s naming rebase omits `family_key`
+  (a root-identity change makes prior residue INVISIBLE, not foreign —
+  `residue.rs:127`); the frozen clause is the R2-D Interface Freeze §6
+  (Track-W), not the I2 contract; the (b)-then-(c) sequence is two
+  catalog migrations and two protocol duals — the third option is (c)'s
+  P1 protocol shape as (b)'s vehicle. LANE-OWNER VERDICT: ADOPT the
+  design's DIRECTION as DR-1's answer — (a0) now; (b) NOT charterable
+  until the folds land; (c) the program; (a) alone and (d) declined.
+  Revision 2 in flight (45-min box). The decision packet is with the
+  operator.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
