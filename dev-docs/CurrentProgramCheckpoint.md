@@ -3172,6 +3172,38 @@ fable token only where it makes a difference." Recorded consequences:
   — all GREEN. The E7-Acceptance O1, O13 and E4 rows are bracketed to the
   close record. The lane IDLES on the DR-1 home answer.]*
 
+  **POSITION 2026-09-02 (late) — RELEASE LANE v0.13.0 BEFORE DR-1.** The
+  operator: two shipped bugs (`--target` and `--dry-run` on `add`/`commit`,
+  `GwzOverClaimingCommitDiagnosis.md`) fixed and released before DR-1; why
+  not caught; whether other parameters share the failure mode. FOUND: all
+  five diagnosed defects are FIXED ON MAIN (the 2026-09-01 handoff
+  snapshots core `c201a01` / cli `4791eb6`) and NEVER RELEASED — verified
+  end to end 2026-09-02 with a debug build of main against the released
+  0.12.1 (which still stages every root file under `add -A --target` and
+  commits root and member under `--dry-run`; script
+  `scratchpad/repro.sh`). WHY NOT CAUGHT: two guard seams, one carrying
+  `dry_run` by type and one not; tests asserted plumbing
+  (`meta.dry_run == Some(true)`) not behaviour; behavioural and end-to-end
+  dry-run tests existed only for verbs on the honouring seam; no negative
+  assertion anywhere on commit; docs promised what no test checked. THE
+  AUDIT (`GwzParameterPlumbingAudit.md`, Opus, 45-min box): eight more,
+  four reproduced — `--dry-run stash drop` DESTROYS the stash (critical),
+  `--dry-run stash apply|pop` real, `--dry-run forall` runs the command,
+  `--dry-run init` creates the workspace, `gwz --all add|commit` acts as
+  `-A`/`-a`; deferred: `--partial`/`--force`/`--sync` accepted and never
+  read by most verbs, `materialize --branch` ignores `--force`,
+  `TagRequest.all` dead, gwz-py drops `--ssh-timeout` and still widens
+  `--all`. Exactly one clap id collides (`all`); the seam split is
+  unchanged and reaches gwz-cli's `forall` dispatch. **Operator ruling:
+  "roll up all the changes — the merge and bug fixes"** → v0.13.0 FROM
+  MAIN (the E4 train ships: catalog activation on `--no-ff` start, the
+  first merge record on the boundary, the ext4/NTFS/APFS admission with
+  its typed remedy, the pins, the GC fix, the allowance close-out) plus
+  the dry-run class fix and the `--all` collision fix, in flight on
+  `fix/dry-run-class` (both repos). Then the three-channel cut per the
+  RELEASE.md runbooks (core → cli release branch → gwz-py → publish →
+  PyPI). DR-1 waits behind the release.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
