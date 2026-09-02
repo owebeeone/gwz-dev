@@ -3167,6 +3167,11 @@ fable token only where it makes a difference." Recorded consequences:
   before the answer; its charter draft is staged with the E4.5-B and
   E4.7 agenda additions.
 
+  *[CI CLOSED at `9c808ff`: Windows `33596394193`, Platform
+  `33596396157`, boundary `33596394533`, retained readers `33596394463`
+  — all GREEN. The E7-Acceptance O1, O13 and E4 rows are bracketed to the
+  close record. The lane IDLES on the DR-1 home answer.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

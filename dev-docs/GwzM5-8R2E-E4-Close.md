@@ -90,4 +90,4 @@ main; every residual is dated and grounded; every carrier is named in §6.
 DR-1 does not start until the operator names its home (one-line question:
 R2-E phase E8, or a new lane).
 
-*[CI CLOSURE: appended when the four runs complete.]*
+*[CI CLOSURE, 2026-09-02: at `9c808ff` — Windows matrix `33596394193` GREEN, Platform matrix `33596396157` GREEN, checked-artifact boundary `33596394533` GREEN, retained merge readers `33596394463` GREEN. The close tree is three-platform green; no commit has landed after it.]*
