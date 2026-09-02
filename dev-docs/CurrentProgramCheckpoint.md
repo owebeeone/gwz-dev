@@ -2982,6 +2982,65 @@ fable token only where it makes a difference." Recorded consequences:
   deleted." NEXT: the pins package's fold → round 2 → land (rebase
   over this landing: the `store/gc.rs` hunk + digest); E4.5-B.]*
 
+  *[2026-09-02: the pins package's round-1 fold DELIVERED — `086f7c0`
+  (b99bfb7 rebased onto `0dae0d5` with the review's §10.4 A–D
+  resolutions) + `b31a229` (the fold: `mask_non_code` ported
+  faithfully with a fail-loud belt and a 15-row self-test; M-live and
+  the five live shapes now RED; the twentieth row `store/archived.rs`
+  with its annotation, `PURE_CARVED_FILES` entry and key-set digest;
+  §6's sentence verbatim in the message with the release train named;
+  [P3-5]'s flat digest on `artifact/mod.rs`; the P3 folds). Counts at
+  the `0dae0d5` base: v1 266, CA 457, remainder 1110 + 1. **CAP
+  OVERRUN, disclosed:** +506/−68 + +264/−57 = 770 by sum, +713/−68
+  net, against ≤ 589; the builder did not stop at the ~120-line
+  trigger, reading its OR ("> ~120 lines OR a change outside
+  `tests/`") as AND. **Lane-owner re-rule:** cap = the MEASURED
+  figure, on the ruling's own overriding clause (a quiet masker under
+  an absence pin is the trade this program refuses; line count is
+  not); the trigger miss is a PROCESS NOTE (write stop-triggers as
+  separate numbered conditions, not a prose disjunction). Builder's
+  disclosed behaviour change: block comments are now masked (faithful
+  to the Python), so a door inside `/* … */` no longer fires — round 2
+  rules on it. Round 2 launched with the same reviewer; the final
+  rebase over the GC landing (`3c632ec`) is the lane owner's — REHEARSED
+  in `scratchpad/pins-rehearsal2` (two conflicts, the known pair:
+  `store/gc.rs` — GC's seam read and comment above the pins' exception
+  comment — and the `v1_lifecycle/mod.rs` digest, recomputed at both
+  commits), tip `119fcff`, and PRE-VERIFIED there from a `--list`-
+  verified snapshot (1839 tests): CA 457, v1 266, remainder 1114 + 1,
+  g23 130 — every pin matched; fmt/check/clippy/boundary green. GC
+  landing matrices at `3c632ec`: Platform `33569810180` GREEN, Windows
+  `33569807177` GREEN; push CI boundary `33569807827` and retained
+  readers `33569807792` GREEN — the GC landing is CLOSED on all four.]*
+
+  *[2026-09-02: **THE PINS PACKAGE E4.4-6-B IS LANDED** — gwz-core main
+  `f563446` (`9fbe4ac` the package rebased over the GC landing, `a7e5e21`
+  the round-1 fold, `f563446` the landing fold: three round-2 doc
+  conditions — the masker's cite of `mask_non_code` re-measured
+  `:1155-1225`, the twentieth row's provenance sentence un-inverted, the
+  quiet-shape count SIX). Round 2 GO-WC (§13): [P1-1] CURED structurally
+  (a scanner, no quote toggle) and empirically (all six quiet shapes
+  fire; M-live RED; the 411-file differential against the checker's
+  masker shows ZERO blinded lines; the belt fires on a real read and
+  false-positives on none); [P2-1] twenty rows recount 20/20; [P2-2]
+  byte-identical restatement with the release train named; all 25
+  digests reproduce; the ~150-line port audited — no duplicated
+  scanning, no dead arm. M-f (a door inside `/* … */` no longer fires)
+  ruled ACCEPTABLE by the reviewer: a door in a comment is not a call
+  and no pin relied on comment visibility. Landing verification on the
+  rebased tree (1839 tests, `--list`-verified snapshot): CA 457, v1
+  266, remainder 1114 + 1, g23 130 — every pin matched; the focused
+  re-verify after the doc folds: fmt/clippy/boundary green, v1 266;
+  per-commit lane gate ok at all three; M4 map and merge-docs green.
+  Dispatched: Windows `33575785509`, Platform `33575787725`; push CI
+  boundary `33575785383`, retained readers `33575785323`. The reviewed
+  pre-rebase shas (`086f7c0`/`b31a229`) stay reachable on the LOCAL
+  branch `e4/e4-4-6b-capfree-pins`. PROCESS NOTE filed: write stop-
+  triggers as numbered separate conditions — the builder read "> ~120
+  lines OR a change outside `tests/`" as a conjunction. NEXT: E4.5-B
+  launches now from the staged brief at base `f563446`; then E4.7; then
+  DR-1 once the operator names its home.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

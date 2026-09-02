@@ -1137,3 +1137,432 @@ or a change outside `tests/` returns to the lane owner before it is written.
 **Round 2** (the same reviewer, peer-blind to this ruling's execution) asks only
 on the three cures, the P3 folds, the rebase resolutions and the re-measured
 companions.
+
+---
+
+## 13. Round 2 (2026-09-02) — the same reviewer, on the three cures, the P3 folds, the §10.4 resolutions and the re-measured companions
+
+Candidate: `e4/e4-4-6b-capfree-pins`, two commits on main `0dae0d5` — `086f7c0`
+(the round-1 package rebased, carrying §10.4's A–D resolutions) and `b31a229`
+(the fold). Reviewed AS DELIVERED against `0dae0d5`; the final rebase over
+`3c632ec` (the landed GC fix) is the lane owner's and is not reviewed or
+reported here. Worktree `e4-pins-wt` byte-clean at `b31a229` on exit; the
+assigned target `e4-pins-target` used throughout, no extra target created;
+partitions run from one `--list`-verified snapshot binary
+(`debug/deps/gwz_core-dba41e97d4500b7d`, 63 162 520 bytes).
+
+Round 1's §§1–11 verified ground is not re-reviewed.
+
+### 13.1 [P1-1] THE MASKER — **CURED**, structurally and empirically
+
+The replacement (`v1_lifecycle/tests/mod.rs:29-177`) is a five-arm SCANNER —
+helpers `at` (`:29-36`), `raw_string_hashes` (`:38-45`), `blank` (`:47-55`), and
+`masked_code` (`:78-177`) — that skips each construct WHOLE. There is no
+`quoted` flag to desynchronise: that is the structural cure, and it is why the
+round-1 shapes cannot recur rather than merely being enumerated away.
+
+**Arm-for-arm against the reference.** I read the port beside
+`check_checked_artifact_boundaries.py::mask_non_code` (`:1155-1225`). The arms,
+their order (`//`, then `/* */`, then raw, then string, then char) and every
+bound match, including: nested block-comment depth counting; raw-string close by
+matching hash count (so `r"`, `r#"…"#`, `r##"…"##` and `br#"…"#` all close
+correctly); `\\` consuming two positions inside a normal string; and the char
+arm's lifetime disambiguation (`index + 2 < len`, `+3` on a backslash, and the
+"a lifetime carries no closing quote" test at `:155`, which is exactly the
+Python's `if end < length and text[end] == "'"`). Bounds are safe: `at`'s
+`text.len() - index` is only ever reached with `index < text.len()`, `blank`
+min-clamps, and an `index` that overshoots exits the loop.
+
+**One deliberate divergence, disclosed and benign.** `:147-153` adds a
+`'\u{…}'` sub-branch the Python does not have. The doc names it ("plus
+`'\u{…}'`, which the Python skips rather than masks"). It makes the mask
+STRICTER — see 13.1.3.
+
+#### 13.1.1 Every round-1 shape re-driven, individually, on the real tree
+
+Each probe appended to a PURE carved file (`workspace_ops/merge/store/gc.rs`),
+`cargo test --lib capability_free`, then reverted. All six shapes that were
+QUIET in round 1 now FIRE:
+
+```
+M-a   pub(crate) fn q(c: char) -> bool { c != '"' }        -> FAILED (1 passed; 1 failed)
+M-b2  pub(crate) const C: u8 = b'"';                        -> FAILED (1 passed; 1 failed)
+M-c   pub(crate) const S: &str = r#"a"b"#;                  -> FAILED (1 passed; 1 failed)
+M-h   pub(crate) const P: &str = r"C:\";                    -> FAILED (1 passed; 1 failed)
+M-i   /* don't use " here */                                -> FAILED (1 passed; 1 failed)
+M-k   fn k<'a>(c: char, s: &'a str) -> bool { c == '"' … }  -> FAILED (1 passed; 1 failed)
+M-g   fn e() -> &'static str { "see https://gwz.invalid/x" } -> FAILED (1 passed; 1 failed)
+```
+
+with the row's own message, e.g. for M-a:
+
+```
+`workspace_ops/merge/store/gc.rs` names the checked boundary door vocabulary
+`checked_artifact`, but GwzM5-8R2E-CapabilityFreeAmendment.md §3 carves ALL of its
+writers out PERMANENTLY … Revise the amendment, at DR-1, before this may exist
+```
+
+**R2-P1 — the combined probe, the strongest single form.** Sixteen tricky
+constructs in one module, with ONE door as the last line, so a FIRE proves that
+no construct before it desynchronised the mask: an odd `"` in a block comment, a
+nested block comment, `c != '"'`, `<'a>` + `c == '"'`, `b'"'`, `r#"a"b"#`,
+`br##"a"#b"##`, `r"C:\"`, `b"a/b"`, `"\""`, `'\''`, `'\u{2014}'`, a multi-line
+`r#"…"#` containing `//`, `"see https://…"`, and an `'outer:` label. Result:
+
+```
+test …the_pure_carved_capability_free_files_name_no_checked_boundary_door ... FAILED
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 1833 filtered out
+```
+
+**Twenty-six-shape table** (byte-faithful emulation of the delivered port,
+validated against the real Rust by the self-test's agreement and by the 411-file
+run in 13.1.3): M-a, M-c, M-b2, M-h, M-i, M-k, M-g, M-b, M-d, M-e, M-j, plus
+lifetimes `'a` / `'static` / `<'a>` before a same-line string / `'outer:` label /
+`<'_>`, chars `'\''` / `'\u{2014}'` / `'_'`, raw forms `br#"a"b"#` / `r"a/b"` /
+`r##"a"#b"##`, a string containing `/*` and `//`, a block comment containing
+`//`, and a lifetime declaration immediately before a string — **25 FIRE, 1
+quiet: M-f only** (the disclosed change, 13.1.4).
+
+#### 13.1.2 M-live re-driven — the round-1 evasion is RED
+
+Appended to `src/git/gitbackend/merge_support.rs`, past the `:236` desync that
+blinded 144 lines under the round-1 masker:
+
+```rust
+/// PROBE: the region blinded by the round-1 masker (desync began at `:236`).
+#[allow(dead_code)]
+pub(crate) fn rewrite_merge_store_record() {}
+```
+```
+test …record_root_exception::the_checked_rewrite_door_is_absent_from_production_sources ... FAILED
+production sources name the checked rewrite door `rewrite_merge_store_record` at
+{"git/gitbackend/merge_support.rs"} — the rejected E4.3 conversion, whose detach-then-
+publish window no shipped reconciler closes. GwzM5-8R2E-RecordRootAmendment.md §2 must
+be revised, at O14's fork, before it may exist
+```
+
+Round 1's `2 passed` is now a named RED that reports the offending file.
+
+#### 13.1.3 The 411-file differential — **zero blinded lines**
+
+I re-ran round 1's measurement, this time diffing a byte-faithful emulation of
+the DELIVERED port against the checker's own `mask_non_code` over every file in
+the record-root tripwire's walk:
+
+```
+production files in the walk: 411
+RESULT: blinded-by-port 6 lines / 2 files ; port-keeps-more 0 lines / 0 files ; belt panics 0
+```
+
+and the six are, in full, the `'\u{…}'` char literals the port masks and the
+Python leaves visible:
+
+```
+git/gitbackend/merge_support.rs:194
+   src :  '\u{0007}' => output.push_str("\\a"),
+   py  :  '\u{0007}' => output.push_str(     ),
+   rust:             => output.push_str(     ),
+  (same shape at :195, :198, :199; workspace_bootstrap/claude_settings.rs:269, :270)
+```
+
+What the port hides that the reference does not is **char-literal content**,
+which cannot spell a door. **Real blind lines: 0** — against 178 across three
+files at `b99bfb7` and 5 at `60072a7`. The regression is not merely repaired; the
+property is now strictly better than the state the package inherited.
+
+#### 13.1.4 The belt — fires on a real read, false-positives on nothing
+
+The `#[should_panic(expected = "ends inside a string literal")]` row passes. It
+is also driven on a REAL FILE READ, which the unit row cannot reach: a walked
+but uncompiled source (`src/zz_probe_belt.rs`, declared by no `mod`, so `rustc`
+ignores it while `production_sources()` reads it):
+
+```
+/* PROBE: this block comment is never closed
+panicked at v1_lifecycle/tests/mod.rs:166:9:
+`zz_probe_belt.rs` ends inside a block comment: the mask ran to end of input, so every
+character after the opener is BLANK and an absence asserted over this file would be an
+artefact of the mask, not a property of the source
+
+const S: &str = "never closed
+panicked at …: `zz_probe_belt.rs` ends inside a string literal: …
+```
+
+Both forms panic and BOTH NAME THE FILE — the fold's `masked_code(relative, …)`
+threading (`record_root_exception.rs:67`, `capability_free_exception.rs`'s
+`carved`) is what makes that possible. **No false positive**: 0 panics over the
+411 in the emulation, and `the_checked_rewrite_door_is_absent_from_production_sources`
+— which masks all 411 through the real port — passes.
+
+The belt is unreachable on a tree `rustc` accepts (every unterminated construct
+is a lex error), which is the right shape for a belt; it protects a truncated,
+mis-encoded or non-Rust read, and it is driven by both rows above.
+
+#### 13.1.5 The doc, and the cured-residual sentence — TRUE
+
+Both round-1 false claims are GONE (`only "` toggles…`" and `//` cannot occur
+inside a char literal") — grepped, zero hits. The replacement (`:57-77`) claims
+the port is faithful, names the one divergence, and records E4.3-B [P3-3] and
+round-1 [P1-1] as CURED, naming twelve shapes the self-test proves. I checked
+all twelve against the fifteen table rows (`:185-201`): `'"'`→row 1, `c == '"'`→2,
+`b'"'`→3, `r#"a"b"#`→4, `r"C:\"`→5, odd `"` in a block comment→6,
+`"https://…"`→7, `b"…"`→8, nested block comment→9, `//` in a raw string→10,
+lifetimes→2/7/11, `'\''`→12, `'\u{…}'`→13 (plus 14 line comment, 15 escaped
+quotes). **Every named shape is present; the sentence is true.** §10.4 A1's
+condition — main's NAMED RESIDUAL deleted only with a true cured-residual
+sentence — is met.
+
+#### 13.1.6 The disclosed behaviour change (M-f): ACCEPTABLE
+
+A door named inside `/* … */` no longer fires. This is correct on three grounds:
+(i) a door in a comment is not a call, and stable Rust has no way to reach an
+item without spelling its name contiguously in code (E4.3-B [P3-3] probe E7);
+(ii) `//` comments were ALREADY invisible under both prior maskers, so block
+comments were an inconsistency, not a feature — E4.3-B's own probe E6 called the
+block-comment hit "a false positive"; (iii) the P-1 half has always used
+`mask_non_code`, which masks block comments, so the two halves are now
+consistent. **No pin relied on comment visibility** — proven, not argued: every
+positive control in the suite (`LANDED_DOOR` in exactly two files;
+`checked_artifact` in `artifact_facts.rs`; `commit_gwz_paths_checked` in
+`finalize.rs`; a door somewhere in each mixed file; `create_dir_all` count 1 in
+`rewrite.rs`) is satisfied by CODE, and all six rows are green under the new
+mask. The only thing lost is that a conversion staged as commented-out code no
+longer trips the scan — which is right, because commented-out code is not a
+conversion.
+
+### 13.2 [P2-1] THE TWENTIETH ROW — **CURED**
+
+**Recounted independently** — my own masker, my own (stricter) `#[cfg(test)]`
+drop, my own counter, no checker code:
+
+```
+ok  workspace_ops/merge/store/archived.rs  {'rename_durable': 1, 'sync_dir': 2, 'create_dir_all': 1, 'remove_file': 1}
+… (all twenty rows) …
+rows: 20  mismatches: 0
+```
+
+**Key-set digest recomputed independently**: `sha256` over the sorted keys =
+`867c580f625d7efe0cf72dcc8e0ad01e36268d1478829a469eb0f57953dbd385` — matches the
+pinned constant exactly.
+
+**All four directions driven on the new row:**
+
+```
+GROWTH   (a second remove_file in archived.rs)
+  capability-free raw writer inventory moved, workspace_ops/merge/store/archived.rs
+  (:275 the v0 terminal archive -- ordinary merge finalization and BOTH abort forms):
+  expected={…'remove_file': 1} actual={…'remove_file': 2}. A NEW RAW WRITER IS NOT BLESSED …
+SHRINK   (sync_dir -> sync_dirX at :52)
+  … expected={…'sync_dir': 2 …} actual={…'sync_dir': 1 …}. a PARTIAL CONVERSION of a carved
+  arm may not land without revising GwzM5-8R2E-CapabilityFreeAmendment.md §3 …
+GONE     (the file hidden)
+  capability-free carved file is GONE: workspace_ops/merge/store/archived.rs (:275 …);
+  the capability-free exception … names it and must be revised first
+DOOR     (use crate::checked_artifact; in archived.rs)
+  `workspace_ops/merge/store/archived.rs` names the checked boundary door vocabulary
+  `checked_artifact` … test result: FAILED. 1 passed; 1 failed
+SET      (a row deleted)  raise SystemExit: the capability-free carved SET moved …
+```
+
+**Companions of the row**: the `:275` annotation is at `archived.rs:39` in its
+siblings' exact form and names both reached operations; `src/` now carries
+**20** `CAPABILITY-FREE EXCEPTION` sites; `PURE_CARVED_FILES` is `[&str; 18]`
+with the file added and the module doc's "Seventeen" → "Eighteen"; the checker's
+counts of the inventory ("nineteen"→"twenty", "Sixteen"→"Seventeen" unpinned,
+"thirteen"→"fourteen" without `durable_fs`, "Two corrections"→"THREE") are all
+updated. The root-side bracket (9) is landed in the amendment (`:518-535`) and
+states the provenance correctly.
+
+### 13.3 [P2-2] THE SENTENCE — **CURED, byte-identical**
+
+Extracted §6's mandated sentence from the amendment and the quoted block from
+`git show -s b31a229`, whitespace-normalised (commit-message wrapping is the only
+possible difference):
+
+```
+AMENDMENT §6 : an abort that touches no checked artifact needs no such filesystem; aborts
+that must re-verify checked artifacts — preservation bundles, a selected root's manifest
+and lock, or the merge's published evidence, re-verified through the checked boundary —
+need persistent file handles and a mount identity.
+FOLD MESSAGE : (identical)
+BYTE-IDENTICAL (whitespace-normalised): True
+```
+
+The carrier is named ("THE RELEASE TRAIN IS ITS CARRIER"), and the message goes
+further than the obligation by stating what the corrected line SUPERSEDES and
+why (the legacy probe at `identity.rs:312-367`, "strictly weaker than the
+catalog's `require_ext4` but not nothing"). The on-disk home in the plan's
+release-notes rider remains the lane owner's at landing, per §12.
+
+### 13.4 The P3 folds
+
+| finding | delivered | verified |
+| --- | --- | --- |
+| [P3-1] | `record_root_exception.rs:47` cites `:1120-1127` | **TRUE** — `def production_rust_files` is at `:1120`, its body closes at `:1127`, measured after the last checker edit |
+| [P3-2] | both new module-scope asserts → `raise SystemExit` | **DONE** — zero module-scope `assert`s remain; three `raise SystemExit` guards at `:408` (main's), `:511` (key-set digest), `:520` (overlap). Driven: the delete probe now emits the named message, not a traceback |
+| [P3-3] | drop wording narrowed | **TRUE** — "TOP-LEVEL `#[cfg(test)] mod` blocks are dropped first … `cfg(all(test, …))` and an INDENTED `#[cfg(test)] mod` are NOT dropped, so they OVER-count, which an exact-count pin raises immediately … No carved file carries either shape today." Matches my round-1 probes 2b/2d and my recount (which used the stricter drop and still agreed on all twenty) |
+| [P3-4] | parenthetical made honest | **TRUE** — "it was drafted and dropped for the line budget, and its allowlist is NOT reconstructable from this text" |
+| [P3-5] | scope limit stated AND closed | **DONE and DRIVEN** — the six-line SCOPE LIMIT paragraph before the inventory, plus the flat row `"artifact/mod.rs": "22bce818…"`. Probe: a new item appended to `artifact/mod.rs` → `- protected source allowlist changed: artifact/mod.rs`. The cheapest defeat of the pin now moves a pin |
+| [P3-6] | the false managed.rs clause dropped | **DONE** — `managed.rs:43` keeps only the STALE-range sentence, which is true against main's folded reason |
+| [P3-9] | §7's authorised wording at the carriers | **DONE** — at `entry_service.rs`'s shared `collect_files` exclusion list ("[P3-8] closes (nothing converts, no snapshot exclusion grows) … so this list does not grow for it"), at `entry_service_drift.rs`, and the `capability.rs` site upgraded from "this package converts nothing" to the full authorised form |
+| [P3-10] | the path | **DONE** — `src/workspace_ops/tests/g23/a1_activation.rs` |
+
+### 13.5 The §10.4 rebase resolutions
+
+| | resolution | verified against `git diff 0dae0d5 b31a229` |
+| --- | --- | --- |
+| A1 | main's NAMED-RESIDUAL deleted with `code()`, cured-residual sentence at the masker | **DONE, and the condition I attached is met** — the sentence is true (13.1.5) |
+| A2 | main's `PRODUCTION_FILE_FLOOR` doc kept | **KEPT** verbatim ("up to 61 files may vanish unseen by it, so the EXACT positive control … is what catches the blinding that matters") |
+| A3 | main's two widened assertion messages kept, with `item_body` calls | **KEPT** — the denylist message at `:99` and the "DECLINED as a refusal at E4.3-B … structurally undrivable" text, both alongside `item_body(&rewrite, "store/rewrite.rs", …)` |
+| A4 | cite re-measured | **DONE** (`:1120-1127`, correct) |
+| B1 | `v1_lifecycle/mod.rs` tree digest re-measured post-merge | **DONE** — `29168296…`, recomputed by me |
+| B2 | main's "AT THE DATA LAYER" sentence + the candidate's paragraph, re-tensed | **DONE and TRUE** — "widening the SCAN SET to the non-v1 carved files is the pins package's, **LANDED BELOW as `CAPABILITY_FREE_RAW_WRITER_INVENTORY`**" |
+| B3 | exceptions comment, both sides, re-tensed | **DONE and TRUE** — "the wider scan set **landed as** `CAPABILITY_FREE_RAW_WRITER_INVENTORY` below" |
+| B4 | main's SystemExit guard + the two conversions | **DONE**; main's "Unreachable while the module-scope guard above stands" comment kept at `:1413` |
+| B5 | main's wording on both strings | **DONE** — `:1407` "(each row's amendment names its own re-decision point)" and `:1439` "the carved path's EXISTING publication primitive only" |
+| C | `managed.rs` | **DONE** ([P3-6]) |
+| D | no collision in the gate driver | correct — main's two commits add and remove no test |
+
+### 13.6 Companions — all re-measured by me
+
+Partitions run from ONE `--list`-verified snapshot binary. The `--list` counts
+partition exactly: 266 + 457 + 1111 + 1 (`root_fault_matrix`) = **1835 = the
+binary's total**.
+
+```
+--list  v1_lifecycle:: minus root_fault_matrix   266
+--list  checked_artifact::                        457
+--list  remainder                                1111   (1110 + 1 ignored)
+--list  total                                    1835
+
+run  v1_lifecycle::      ok. 266 passed; 0 failed; 0 ignored; 1569 filtered out   (359.30s)
+run  checked_artifact::  ok. 457 passed; 0 failed; 0 ignored; 1378 filtered out   ( 54.59s)
+run  lib remainder       ok. 1110 passed; 0 failed; 1 ignored; 724 filtered out   ( 61.27s)
+run  root_fault_matrix (release)  ok. 1 passed; 0 failed                          (368.36s)
+```
+
+262 → 266 is exactly the four rows the driver's block now names: P-2's two, plus
+the masker self-test and its `#[should_panic]` belt. The dated block is TRUE at
+every clause I could check — the partition it moves, the four rows by name, the
+cfg-independence argument ("All four rows read source text checked out
+everywhere (two of them only in-memory literals) under no `cfg` gate"), and the
+base ("at the `0dae0d5` base — the standalone GC decode fix has NOT landed and
+its +4 to the remainder is deliberately NOT pre-counted here"), which my
+remainder of 1110 confirms. The battery expectation is `"266 passed"`.
+
+**Digests** — I recomputed **every** row of both tables with my own
+implementation of `source_tree_digest`'s algorithm: 18 flat + 7 tree, **0
+mismatches**, including the three the fold names (`artifact/mod.rs`
+`22bce818…`, `checked_artifact/capability.rs` `dcb8d2b0…`,
+`v1_lifecycle/mod.rs` tree `29168296…`) and the five unchanged.
+
+**Checkers, under a symlink farm** (`farm/gwz-core` a real directory of
+symlinks with `scripts/checks/` copied, so `Path(__file__).resolve().parents[3]`
+lands on the farm root):
+
+```
+checked-artifact boundary: ok (18 visible entries, 8 classified modules)
+validated 7 migration rules, 7 runtime bindings, and 10 archive shapes
+merge document consistency: ok (12 sources, 155 assertions)
+M4 scenario map: ok (39 scenario rows, 43 named tests, 22 registry rows all claimed)
+unittest test_check_checked_artifact_boundaries:  Ran 69 tests in 778.160s  OK
+```
+
+**Tripwires and pins**: `catalog_activation_pin` (PRODUCTION_CALLER_COUNT 1) 1
+passed; `contracts.rs:158`/`:181` 2 passed against the rewritten remedy string;
+E4.1's `a_v1_resume_refuses_without_mutation_and_abort_still_clears_the_record`
+1 passed. `cargo fmt --check` clean; `cargo clippy --all-targets` zero
+warnings. **Trailers: none on either commit**; author and committer
+`Gianni Mariani <gianni@everbility.com>` on both.
+
+### 13.7 The port audit (the cap's reviewable half)
+
+Measured: the masker block is `:29-177` = **149 lines** (helpers 27 incl. doc,
+the `masked_code` doc comment 21, the scanner body 100); the self-test and belt
+are `:179-228` = **50**. Net over `0dae0d5`: **+713 / −68 over 39 files**
+(`086f7c0` +506/−68, `b31a229` +264/−57). The re-ruled cap is the lane owner's
+and is not re-litigated here.
+
+**Does the port carry anything a faithful port does not need?** No. I read it
+arm by arm against the reference: no duplicated scanning, no shape handled
+twice, no dead arm, no unreachable branch. The scanner is longer than the
+Python's ~72 lines for three accountable reasons — Rust `else if` arms with
+braces, the `unterminated` bookkeeping the ruling mandated (~10 lines), and the
+`'\u{…}'` sub-branch (~7 lines). The 21-line doc comment is the cured-residual
+record §12 required, not code.
+
+**Does the size hide a defect?** No. The 411-file differential (13.1.3) is the
+answer: the port and the reference agree on every line of every production file
+except six, and those six are the `'\u{…}'` divergence, benign in the strict
+direction. Two notes for the record, neither a finding: (a) the `'\u{` branch's
+only bad case — an opener whose `}` and following `'` lie far away — is
+unreachable on a tree `rustc` accepts and is not flagged by the belt; (b) the
+self-test's fifteen rows omit `br#"…"#`, an `'outer:` label and `<'_>`, all
+three of which I drove externally and all three of which pass.
+
+### 13.8 Round-2 findings (three, all P3, all foldable)
+
+**[R2-P3-1] A NEW wrong cite, introduced by the fold three lines above the one
+it fixed.** `v1_lifecycle/tests/mod.rs:61` cites `mask_non_code` at
+`check_checked_artifact_boundaries.py:1013-1076`. Measured: `def mask_non_code`
+is at **`:1155`** and returns at **`:1225`**. `:1013` and `:1076` are an
+unrelated allowlist entry (`…catalog_tests/grammar.rs`) and an unrelated
+comment. The value matches NO revision — not base (`:984`), not main (`:992`),
+not the pre-fold rebase (`:1134`). The fold's own message says the sibling cite
+was "re-measured after the last checker edit"; this one was not. Fourth
+occurrence of the E4.3-B [P3-5]/[P3-5R]/[P3-1] class in this file family. A doc
+comment; nothing depends on it. **It must be re-measured at the rebase over
+`3c632ec` in any case, since that rebase moves `mask_non_code` again.**
+
+**[R2-P3-2] The checker's own provenance sentence is INVERTED.**
+`check_checked_artifact_boundaries.py:462-463` reads:
+
+> `store/archived.rs::archive` … **is named by the amendment, the charter prep
+> and neither axis of its dual** (round 1 [P2-1]).
+
+which asserts the opposite of the fact. The fold's commit message states it
+correctly ("It is named by neither the amendment, the charter prep nor either
+axis"), and so does the amendment's landed bracket (9) ("that §1, the E4.4
+charter prep and both axes of this amendment's dual all missed"). A dropped "by
+neither … nor". It inverts a load-bearing provenance fact at the site a future
+reader consults first. One-line fold.
+
+**[R2-P3-3] The quiet-shape count is stated three ways, and the origin is
+mine.** The masker doc (`:68`) says "the four QUIET shapes"; the fold's commit
+message says "all five formerly quiet live shapes fire"; the number actually
+driven, in round 1 and again here, is **six** — M-a, M-c, M-b2, M-h, M-i, M-k.
+My round-1 report is the source of the drift: its verdict line said "four
+quiet-failure shapes" while its own table listed six, and a sub-head said "three
+further QUIET shapes" over four rows. **The correct number is six.** The commit
+message is immutable; the doc comment at `:68` is the home for the correction.
+
+### 13.9 Verdict
+
+Everything §12 ruled MUST CURE is cured, and the two cures I could attack hardest
+survive the attack. [P1-1] is not patched but replaced: a scanner has no state to
+desynchronise, the 411-file differential now shows **zero** real blinded lines
+against the reference (from 178 at `b99bfb7` and 5 at the inherited `60072a7`),
+the belt fires by name on a real read and false-positives on nothing, and
+round 1's live evasion is RED. [P2-1]'s twentieth row recounts clean and drives
+in all four directions. [P2-2] is byte-identical with its carrier named. Every P3
+fold and every §10.4 resolution landed as authorised, with B2/B3's re-tensed
+forward references true. All companions re-measured by me and reproduced.
+
+Three P3s remain, all one-line edits, one of which the lane owner must touch
+anyway during the rebase over `3c632ec`.
+
+**GO-WITH-CONDITIONS.** Conditions, foldable by the lane owner at landing, no
+third round:
+
+1. **[R2-P3-1]** Re-measure the `mask_non_code` cite at
+   `v1_lifecycle/tests/mod.rs:61` on the final rebased tree — it is wrong today
+   (`:1013-1076` vs the actual `:1155-1225`) and the GC-fix rebase moves the
+   function again.
+2. **[R2-P3-2]** Repair the inverted provenance sentence at
+   `check_checked_artifact_boundaries.py:462-463` to "is named by NEITHER the
+   amendment, the charter prep NOR either axis of its dual".
+3. **[R2-P3-3]** Correct "four QUIET shapes" to six at
+   `v1_lifecycle/tests/mod.rs:68`.
+
+Reviewer note for the record: no P0/P1/P2 stands, so no escalation fires and
+nothing returns to the operator on this axis.

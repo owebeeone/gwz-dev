@@ -587,7 +587,33 @@ assumption.)*
   fail-closed and contract-§7-consistent; the retained-forever set
   strictly shrinks against the shipped base, which retained EVERY v1
   archive. Reach: ordinary retention now sweeps v1 archives too (release-
-  notes line in `b5ff7fc`'s message; carrier the release train).]* *(E5 landing,
+  notes line in `b5ff7fc`'s message; carrier the release train).]*
+  *[2026-09-02, LANDED: **the pins package E4.4-6-B** (charter = the
+  capability-free amendment's §7) — gwz-core `9fbe4ac` (the package:
+  the twenty-row `CAPABILITY_FREE_RAW_WRITER_INVENTORY` with its key-
+  set digest and per-ARM negative scans; the carved-site annotations;
+  the abort sentence re-scoped BY PATH at its ten homes; the eight JSON
+  carriers; the allowance annotations; `store/gc.rs` and
+  `store/retention.rs` counts; NO production conversion), `a7e5e21`
+  (the round-1 fold: the shared masker made a FAITHFUL port of the
+  checker's `mask_non_code` — a scanner, no quote toggle — with a fail-
+  loud belt and a 15-row self-test; the twentieth row
+  `store/archived.rs::archive`; §6's sentence verbatim in the message
+  with the release train as carrier; a flat digest on `artifact/mod.rs`),
+  `f563446` (the landing fold: three round-2 doc conditions). Opus
+  interior review `GwzM5-8R2E-E4.4-6B-Review.md`: round 1 NO-GO (P1 the
+  first masker's `quoted` flag leaked across lines through `'"'` char
+  literals — 178 live blinded lines, the E4.3-B door invisible; P2 the
+  twentieth row; P2 the undischarged §6 restatement), ruled by the lane
+  owner under the E4 standing order (§12); round 2 GO-WC (§13): the
+  masker CURED structurally and empirically — a 411-file differential
+  against the checker's own masker shows ZERO blinded lines; twenty rows
+  recount 20/20; all 25 digests reproduce. Cap re-ruled to the measured
+  figure (770 by sum, +713/−68 net against ≤ 589) on the ruling's own
+  clause — a quiet masker under an absence pin is the trade refused, not
+  line count. O13 stays the v1_lifecycle SCAN; the inventory is the
+  DATA layer; `store/rewrite.rs` stays the record-root amendment's
+  alone.]* *(E5 landing,
   2026-08-28 — two lane-owner determinations, review [P2-3] and
   adjudication G: (1) E4.4 is RATIFIED as carrier of the owed tier-2
   archive-equivalence executions for the eight
