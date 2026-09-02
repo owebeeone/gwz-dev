@@ -699,6 +699,13 @@ assumption.)*
   one docs+allowances step (Opus builder for the gwz-core edits +
   digests; the lane owner for the close record in the E7-Acceptance
   form), after E4.5-B lands; its record IS the phase close, then DR-1.]*
+  *[2026-09-02, LANDED and PHASE E4 CLOSED: E4.7 `d8c140f` + landing fold
+  `9c808ff` (6 expired / 16 re-reasoned permanent-pending-DR-1 / 2 kept;
+  the three residual sentences; the finish()-reachability record — A-1
+  STANDS; six digests re-pinned; no pin moved). Review
+  `GwzM5-8R2E-E4.7-Review.md` GO-WC (1 P2, 7 P3, all folded). The phase
+  close record is `GwzM5-8R2E-E4-Close.md`; Phase E4's conversions are
+  E4.1 and E4.2. DR-1 opens on the operator's home answer.]*
 - **DR-1** — the phase-end design round (minted by the operator's ruling
   `GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md` point 5; chartered at `GwzM5-8R2E-CapabilityFreeAmendment.md` §5; its own dual on the
   amendment-tier line). Opens AFTER the pins package and E4.7 land, never

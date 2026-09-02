@@ -3131,6 +3131,42 @@ fable token only where it makes a difference." Recorded consequences:
   not start until E4.7 closes, and its home goes to the operator as a
   one-line question after E4.7.
 
+  **POSITION 2026-09-02 (E4.7) — E4.7 LANDED; PHASE E4 CLOSED.** E4.7
+  (Opus builder, base `f563446`, cap 460): `d8c140f` — 171 allow/cfg_attr
+  attributes swept, 23 Tier-3 unchanged, 24 actionable = 6 EXPIRED (each
+  proven by removal + check + clippy `-D warnings` green, consumers
+  read), 16 RE-REASONED PERMANENT pending DR-1 (each proven to bite; four
+  inert under an ancestor blanket with measured deltas), 2 KEPT (the
+  `gc_archived` family; deletion fires O13's shrinkage arm); the three
+  residual sentences at `execute.rs` (marker — directional-residue
+  window, ruling (a); lock and boundary — observation-dead window); the
+  finish()-reachability record at `cleanup.rs:146-200` — A-1's reopen
+  condition CHECKED and NOT MET, DECISION A-1 STANDS; six digests
+  re-pinned; no pin or partition moved. Review
+  `GwzM5-8R2E-E4.7-Review.md` GO-WC: the P2 — the four inert-allow numbers
+  were net clippy diagnostic-count deltas written as item counts (rustc
+  reports the outermost dead item; measured 3 / 21 / 4 / 43, one of them
+  6× understated) — and seven P3 (the `gc_archived` extent under-
+  enumerated: eleven functions + two structs + four members in a third
+  file; a stale `:108-111` cite; inertness missing from `reason=`; two
+  A1-era allowances no record owns; wording/path nits); all folded at
+  landing `9c808ff` (C1–C6) and in the close record (C7). Landing: lane
+  gate ok at both commits, M4 + merge-docs green, `--list` 1839
+  unchanged, the partitions NOT re-run (review-cost discipline: the
+  masked diff adds no code line; the matrices are the belt). Dispatched:
+  Windows `33596394193`, Platform `33596396157`; push CI `33596394533`,
+  `33596394463`. **THE PHASE CLOSE RECORD:** `GwzM5-8R2E-E4-Close.md` (the
+  step ledger, the residual register, the census, the five rulings, the
+  carriers). REVIEW-COST DISCIPLINE (operator, 2026-09-02, on the E4.7
+  reviewer re-running partitions 42 minutes in): reviewers verify by
+  reading and cheap checks; partitions measured ONCE at the lane owner's
+  landing; never re-run a suite the builder ran at the byte-identical
+  tree; time-box — filed as a standing memory. E4.7's builder's scratch
+  symlinks removed; worktree torn down. **OPEN TO THE OPERATOR, one
+  line: DR-1's home — R2-E phase E8, or a new lane?** DR-1 does not start
+  before the answer; its charter draft is staged with the E4.5-B and
+  E4.7 agenda additions.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
