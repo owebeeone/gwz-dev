@@ -3393,6 +3393,16 @@ fable token only where it makes a difference." Recorded consequences:
   belt. gwz-py's CI on main is GREEN after the lock refresh
   (`33642798539`).
 
+  *[v0.13.0 CI CLOSURE, 2026-09-03: gwz-core release verify
+  `33639413040` — Windows leg GREEN, ubuntu leg RED on the remainder pin
+  only (corrected on main at `d6830cd`; the tag's verify stays red by
+  construction); gwz-cli Release `33639415374` GREEN (16 dist assets)
+  and Documentation `33639415391` GREEN; gwz-py Publish `33640038038`
+  GREEN, PyPI `gwz` 0.13.0 live; gwz-py CI on main GREEN after the
+  lockfile refresh. The installed 0.13.0 re-drives every fixed defect
+  green. The release is COMPLETE on all three channels, with the one
+  recorded red leg and its cause.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
