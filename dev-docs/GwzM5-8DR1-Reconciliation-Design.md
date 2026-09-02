@@ -1,7 +1,11 @@
 # GwzM5-8 DR-1 E8.3 — the observer/record RECONCILIATION class, and the rest of the round's agenda
 
 Date: 2026-09-03. Author: the implementation lane (E8.3 investigator).
-Status: **DRAFT — for the round's dual.** Home: R2-E phase E8 (DR-1's charter
+Status: **REVISION 2, 2026-09-03, folds the dual.** Both axes GO-WITH-CONDITIONS
+(`GwzM5-8DR1-Reconciliation-ReviewCode.md`, `GwzM5-8DR1-Reconciliation-ReviewState.md`);
+every condition is folded in place below. Base re-pointed to gwz-core main
+**`d6830cd`** (see the verification notes: no mechanism-cited file differs from
+`ffd4f95`, and both reviewers independently re-checked every cite at `d6830cd`). Home: R2-E phase E8 (DR-1's charter
 `GwzM5-8DR1-Charter.md:6-10`; the operator's home answer still owed, E8.1 §6 Q1).
 Base: gwz-core main **`ffd4f95`** (v0.13.0). Every code claim below is cited
 `file:line` **at `ffd4f95`** and was read this session unless marked UNVERIFIED.
@@ -39,9 +43,28 @@ readers (`:123-145`) classify "absent-or-detached leaf + a family residue whose
 `goal` names this leaf" as the **reconcilable** state — `Candidate`/`Before`
 rather than `Other`/`Ambiguous`. That single change closes all three windows for
 all leaves, converts three of the four residual-register rows, un-blocks the
-record root's own re-examination, and is expressible as **five steps, each under
-500 LOC**, on the capability-free plain lease with **no new probe on any listed
-operation**.
+record root's own re-examination, and is expressible as **six steps, each at or
+under 450 LOC**, on the capability-free plain lease with **no new probe on any
+listed operation**.
+
+**REVISION 2's headline change — the cure has THREE components, not two.** Both
+review axes found, independently, that REVISION 1 designed a survey and an
+observer and stopped: the observer would report a reconcilable state and then the
+executor (`execute_v1_evidence_rollback` → `remove_exact`/`write_checked`) would
+re-run the *direction-bound* gate, see the counterpart residue as `foreign`, and
+return a typed `Err` — moving the user from `Ok(RecoveryRequired)` to `Err`, not
+to `Aborted`. §2.5 adds the third component, a **reconciler**: a pre-pass that
+converges the leaf to an endpoint and **retires the counterpart family**, under
+the caller's already-held lease. Two corrections make it smaller than either
+reviewer assumed: the reconciled direction was **inverted** (for a never-published
+leaf the truthful state is `After`, which `classify_table` already answers at
+`classification.rs:253` and which short-circuits both writers with `Ok(())` and no
+write at `transition.rs:44`/`:119`), so the **marker class needs no reconciler at
+all**; and keeping the reconciler as a pre-pass **outside** `classify_table` costs
+no new `ExactTransition` variant, no new table row, and no move of the 232-line
+pin. The retirement half is load-bearing: without it a stale forward family stays
+`foreign` to the *next* merge on a path-stable leaf, converting a one-merge wall
+into a permanent one.
 
 **Four corrections to the adopted record, measured this session** (details in
 §1.4, §4.5, §4.7, §4.9): the directional-residue **mechanism cite is one layer
@@ -152,8 +175,8 @@ than one arm, which is what makes a residue directional at all.*
 | L2 | **Marker** | `gwz.conf/markers/<id>.yaml` (`MARKER_DIR`, `artifact/mod.rs:32`) | On the merge path No — reached via `progress.candidate_marker_path` (`model/v0.rs:181`). **But markers ARE enumerated** for other purposes: `list_artifacts(root.join(MARKER_DIR), …)` at `artifact/mod.rs:464` | forward RAW (`execute.rs:79`); **reverse CHECKED** (`abort/evidence.rs:160-164`, `remove_exact`) | forward expected `Missing` ⇒ **NO** | No, on the merge path | **YES — the only leaf where it is DRIVEN** (E4.5-B) | forward RESIDUAL `:277` |
 | L3 | **Lock** | `gwz.conf/gwz.lock.yml` | No for discovery; **yes for observation** (`live.rs:110-112` returns `None` unless the lock digests Regular) | forward RAW (`execute.rs:88`); **reverse CHECKED** (`abort/evidence.rs:154-159`, `write_checked`) | forward expected `Bytes` ⇒ **YES** | No | **YES** (would be, on conversion) | forward RESIDUAL `:278` |
 | L4 | **Workspace boundary** | `.git/info/exclude` | No — regenerated from manifest+lock | forward RAW (`execute.rs:98`); **reverse CHECKED** (`abort/evidence.rs:148-153`) | forward expected `Bytes`, except the empty-baseline case ⇒ **YES** | No | **YES** (would be, on conversion) | forward RESIDUAL `:279` |
-| L5 | **Root manifest** (`@root` selected abort) | `gwz.conf` (WORKSPACE_MANIFEST) | No | **CHECKED both ways already**: reader `root/abort.rs:123-130`, writer `root/abort.rs:380` (`write_checked`) | `Bytes → Bytes` ⇒ **YES** | No | **YES — shipped** | shipped, unaudited |
-| L6 | **Root lock** (`@root` selected abort) | `gwz.conf/gwz.lock.yml` | as L3 | **CHECKED both ways already**: reader `root/abort.rs:137-144`, writer `root/abort.rs:380` | **YES** | No | **YES — shipped** | shipped, unaudited |
+| L5 | **Root manifest** (`@root` selected abort) | `gwz.conf` (WORKSPACE_MANIFEST) | No | **CHECKED both ways already**: reader `root/abort.rs:123-130`, writer `root/abort.rs:380` (`write_checked`). **A SECOND, EARLIER observer gates it** *(added at Code [P2-2])*: `abort/preflight.rs:110-118` does `artifact_facts::observe` on `WORKSPACE_MANIFEST` and returns `MergeRecoveryRequired` unless the fact is `Bytes(_)` — it runs **before** `root/abort.rs` is reached, so it refuses a detached manifest first, and S3's `root/abort.rs` work alone cannot close L5 | `Bytes → Bytes` ⇒ **YES** | No | **YES — shipped** | shipped, unaudited |
+| L6 | **Root lock** (`@root` selected abort) | `gwz.conf/gwz.lock.yml` — **the SAME leaf and the same `family_key` as L3** *(State [P2-2])* | as L3 | **CHECKED both ways already**: reader `root/abort.rs:137-144`, writer `root/abort.rs:380`; **plus the earlier `abort/preflight.rs:110-118` gate**, as L5 | **YES** | No | **YES — shipped** | shipped, unaudited |
 | L7 | **Preservation workspace leaves** (managed marker in the worktree; workspace lock) | per `spec.managed_marker_path`; `artifact::LOCK_PATH` | No | **CHECKED both ways already** — one door, `files::replace_relative` (`preservation_root/files.rs:37-49`), called from `mutate_managed`'s `MarkerWorktree` (`preservation_root.rs:477-482`) and `LockWorktree` (`:483-488`) arms with `(source, goal)` taken from a `GitRootManagedTransition` whose direction the caller chooses | `Some(source)` ⇒ **YES**; first-write `None` ⇒ no | No | **YES — shipped, and structurally symmetric** | shipped; **this is flag 9's answer, §4.7** |
 | L8 | **Preservation bundle** | `.gwz/stash/bundles/<stash_id>.yaml` (`STASH_BUNDLE_DIR`, `stash/mod.rs:13`; `bundle_relative`, `checked_bundle.rs:129-131`) | **Yes for `gwz stash`** — `list_bundles` enumerates the directory (`stash/mod.rs:266-289`); record-anchored on the merge path | **CHECKED ON EXACTLY ONE ARM — the v1 preserving/reverse arm**: `reverse/execute/preservation.rs:74` → `v1_write_bundle_checked` (`checked_bundle.rs:64-112`) → `replace_merge_preservation_bundle` (`entry.rs:139-148`). Expected = the bundle over `plans[..index]`, goal = over `plans[..=index]` (`:80-83`). **Every other writer is RAW and carved as `:276`**: the v0 `--abort --preserve` forward arm (`preserve/artifacts.rs:357` → `stash::write_bundle`, `stash/mod.rs:261-263`) and six `gwz stash` sites (`handle_stash/commands.rs:68,86,93,122,318,327`) | member 1: `None` ⇒ no; **members ≥ 2: `Bytes → Bytes` ⇒ YES** | No | **NO — one checked arm.** But see §4.7: the raw siblings on the same leaf neither observe nor classify the residue | shipped; detach window OPEN and undocumented |
 | L9 | **Catalog's own records** (bootstrap record, scratch) | `.gwz/catalog-final/…` | The bootstrap record is the catalog's root | `activate_workspace_catalog` (`entry.rs:313`), `bootstrap_merge_start_parents` (`:349`) | activation is create-shaped; parents are `prepare_parent` | n/a — guarded by its own `matches_attempt` reconciler (`catalog_bootstrap_record.rs:172-185`) | n/a | LANDED (E4.1); **already has a reconciler** — see §2.5 |
@@ -229,6 +252,15 @@ independent comparisons in `matches_request` (`action_key`, `expected`, `goal`,
 per-`(leaf, expected, goal, operation)` and **strictly unidirectional** — that is
 the defect, stated at its root.
 
+**And the gate is hiding a correct answer, not merely an unmatched one
+(Code [P2-1]).** If the `:141-143` `foreign` gate were bypassed, this scenario
+falls through to `classify_table(ExistingRemove, authority = false, Absent,
+Absent, Missing)` = **`After`** (`classification.rs:247-253`) — *the reverse
+operation is already complete*, which for a never-published marker is the
+truthful answer. So the classifier is not missing a rule; it is being prevented
+from reaching one it already has. That fact fixes the direction of the whole
+cure (§2.4(A), §2.5) and is why the marker class needs no reconciler at all.
+
 **Status of this correction: measured by reading, twice, at `ffd4f95`; NOT
 re-driven** (the round is read-only and the RED row is out of tree). Step S1 of
 §7 drives it as its first act, and the correction is text at four record homes
@@ -236,7 +268,7 @@ plus one in-tree comment (§5.3).
 
 ---
 
-## 2. The one cure — observer-side reconciliation over a direction-free survey
+## 2. The one cure — a direction-free survey, an observer that reads it, and a reconciler that converges
 
 ### 2.1 Shape, in one sentence
 
@@ -318,9 +350,14 @@ So the widening is: `&[u8] → Option<&[u8]>` on those four doors and their four
 wrappers; `RegularFileFact` is unchanged (it already has `Missing`,
 `artifact_facts.rs:8-13`). **No new `entry.rs` door ⇒ `ENTRY_REFERENCES` /
 `ENTRY_ITEMS` unmoved, `catalog_activation_pin.rs`'s `PRODUCTION_CALLER_COUNT`
-unmoved.** The 13 external call sites that move with the signatures:
-`abort/evidence.rs:82,:83,:148,:154,:160,:277,:285,:292,:300,:307,:314`,
-`root/abort.rs:123,:131,:137,:145,:380`, `abort/preflight.rs:111`.
+unmoved.** **Nine** external call sites move with the signatures *(corrected from
+13 at Code [P3-1])*: `abort/evidence.rs:148,:154,:160,:277,:292,:307` and
+`root/abort.rs:123,:137,:380`. The other eight —
+`abort/evidence.rs:82,:83,:285,:300,:314`, `root/abort.rs:131,:145` and
+`abort/preflight.rs:111` — are `artifact_facts::observe` calls with **no
+`expected` parameter** and are untouched by the widening. They are, however,
+exactly the sites §2.5's reconciler must reach, because an `observe` has no
+residue channel at all (State [P2-4](i)).
 
 **One constraint the widening inherits, measured — it is not free.**
 `classify_remove_exact` rejects a non-`Bytes` expected outright
@@ -341,14 +378,20 @@ edit; avoiding that edit is worth the routing.
 `PR` = `publication/live.rs::PublicationResolution`.
 
 **(A) Window (iii), the directional residue — abort side, the driven row.**
+*Every row names which of the three components (survey / observer / reconciler)
+produces the outcome, and what the USER sees* (State [P2-4](iv)).
 
-| Leaf | Situation | Today | After the cure |
+| Leaf & arm | Today → user | After the cure → user | By which component |
 | --- | --- | --- | --- |
-| L2 marker | forward publication interrupted mid-`replace_exact`; leaf `Missing`; forward residue present. Abort's **non-pending** arm | `observe` ⇒ `Missing`; `classify_file(…, missing_is_baseline=true)` ⇒ `FS::Baseline` (`evidence.rs:313-318`, `:352-353`) — already tolerant | unchanged — **the non-pending arm was never the wall** |
-| L2 marker | same, abort's **pending == Marker** arm (`evidence.rs:307-311`) | `classify_remove` ⇒ `inspect_family` ⇒ `foreign` (`residue.rs:179-181`, `:205-206`) ⇒ `Ambiguous` (`classification.rs:141-143`) ⇒ `transition_file` ⇒ **`FS::Other`** (`evidence.rs:325-332`) ⇒ shape not exact ⇒ `preflight_v1_evidence` `Err` ⇒ **`RecoveryRequired`** | survey reports one action, `operation = Replace`, `expected = Missing`, `goal = marker_yaml`, `goal_present`. The abort is asking `Bytes(marker_yaml) → Missing`. **The surveyed action is the exact counterpart** (its `goal` is my `expected`, its `expected` is my `goal`) ⇒ **`RFT::Before`** (the forward write did not complete, so the leaf is still at the reverse operation's *pre* state) ⇒ `transition_file` ⇒ **`FS::Candidate`** ⇒ shape exact ⇒ **`Ok(Aborted)`** |
-| L3 lock, L4 boundary (after conversion) | forward publication interrupted; leaf detached; forward residue present. Abort's pending arm calls `classify_write(candidate → baseline)` (`evidence.rs:277-282`, `:292-297`) — reverse pair | same chain ⇒ `Ambiguous` ⇒ **`FS::Other`** ⇒ `Err` | counterpart surveyed ⇒ **`RFT::Before`** ⇒ **`FS::Candidate`** ⇒ exact |
-| L5 root manifest, L6 root lock | a forward preservation/rollback transition interrupted, then the counterpart transition attempted (`root/abort.rs:123-130`, `:137-144`) | `Ambiguous` ⇒ `transition_state` ⇒ refusal | counterpart surveyed ⇒ `Before` ⇒ the caller's existing `Before` handling runs |
-| L7 preservation workspace leaves | `mutate_managed` interrupted on one direction, counterpart direction attempted (`preservation_root.rs:207`) | `observe_transition` ⇒ `Ambiguous` ⇒ refusal at `:209-210` | counterpart surveyed ⇒ `Before` ⇒ the existing `after`/`pattern_matches` logic runs |
+| L2 marker, abort **non-pending** (`evidence.rs:313-318`) | `observe` ⇒ `Missing`; `classify_file(…, missing_is_baseline=true)` ⇒ `FS::Baseline` (`:356`) — already tolerant → **`Ok(Aborted)`** on this cell | unchanged — **the non-pending arm was never the wall** | — |
+| L2 marker, abort **pending == Marker** (`evidence.rs:307-311`) | `classify_remove` ⇒ `inspect_family` ⇒ `foreign` (`residue.rs:179-181`, `:205-206`) ⇒ `Ambiguous` (`classification.rs:141-143`) ⇒ `transition_file` ⇒ **`FS::Other`** ⇒ shape not exact ⇒ `preflight_v1_evidence` `Err` → user sees **`Ok(RecoveryRequired)`**, then **`Err(RecoveryEvidenceMismatch)`** on the second `--abort` | survey reports one action `(Missing → marker_yaml, Replace)`; the abort asks `(Bytes(marker_yaml) → Missing, Remove)` — **the exact counterpart**. The marker was **never published**, so the reverse operation's *post* state already holds ⇒ **`RFT::After` ⇒ `FS::Baseline`** ⇒ shape exact. `execute_v1_evidence_rollback` then calls `remove_exact`, which classifies `After` and **returns `Ok(())` without writing** (`transition.rs:119-120`) → **`Ok(Aborted)`** | **survey + observer.** No reconciler needed — no detach happened |
+| L3 lock, L4 boundary (after S4), abort **pending == Lock/Boundary** (`:277-282`, `:292-297`) | same chain ⇒ `Ambiguous` ⇒ **`FS::Other`** ⇒ `Err` → **`Ok(RecoveryRequired)`** then **`Err`** | **the leaf is genuinely mid-flight**: absent, with the baseline bytes alive only as the detached `.source`. Neither `Before` nor `After` is true. The **reconciler** (§2.5) restores `.source` onto the leaf and retires the counterpart family; the observer then re-classifies on a clean slate and gets the ordinary `FS::Candidate` ⇒ shape exact ⇒ **`Ok(Aborted)`** | **survey + reconciler + observer** |
+| L3, L4, abort **pending == None** (`:284-289`, `:299-304`) | `evidence_shape_is_exact` runs `file_states(root, record, None)` **first** (`:390-393`), so this arm is reached before any pending arm; `observe` ⇒ `Missing` ⇒ `classify_file(…, false)` ⇒ **`Other`** ⇒ `preflight_v1_evidence` `Err` (`:34-55`) → **`Ok(RecoveryRequired)`** | **`artifact_facts::observe` returns `RegularFileFact` (`Missing｜Bytes｜Invalid`, `artifact_facts.rs:8-13`) — it has no residue channel, and I9 forbids a new door.** Resolution: the None arms do **not** grow a survey call. Instead `file_states` calls the **reconciler once, up front**, before computing any arm (§2.5); after it returns, the leaf is at an endpoint and the existing `classify_file` is correct unchanged → **`Ok(Aborted)`** | **reconciler (pre-pass), then today's observer verbatim** |
+| L5 root manifest, L6 root lock (`root/abort.rs:123-130`, `:137-144`) | `Ambiguous` ⇒ `transition_state` ⇒ refusal → **`Err`** | reconciler pre-pass in the same place, then the existing `Before` handling → **`Ok`** | **reconciler + observer** |
+| **`@root` preflight (`abort/preflight.rs:110-118`)** *(added at Code [P2-2])* | `artifact_facts::observe` on `WORKSPACE_MANIFEST` and `LOCK_PATH`; **anything but `Bytes(_)` ⇒ `MergeRecoveryRequired`** — and this runs **before** `root/abort.rs` is ever reached, so a detached L5/L6 is refused here first → **`Ok(RecoveryRequired)`** | the reconciler pre-pass runs here too, as `preflight`'s first act; the existing `Bytes(_)` gate then passes unchanged → **`Ok`** | **reconciler; observer unchanged** |
+| L7 preservation-root leaves (`preservation_root.rs:207`) | `observe_transition` ⇒ `Ambiguous` ⇒ refusal `:209-210` → **`Err`** | reconciler pre-pass before `observe_transition`; existing `after`/`pattern_matches` logic then runs → **`Ok`** | **reconciler + observer** |
+| **L11 exact-file set (`observe/finalization.rs:439-458`)** *(row added at State [P2-4](iii))* | `regular_file_equals` maps `NotFound → Ok(false)` at `:442` ⇒ reported as root drift → **`Err`/drift** | L11 is **read-only and downstream of the reconciler**: once the pre-pass has converged the leaf, `NotFound` no longer occurs on a reconcilable leaf. **No change to `regular_file_equals` itself** — S3 only has to guarantee the pre-pass runs before it | **reconciler; L11 untouched** |
+| **L3/L4, the NEXT merge after a reconciled abort** *(row added at Code [P1-1](c) / State [P1-1](3))* | n/a today — the raw forward writer leaves no residue | **without retirement this is a regression**: a stale forward family on a path-stable leaf is `foreign` to merge #2's `replace_exact` (`residue.rs:179-181`) ⇒ permanent refusal at `transition.rs:44-49`. **The reconciler therefore retires the counterpart family as part of its own act, before it returns** — so merge #2 enumerates nothing → **`Ok`** | **reconciler's retirement half — the load-bearing half** |
 
 **(B) Window (i), the detach absence — forward side.**
 
@@ -374,9 +417,121 @@ edit; avoiding that edit is worth the routing.
 
 | Situation | Today | After the cure |
 | --- | --- | --- |
-| L1 rewrite interrupted mid-detach (`c9a7303` row) | `.gwz/merge` empty; `load_open` ⇒ `Err(IoError NotFound)`; `classify_open_record` (`merge/store/mod.rs:211-241`) enumerates `.gwz/merge/*.yaml` ⇒ **no open merge**; `--abort` cannot find the id; residue durable, invisible, git-status-exempt (`policy.rs:33-45`) | **still no open merge** — because `classify_open_record` does not survey. **The cure does not close (ii) by itself.** It supplies the *primitive* (§2.5) that makes closing it a ~200-LOC follow-on: `classify_open_record` surveys `.gwz/checked-artifacts` for a family whose `canonical_path_identity` resolves under `.gwz/merge`, and reports the record as OPEN-DETACHED with the id read from the surveyed `expected` bytes. **Deliberately a separate step (S5) and a separate decision (§3.3).** |
+| L1 rewrite interrupted mid-detach (`c9a7303` row) | `.gwz/merge` empty; `load_open` ⇒ `Err(IoError NotFound)`; `classify_open_record` (fn at **`store/mod.rs:216`**, *cite corrected at Code [P3-5]*) enumerates `.gwz/merge/*.yaml` ⇒ **no open merge**; `--abort` cannot find the id; residue durable, invisible, git-status-exempt (`policy.rs:33-45`) | **still no open merge** — because `classify_open_record` does not survey. **The cure does not close (ii) by itself.** It supplies the *primitive* (§2.5) that makes closing it a ~200-LOC follow-on: `classify_open_record` surveys `.gwz/checked-artifacts` for a family whose `canonical_path_identity` resolves under `.gwz/merge`, and reports the record as OPEN-DETACHED with the id read from the surveyed `expected` bytes. **Deliberately a separate step (S5) and a separate decision (§3.3).** |
 
-### 2.5 The precedent: the tree already owns exactly this reconciler, for the catalog
+### 2.5 THE THIRD COMPONENT — the reconciler (added at [P1-1], both axes)
+
+**The defect both reviewers found.** REVISION 1 designed a survey and an observer
+and stopped. On the abort side that leaves the ledger's `Aborted` cells with no
+execution path: the observer reports a reconcilable state, then
+`execute_v1_evidence_rollback` (`abort/evidence.rs:131-172`) calls
+`remove_exact` (`:160-164`) or `write_checked` (`:148-159`), whose OWN
+`classify_*` gate re-runs the **direction-bound** `inspect_family` that §2.2
+deliberately leaves un-widened, sees the counterpart residue as `foreign`, and
+returns `Err("removal evidence is ambiguous")` (`transition.rs:121-126`) or
+`Err("replacement evidence is ambiguous")` (`transition.rs:44-49`). **The user
+would move from `Ok(RecoveryRequired)` to a typed `Err` — not to `Aborted`.**
+Both axes reached this independently; it is correct, and it is the single most
+important change in this revision.
+
+**Two facts make the fix smaller than either reviewer assumed.**
+
+1. **The direction was inverted, and correcting it dissolves the marker case
+   entirely.** For the marker the reverse operation is `Bytes(marker_yaml) →
+   Missing` (`ExistingRemove`); an **absent** leaf is that operation's *post*
+   state, not its pre state. The truthful reconciliation is **`After`**, not
+   `Before`. And `classify_table` already says so: with the `foreign` gate
+   bypassed, `(ExistingRemove, authority=false, Absent, Absent, Missing)` yields
+   **`After`** at `classification.rs:253` — the row exists today (Code [P2-1],
+   recorded in §1.4). `After` then short-circuits **both** writers with
+   `Ok(())` and **no write at all**: `replace_exact` at `transition.rs:44`
+   (`ProofOnly | After => return Ok(())`) and `remove_exact` at `:119`
+   (`After => return Ok(())`). **So for every leaf whose forward arm is
+   `MissingReplace` — the marker, and the merge record's create arm — the
+   direction correction alone closes the loop. No reconciler, no writer arm, no
+   new variant, no `classify_table` edit.**
+2. **The reconciler is needed only for leaves that actually detached.** For
+   `ExistingReplace`/`ExistingRemove` forward arms (L3, L4, L5, L6, L7) the leaf
+   is absent *and* the baseline bytes exist only as the detached `.source` in the
+   private area. That state is neither endpoint, and `classify_table` has no row
+   for it (`(ExistingReplace, false, Absent, Absent, Missing)` falls to
+   `_ => Ambiguous`, `:277`) — correctly, because it is genuinely mid-flight.
+   Something must physically move bytes.
+
+**The component: `reconcile_counterpart`, a pre-pass, not a classification.**
+
+```
+// checked_artifact/residue.rs or a sibling — sketch, not code to land
+impl CheckedArtifact {
+    /// Converge this leaf to an endpoint if, and only if, its family holds
+    /// exactly one interrupted action that is the EXACT COUNTERPART of the
+    /// caller's (expected, goal). Returns what it did; Ok(NothingToDo) is the
+    /// overwhelmingly common case. Never partial: converge AND retire, or
+    /// neither.
+    pub(super) fn reconcile_counterpart(
+        &self, expected: &CheckedArtifactFact, goal: Option<&[u8]>,
+    ) -> ModelResult<Reconciled>;
+}
+```
+
+It runs **as the first act of the observer's caller**, under the lease that
+caller already holds, on the `CheckedArtifact` it has already acquired (I6 — no
+new probe). It does three things and then gets out of the way:
+
+1. **Survey** (§2.2) — direction-free, read-only.
+2. **Converge** — restore the detached `.source` back onto the managed leaf
+   (`transition.rs:290-301`'s rename, inverted), or, if the `.goal` was already
+   published, leave the leaf as it is. This is the one write, and it is a rename
+   within a directory the caller already owns.
+3. **Retire** — clear the counterpart family with the existing `cleanup.rs`
+   primitives (`:87`/`:89` staged goal, `:132`/`:134` quarantined source,
+   `:222`/`:224` authority record). **This half is load-bearing**: without it a
+   stale forward family stays `foreign` to every later action on a path-stable
+   family, so merge #2's `replace_exact` on the lock refuses permanently — the
+   design would have converted a one-merge wall into a permanent one (Code
+   [P1-1](c), State [P1-1](3)). `cleanup.rs` today retires only the writer's
+   **own** family (`:70`, `:117`, `:202`); the reconciler is the first
+   foreign-family retirement in the tree, which is exactly why it must be a
+   named, reviewed action rather than a side effect.
+
+**Retirement timing, stated (the coordinator's question).** Retirement happens
+**inside `reconcile_counterpart`, before it returns** — not deferred to a sweep.
+So the next merge's publication never enumerates a counterpart family, whether
+or not an abort ran in between: if the user re-runs the merge instead of
+aborting, the retry is **same-direction**, `inspect_family` matches, and the
+boundary's own `RecoverableDetached` convergence handles it without the
+reconciler at all (the L8 precedent, §2.4(B)). The reconciler is only ever
+reached by a **counterpart** caller.
+
+**Why a pre-pass and NOT a new `ExactTransition` variant.** To express the
+counterpart state *inside* `classify_table` you would have to make
+`inspect_family` direction-free — which §2.2 shows would weaken the writer's own
+refusal, the very property that makes `replace_exact` safe. Keeping the
+counterpart handling **outside** the classification table means:
+`ExactTransition` gains **no variant**; `classify_table`
+(`classification.rs:235-277`) gains **no row**; and its 232-line pinning test
+(`classification.rs:302-533`) **does not move**. After the pre-pass, the leaf is
+at an endpoint and every existing classifier is correct verbatim. **This is the
+answer to the coordinator's "say which and why": a named retirement action
+(option (b) of Code [P1-1]), not a writer-side counterpart arm (option (a)).**
+
+**The residual risk, stated.** If a build discovers the pre-pass cannot converge
+without expressing an intermediate state to the classifier, the fallback is
+option (a) — a new `ExactTransition` variant, new `classify_table` rows, and a
+re-pin of the 232-line test. **That is S2b's stop-trigger** (§7), and the sizes
+below carry it as a named contingency rather than a base assumption.
+
+**Who restores the detached `.source`, per leaf** (the coordinator's question):
+L3 lock, L4 boundary, L5 root manifest, L6 root lock — the reconciler invoked
+from `abort/evidence.rs::file_states`, `abort/preflight.rs:110-118` and
+`root/abort.rs`, each under the abort's plain lease. L7 — the reconciler invoked
+from `preservation_root.rs:207`, under the preservation transition's lease.
+L2 marker and L1's create arm — **nobody**, because nothing detached. L8 — nobody
+(same-direction retry, already converges).
+
+---
+
+### 2.5a The precedent: the tree already owns exactly this reconciler, for the catalog
 
 `protocol/catalog_bootstrap_record.rs:172-185` `matches_attempt`, with
 `catalog/scratch.rs:19-46` and `catalog/classifier.rs:96-104`, `:301-319`
@@ -393,16 +548,16 @@ yet given to the leaves.**
 
 | # | Invariant | Enforcement |
 | --- | --- | --- |
-| **I1** | **No silent adoption of foreign residue.** | The survey enumerates **only** under `family_prefix(&self.family_key())` (`residue.rs:116`, `:127`) — `family_key` is SHA-256 over the **root identity** and the **canonical path identity** (`authority.rs:196-202`). A residue from another workspace, another root, or another path is not enumerated at all. The ownership token's boundary (`bootstrap/managed/provider.rs:51-62`) is untouched: the survey adds no name, no token, no scope. |
-| **I2** | **The survey never repairs.** | `survey_family` returns a value; it opens the private dir with `create = false` (`residue.rs:111`) and performs no rename, no unlink, no barrier. Every *action* stays where it is today — inside `replace_exact`/`remove_exact` under the writer's own lease. |
+| **I1** | **No silent adoption of foreign residue — stated as an exclusion PROOF, because the token's own boundary demands one.** *(rewritten at State [P2-2], Code [P3-2])* | `bootstrap/managed/provider.rs:58-61` says: *"A later step that uses a resident record to decide adoption of state this action did not create makes determinism load-bearing for exclusion, and must re-litigate the token then."* The reconciler **is** such a step, so "untouched" was the wrong answer. The proof, in three parts: **(a) enumeration bound, enforced at the SURVEY** — only `family_prefix(&self.family_key())` (`residue.rs:116`, `:127`), and `family_key` is SHA-256 over the root durable identity + the canonical path identity (`authority.rs:196-202`), so another workspace, root or path is never enumerated. **(b) The counterpart proof, enforced at the CLASSIFIER, not the survey** — byte-swapped `(expected, goal)` plus the C2/C3 identity comparisons of `matches_request` (`authority.rs:107-110`), retained unchanged (I3). This is the only thing that separates two co-resident writers of one family. **(c) The same-user boundary is out of scope** per the token's own E16 clause (`provider.rs:58-59`). **Two facts this makes explicit: L3 and L6 are ONE leaf** — `gwz.conf/gwz.lock.yml` / `artifact::LOCK_PATH` — so one `family_key` is written by two different observer/writer pairs (merge publication/abort, and selected-root rollback), and **(b) alone separates them**; and **(c) P2's naming rebase replaces (a)'s ground** with a nonce-derived prefix (E8.1 §4.2/§4.4), under which a copied workspace image carrying the same instance id becomes enumerable — so **K1 must carry this invariant forward, not merely the survey's code** (§5.1). |
+| **I2** | **The survey never repairs; the RECONCILER repairs, under the caller's already-held lease, and only on an exact counterpart.** *(corrected at [P1-1], both axes)* | `survey_family` returns a value: it opens the private dir with `create = false` (`residue.rs:111`) and performs no rename, no unlink, no barrier. `reconcile_counterpart` (§2.5) is the one component that writes, and it writes only (a) the restore-rename of a detached `.source`, and (b) the retirement of the counterpart family through the existing `cleanup.rs` primitives. It runs on an already-acquired `CheckedArtifact` under the lease its caller already holds — it acquires nothing and takes no lease of its own. It is **all-or-nothing**: converge and retire, or neither. Every *ordinary* action stays exactly where it is today, inside `replace_exact`/`remove_exact`. |
 | **I3** | **A reconciled classification is never stronger than an exact one.** | The counterpart rule accepts **only** an exact counterpart: the surveyed action's `expected` equals the caller's `goal` **and** its `goal` equals the caller's `expected` **and** its `family_key` and `canonical_path_identity` equal the caller's **and** `artifact_root_identity` and `retained_parent_identity` match (the C2/C3 checks of `matches_request`, `authority.rs:107-110`, retained unchanged). Anything else ⇒ `Ambiguous`, exactly as today. |
 | **I4** | **Exactly one interrupted action, or refuse.** | `FamilySurvey.actions.len() > 1` ⇒ treat as `unreadable` ⇒ `Ambiguous`. Two `.authority` files under one family is already `foreign` today (`residue.rs:170-173`, `:179-181`); the survey must not become the place where that stops being an error. |
 | **I5** | **The record root stays the reconciliation root.** | The cure gives *leaves* a reconciler. It does **not** make the merge record recoverable from residue — that is S5, a separate step under a separate decision (§3.3). Until and unless S5 lands, **RR §2's ground stands verbatim**: the record root's detach-then-publish window is closed by no shipped reconciler, so `rewrite.rs::commit` keeps `rename_durable(replace=true)`. |
-| **I6** | **Nothing on the capability-free list acquires a probe.** | Measured, and provable at the same three cites the prep used: `abort/evidence.rs::file_states` **already** acquires a `CheckedArtifact` for all three leaves on every reachable v1 abort — `artifact_facts::observe` at `:285`, `:300`, `:314` → `entry::observe_merge_root_artifact` (`entry.rs:36-41`) → `root_artifact` (`:151-…`) → `CheckedArtifact::acquire` → `durable_identity`. The survey is a method on an **already-acquired** `CheckedArtifact`; it adds **zero** acquisitions. Likewise `root/abort.rs:131`, `:145` and `preservation_root.rs:207`. **The forward `live.rs::snapshot` is the one exception and needs care** — see I7. |
+| **I6** | **Nothing on the capability-free list acquires a probe.** | Measured, and provable at the same three cites the prep used: `abort/evidence.rs::file_states` **already** acquires a `CheckedArtifact` for all three leaves on every **post-publication** v1 abort *(wording corrected at State [P3-1]: `preflight_v1_evidence` returns `Ok(())` when `record.publication` is `None`, `abort/evidence.rs:39-41`, so a pre-publication abort acquires nothing before or after the cure)* — `artifact_facts::observe` at `:285`, `:300`, `:314` → `entry::observe_merge_root_artifact` (`entry.rs:36-41`) → `root_artifact` (`:151-…`) → `CheckedArtifact::acquire` → `durable_identity`. The survey and the reconciler are both methods on an **already-acquired** `CheckedArtifact`; together they add **zero** acquisitions. Likewise `root/abort.rs:131`, `:145` and `preservation_root.rs:207`. **The forward `live.rs::snapshot` is the one exception and needs care** — see I7. |
 | **I7** | **The forward observer's new acquisition is on the activated lease only.** | `live.rs::snapshot` today uses `fs::symlink_metadata` + Sha256 and acquires **nothing** (`regular_digest`, `live.rs:166-187`; E8.1 §2 C12: *"none … already T1"*). Surveying requires an acquisition it does not have. Reachability, re-driven by E4.5-B at `f563446` and unchanged in shape at `ffd4f95`: `execute::publication` ← `finalization.rs:53` (sole) ← `FinalizationRuntime::new` ← `forward.rs:69` (sole production) ← `ForwardRuntime::new` ← `start.rs:89`/`:160`, both immediately before `service::run`, and `service.rs:119-124` takes `acquire_activated` at `:121` for exactly those requests. **The forward publication observer runs under `acquire_activated` and under nothing else** — so its new acquisition is inside the checked feature's own capability envelope and touches no listed operation. This must be **written into the step's charter as its RR §4 enumeration**, not assumed. |
 | **I8** | **The v0 lane is untouched.** | `acceptance/publication.rs::classify_candidate_parts` (`:81-100`) is shared with v0 through `classify_candidate_publication` (`:43-51`) and `classify_candidate_publication_view` (`:53-69`), and v0 is carved. **The normalisation happens inside `live.rs::snapshot` before `CandidatePublicationObservation::new` (`live.rs:123`)**; `acceptance/publication.rs` is not edited. (Prep §2.2's rule, adopted verbatim.) |
 | **I9** | **No new door, no moved pin, no moved census key.** | The widening reshapes four existing `entry.rs` doors' parameters; the survey is one new `pub(super)` method on `CheckedArtifact` plus, if a caller outside `checked_artifact` needs it, **one** observe-shaped `entry.rs` door. **If a door is added, `ENTRY_REFERENCES`/`ENTRY_ITEMS` and the `entry.rs` byte pin move and that is amendment-tier** — S2 is written to avoid it by keeping the survey behind the existing `classify_*` doors' return values (see §7 S2). `PRODUCTION_CALLER_COUNT` stays 1 either way (no new catalog namer). The 165-key fault census is not touched. |
-| **I10** | **Failure stays typed and terminal.** | A survey that is `unreadable`, or reports a non-counterpart, yields exactly today's `Ambiguous`. The cure only ever converts `Ambiguous → Before/Recoverable`; it never converts a refusal into a *different* refusal, and never converts `After` into anything. |
+| **I10** | **Failure stays typed and terminal; and the cure's direction is truthful, not optimistic.** *(corrected at [P1-1], both axes)* | A survey that is `unreadable`, or reports a non-counterpart, yields exactly today's `Ambiguous`. The cure converts `Ambiguous` to **whichever endpoint is true**: `After` where the counterpart action never published (the marker class — `classification.rs:253` already answers this), `Before`/`Candidate` where the reconciler has physically restored the detached source. **REVISION 1's "only ever converts `Ambiguous → Before/Recoverable`" was wrong** and is withdrawn: it would have claimed a merge was mid-rollback when in fact the rollback was already complete. The cure never converts a refusal into a *different* refusal, and never converts a true `After` into anything. |
 
 ### 2.7 What test rows prove it
 
@@ -467,20 +622,39 @@ re-affirmed there, deliberately"*).
 The decision is genuinely open and belongs to the operator (§6 Q1). The lane's
 reading:
 
-* **S5 is small** (~200 LOC): `classify_open_record` (`merge/store/mod.rs:211-241`)
+* **S5 is small** (~200 LOC): `classify_open_record` (fn at **`store/mod.rs:216`**, *cite corrected at Code [P3-5]*)
   and `discover_open` gain a survey pass over `.gwz/checked-artifacts` for a family
   whose `canonical_path_identity` resolves under `.gwz/merge`, reporting
   OPEN-DETACHED with the id read from the surveyed `expected` bytes.
-* **S5 is disproportionately risky**: it puts *discovery itself* — the entry point
-  of every merge command, including the capability-free ones — on a private-area
-  read. `recovery_support.rs:360-363` deliberately ignores private residue today.
-  A survey there is read-only and needs no probe *if* it is a plain directory
-  scan, but if it is routed through `CheckedArtifact::acquire` it would put
-  **discovery** on the identity probe, which is the ruling's red line.
+* **S5 is disproportionately risky, on TWO independent grounds** *(the second
+  added at State [P1-2])*:
+  * *Discovery.* It puts *discovery itself* — the entry point of every merge
+    command, including the capability-free ones — on a private-area read.
+    `recovery_support.rs:360-363` deliberately ignores private residue today. A
+    survey there is read-only and needs no probe *if* it is a plain directory
+    scan, but routed through `CheckedArtifact::acquire` it would put **discovery**
+    on the identity probe — the ruling's red line.
+  * *The lease.* **Discovery reconciliation is not sufficient to convert the
+    record root, and REVISION 1 was wrong to imply it was.** RR §1b: `commit`
+    (`store/rewrite.rs`) is shared by the activated forward arms and the
+    **plain-lease reverse arms** (`service.rs:119-124`: `ResumeStart | Continue ⇒
+    acquire_activated` at `:121`, everything else ⇒ plain `acquire` at `:123`).
+    Converting `commit` therefore puts **every standard-path v1 abort** on the
+    identity probe. RR §4's Plain-Lease Probe Clause leaves exactly two live
+    routes — split the lease, or prove the reverse reach absent — because the
+    third, "amend the capability-free list", is **CLOSED by ruling (A)**. So S5
+    is *discovery reconciliation **plus** a lease split of `commit`*, and its
+    ~200-LOC figure — already flagged UNVERIFIED — **cannot hold** once the split
+    is included.
+* **In every outcome, the reverse arm's rewrite stays RAW.** The lease split is
+  what makes that explicit rather than accidental: the forward arm may convert,
+  the reverse arm may not, and RR §2's exception is **re-affirmed for the reverse
+  arm regardless of Q1's answer**.
 * **The lane recommends: build S1-S4, then RE-AFFIRM the record-root exception**
   and record S5 as a named, sized, deliberately-declined option — unless the
-  operator wants the record root converted, in which case S5 is chartered
-  separately with "discovery takes no probe" as its stop-trigger.
+  operator wants the forward rewrite arm converted, in which case S5 is chartered
+  separately with two stop-triggers: *discovery takes no probe*, and *no reverse
+  arm moves onto the boundary*.
 
 ### 3.4 The abort sentence — precisely what it becomes
 
@@ -495,26 +669,46 @@ home):
 > manifest and lock, or the merge's published evidence, re-verified through the
 > checked boundary — need persistent file handles and a mount identity."*
 
-**After S3-S4 the sentence's *scope* does not change and its *ground* does.**
-The three door classes are unchanged (S3 adds no acquisition, I6). What changes is
-the parenthetical CapFree §6 attached to the third class: *"And 'the merge's
-published evidence' not 'own checked evidence': the forward path wrote it raw
-(`finalization/execute.rs:45,48,51`)"* — after S4 the forward path writes it
-**through the boundary**, so that clause retires. The sentence becomes:
+**After S3-S4 the sentence's *scope* does not change and its *ground* does** —
+but it must be written against **E8.1 §4.7's TIERED sentence, which retires
+CapFree §6's text**, not against CapFree §6 itself. REVISION 1 rewrote the
+retiring text and is withdrawn here *(State [P2-3])*. The two compose as
+**tiered sentence + scoped addendum**, in that order:
 
-> **"An abort that touches no checked artifact needs no such filesystem. An abort
-> that must re-verify checked artifacts — preservation bundles, a selected root's
-> manifest and lock, or the merge's published evidence — needs persistent file
-> handles and a mount identity, of the weaker legacy probe
-> (`identity.rs:312-367`: `name_to_handle_at` + `statx` mount id, no ext4 magic),
-> which admits btrfs, xfs and zfs where the catalog's `require_ext4`
-> (`provider/platform/linux.rs:136-151`) refuses. Such an abort **reconciles** an
-> interrupted publication from the merge's own private residue rather than
-> refusing it: an absent or detached leaf whose family names the counterpart
-> action is classified as that action's pre-state, so `gwz merge --abort` clears
-> a merge interrupted at any point of its publication."**
+> **[E8.1 §4.7's tiered sentence, adopted, unchanged — it owns the filesystem
+> and tier claims.]** An abort that touches no checked artifact needs no such
+> filesystem. An abort that must re-verify checked artifacts — preservation
+> bundles, a selected root's manifest and lock, or the merge's published
+> evidence — recovers exactly at tier 3, and at tier 2 within the session;
+> outside that it refuses with `IdentityUnprovable`.
+>
+> **[This document's addendum, scoped INSIDE that tier.]** *Within the tier at
+> which it re-verifies*, such an abort **reconciles** an interrupted publication
+> from the merge's own private residue rather than refusing it: an absent or
+> detached leaf whose family holds the exact counterpart action is converged to
+> that action's endpoint and the counterpart family is retired, so
+> `gwz merge --abort` clears a merge interrupted **at any point of its
+> publication that the tier can still prove**.
 
-Three further consequences at the same ten homes:
+**Two claims REVISION 1 made and this revision drops.** (a) *"clears a merge
+interrupted at any point of its publication"* — unqualified, it is **false at T1
+and at T2-after-reboot** (E8.1 refuses *before* reconciliation is reached), and it
+was **false even at T3** under REVISION 1's own mechanism, since [P1-1] showed the
+executor still refused. The addendum is now scoped by tier and is true only
+because §2.5 exists. (b) The legacy-probe parenthetical and the
+`provider/platform/linux.rs` cite are **dropped entirely** — E8.1 §4.7 replaces
+filesystem-naming with tier claims, so repeating a filesystem list here would
+re-introduce the text it retires (and the cite has drifted to `:142`/`:132` at
+`d6830cd` anyway).
+
+**One coupling this exposes, owed to S2** *(State [P2-3], second half)*: E8.1
+§4.4's corrected rule is *"degrade the classification, never make the record
+foreign, never make it invisible."* I4 as written (`actions.len() > 1 ⇒
+unreadable ⇒ Ambiguous`) collapses a **tier-degraded** family into the same
+bucket as a **foreign** one. **S2 must distinguish the two**, or (c) P3
+re-litigates S2. Folded into S2's charter and into K1.
+
+Three further consequences at the same ten homes:Three further consequences at the same ten homes:
 
 1. The dated residual CapFree §6 attaches (*"never driven on a non-admitted
    filesystem … cured only by DR-1's (C)"*) **narrows**: after S3, the abort's
@@ -580,8 +774,17 @@ deletion lands** — that is the step's headline risk, not the deletion.
 
 ### 4.2 The tier-2 comparable archive sub-surface
 
-**Disposition: KEEP DEFERRED — do not mint at E8.3.** The ruling deferred it
-explicitly (point 4) and CapFree §5 makes minting conditional on a *carrier*.
+**Disposition: KEEP DEFERRED — do not mint at E8.3, ON THE OPERATOR'S WORD
+(Q9), not on the lane's.** *(re-grounded at State [P2-5].)* This is a
+**re-deferral of something an adopted record assigned to this round**: CapFree §5
+says *"DR-1 mints the sub-surface BY AMENDMENT WITH ITS OWN DUAL and names the
+execution carrier"*, and the charter's §4 deliverable 3 says the same. A lane
+cannot discharge that by declining it. **The disposition is therefore conditional
+and carries a dated bracket at two homes** — `GwzM5-8R2E-CapabilityFreeAmendment.md`
+§5 and `GwzM5-8DR1-Charter.md` §4 deliverable 3 — recording that DR-1 reached the
+item, sized it, and re-deferred it on the operator's answer to Q9. Ruling point 4
+("explicitly defer") permits exactly this, in one line. The ruling deferred it
+once already (point 4) and CapFree §5 makes minting conditional on a *carrier*.
 The carrier question is downstream of two things E8.3 does not settle: whether
 the archive conversion is revived at all (§4.5), and (C)'s shape (E8.1's (b)/(c)
 choice, §6 Q2 there). Minting a comparable sub-surface for an archive route that
@@ -641,8 +844,15 @@ correct where they already are"*. **The survey of §2.2 reads exactly that area.
 Therefore:
 
 > **BINDING ORDER: the legacy area may not be retired, moved, or re-rooted while
-> any observer surveys it.** S1-S4 make `.gwz/checked-artifacts` a **read
-> dependency of the abort path**, which it was not before. The retirement's
+> any observer surveys it.** *(Stated exactly, per State [P3-2] — REVISION 1
+> overstated this.)* The post-publication abort **already** reads
+> `.gwz/checked-artifacts`, through `inspect_family` inside every `classify_*`
+> door (`classification.rs:140`); it is not a new *read* dependency. What S1-S4
+> change is **what** is read and **that it is now written**: the survey widens
+> the read from one action key to the whole family, and §2.5's reconciler makes
+> the abort a **writer** of that area for the first time (a restore-rename plus a
+> foreign-family retirement). **That second half is the genuinely new
+> dependency**, and it is the one the binding order protects. The retirement's
 > prerequisite list gains: (1) the survey's area must be a parameter of the
 > policy, not a literal; (2) a migration must move residue, not just future
 > writes, or an in-flight interrupted publication becomes unreconcilable across
@@ -677,7 +887,7 @@ The full set, with spans:
   `observe_open` `:185`, `open_record_present` `:194`,
   `CanonicalArchiveAcquisition` `:22`.
 * **`merge/gc.rs` — 4 functions + 2 structs, 154 code lines:**
-  `preflight_archived_cleanup` (`:31-130`), `delete_preflighted_backup_refs`
+  `preflight_archived_cleanup` (fn at **`:53`**, doc from `:31`; *cite corrected at Code [P3-5]*), `delete_preflighted_backup_refs`
   (`:132-142`), `require_backup_refs_absent` (`:144-167`), **`cleanup_error`
   (`:169-176`)**, `PreparedArchivedCleanup` (`:18-20`), `ArchivedBackupArtifact`
   (`:22-29`). **Correctly excluded** (live, reached from `handle_gc` `:178`):
@@ -735,6 +945,13 @@ by (C) at all** — only by a *reversal of ruling (A)*, which is closed.
 * **Keep**: reproduces the "permanent by silence" failure E4.7 exists to stop,
   and now with a *twice*-under-enumerated extent record.
 
+**Record homes, named** *(State [P3-3])*: O13's accepted-residual at
+`GwzM5-8R2E-Plan.md` §1.1; **CapFree §3's `:275` inventory row** (`archive.rs`,
+`remove_file: 1`); **CapFree §5's O8 paragraph** ("conditional on (C)");
+**RR §6's inverted bracket** (the archive files "permanent-documented in all
+three rows"); plan `:53` and `:512-513`. The (C)-cannot-revive argument is a
+**record** argument, not a code measurement, and stands on ruling (A)'s closure.
+
 **Sizing:** one amendment (O13 shrinkage + the carve-out inventory row + the two
 allowance expiries) + one deletion step, **≈350 lines removed, ~60 added** (the
 inventory/digest re-pinning). Foundational-independent — it can run in parallel
@@ -769,7 +986,12 @@ identity is anchored to. Routing the writer to a new Git-directory replace door
 instead would cost a **new `entry.rs` door** (prep §3.3, which also found the
 amendment's premise for that door falsified by the tree, §3.2) — moving
 `ENTRY_REFERENCES`, `ENTRY_ITEMS` and the `entry.rs` byte pin for no behaviour.
-**Sizing:** frozen-text amendment, own dual, ~1 cell + 1 bracket. **Must land
+**Record homes, named** *(State [P3-4])*: the FROZEN cell is
+`GwzM5-8R4bR2ConsumerCheckpoint.md` §10 row `:279`; **CapFree §3's `:279`
+dispositions row** ("E4.6-B converts … through a new git-directory replace door")
+needs its own bracket. Both are frozen-tier and **one dual can carry both**.
+
+**Sizing:** frozen-text amendment, own dual, ~1 cell + 2 brackets. **Must land
 with or before S4**, since S4 converts the forward arm through the same workspace
 door and would otherwise land a writer the frozen cell contradicts.
 
@@ -820,8 +1042,13 @@ so:
   hazard is an interrupted transition followed by its **counterpart**, which is
   exactly the E4.5-B wall on shipped code.
 
-**Disposition:** L7's exposure is **already shipped and undated**. It gets a
-dated residual line of its own now (the `[R2-P3-1]` form), and its cure is
+**Disposition:** L7's exposure is **already shipped and undated**, and **it has
+no adopted home** — E4-Close §2's residual register lists *raw* arms only, and L7
+is a *checked* arm *(State [P3-7])*. **Proposed home: a dated bracket at
+E4-Close §2** (or CapFree §6, which already carries the preservation abort path).
+**Q7 is therefore answered "now"**, not "at S4's landing": an undated shipped
+exposure is precisely the state the residual register exists to prevent. It gets
+a dated residual line in the `[R2-P3-1]` form, and its cure is
 NEW-5 inside S4 — **not a separate class**. The record's flag-9 sentence
 (`GwzM5-8R2E-E45B-Report.md:69`, `GwzM5-8DR1-Charter.md:119`) asked about the
 *bundle* leaves; **the answer is that the hazard is at the preservation-ROOT
@@ -853,7 +1080,12 @@ without disposition; DR-1 owns them.
   `store/tests.rs:176,:298,:313`, `g23/archive_equivalence_v0.rs:266`,
   `g23/characterization_archive_v0.rs:167,:301`,
   `g23/preserve/preserving_abort_gate.rs:99`, `g23/continue_merge.rs:228`.
-  **Disposition: RETIRE `load_archived`, do not consume it** — a dead `pub`
+  **One check owed before the deletion** *(State [P3-5])*: `load_archived` is a
+`pub` method on the **`MergeStore` trait**, i.e. a trait *surface*. A grep of
+`GwzM5-8R2DInterfaceFreeze.md` returns no hit, but whether that surface is frozen
+**elsewhere** is **UNVERIFIED** — settle it before deleting, not after.
+
+**Disposition: RETIRE `load_archived`, do not consume it** — a dead `pub`
   method kept alive by an allow is the shape E4.7 exists to stop, and consuming
   it would invent a caller to justify a method. ~25 LOC removed; **the eight
   test call sites are the cost** and must be re-homed or retired with it, which
@@ -954,9 +1186,25 @@ nonce-derived `family_prefix` guarantees"*. The survey of §2.2 enumerates by
 survey, it must carry the survey forward; if it lands before, the survey is
 written against the new names.** Either order works; **both at once does not.**
 
-**K2 — the abort sentence has one set of ten homes.** §3.4's rewrite and E8.1
-§4.7's tiered rewrite touch the same ten homes. **Whichever lands second folds
-the other's text**; the charters must name which is which.
+**K1 carries an INVARIANT, not just code** *(State [P2-2])*. I1's exclusion proof
+rests in part (a) on `family_key` = SHA-256(root durable identity + canonical
+path). (c) P2 **replaces that ground** with a nonce-derived `family_prefix`
+(E8.1 §4.2/§4.4), under which a **copied workspace image carrying the same
+instance id becomes enumerable** — part (a) weakens, and part (b), the
+classifier's counterpart proof, becomes the whole boundary. So (c) P2's charter
+must **re-state and re-prove I1**, not merely re-point the survey's names.
+**Second K1 obligation** *(State [P2-3])*: S2 must already distinguish a
+**tier-degraded** family from a **foreign** one (E8.1 §4.4's rule: *"degrade the
+classification, never make the record foreign, never make it invisible"*), or
+(c) P3 re-litigates S2.
+
+**K2 — the abort sentence has one set of ten homes, and E8.1 owns the base text.**
+*(Corrected at State [P2-3]: REVISION 1 named CapFree §6 as the base; E8.1 §4.7
+**retires** that text.)* §3.4 is now written as **E8.1's tiered sentence plus a
+scoped addendum**, so the two do not compete: **E8.1 §4.7 lands the sentence, and
+this document's addendum lands with S4** — and the addendum is only *true* once
+§2.5's reconciler exists. If S4 lands first, the addendum ships against CapFree
+§6's text and is re-based at (c) P5; the charters must name which.
 
 There is **no** coupling between the cure and (a0), (b), or (c) P1: tiers do not
 change this class (E8.1 §4.4, adopted) and this class does not change tiers.
@@ -1026,17 +1274,18 @@ whenever a builder is free.
 
 ## 6. Open questions for the operator — one line each
 
-1. **The record root:** re-affirm the RR §2 exception with S5 named-and-declined (the lane's recommendation), or charter S5 and convert `rewrite.rs::commit`?
+1. **The record root:** re-affirm the RR §2 exception with S5 named-and-declined (the lane's recommendation), or charter S5 = discovery reconciliation (no probe) **plus a lease split of `commit`** — noting that `commit` is shared with the plain-lease reverse arms (`service.rs:119-124`), that RR §4 leaves only the split since ruling (A) closed the third route, and that **the reverse arm's rewrite stays raw in every outcome**, so RR §2's exception is re-affirmed for the reverse arm regardless?
 2. **The `gc_archived` family:** delete it now (fires O13's shrinkage arm, amendment-tier) — the lane's recommendation — or keep it a second phase?
 3. **O14:** amend the freeze to name `CheckedArtifactAuthority` as the landed write authority and retire `authorize_write` (the lane's recommendation), or wire it?
 4. **Sequencing:** under E8.1 §6 Q2's option (i)/(ii)/(iii), confirm S1-S4 run **in parallel with (b)** rather than inside (c)?
 5. **The abort sentence:** land §3.4's reconciliation rewrite with S4 and let E8.1 §4.7's tiered rewrite fold it at (c) P5 — or hold both for one edit?
 6. **Row `:279` cell 2:** amend the cell to "checked workspace artifact action" (the lane's recommendation, no new door), or route the writer to a new Git-directory door?
-7. **The L7 shipped exposure:** does the preservation-root directional hazard (§4.7) need its own dated residual line **now**, ahead of S4, or does S4's landing suffice?
-8. **The legacy-area order (§4.4):** confirm OPEN-R1's retire-the-area answer is **NO for the duration of R2-E**, on the ground that the abort now reads that area?
-9. **Tier-2:** confirm it stays deferred until §4.5's delete/rebuild decision, rather than being minted in this round?
+7. **The L7 shipped exposure:** the lane now answers **"now"** (§4.7, State [P3-7]) — it is a *checked* arm, so E4-Close §2's register (raw arms only) has no row for it; confirm the dated bracket goes at E4-Close §2, or name CapFree §6 instead?
+8. **The legacy-area order (§4.4):** confirm OPEN-R1's retire-the-area answer is **NO for the duration of R2-E** — on the corrected ground that the abort already *reads* `.gwz/checked-artifacts` and, after §2.5, will *write* it for the first time?
+9. **Tier-2:** CapFree §5 and charter §4 deliverable 3 assign the minting to **this round**; confirm the re-deferral until §4.5's delete/rebuild decision (ruling point 4 permits it in one line), so the dated bracket can be written at both homes?
 10. **The §1.4 correction:** may S1 land the corrected mechanism at the four record homes *before* it is driven, or must the drive come first (the lane recommends drive-first, per the three-strikes lesson)?
 11. **The bundle's residue-orphaning exposure (§4.7, newly named):** charter the ~120-LOC `cleanup.rs` sweep now, or date it as a residual behind S1-S4?
+12. **Converting the marker after the cure lands** *(added at State [P2-1])*: ruling (a)'s letter is unqualified — *"Do not convert it"* — and CapFree §7's ruled bracket (`:565-568`) says none of the three arms converts, while the charter's forward-arm line (`:76-77`) promises conversion "only with the reader-side reconciliation" for `:48`/`:51` only; may `execute.rs:79` (the marker, `:277`) convert in S4 once S3 has landed and removed the ground the residual was dated on — and does the same word extend to `:88`/`:98` (`:278`/`:279`)?
 
 ---
 
@@ -1049,20 +1298,20 @@ Foundational-first; the parallel column says what may run concurrently.
 
 | Step | Goal | Size | Parallel with |
 | --- | --- | --- | --- |
-| **S1** | **Drive and re-record the mechanism.** Apply the preserved patch out of tree, reproduce RED-1, and instrument which frame refuses (`inspect_family` `foreign` vs `classification.rs:175-177`). Land NEW-1 as a permanent pin on the corrected mechanism. Correct the cite at four record homes + one in-tree comment; correct the `:45/:48/:51` → `:79/:88/:98` drift everywhere. **No production behaviour change.** | ~150 LOC (≈40 test, the rest record text) | §4.5, §4.8, §4.9, §4.10, §4.11 |
+| **S1** | **Drive and re-record the mechanism.** *(Both axes: S1 is GO now and is unaffected by [P1-1] — indeed its RED-1 drive is what would have exposed [P1-1] empirically.)* Apply the preserved patch out of tree, reproduce RED-1, and instrument which frame refuses (`inspect_family` `foreign` vs `classification.rs:175-177`). Land NEW-1 as a permanent pin on the corrected mechanism. Correct the cite at four record homes + one in-tree comment; correct the `:45/:48/:51` → `:79/:88/:98` drift everywhere. **No production behaviour change.** | ~150 LOC (≈40 test, the rest record text) | §4.5, §4.8, §4.9, §4.10, §4.11 |
 
 ### Phase R2 — the primitive and the vocabulary (foundational for R3; S2 ∥ S2b)
 
 | Step | Goal | Size | Parallel with |
 | --- | --- | --- | --- |
-| **S2** | **The direction-free family survey.** `residue.rs::survey_family` + `FamilySurvey`/`SurveyedAction`; the counterpart predicate on `CheckedArtifactAuthority` (I3); a `classify_*` return path that carries "reconcilable-as-counterpart" **without a new `entry.rs` door** (extend `ExactTransition`/`MergeArtifactTransition`/`RegularFileTransition` rather than adding a door — I9). NEW-2. | ~350 LOC | S2b |
-| **S2b** | **The classifier widening.** `expected: &[u8] → Option<&[u8]>` on `entry.rs:43-51,:53-63,:65-71,:73-82` and the four `artifact_facts` wrappers (`:38-50,:52-66,:68-73,:75-86`), matching the preservation doors' shipped shape. Callers updated at `abort/evidence.rs:148-164,:277-311`, `root/abort.rs:123-145,:380`. **Behaviour-preserving** — every existing caller passes `Some(…)`. | ~250 LOC | S2 |
+| **S2** | **The direction-free family survey.** `residue.rs::survey_family` + `FamilySurvey`/`SurveyedAction`; the counterpart predicate on `CheckedArtifactAuthority` (I3). **Must distinguish a tier-degraded family from a foreign one** (State [P2-3]; E8.1 §4.4's rule), or (c) P3 re-litigates it. Read-only: no `entry.rs` door (I9). NEW-2. | ~350 LOC | S2b |
+| **S2b** | **The reconciler + the classifier widening.** `reconcile_counterpart` (§2.5): survey → restore the detached `.source` → retire the counterpart family through `cleanup.rs`'s existing primitives (`:87/:89`, `:132/:134`, `:222/:224`), all-or-nothing, on the caller's already-held lease. Plus `expected: &[u8] → Option<&[u8]>` on `entry.rs:43-51,:53-63,:65-71,:73-82` and the four `artifact_facts` wrappers, at the **nine** moving call sites of §2.3. NEW-2b: the foreign-family retirement, and its all-or-nothing property. **Stop-trigger: a new `ExactTransition` variant** (see above). | **~450 LOC** *(was 250; the reconciler is the [P1-1] addition)*; **~700 if the stop-trigger fires** and the `classify_table` rows + 232-line pin move | S2 |
 
 ### Phase R3 — the observers (the cure lands; S3 ∥ S4 after both R2 steps)
 
 | Step | Goal | Size | Parallel with |
 | --- | --- | --- | --- |
-| **S3** | **The abort-side reconciliation.** `abort/evidence.rs::file_states` (`:269-322`) — both the `pending == Some` arms (`:277`, `:292`, `:307`) and the `pending == None` arms (`:284`, `:299`, `:313`) consult the survey; `transition_file` (`:325-332`) and `classify_file` (`:343-361`) gain the reconcilable state. `root/abort.rs:123-145` likewise. **RED-1 turns GREEN here** (the marker's forward arm is still raw, so this step alone fixes the *shipped* L5/L6/L7 exposure and readies L2). NEW-3. **No new acquisition (I6) — the RR §4 enumeration goes in the charter.** | ~400 LOC | S4 |
+| **S3** | **The abort-side reconciliation — now a PRE-PASS, not a widened classifier.** `file_states` (`:269-322`) calls `reconcile_counterpart` **once, up front**, before computing any arm; after it returns the leaf is at an endpoint and `classify_file` (`:343-361`) and `transition_file` (`:325-332`) are correct **unchanged** — which is what resolves the `pending == None` cells that `observe` could never have resolved (State [P2-4](i)). Same pre-pass at **`abort/preflight.rs:110-118`** *(added at Code [P2-2] — it refuses a detached L5/L6 before `root/abort.rs` is reached, so S3 cannot close L5/L6 without it)* and at `root/abort.rs:123-145`. **The direction correction of §2.5 lands here: absent-leaf-never-published ⇒ `After` ⇒ `FS::Baseline`.** L11 (`observe/finalization.rs:439-458`) needs **no edit** — only the guarantee that the pre-pass precedes it. **RED-1 turns GREEN here.** NEW-3. **No new acquisition (I6).** | **~450 LOC** *(was 400)* | S4 |
 | **S4** | **The forward-side normalisation + the three conversions.** `publication/live.rs::snapshot` surveys before the `:110-112` bail and before `CandidatePublicationObservation::new` (`:123`); `acceptance/publication.rs` **untouched** (I8). Then convert `execute.rs:79/:88/:98` onto the boundary, expected `Missing`/`Bytes`/`Bytes`-or-`Missing` (prep §2.3's empty-baseline branch). Retire the three residual sentences. NEW-4, NEW-5, NEW-6. **RR §4 enumeration: `acquire_activated` and nothing else (I7).** | ~450 LOC | S3 |
 
 ### Phase R4 — the record acts (after R3; all parallel)
@@ -1077,14 +1326,15 @@ Foundational-first; the parallel column says what may run concurrently.
 
 | Step | Goal | Size | Depends on |
 | --- | --- | --- | --- |
-| **S5** | *Conditional on Q1.* The record-root discovery reconciliation: `classify_open_record` (`merge/store/mod.rs:211-241`) + `discover_open` survey `.gwz/checked-artifacts`. **Stop-trigger: discovery must take no probe.** RED-2 turns GREEN. | ~200 LOC | S2, Q1 |
-| **I1** | *Independent.* §4.5 — delete the `gc_archived` family (11 fns + 2 structs + 4 members), with the O13 shrinkage amendment. | ~450 removed / ~60 added | Q2 |
+| **S5** | *Conditional on Q1.* The record-root reconciliation, **in two halves**: (a) discovery — `classify_open_record` (`store/mod.rs:216`) + `discover_open` (`:82`) survey `.gwz/checked-artifacts` for a family whose `canonical_path_identity` resolves under `.gwz/merge`; **(b) a LEASE SPLIT of `commit`** (`service.rs:119-124`), without which converting the forward rewrite arm puts every standard-path v1 abort on the probe (RR §1b). **Amends: RR §2 (the exception clause), RR §3 P-1 (shrinkage arm) and P-2 (the tripwire asserting the door absent), RR §6, the O13 permanent row, AND RR §4's plain-lease clause for the split.** Two stop-triggers: *discovery takes no probe*; *no reverse arm moves onto the boundary*. RED-2 turns GREEN. | **~200 LOC for (a) alone — figure does NOT hold once (b) is included; UNVERIFIED** | S2, Q1 |
+| **I1** | *Independent.* §4.5 — delete the `gc_archived` family (**12** fns + 2 structs + 4 members), with the O13 shrinkage amendment. *(Aligned to §4.5's measured figures at Code [P3-4]; REVISION 1's "11 / ~450" was internally inconsistent.)* | **≈350 removed / ~60 added** | Q2 |
 | **I2** | *Independent.* §4.1 — the O14 freeze amendment + `authorize_write` retirement. | ~40 LOC + amendment | Q3 |
 | **I3** | *Independent.* §4.8 (both allowances — note the eight test call sites), §4.9 (`CatalogOwnerV1`, at the **corrected** span `catalog.rs:51-63`), §4.10 (the checker row — **after** I1's decision), §4.11 (`authority_record.rs:50-53`), and the `checked_bundle.rs:1` "Test-gated" doc falsehood (§4.7). | ~160 LOC total | I1 for §4.10 only |
-| **I4** | *Independent, newly named (§4.7).* The bundle's **residue-orphaning** sweep: `cleanup.rs` retires a family whose authority describes a leaf that matches neither endpoint, so a raw carved sibling overwriting a checked leaf cannot strand residue. **Not a conversion** — the raw siblings stay capability-free. | ~120 LOC | Q11 |
+| **I4** | *Independent, newly named (§4.7).* The bundle's **residue-orphaning** sweep: `cleanup.rs` retires a family whose authority describes a leaf that matches neither endpoint. **Trigger site, now stated** *(State [P3-6])*: **inside the v1 reverse arm's existing door** — `v1_write_bundle_checked`'s `finish()` path (`checked_bundle.rs:64-112`) — which is on the plain lease but on an **already-probing** path (CapFree §6 path (ii)), so it adds no capability. **It must NEVER be triggered from `gwz stash` or the v0 preserve arm** (`handle_stash/commands.rs:68,:86,:93,:122,:318,:327`; `preserve/artifacts.rs:357`) — those are carved and may take no probe. **Not a conversion.** Note it does **not** subsume [P1-1]'s retirement: its predicate ("matches neither endpoint") does not fire on a counterpart residue, whose absent leaf *equals* the forward action's `Missing` endpoint (Code [P1-1]). | ~120 LOC | Q11 |
 
 **Critical path:** S1 → (S2 ∥ S2b) → (S3 ∥ S4) → R4. **Four sequential
-milestones, six steps, none over 450 LOC.** Everything in R5 is off the path.
+milestones, six steps, none over 450 LOC** *(S2b carries a named contingency to
+~700 if its stop-trigger fires)*. Everything in R5 is off the path.
 
 ### The sizing cross-check, and the one thing that could blow it
 
@@ -1102,13 +1352,24 @@ fits inside S2+S2b+S3+S4's 1,450-LOC budget with room for the test rows.
 
 **The one thing that could blow it, and the design decision that avoids it:**
 adding a third `FileState` variant (e.g. `Detached`) would force a re-audit of
-**35 shape literals** across the 11 predicates at `abort/evidence.rs:189-265`,
-and any `classify_table` row edit drags a **232-line pinning test**
-(`classification.rs:302-533`). **S3 is therefore chartered to reconcile
-*into* the existing `Baseline`/`Candidate` vocabulary** — the survey resolves a
-detached leaf to whichever endpoint the counterpart action names — and **must not
-add a `FileState` variant**. That is S3's stop-trigger: *"if the cure cannot be
-expressed without a new `FileState` variant, stop and report."*
+**29 shape literals** *(corrected from 35 at Code [P3-3]: `initial_publication` 9,
+`boundary_before` 4, `boundary_after` 5, `lock_before` 2, `lock_after` 3,
+`marker_before` 2, `marker_after` 2, `index_before` 1, `index_after` 1)* across
+the 11 predicates at `abort/evidence.rs:189-265` — the argument is unchanged by
+the count. And an `ExactTransition` variant would drag `classify_table`'s
+**232-line pinning test** (`classification.rs:302-533`, confirmed by both axes).
+
+**§2.5's pre-pass design exists precisely to avoid both**, so the stop-triggers
+are now two, and the second is the one that matters *(Code [P1-1], condition 1)*:
+
+* **S3:** *"if the cure cannot be expressed without a new `FileState` variant,
+  stop and report."* — the reconciler converges the leaf to an endpoint before
+  any `FileState` is computed, so the existing three-variant vocabulary suffices.
+* **S2b:** *"if `reconcile_counterpart` cannot converge without expressing an
+  intermediate state to `classify_table`, stop and report"* — the fallback is
+  Code [P1-1]'s option (a): a new `ExactTransition` variant, new `classify_table`
+  rows, and a re-pin of the 232-line test. **That contingency is budgeted below,
+  not assumed away.**
 
 ---
 
@@ -1146,6 +1407,17 @@ newly named); `authorize_write`/`RetainedWriteAuthorityV1` consumer counts;
 inventory row and its digest code (`py:510-539`, `:1470-1513`); the preservation
 bundle's three writer families; `policy.rs:41-45` and its construction sites.
 
+**The dual, folded.** Both axes GO-WITH-CONDITIONS, both peer-blind, both read at
+`d6830cd`. **Code axis:** 31 verified, 4 refuted, 2 UNVERIFIED; conditions = the
+[P1-1] writer/direction fix, `abort/preflight.rs:110-118` into the matrix and S3,
+and the three P3 counts. **State axis:** conditions = [P1-1] the third component,
+[P1-2] Q1's lease split, [P2-1] the marker-conversion question, plus text folds.
+**Every condition is folded above**; the two carried by the reviewers as their own
+UNVERIFIED are inherited below (items 7-8). Both axes independently confirmed
+§1.4's load-bearing correction line by line, and both confirmed the three record
+corrections (`gc_archived` = 12 with `cleanup_error`; the hazard at L7 not L8;
+`catalog.rs:51-63`).
+
 **UNVERIFIED — genuinely open:**
 1. **The §1.4 correction is measured by reading, twice — not by driving RED-1.**
    S1 exists to drive it. **It should not be folded into any frozen text until S1
@@ -1165,6 +1437,21 @@ bundle's three writer families; `policy.rs:41-45` and its construction sites.
    §4.7 states the structure; NEW-5 is what would prove reachability.
 6. E8.1's own UNVERIFIED list is inherited wherever this document leans on §4.4
    or §7.
+7. *(Code axis, inherited)* Whether `publication/live.rs::snapshot` is reachable
+   **only** under `acquire_activated` — the design's chain (`finalization.rs:53`
+   → `forward.rs:69` → `start.rs:89`/`:160`) was not re-traced inside the review's
+   box. `snapshot` has 14 callers, all inside
+   `observe/finalization/publication.rs`. **The fallback holds regardless**: a new
+   acquisition in `snapshot` is the *legacy* probe the abort already takes, not
+   catalog activation, so the ruling's red line is uncrossed under either lease —
+   but I7 should be re-driven at S4's charter rather than assumed.
+8. *(State axis, inherited)* L7's directional hazard is **structurally** present;
+   whether it is **reachable** in a real preservation transition sequence is not
+   driven. NEW-5 is what would prove it.
+9. `load_archived`'s trait-surface freeze status outside
+   `GwzM5-8R2DInterfaceFreeze.md` (State [P3-5]).
+10. S5's sizing once the `commit` lease split is included (State [P1-2]) — the
+    ~200-LOC figure covers discovery only.
 
 **Base moved under this document, mid-session — recorded, not chased.** This
 document is written against `ffd4f95` as chartered. While it was being written,
