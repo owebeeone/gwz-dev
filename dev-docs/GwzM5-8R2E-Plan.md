@@ -706,7 +706,11 @@ assumption.)*
   `GwzM5-8R2E-E4.7-Review.md` GO-WC (1 P2, 7 P3, all folded). The phase
   close record is `GwzM5-8R2E-E4-Close.md`; Phase E4's conversions are
   E4.1 and E4.2. DR-1 opens on the operator's home answer.]*
-- **DR-1** — the phase-end design round (minted by the operator's ruling
+- **DR-1** — *[OPENED 2026-09-03 as R2-E PHASE E8 (lane-owner default home)
+  on the operator's "run the DR to see what we can do to work-around the
+  filesystem type checks"; charter `GwzM5-8DR1-Charter.md`; lead item the
+  filesystem-identity design `GwzM5-8DR1-FilesystemIdentity-Design.md`.]*
+  the phase-end design round (minted by the operator's ruling
   `GwzM5-8R2E-CapabilityFreeRuling-2026-09-02.md` point 5; chartered at `GwzM5-8R2E-CapabilityFreeAmendment.md` §5; its own dual on the
   amendment-tier line). Opens AFTER the pins package and E4.7 land, never
   inside E4. Agenda: (C) the non-identity / degraded boundary mode;

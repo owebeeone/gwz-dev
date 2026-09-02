@@ -3257,6 +3257,30 @@ fable token only where it makes a difference." Recorded consequences:
   filesystem admission noted; `--all`/`-A`/`-a` semantics). DR-1 is
   now unblocked, pending the operator's home answer.
 
+  **POSITION 2026-09-03 — DR-1 OPENED (R2-E PHASE E8, the lane owner's
+  default home).** Operator: "run the DR to see what we can do to
+  work-around the filesystem type checks." Charter filed
+  (`GwzM5-8DR1-Charter.md`: the ruling's agenda — (C) the non-identity /
+  degraded boundary mode, reader-side record reconciliation, O14's
+  fork, the tier-2 sub-surface, the record-root re-exam, the legacy
+  in-place-writer retirement, O8's `gc_archived` route, row `:279`'s
+  cell-2 text — plus E4.5-B's additions (the directional-residue class,
+  the classifier widening, the preservation-bundle audit) and E4.7's
+  (two ownerless A1-era allowances, the `gc_archived` extent, the
+  `CatalogOwnerV1` narrowing, the stale inventory-row description)).
+  LEAD ITEM: the filesystem-identity design — an Opus investigation
+  (75-min box) inventories every filesystem-type and identity check and
+  its consumers, ranks the work-arounds (attempt-based detection instead
+  of the ext4 magic gate; admitting what the per-leaf probe already
+  admits with the catalog bound to a gwz-minted instance id; the full
+  graded-evidence design; a recorded override) with sizes and the record
+  each amends, and drafts the graded design → dual on the amendment-tier
+  line, time-boxed. The lane owner's concept (conversation, 2026-09-02):
+  identity by attempt not magic number; tiers recorded in the evidence;
+  the straight line never refuses; guarantees degrade in the classifier;
+  refusal attaches to claims; coverage by injecting "tier unavailable"
+  on ext4 — no FAT32 lab.
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
