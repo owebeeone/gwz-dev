@@ -3039,7 +3039,9 @@ fable token only where it makes a difference." Recorded consequences:
   triggers as numbered separate conditions — the builder read "> ~120
   lines OR a change outside `tests/`" as a conjunction. NEXT: E4.5-B
   launches now from the staged brief at base `f563446`; then E4.7; then
-  DR-1 once the operator names its home.]*
+  DR-1 once the operator names its home. *[CI CLOSED at `f563446`:
+  Windows `33575785509`, Platform `33575787725`, boundary `33575785383`,
+  retained readers `33575785323` — all GREEN.]*]*
 
   **POSITION 2026-09-02 (E4.5-B) — STOP-TRIGGER (5) FIRED; A DIFFERENT
   SCOPING RETURNS TO THE OPERATOR.** The E4.5-B builder (Opus, base
