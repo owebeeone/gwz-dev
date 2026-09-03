@@ -225,14 +225,43 @@ names only `preserve/artifacts.rs` of the carved files, and the NON-v1
 carved files' tree coverage is enumerated by the pins package per file
 (flat-pinned / tree-pinned by which root / unpinned). The count-map choice
 stands regardless: a digest is a refresh-only byte backstop, the map is the
-property pin.]* Per carved file a negative
+property pin.]* *[Revised at the M5d close, 2026-09-03, under
+`GwzM5-8M5d-Charter.md` §7 (the `GwzM5-8R2E-CapabilityFreeAmendment.md` §3
+row) and drafted at S1 in `GwzM5-8M5d-GateRevisions.md` Part A. The set
+SHRINKS by five rows; nothing enters on this tree. The count is 20 → 15
+and the key-set digest moves with it.
+
+WHAT LEAVES, and why it is a carve-out and not a conversion. M5d deletes
+the v0 merge lifecycle engine from production: 0.14 has no v0 start,
+continue, abort, migrate or finalize, and an open v0 envelope is refused
+with one sentence naming release `v0.13.0`. Five carved rows are that
+engine's writers and leave with it — `merge/finalize.rs` and
+`merge/store/archived.rs` as whole files, and `merge/abort/evidence.rs`,
+`merge/abort/preflight.rs` and `merge/preserve/artifacts.rs` as the v0
+arms of files whose v1 halves stay (the last of those three now names
+zero tokens, so its row is DELETED rather than re-counted). This
+shrinkage is NOT the shrinkage §3 forbids: the arms are DELETED,
+together with the operations that reached them, and no capability-free
+operation is moved onto the probe.
+
+`merge/store/gc.rs` and `merge/store/retention.rs` do NOT leave. They
+are the live GC deletion writer and its retention enforcement under
+`WorkspaceMutatorLock`, they are `GwzM5-8I2CompatibilityContract.md`
+§7, which M5d retains and does not amend, and charter §7 excludes them
+by name. Their rows and counts are unchanged.
+
+WHAT DOES NOT ENTER. Charter §7 authorised one `entry.rs` raw primitive
+(`write_atomic_verified`) to enter if step (3) relocated it. That
+primitive was deleted with the v0 store and was not relocated on this
+tree; raw create remains the checked door in `entry.rs`. The entering
+row is therefore withheld. A later landing that restores the primitive
+revises this amendment again.]* Per carved file a negative
 scan in E4.3-B's P-2 idiom (CRLF-normalized at the read; self-excluding
 needle) asserts the carved ARM names no checked boundary door — per-ARM,
-region-scoped, for the two mixed files `abort/evidence.rs` (carved v0
-`rollback_evidence` beside 27 converted-arm door namers) and
-`abort/preflight.rs` (`restore_baseline` beside its `artifact_facts`
-observe), with a needle that excludes the git `_checked` seam
-(`finalize.rs:193`, `execute.rs:31`) or `finalize.rs` fails on day one.
+region-scoped, for any remaining mixed file (M5d left none: both v0
+abort mixed arms left with the engine), with a needle that excludes the
+git `_checked` seam (`v1_lifecycle/finalization/execute.rs:57`) or that
+file fails on day one.
 Anti-vacuity throughout: a blinded scan root or a vanished file fails
 loudly.
 
