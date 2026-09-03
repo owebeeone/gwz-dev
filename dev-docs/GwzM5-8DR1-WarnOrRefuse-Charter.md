@@ -390,3 +390,13 @@ before any write. R0-L green on both architectures. No tag.
    default: the next Windows-verified step.
 4. An xfs row in R0-L — default: yes if `xfsprogs` installs on the runner,
    else deferred with a note.
+
+## 9. Landed (2026-09-03)
+
+W1 core `0900252` / cli `fc738eb` / py `dbd7adf`; W2 core `e16d37a`; W3 core
+`6d56836`; W4 cli `68b44d5` / py `da9fb7a`; W5 core `57502e4` / cli `dccd619`.
+No tag. Open decisions §8: 1-3 closed by the operator (not in ship (1)); 4
+resolved YES (a real xfs row runs in R0-L). §4.1 measured: overlay without
+`nfs_export` fails `name_to_handle_at` (EOPNOTSUPP) on a real mount, so the
+record boundary refuses `--no-ff` there; sshfs unmeasured. Ship (2) = M5c is
+chartered next with the operator's decided default (§0.1).

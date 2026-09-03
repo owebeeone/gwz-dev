@@ -3570,6 +3570,58 @@ fable token only where it makes a difference." Recorded consequences:
   mentions: the remedy STRING (W3), the parked `linux_ext4` value
   contract, three unrelated comments. W3 charters now.]*
 
+  *[2026-09-03: **SHIP (1) LANDED — W3, W4, W5** (`GwzM5-8DR1-WarnOrRefuse-Charter.md`). NO TAG.
+  **W3** gwz-core `6d56836`: `entry.rs::crash_recovery_decision(root)` →
+  `bootstrap::probe_workspace_admission` (the catalog's own admission probe
+  through `RetainedCatalogTargetV1::retain`, read-only — creation lives in
+  `prepare_final_slot`/`acquire_final`, never on this path); every probe
+  `Unsupported`/`Io` → `Unsupported{filesystem, gap}` (gap from
+  `describe_volume`: volatile > remote > no-durable-identity; name `None` →
+  `unknown`); `Ambiguous` stays an error (workspace integrity, not a
+  filesystem property). Start decides BEFORE any lease: strict → typed
+  `UnsupportedOperation` (`checked catalog: <sentence>; <remedy>`), no
+  lease/record/Git; default → ONE `Diagnostic`/`Warn` event with the
+  operator's exact sentence, then `acquire_for_merge_start_uncatalogued`
+  (plain lease + both parents via `CheckedArtifact::prepare_parent`); the
+  decision is PASSED into `service::run` (no re-probe); Continue decides
+  once per process and warns once; `crash_recovery` populated on start and
+  continue responses; `validate.rs` refuses the flag off-start
+  (`InvalidRequest`); remedy rewritten identity-based; `cfg(test)` seam on
+  `HostPlatform`. Five g23 rows (`tests/g23/crash_recovery.rs`) + one
+  validate row; the a1_activation floor pin EXTENDED to assert the catalog
+  exists and `supported == true` above the bar. Pins: g23 130→135, remainder
+  1119→1125 darwin MEASURED / 1120→1126 linux DERIVED; CA 459/476 and v1 266
+  UNMOVED; nine digests re-pinned. CI at the landed head: platform-matrix
+  `33708546704` success, windows-matrix `33708549015` success (first head
+  `1f7f5e8` failed one source-scan pin, `no_ff_wire::…pinned_surface`, fixed
+  by one allowlist line; superseded Windows run cancelled by the lane
+  owner). Production ~262 LOC, tests ~480 — over the ~650 stop line by test
+  volume only, flagged by the builder, accepted. Review: lane-owner read of
+  the production diff — GO. **W4** gwz-cli `68b44d5`, gwz-py `da9fb7a`:
+  `--filesystem-strict` (start-only, `InvalidRequest` with any lifecycle
+  op), Human sink prints `warning:`/`error:` diagnostics once each per
+  invocation (de-dup), JSON `crash_recovery` object (gap in the house
+  CamelCase after one fold), gwz-py human mode now streams events and echoes
+  the same way; `docs/CLI.md` regenerated (clap pin). Held until W3 landed
+  so main never offered a flag core ignored. **W5** gwz-core `57502e4`,
+  gwz-cli `dccd619`: R0-L rebased on the identity contract (no name test;
+  strong table {ext4, xfs, f2fs} as vocabulary; 15-row negative table's
+  verdicts intact, tmpfs/overlay now refused on REAL mounts; a real xfs
+  loop-mount row on both architectures — probe run `33707433938` green);
+  `OperationModel.md` §"Checked Merge Artifacts And Filesystem Identity"
+  rewritten (operator's headline verbatim, record-boundary limit stated);
+  `commands/merge.md` synopsis + "Crash recovery and filesystems";
+  `MergeRecovery.md`, `MachineOutput.md`; manifest +2 assertions (warning
+  sentence, headline) — docs gate `ok (13 sources, 165 assertions)` on the
+  umbrella after landing. Release notes DRAFT committed as
+  `GwzReleaseNotes-v0.14.0.md` (no release is cut by it). Lane gate ok at
+  every landing; `check_pins.py` green (459/266/1125/135). **Measured for
+  M5c (§4.1):** R0-L's real overlay mount answers `name_to_handle_at`
+  EOPNOTSUPP without `nfs_export`, so the record boundary refuses there;
+  sshfs unmeasured. **NEXT: charter M5c (ship 2)** with the operator's
+  decided default — raw record write when the legacy handle probe fails;
+  ordinary merges must not newly refuse overlay/sshfs.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
