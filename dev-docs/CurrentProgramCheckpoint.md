@@ -3542,6 +3542,34 @@ fable token only where it makes a difference." Recorded consequences:
   diff (mechanical step; no Opus round) — GO. Lane gate ok. W2 continues on
   its branch off `a7adc95` and rebases at landing (disjoint files).]*
 
+  *[2026-09-03: **W2 LANDED** — gwz-core main `e16d37a` (rebased onto W1,
+  fast-forward; branch `w2/identity-gate` removed locally and on origin).
+  `platform/linux.rs::identity` is now `refuse_volatile_filesystem`
+  (`f_type ∈ {TMPFS_MAGIC, RAMFS_MAGIC}` → `Unsupported(Persistent-
+  FilesystemIdentity, "volatile filesystem: …")`, a CATALOG-ADMISSION
+  refusal only per the operator's ruling; W3 maps it onto the warning) →
+  `filesystem_uuid` → `persistent_handle`; `require_ext4` DELETED (no test
+  had pinned the name test — nothing rewritten); xfs/f2fs now admitted by
+  identity. `describe_volume` on all four platform files
+  (`VolumeDescription { name, remote, volatile }`, a WORDING AID;
+  Linux name from `/proc/self/mountinfo` by `statx` mount id with a magic
+  fallback; macOS `f_fstypename` + `MNT_LOCAL`; Windows volume name +
+  `DRIVE_REMOTE`/UNC; `require_ntfs` STAYS). Nine tests added (8 Linux,
+  1 macOS, 1 Windows-fixture): CA 458→459 darwin MEASURED (builder, and
+  again by the lane owner on the rebased tree: 459) / 468→476 linux
+  MEASURED on the platform-matrix dispatch; three digests re-pinned;
+  boundary checker ok; `check_pins.py` ok on the rebased tree (459/266/
+  1119/130). CI at the builder's pre-rebase head `0104329`:
+  platform-matrix `33701500498` success (ubuntu-arm 1863 passed, CA 476;
+  macos-14 green), windows-matrix `33701502408` success (1803 passed, 0
+  failed). Review: lane-owner read of the production diff — GO; noted the
+  builder's four disclosed residuals (no octal decoder — the kernel
+  escapes separators so field counting holds; the `/dev/shm` row
+  self-skips; `DRIVE_REMOTE` restated locally; the linux-identity-probe
+  workflow not dispatched, W2 touches nothing under it). Remaining `ext4`
+  mentions: the remedy STRING (W3), the parked `linux_ext4` value
+  contract, three unrelated comments. W3 charters now.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

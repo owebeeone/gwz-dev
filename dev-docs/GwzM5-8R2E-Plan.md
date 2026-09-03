@@ -739,7 +739,7 @@ assumption.)*
   version bump); R0-L/OperationModel rewritten so the default is not
   ext4-only; steps W1 ∥ W2 → W3 → W4 ∥ W5, ~1450 LOC total; no tag.
   **W1 LANDED 2026-09-03** (core `0900252`, cli `fc738eb`, py `dbd7adf`);
-  W2 in flight on `w2/identity-gate`.
+  **W2 LANDED 2026-09-03** (core `e16d37a`; CA pins 459/476). W3 next.
   **Ship (2) — M5c** using the same decision point: ordinary/custom starts
   write v1; the `ACTIVE_WRITER_FLOOR` raise is the one reviewed change with the
   ordinary-start surfaces; a below-bar ordinary start is a v1 record with no
