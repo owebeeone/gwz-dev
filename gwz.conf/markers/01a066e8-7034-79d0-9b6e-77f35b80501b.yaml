@@ -1,0 +1,86 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a066e8-7034-79d0-9b6e-77f35b80501b
+workspace_id: ws_default
+origin_url_hash: sha256:e35341f4b797aa8e57a066bf78413f40c277b3985e757118ca9aea8d390fbb9c
+created_at: unix-ms:1788432904267
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 3d0740a3c86f5f31a7bd734a0227a34887e1db98
+  branch: main
+selected_targets:
+- '@root'
+- mem_gwz_cli
+- mem_gwz_core
+- mem_taut
+- mem_gwz_py
+- mem_taut_shape
+- mem_taut_shape_rs
+- mem_taut_shape_py
+committed_targets:
+- '@root'
+members:
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: dccd619e405cd9ad9031c25c8c33f97bdf3cf086
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: 57502e461055809503ca9dc0d7cb791b8b332f6c
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: da9fb7a3e1f81d8a004f694343fa18588160d4c0
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 9a752094dbede65babcc6c44185f64cef4c6e974
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: 4154bb7953c30c3695f125d15268de3d37980d4d
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true

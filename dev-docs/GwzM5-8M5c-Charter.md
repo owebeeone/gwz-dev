@@ -1,11 +1,16 @@
 # M5c — the production v1 ordinary-start owner (DR-1 ship (2))
 
-**Status:** CHARTERED 2026-09-03 by the lane owner (Fable) on the operator's
-instruction of the same date; **awaiting the operator's read before any build**
-(ship (1)'s precedent). Home: R2-E phase E8. No tag of any kind is cut by this
-charter; the operator asks for every tag.
+**Status:** **superseded for all ship-2 design** by
+`GwzM5-8M5d-Charter.md` as of 2026-09-03. Historical evidence and
+already-completed gates remain valid only where M5d says they do. Do
+not implement this file. Sections §0–§6 below are **not current
+authority**; event / response / `gwz stage` / raw-create requirements
+are restated in M5d §3–§4 and those restatements control.
 
-## 0. The operator's decisions that bind this charter (2026-09-03, verbatim)
+Previously: CHARTERED 2026-09-03 by the lane owner (Fable), awaiting
+the operator's read. Home: R2-E phase E8. No tag.
+
+## 0. Historical: operator decisions that bound the superseded M5c charter (2026-09-03, verbatim)
 
 > M5c is not held for evidence. M5c is a record-version milestone (ordinary
 > start writes v1 + the ordinary-start surfaces + the one-line floor raise). It

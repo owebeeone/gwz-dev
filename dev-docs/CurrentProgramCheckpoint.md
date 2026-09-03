@@ -3644,6 +3644,39 @@ fable token only where it makes a difference." Recorded consequences:
   handle-less volumes — recommendation (i) stated limit. AWAITING THE
   OPERATOR'S READ; nothing builds before it. NO TAG.]*
 
+  *[2026-09-03: **M5c SUPERSEDED — M5d CHARTERED.** Controlling ship-2
+  text is `GwzM5-8M5d-Charter.md`. Operator: kill v0 on main (open v0
+  is not a merge; one sentence, use 0.13.x); best-effort merge on every
+  FS with the ship (1) warning; no crash-recovery work on odd volumes;
+  no reverse-path-raw milestone; no 0.14.0 tag until M5d lands. M5c's
+  “keep the v0 reader / wrap the v0 corpus” is withdrawn. Dual on the
+  compatibility-contract §4–§5 amendment and on the floor+erasure
+  landing. NO BUILD until authorized. NO TAG.]*
+
+  *[2026-09-03: **M5d DESIGN ACCEPTED.** Dual GO on revision 3 SHA-256
+  `ec4eb0117b8ed9bd11528aaa9dc0bf6d727d6bec42c41180c0aa33db1fbf9da8`
+  after `GwzM5-8M5d-ReviewConsistency-3.md` and
+  `GwzM5-8M5d-ReviewSafety-3.md`. Accepts ship-2 design only. NO BUILD
+  until authorized. NO TAG. I2.md body waits for the close dual.]*
+
+  *[2026-09-03: **M5d ACCEPTED AT REVISION 5 — REVIEW LOOP CLOSED BY
+  OPERATOR.** Implementation-lane review
+  (`GwzM5-8M5d-ReviewImplementation.md`, GO-WC: two P2 folds) →
+  revision 4 → round-4 dual NO-GO (`ReviewConsistency-4`, `ReviewSafety-4`)
+  → operator ruling: "0.14 must only be consistent with itself; v0 safety
+  is off the table" → RemPlan-3 applied → revision 5 SHA-256
+  `df6399662c2c93b3e94072f62cd61856e74fa0b7ef6f6699b685e2ae804e32ec`
+  → operator: "we've done enough re-reviews"; no re-verdict. Revision 5
+  is the controlling ship-2 design. Landing shape now: parity, raw
+  create and class-(ii) suite re-pointing may land on `main` first; the
+  close (floor + production §2 refuse + engine deletion + pins +
+  CapabilityFree/F-3) is the one dual landing. Decision-time handle probe
+  on the workspace root; one Diagnostic; optional `handles_ok` response
+  field. Sizing: `GwzM5-8M5d-Review.md` (~2× ship (1) in packages). The
+  full M5d corpus (charter rev 5, sizing, implementation review, four
+  rounds × two axes, three RemPlans) is committed with this entry; the
+  M5c charter carries the supersession banner. NO TAG.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
