@@ -24,9 +24,9 @@ gwz-py:   7f40afb20f4fa2c4c9d73f694edadea89c7b668a
 
 Read these inputs before reviewing:
 
-- `dev-docs/GwzDevCodeM2a-RemPlan-2.md`
-- `dev-docs/GwzDevCodeM2a-Review56-2.md`
-- `dev-docs/GwzDevCodeM2a-ReviewF5-2.md`
+- `dev-docs/history/GwzDevCodeM2a-RemPlan-2.md`
+- `dev-docs/history/GwzDevCodeM2a-Review56-2.md`
+- `dev-docs/history/GwzDevCodeM2a-ReviewF5-2.md`
 - `gwz-core/dev-docs/GWZRequirements.md`
 - `gwz-core/dev-docs/GwzMergeDesign.md`
 - `gwz-core/dev-docs/GwzMergePlan.md`
@@ -90,7 +90,7 @@ late-drift resting-state handoff.
 ## Verification
 
 Run the complete gate in section 8 of
-`dev-docs/GwzDevCodeM2a-RemPlan-2.md`. Independently inspect and, where useful,
+`dev-docs/history/GwzDevCodeM2a-RemPlan-2.md`. Independently inspect and, where useful,
 extend the adversarial reproductions rather than relying only on the existing
 green tests. Record every command, exit status, and exact Rust/Python test count
 in the report.

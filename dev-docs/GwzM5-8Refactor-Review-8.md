@@ -7,7 +7,7 @@ Reviewed:
 - `dev-docs/GwzM5-8Refactor.md`, revision with SHA-256
   `3f7363f7f05553f75b633a31371228832ae4a35fabce1b1e09ee06b4d9457a50`;
 - numbered reviews 1–7;
-- `dev-docs/GwzM5-8Refactor-ReviewF5.md`;
+- `dev-docs/history/GwzM5-8Refactor-ReviewF5.md`;
 - `gwz-core/dev-docs/GwzMergePlan.md`, revision with SHA-256
   `c19312413bef6b5aa2f8cf2d3044bd22543344b26a164a647e2cf9ef85b66cc0`;
   and

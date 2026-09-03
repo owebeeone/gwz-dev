@@ -779,7 +779,7 @@ companion-class and were fixed in the step.
   regeneration (binding per the A1 Safety review's T-5 acceptance).** The
   built `mode: no_ff` v1 envelope pair (digests `e4ea14de…` /
   `a1cb103c…`) is durably archived at
-  `dev-docs/GwzM5-8T5CandidatePair.patch` (moved from session scratch at
+  `dev-docs/history/GwzM5-8T5CandidatePair.patch` (moved from session scratch at
   the A1 Completeness review's [P2-1]); it lands with the first evidence
   regeneration that re-runs the retained-reader matrix against released
   binaries, alongside the five-surface variant-key rule change enumerated

@@ -1,8 +1,10 @@
 # dev-docs/history
 
 Nothing in this directory is normative. Files here are fully superseded
-process artifacts (typically old review rounds) retained for provenance,
-moved under rulebook rule L1-33 (`dev-docs/AgentProcessRules.md`).
+development artifacts retained for provenance: typically old review rounds,
+or completed-work documents superseded by the landed product and its current
+product documentation. They are moved under rulebook rule L1-33
+(`dev-docs/AgentProcessRules.md`).
 
 Rules for this directory:
 

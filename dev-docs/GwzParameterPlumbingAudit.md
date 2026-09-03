@@ -6,7 +6,7 @@
 - **Mode:** read-only audit. No source changed. The only binary used was the
   pre-existing `target/debug/gwz` (reports `gwz 0.2.0-dev`); every probe ran in a
   throwaway workspace under `/tmp/gwzaudit`. No test suite was run.
-- **Prompt:** the follow-up to `dev-docs/GwzOverClaimingCommitDiagnosis.md` —
+- **Prompt:** the follow-up to `dev-docs/history/GwzOverClaimingCommitDiagnosis.md` —
   the five defects there are fixed, but the *pattern* (a parameter accepted at
   the CLI and then collided, discarded, or never read) was never swept for
   systematically.

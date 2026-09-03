@@ -9,8 +9,8 @@ work and the M2b unblock criteria are owned by
 
 Inputs:
 
-- `dev-docs/GwzDevCodeM2a-ReviewF5.md`
-- `dev-docs/GwzDevCodeM2a-Review56.md`
+- `dev-docs/history/GwzDevCodeM2a-ReviewF5.md`
+- `dev-docs/history/GwzDevCodeM2a-Review56.md`
 
 ## 1. Assessment
 

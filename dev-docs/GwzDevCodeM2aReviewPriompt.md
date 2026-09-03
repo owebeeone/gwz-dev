@@ -13,7 +13,7 @@ gwz-dev/dev-docs/GwzDevCodeM2a-ReviewXX.md
 ```
 
 For example, designation `F5` writes
-`gwz-dev/dev-docs/GwzDevCodeM2a-ReviewF5.md`.
+`gwz-dev/dev-docs/history/GwzDevCodeM2a-ReviewF5.md`.
 
 Do not modify implementation code, tests, protocol files, existing
 documentation, workspace artifacts, or another reviewer's report. The review
@@ -53,9 +53,9 @@ model, serializer, test, and design contract needed to verify behavior.
 The following unrelated root files are outside scope and must remain untouched:
 
 ```text
-dev-docs/AnnounceGwzHn.md
-dev-docs/GwzMergeCode-ReviewF5-2.md
-dev-docs/HN-AnnounceGWZ.md
+dev-docs/history/AnnounceGwzHn.md
+dev-docs/history/GwzMergeCode-ReviewF5-2.md
+dev-docs/history/HN-AnnounceGWZ.md
 ```
 
 ## Sources of truth
@@ -68,9 +68,9 @@ Read these before judging the implementation:
 3. `gwz-core/dev-docs/GWZDesign.md` — overall workspace model.
 4. `gwz-core/dev-docs/GWZRequirements.md` — baseline requirements, especially
    the REQ-089 family.
-5. `dev-docs/GwzMergeCode-ReviewF5.md`,
-   `dev-docs/GwzMergeCodeRemPlan-1.md`, and
-   `dev-docs/GwzMergeCode-ReviewF5-2.md` — prior M0 findings, dispositions, and
+5. `dev-docs/history/GwzMergeCode-ReviewF5.md`,
+   `dev-docs/history/GwzMergeCodeRemPlan-1.md`, and
+   `dev-docs/history/GwzMergeCode-ReviewF5-2.md` — prior M0 findings, dispositions, and
    regression risks.
 6. `gwz-cli/docs/commands/merge.md`, `gwz-cli/docs/MachineOutput.md`, and
    `gwz-cli/docs/Releases.md` — current public claims and release boundary.

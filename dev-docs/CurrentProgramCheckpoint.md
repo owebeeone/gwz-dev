@@ -545,7 +545,7 @@ fable token only where it makes a difference." Recorded consequences:
   grammar collision permanent; the retirement family is
   crash-bounded, not constant-bounded); execution pinned to the
   R2-F relocation package; the A1 gate stays fail-closed in code.
-  Record: dev-docs/GwzM5-8R2DPhase4Closure.md §2.7. The
+  Record: dev-docs/history/GwzM5-8R2DPhase4Closure.md §2.7. The
   dirent-barrier resume-window residual is verified CLOSED in code
   (all six Ready edges through the keyed prologue; regression
   pinned; R2-F power-loss companion survives). Settle item 8

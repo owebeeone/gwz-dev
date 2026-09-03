@@ -108,7 +108,7 @@ Update `CurrentProgramCheckpoint.md`:
 Write one short amendment, not a new program document:
 
 ```text
-dev-docs/GwzM5-8ThinA1Amendment.md
+dev-docs/history/GwzM5-8ThinA1Amendment.md
 ```
 
 It must satisfy L1-08: name the superseded clauses, state the new
