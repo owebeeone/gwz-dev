@@ -3495,6 +3495,32 @@ fable token only where it makes a difference." Recorded consequences:
   checkpoint's E4.5-B entry) carry dated correction brackets, left as
   written. The lane now IDLES on the operator's eighteen answers.]*
 
+  *[2026-09-03: **OPERATOR RULING ON DR-1's EIGHTEEN + THE PRODUCT LINE** —
+  "The merge runs on every filesystem. Crash recovery is a capability, not
+  a gate." The (b) design is NOT built and NOT amended (parked as adopted);
+  no catalog nonce, no 0.13.0 catalog migration, no 0.14 tuple, no
+  best-effort catalog, no flag recorded in the catalog. **Ship (1)**
+  chartered: `GwzM5-8DR1-WarnOrRefuse-Charter.md` — a start-time decision
+  (above the bar → catalog as today; below → one warning
+  `crash recovery is unsupported on <fs> (<reason>). Merge will continue.
+  Use --filesystem-strict to refuse.` and NO catalog; `--filesystem-strict`
+  → today's refusal; abort/status/gc untouched; continue re-decides the
+  same way on the same volume, silently after one warning); the Linux gate
+  identity-based (`require_ext4` deleted, tmpfs/ramfs refused as volatile);
+  a `diagnostic` event kind, `MergeRequest.filesystem_strict`,
+  `MergeResponse.crash_recovery` (closed-system protocol additions the
+  operator allowed the same day — "when did I demand no protocol change?":
+  the instruction's ship-(1) line said "No protocol change. No tag.", read
+  by the lane as the taut protocol; the operator meant the catalog/record
+  formats); R0-L and OperationModel rewritten so the default is not
+  ext4-only; W1 ∥ W2 → W3 → W4 ∥ W5, ~1450 LOC; NO TAG. **Ship (2) = M5c**
+  on the same decision point, chartered after ship (1); its named
+  precondition is charter §4.1 (the record boundary's own persistent-handle
+  requirement, the legacy probe, still refuses handle-less filesystems).
+  Reconciliation answers 10-18 stand but are OFF the critical path (parked
+  list in the plan's E8.2). Ship (1)'s build starts on the operator's word
+  after the confirmation page.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself

@@ -726,8 +726,29 @@ assumption.)*
   `e15b3a4`; Linux identity probe `33644792520` + Platform matrix
   `33644795635` dispatched on the branch (the provider only compiles on Linux);
   lands on green with no dual (both axes: behaviour-preserving).
-- **E8.2 — the build steps of the chosen sequencing** — chartered after the
-  answers, each < 500 LOC, foundational-first.
+- **E8.2 — the build steps** — *[RE-CHARTERED 2026-09-03 on the operator's
+  instruction: "The merge runs on every filesystem. Crash recovery is a
+  capability, not a gate." TWO ships, this order. **Ship (1) — warn-or-refuse**
+  (`GwzM5-8DR1-WarnOrRefuse-Charter.md`): a decision point at merge start
+  (above the bar → activate the catalog as today; below → ONE warning and
+  continue with NO catalog; `--filesystem-strict` → today's refusal); the
+  Linux gate made identity-based (`require_ext4` deleted, tmpfs/ramfs refused
+  as volatile; xfs/f2fs admitted); the warning names the filesystem and one of
+  three reasons; a `diagnostic` event kind + `MergeRequest.filesystem_strict`
+  + `MergeResponse.crash_recovery` (closed-system protocol additions, no
+  version bump); R0-L/OperationModel rewritten so the default is not
+  ext4-only; steps W1 ∥ W2 → W3 → W4 ∥ W5, ~1450 LOC total; no tag.
+  **Ship (2) — M5c** using the same decision point: ordinary/custom starts
+  write v1; the `ACTIVE_WRITER_FLOOR` raise is the one reviewed change with the
+  ordinary-start surfaces; a below-bar ordinary start is a v1 record with no
+  catalog; chartered after ship (1) lands, with the record-boundary
+  handle-requirement finding (charter §4.1) as its named precondition.
+  **PARKED, do not start** (operator, verbatim list): the graded-evidence
+  protocol; the catalog nonce / dual-tuple migration / (b) — the E8.1 design
+  is NOT amended, it is parked as adopted; reconciliation S2+; recording the
+  flag on the wire (catalog); marker/lock/boundary conversion; record-root
+  S5; `gc_archived`, O14 freeze amend, `:279` wording, tier-2 archive, residue
+  sweep. E8 remains the home.]*
 - **E8.3 — the reconciliation class, designed once** — ADOPTED 2026-09-03
   after a Code+State dual (both GO-WC round 1, both CONFIRMED round 2):
   `GwzM5-8DR1-Reconciliation-Design.md` REVISION 2. Finding: the three
