@@ -3521,6 +3521,27 @@ fable token only where it makes a difference." Recorded consequences:
   list in the plan's E8.2). Ship (1)'s build starts on the operator's word
   after the confirmation page.]*
 
+  *[2026-09-03: **W1 LANDED** (operator's "Start W1 ∥ W2. No tag.") —
+  gwz-core main `0900252`, gwz-cli main `fc738eb`, gwz-py main `dbd7adf`
+  (all fast-forwards). The five §3.7 slots in `protocol/gwz.taut.py`
+  (`MergeRequest.filesystem_strict` slot 8; `MergeCrashRecoveryGap`;
+  `MergeCrashRecovery`; `MergeResponse.crash_recovery` slot 11;
+  `EventKind.diagnostic` = 8), regenerated on both sides through the pinned
+  taut-proto 0.9.1 (`protocol/regen.py`; gwz-py `regen_protocol.py`);
+  corpus vectors regenerated; five pre-log wire pins moved deliberately with
+  dated comments (`check_log_additive.py`, gwz-py `check_protocol_drift.py`
+  + `test_log_protocol.py`, and the MergeRequest parity hex in
+  `tests/protocol.rs` + gwz-py `test_codec.py`: map header a7→a8, trailing
+  `08 f6`, every pre-existing slot byte-identical); compile fallout only in
+  gwz-cli and gwz-py (`filesystem_strict: None`, `crash_recovery: None`;
+  no flag yet — W4); three round-trip tests added in `tests/protocol.rs`
+  and one IR pin test in gwz-py. Measured once by the builder at the landed
+  tree: core lib 1844 passed (pins UNMOVED: CA 458, v1 266, remainder 1119,
+  g23 130 — `check_pins.py` ok), `--test protocol` 36, gwz-cli green,
+  gwz-py 577 passed, drift check OK. Review: lane-owner read of the full
+  diff (mechanical step; no Opus round) — GO. Lane gate ok. W2 continues on
+  its branch off `a7adc95` and rebases at landing (disjoint files).]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
