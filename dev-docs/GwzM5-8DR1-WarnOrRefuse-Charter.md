@@ -48,6 +48,28 @@ indicating that it's proceeding anyway"); a protocol change is isolated in a
 closed system today (gwz-cli, gwz-py); the CLI may need to throttle how often
 it echoes the message — a design element of this charter (§3.5).
 
+## 0.1 Operator rulings on this charter (2026-09-03, after the confirmation page; controlling)
+
+- **tmpfs / ramfs.** Catalog ADMISSION may treat them as volatile (the
+  catalog does not activate). The merge still starts, one warning, gap =
+  `volatile_filesystem`; `--filesystem-strict` refuses. The provider's
+  volatile check (§3.2) must never become a default merge refusal — the
+  decision point (§2) maps every probe-time `Unsupported`, the volatile one
+  included, onto the warning path. Network stays a warning REASON, never a
+  name denylist.
+- **Deviations accepted for ship (1):** continue re-decides on the same
+  volume; Windows keeps `require_ntfs`; no per-attempt record field; no
+  cross-invocation throttle (§7, §8 items 1-3 closed).
+- **Protocol as stated in §3.7:** request flag, response `crash_recovery`,
+  `EventKind.diagnostic`. No version bump. No catalog or v1 record format
+  change.
+- **M5c (ship (2)), decided now:** W3 measures which filesystems die at
+  `create_merge_store_record` (§4.1). When M5c is chartered, the default is:
+  if the legacy handle probe fails, write the record RAW (today's v0
+  publication primitive, `write_atomic_verified`). An ordinary merge must not
+  newly refuse overlay/sshfs. That raw path is NOT built in ship (1).
+- **Go:** "Start W1 ∥ W2. No tag."
+
 ## 1. The mechanism as found (verified by reading, 2026-09-03)
 
 - **Where the catalog is activated.** A `--no-ff` start runs
