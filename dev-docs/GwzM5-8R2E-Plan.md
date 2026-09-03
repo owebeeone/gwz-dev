@@ -743,7 +743,11 @@ assumption.)*
   **W3 LANDED** (core `6d56836`), **W4 LANDED** (cli `68b44d5`, py `da9fb7a`),
   **W5 LANDED** (core `57502e4`, cli `dccd619`) — **SHIP (1) COMPLETE ON MAIN
   2026-09-03, NO TAG**; release-notes DRAFT `GwzReleaseNotes-v0.14.0.md`.
-  Ship (2) = M5c: charter next.
+  **Ship (2) = M5c CHARTERED 2026-09-03** (`GwzM5-8M5c-Charter.md`: Phase A
+  forward parity A1 ∥ A2 ∥ A3; Phase B raw record below the legacy bar B1 →
+  B2; Phase C the floor raise C1 as ONE reviewed change with a dual, then C2
+  release readiness; ~1,800 LOC) — AWAITING THE OPERATOR'S READ; five
+  one-line decisions in its §6.
   **Ship (2) — M5c** using the same decision point: ordinary/custom starts
   write v1; the `ACTIVE_WRITER_FLOOR` raise is the one reviewed change with the
   ordinary-start surfaces; a below-bar ordinary start is a v1 record with no

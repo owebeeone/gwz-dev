@@ -3622,6 +3622,28 @@ fable token only where it makes a difference." Recorded consequences:
   decided default — raw record write when the legacy handle probe fails;
   ordinary merges must not newly refuse overlay/sshfs.]*
 
+  *[2026-09-03: **M5c CHARTERED** — `GwzM5-8M5c-Charter.md`, from a
+  read-only mapping of the ordinary-start surfaces (three load-bearing claims
+  verified by the lane owner: the archived v1 response returns empty repo
+  rows, `merge/response.rs:64-68`; `handle_stage.rs:34` discovers through
+  the v0-only store decoder; the boundary's legacy-probe refusal renders
+  `UnsupportedOperation`, `observation.rs:372-377`). Findings: dry-run is
+  intercepted before the version fork (pin only); root participants are
+  present in v1 with one provenance asymmetry and a `gwz stage` gap; the
+  v1 path emits no member events and no per-transition state changes;
+  completed v1 starts return no repo rows; the record CREATE is the ONLY
+  forward-path checked door (rewrite/archive/publications already raw);
+  F-3 constrains the raw fallback's placement to `checked_artifact::entry`
+  with the primitive relocated to a neutral module; ordinary=v0 is pinned
+  across the g23 v0 corpus, the retained-reader manifest, the docs manifest
+  and `merge.md`. Design: raw record write GATED to the uncatalogued lease
+  (operator's default), shape-parity events, archived-projection responses,
+  version-agnostic stage discovery, floor raise with a test-only floor
+  override for the v0 corpus, dual on the floor step. Steps A1 ∥ A2 ∥ A3 ∥
+  B1 → B2 → C1 (dual) → C2. Decision item: reverse-path doors on
+  handle-less volumes — recommendation (i) stated limit. AWAITING THE
+  OPERATOR'S READ; nothing builds before it. NO TAG.]*
+
   **THE CITATION-DRIFT NOTE, FILED (2026-08-27, per the addendum's
   Appendix A — the lane owner's filing choice is THIS checkpoint,
   the corpus's resolution index; the compatibility contract itself
