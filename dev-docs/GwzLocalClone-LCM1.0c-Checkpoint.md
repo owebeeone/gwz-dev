@@ -1,6 +1,26 @@
 # GWZ local clone — LCM1.0c checkpoint record (lane C)
 
-Status: **BUILT 2026-09-05, awaiting the LCM1.0d independent review.**
+> **Status (lane owner, 2026-09-05): accepted at gwz-core
+> `a8eae4e428abe296bb105b693443ee47a9caf045` / gwz-cli
+> `86840f67e23a9ef04312df0dd7c8f781cc476e04` / gwz-py
+> `afcd5a396ccaf5e64884f8f1cec2f66273ac08bb` with this record, after
+> `GwzLocalClone-LCM1.0c-ReviewCode-2.md` (Fable 5.1, medium) and
+> `GwzLocalClone-LCM1.0c-ReviewState-2.md` (Opus 5) both reported GO on that
+> revision; this accepts the LCM1.0c skeleton checkpoint (plan stage 1.0d)
+> only.** Round 1 (`-ReviewCode.md`, `-ReviewState.md`): NO-GO, three P2 root
+> causes (C-P2-1, S-P2-1 = C-P3-4, S-P2-2) and seven distinct P3s; remediated
+> in one commit (`LCM1.0c-rem1`, plan `GwzLocalClone-LCM1.0c-RemPlan.md`);
+> remediation rounds used: 1 of 2. Round 2 opened four new P3s
+> (C2-P3-1, C2-P3-2, S2-P3-1, S2-P3-2), all non-architectural, none
+> blocking; they are lane C follow-ups queued before lane S writes the real
+> store (S2-P3-1, C2-P3-1, C2-P3-2) and alongside operator item §7.6
+> (S2-P3-2). Escaped defects: none known. Parallel feature lanes (W1) may
+> open on this tuple. Root checkpoint commit pending operator approval.
+
+
+Status: **BUILT 2026-09-05; remediation round 1 applied (see the
+"Remediation round 1" section at the end), awaiting the LCM1.0d round-2
+re-review.**
 This is the evidence record of plan revision 4 stage 1.0c ("contract and
 skeleton checkpoint") for the boundary document revision 1. Everything
 below is measured on the tuple in §1 unless labelled otherwise; targets
@@ -11,7 +31,7 @@ Written by the skeleton implementer; it is not the 1.0d review.
 
 | Repository | Before | After LCM1.0c | Branch | Working tree |
 |---|---|---|---|---|
-| gwz-dev (root) | `0c9f715b480fa5c7cec13ec99b2c233f016ef314` | unchanged, **not committed** | `main` | `Cargo.lock` modified: the pre-existing gwz-core `0.13.0 → 0.14.0` line plus the thirteen new path packages Cargo added when the outer workspace built them; this document is untracked |
+| gwz-dev (root) | `0c9f715b480fa5c7cec13ec99b2c233f016ef314` | `fc8b18966f24c14f422147d16f61a0dd19159670` | `main` | committed at `fc8b189` ("LCM1.0c checkpoint: pin gwz-core 52468ca …"): the root `Cargo.lock` (the gwz-core `0.13.0 → 0.14.0` line plus the thirteen new path packages) and this document. Closes §7.7. (Round-1 remediation then re-edits this document in the working tree; the lane owner commits the root checkpoint.) |
 | gwz-core | `87207c2e61e18aa11ce494a4113e29d20f6ea465` | `52468cac728b7b5a877071187de2cb04196821ec` | `main` | clean |
 | gwz-cli | `c04b488efe7f5188e6c4fecebf74a4d63f20113f` | `86840f67e23a9ef04312df0dd7c8f781cc476e04` | `main` | clean |
 | gwz-py | `65fc6678a1df7a0415fcb86891d50120be79033c` | `afcd5a396ccaf5e64884f8f1cec2f66273ac08bb` | `main` | clean |
@@ -208,7 +228,7 @@ pointer, marker, copy, import ref or record created. Malformed family start
 requests refuse `invalid_request` before that; a selector reaching the
 engine directly is refused by the engine.
 
-### 2.5 Driver wiring (gwz-py `571ca97`, gwz-cli `86840f6`)
+### 2.5 Driver wiring (gwz-py `afcd5a3`, gwz-cli `86840f6`)
 
 gwz-py: protocol package regenerated (`scripts/regen_protocol.py`, taut-proto
 0.9.1), drift pin moved with reason, `test_protocol.py` pins 27/28 and the
@@ -252,6 +272,14 @@ from the runner's standalone checkout. A workflow does not configure
 branch protection by itself.
 
 ## 3. Gate commands and counts (measured on gwz-core `06d7a00`..`52468ca` in the outer checkout; the rows re-run after e169877 and 52468ca are marked)
+
+Round-1 remediation evidence inputs (added to the evidence list, LCM1.0c-rem1):
+the two peer-blind reviews `dev-docs/GwzLocalClone-LCM1.0c-ReviewCode.md`
+(Fable 5.1, medium) and `dev-docs/GwzLocalClone-LCM1.0c-ReviewState.md`
+(Opus 5), the review prompt `dev-docs/GwzLocalClone-LCM1.0cReviewPrompt.md`,
+and the remediation plan `dev-docs/GwzLocalClone-LCM1.0c-RemPlan.md`. The
+round-1 gate results are tabulated in the "Remediation round 1" section at
+the end of this document.
 
 | Gate | Result |
 |---|---|
@@ -346,7 +374,7 @@ syntax error (`fn deliberately_broken( { this is not rust`), then:
 
 | Command (manifest form) | Result |
 |---|---|
-| gwz-history-check `--lib` | PASS, 1 test (closure: repo-contract, family-model; refcopy is outside it) |
+| gwz-history-check `--lib` | PASS, 1 test (closure: repo-contract only; family-model and refcopy are both outside it) |
 | gwz-workspace-install `--lib` | PASS, 2 tests (depends on copy-**contract**, not on the refcopy implementation) |
 | gwz-family-model `--lib` | PASS, 11 tests |
 | gwz-refcopy `--lib` | FAIL: `error: this file contains an unclosed delimiter` |
@@ -453,6 +481,22 @@ lane log).
   dependencies per `gwz-core/BUILD.bazel`'s taut-shape note, so no BUILD
   files were added for the crates. **Not verified** (no bazel run); listed
   as an open item.
+- **Hook-path preflight tests (plan §3 "1.0c", third paragraph) — DEFERRED to
+  lane I, recorded here (LCM1.0c-rem1, Code P3-5).** The skeleton carries only
+  the vocabulary (`gwz-repo-contract`'s `LayoutHazard::{EscapingConfig,
+  UnresolvableConfig}`; `gwz-repo-inspect` refuses `Unimplemented`); no
+  preflight and no test exist yet. Lane I owns "test valid internal and
+  escaping relative hook paths at source preflight before reservation," using
+  lane T's fixtures (`crates/local-testrepo`), and must pin one `LayoutHazard`
+  outcome per fixture:
+    - an escaping relative hook path (`../…` out of the repo) ⇒ `EscapingConfig`;
+    - a valid internal relative hook path ⇒ admitted layout (no hazard);
+    - configuration that cannot be resolved (missing/unreadable hook config,
+      or a `core.hooksPath` that does not resolve) ⇒ `UnresolvableConfig`;
+    - each of the above additionally for a **bare** repository and for a
+      **push-hook working directory**, so the working-directory variants are
+      not lost between this checkpoint and LCM1.1.
+  These fixtures are lane I's TDD start; see the §8 lane I brief.
 
 ## 7. Open questions for the operator (L1-28)
 
@@ -489,6 +533,14 @@ lane log).
    Option B (landed): keep the layout and use the manifest-path command in
    CI and standalone. Recommendation: A, once the root manifest can be
    committed together with the gwz-core change.
+   **S-P3-3 retirement condition (LCM1.0c-rem1).** Until this is resolved, the
+   local-clone boundary gate refuses any classified crate that *declares* a
+   third-party dependency while the CI Tier A step runs unlocked (the
+   `--locked`-less `--manifest-path` loop). That guard retires when either
+   Option A lands (gwz-core its own workspace, excluded from the root as
+   `taut-shape-rs` is) or per-crate `Cargo.lock` files are committed and
+   `--locked` is restored on the CI Tier A step — at which point lane I may
+   add `git2` to `gwz-repo-inspect`.
 7. **Root `Cargo.lock` (gwz-dev, C-owned).** Resolving the 13 new path
    packages added their entries to the root workspace lock (104 lines,
    nothing else changes). It is left uncommitted in the root working tree;
@@ -520,8 +572,94 @@ lane log).
   multi-repository fixture check, OID vector verification and the
   engine-entry composition (conflict/continue/abort, explicit root) are the
   remaining 1.0b work, using T's fixtures.
+- **I (repo-inspect):** own the hook-path preflight tests deferred in §6
+  (LCM1.0c-rem1, Code P3-5). Start from lane T's `crates/local-testrepo`
+  fixtures and drive `gwz-repo-inspect`'s layout inspection to the
+  `LayoutHazard` outcome each fixture requires — `EscapingConfig` for an
+  escaping relative hook path, an admitted layout for a valid internal
+  relative one, `UnresolvableConfig` for unresolvable hook configuration —
+  each also for a bare repository and a push-hook working directory. The
+  skeleton refuses `Unimplemented` today; the failing preflight test is lane
+  I's TDD start.
+- **S (family-store) — first failing test:** wire
+  `gwz_family_store_contract::contract_tests::run_all` through a real
+  temp-directory `StoreFixture` for `YamlFamilyStore`. As of LCM1.0c-rem1
+  `run_all` covers the pointer/marker half (marker-before-pointer ordering,
+  `StoreError::Partial { completed: [MarkerWritten] }` on a scripted pointer
+  failure via the new `StoreFixture::fail_next` hook, repeatable
+  `remove_pointer`, `ConflictingMetadata`, `PointerTargetInvalid`, and the
+  `removing_the_row_before_the_pointer_is_refused_and_leaves_no_orphan`
+  ordering case), all green against `InMemoryFamilyStore`. Lane S's real-store
+  `run_all` is expected RED at this checkpoint (the store refuses
+  `Unimplemented`) and is lane S's first failing test; a filesystem fixture
+  implements `fail_next` by making the target path unwritable rather than
+  queuing a scripted failure.
 - **1.0d reviewer:** review gwz-core `7faf475..52468ca` (six commits, tip
   `52468ca`), `86840f6` (gwz-cli) and `afcd5a3` (gwz-py) with this document;
   re-run §3; examine §5's isolation experiment; check the contracts against
   boundaries §3 line by line; decide §7 items 4–6 or route them to the
-  operator, and hand items 7 and 8 to the operator as they stand.
+  operator, and hand items 7 and 8 to the operator as they stand. For the
+  round-1 remediation, see the "Remediation round 1" section below and the new
+  tuple it records.
+
+
+## 9. Remediation round 1 (LCM1.0c-rem1)
+
+2026-09-05. Lane C landed **one** gwz-core commit
+(`a8eae4e428abe296bb105b693443ee47a9caf045`) on `main`, message `LCM1.0c-rem1: …`, resolving the
+two peer-blind NO-GO verdicts' bounded findings per
+`dev-docs/GwzLocalClone-LCM1.0c-RemPlan.md`. No gwz-cli or gwz-py change was
+needed. No pinned compiler-root or source-digest file was touched. The record
+edits above (§1, §2.5, §3, §5.2, §6, §8, this section) stay in the gwz-dev
+working tree for the lane owner to commit with the root checkpoint.
+
+**New tuple.** gwz-dev root checkpoint `fc8b189` (this record re-edited,
+uncommitted); gwz-core **`a8eae4e428abe296bb105b693443ee47a9caf045`** (was `52468ca`); gwz-cli
+`86840f67e23a9ef04312df0dd7c8f781cc476e04` (unchanged); gwz-py
+`afcd5a396ccaf5e64884f8f1cec2f66273ac08bb` (unchanged).
+
+**Finding → change → closure test.** IDs are `C-` = ReviewCode, `S-` = ReviewState.
+
+| ID | What changed (file) | Closure test — result |
+|---|---|---|
+| **C-P2-1** | `src/git/gitbackend/transport.rs` `admitted_local_peer` canonicalises the admitted directory and hands libgit2 its `url::Url::from_file_path` (`file://…`) so the transport table matches `file://` before the `:` heuristic; caller-facing `file://` inputs still refused; `docs/GitBackend.md` updated | `local_clone::tests::transport::anonymous_ports_stay_local_for_a_peer_path_containing_a_colon` (`#[cfg(unix)]`, source+bare hub under a `:` path; fetch creates the import ref, push updates the hub, `remotes()` empty) — **PASS** |
+| **S-P2-1 = C-P3-4** | `FETCH_HEAD` measured, not described: the fetch test plants a record before the fetch and asserts the observed truth; `contract.rs`, `docs/GitBackend.md`, `dev-docs/GWZDesign.md`, and the test comment aligned — libgit2 1.9.7 truncates `FETCH_HEAD` to empty on every fetch (`truncate_fetch_head`) even with `update_fetchhead(false)`, so a prior record does not survive; the file is outside the port's promise | `local_clone::tests::transport::fetch_anonymous_imports_an_explicit_refspec_without_persisting_a_remote` (asserts the planted record is truncated to empty) + the absent-before arm in `adapter_maps_every_port_method_onto_the_backend` — **PASS** |
+| **S-P2-2** | `crates/family-store-contract/src/lib.rs` call-order clause replaced: pointer/marker install only after the `creating` row; pointer/marker removal strictly before `RemoveRow`/`Disband`; a pointer whose row is gone must not be produced. The reference fake now refuses `RemoveRow`/`Disband` that would strand a pointer (new additive `StoreError::PointerStillInstalled`) | `contract_tests::run_all` case `removing_the_row_before_the_pointer_is_refused_and_leaves_no_orphan` (the orphaning order is refused; the required order leaves no orphan) — **PASS** |
+| **S-P3-1 = C-P3-3** | `StoreFixture::fail_next(&mut self, root, StoreOperation)` added; `run_all` extended with the pointer half: marker-before-pointer ordering, `Partial { completed: [MarkerWritten] }` on a scripted pointer failure, repeatable `remove_pointer`, `ConflictingMetadata`, `PointerTargetInvalid` | `cargo test -p gwz-family-store-contract --lib` (run_all via `in_memory_store_satisfies_the_conformance_suite`) — **PASS**; the real-store `run_all` wiring is lane S's first failing test (§8) |
+| **C-P3-2** | `crates/copy-contract/src/contract_tests.rs`: countdown-`Cancellation` case with a non-empty partial, `#[cfg(unix)]` read-only-destination `DestinationUnwritable` case; both assert `partial` counts equal the destination's actual contents and the source is untouched; in-crate negative unit test rejects a lying fake | `cargo test -p gwz-copy-contract --lib` (`ordinary_copier_satisfies_the_conformance_suite`, `the_accuracy_check_rejects_a_copier_that_lies_about_its_partial_report`) — **PASS** |
+| **C-P3-1** | `src/workspace_ops/merge/validate.rs` exposes the engine start gate as `validate_merge_start_shape` + `MergeRequest::validate_merge_start_shape` (inherent method, so no re-export through the pinned `merge/mod.rs`); `validate_family_merge` runs it on the projected request (selector cleared, placeholder import ref) before returning the selector | `local_clone::request::tests::family_merge_shape_runs_the_engine_start_gate_before_any_import`, `local_clone::tests::request::a_malformed_family_start_is_refused_with_the_engine_code_before_any_import` (whitespace message ⇒ `merge_validation_failed`, no `refs/gwz/local-imports/*`), `workspace_ops::merge::validate::tests::merge_start_shape_is_the_engine_start_gate_and_start_only` — **PASS** |
+| **S-P3-2** | `scripts/checks/test_v1_lifecycle_privacy_probe.py` and `scripts/checks/test_check_checked_artifact_boundaries.py` copy `crates/` through `copy_probe_dir` (`ignore=shutil.ignore_patterns("target", "Cargo.lock")`); unit test over the helper in each | `…::test_probe_copy_omits_git_ignored_build_output` (both files) — **PASS** |
+| **S-P3-3** | `scripts/checks/check_local_clone_boundaries.py` refuses when any classified crate manifest declares a third-party dependency while the CI Tier A step is unlocked (workflow `--locked`-less `cargo test --manifest-path` loop detected, or an explicit `ci_tier_a_unlocked` inventory flag); retirement condition in §7 item 6 | `scripts/checks/test_check_local_clone_boundaries.py::…::test_declared_third_party_with_unlocked_tier_a_is_rejected` (fails unlocked, passes locked); current tree passes — **PASS** (18 tests) |
+| **C-P3-5** | This record: §6 hook-path preflight deferral naming lane I, lane T's fixtures and the `LayoutHazard` outcome per fixture; §8 lane I brief | the deferral text and the §8 brief above |
+| **Optional ride-along** | `.github/workflows/checked-artifact-boundary.yml`: `--component clippy` on the local-clone-boundary job and `cargo clippy --manifest-path … --all-targets -- -D warnings` in the Tier A loop | CI only; the 13 crates already clippy-clean locally |
+
+**Gate results (measured on this commit's tree, host Darwin 25.6.0 arm64,
+cargo 1.95.0, python3.13).**
+
+| Gate | Result |
+|---|---|
+| `cargo fmt --all -- --check` | clean |
+| `CLIPPY_CONF_DIR="$PWD" cargo clippy --all-targets --all-features -- -D warnings` (gwz-core) | clean |
+| `cargo clippy --manifest-path crates/{copy-contract,family-store-contract}/Cargo.toml --all-targets -- -D warnings` | clean |
+| `python3.13 scripts/checks/check_checked_artifact_boundaries.py` | `ok (24 visible entries, 9 classified modules)` |
+| `python3.13 scripts/checks/check_local_clone_boundaries.py` | `ok` — 13 packages, 26 edges |
+| `python3.13 -m unittest scripts/checks/test_check_local_clone_boundaries.py` | 18 tests OK (was 17; +S-P3-3 negative fixture) |
+| `python3.13 protocol/regen.py --check` | `OK -- committed protocol artifacts are current` |
+| `cargo test -p gwz-core --lib local_clone` | 16 passed (was 13; +3) |
+| `cargo test -p gwz-core --lib workspace_ops::merge::validate` | 7 passed (was 6; +1) |
+| `cargo test -p gwz-core --lib workspace_ops::tests::g01::tracking_backend` | 1 passed |
+| `cargo test -p gwz-copy-contract --lib` | 6 passed (was 5; +1 negative) |
+| `cargo test -p gwz-family-store-contract --lib` | 4 passed (run_all now covers the pointer half) |
+| `cargo test -p gwz-family-store --lib` | 1 passed (compiles against the new `StoreError` variant) |
+| `run_r4bg_aggregate_gates.py fault:4` (lib remainder) | ok `1022 passed` |
+| `PYTHON=python3.13 scripts/checks/check_lane_commits.sh 87207c2 HEAD` | `lane gate: ok` at every commit |
+
+**Remainder re-pin (same commit).** The lane adds four `#[test]` rows to the
+lib remainder partition and removes none — three under `local_clone::` (the
+C-P2-1 colon case `#[cfg(unix)]`, the C-P3-1 unit and Tier B rows) and one in
+`workspace_ops::merge::validate::tests` — so
+`scripts/checks/run_r4bg_aggregate_gates.py` moves lib remainder **darwin
+1018 → 1022 (measured), linux 1019 → 1023 (derived, +4, every row cfg-free on
+a unix host)**; `checked_artifact::` 459 and `v1_lifecycle::` 266 are unmoved.
+The copy-contract and family-store-contract suite additions are in their own
+crates and do not touch the gwz-core lib census.
