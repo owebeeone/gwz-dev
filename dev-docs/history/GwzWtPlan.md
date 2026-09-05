@@ -1,6 +1,10 @@
 # GwzWt Implementation Plan
 
-Status: **ADOPTED 2026-09-01** — P0.1 ran GO-WITH-CONDITIONS
+Status: **UNACCEPTED 2026-09-03** — superseded by
+`GwzLocalCloneDesign.md`. Do not launch S1.1–S4.2. Authority for lanes
+is the local-clone design, not the W-* rows below.
+
+Previously: **ADOPTED 2026-09-01** — P0.1 ran GO-WITH-CONDITIONS
 (`GwzWt-P0.1-Review.md`: 0 P0 / 4 P1 / 7 P2 / 7 P3), every finding folded
 same day (§6), including two corrections to the ADOPTED design executed
 under the design's own governs-rule (its §5.5 stale exclude instruction;

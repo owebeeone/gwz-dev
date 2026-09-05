@@ -2,8 +2,10 @@
 
 Date: 2026-09-01
 
-Status: Revised after adversarial review; AI-0 and the bounded AI-1S proof are
-specified, but no public interface is frozen
+Status: **Parked.** Specimen of an AI-invented facet. Default is noise until a
+need is observed (a caller that is not a supervised shell, or a job existing
+verbs cannot recover). Not a roadmap, not an implementation charter, not a
+public-interface freeze. See `GwxMergeFindingsDraft.md` §4.
 
 Review: [GwzAiReqDd-AdversarialReview.md](GwzAiReqDd-AdversarialReview.md)
 

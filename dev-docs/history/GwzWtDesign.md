@@ -1,6 +1,12 @@
 # GwzWt — Workspace Worktrees: Requirements & Design
 
-Status: **ADOPTED 2026-09-01** — two review rounds complete
+Status: **UNACCEPTED 2026-09-03** — superseded by
+`GwzLocalCloneDesign.md`. Agent lanes are a second **workspace** (local
+copy, reflink when the filesystem answers), not a linked worktree.
+Shared refdb / exclude / catalog is the pain, not a feature. This file
+and `GwzWtPlan.md` are historical; do not charter GwzWt builds.
+
+Previously: **ADOPTED 2026-09-01** — two review rounds complete
 (`GwzWtDesign-Review.md`): round 1 NO-GO (2 P0 / 4 P1 / 7 P2 / 4 P3, all
 folded, six as recorded design decisions), round 2 **GO WITH CONDITIONS**
 (14 cured / 3 partial / 0 not-cured; fresh 2 P1 + 1 P2 + 3 P3, all folded

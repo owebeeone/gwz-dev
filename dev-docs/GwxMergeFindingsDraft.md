@@ -20,6 +20,8 @@ What the record has actually taught, written as findings rather than a grade:
 
 8. The human's leverage concentrated at the economics layer. Your interventions that shaped outcomes were quota windows, "burn it," conservation, and the thin-A1 scope law — zero lines of code review. The experiment suggests the human role in AI-autonomous engineering migrates to constraint design and resource governance, and that this frame was load-bearing, not decorative.
 
+9. Speculative completeness is a new incident class. An AI can notice a real shape (“this is a DSL”) and, when asked to spell the missing facet, emit a coherent host/runtime (GwzAi: intent, capabilities, fences, receipts). Prose coherence is not a need. The merge program already taught the coordinator lesson; implementing the specimen would rehearse it. Default: park the facet as noise until a need is *observed* — a caller that dies and retries without a human, or an agent job that has no legal sentence and already invents git. Mint a job-freeze (who calls, which sentence is illegal today, what evidence would unpark) before any object model. `GwzAiReqDd.md` is the parked specimen.
+
 Still open, and worth watching as the tail runs: whether deferred-escalation batching is sound — the Phase 5 dual is the designed test of whether six second-axis reviews can safely age to one gate, and it will say something either way; whether the assurance density purchased here pays off in production life (only A1 activation and time answer that); and whether any of this transfers off a well-specified systems domain onto messier work, which this experiment can't answer at all.
 
 ## 2. Merge-architecture findings
@@ -37,6 +39,10 @@ The section above is about how the program ran. This one answers the actual ques
 ## 3. Standing reminder (2026-08-30)
 
 Do not design **non-transactional APIs where it matters** — crash, identity, publication, multi-step mutation. The object store can be fine while the live API (check-then-rename, porcelain files as truth, recover-by-heuristic) is the whole tax. A later “real git database” with a legacy impl and a transactional impl is a thought exercise, not this program’s next build. Finish merge on the current plan. Standing rule: `.cursor/rules/transactional-apis.mdc`.
+
+## 4. Standing reminder (2026-09-01) — speculative facets default to noise
+
+When a model proposes a complete-looking architecture for a hole nobody is calling, **park it**. Do not implement it to discover whether it was needed. Unpark only when the need is observed in use (retrying unattended caller, or a missing verb agents already escape to git for). Until then the document is a specimen, not a train. Current specimen: `GwzAiReqDd.md`.
 
 ---
 
