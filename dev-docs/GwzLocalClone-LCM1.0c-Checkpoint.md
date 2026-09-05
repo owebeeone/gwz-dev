@@ -757,3 +757,56 @@ symlinked-parent spelling are not `run_all` cases: the in-memory fake has no
 notion of directory existence or symlinks, so they are lane S in-crate tests
 (§8). `docs/GitBackend.md` needed no sentence: the tracking-ref assertion
 pins a clause the contract already states.
+
+## 11. Post-acceptance follow-up 2 (LCM1.0c-fu2, operator rulings + W1 proposals)
+
+Written by the lane owner: lane C landed `fu2a`/`fu2b`/`fu2c` and was cut off
+by a usage limit before the tail; the lane owner committed the re-pin
+(`fu2d`) and this section, and verified every gate below on the pinned
+1.95.0 toolchain from `gwz-core/`.
+
+**Tuple.** gwz-core `616fc18` (four commits on `0d7b53d`); gwz-cli `196f911`;
+gwz-py `ad17c50`; gwz-dev `acdbcbf` plus the uncommitted root files listed
+below.
+
+| Ruling / proposal | Landed | Evidence |
+|---|---|---|
+| R1 `--from` wire name `copy_source` (design §11 item 11) | `fu2a` — taut tag 6, regenerated Rust + Python, core decode/refusal | `regen.py --check` OK; `local_clone` slice green |
+| R2 `LocalFamilyResponse.members` (item 12) | `fu2a` — `LocalFamilyMemberEntry` mirroring `gwz_family_model::ListState`; core projects it for op=list behind the still-`Unimplemented` store | new `local_clone::list` tests |
+| R3 `unknown_local = 62` (item 13) | `fu2a` — catalogs + `errors.rs` + family-merge wrapper carry the state detail | `local_clone` slice green |
+| R4 workspace layout Option A (item 14) | `fu2b` — gwz-core is its own Cargo workspace (14 members); root excludes it; CI Tier A is `cargo test -p <name> --lib --locked` + locked clippy; the unlocked-Tier-A guard retired per §7.6; per-crate lock/target ignores removed | all 13 crates `--locked` green in-tree; root `cargo build -p gwz --locked` ok |
+| W1, H1, H3, F1, F2, R1, R2 contract proposals | `fu2c` — all additive: `WorkObservation.unknown`, `UnknownKind::Cancelled`, a coordination-record root source, `Refusal` non-exhaustive with typed `PathNotNormalised`/`AllocationCollision`, `classify_dispose_target` at the request gate, `CopyWarningKind::NativeUnavailable`, `CopyError::refused_with` | Tier A counts below |
+| H2 adapter rule (one `check_history` call per witness store) | `fu2c` — documented where the core adapter will live; no signature change | doc comment; carried to lane X/D briefs |
+| Escaped defect: gwz-py stale `PRE_LOG_WIRE_SHA256` | `ad17c50` — re-pinned with the reason | gwz-py fast suites 113 passed, no red |
+
+**Gates (lane owner, 2026-09-06, rustc 1.95.0 from `gwz-core/`).** Checked-artifact
+boundary ok (24 visible entries, 9 classified modules); local-clone boundary ok;
+its unittest OK; `protocol/regen.py --check` OK; `cargo fmt --all -- --check`
+clean; Tier A `--locked` for all 13 crates green (copy-contract 6, family-model 29,
+family-store-contract 7, family-store 1, history-check 30, local-disposal 3,
+local-import 4, refcopy 35, repo-contract 7, repo-factory 2, repo-inspect 1,
+work-detector 32, workspace-install 2); `check_lane_commits.sh 0d7b53d HEAD` ok at
+all four commits; gwz-cli `cargo test -p gwz` 224 passed and the CLI reference
+check ok; gwz-py drift `sha256:08c45973…` and 113 fast tests passed; root
+`cargo build -p gwz --locked` ok with gwz-core excluded.
+
+**Census and re-pin (`fu2d`).** `--list` 1754 rows; `checked_artifact::` 459 and
+`v1_lifecycle::` 266 unmoved; lib remainder 1029 listed, two `#[ignore]` rows in
+the lib (one in each of the remainder and v1_lifecycle partitions), so darwin
+executes 1028 — measured directly with the two partition skips. Linux 1029 is
+derived (+6 cfg-free rows) and first-dispatch-expected.
+
+**Left uncommitted for the lane owner (root repo).** `Cargo.toml` (the
+`exclude = ["gwz-core"]` and its rationale), `dev-docs/GwzLocalCloneDesign.md`
+(revision 9, recording rulings 11–16), `dev-docs/GwzLocalCloneLibraryBoundaries.md`
+(revision 2, §5 Tier A form and §6 gate/CI), and this section.
+
+**Not done.** Bazel was not run in this follow-up (`bazel query //...` remains the
+named command); the probe harnesses were not re-run under the new workspace table
+(their 16-minute suites were out of budget) — both carry into the next lane C task.
+
+**What the next lanes need.** I (repo-inspect + the hook-path preflight), T
+(`local-testrepo`), S (`YamlFamilyStore` against the corrected pointer contract) and
+R (native copy path) are unblocked by Option A and may declare their third-party
+dependencies. CR wires `--from` to `copy_source` and renders `local list`; CP
+renders the same payload and adds the shared parity fixture.

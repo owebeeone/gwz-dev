@@ -1,13 +1,17 @@
 # Gwz local clone — Requirements & Design
 
-Status: **DRAFT 2026-09-05 revision 8** — retains the operator's
-“best effort is good enough” direction and adds review corrections for
-preflight/dry-run behavior and independent library boundaries. Supersedes
-revision 7 (SHA-256
-`5fe266c7b947f147f3522c8f857d2ec4cb4fed77fd9e09f876b42b2c4a8ec3a8`).
-Prior reviews remain evidence about their recorded inputs, not independent
-acceptance of this revision. GwzWt remains superseded for agent-lane
-isolation. Planning only; no implementation or release acceptance claimed.
+Status: **DRAFT 2026-09-05 revision 9** — records the operator's rulings
+of 2026-09-05 after the accepted LCM1.0c skeleton (`GwzLocalClone-LCM1.0c-Checkpoint.md`
+§7): the `--from` wire name `copy_source`, the `gwz local list` payload, the
+`unknown_local` error code, and workspace layout Option A (§7, §11 items
+11–16). Supersedes revision 8 (SHA-256 `4768268458885779e0d51ad5646bad7254d5eb783992f954c1e19f6eaff12924`);
+revision 8 itself retained the operator's “best effort is good enough”
+direction and the review corrections for preflight/dry-run behavior and
+independent library boundaries. `GwzLocalClonePlan.md` revision 4 cites
+revision 8; only §7 and §11 changed here. Prior reviews remain evidence about
+their recorded inputs, not independent acceptance of this revision. GwzWt
+remains superseded for agent-lane isolation. Planning only; no release
+acceptance claimed.
 
 **Engineering constraint:** use ordinary filesystem/Git operations and
 existing merge behavior. Do not build a new checked-artifact catalog,
@@ -554,7 +558,7 @@ CloneLocalWorkspaceRequest = Msg(
   dest=F(3, STR, optional=True),
   mode=F(4, LocalCloneMode),              # verbatim=0, clean=1, bare=2
   branch=F(5, STR, optional=True),        # -b; clean/bare only; before ready
-  from=F(6, STR, optional=True),          # family name or path
+  copy_source=F(6, STR, optional=True),   # --from: family name or path ('from' is a keyword in both generated languages)
   # Field 7 is not a public family_id input; core derives family identity.
 )
 
@@ -569,6 +573,28 @@ LocalFamilyRequest = Msg(
 )
 # Absent/empty list = no force. CLI rejects bare --force before encoding;
 # core rejects unknown hazards and keep+force. BOOL-only force is withdrawn.
+
+LocalFamilyResponse = Msg(
+  response=F(1, ResponseEnvelope),
+  members=F(2, List(LocalFamilyMemberEntry)),   # op=list only; empty otherwise
+)
+LocalFamilyMemberEntry = Msg(
+  name=F(1, STR),
+  kind=F(2, LocalMemberKind),                   # checkout=0, bare=1
+  recorded_state=F(3, LocalMemberState),        # creating=0, ready=1, disposing=2
+  observed_state=F(4, LocalObservedState),      # mirrors gwz_family_model::ListState
+                                                # (ready, incomplete, interrupted_disposal,
+                                                #  missing, mismatched, malformed, pointer_removed)
+  path=F(5, STR),                               # root-relative
+  last_error=F(6, STR, optional=True),
+)
+# Exact enum spellings are fixed by core's taut allocation (lane C); the names
+# above mirror the pure model's projection one-for-one.
+
+GwzErrorCode.unknown_local = 62               # family-only merge miss (absent or
+                                              # non-ready family name); state detail
+                                              # travels in the message. Pull/push keep
+                                              # missing_remote for the neither case.
 
 MergeRequest.source_ref = F(3, STR, optional=True)   # git ref; UNCHANGED
 MergeRequest.local_source_name = F(9, STR, optional=True)  # NEW; start only
@@ -842,6 +868,29 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
 10. Pull branch selection — **keep existing same-branch semantics**;
     cross-branch integration uses family merge with HEAD or an explicit
     source ref. A hub's symbolic HEAD is not a pull routing mechanism.
+11. `--from` wire name — **`copy_source`** (operator, 2026-09-05): `from` is
+    a keyword in both generated languages; tag 6 was held until this ruling.
+12. `gwz local list` payload — **`LocalFamilyResponse.members`** as in §7
+    (operator, 2026-09-05), mirroring the pure model's observed-state table.
+13. `UnknownLocal` error code — **`unknown_local = 62`** (operator,
+    2026-09-05); not folded into `missing_remote`.
+14. Workspace layout — **Option A** (operator, 2026-09-05): gwz-core is its
+    own Cargo workspace with `crates/*` as members, excluded from the root
+    gwz-dev workspace as `taut-shape-rs` already is; CI Tier A runs
+    `cargo test -p <name> --lib --locked` from gwz-core; the unlocked-Tier-A
+    guard retires on that landing. This unblocks the crates that declare
+    third-party dependencies (git2, a YAML crate, libc/rustix).
+15. `local dispose --force <hazards>` parse shape — the Rust CLI cannot add a
+    subcommand `--force` beside the global one, so the hazard list is parsed
+    as operands of the global `--force`; **every command line in §5 and §8
+    is byte-identical**, and both drivers refuse a bare `--force`, an empty
+    list or element, and keep+force before encoding. Recorded, not changed.
+16. Push into checkout members — **PENDING** (decide before LCM2.4):
+    libgit2's local transport refuses every push into a non-bare
+    repository, so family push reaches bare hubs only through
+    `push_anonymous`; a checkout member integrates from its own side with
+    `pull`/`merge --remote`. Lead recommendation: narrow §6.1/§8.2
+    accordingly rather than add a receiver-side fetch under the push verb.
 
 ## 12. Acceptance cases for the implementation plan
 

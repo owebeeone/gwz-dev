@@ -1,9 +1,19 @@
 # GWZ local clone — library boundaries and testing
 
-Status: **PROPOSED 2026-09-05 revision 1**. Local adoption decision for
+Status: **PROPOSED 2026-09-05 revision 2**. Local adoption decision for
 the local-clone plan, following F51 and the second GPT-6/Sol reviews.
-The packages, commands and gates below are planned, not implemented or
-measured. The compiled interface checkpoint is an LCM1.0 deliverable.
+The packages, commands and gates below were planned at revision 1; the
+LCM1.0c checkpoint (`GwzLocalClone-LCM1.0c-Checkpoint.md`) implemented and
+measured them, and revision 2 records the workspace layout the operator
+ruled on 2026-09-05 (Option A; design §11 item 14) in §5 and §6 only.
+
+Changelog: 2026-09-05 revision 2 (LCM1.0c follow-up 2, lane C) — §5 Tier A
+command form is `cargo test -p <Cargo-package> --lib --locked` from
+`gwz-core/`, one form for a standalone core checkout and the outer gwz-dev
+workspace alike, because gwz-core is now its own Cargo workspace with
+`crates/*` as members and is excluded from the root workspace; §6 the gate
+checks that layout and the CI job runs that form, and the S-P3-3
+unlocked-Tier-A guard is retired on its recorded condition. §1–§4 unchanged.
 
 ## 1. Scoped policy adoption
 
@@ -201,15 +211,27 @@ promise to tolerate malformed workspace configuration.
 ## 5. Fast feedback and integration tiers
 
 Every package in §2 has the concrete fast command
-`cargo test -p <Cargo-package> --lib` from a checkout containing it. For
-example, `cargo test -p gwz-history-check --lib` compiles the repository
-contract and its own algorithm/tests, not `gwz-repo-inspect` or core.
-All unit and applicable contract tests belong in that target. These
-commands become runnable only when the LCM1.0 skeleton lands.
+`cargo test -p <Cargo-package> --lib --locked`, run from `gwz-core/`. For
+example, `cargo test -p gwz-history-check --lib --locked` compiles the
+repository contract and its own algorithm/tests, not `gwz-repo-inspect` or
+core. All unit and applicable contract tests belong in that target.
+
+Layout (revision 2; workspace Option A, operator ruling 2026-09-05, design
+§11 item 14): `gwz-core/Cargo.toml` declares `[workspace] resolver = "2"
+members = ["crates/*"]` while keeping its own `[package]` and `[lib]`, and
+the root gwz-dev `Cargo.toml` excludes `gwz-core` exactly as it excludes
+`taut-shape-rs` (gwz-cli's path dependency on gwz-core still resolves
+through the root lock). A standalone core checkout and the outer gwz-dev
+workspace are therefore the same Cargo workspace for the libraries, run the
+same command, and resolve against the same committed `gwz-core/Cargo.lock`;
+`--locked` holds in both. No library declares a `[workspace]` of its own.
+A crate that declares a third-party dependency (`git2`, a YAML crate,
+`libc`/`rustix`) is resolved by that lock, which is what the retirement of
+the S-P3-3 guard (§6) rests on.
 
 | Tier | Contents and command | Project target, not measured performance |
 |---|---|---|
-| A — each library | Its exact `cargo test -p … --lib`; deterministic values, tiny temp files/real Git repos where applicable; fake ports for orchestration; no process spawn, service, sleeps or full workspace | Test execution ≤ 2 s; warm incremental compile plus tests ≤ 10 s **per package** on the recorded development host |
+| A — each library | Its exact `cargo test -p … --lib --locked` from `gwz-core/`; deterministic values, tiny temp files/real Git repos where applicable; fake ports for orchestration; no process spawn, service, sleeps or full workspace | Test execution ≤ 2 s; warm incremental compile plus tests ≤ 10 s **per package** on the recorded development host |
 | B — adapter slice | `cargo test -p gwz-core --lib local_clone::tests::<slice>`; real copy/Git/engine/store adapters, subprocess lock smoke and selected native-copy execution | Test execution ≤ 10 s and warm command ≤ 30 s per slice; split a growing slice; cold core build recorded separately |
 | C — milestone/system | Existing protocol drift, Rust/Python parity, merge regressions and native platform jobs; `gwz-py/run_tests.py` remains broad acceptance | Separate CI/milestone budget, recorded at LCM1.0; never required on every library edit |
 
@@ -237,11 +259,28 @@ alone is not evidence that its implementations satisfy the contracts.
 ## 6. Architecture gate and evidence
 
 LCM1.0 supplies `gwz-core/scripts/checks/check_local_clone_boundaries.py`
-and a machine-readable inventory matching §2. The proposed command is
+and a machine-readable inventory matching §2. The command is
 `python3 scripts/checks/check_local_clone_boundaries.py` from core, invoked
-as a failing CI job. It is development tooling, never a runtime dependency.
-No such gate exists yet, and a workflow does not configure hosting branch
-protection by itself.
+as a failing CI job (`.github/workflows/checked-artifact-boundary.yml`, job
+`local-clone-boundary`). It is development tooling, never a runtime
+dependency. A workflow does not configure hosting branch protection by
+itself.
+
+Revision 2 (layout Option A): the gate reads every member through one
+`cargo metadata --no-deps` at the gwz-core root and additionally requires
+that the gwz-core manifest is the workspace whose members cover every
+present classified crate, that no crate declares a `[workspace]` of its
+own, and that `gwz-core/Cargo.lock` is committed. The CI Tier A step runs
+`cargo test -p <name> --lib --locked` and `cargo clippy -p <name>
+--all-targets --locked -- -D warnings` from gwz-core over the inventory's
+present packages (`--list-present`), so a lane flipping `expected` to
+`present` is covered without editing the workflow. The S-P3-3 guard
+(LCM1.0c-rem1: refuse a declared third-party edge while the Tier A step
+runs unlocked) is retired on its recorded condition (checkpoint §7.6) — the
+step is locked against the committed workspace lock — and stays only as a
+shape guard: any recognised Tier A command in `.github/workflows/` without
+`--locked` still refuses a declared third-party edge; the former
+`ci_tier_a_unlocked` inventory flag is gone.
 
 The gate inventories every library manifest under `crates/`, rejects new
 unclassified packages, and checks resolved package identities and declared
