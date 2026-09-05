@@ -16,6 +16,9 @@
 > store (S2-P3-1, C2-P3-1, C2-P3-2) and alongside operator item §7.6
 > (S2-P3-2). Escaped defects: none known. Parallel feature lanes (W1) may
 > open on this tuple. Root checkpoint commit pending operator approval.
+> **Follow-up 1 (`LCM1.0c-fu1`, §10, 2026-09-05):** the four round-2 P3s and
+> the two Code round-2 residuals landed as one gwz-core commit `79c55667472503c66cbd45e2a4d9e7fce9919cdb` on
+> `a8eae4e`; lane S starts on the corrected `family-store-contract` (§8).
 
 
 Status: **BUILT 2026-09-05; remediation round 1 applied (see the
@@ -583,14 +586,40 @@ lane log).
   I's TDD start.
 - **S (family-store) — first failing test:** wire
   `gwz_family_store_contract::contract_tests::run_all` through a real
-  temp-directory `StoreFixture` for `YamlFamilyStore`. As of LCM1.0c-rem1
-  `run_all` covers the pointer/marker half (marker-before-pointer ordering,
-  `StoreError::Partial { completed: [MarkerWritten] }` on a scripted pointer
-  failure via the new `StoreFixture::fail_next` hook, repeatable
-  `remove_pointer`, `ConflictingMetadata`, `PointerTargetInvalid`, and the
-  `removing_the_row_before_the_pointer_is_refused_and_leaves_no_orphan`
-  ordering case), all green against `InMemoryFamilyStore`. Lane S's real-store
-  `run_all` is expected RED at this checkpoint (the store refuses
+  temp-directory `StoreFixture` for `YamlFamilyStore`. As of LCM1.0c-fu1
+  (§10) `run_all` has 15 cases, all green against `InMemoryFamilyStore`: the
+  index half (6) and the pointer/marker half (9) — marker-before-pointer
+  ordering, `StoreError::Partial { completed: [MarkerWritten] }` on a scripted
+  pointer failure via `StoreFixture::fail_next`, repeatable `remove_pointer`,
+  `ConflictingMetadata` (reached through a row recorded at `../root-two`,
+  where a second family's index lives), `PointerTargetInvalid` (family two's
+  own `<root-two>/../ws-A`, which already holds family one's pointer), the
+  `RemoveRow` **and** `Disband` ordering refusals, `PathMismatch` for a
+  destination that is not the row's path, and a non-canonical spelling of the
+  row's path (`<root>/./../ws-A`) that must be accepted, must protect the row,
+  and must be removable by name. What the corrected contract requires of the
+  real store and its fixture:
+  - `StoreFixture::member_workspace(root, relative)`: `create_dir_all` the
+    join, return the join. `fresh_root` must return a root whose parent is
+    fixture-private (rows are recorded at `../<name>`).
+  - **One resolution.** `install_pointer` resolves `root.join(row.path)` and
+    `destination` through the same canonicalisation (`std::fs::canonicalize`;
+    both must exist — the orchestrator allocates the destination first, and a
+    missing destination is `Io { operation: WriteMarker }`) and refuses
+    `PathMismatch` when they differ, *before* reading the destination's own
+    metadata (`ConflictingMetadata`, `PointerTargetInvalid`). `remove_pointer`
+    and the `RemoveRow`/`Disband` guard resolve the row's path the same way; a
+    recorded path that no longer resolves (directory gone) holds no pointer —
+    `remove_pointer` reports nothing and the guard does not refuse.
+  - Effects name `destination` as passed (install) and `root.join(row.path)`
+    (remove); the suite compares them exactly.
+  - The `Disband` guard is derived from the rows (a filesystem store cannot
+    enumerate pointers) and names the first row, in name order, whose pointer
+    stands — never a `"*"` sentinel.
+  - In-crate, outside `run_all` (the fake has no notion of existence or
+    symlinks): the missing-destination `Io { WriteMarker }` arm, and
+    optionally a `#[cfg(unix)]` symlinked-parent spelling of the row's path.
+  Lane S's real-store `run_all` is RED today (the store refuses
   `Unimplemented`) and is lane S's first failing test; a filesystem fixture
   implements `fail_next` by making the target path unwritable rather than
   queuing a scripted failure.
@@ -663,3 +692,68 @@ C-P2-1 colon case `#[cfg(unix)]`, the C-P3-1 unit and Tier B rows) and one in
 a unix host)**; `checked_artifact::` 459 and `v1_lifecycle::` 266 are unmoved.
 The copy-contract and family-store-contract suite additions are in their own
 crates and do not touch the gwz-core lib census.
+
+## 10. Post-acceptance follow-up 1 (LCM1.0c-fu1)
+
+2026-09-05. Lane C landed **one** gwz-core commit (`79c55667472503c66cbd45e2a4d9e7fce9919cdb`) on `main`,
+message `LCM1.0c-fu1: …`, closing the four round-2 P3 findings (Code C2-P3-1,
+C2-P3-2; State S2-P3-1, S2-P3-2) and the two Code round-2 residuals
+(`GwzLocalClone-LCM1.0c-ReviewCode-2.md` §3: the unpinned "updates no `origin`
+tracking ref" clause, and the fake's silent `fail_next` fallback) before lane
+S starts on the real store. No gwz-cli or gwz-py change; no pinned file; no
+new dependency; `crates/family-model` (lane F) untouched. The gwz-core
+`#[test]` census is unchanged (1748 rows: 16 `local_clone` + 1732 filtered),
+so `run_r4bg_aggregate_gates.py` is not re-pinned. This record's edits (status
+block, §8 lane S brief, this section) stay uncommitted in gwz-dev for the lane
+owner.
+
+**New tuple.** gwz-core **`79c55667472503c66cbd45e2a4d9e7fce9919cdb`** (was `a8eae4e`); gwz-cli
+`86840f67e23a9ef04312df0dd7c8f781cc476e04` and gwz-py
+`afcd5a396ccaf5e64884f8f1cec2f66273ac08bb` unchanged; gwz-dev root: this
+record re-edited, uncommitted.
+
+**Finding → change → closure test.** Paths are gwz-core; `lib.rs` and
+`contract_tests.rs` are `crates/family-store-contract/src/`. RED was observed
+before each implementation step: the un-resolving fake failed the repaired
+`PointerTargetInvalid` case exactly as S2-P3-1 predicts, and both checker
+fixtures failed `False is not true` against the per-line parser.
+
+| ID | What changed (file:line) | Closure test — result |
+|---|---|---|
+| **S2-P3-1** | Contract: call-order clause gains "One resolution of the recorded path" (`lib.rs:311-323`); `install_pointer` declaration states the destination is the store's own resolution of the row's recorded path, must exist, and the refusal order (`lib.rs:344-361`); `remove_pointer` resolves the same way (`lib.rs:367-373`); `MetadataEffect` says which spelling `workspace` carries (`lib.rs:100-105`). Additive `StoreError::PathMismatch { member, recorded, requested }` (`lib.rs:165-175`, Display `:246`); `src/local_clone/errors.rs:64` maps it to `invalid_request`. Fake: one lexical `resolve` (`contract_tests.rs:612`) keys every map and serves `install_pointer` (`:987` refuses `PathMismatch` before the destination's metadata), `remove_pointer` and both guard arms through `installed_pointer_of` (`:823`). Repaired cases: `…over_another_familys_pointer_is_pointer_target_invalid` (`:242`; family two installs at its own `member_workspace(&root_two, "../ws-A")`, family one's pointer pre-planted there) and `…into_a_destination_holding_an_index_conflicts` (`:205`; the row is recorded at `../root-two`, where family two's index lives, because handing `install_pointer` the root is now a `PathMismatch`) | `run_all` cases `a_pointer_installed_through_a_non_canonical_spelling_is_the_rows_pointer` (`:386`: `root.join("./../ws-A")` accepted; `apply(RemoveRow)` refused `PointerStillInstalled { member: "A" }` while it stands; `remove_pointer` reports `PointerRemoved`; then `RemoveRow` succeeds) and `installing_a_pointer_anywhere_but_the_rows_path_is_refused_without_effects` (`:337`: `PathMismatch { member: "A" }`, `NoFamily` observed at both paths, `remove_pointer` reports nothing, the row is removable) — **PASS** |
+| **C2-P3-1** | `StoreFixture::member_workspace(&mut self, root, relative) -> PathBuf` (`contract_tests.rs:35-43`; fake `:1107` = join; a filesystem fixture `create_dir_all`s then joins); free `destination_of` removed; `founded_with_a_creating_member` (`:96`) and both `root_two`s (`:222`, `:258`) route through it; `fresh_root` doc requires a fixture-private parent (`:31-34`); contract says a missing destination is `Io { operation: WriteMarker }` and the store creates nothing above `.gwz/` (`lib.rs:349-357`) | the fake's `run_all` unchanged-green (7 passed); the real closure is lane S's `run_all` with a store that creates nothing above `.gwz/` (§8) — **PASS** (fake) / lane S (real) |
+| **C2-P3-2** | `run_all` case `disbanding_before_the_pointers_is_refused_and_leaves_no_orphan` (`contract_tests.rs:427`); the fake's `Disband` guard is row-derived and names the member (`:931-945`; no `"*"` sentinel); `PointerStillInstalled` doc and Display describe both refusals: "member `A` still has its clone pointer installed at …; remove the pointer before removing the row or disbanding the family" (`lib.rs:156-164`, `:240-245`) | the new case (`Disband` → `Err(PointerStillInstalled { member: "A" })`, index intact; `remove_pointer`; `Disband` → `Ok([IndexRemoved])`; `reread` → `None`) and `lib.rs:415` `ordering_and_path_refusals_name_the_member_and_the_paths` (asserts "disbanding" present, `*` absent) — **PASS** |
+| **S2-P3-2** | `scripts/checks/check_local_clone_boundaries.py:277-330`: `tier_a_commands` drops comment lines and joins `\`-continuations (`:280-294`) before matching; `tier_a_unlocked` — the inventory flag wins; else every `.github/workflows/*.yml`/`*.yaml` is scanned; no workflow ⇒ unlocked iff `crates_dir` exists (`:321`); workflows but no recognisable Tier A command, or an unreadable workflow ⇒ unlocked; else unlocked iff ANY `cargo test … --manifest-path` command lacks `--locked` (`:330`) | `scripts/checks/test_check_local_clone_boundaries.py:493` `test_tier_a_command_split_across_continuations_is_unlocked_and_refused` (wrapped, `--locked`-less loop ⇒ `True`; the gate refuses the declared `tempfile` edge with "runs unlocked") and `:509` `test_locked_on_every_tier_a_command_is_locked_and_anything_less_is_not` (no workflow ⇒ `True`; no Tier A command ⇒ `True`; `--locked` on the wrapped command and on a second file's command ⇒ `False`, gate passes with the "locked Tier A step" note; one unlocked command in the second file ⇒ `True`, gate refuses) — **PASS**, 20 OK (was 18); the real tree still passes and evaluates `True`, with exactly the standalone Tier A loop line parsed |
+| **Residual: tracking ref** | `src/local_clone/tests/transport.rs:46-66`: after `fetch_anonymous`, `references_glob("refs/remotes/*")` on the receiver is asserted empty | `local_clone::tests::transport::fetch_anonymous_imports_an_explicit_refspec_without_persisting_a_remote` — **PASS** |
+| **Residual: `fail_next` fallback** | `contract_tests.rs:1128-1145`: an unknown root panics ("is not a root this fixture handed out") instead of scripting the last store's failure | `contract_tests::tests::fail_next_on_a_root_the_fixture_never_handed_out_panics` (`:1177`) — **PASS**; plus `the_fakes_resolution_is_lexical_and_root_bounded` (`:1159`) over `resolve` |
+
+**Ownership note.** The brief's "additive `Refusal` arm" would live in
+`crates/family-model` (lane F). It was not needed: the pure model never sees
+the requested destination — the mismatch is a store decision between the
+session's own resolution of the row and the caller's argument — so the typed
+refusal is the contract crate's `StoreError::PathMismatch`, and no
+family-model change is proposed. The suite was measured on the working tree,
+which at the time carried lane F's uncommitted family-model edits; this
+commit references no item they add (only `MemberRow`, `validate_transition`
+and the existing constants), so it is independent of them.
+
+**Gate results (this commit's tree, host Darwin 25.6.0 arm64, cargo 1.95.0,
+python3.13; run from gwz-dev unless noted).**
+
+| Gate | Result |
+|---|---|
+| `cargo fmt -p gwz-family-store-contract -- --check`, `… -p gwz-family-store …`, `… -p gwz-core …` | clean |
+| `cargo clippy -p gwz-family-store-contract --all-targets -- -D warnings`, `… -p gwz-family-store …`, `… -p gwz-core …` | clean |
+| `cargo test -p gwz-family-store-contract --lib` | 7 passed (was 4; `run_all` 15 cases, was 12) |
+| `cargo test -p gwz-family-store --lib` | 1 passed |
+| `cargo test -p gwz-core --lib local_clone` | 16 passed, 1732 filtered (census 1748, unchanged) |
+| `python3.13 scripts/checks/check_local_clone_boundaries.py` (gwz-core) | `ok` — 13 packages, 26 edges |
+| `python3.13 -m unittest scripts/checks/test_check_local_clone_boundaries.py` | 20 OK (was 18) |
+| `python3.13 scripts/checks/check_checked_artifact_boundaries.py` | `ok (24 visible entries, 9 classified modules)` |
+| `PYTHON=python3.13 scripts/checks/check_lane_commits.sh a8eae4e HEAD` | `lane gate: ok` at all 11 post-`a8eae4e` commits (nine from the parallel lanes, lane F's `2055408` — this commit's parent — and `79c5566`) |
+
+**Not done, and why.** The missing-destination `Io { WriteMarker }` arm and a
+symlinked-parent spelling are not `run_all` cases: the in-memory fake has no
+notion of directory existence or symlinks, so they are lane S in-crate tests
+(§8). `docs/GitBackend.md` needed no sentence: the tracking-ref assertion
+pins a clause the contract already states.
