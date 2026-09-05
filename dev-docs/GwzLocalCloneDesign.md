@@ -1,14 +1,16 @@
 # Gwz local clone — Requirements & Design
 
-Status: **DRAFT 2026-09-05 revision 9** — records the operator's rulings
-of 2026-09-05 after the accepted LCM1.0c skeleton (`GwzLocalClone-LCM1.0c-Checkpoint.md`
-§7): the `--from` wire name `copy_source`, the `gwz local list` payload, the
-`unknown_local` error code, and workspace layout Option A (§7, §11 items
-11–16). Supersedes revision 8 (SHA-256 `4768268458885779e0d51ad5646bad7254d5eb783992f954c1e19f6eaff12924`);
-revision 8 itself retained the operator's “best effort is good enough”
-direction and the review corrections for preflight/dry-run behavior and
-independent library boundaries. `GwzLocalClonePlan.md` revision 4 cites
-revision 8; only §7 and §11 changed here. Prior reviews remain evidence about
+Status: **DRAFT 2026-09-06 revision 10** — records the operator's four
+cross-driver rulings of 2026-09-06 after W2 (`GwzLocalClone-LCM1.0c-Checkpoint.md`
+§12, LCM1.0c follow-up 3): one parity fixture in gwz-core, snake_case enum
+values in machine output, `LocalFamilyResponse.root_path`, and `push
+--remote` encoded once with an empty `--name` refused at the driver (§7,
+§8.1, §11 items 17–20). Supersedes revision 9 (SHA-256 `f38bde917f89beecc39938ae29ef839ab89d437ac475677aa1b374d6c2cdc7d4`);
+revision 9 recorded the rulings of 2026-09-05 (the `--from` wire name
+`copy_source`, the `gwz local list` payload, the `unknown_local` error code,
+and workspace layout Option A, §11 items 11–16) over revision 8's “best
+effort is good enough” direction and review corrections. `GwzLocalClonePlan.md`
+revision 4 cites revision 8; only §7, §8.1 and §11 changed since. Prior reviews remain evidence about
 their recorded inputs, not independent acceptance of this revision. GwzWt
 remains superseded for agent-lane isolation. Planning only; no release
 acceptance claimed.
@@ -577,6 +579,12 @@ LocalFamilyRequest = Msg(
 LocalFamilyResponse = Msg(
   response=F(1, ResponseEnvelope),
   members=F(2, List(LocalFamilyMemberEntry)),   # op=list only; empty otherwise
+  root_path=F(3, STR, optional=True),           # the family root's path as core
+                                                # observed it (index dir, reached via
+                                                # the pointer from a clone); present
+                                                # exactly when members is; a driver
+                                                # joins it with each member's path
+                                                # (operator 2026-09-06, §11 item 19)
 )
 LocalFamilyMemberEntry = Msg(
   name=F(1, STR),
@@ -600,9 +608,21 @@ MergeRequest.source_ref = F(3, STR, optional=True)   # git ref; UNCHANGED
 MergeRequest.local_source_name = F(9, STR, optional=True)  # NEW; start only
 # F(8) is filesystem_strict (ship 1). Do not reuse.
 
-PushRequest.remote = F(2, STR, optional=True)        # ready family; absent row -> Git remote
+PushRequest.remote = F(2, STR, optional=True)        # ready family; absent row -> Git remote;
+                                                     # the ONLY field a driver puts the push
+                                                     # token in -- OperationPolicy.remote stays
+                                                     # absent on push (operator 2026-09-06,
+                                                     # §11 item 20); core still reads a
+                                                     # policy-only token from older callers
 PullHeadRequest.meta.policy.remote                   # OperationPolicy.remote=F(5); same dispatch
 ```
+
+Machine output (`--json`/`--jsonl`) spells every enum value -- `kind`,
+`recorded_state`, `observed_state` and the rest -- in the protocol's own
+snake_case (`checkout`, `interrupted_disposal`), in both drivers (operator
+2026-09-06, §11 item 18). The cross-driver fixture that pins the table
+below and the refusals both drivers make before encoding is the one file
+`gwz-core/protocol/fixtures/cli_parity/local_family_cases.json` (§11 item 17).
 
 Old binary does not send 27/28. New CLI / old core refuses typed.
 
@@ -626,8 +646,9 @@ Old binary does not send 27/28. New CLI / old core refuses typed.
 | `gwz merge --remote A` | `MergeRequest` op=start `local_source_name=A` (HEAD per paired member) |
 | `gwz merge --remote C lane/agent-17` | `local_source_name=C` `source_ref=lane/agent-17` |
 | `gwz merge --remote origin` | `UnknownLocal` (family-only; reserved / not a member) |
-| `gwz push --remote hub` | `PushRequest` remote=hub (family); current branch to the same branch in hub |
-| `gwz push --remote origin` | `PushRequest` remote=origin (git) |
+| `gwz push --remote hub` | `PushRequest` remote=hub (family), `meta.policy.remote` absent; current branch to the same branch in hub |
+| `gwz push --remote origin` | `PushRequest` remote=origin (git), `meta.policy.remote` absent |
+| `gwz clone --local --name "" dest` | refused by the driver before encoding (empty name; core's shape check refuses it too) |
 | `gwz merge A` | **git ref `A`**, not a family name |
 
 ## 8. Examples
@@ -698,6 +719,12 @@ C     checkout  ready  /Users/…/limbo/gwz-dev-C
 D     checkout  ready  /Users/…/limbo/gwz-dev-D
 hub   bare      ready  /Users/…/limbo/gwz-dev-hub
 ```
+
+The absolute paths are literal, not the driver's guess: the response
+carries the root's observed path in `LocalFamilyResponse.root_path` (§7)
+and each member's root-relative `path` (`.` for the root); the driver joins
+the two. A list run in D (a clone) still names root's directory, because
+`root_path` is the index's directory reached through D's pointer.
 
 ### 8.2 Pull and merge from a name
 
@@ -891,6 +918,28 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
     `push_anonymous`; a checkout member integrates from its own side with
     `pull`/`merge --remote`. Lead recommendation: narrow §6.1/§8.2
     accordingly rather than add a receiver-side fetch under the push verb.
+17. Cross-driver parity fixture — **one file, in gwz-core** (operator,
+    2026-09-06): `gwz-core/protocol/fixtures/cli_parity/local_family_cases.json`,
+    beside the existing merge fixtures, merged from both drivers' copies
+    (30 message cases, 23 refusals; the §7 table decided every
+    disagreement). The drivers re-point at it in their next lanes and drop
+    their copies.
+18. Enum spelling in machine output — **snake_case** (operator,
+    2026-09-06), the protocol's own names, as the Python driver already
+    renders them. Nothing in gwz-core decides the spelling (the generated
+    Rust enums carry `wire()`/`from_wire()` and derive `Debug` only), so
+    the Rust CLI's `{:?}` rendering (`"Checkout"`, `"InterruptedDisposal"`)
+    is lane CR's change; the human table already used the snake_case words.
+19. `LocalFamilyResponse.root_path` — **allocated** (operator, 2026-09-06):
+    tag 3, optional STR, the observed root; §7 and §8.1. Members' `path`
+    stays root-relative on the wire.
+20. `push --remote` encoding and an empty `--name` — **`PushRequest.remote`
+    only**, `OperationPolicy.remote` absent on push (operator, 2026-09-06);
+    core keeps request-over-policy precedence for a caller that still sets
+    the policy field. An empty `--name` **refuses at the driver** before
+    encoding; core's own shape check (`validate_clone_local`) refuses the
+    empty and reserved names as well, so the driver's refusal is the earlier
+    answer, not the only one.
 
 ## 12. Acceptance cases for the implementation plan
 
