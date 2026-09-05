@@ -1,10 +1,10 @@
-# GWZ v0.14.0 — release notes (DRAFT)
+# GWZ v0.14.0 — release notes
 
-Status: **DRAFT 2026-09-05**, assembled by the implementation lane from the
-tree at gwz-core `8291e37` and gwz-cli `c04b488`. **No release is cut by
-this document. No tag of any kind is created by this document.** It exists so
-that the release body, whenever the operator asks for one, is written from the
-tree rather than from memory.
+Status: **FINAL 2026-09-05**, assembled by the implementation lane from the
+released tree: gwz-core `c67e0d4` (tag `v0.14.0`), gwz-cli `79b53f6`
+(tag `v0.14.0`, pins gwz-core `v0.14.0`), gwz-py `5bc4a03` (tag `v0.14.0`,
+pins gwz-core `v0.14.0`). Published as the gwz-core GitHub release body at
+the tag.
 
 Two things to know before reading further. First, GWZ now has **one merge
 implementation**: every way of starting a merge writes the same record and
