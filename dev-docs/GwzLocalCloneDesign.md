@@ -1,11 +1,17 @@
 # Gwz local clone — Requirements & Design
 
-Status: **DRAFT 2026-09-06 revision 10** — records the operator's four
+Status: **DRAFT 2026-09-06 revision 11** — records the two text
+corrections LCM1.1's wiring proved necessary (`GwzLocalClone-LCM1.0c-Checkpoint.md`
+§13, lane C): the allocation marker lands with the pointer in step 3 of §4,
+not in step 2, and §4.1's "remove in install" row is owned by
+installation's `install_destination_git` port in every mode (§4, §4.1,
+§11 items 21–22). Supersedes revision 10 (SHA-256 `d06e9eebb2538fff67898c47df6c8dd31c8a335fc36d0aade6bf14ee8a0c6c1d`);
+revision 10 recorded the operator's four
 cross-driver rulings of 2026-09-06 after W2 (`GwzLocalClone-LCM1.0c-Checkpoint.md`
 §12, LCM1.0c follow-up 3): one parity fixture in gwz-core, snake_case enum
 values in machine output, `LocalFamilyResponse.root_path`, and `push
 --remote` encoded once with an empty `--name` refused at the driver (§7,
-§8.1, §11 items 17–20). Supersedes revision 9 (SHA-256 `f38bde917f89beecc39938ae29ef839ab89d437ac475677aa1b374d6c2cdc7d4`);
+§8.1, §11 items 17–20), over revision 9 (SHA-256 `f38bde917f89beecc39938ae29ef839ab89d437ac475677aa1b374d6c2cdc7d4`);
 revision 9 recorded the rulings of 2026-09-05 (the `--from` wire name
 `copy_source`, the `gwz local list` payload, the `unknown_local` error code,
 and workspace layout Option A, §11 items 11–16) over revision 8's “best
@@ -199,11 +205,14 @@ Under the family lock and §2's quiescence assumption:
 1. Aggregate name, path, source-layout and nested-repository checks before
    reservation. Refuse overlap, a nonempty destination, or a destination
    that is already a workspace. Do not fetch missing repositories.
-2. Write a `creating` row, allocate the destination and write its marker.
-   Capture source manifest, lock and repository HEAD/ref observations in
-   memory for this invocation. Stop on any failed step.
+2. Write a `creating` row and allocate the destination as an empty
+   directory. Capture source manifest, lock and repository HEAD/ref
+   observations in memory for this invocation. Stop on any failed step.
 3. Copy with exclusions applied during traversal, install fresh destination
-   metadata, and validate Git independence. Recheck the source observations.
+   metadata — the allocation marker and then the pointer, one store call
+   after the copy, because the copy admits only a new or empty destination
+   and so the marker cannot precede it (§11 item 21) — and validate Git
+   independence. Recheck the source observations.
    For clean/bare, create branches and recapture configuration before ready.
 4. Write the final manifest last, then update the row to `ready`. Errors
    or interruption leave the directory and diagnostic row for inspection;
@@ -284,6 +293,14 @@ the final column is the completion rule.
 | stash bundles under `.gwz/` | omit | **absent** |
 | `.git/worktrees/` in every included repository | omit | **absent** |
 | filesystem / credential URLs in copied `.git/config` remotes | remove in install | absent; ordinary non-credential https/ssh origin URLs remain |
+
+The last row is installation's job in every mode — its
+`install_destination_git` port, which runs after the copy or the
+construction and before the pointer — and never the factory's: a clean or
+bare construction is only ever handed a URL the same rule keeps
+(`gwz-repo-factory::origin_is_kept`, the one rule both share), so what
+install removes from a verbatim copy is exactly what construction never
+writes (§11 item 22).
 
 Recapture may write `gwz.conf/gwz.lock.yml` before the manifest.
 Regenerate the conf-integrity marker for the final manifest and lock
@@ -940,6 +957,25 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
     encoding; core's own shape check (`validate_clone_local`) refuses the
     empty and reserved names as well, so the driver's refusal is the earlier
     answer, not the only one.
+21. Where the allocation marker lands — **step 3, with the pointer** (lane C,
+    LCM1.1 wiring, 2026-09-06; found by lane N): `FamilySession::
+    install_pointer` writes the marker and then the pointer in one call, and
+    the copy contract admits only a new or empty destination, so the marker
+    written in step 2 would make the destination non-empty before the copy.
+    The text of §4 step 2 was corrected rather than the store split: one
+    ordered store call is the recoverable order the contract froze
+    (marker-before-pointer; LCM1.0c-rem1 State P2-2), and a marker without
+    its pointer is exactly the "interrupted" shape `local list` already
+    classifies. The row is still reserved before any destination effect.
+22. Owner of §4.1's "remove in install" row — **installation's
+    `install_destination_git` port, in every mode** (lane C, LCM1.1 wiring,
+    2026-09-06; found by lane N). Install and construction share one rule,
+    `gwz-repo-factory::origin_is_kept`: install strips what a verbatim copy
+    inherited; the factory's `set_origin` is called only with a URL that
+    rule keeps, so a clean or bare destination has nothing to strip and the
+    port reports nothing removed. Only the URL keys go (`remote.<name>.url`,
+    `remote.<name>.pushurl`); fetch refspecs and `refs/remotes/<name>/*`
+    are copied history and stay.
 
 ## 12. Acceptance cases for the implementation plan
 

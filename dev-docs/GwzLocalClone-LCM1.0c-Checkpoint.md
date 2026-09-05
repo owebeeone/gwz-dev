@@ -900,3 +900,218 @@ All landed in fu3c (`8652b87`), additively — new fields with defaults, new ite
 - **CR**: (1) re-point `src/tests/g12.rs` at `include_str!("../../../gwz-core/protocol/fixtures/cli_parity/local_family_cases.json")`, resolve dotted `fields`, read `driver_message_contains.rust` beside `message_contains`, honour `drivers`, drop `tests/fixtures/cli_parity/local_family_cases.json`; (2) `local_list_render.rs:116-118`: snake_case via the existing `*_word` functions; (3) render `root_path` in JSON and join it with `path` for the human table; (4) `clirequest/invocation.rs:202`: no `policy.remote` on push; (5) `clirequest/workspace.rs` `local_request`: refuse `--name ""` naming `--name`.
 - **CP**: (1) re-point `PARITY_FIXTURE` at `parents[3] / "gwz-core/protocol/fixtures/cli_parity/local_family_cases.json"`, read `driver_message_contains.python`, remove the two message blocks from `parser_cases.json`; (2) join `root_path` with `path` in `render_family_listing`; nothing for rulings 2 and 4.
 - **H**: `check_history` treats a non-empty `ProtectedRoots.unknown` as an unknown inventory (contract doc, `repo-contract/src/lib.rs:470`). **D**: same for disposal's fresh checks. **I**: only then switch `inventory_history` to per-root unknowns; may adopt `object_reader_conformance_allowing(&[Reflog, Stash])` in `tests/objects.rs`. **S**: implement `StoreFixture::alias_workspace` with a symlink so the S-4 case runs on the real store; `clear_failures` lets `BracketedStore` go. **R**: keep or replace the crate-level `result_large_err` allow. **W**: W-2 revisited at LCM2. **Lane owner**: the Bazel `MODULE.bazel` cure and the `.razel-exec` loop (root).
+
+## 13. LCM1.1 wiring (lane C, core integration)
+
+2026-09-06, lane C. The three dispatch slots stop refusing: `gwz clone
+--local --name A [dest]` (verbatim), `gwz local list`, `gwz local dispose
+<name> --keep` and `gwz local disband` run end to end over the libraries for
+the first time. Five gwz-core commits on `96226c9`, each on an explicit
+pathspec, each passing the lane gate on its own tree; no gwz-cli or gwz-py
+change; no pinned file touched (`src/lib.rs`, `src/workspace_ops/mod.rs`,
+`merge/mod.rs`, `gitbackend.rs`, `checked_artifact/**` all at their pinned
+digests -- the adapters register under `src/local_clone/mod.rs`, which is not
+pinned). LCM1.2 (the family merge's import through lane X's `prepare_import`
+and the transport adapter, then the delegation) was **not started**, as
+briefed: `family_merge.rs` steps 5-6 still refuse `unsupported_operation`
+after resolution.
+
+**Tuple.** gwz-core **`81fcaf225f96fd8d1fce1b3bfc4cb44f15bb21e4`** (lane C:
+`861131d` LCM1.1a, `87e2d4d` LCM1.1b, `1bc771b` LCM1.1c, `b55b506` LCM1.1d,
+`81fcaf2` LCM1.1e); gwz-cli `4c5d7fd` and gwz-py `30885cd` unchanged; gwz-dev
+root `01984d4` plus the uncommitted files listed in §13.7.
+
+### 13.1 What each port is wired to (`src/local_clone/adapters/`)
+
+| Port | Adapter | Behind it |
+|---|---|---|
+| `InstallPorts::snapshot_source` | `install::capture_source` (taken **before** the family lock) over `inventory` | core's own traversal of the included repositories (root, manifest members, unmanaged nested repositories keyed `nested:<path>`; excluded subtrees skipped; symlinks never followed; `.git` never entered), `gwz-repo-inspect::LocalRepoInspector::inspect_layout` on each with every repository's hazards **aggregated** into one `LayoutError::Unsupported`, `git2` for local branch and remote names, SHA-256 over manifest+lock bytes, the open-merge probe |
+| `InstallPorts::recheck_source` | the same capture again, compared whole; the first difference is the `Drift` detail | |
+| `InstallPorts::observe_destination` | `install::CoreInstallPorts` | the filesystem (`exists`/`nonempty`/`is_workspace`), `gwz-family-store::YamlFamilyStore::observe_workspace` (index present, pointer, marker -- the new read-only store method), `.gwz/merge` presence, §4.1's at-ready column as `residual` (family lock, catalog, checked-artifacts, stash bundles, every repository's `.git/worktrees`), and `dependencies` = §4.0 dest-complete: `inspect_layout` of every destination repository, HEAD equal to the frozen source HEAD, and every protected root's object graph complete in the destination's own store through `gwz-history-check::check_history` (one call per repository, the repository as its own witness) |
+| `InstallPorts::allocate_destination` | `std::fs::create_dir`; an existing empty directory is admitted | |
+| `InstallPorts::install_destination_git` | `git_config::install_destination_git` | `git2` local-config edits: `remote.<name>.url`/`.pushurl` values that `gwz-repo-factory::origin_is_kept` rejects are removed; refspecs and `refs/remotes/*` stay; reported as `<repository>: <remote>` |
+| `InstallPorts::construct_repositories` | refuses `Unimplemented` | `gwz-repo-factory` was **not** dropped in: the port shape fits (`FactoryRequest` from the snapshot, a `RepoBuildPort` over `git2`), but the builder port needs `transfer_objects` + checkout over the backend and the factory's follow-ups (`RecaptureLock`, `WriteFamilyRoot`, `WriteManifestLast`) need `recapture_configuration` to write a real lock for a constructed destination -- LCM2.3/LCM3.1 work, not cheap; clean and bare refuse at `create::clone_local` before any observation |
+| `InstallPorts::recapture_configuration` | `CoreInstallPorts` | verbatim: the copied `gwz.conf/gwz.lock.yml` is read back (`artifact::read_lock`; an undecodable copy stops before the manifest) and reported `lock_recaptured: false`, nothing generated -- the copied lock *is* the destination's state byte for byte; clean/bare `Unimplemented` |
+| `InstallPorts::publish_manifest` | `CoreInstallPorts` | `artifact::write_manifest(dest, source manifest)` -- the typed writer regenerates the conf-integrity marker over the final manifest and the copied lock; `marker_regenerated` = `inspect_conf_integrity(dest) == Verified` |
+| `TreeCopier` | `gwz-refcopy::SystemTreeCopier`, `CopyMode::Auto` | `exclusions::verbatim_exclusions`: the ten fixed §4.1 copy-time rows (family index, lock, marker, pointer, catalog-final, checked-artifacts, `.gwz/locks`, `.gwz/merge`, `.gwz/stash/bundles`, `gwz.conf/gwz.yml`) plus `<git dir>/worktrees` per included repository; `gwz.conf/gwz.lock.yml` and `gwz.conf/markers/conf-integrity.yml` are copied and then superseded by publication |
+| `FamilySession` | `gwz-family-store::YamlFamilyStore::try_lock` on the canonical addressed workspace (a clone locks its root through its pointer) | founding (`found`) when `reread` is `None`; the family id and both allocation ids are minted by core (`member_paths`: `fam_<32 hex>`, `alloc_<32 hex>` via `getrandom`) |
+| `DisposalPorts::observe_target` | `disposal::CoreDisposalPorts` | the store's `observe_member_target` for the target (`Missing` short-circuits), the inventory traversal of the target tree, `inspect_layout`/`observe_work`/`inventory_history` per repository (a layout the inspector refuses becomes an `UnsupportedLayout` unknown), GWZ evidence fail-closed: merge = the probe (`Open`/`None`/`Unknown`), stash = `Unknown` when any bundle record exists (decoding into coordination roots is LCM2.1) |
+| `DisposalPorts::check_history` | `CoreDisposalPorts` | **one `gwz-history-check::check_history` call per witness store** (lane H's rule H2), each with a `LocalObjectReader` over exactly one surviving repository, witnesses paired by identity (`RepoKey::Root` -> the root's repository and every other ready member's root; `Member{id}` -> the member with the same manifest id in each survivor; `nested:` -> no witness), outcomes combined per root: covered by any single witness whole -> `Preserved`; else `Unknown` if any witness was unknown, else `Unpreserved` naming the roots; an incomplete `ProtectedRoots` (I-2) answers `Unknown` before any read |
+| `DisposalPorts::remove_directory` | `removal::remove_tree` | depth-first, `symlink_metadata` on every entry, a link removed as a link (never entered), the target itself must be a real directory; stops at the first error naming what remains |
+| `LocalTransport` | `transport::BackendLocalTransport` (unchanged, LCM1.0c) | |
+
+The compositions: `local_clone::create::clone_local` (mode -> observation
+-> destination and recorded path -> capture before the lock -> lock ->
+found -> `install`; a refusal that reserved nothing un-founds a family this
+invocation founded; a failure after the row reports the step, the cause,
+every completed effect and what is retained), `local_clone::dispose::keep`
+(`gwz_local_disposal::dispose` with `DisposePolicy::Keep`; the addressed
+workspace is canonicalised before the lock so the library's lexical
+root/cwd comparison holds) and `local_clone::dispose::disband` (every
+member's `remove_pointer`, then `FamilyChange::Disband`; a workspace in no
+family is a `Noop`, an interrupted disband repeats). The open-merge probe
+is `workspace_ops::open_merge_probe` = the merge store's own
+`classify_open_record`, passed as a function pointer because
+`workspace_ops::merge` is private to `workspace_ops` (a probe that cannot
+classify a record is an error, never "no merge").
+
+**The first real `gwz clone --local`.** `local_clone::tests::create::
+root_to_a_verbatim_create_is_independent_installed_and_ready`, on a
+workspace built with `gwz-local-testrepo` (a root repository plus member
+`app`, one commit each, registered through `handle_create_workspace` and
+`handle_add_existing_repo`, then an untracked `app/notes.txt` and an
+unstaged `README` edit). Response message, verbatim: `created local clone
+\`A\` at <tmp>/root-A (verbatim; recorded as ../root-A; 42 files copied (42
+natively, 0 ordinarily), 44 directories, 0 symlinks, 10423 logical bytes; 0
+remote URL(s) removed; family fam_<32 hex>, founded)`. What it produced:
+`<tmp>/root-A` with `.gwz/family-root` and `.gwz/local-clone-allocation`
+regenerated, no `.gwz/local-family.yml`, no `.gwz/local-family.lock`, no
+`.gwz/merge`, no `.gwz/locks`, no `app/.git/worktrees`; `gwz.conf/gwz.yml`
+byte-equal to the source's and the lock byte-equal, conf integrity
+`Verified`; the dirt carried; the root's index founded with row `A`
+`ready`, path `../root-A`, `checkout`, `verbatim`, source `.`; the family
+readable from A through its pointer; the source untouched; every
+destination repository's common dir inside the destination; a commit made
+in `A/app` absent from the source's object store. 42 of 42 files went
+through Apple `clonefile` (APFS).
+
+### 13.2 What still refuses, and why
+
+| Refusal | Where | Why |
+|---|---|---|
+| `--clean`, `--bare` | `create::clone_local`, before any observation | LCM3.1 / LCM2.3; `construct_repositories`, clean/bare `recapture_configuration` and `publish_manifest` answer `Unimplemented` behind it |
+| `--from` (`copy_source`) | `validate_clone_local` | LCM3.2 (unchanged) |
+| ordinary `dispose <name>` (no `--keep`) | `handle_local_family`, after the family observation | its fresh work/history checks are LCM2.1; the ports are wired and exercised directly (§13.3) but the slot refuses before any effect; `--keep` with hazards stays malformed |
+| family merge steps 5-6 | `family_merge::handle`, after resolution | LCM1.2 -- lane X's `prepare_import(&ImportRequest { transfer, receivers, sources, selected, selector }, &mut BackendLocalTransport, &cancellation)` and the delegation to `handle_merge_with_events`, out of scope by the brief |
+| a family `dry_run` | request shape | unchanged |
+
+### 13.3 Tier B slices (`cargo test -p gwz-core --lib --locked local_clone::tests::<slice>`; Darwin 25.6.0 arm64, cargo 1.95.0; execution time as reported by the harness, warm)
+
+| Slice | Tests | Cost | What it measures |
+|---|---|---|---|
+| `create` | 5 | 0.60 s | root -> A verbatim (above); an `alternates` hazard refused `unsupported_operation` **before reservation** with `family_files_absent` at the root (no lock file, no index, no pointer, no marker) and no destination; an install cancelled after the pointer and before the manifest (`CancelWhenExists(dest/.gwz/family-root)`) leaving row `A` `creating` with `last_error` "publish manifest: install cancelled", effects `[RowAllocated, DestinationAllocated, TreeCopied, DestinationGitInstalled, PointerInstalled, ConfigurationInstalled, ErrorRecorded]`, the pointer, marker, copied tree and copied lock present and **no manifest** (the manifest really is last); root -> A -> B from A (B recorded on the root with `source_path ../root-A`, B pointing at the root, `list` from B = root, A, B), a taken name and an occupied destination refused `path_collision` with nothing reserved; the fixture itself |
+| `list` | 2 | 0.27 s | root -> A: `list` from the root, from A and from inside `A/app` reports `root` then `A` `ready` (`kind 0, recorded 1, observed 0`, path `../root-A`) with `root_path` = the root directory in all three, and leaves both trees byte-identical (a full-tree digest before and after); the interrupted create lists `creating`/`incomplete` with its diagnostic and nothing removed or promoted; the tree removed by hand lists `missing` |
+| `dispose` | 5 | 0.62 s | `dispose A --keep`: pointer and marker gone, every other file byte-identical, the row gone, A in no family, a repeat `member_not_found`; keep on the interrupted create (no manifest appears); `disband` from clone B with A's pointer already removed by hand: A's marker, B's pointer and marker and the index removed, every tree byte-identical, a repeat `Noop`; ordinary deletion refused `unsupported_operation` with nothing touched; the ports directly -- `observe_target` (Present/Matches/Matches, two repositories, the copied untracked note observed, merge evidence `None`, history known and complete), `check_history` `Preserved` through the root's paired witness and `Unpreserved` naming a commit made only in A, a `nested:` key `Unpreserved` with no witness, `remove_directory` on a scratch tree |
+| `request` | 4 | 0.13 s | the pinned refusal order, now: clean mode unsupported before any family file; ordinary dispose unsupported; a disband outside any family a `Noop` writing nothing |
+| `transport` | 7 | 0.07 s | unchanged |
+| `local_clone::adapters` (unit) | 10 | 0.01 s | minted ids, the default sibling destination, the recorded path (`../gwz-dev-A`, `../../../../tmp/lanes/A`, the inside/itself/above refusals), the intended destination (`dest=.` is the invocation directory, as `git clone <url> .`), the §4.1 exclusion set row for row, the remover (a link out of the tree removed as a link, a symlinked target refused), the remote-URL rule (https and scp-style kept; a path, `file:`, a token URL and a `../peer` push URL dropped; refspecs kept; idempotent) |
+
+Whole `local_clone` filter: 45 tests, 1.6 s. Each real-workspace test builds
+its own fixture (two `git init`, two commits, the two public handlers) --
+about 60 ms -- so the slices are far inside the 10 s Tier B target.
+
+### 13.4 The two discrepancies
+
+- **Design §4 step 2 ("allocate the destination and write its marker").**
+  Resolved by **amending the design text** (root file, uncommitted: design
+  revision 11, §4 steps 2-3, §11 item 21), not by splitting the store's
+  writes. The store's `install_pointer` writes marker-then-pointer in one
+  call, and that order is the recoverable one the contract froze
+  (LCM1.0c-rem1 State P2-2); the copy contract admits only a new or empty
+  destination, so a marker written in step 2 would make the destination
+  non-empty before the copy. Splitting the store into two calls would give
+  the orchestrations a second ordering to get wrong for no gain: the row
+  is still reserved before any destination effect, and a marker without a
+  pointer is exactly the interrupted shape `local list` already classifies.
+- **§4.1's "remove in install" row had no named owner.** Given to
+  `install_destination_git` (`adapters/git_config.rs`), and **confirmed as
+  installation's job in every mode**, not the factory's for clean and bare:
+  the two share one rule, `gwz-repo-factory::origin_is_kept` -- install
+  strips what a verbatim copy inherited, and the factory's `set_origin` is
+  only ever handed a URL that rule keeps, so a constructed destination has
+  nothing to strip and the port reports nothing removed. Recorded in
+  design §4.1 (the paragraph after the table) and §11 item 22 (root,
+  uncommitted), and in gwz-core `dev-docs/GWZDesign.md`. Only the URL keys
+  are removed; fetch refspecs and `refs/remotes/<name>/*` are copied
+  history and stay.
+
+### 13.5 Crate edits outside `src/`, with reasons
+
+| Path | Edit | Reason |
+|---|---|---|
+| `Cargo.toml`, `Cargo.lock` | `[dev-dependencies] gwz-local-testrepo = { path = "crates/local-testrepo" }`; one lock line (`gwz-core`'s dependency list) | the Tier B slices build real workspaces with lane T's harness; dev edge only; the root gwz-dev `Cargo.lock` is unchanged and `--locked` there (verified with `cargo metadata --locked --offline` at the root) |
+| `crates/family-store/src/lib.rs`, `tests.rs` (lane S) | additive: `YamlFamilyStore::observe_workspace(workspace, family_id, root, allocation) -> WorkspaceObservation { Missing, Unobservable{detail}, Present(WorkspaceMetadata { index, pointer, marker }) }` and `observe_member_target(root, view, row) -> TargetObservation`; one in-crate test | the port-shape addition the wiring proved necessary: `gwz local list` and disposal's fresh evidence read the pointer and marker at each row's resolved path, and the format (including the marker schema, `pub(crate)`) is the store's, so the observation-only reading lives there rather than as a shadow decoder in core. Not a `FamilyStore` contract method (that would have widened the frozen contract and the in-memory fake for a read core composes concretely anyway). Decision recorded in its doc: a pointer `Matches` only when it names this family **and** this root (resolved), so a moved root lists `mismatched` (design §11 item 4, fail closed). Tier A 39 (was 38); `run_all` untouched |
+| `scripts/checks/run_r4bg_aggregate_gates.py` | lib remainder pin 1030/1031 -> **1052 darwin (MEASURED) / 1053 linux (DERIVED)**, dated reason | 22 new `#[test]` rows, all under `local_clone` (adapters 10, tests::create 5, tests::list 2, tests::dispose 5); census 1778 rows (was 1756); `checked_artifact::` 459 and `v1_lifecycle::` 266 unmoved. **Process note:** the rows landed in LCM1.1a-d and the pin followed in LCM1.1e rather than in each commit -- a deviation from the brief's "same commit", reported here |
+| `docs/RustApi.md`, `docs/ErrorCatalog.md`, `dev-docs/GWZDesign.md` | LCM1.1 status, the adapters, what still refuses, the codes reused (nothing new allocated) | documentation |
+
+No other crate was edited. `crates/local-testrepo`, `repo-inspect`,
+`refcopy`, `workspace-install`, `local-disposal`, `history-check`,
+`repo-factory`, `family-model`, the three contracts and `local-import` are
+consumed as they stand; no port shape in any of them changed.
+
+### 13.6 Gates (final tree, gwz-core `81fcaf2`; Darwin 25.6.0 arm64, cargo 1.95.0, python3.13, from gwz-core)
+
+| Gate | Result |
+|---|---|
+| `cargo fmt --all -- --check` | clean (run before every commit) |
+| `CLIPPY_CONF_DIR="$PWD" cargo clippy --all-targets --all-features --locked -- -D warnings` | clean (before every commit; one `if_same_then_else` in the store's observation fixed before LCM1.1a) |
+| `python3.13 scripts/checks/check_checked_artifact_boundaries.py` | ok (24 visible entries, 9 classified modules) |
+| `python3.13 scripts/checks/check_local_clone_boundaries.py` + its unittest | ok (14 packages, 39 edges); 23 OK |
+| `python3.13 protocol/regen.py --check` | OK (no protocol change) |
+| Tier A `--locked`: family-store 39, workspace-install 27, local-disposal 27, repo-inspect 88, local-testrepo 39 | all passed |
+| `cargo test -p gwz-core --lib --locked local_clone` | **45 passed**, 1.6 s (was 23) |
+| lib remainder (`-- --skip checked_artifact:: --skip workspace_ops::merge::v1_lifecycle::`) | 1052 passed; 1 ignored; 53.4 s |
+| `PYTHON=python3.13 scripts/checks/check_lane_commits.sh 96226c9 HEAD` | `lane gate: ok` at all five commits, 39 s |
+| root `cargo metadata --locked --offline` | ok (root lock unchanged) |
+
+Not run: the 16-minute probe suites, Bazel (the fu3 debt stands), gwz-cli
+and gwz-py suites (no driver change; the CR/CP lanes own their trees).
+
+### 13.7 Left uncommitted for the lane owner (root repo)
+
+`dev-docs/GwzLocalCloneDesign.md` (revision 11: status, §4 steps 2-3, the
+§4.1 paragraph after the exclusion table, §11 items 21-22; supersedes
+revision 10, SHA-256 `d06e9eebb2538fff67898c47df6c8dd31c8a335fc36d0aade6bf14ee8a0c6c1d`)
+and this record (§13). The member pin to record through `gwz`: gwz-core
+`81fcaf225f96fd8d1fce1b3bfc4cb44f15bb21e4`; gwz-cli `4c5d7fd` and gwz-py
+`30885cd` unchanged. No root `Cargo.lock` change.
+
+### 13.8 Residual risks and what the next lanes must know
+
+- **Cost of dest-complete.** `observe_destination` walks every destination
+  repository's protected object graph through `gwz-history-check` (headers
+  and edges, memoised). On the fixtures it is milliseconds; on a workspace
+  the size of gwz-dev it is seconds and scales with the object count.
+  Design §4.0 asks for it ("validate reachable object connectivity");
+  `Limits::default()` (100 000 roots, 256 MiB bookkeeping) bounds it and a
+  limit is an `Incomplete` destination, never a silent pass. If the cost
+  proves too high on real trees, the bound -- not the check -- is the
+  lever.
+- **Nested bare repositories** (a directory that is itself a Git directory,
+  with no `.git` entry) are not inventoried: they are copied as ordinary
+  directories and neither inspected nor independence-checked. Design §4.0
+  names "unmanaged/ignored nested repositories"; the traversal recognises
+  them by a `.git` entry (directory or gitfile). A `.git` gitfile is found
+  and refused (`GitFile`), as the design requires.
+- **Error codes.** Nothing new was allocated; `io_error` carries source
+  drift, copy failures, an incomplete destination and a cancelled install,
+  and `unsupported_operation` carries a §4.0 source hazard. The messages
+  name the step, the typed cause, the effects and what is retained, which
+  is what an operator acts on; a dedicated code is a driver-facing question
+  for the lane owner (design §7 allocates none).
+- **Founding and refusal.** A create that founds a family and is then
+  refused before reservation removes the empty index it just wrote
+  (`Disband` on a memberless family); the lock file `.gwz/local-family.lock`
+  created by `try_lock` stays, as it does after any locked operation. A
+  §4.0 hazard is refused before the lock, so that case leaves nothing at
+  all (measured).
+- **`recapture_configuration` in verbatim mode reports `lock_recaptured:
+  false`**: nothing is recaptured because the copied lock is the
+  destination's exact state; the library requires recapture only for
+  clean/bare. When LCM3.1 lands, the port must write a real lock for a
+  constructed destination.
+- **Windows** builds of the new adapters are unverified here (the
+  foreign-target clippy step in CI covers only the crates); the remover
+  has a `cfg(windows)` link arm (`remove_dir` then `remove_file`).
+- **CR/CP**: nothing changes on the wire. The create's response carries
+  its summary in `response.meta.message`; `local dispose --keep` and
+  `disband` answer `LocalFamilyResponse` with empty `members`, no
+  `root_path`, and a message; a disband outside any family is
+  `AggregateStatus::Noop`. The parity fixture is untouched.
+- **Lane X (LCM1.2)** picks up at `family_merge::handle` after
+  `resolve_family_merge`: build `ImportRequest` (transfer id, receivers
+  from the addressed workspace's lock, sources from the bound member's
+  path, `selected`, `SourceSelector::Head` or `Ref`), `prepare_import` over
+  `BackendLocalTransport`, then `handle_merge_with_events` with the
+  selector cleared and `source_ref = import_ref`. The family lock is the
+  store session from `try_lock`; hold it across both.
