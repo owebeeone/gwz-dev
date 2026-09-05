@@ -1115,3 +1115,350 @@ and this record (§13). The member pin to record through `gwz`: gwz-core
   `BackendLocalTransport`, then `handle_merge_with_events` with the
   selector cleared and `source_ref = import_ref`. The family lock is the
   store session from `try_lock`; hold it across both.
+
+## 14. LCM1.1 fixes 1-3 (lane C, core integration)
+
+2026-09-06, lane C. The three things the LCM1.1 wiring (§13) left open:
+the overloaded error codes, the unbounded destination-completion check,
+and the two drivers' untested path joins. The measurement for fix 2 found
+a defect the wiring had not seen: dest-complete would have **falsely
+refused every real repository** in this workspace after the copy. Commits
+(each on an explicit pathspec, no pinned file touched, no attribution
+trailer): gwz-core **two** (fixes 1+2 together -- they share
+`create.rs`, `tests/create.rs` and the remainder pin, and neither half
+compiles alone -- then the fix 3 fixture), gwz-cli one, gwz-py one.
+
+**Tuple.** gwz-core **`8bb88049684f0c24a207f83a2e82f32eaf48942a`** (lane C:
+`a398450` fixes 1+2, `8bb8804` fix 3, on top of the concurrent Bazel
+lane's `2c30ebe`, which is not lane C's); gwz-cli
+**`5e5f69b`**; gwz-py **`88f8d2b`**; root `6b55f61` plus the two
+uncommitted files in §14.7. Baseline: gwz-core `81fcaf2`, gwz-cli
+`ed132ea`, gwz-py `d9e81a0`. `check_lane_commits.sh 81fcaf2 HEAD`: `lane
+gate: ok` at `2c30ebe`, `a398450` and `8bb8804`.
+
+### 14.1 Fix 1 -- the four local-create codes (`GwzErrorCode` 63-66)
+
+Allocated after `unknown_local = 62` in `protocol/gwz.taut.py`; regenerated
+`src/protocol/generated.rs` (+12 lines; the corpus vectors are unchanged
+-- no message changed), gwz-py `src/gwz/protocol/generated/{api.py,
+gwz.ir.json}`; `docs/MessageCatalog.md` through its generator (+4 rows);
+`docs/ErrorCatalog.md` (four rows and a rewritten "Local Clone Family"
+section with the call-site table), `docs/Protocol.md`, `docs/RustApi.md`,
+gwz-core `dev-docs/GWZDesign.md`; design §7 and §11 item 23 (root). The
+mapping is one table, `src/local_clone/errors.rs::{layout_code,
+install_port_code, install_refusal_code, install_error_code}`, which
+`create.rs` now calls (`port_error` for the capture before the lock,
+`failure_error` for the install).
+
+| Code | Outcome | Call site (typed cause) | Why its own code |
+|---|---|---|---|
+| `unsupported_source_layout` (63) | a design §4.0 source-layout hazard (gitfile, external common dir, alternates, escaping link or configuration, partial clone, environment override), or a `.git` entry that is not a repository; refused before reservation, nothing written | `InstallPortError::Layout(LayoutError::Unsupported \| NotARepository)` at `capture_source` (before the lock) and `InstallRefusal::SourceLayout` at admission | it is a refusal of the *source*, which the operator repairs (dissociate, convert, move the hooks) -- not "this build lacks the feature", which `unsupported_operation` now means exactly |
+| `copy_failed` (64) | the tree copy stopped: permission, space, I/O, metadata, an uncopyable entry; row and partial destination retained, source unchanged (design §4, §12) | `InstallError::Copy` for every `CopyErrorCategory` except `DestinationNotEmpty` (still `path_collision`), `Unimplemented` (`unsupported_operation`) and `Cancelled` (below) | the operator's next step is `dispose --keep` and a retry after fixing the cause; an `io_error` said nothing about the retained row |
+| `source_drift` (65) | the source moved between the snapshot and publication (design §4 step 3, §12) | `InstallPortError::Drift` from `recheck_source` (`InstallError::Source`) | the cure is quiescence (design §2), not disk or permissions |
+| `destination_incomplete` (66) | a completion rule failed before ready -- §4.0 dest-complete (a missing object, HEAD off the frozen HEAD, an inadmissible layout, a walk past the ceiling), §4.1's at-ready column, `LockNotRecaptured`, `MarkerNotRegenerated` -- or the install was cancelled | `InstallError::Incomplete`, `InstallError::Cancelled`, `CopyErrorCategory::Cancelled` | the retained shape `local list` reports as `creating/incomplete`; design §4 step 4 names "errors or interruption" as one outcome, and the message says which |
+
+Kept: `unsupported_operation` for clean/bare, `--from`, ordinary dispose, a
+family dry-run, `LayoutError::Unimplemented` and every `Unimplemented`
+port/store/copier; `io_error` for `LayoutError::ReadFailed` (an inspector
+that could not read, lane I proposal I-3), `InstallPortError::
+{Construction, Configuration, Destination}`, a path that does not resolve,
+the store's `Io`/`Partial`, disposal's `Port`/`RemovalStopped`. **Not
+allocated:** a cancellation code -- the wired slot passes `NeverCancelled`,
+so a cancelled install has a call site but no producer outside tests;
+folding it into `destination_incomplete` describes the state the operator
+faces and the message carries "install cancelled". `DisposeError::Unknown`
+(unknown disposal evidence, LCM2.1, unreachable behind the ordinary-dispose
+refusal) stays `unsupported_operation` until it has a producer.
+
+**Tests.** `local_clone::errors::tests::install_failures_map_onto_the_four_local_create_codes`
+(every variant of the three enums and every copy category, plus
+distinctness from each other and from 14/28); `tests::create`:
+`a_source_hazard_refuses_before_reservation_and_leaves_nothing` now asserts
+63, `an_interrupted_create_leaves_a_creating_row_and_an_inspectable_directory`
+66, and three provocations -- `source_drift_before_publication_is_source_drift_with_the_row_retained`
+(a cancellation port that creates a branch in the root repository at the
+`Reserve` checkpoint, after the snapshot: 65, effects through
+`PointerInstalled`, `last_error` "source drift", no manifest),
+`an_object_missing_from_the_destination_store_is_destination_incomplete`
+(a port that deletes `app`'s HEAD tree object from the destination once
+the copier has reproduced it: 66, "objects missing from the destination
+store", the tree's id, no manifest),
+`an_unreadable_source_file_is_copy_failed_with_the_partial_destination_retained`
+(`#[cfg(unix)]`, a 0o000 file in `app`; `clonefile` refuses it as `cp -c`
+does: 64, `DestinationAllocated` without `TreeCopied`, no pointer, source
+untouched). `tests/protocol.rs::error_code_wire_values_are_pinned` pins
+63-66, their `from_wire` round trip and their distinctness from 14 and 28.
+The `LocalFamilyMemberEntry` hex pin `a601614102000301040405672e2e2f77732d4106f6`
+is **unmoved** in `tests/protocol.rs` and gwz-py `test_codec.py` (no
+message changed; both green).
+
+**Pins moved, one fingerprint of one schema.** `gwz-core/protocol/
+check_log_additive.py`, `gwz-py/scripts/check_protocol_drift.py`,
+`gwz-py/src/tests/test_log_protocol.py`:
+`2eca6469ed1281e77a95f1e419aa4065002aa94c77507a73ada6f6f9c8bb5503` ->
+`0a173de982aaa93225e26581d678b4722356afc967fb4543de531708900cf981`,
+MEASURED additive: the pre-log projection rendered on `81fcaf2` and on the
+edited schema and diffed -- 4 added lines, 0 removed, 3 hunks, the four
+enum members as map keys; the old pin reproduced on the old tree.
+`regen.py --check` OK; gwz-py packaged-IR drift check OK
+(`sha256:9f624806ae5e485e92a7ed47503591f6a4c8bb10d9f1b877aaf61245cbacf5cc`).
+
+**Drivers.** Both render a `ModelError` code generically (gwz-cli
+`{:?}` of the model enum; gwz-py the PascalCase label of the wire name),
+so no rendering code changed; the tests pin it. gwz-cli `src/tests/g12.rs`:
+`the_four_local_create_codes_are_presented_as_typed_refusals` (human
+`Code: message`, `--json` label and message, wire 63-66, distinct from
+`UnsupportedOperation`/`IoError`) and
+`a_source_layout_hazard_reaches_the_driver_as_unsupported_source_layout`
+(a real workspace whose root repository holds `objects/info/alternates`:
+`gwz clone --local --name A` refuses 63 through the driver, "Alternates",
+"nothing was reserved", no index founded). gwz-py
+`src/tests/test_cli_local_family.py`: four `REFUSALS` rows (human and
+`--json` presentation, 20 parametrised cases) and `test_protocol.py` pins
+63-66 beside 14 and 28. The argv parity fixture
+`local_family_cases.json` is **untouched**: its `core_refuses` rows are the
+dry-run, `--from`, unknown-hazard and `unknown_local` refusals, and none of
+the four new outcomes is decidable from a command line.
+
+### 14.2 Fix 2 -- the destination-completion check, measured and bounded
+
+**Measured first** (Darwin 25.6.0 arm64, Apple M-series; `check_history`
+with the repository as its own witness, `Limits::default()`, exactly as
+`install.rs:200-226` ran it; a temporary harness, not committed):
+
+| Repository | Store (loose + packed) | Roots | Outcome before | Cost before (warm / cold) |
+|---|---|---|---|---|
+| gwz-core | 2 044 + 7 166 = 9 210 | 374 | **Unpreserved, 30 roots** (reflog entries, `stash@{1}`) | 152 ms / 380 ms |
+| gwz-cli | 1 609 + 309 = 1 918 | 220 | **Unpreserved, 12 roots** | 80 ms / 271 ms |
+| gwz-dev root | 4 957 + 0 | 473 | **Unpreserved, 3 roots** (`stash@{1..3}`) | 262 ms / 778 ms |
+| taut | 68 + 1 462 = 1 530 | 24 | Verified, 1 378 objects | 13.6 ms (9.9 µs/object) / 25 ms |
+| synthetic, loose, 1 000 commits | 5 000 | 1 002 | Verified | 0.27 s (54 µs/object) |
+| synthetic, loose, 4 000 commits | 20 000 | 4 002 | Verified | 1.35 s (67 µs/object) |
+| synthetic, loose, 16 000 commits | 80 000 | 16 002 | Verified | 9.0 s (112 µs/object) |
+| synthetic, packed (`git repack -adq`), 16 000 commits | 80 000 | 16 002 | Verified | 4.9 s (61 µs/object) |
+
+Two findings. (1) **The cost**: linear in the reachable object count,
+roughly one second per 10-16 k objects, superlinear on a large loose store
+(directory lookups), with bookkeeping of about 186 bytes per distinct
+object at peak (14.9 MB for 80 k) -- so `Limits::default()`'s 256 MiB was
+an implicit ceiling of about 1.4 M objects that nothing stated. (2) **A
+defect**: `check_history`'s witness rule (`is_eligible_witness_root`)
+rightly excludes a witness's own reflog and stash entries -- operation
+state is not durable retention -- so with the destination as its own
+witness, every protected root that only a reflog or stash entry names is
+"no eligible retained witness root reaches it": Unpreserved. Every real
+repository here has such roots (an amended commit, an older stash); the
+LCM1.1 fixtures have one commit each and never did. A real `gwz clone
+--local` of this workspace would have been refused after the copy with
+"objects missing from the destination store", the row left `creating`.
+
+**What changed.** Dest-complete is now a *connectivity* walk, not a
+preservation proof:
+
+- `gwz-history-check::check_connectivity(protected, reader, limits,
+  cancellation) -> ConnectivityOutcome {Complete(ConnectivityCoverage),
+  Incomplete(Vec<MissingObject{root, missing}>), Unknown}` -- additive
+  (crate `lib.rs`, a `# Connectivity` section in the crate doc; `check_
+  history` untouched, disposal still uses it): every protected root is
+  walked from itself, an object is read once however many roots reach it,
+  and the outcome is per root -- the first object found missing beneath it,
+  or the root's own object. Same `Limits`, same memoisation, same
+  cancellation points, same `Unknown > Incomplete > Complete` precedence;
+  an incomplete inventory (`ProtectedRoots::unknown`, contract I-2) is
+  `Unknown` before any read. Tier A: 9 new rows (`a_reflog_only_root_with_a_complete_subgraph_is_connected`
+  pins both answers side by side -- Unpreserved to `check_history`, Complete
+  to `check_connectivity`, every object once; a missing blob below one root
+  names that root and the blob; a root whose own object is missing; shared
+  subgraphs read once; an incomplete inventory, uninterpreted evidence, the
+  root cap, the bookkeeping cap and cancellation all `Unknown` and never
+  `Complete`; no roots; an unreadable store), 39 in all (was 30).
+- `src/local_clone/adapters/object_census.rs` (new, registered in
+  `adapters/mod.rs`): `census_of(common_dir)` counts the destination store
+  before the walk -- loose object files by shape under `objects/xx/`, and
+  every pack index's fan-out total (v2 at offset 8, v1 at 0), 1-24 ms on
+  the repositories above -- and `connectivity_limits(roots, census)`
+  derives the walk's `Limits` from what was copied: `max_roots` exactly the
+  roots the inventory found (the walk starts from all of them and needs no
+  cap of its own; the 100 000 default could refuse a reflog-heavy store for
+  nothing), `max_bookkeeping_bytes` = min(256 MiB, 512 B x census + 4 MiB).
+  The census is an upper bound on what the walk can visit (an object both
+  loose and packed counts twice, never zero times). Four tests (a synthetic
+  store with v1 and v2 indexes and non-object files; agreement with `git
+  count-objects` before and after `git repack -adq`; an unreadable store;
+  the limits).
+- `adapters/install.rs::dependencies` calls `check_connectivity` with those
+  limits and records a `RepositoryVerification {key, roots, objects_visited,
+  census, elapsed}` per repository (`CoreInstallPorts::verifications`);
+  `Incomplete` and `Unknown` details now carry the census, the root count
+  and, for a ceiling, the bookkeeping allowed. `create.rs::CreateReport`
+  gains `verification` and the message a clause: `dest-complete: 2
+  repositories, 23 objects verified of 23 in store, 1 ms`.
+
+**Measured after** (`check_connectivity`, derived limits, warm):
+
+| Repository | Census | Roots | Objects visited | Cost after | Bookkeeping / budget |
+|---|---|---|---|---|---|
+| gwz-core | 9 242 | 375 | 8 781 | **105 ms (12 µs/object)**, census 5.5 ms | 1.03 MB (117 B/object) / 8.9 MB |
+| gwz-cli | 1 921 | 221 | 1 842 | 55 ms (30 µs/object), census 4.8 ms | 0.27 MB / 5.2 MB |
+| gwz-dev root | 4 957 | 473 | 3 830 | 250-280 ms (65-73 µs/object), census 11 ms | 0.64 MB / 6.7 MB |
+| taut | 1 530 | 24 | 1 378 | 7.7 ms (5.6 µs/object), census 0.9 ms | 0.17 MB / 5.0 MB |
+
+All four `Complete`. The per-object cost is unchanged in kind (it is the
+same `read_object` loop); the real repositories are faster than the
+false-refusing walk because nothing gathers witness roots or tracks
+origins. A whole `gwz clone --local` of this workspace's five repositories
+(about 19 k objects) now spends about 0.45 s in dest-complete.
+
+**What is and is not verified now.** Verified, for every repository that
+stands at the destination: an admitted layout (`inspect_layout`: no
+external common dir, alternates, escaping link or configuration), HEAD
+equal to the frozen source HEAD, and every protected root the destination
+holds -- every ref, `HEAD`, every retained reflog entry, every stash entry,
+any coordination root -- with its exact object and entire subgraph
+readable from the destination's own store; each object read once; the
+walk bounded by exactly those roots and by a bookkeeping budget derived
+from the copied store's census, never above the library's 256 MiB, which
+is the **documented outer ceiling: about 1.4 million objects per
+repository** (measured 186 B/object peak; roughly 90-150 s at the measured
+rates), past which the walk answers `Unknown(LimitExceeded)` and the
+create refuses `destination_incomplete` naming the ceiling, the census and
+the roots, with the row and directory retained. Not verified: object
+*content* integrity (the reader trusts the store's own hashing; a corrupt
+object that still parses passes, as it would `git fsck --connectivity-only`);
+objects no root reaches (dangling by construction -- a `gwz init` root with
+an unborn HEAD reports "0 objects verified of 6 in store"); nested bare
+repositories (§13.8, unchanged); and wall-clock time -- the ceiling is in
+objects, and a lower one (or a source-side census refusal before
+reservation, which would spare the operator a refusal after a long copy)
+is a product decision left to the lane owner.
+
+**Tests** (gwz-core, beyond the crate's): `tests::create::a_source_with_reflog_only_history_creates_and_reports_the_verified_objects`
+-- RED before the fix (the false refusal reproduced: `app`'s only commit
+amended so the original is reflog-only, and a stash in `app` naming two
+commits no ref does), now creates with `app` reporting exactly 8 objects
+(two commits, their shared tree and blob, the stash commit, its index
+commit, the stashed tree and blob), the census bounding every walk, and
+the message carrying the clause; `an_object_missing_from_the_destination_store_is_destination_incomplete`
+proves the walk still catches a missing object after the change.
+
+### 14.3 Fix 3 -- the two drivers' path joins, pinned together
+
+`gwz-core/protocol/fixtures/cli_parity/local_family_listing_cases.json`
+(beside the argv fixture; `_schema`-documented like it): fourteen cases,
+each a `root_path` (string or null), a member `path` and the display path
+both drivers must render -- the seven the brief named (`plain-child`,
+`sibling-through-parent`, `nested-member`, `two-level-escape`,
+`absent-root`, `empty-root`, `already-absolute-member-path`) plus the root
+row itself, an absent root for the root row, a root with a trailing
+separator, a parent reference inside the member path, current-directory
+segments, an escape above a relative root and an escape at the filesystem
+root. Expected values are spelled with `/`; a driver on a host whose
+separator differs compares after mapping it (neither driver's suites run
+on Windows today -- both Windows CI legs build and package only -- so that
+is a stated allowance, not a measured one). gwz-cli
+`src/tests/g12.rs::the_listing_fixture_cases_render_the_expected_display_path`
+(`include_str!` of the sibling, `local_list_render::member_path`, unique
+ids, the seven required ids present); gwz-py `test_cli_local_family.py::
+test_listing_fixture_case_renders_the_expected_display_path` (one
+parametrised row per case, `cli_local_family.member_display_path`, skips
+with the reason when the sibling checkout is absent) and
+`test_listing_fixture_covers_the_required_shapes_once_each`.
+
+**The drivers disagreed on one case, `already-absolute-member-path`.**
+gwz-cli's `Path::new(root).join(path)` lets an absolute member path
+replace the root (`/tmp/lanes/A`); gwz-py's
+`os.path.join(root_path, *path.split("/"))` split the path first, the
+leading empty segment lost the absoluteness, and the result nested under
+the root (`/Users/limbo/gwz-dev/tmp/lanes/A`). The fixture keeps the
+conventional answer -- the path as the row records it, never a fabricated
+nested one -- and gwz-py's join was corrected to
+`os.path.normpath(os.path.join(root_path, path))` (`normpath` already
+maps `/` to the host separator, so the split was never needed). The wire
+never carries an absolute member path; the disagreement was latent. The
+other thirteen cases agreed on the first run in both drivers.
+
+### 14.4 The drivers' stale rows (a finding at the baseline)
+
+Five gwz-cli tests were red at the baseline tuple itself -- gwz-cli
+`ed132ea` against gwz-core `81fcaf2` -- because they pinned every family
+verb as `UnsupportedOperation` (the pre-LCM1.1 answer) and §13.6 records
+that the driver suites were not re-run after the wiring: `g12::
+clone_local_dispatches_and_refuses_typed` (the verbatim clone is served
+and succeeded, into `../dest-a` beside the temporary directory),
+`g12::local_family_verbs_dispatch_and_refuse_typed` (`dispose --keep` is
+`MemberNotFound` for a workspace in no family, `disband` a served `Noop`),
+`local_family_workflows::{family_verbs_reach_core_and_report_its_typed_refusal,
+a_refused_family_verb_carries_no_listing,
+jsonl_streams_the_operation_lifecycle_then_the_refusal}` (`disband`).
+Rewritten to core's measured answers through the real binary: ordinary
+`dispose` with or without a waiver stays `UnsupportedOperation` (exit 1,
+`event, event, response` on `--jsonl`); `dispose --keep` is
+`MemberNotFound` naming the verb and the workspace; `disband` outside a
+family exits 0 as `Noop` ("nothing to disband") and founds nothing; the
+verbatim clone is served into a destination the test owns
+(`clone_local_dispatches_verbatim_and_refuses_the_unbuilt_modes_typed`),
+and a new `the_verbatim_lifecycle_is_served_end_to_end` drives `clone
+--local -> local list (root_path beside the rows) -> dispose --keep
+(every file retained, pointer gone) -> disband (index gone, tree retained)`
+through the binary. Clean, bare, `--from`, dry-run and the three
+`merge --remote` rows are unchanged.
+
+### 14.5 Gates (final trees; Darwin 25.6.0 arm64, cargo 1.95.0, python3.13, from gwz-core unless noted)
+
+| Gate | Result |
+|---|---|
+| `cargo fmt --all -- --check` | clean (gwz-core; gwz-cli `cargo fmt -p gwz -- --check` clean) |
+| `CLIPPY_CONF_DIR="$PWD" cargo clippy --all-targets --all-features --locked -- -D warnings` | clean |
+| `python3.13 scripts/checks/check_checked_artifact_boundaries.py` | ok (24 visible entries, 9 classified modules) |
+| `python3.13 scripts/checks/check_local_clone_boundaries.py` + `-m unittest scripts/checks/test_check_local_clone_boundaries.py` | ok; 23 OK |
+| `python3.13 protocol/regen.py --check` | OK |
+| `protocol/.regen-venv/bin/python protocol/check_log_additive.py` | OK `0a173de9...` |
+| `cargo test -p gwz-core --lib --locked local_clone` | **54 passed** (was 45; +9) |
+| Tier A `cargo test -p gwz-history-check --lib --locked` | **39 passed** (was 30; +9); no other crate touched |
+| `cargo test -p gwz-core --test protocol --locked` (`error_code_wire_values_are_pinned`, `local_clone_follow_up_2_allocations_are_pinned`) | passed |
+| lib remainder census (`--list`) | 1787 rows (was 1778); `checked_artifact::` 459 and `v1_lifecycle::` 266 unmoved; remainder 1062 listed = **1061 executed darwin** (+9), linux 1062 DERIVED; `run_r4bg_aggregate_gates.py` re-pinned 1052/1053 -> 1061/1062 **in the same commit as the rows** |
+| gwz-cli `cargo test -p gwz --locked` (from gwz-cli) | **240 passed** (was 236 at the brief's count, 5 of them red against `81fcaf2`): lib 170 (+3), `local_family_workflows` 7 (+1), diff 26, local 29, publish 4, release 2, rename 2 |
+| gwz-cli `python3 scripts/generate_cli_reference.py --check` | exit 0 |
+| gwz-py `pytest src/tests/test_protocol.py test_codec.py test_log_protocol.py test_cli_local_family.py` (`.venv/bin/python`) | **173 passed** (138 with the HEAD test files against the regenerated package, one of them the moved pin; +35: 20 refusal rows, 14 fixture cases, 1 coverage) |
+| gwz-py `scripts/check_protocol_drift.py` | OK |
+| `PYTHON=python3.13 scripts/checks/check_lane_commits.sh 81fcaf2 HEAD` | see the final report (run after the commits) |
+
+Not run: the 16-minute probe suites; the full lib-remainder execution
+(the `--list` census is the brief's method); Bazel (a concurrent lane owns
+it); Windows (unverified here, as in §13.8).
+
+### 14.6 Pins moved (old -> new)
+
+- `gwz-core/protocol/check_log_additive.py`, `gwz-py/scripts/check_protocol_drift.py`,
+  `gwz-py/src/tests/test_log_protocol.py`: `2eca6469...` -> `0a173de9...`
+  (MEASURED additive, 4 added / 0 removed / 3 hunks).
+- `gwz-core/scripts/checks/run_r4bg_aggregate_gates.py`: lib remainder
+  1052 / 1053 -> 1061 / 1062 (census; +9 rows, all `local_clone::`).
+- `tests/protocol.rs` and gwz-py `test_codec.py` hex pins: **unmoved**.
+- `docs/MessageCatalog.md`: regenerated (+4 rows).
+
+### 14.7 Left uncommitted for the lane owner (root repo)
+
+`dev-docs/GwzLocalCloneDesign.md` (revision 12: status, §7 the four codes,
+§11 items 23-25; supersedes revision 11, whose SHA-256 the status line
+records) and this record (§14). The member pins to record through `gwz`:
+gwz-core `8bb8804`, gwz-cli `5e5f69b`, gwz-py `88f8d2b`. No root
+`Cargo.lock` change (no dependency moved; `gwz-core/Cargo.toml` and its
+lock are unchanged).
+
+### 14.8 Residual risks and what the next lanes must know
+
+- **A lower dest-complete ceiling, or a source-side one**, is the lane
+  owner's call: the walk is bounded and reported, but a 1.4 M-object
+  repository walks for minutes before refusing, after the copy. A census
+  of the *source* store before reservation would refuse before any effect.
+- **`check_history` still carries the I-2 obligation** (a non-empty
+  `ProtectedRoots::unknown`); `check_connectivity` honours it from birth.
+- **Cancellation has no producer** in the wired slot; when a driver-side
+  cancellation port lands, decide whether a cancelled create deserves a
+  code of its own or stays `destination_incomplete`.
+- **`InstallPortError::Configuration` for an undecodable copied lock**
+  maps to `io_error`; `manifest_invalid` would fit better, but the port
+  error carries only a string. Left as is.
+- **The listing fixture's Windows allowance** is unmeasured; the first
+  driver suite to run on Windows measures it.

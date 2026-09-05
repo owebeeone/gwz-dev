@@ -1,7 +1,9 @@
-# Root package. Its only job is to make `//` a Bazel package so the workspace Cargo manifest + lock
-# are addressable as labels: crate_universe (MODULE.bazel: crate.from_cargo) reads `//:Cargo.lock`
-# and `//:Cargo.toml`, and `module_ctx.watch(//:Cargo.lock)` needs this package to exist. Without a
-# BUILD file here, that watch fails with "BUILD file not found ... //:Cargo.lock".
+# Root package. Keeps `//` a Bazel package (razel and `bazel query //...` expect one at the root)
+# and exports the OUTER Cargo workspace's manifest + lock so tooling can address them as labels.
+# No crate_universe hub reads them any more: the @crates hub for gwz-cli is a from_specs hub
+# pinned to this lock's versions by hand (MODULE.bazel explains why from_cargo cannot splice the
+# outer workspace); gwz-core's own manifest + lock are exported by //gwz-core:BUILD.bazel for
+# the @gwz_core_crates hub.
 exports_files([
     "Cargo.toml",
     "Cargo.lock",

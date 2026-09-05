@@ -1,12 +1,45 @@
 # Bazel (bzlmod) + razel build for the gwz workspace. The crates' BUILD.bazel files use
 # @rules_rust//rust:defs.bzl, which razel resolves natively too, so they are shared by both
-# `bazel` and `razel`. External crates.io deps come from crate_universe (@crates//:<name>);
+# `bazel` and `razel`. External crates.io deps come from crate_universe hubs (@<hub>//:<name>);
 # workspace-internal deps are plain // labels.
 #
-# REQUIRES a unified Cargo workspace so crate_universe has a single Cargo.lock:
-#   //:Cargo.toml  — a [workspace] manifest with members = ["gwz-core", "gwz-cli"]
-#   //:Cargo.lock  — its resolved lock (gwz-cli's gwz-core dep must be path, not git)
-# Then generate the @crates lockfile razel reads:  bazel mod deps --lockfile_mode=update
+# TWO Cargo workspaces (workspace layout Option A, operator ruling 2026-09-05; dev-docs/
+# GwzLocalCloneDesign.md §11 item 14), TWO crate_universe hubs:
+#   //:Cargo.toml + //:Cargo.lock                  the outer workspace, members = ["gwz-cli"];
+#                                                  gwz-core is `exclude`d and reached by path.
+#   //gwz-core:Cargo.toml + //gwz-core:Cargo.lock  gwz-core's own workspace, members = crates/*.
+# crate_universe refuses manifests from different Cargo workspaces inside one `from_cargo`
+# ("manifests are not allowed to from from different workspaces"), so:
+#   @gwz_core_crates  from_cargo on //gwz-core:Cargo.lock; used by //gwz-core and
+#                     //gwz-core/crates/*. cargo and bazel/razel read the same lock: lockstep.
+#   @crates           from_specs for gwz-cli's three direct crates.io deps, version-pinned by
+#                     hand to //:Cargo.lock; used by //gwz-cli. NOT resolved from the lock -- see
+#                     "Why the outer workspace cannot use from_cargo" below.
+# A BUILD.bazel takes third-party deps only from the hub of its own workspace and reaches
+# crates of the other workspace through their Bazel targets (gwz-cli -> //gwz-core:gwz_core),
+# never through the other hub. Neither hub writes a Cargo.lock back; cargo (`--locked`) owns
+# them. Regenerate MODULE.bazel.lock (which razel reads) with:
+#     bazel mod deps --lockfile_mode=update
+#
+# Why the outer workspace cannot use from_cargo (rules_rust 0.70.0; unchanged through 0.74.0 and
+# main as of 2026-09-06, crate_universe/src/metadata/cargo_tree_resolver.rs, cli/splice.rs):
+#   1. Its root manifest is VIRTUAL ([workspace] only). cargo-bazel's feature resolver rebuilds
+#      the spliced tree in a temp dir and, for a virtual root, invents a root package by pushing
+#      "." into workspace.members. Cargo then treats `root/.` as a prefix of every path under the
+#      root, so `exclude = ["gwz-core"]` no longer applies, gwz-core -- a [package] AND a
+#      [workspace] root in one manifest since Option A -- is adopted as a member, and `cargo tree`
+#      fails: "multiple workspace roots found in the same workspace". (Reproduced by hand: the
+#      identical symlink layout passes with the exclude honoured and fails with "." present.)
+#   2. The one splicer path that yields a real root package instead (a crate.spec on the hub,
+#      inject_direct_packages) needs a Cargo.lock entry for that synthetic package. With
+#      skip_cargo_lockfile_overwrite the splice dir's Cargo.lock is a symlink to the real
+#      //:Cargo.lock, `cargo fetch` is skipped, and the resolver's `cargo metadata --locked`
+#      refuses ("cannot update the lock file ... because --locked was passed").
+#   3. Without skip_cargo_lockfile_overwrite, cargo-bazel writes the synthetic package back into
+#      the real //:Cargo.lock, which then breaks every `cargo ... --locked` in this workspace.
+# The three cannot all be avoided from Bazel-owned files, so gwz-cli's tiny third-party surface
+# is pinned by hand instead. The pins MUST track //:Cargo.lock; check with:
+#     grep -A1 -E '^name = "(clap|console|serde_json)"$' Cargo.lock
 module(name = "gwz", version = "0.1.0")
 
 bazel_dep(name = "rules_rust", version = "0.70.0")
@@ -21,17 +54,62 @@ use_repo(rust, "rust_toolchains")
 
 register_toolchains("@rust_toolchains//:all")
 
-# crates.io deps resolved from the workspace Cargo.toml / Cargo.lock (single source of truth,
-# so cargo and bazel/razel stay in lockstep). Generated targets are @crates//:<name>;
-# per-crate BUILD.bazel files pull them in via all_crate_deps()/aliases().
 crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+
+# Hub @gwz_core_crates: gwz-core's workspace, resolved from //gwz-core:Cargo.lock. The
+# workspace root manifest is what cargo-bazel splices; the member manifests are listed too so
+# the extension watches them (a feature change on a dependency alters a manifest but not the
+# lock). Workspace members are NOT spliced into spokes -- crate_universe expects them to be
+# Bazel targets -- which is why every crates/<name> is a package with its own rust_library.
+# taut-shape reaches this hub the way gwz-core's own lock says: the git rev pinned in
+# gwz-core/Cargo.toml (the outer workspace's [patch] to the sibling checkout is not visible
+# from inside gwz-core's workspace, for cargo or for Bazel).
 crate.from_cargo(
-    name = "crates",
-    cargo_lockfile = "//:Cargo.lock",
+    name = "gwz_core_crates",
+    cargo_lockfile = "//gwz-core:Cargo.lock",
     manifests = [
-        "//:Cargo.toml",
         "//gwz-core:Cargo.toml",
-        "//gwz-cli:Cargo.toml",
+        "//gwz-core/crates/copy-contract:Cargo.toml",
+        "//gwz-core/crates/family-model:Cargo.toml",
+        "//gwz-core/crates/family-store:Cargo.toml",
+        "//gwz-core/crates/family-store-contract:Cargo.toml",
+        "//gwz-core/crates/history-check:Cargo.toml",
+        "//gwz-core/crates/local-disposal:Cargo.toml",
+        "//gwz-core/crates/local-import:Cargo.toml",
+        "//gwz-core/crates/local-testrepo:Cargo.toml",
+        "//gwz-core/crates/refcopy:Cargo.toml",
+        "//gwz-core/crates/repo-contract:Cargo.toml",
+        "//gwz-core/crates/repo-factory:Cargo.toml",
+        "//gwz-core/crates/repo-inspect:Cargo.toml",
+        "//gwz-core/crates/work-detector:Cargo.toml",
+        "//gwz-core/crates/workspace-install:Cargo.toml",
     ],
+    skip_cargo_lockfile_overwrite = True,
 )
-use_repo(crate, "crates")
+
+# Hub @crates: gwz-cli's direct crates.io deps, mirroring gwz-cli/Cargo.toml [dependencies]
+# (features included) and pinned to the versions //:Cargo.lock resolved them to. Transitive
+# deps are resolved by cargo-bazel from these pins and recorded in MODULE.bazel.lock; they are
+# not read from //:Cargo.lock (see the header). Every spec is scoped to this hub: an unscoped
+# crate.spec applies to all hubs and would inject itself into gwz-core's splice.
+crate.spec(
+    package = "clap",
+    version = "=4.6.6",
+    features = [
+        "derive",
+        "wrap_help",
+    ],
+    repositories = ["crates"],
+)
+crate.spec(
+    package = "console",
+    version = "=0.16.4",
+    repositories = ["crates"],
+)
+crate.spec(
+    package = "serde_json",
+    version = "=1.0.151",
+    repositories = ["crates"],
+)
+crate.from_specs(name = "crates")
+use_repo(crate, "crates", "gwz_core_crates")

@@ -1,11 +1,18 @@
 # Gwz local clone — Requirements & Design
 
-Status: **DRAFT 2026-09-06 revision 11** — records the two text
+Status: **DRAFT 2026-09-06 revision 12** — records LCM1.1's three fixes
+(`GwzLocalClone-LCM1.0c-Checkpoint.md` §14, lane C): four `GwzErrorCode`
+allocations for the local-create outcomes the wiring had folded into
+`unsupported_operation` and `io_error` (§7, §11 item 23), the §4.0
+dest-complete walk as a bounded connectivity check with its measured cost
+(§11 item 24), and the cross-driver listing-path fixture (§11 item 25).
+Supersedes revision 11 (SHA-256 `94836f08cec5f16bd050b2135182715b3d200f34f9c3a312338bf36be2cbedab`);
+revision 11 recorded the two text
 corrections LCM1.1's wiring proved necessary (`GwzLocalClone-LCM1.0c-Checkpoint.md`
 §13, lane C): the allocation marker lands with the pointer in step 3 of §4,
 not in step 2, and §4.1's "remove in install" row is owned by
 installation's `install_destination_git` port in every mode (§4, §4.1,
-§11 items 21–22). Supersedes revision 10 (SHA-256 `d06e9eebb2538fff67898c47df6c8dd31c8a335fc36d0aade6bf14ee8a0c6c1d`);
+§11 items 21–22), over revision 10 (SHA-256 `d06e9eebb2538fff67898c47df6c8dd31c8a335fc36d0aade6bf14ee8a0c6c1d`);
 revision 10 recorded the operator's four
 cross-driver rulings of 2026-09-06 after W2 (`GwzLocalClone-LCM1.0c-Checkpoint.md`
 §12, LCM1.0c follow-up 3): one parity fixture in gwz-core, snake_case enum
@@ -620,6 +627,19 @@ GwzErrorCode.unknown_local = 62               # family-only merge miss (absent o
                                               # non-ready family name); state detail
                                               # travels in the message. Pull/push keep
                                               # missing_remote for the neither case.
+GwzErrorCode.unsupported_source_layout = 63   # a §4.0 source-layout hazard (or a .git
+                                              # entry that is not a repository), refused
+                                              # before reservation; v0 refuses, never
+                                              # rewrites (LCM1.1 fix 1, §11 item 23)
+GwzErrorCode.copy_failed = 64                 # the tree copy stopped; the creating row
+                                              # and the partial destination are retained
+GwzErrorCode.source_drift = 65                # the source moved between the snapshot and
+                                              # publication (§4 step 3); not marked ready
+GwzErrorCode.destination_incomplete = 66      # a completion rule failed before ready --
+                                              # §4.0 dest-complete, §4.1's at-ready column,
+                                              # recapture, the marker -- or the install was
+                                              # cancelled; the row and directory are retained
+                                              # (`local list`: creating/incomplete)
 
 MergeRequest.source_ref = F(3, STR, optional=True)   # git ref; UNCHANGED
 MergeRequest.local_source_name = F(9, STR, optional=True)  # NEW; start only
@@ -976,6 +996,60 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
     port reports nothing removed. Only the URL keys go (`remote.<name>.url`,
     `remote.<name>.pushurl`); fetch refspecs and `refs/remotes/<name>/*`
     are copied history and stay.
+23. Local-create error codes — **allocated** (lane C, LCM1.1 fix 1,
+    2026-09-06; checkpoint §14): `unsupported_source_layout` (63) for a
+    §4.0 hazard or a `.git` entry that is not a repository, refused before
+    reservation; `copy_failed` (64) for a stopped copy (§4: "errors, not
+    unsupported"; §12: partial destination retained, source unchanged);
+    `source_drift` (65) for a source that moved between the snapshot and
+    publication (§4 step 3; §12: "fail without marking ready");
+    `destination_incomplete` (66) for a failed completion rule (§4.0
+    dest-complete, §4.1's at-ready column, recapture, the marker) or a
+    cancelled install, which leaves the same retained shape (§4 step 4
+    "errors or interruption"; `local list` reports `creating/incomplete`).
+    `unsupported_operation` now means exactly "not built yet" (clean, bare,
+    `--from`, ordinary dispose, a family dry-run) and `io_error` exactly an
+    I/O failure. The mapping is one table,
+    `gwz-core/src/local_clone/errors.rs`; drivers present the four like any
+    typed refusal (their own names as labels), and the argv parity fixture
+    is untouched -- none of the four is decidable from a command line.
+24. §4.0 dest-complete as built — **a bounded connectivity walk, not a
+    preservation proof** (lane C, LCM1.1 fix 2, 2026-09-06; checkpoint §14).
+    LCM1.1 wired dest-complete as `gwz-history-check::check_history` with
+    the destination as its own witness; measured on every real repository
+    of this workspace, that answered "unpreserved" for a commit only a
+    reflog or stash entry names (gwz-core 30 of 374 roots, gwz-cli 12 of
+    220, the gwz-dev root 3 of 473) -- the preservation rule rightly
+    excludes a witness's own reflog and stash -- so a real `gwz clone
+    --local` would have been refused after the copy. Dest-complete now
+    walks from every protected root of every destination repository
+    (`check_connectivity`, additive in the same library): the root's exact
+    object and its entire subgraph must be readable from the destination's
+    own store, alternates disabled by admission; each object is read once.
+    The walk is bounded by what was copied -- exactly the roots the
+    inventory found, and a bookkeeping budget of 512 bytes per object of a
+    census of the copied store (loose files plus every pack index's
+    fan-out total, 1–24 ms), never above the library's 256 MiB cap, which
+    is the documented outer ceiling (about 1.4 million objects per
+    repository at the measured 186 bytes peak per object); past it
+    dest-complete refuses typed (`destination_incomplete`, naming the
+    ceiling, the census and the roots) rather than walking on. Measured
+    cost (Darwin arm64, warm): 12 µs per object on gwz-core's 9.2 k-object
+    packed store (105 ms), 65–73 µs on the all-loose gwz-dev root (4.9 k,
+    250–280 ms), 61 µs packed / 112 µs loose on a synthetic 80 k-object
+    history (4.9 s / 9.0 s). The create's message reports repositories,
+    objects verified, the census and the time. Not verified: object
+    content integrity (the reader trusts the store's hashes), objects no
+    root reaches (dangling by construction), nested bare repositories
+    (§13.8, unchanged), and wall-clock time -- the ceiling is in objects.
+25. Listing-path rendering fixture — **one file, in gwz-core** (lane C,
+    LCM1.1 fix 3, 2026-09-06): `protocol/fixtures/cli_parity/
+    local_family_listing_cases.json`, fourteen `root_path` + `path` →
+    display-path cases both drivers assert against their own lexical join.
+    It found the two joins disagreeing on an already-absolute member path
+    (gwz-py nested it under the root by splitting on `/` first); the fixture
+    keeps the conventional answer -- the path as recorded -- and gwz-py's
+    join was corrected. The wire never carries an absolute member path.
 
 ## 12. Acceptance cases for the implementation plan
 

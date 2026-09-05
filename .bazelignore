@@ -1,0 +1,29 @@
+# Directories Bazel must not walk when loading //... or expanding globs. .bazelignore takes
+# exact workspace-relative directory paths, one per line (no globs), so every name is spelled out.
+#
+# razel's execroot forest and convenience symlinks. `.razel-exec/bazel-gwz-dev` points at this
+# workspace's own `bazel-gwz-dev` -> Bazel execroot, whose forest links back to `.razel-exec`:
+# an infinite symlink chain that fails `bazel query //...` with "infinite symlink expansion".
+# Pre-existing (June 2026 razel artifacts); the Option A workspace split did not touch it.
+.razel-exec
+.razel-cache
+.razel-crates
+razel-out
+razel-bin
+razel-testlogs
+# Bazel's own convenience symlinks in the workspace root.
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-gwz-dev
+# Cargo build output: tens of GB and tens of thousands of files, never a Bazel input.
+target
+gwz-core/target
+gwz-cli/target
+gwz-py/target
+taut-shape-rs/target
+# Python virtualenvs and scratch copies of this workspace (scratch/gwz-dev carries a stale
+# MODULE.bazel, which Bazel would treat as a repository boundary).
+.venv
+gwz-py/.venv
+scratch
