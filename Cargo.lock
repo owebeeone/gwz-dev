@@ -430,14 +430,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "gwz-copy-contract"
+version = "0.1.0"
+
+[[package]]
 name = "gwz-core"
-version = "0.13.0"
+version = "0.14.0"
 dependencies = [
  "cap-fs-ext",
  "cap-std",
  "chrono",
  "getrandom 0.3.4",
  "git2",
+ "gwz-copy-contract",
+ "gwz-family-model",
+ "gwz-family-store",
+ "gwz-family-store-contract",
+ "gwz-history-check",
+ "gwz-local-disposal",
+ "gwz-local-import",
+ "gwz-refcopy",
+ "gwz-repo-contract",
+ "gwz-repo-factory",
+ "gwz-repo-inspect",
+ "gwz-work-detector",
+ "gwz-workspace-install",
  "libc",
  "regex",
  "rustix",
@@ -451,6 +468,92 @@ dependencies = [
  "url",
  "windows-sys 0.61.2",
  "yaml-rust2",
+]
+
+[[package]]
+name = "gwz-family-model"
+version = "0.1.0"
+
+[[package]]
+name = "gwz-family-store"
+version = "0.1.0"
+dependencies = [
+ "gwz-family-model",
+ "gwz-family-store-contract",
+]
+
+[[package]]
+name = "gwz-family-store-contract"
+version = "0.1.0"
+dependencies = [
+ "gwz-family-model",
+]
+
+[[package]]
+name = "gwz-history-check"
+version = "0.1.0"
+dependencies = [
+ "gwz-repo-contract",
+]
+
+[[package]]
+name = "gwz-local-disposal"
+version = "0.1.0"
+dependencies = [
+ "gwz-family-model",
+ "gwz-family-store-contract",
+ "gwz-repo-contract",
+ "gwz-work-detector",
+]
+
+[[package]]
+name = "gwz-local-import"
+version = "0.1.0"
+dependencies = [
+ "gwz-family-model",
+ "gwz-repo-contract",
+]
+
+[[package]]
+name = "gwz-refcopy"
+version = "0.1.0"
+dependencies = [
+ "gwz-copy-contract",
+]
+
+[[package]]
+name = "gwz-repo-contract"
+version = "0.1.0"
+
+[[package]]
+name = "gwz-repo-factory"
+version = "0.1.0"
+dependencies = [
+ "gwz-repo-contract",
+]
+
+[[package]]
+name = "gwz-repo-inspect"
+version = "0.1.0"
+dependencies = [
+ "gwz-repo-contract",
+]
+
+[[package]]
+name = "gwz-work-detector"
+version = "0.1.0"
+dependencies = [
+ "gwz-repo-contract",
+]
+
+[[package]]
+name = "gwz-workspace-install"
+version = "0.1.0"
+dependencies = [
+ "gwz-copy-contract",
+ "gwz-family-model",
+ "gwz-family-store-contract",
+ "gwz-repo-contract",
 ]
 
 [[package]]
