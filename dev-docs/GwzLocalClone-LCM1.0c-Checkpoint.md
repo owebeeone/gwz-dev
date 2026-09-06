@@ -2304,3 +2304,281 @@ record through `gwz`: gwz-core `7b9ee45`, gwz-cli `dc1b40f`, gwz-py
   On the fixtures it is milliseconds; on a workspace the size of gwz-dev
   it is seconds and scales with the object count and the number of
   survivors; a limit is `unknown_evidence`, never a silent pass.
+
+## 18. Command-surface ruling (lane C, core integration): `gwz local clone <name> [dest]`
+
+2026-09-06, lane C, executing the operator's ruling of the same day. Local-clone
+creation moves from `gwz clone --local` to a subcommand of `local`, so the
+family's own verb owns creation, inspection and retirement together, with the
+member name **positional** so the verb is internally consistent with `dispose
+<name>`. `gwz clone --local` is **removed entirely, with no alias**: nothing
+is released and nothing is pushed, so there is no compatibility obligation,
+and an alias born today would be documented forever. The operator's reason:
+`clone` already does heavy lifting for the URL form, and the local form
+shared a name with it and almost nothing else -- no URL, a different request
+message, a different action kind, a disjoint flag set. This is a **driver and
+documentation change; the wire does not move** (§18.3).
+
+| Before (design revision 14 §7) | After (revision 15 §7) |
+|---|---|
+| `gwz clone --local --name A ../gwz-dev-A` | `gwz local clone A ../gwz-dev-A` |
+| `gwz clone --local --clean -b lane/x --name C dest` | `gwz local clone C dest --clean -b lane/x` |
+| `gwz clone --local --bare --name hub dest` | `gwz local clone hub dest --bare` |
+| `gwz clone --local --clean --from A --name B ../gwz-dev-B` | `gwz local clone B ../gwz-dev-B --clean --from A` |
+| `gwz clone --local --name "" dest` (driver refusal) | `gwz local clone "" dest` (driver refusal, both drivers: `local clone <name> must not be empty`) |
+| `gwz clone --local` (driver refusal: requires `--name`) | `gwz local clone` (the parser's own required-argument error, as for `dispose <name>`) |
+| `gwz clone --local --name A url dest` (driver refusal) | `gwz local clone A url dest` (the parser's own surplus-argument error) |
+| -- | `gwz clone --local --name A ../gwz-dev-A` is **rejected** by both parsers naming `--local`; no request is built and it is never re-read as a URL clone of `A` |
+
+The full surface, as `gwz local clone --help` renders its usage line:
+`gwz local clone <name> [dest] [--clean | --bare] [-b <branch>] [--from <name|path>]`;
+`gwz local list`; `gwz local dispose <name> [--keep] [--force <hazard,...>]`;
+`gwz local disband`. The `local` summary line is now "Create, inspect and
+retire the local clone family"; `clone`'s is "Clone a workspace from a URL
+and materialize its members", its usage `gwz clone <url> [directory]`, and its
+help says nothing about local clones.
+
+**Tuple.** gwz-core **`542eb79`** (on `7b9ee45`), gwz-cli **`1499e6f`** (on
+`dc1b40f`), gwz-py **`0d6a856`** (on `0b82604`), root `fe9ed30` plus the
+uncommitted files in §18.7. One commit per repository, explicit pathspecs, no
+attribution trailer, nothing pushed, no tag, no branch. `PYTHON=python3.13
+scripts/checks/check_lane_commits.sh 7b9ee45 HEAD`: `lane gate: ok` at
+`542eb79`.
+
+### 18.1 What moved
+
+- **gwz-cli** (`1499e6f`). `LocalCommandArgs::Clone(LocalCloneArgs)` in
+  `src/clirequest/local.rs`: `name` a required positional (`value_name =
+  "name"`), `dest` the optional second positional, `--verbatim`, `--clean`,
+  `--bare`, `-b <branch>`, `--from <name|path>`; `override_usage` spells the
+  ruling's line. `LocalCloneArgs::request` is the former
+  `CloneArgs::local_request`, building the same `CloneLocalWorkspaceRequest`.
+  `CloneArgs` (`workspace.rs`) is `url: String` (required again, Clap's own
+  error when missing) and `dir: Option<String>` and nothing else; the flag
+  loop that said "accepted only with --local" is gone because there is no
+  flag to loop over. The dry-run gate in `invocation.rs` reads
+  `CommandArgs::Clone(_)`. `clone_long.rs`/`clone_after.rs` are URL-only;
+  `local_long.rs`/`local_after.rs` gain `LOCAL_CLONE_LONG`/`LOCAL_CLONE_AFTER`
+  and the family paragraph names `gwz local clone`. `docs/CLI.md`
+  regenerated (`python3 scripts/generate_cli_reference.py --write`, +162/-64:
+  the `gwz local clone` section, the shorter `gwz clone` one);
+  `docs/commands/clone.md` rewritten as the URL form with one see-also line to
+  `local.md`; `docs/commands/local.md` gains the `gwz local clone` section
+  (arguments, options, the five examples, the lone-operand rule) and its
+  **stale Status note was corrected** -- it still said `dispose`, `disband`
+  and the create "answer `UnsupportedOperation`", which has been false since
+  LCM1.1/LCM2.2; it now says what this tuple serves (verbatim create, list,
+  ordinary and `--keep` dispose, disband, the family merge) and what still
+  refuses (`--clean`, `--bare`, `--from`).
+- **gwz-py** (`0d6a856`). `cli_local_family.py` no longer extends `clone` at
+  all: `wrap_clone`, `configure_clone_local`, `_make_positional_optional`,
+  `_reject_local_only_flags` and `LOCAL_ONLY_FLAGS` are gone, so
+  `cli_local.py`'s `clone` (untouched, as instructed) is registered exactly as
+  it registers itself -- `test_existing_forall_and_clone_registrations_are_
+  untouched` pins `specs["clone"].handler is cli_local.handle_clone` and its
+  `configure`. `configure_local` adds the `clone` subparser (`name` required,
+  `dest` `nargs="?"`, the same five flags) and `handle_local` routes it to
+  `handle_local_clone`, whose validations and texts are the Rust driver's word
+  for word: `local clone <name> must not be empty`, `--verbatim and --clean
+  are mutually exclusive`, `--verbatim and --bare are mutually exclusive
+  (--bare implies --clean)`, `-b <branch> is accepted only with --clean or
+  --bare`, `--from <name|path> must not be empty`. The `local` help line is
+  "Create, inspect and retire the local clone family".
+- **The shared fixture** (`542eb79`, `protocol/fixtures/cli_parity/
+  local_family_cases.json`, +76/-40). Ten message cases re-spelled
+  (`clone-local-verbatim`, `-verbatim-explicit`, `-default-dest`,
+  `-clean-branch`, `-bare`, `-bare-branch`, `-from-name`, `-from-path`,
+  `-from-path-with-dest`, `-dry-run`): argv and the `design_row` prose that
+  quotes it only -- the mutation script asserted every `message`, every
+  `fields` value, every `core_refuses` and every `drivers` byte-identical
+  before and after. Rows 1-5 use the design's own order (name, dest, then
+  flags); rows 6-9 put the flags first, pinning that both parsers interleave.
+  Eight refusal rows re-spelled (`clone-local-without-name` -> `local clone`;
+  `-empty-name` -> `local clone ""`; `-url-and-dest` -> `local clone A url
+  dest`; `-verbatim-and-clean`, `-verbatim-and-bare`,
+  `-branch-without-clean-or-bare`, `-empty-from`; and the three
+  `*-without-local` rows keep their argv but their needle is now the flag the
+  parser names, `--from`/`--clean`, since `clone` declares none of them).
+  Appended: message case `local-clone-single-operand-is-the-name` (`local
+  clone dest` -> name=`dest`, dest absent) and refusals
+  `clone-local-spelling-is-removed` and `clone-local-clean-spelling-is-removed`
+  (the revision-14 §7 command lines, rejected naming `--local`, no request
+  built). `clone-local-dest-without-name` is scoped `"drivers": []` with a
+  note: the positional surface cannot spell a destination without a name. 31
+  message cases (was 30), 25 refusals (was 23); gwz-cli asserts 31/24, gwz-py
+  31/24; both floors raised. `local-dispose-hazards-without-force` is no
+  longer rust-only (§18.4).
+- **The design** (root, uncommitted): revision 15 -- status line (supersedes
+  revision 14, SHA-256 `4e4edf5db536e8eae91ff4f7078fd14385266df940b81271827a4991bdd145aa`),
+  §4's command line and the positional rule, §4.3's heading, every §7 row
+  that spelled `clone --local` plus a row for the rejected old spelling, every
+  §8.1/§8.3 example plus the rejected one, §11 item 20's empty-name rule
+  re-spelled, and §11 item 28 recording the ruling, its reason, the removal
+  without an alias, the out-of-scope exchange verbs and that the wire is
+  unchanged. §11 item 24's "a real `gwz clone --local` would have been
+  refused" is left as the history it is.
+
+### 18.2 What deliberately did not move
+
+- **Exchange.** `merge --remote <name> [<ref>]`, `pull --head --remote
+  <name>` and `push --remote <name>` are untouched: their fixture rows, their
+  driver code and their pages are byte-identical. There is no `gwz local
+  merge`. The `local` verb has exactly four subcommands -- `clone`, `list`,
+  `dispose`, `disband` -- pinned in both drivers, none aliased.
+- **The wire.** `protocol/gwz.taut.py` is untouched (its comment on line 245
+  still says "for `gwz clone --local`"; the brief forbids editing that file
+  and a comment there is not worth a schema hash). No regeneration: `regen.py
+  --check` says the committed artifacts are current. No fingerprint pin moved
+  (`check_log_additive.py`, gwz-py `check_protocol_drift.py`,
+  `test_log_protocol.py` all as at `7b9ee45`). `docs/generate_message_catalog.py`
+  and the generated `docs/MessageCatalog.md` still say `clone --local` in the
+  CloneLocalWorkspaceRequest row: regenerating a catalog for a spelling is
+  exactly the "regeneration" the ruling excludes, so both are left for the
+  next protocol landing to carry.
+- **Core.** `handle_clone_local_workspace` and everything under
+  `src/local_clone/` are unchanged; the only core source touch is the doc
+  comment above the handler. `cargo test -p gwz-core --lib local_clone
+  --locked`: **86 passed, unchanged**. The lib remainder pins are untouched
+  (no row added or removed in core).
+- **Every driver validation** is where it was, at the driver, with the same
+  texts modulo the flag spelling; core's own shape check (`validate_clone_
+  local`) still refuses the empty and reserved names behind it.
+- `gwz-py/src/gwz/cli_local.py` untouched, as instructed.
+- `dev-docs/GwzLocalClonePlan.md` (revision 4, which spells the old form in
+  its stage descriptions) and the historical review documents are left as
+  records of their inputs; the design's status line and item 28 are the
+  authority for the spelling now.
+
+### 18.3 Proof the wire did not move
+
+`python3.13 protocol/regen.py --check`: `regen: OK -- committed protocol
+artifacts are current` (run on the final tree). `git show --stat 542eb79`:
+five files, none under `protocol/` but the fixture, none under
+`src/protocol/`. The fixture mutation asserted every message case's
+`message`, `fields`, `core_refuses` and `drivers` unchanged. `cargo test -p
+gwz-core --lib local_clone --locked` 86 (was 86). The rejection rows in both
+drivers assert that no request of any kind is built for the old spelling.
+
+### 18.4 Decisions the ruling did not settle
+
+1. **A missing name is the parser's error, not a typed driver refusal.**
+   `dispose <name>` already works that way in both drivers, and the ruling
+   asked for internal consistency with it. Clap answers "the following
+   required arguments were not provided: `<name>`", argparse "the following
+   arguments are required: name"; both exit 2, the code every rejected `gwz`
+   invocation uses. Likewise a third operand (`local clone A url dest`) is
+   the parser's surplus-argument error: with no URL on the command there is
+   nothing left for the driver to say about it. The **empty** name stays a
+   typed driver refusal in both (ruling 4, §12).
+2. **gwz-py's parity harness now reads argparse's own exits.** `reject()`
+   takes `parser_exit=` for the ids in `ROWS_REFUSED_BY_THE_PARSER` (captured
+   with `redirect_stderr`, `SystemExit` non-zero, no bridge call), and every
+   other refusal row must still be the typed `CliUsageError`; a guard test
+   pins that every id in that set is a fixture row. Without this, the old
+   spelling's rejection could be pinned in the fixture for gwz-cli only,
+   which is not the cross-driver evidence the ruling wants. As a consequence
+   `local-dispose-hazards-without-force`, scoped to rust at follow-up 3 for
+   exactly this limitation, now asserts in both drivers (shared needle none,
+   rust `--force`, python `unrecognized arguments: dirty`); its note says so.
+3. **The inexpressible row is kept, scoped to no driver.** The fixture's
+   stability rule forbids deleting a case; `"drivers": []` keeps the id and
+   its history readable, both harnesses skip it, and gwz-py's
+   `ROWS_THIS_DRIVER_CANNOT_ASSERT` names it with the reason. The argv shape
+   it described (`clone --local dest`) is now the appended message case: a
+   lone operand is the name.
+4. **The command page for `clone` keeps one see-also line** to
+   `gwz local clone`. The ruling's "its help says nothing about local
+   clones" is applied to the help text strictly (asserted: no `--local`,
+   `--name`, `--clean`, `--bare`, `--from`, `local clone` or `family` in
+   `gwz clone --help`); the Markdown page is documentation navigation, and a
+   reader who lands there looking for a second working copy is sent to the
+   right verb. Remove the line if the operator reads the ruling as covering
+   the page too.
+5. **Example ordering.** The design's command lines and the help examples put
+   the flags after the positionals, as the ruling's usage line does; the
+   fixture pins both orders (rows 1-5 after, rows 6-9 before).
+6. **Core docs re-spelled, catalog not** (§18.2): `docs/ErrorCatalog.md`,
+   `docs/Protocol.md`, `dev-docs/GWZDesign.md` and the handler's doc comment
+   name the new spelling with the old one beside it as history.
+
+### 18.5 Tests
+
+- gwz-cli `src/tests/g12.rs`: the create rows renamed `local_clone_*` and
+  re-spelled; `local_clone_positionals_are_the_name_then_the_destination`
+  (lone operand is the name; flags on either side build the same request)
+  and `clone_local_is_removed_without_an_alias` (five old spellings rejected
+  untyped naming `--local`; `clone` has no alias and declares none of the six
+  local flags; `local` has exactly `clone list dispose disband`, none aliased)
+  are new; `url_clone_is_unchanged_and_the_local_flags_are_unknown_to_it`
+  pins the URL request, the derived target and that each former flag is an
+  "unexpected argument"; `local_clone_refuses_malformed_flag_combinations`
+  pins the parser's missing-name and surplus-operand errors and the exact
+  empty-name text; the help test asserts the two summary lines, the usage
+  line, the `local clone` page and that `clone`'s help is silent; the
+  reference test asserts `### \`gwz local clone\`` and that neither page
+  spells `clone --local`. Fixture floors 31/24.
+- gwz-cli `tests/local_family_workflows.rs`: every create through the real
+  binary spelled `local clone` (dispatch refusals, the verbatim lifecycle,
+  the family merge, ordinary dispose); `driver_refusals_are_rejected_before_
+  anything_is_dispatched` gains the missing-name, empty-name and
+  surplus-operand rows and two old-spelling rows, exit 2 with the needle on
+  stderr, and asserts afterwards that no destination and no URL-clone target
+  named after the `--name` operand was allocated under the invocation's
+  directory. (A first draft looked in the shared temp root and tripped over
+  a stray `T/dest-a` from 08:57 today, an older g12 test's leftover from
+  before this session; it is not this lane's and was left alone.)
+- gwz-py `src/tests/test_cli_local_family.py`: the fixture-driven rows move
+  with the fixture; `test_local_clone_flag_validation_precedes_any_request`
+  (the five typed texts), `test_local_rejects_unsupported_shapes_at_parse`
+  (+`local clone`, +`local clone A dest extra`, +`clone`),
+  `test_clone_local_is_removed_without_an_alias` (four old spellings:
+  `SystemExit` 2, `unrecognized arguments`, `--local` on stderr),
+  `test_clone_declares_no_local_flag_and_local_owns_creation` (`clone`'s
+  options disjoint from the six, positionals exactly `url directory`, `local`
+  exactly the four verbs, the summary line), `test_parser_refused_rows_are_
+  fixture_rows`; the presentation rows run `local clone A`.
+
+### 18.6 Gates (final trees; Darwin 25.6.0 arm64, cargo 1.95.0, python3.13)
+
+| Gate | Result |
+|---|---|
+| gwz-cli `cargo test -p gwz` | **246 passed** (was 244; lib 174 = +2, `local_family_workflows` 9, the rest unchanged) |
+| gwz-cli `cargo clippy -p gwz --all-targets -- -D warnings` | clean |
+| gwz-cli `cargo fmt -p gwz -- --check` | clean |
+| gwz-cli `python3 scripts/generate_cli_reference.py --check` | current (after `--write`) |
+| gwz-cli `cargo run -q -p gwz -- --version` | `gwz 0.2.0-dev` |
+| gwz-py `.venv/bin/python -m pytest src/tests/test_cli_local_family.py src/tests/test_cli_parser.py src/tests/test_cli_local.py src/tests/test_protocol.py src/tests/test_codec.py -q` | **234 passed**. The brief's "200 at baseline" is §17.7's five-file set (with `test_log_protocol.py` and `test_native_local_family.py` in place of `test_cli_parser.py` and `test_cli_local.py`); on this set the baseline is 225 by construction (+1 fixture message case, +2 both-driver refusal rows, +1 guard test, -3/+3 on the two parametrized shape tests, +4 old-spelling rows, +1 surface test = +9) |
+| gwz-core `python3.13 scripts/checks/check_local_clone_boundaries.py` | ok |
+| gwz-core `python3.13 protocol/regen.py --check` | OK, artifacts current |
+| gwz-core `cargo test -p gwz-core --lib local_clone --locked` | **86 passed** (unchanged) |
+| gwz-core `PYTHON=python3.13 scripts/checks/check_lane_commits.sh 7b9ee45 HEAD` | `lane gate: ok` at `542eb79` (8.0 s) |
+| disk | 5.5 GiB free before and after; no `target/` pruning |
+
+Not run: the 16-minute probe suites, Bazel, Windows, gwz-py's native suite
+(no bridge change; `test_native_local_family.py` changed a docstring only).
+
+### 18.7 Left uncommitted for the lane owner (root repo)
+
+`dev-docs/GwzLocalCloneDesign.md` (revision 15) and this record (§18). Also
+modified in the root tree, **not by this lane**: `dev-docs/GwzRemoteAuthProposal.md`
+(+114/-9, mtime 14:22 today, SSH identity / push ordering / root-scoped
+tags), which was clean when this lane started and was left untouched. The
+member pins to record through `gwz`: gwz-core `542eb79`, gwz-cli `1499e6f`,
+gwz-py `0d6a856`. No root `Cargo.lock` change; no `Cargo.toml`/`Cargo.lock`
+change in any member.
+
+### 18.8 Residual risks and what the next lanes must know
+
+- `gwz local clone <path>` with no name -- a path typed where the name goes
+  -- reaches core and is refused by its name rules (`/` or `:` in a name);
+  the driver does not second-guess it. A name that is also a valid directory
+  name (`gwz local clone dest`) creates a member called `dest` at the default
+  destination, which is what the positional surface means.
+- `docs/MessageCatalog.md` and `protocol/gwz.taut.py`'s comment still spell
+  `clone --local` (§18.2); the next protocol landing regenerates the one and
+  may edit the other.
+- `GwzLocalClonePlan.md` revision 4 spells the old form; its stages are
+  history, not the surface.
+- The gwz-py harness now reads parser exits for a named set of rows only; a
+  new parser-level row must be added to `ROWS_REFUSED_BY_THE_PARSER` or its
+  test fails loudly (typed refusal expected), which is the intended failure.

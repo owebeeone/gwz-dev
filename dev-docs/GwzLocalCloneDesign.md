@@ -1,13 +1,21 @@
 # Gwz local clone — Requirements & Design
 
-Status: **DRAFT 2026-09-06 revision 14** — records LCM2.1/LCM2.2
+Status: **DRAFT 2026-09-06 revision 15** — records the operator's
+command-surface ruling of 2026-09-06 (`GwzLocalClone-LCM1.0c-Checkpoint.md`
+§18, lane C): local-clone creation is `gwz local clone <name> [dest]
+[--clean | --bare] [-b <branch>] [--from <name|path>]`, a subcommand of the
+family's own verb with the member name positional; `gwz clone --local` is
+removed without an alias; exchange stays on `merge`/`pull`/`push --remote`;
+the wire is unchanged (§4, §7, §8, §11 item 28).
+Supersedes revision 14 (SHA-256 `4e4edf5db536e8eae91ff4f7078fd14385266df940b81271827a4991bdd145aa`);
+revision 14 recorded LCM2.1/LCM2.2
 (`GwzLocalClone-LCM1.0c-Checkpoint.md` §17, lane C): ordinary `gwz local
 dispose <name>` served end to end under §5's standing default (refuse
 unless history is verifiably preserved elsewhere), with three
 `GwzErrorCode` allocations for its outcomes, `unwaived_hazard` (69),
 `unknown_evidence` (70) and `disposal_incomplete` (71), the reuses beside
-them, and the deferral of gwz stash record decoding (§7, §11 item 27).
-Supersedes revision 13 (SHA-256 `bfcdcbb6eda6774895b4f5c2eaac7d9fddf6841238ac1c09e6348aeff499aedc`);
+them, and the deferral of gwz stash record decoding (§7, §11 item 27),
+over revision 13 (SHA-256 `bfcdcbb6eda6774895b4f5c2eaac7d9fddf6841238ac1c09e6348aeff499aedc`);
 revision 13 recorded LCM1.2
 (`GwzLocalClone-LCM1.0c-Checkpoint.md` §16, lane C): the family merge
 served end to end through the retained import, and two `GwzErrorCode`
@@ -217,8 +225,11 @@ it does not license guessed cleanup.
 
 ## 4. Create
 
-`gwz clone --local --name <Name> [dest]` from the cwd workspace (any
-`ready` family member, or `root`). Dest defaults to
+`gwz local clone <Name> [dest] [--clean | --bare] [-b <branch>]
+[--from <name|path>]` from the cwd workspace (any `ready` family member, or
+`root`). The member name is positional, as it is for `dispose <name>`, and
+creation is a subcommand of the family's own verb (operator, 2026-09-06,
+§11 item 28); `gwz clone` is the URL form only. Dest defaults to
 `../<root-dirname>-<Name>`. Copy source is cwd (or `--from <name|path>`).
 
 Under the family lock and §2's quiescence assumption:
@@ -371,7 +382,7 @@ requiring a clean root uses its ordinary commit/refusal rules.
 `--verbatim` and `--clean` are mutually exclusive. `--bare` implies
 `--clean` (no worktree dirt).
 
-### 4.3 Bare (`--bare --name hub`)
+### 4.3 Bare (`--bare`)
 
 Same workspace **directory layout** (root + each `member.path`). Each
 member `.git` is a **real bare repo** (`core.bare=true`, no worktree).
@@ -714,9 +725,9 @@ Old binary does not send 27/28. New CLI / old core refuses typed.
 
 | CLI | Message |
 |---|---|
-| `gwz clone --local --name A ../gwz-dev-A` | `CloneLocalWorkspaceRequest` mode=verbatim name=A dest=… |
-| `gwz clone --local --clean -b lane/x --name C dest` | same, mode=clean, branch=lane/x |
-| `gwz clone --local --bare --name hub dest` | same, mode=bare |
+| `gwz local clone A ../gwz-dev-A` | `CloneLocalWorkspaceRequest` mode=verbatim name=A dest=… |
+| `gwz local clone C dest --clean -b lane/x` | same, mode=clean, branch=lane/x |
+| `gwz local clone hub dest --bare` | same, mode=bare |
 | `gwz local list` | `LocalFamilyRequest` op=list |
 | `gwz local dispose C` | `LocalFamilyRequest` op=dispose name=C |
 | `gwz local dispose C --keep` | same, keep=true |
@@ -732,7 +743,8 @@ Old binary does not send 27/28. New CLI / old core refuses typed.
 | `gwz merge --remote origin` | `UnknownLocal` (family-only; reserved / not a member) |
 | `gwz push --remote hub` | `PushRequest` remote=hub (family), `meta.policy.remote` absent; current branch to the same branch in hub |
 | `gwz push --remote origin` | `PushRequest` remote=origin (git), `meta.policy.remote` absent |
-| `gwz clone --local --name "" dest` | refused by the driver before encoding (empty name; core's shape check refuses it too) |
+| `gwz local clone "" dest` | refused by the driver before encoding (empty name; core's shape check refuses it too) |
+| `gwz clone --local --name A ../gwz-dev-A` | refused by the driver's parser: `--local` is unknown to `clone`, the pre-revision-15 spelling having been removed without an alias (§11 item 28); no request is built, and it is never re-read as a URL clone of `A` |
 | `gwz merge A` | **git ref `A`**, not a family name |
 
 ## 8. Examples
@@ -756,36 +768,39 @@ lane branches do not yet exist. Settle any reported generated
 
 ```sh
 cd ~/limbo/gwz-dev
-gwz clone --local --name A ../gwz-dev-A
+gwz local clone A ../gwz-dev-A
 # A has the source tree and Git state. dest .gwz/ is installed:
 # family-root → root + family_id; no local-family.yml, no catalog,
 # no .gwz/merge/. Source Git/worktree unchanged; root index updated.
 
-gwz clone --local --clean -b lane/agent-17 --name C ../gwz-dev-C
+gwz local clone C ../gwz-dev-C --clean -b lane/agent-17
 # clean; freeze; recapture dest lock; branch before ready.
 
 cd ../gwz-dev-A
-gwz clone --local --clean -b lane/from-A --name B ../gwz-dev-B
+gwz local clone B ../gwz-dev-B --clean -b lane/from-A
 # registers on root, not on A. B’s family-root is computed, not copied.
 
 cd ../gwz-dev-C
-gwz clone --local --clean --name D ../gwz-dev-D
+gwz local clone D ../gwz-dev-D --clean
 
 cd ~/limbo/gwz-dev
-gwz clone --local --bare --name hub ../gwz-dev-hub
+gwz local clone hub ../gwz-dev-hub --bare
 # core.bare=true per member; gwz.conf last + family-root on hub.
 
-gwz clone --local --name A ../elsewhere
+gwz local clone A ../elsewhere
 # refuse: name A already holds ../gwz-dev-A
 
-gwz clone --local --name origin ../nope
+gwz local clone origin ../nope
 # refuse: origin is reserved / already a git remote
 
-gwz clone --local --name root ../nope
+gwz local clone root ../nope
 # refuse: root is reserved
 
-gwz clone --local --name A2 ../gwz-dev-A
+gwz local clone A2 ../gwz-dev-A
 # refuse: dest path already a family member (or already a workspace)
+
+gwz clone --local --name A ../gwz-dev-A
+# rejected by the parser: `clone` takes a URL and nothing else (§11 item 28)
 ```
 
 Verbatim also preserves staged edits, unstaged edits, and untracked
@@ -854,7 +869,7 @@ cd ~/limbo/gwz-dev-C && gwz merge feature/y    # conflicts; stays open
 # Both legal. status/abort/continue are per cwd workspace.
 
 cd ~/limbo/gwz-dev-C
-gwz clone --local --name nope ../gwz-dev-nope
+gwz local clone nope ../gwz-dev-nope
 # refuse: source has an open gwz merge. Abort it or use --clean.
 ```
 
@@ -1020,7 +1035,8 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
 20. `push --remote` encoding and an empty `--name` — **`PushRequest.remote`
     only**, `OperationPolicy.remote` absent on push (operator, 2026-09-06);
     core keeps request-over-policy precedence for a caller that still sets
-    the policy field. An empty `--name` **refuses at the driver** before
+    the policy field. An empty name (`--name ""` then; the positional
+    `gwz local clone ""` since item 28) **refuses at the driver** before
     encoding; core's own shape check (`validate_clone_local`) refuses the
     empty and reserved names as well, so the driver's refusal is the earlier
     answer, not the only one.
@@ -1157,6 +1173,40 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
     message says why and that `--keep` detaches (§17.4). No automatic
     archive exists anywhere on the path (measured: no entry appears beside
     the family after a deletion).
+28. Create spelling — **`gwz local clone <name> [dest] [--clean | --bare]
+    [-b <branch>] [--from <name|path>]`** (operator, 2026-09-06; checkpoint
+    §18, lane C). Creation moved from `gwz clone --local --name <name>
+    [dest]` to a subcommand of `local`, so the family's own verb owns
+    creation, inspection and retirement together, with the member name
+    positional so the verb is internally consistent with `dispose <name>`.
+    The operator's reason: `clone` already does heavy lifting for the URL
+    form, and the local form shared a name with it and almost nothing else —
+    no URL, a different request message, a different action kind, a disjoint
+    flag set. `gwz clone --local` was **removed entirely, with no alias**:
+    nothing had been released and nothing pushed, so there was no
+    compatibility obligation, and an alias born that day would have been
+    documented forever. `gwz clone` is once again only the URL form, its
+    summary line implies no local form and its help says nothing about local
+    clones; the local flags are unknown arguments to it, and the old
+    spelling is rejected by the parser naming `--local`, never re-read as a
+    URL clone of the name. **Out of scope by the same ruling:** exchange
+    stays where it is — `merge --remote <name>`, `pull --head --remote
+    <name>` and `push --remote <name>` are existing verbs that gained a
+    family-resolved remote, not local subcommands; there is no `gwz local
+    merge`. **The wire did not move:** `CloneLocalWorkspaceRequest`,
+    `ActionKind.clone_local_workspace = 27`, `copy_source` (tag 6) and every
+    field are exactly as allocated; no schema edit, no regeneration, no
+    drift-pin movement, no core request or response change; core's dispatch
+    slot (`handle_clone_local_workspace`) is unchanged and only how the
+    drivers build that request changed. Every validation stayed at the
+    driver: `--verbatim` mutually exclusive with `--clean` and `--bare`, `-b`
+    requiring clean or bare, an empty name refused before encoding (item
+    20), an empty `--from` refused. A missing name and a surplus operand are
+    now each parser's own error, as they are for `dispose <name>`; a lone
+    operand is the name (a path typed there is caught by core's name rules).
+    The cross-driver fixture (item 17) moved with the surface, every message
+    and field value byte-identical, and gained the rows that pin the old
+    spelling as *rejected* in both drivers.
 
 ## 12. Acceptance cases for the implementation plan
 
