@@ -38,7 +38,12 @@
 #   3. Without skip_cargo_lockfile_overwrite, cargo-bazel writes the synthetic package back into
 #      the real //:Cargo.lock, which then breaks every `cargo ... --locked` in this workspace.
 # The three cannot all be avoided from Bazel-owned files, so gwz-cli's tiny third-party surface
-# is pinned by hand instead. The pins MUST track //:Cargo.lock; check with:
+# is pinned by hand instead. The pins MUST track //:Cargo.lock, and a gate refuses when they do
+# not (a version, a feature set, default_features, the dependency set itself, an inexact or
+# unscoped spec, or gwz-cli/BUILD.bazel's @crates labels drifting from the specs):
+#     python3 gwz-core/scripts/checks/check_bazel_pin_drift.py        # from this directory
+# It is a workspace-root gate (its inputs are this file, //:Cargo.lock and gwz-cli/Cargo.toml),
+# run in the landing gate set; gwz-core's CI runs only its unit tests. By hand:
 #     grep -A1 -E '^name = "(clap|console|serde_json)"$' Cargo.lock
 module(name = "gwz", version = "0.1.0")
 

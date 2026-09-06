@@ -1462,3 +1462,275 @@ lock are unchanged).
   error carries only a string. Left as is.
 - **The listing fixture's Windows allowance** is unmeasured; the first
   driver suite to run on Windows measures it.
+
+## 15. LCM1.0c follow-up 4 (lane C, core integration): two invariants made enforced
+
+2026-09-06, lane C. Two invariants that held by habit now hold by a gate and
+by code: the hand-pinned Bazel hub for gwz-cli tracks the outer `Cargo.lock`
+(§15.1), and the local clone family record is ignored by git at every
+workspace because the create writes the exclude, not because a copy happened
+to carry it (§15.2). Commits (each on an explicit pathspec, no pinned file
+touched, no attribution trailer): gwz-core **two** -- `603d628` the gate,
+`63f1332` the privacy enforcement with its Tier B slice and the remainder
+re-pin (one commit: the rows and the pin move together); gwz-cli **one**
+(`8fd6df6`, a comment naming the gate); gwz-py untouched.
+
+**Tuple.** gwz-core **`63f1332`** (on `8bb8804`), gwz-cli **`8fd6df6`** (on
+`5e5f69b`), gwz-py **`88f8d2b`** (unchanged), root `1d5f8a3` plus the two
+uncommitted files in §15.5. `PYTHON=python3.13 scripts/checks/check_lane_commits.sh
+8bb8804 HEAD`: `lane gate: ok` at `603d628` and `63f1332`.
+
+### 15.1 The Bazel pin-drift gate (`gwz-core/scripts/checks/check_bazel_pin_drift.py`)
+
+**The hazard.** Under workspace layout Option A (§11) `crate.from_cargo`
+cannot splice the outer virtual workspace (MODULE.bazel's header records the
+three reasons), so the `@crates` hub is `crate.from_specs` with gwz-cli's
+three direct crates.io dependencies pinned **by hand** -- `clap =4.6.6`
+(`derive`, `wrap_help`), `console =0.16.4`, `serde_json =1.0.151` -- and cargo
+and Bazel agreed only while a human kept those pins in step with
+`//:Cargo.lock`. The comment said so; this gate is the check the comment
+could not be.
+
+**What it compares.** Four files, three of them inputs the brief named:
+
+| Input | What is read | How |
+|---|---|---|
+| root `MODULE.bazel` | every `crate.spec` scoped to the hub -- `package`, `version`, `features`, `default_features`, `repositories` -- and the `crate.from_specs(name = "crates")` declaration | `ast.parse` (Starlark is a syntactic subset of Python), no evaluation; a file `ast` cannot parse is an error |
+| `gwz-cli/Cargo.toml` | the `[dependencies]` entries that come from a registry (a `path`/`git`/`workspace` entry is not a hub member; a rename resolves to its `package`), each with `features` and `default-features`; `[dev-dependencies]`/`[build-dependencies]` are not hub members because gwz-cli's BUILD declares no `rust_test` | `tomllib` |
+| root `Cargo.lock` | the version each direct dependency resolved to, read off the cli package's **own edge** (`name`, or `name version` when the lock holds two versions of it -- an unspelled edge into an ambiguous lock is an error, not a guess) | `tomllib` |
+| `gwz-cli/BUILD.bazel` | the `@crates//:<name>` labels the crate consumes (`--no-cli-build` leaves them out) | a regex over labels |
+
+**Refuses (exit 1)** when a spec's version is not the lock's (either side
+moving), when it is not an exact `=x.y.z` pin, when a feature set or
+`default_features` differs from the manifest, when a direct registry
+dependency has no spec (added), when a spec names no direct dependency
+(removed), when the lock has no edge to a declared dependency, when a spec
+is unscoped or shared with another hub (it would inject itself into
+gwz-core's splice), and when the BUILD labels drift from the spec set.
+**Errors (exit 2, never a pass):** a missing or unreadable input, an
+unparseable `MODULE.bazel`, a hub that is not declared, an ambiguous lock
+edge. Every finding names the file and line.
+
+**Negative fixtures** (`test_check_bazel_pin_drift.py`, 15 rows, all
+synthetic four-file trees in a temporary directory so the checker, not Bazel
+or cargo, is the rejector): `test_bumped_version_is_rejected_from_either_side`
+(the lock moved under the pin; the pin moved off the lock),
+`test_changed_feature_is_rejected` (a feature the manifest gained, one the
+pin dropped, `default-features = false` without `default_features = False`,
+and the matching pin passing), `test_added_direct_dependency_is_rejected`
+(with and without the lock edge), `test_removed_direct_dependency_is_rejected`,
+`test_a_dependency_the_lock_does_not_describe_is_a_finding`,
+`test_inexact_pin_is_rejected` (`"4.6.6"`, `"^4.6.6"`, `"=4.6"`, `">=4.6.6, <5"`),
+`test_unscoped_and_shared_specs_are_rejected` (and another hub's spec
+ignored), `test_build_labels_must_equal_the_spec_set` (both directions, and
+`--no-cli-build`), `test_missing_or_unparseable_input_is_an_error_not_a_pass`
+(each of the four inputs, an absent root, a truncated `crate.spec(`, a
+missing `from_specs`). Positive: the real tree (skipped with its reason on a
+checkout with no gwz-dev root), a synthetic tree, a renamed dependency,
+path and dev dependencies not hub members (a pin for `gwz-core` refused as
+naming no dependency), two lock versions of a direct dependency resolved by
+the spelled edge, and the parsers on the real shapes.
+
+**Proof it bites**, on the tree as it stands (each edit reverted, `git diff
+--quiet` and a byte comparison against a saved copy confirming it):
+
+| Edit | Result |
+|---|---|
+| none | `bazel pin drift: ok` -- 3 pins, 3 direct registry dependencies, 3 BUILD labels, lock version 4 with 188 packages |
+| `MODULE.bazel` clap `=4.6.6` -> `=4.6.7` | exit 1: `MODULE.bazel:95: crate.spec 'clap' pins 4.6.7 but Cargo.lock resolved 4.6.6 (version drift)` |
+| `MODULE.bazel` clap loses `"wrap_help"` | exit 1: `crate.spec 'clap' features ['derive'] differ from gwz-cli/Cargo.toml's ['derive', 'wrap_help'] (feature drift)` |
+| `Cargo.lock` console `0.16.4` -> `0.16.5` (a pretend `cargo update`) | exit 1: `MODULE.bazel:104: crate.spec 'console' pins 0.16.4 but Cargo.lock resolved 0.16.5 (version drift)` |
+
+**Where it lives, and where it belongs.** It is in
+`gwz-core/scripts/checks/` as briefed, resolving the gwz-dev root from its
+own location exactly as `check_merge_docs.py` does (`parents[3]`; every path
+overridable). Honestly: it does not belong to gwz-core. Its inputs are two
+root-repo files and two gwz-cli files, and the events that produce drift --
+a `cargo update` at the root, a dependency bump in gwz-cli, an edit of
+`MODULE.bazel` -- never touch gwz-core, so gwz-core's CI can never run on
+the commit that introduces a drift; and if the job fetched the sibling
+repositories it would check their `main`, not the tuple the root's
+`gwz.conf` pins, and put a red on gwz-core pull requests for a drift made
+elsewhere. The principled home is the **root repository**, owner of
+`MODULE.bazel` and `Cargo.lock` and the only checkout where every input
+exists by construction. The root has no `scripts/` and no CI today, and
+`gwz-core/scripts/checks/` already houses two other workspace-root gates for
+the same reason (`check_merge_docs.py`, `check_m4_scenario_map.py`, both
+"NOT wired here" in the CI file and run in the landing gate set), so the
+gate stays beside them until the multi-repo checkout of the R2-D settled
+tuple §11.3 item 7 / R2-F CI work lands. **What the lane owner must move
+then:** the two files to `gwz-dev/scripts/checks/` (`DEFAULT_WORKSPACE_ROOT`
+and the test's `WORKSPACE_ROOT` become `parents[2]`), the invocation into
+the root's gate, and the CI step below out of gwz-core (or left, for the
+unit tests). Until then it is a landing-gate-set command, run from gwz-core
+inside the workspace: `python3.13 scripts/checks/check_bazel_pin_drift.py`.
+
+**CI wiring** (gwz-core `.github/workflows/checked-artifact-boundary.yml`,
+job `local-clone-boundary`, the job that runs the boundary checkers): a
+step running `python -m unittest scripts/checks/test_check_bazel_pin_drift.py
+-v`. The live check is **not** wired there and is deliberately not guarded
+by a file-exists test -- the single-repo checkout has none of its inputs
+(the L2-05 blocker class), and a gate that passes when its inputs are
+absent is no gate; the step's comment says so. The real-tree row skips
+naming the reason on that runner and runs here. `MODULE.bazel`'s comment
+and gwz-cli's `BUILD.bazel` comment now name the gate beside the `grep` they
+used to offer.
+
+**Coverage limits, stated.** The gate compares declared pins with the
+lock's resolution of the *direct* dependencies; it does not compare the
+transitive graph cargo-bazel resolves into `MODULE.bazel.lock` with
+`Cargo.lock`'s (the two are resolved separately by design, per the
+MODULE.bazel header), and a `rust_test` added to gwz-cli's BUILD would need
+the hub to carry `[dev-dependencies]` too, which the gate would then have to
+learn (documented in its docstring).
+
+### 15.2 The family record's git privacy, enforced
+
+**What held, and how.** The record -- `<root>/.gwz/local-family.yml` and
+its lock, `<clone>/.gwz/family-root` and `<clone>/.gwz/local-clone-allocation`
+-- was ignored by git because `/.gwz/` sits in the root repository's
+`.git/info/exclude` managed block, which `workspace_ops::ensure_workspace_exclude`
+regenerates on every *other* mutation verb (local, never committed), and
+because a verbatim copy carries `.git/info/exclude` along. The create wrote
+it nowhere: not at the destination, not at the root it founded the index
+in. Nothing tested any of it.
+
+**Could it have leaked?** For the shipped verbatim mode from a root that
+gwz created or any gwz mutation verb had touched: **no** -- the block was
+there and the copy carried it (measured now: A's exclude byte-identical to
+the root's, the block once). Two ways it could have, both reproduced as the
+preconditions of the new rows and both now closed:
+
+1. **A stripped source.** With A's `.git/info/exclude` removed, `git
+   status` at A lists `.gwz/family-root` and `.gwz/local-clone-allocation`,
+   and a clone B of A inherited no block (the copy carries what the source
+   has). A member's exclude is regenerated by nothing but the verbs run
+   *at A*. This is exactly the state a **constructed** destination (clean
+   LCM3.1, bare LCM2.3) would have been in from birth: `gwz-repo-factory`
+   builds a fresh repository and inherits nothing.
+2. **The founding root.** With the root's exclude removed, founding wrote
+   `.gwz/local-family.yml` into a root that showed it as untracked -- one
+   `git add -A` at the root from a commit -- and the create, the only verb
+   that writes at the root without going through `sync_workspace_boundary`,
+   did not regenerate the block.
+
+Never at risk, and now proven rather than assumed: the tracked
+configuration. `gwz.conf/gwz.yml` at a destination is the source's bytes
+(§13), `gwz.conf/gwz.lock.yml` names commits and branches, the
+conf-integrity marker names digests; the family id, the member name, the
+recorded path and every host path live only in `.gwz/`. And no family
+binding is a git remote: install strips path and `file:` URLs (§4.1's last
+row, `gwz_repo_factory::origin_is_kept`), so `capture` and `repo sync`
+have nothing family-shaped to record.
+
+**What changed** (gwz-core `63f1332`):
+
+- `local_clone/adapters/git_config.rs::ensure_managed_exclude(backend,
+  workspace, manifest)`: the managed block through the existing helper --
+  `read_lock_or_empty` for the lock when the workspace holds one, then
+  `workspace_ops::ensure_workspace_exclude` (idempotent, operator lines
+  preserved, never committed). A workspace with no `.git` is refused
+  `InstallPortError::Configuration` ("no root repository to hold the
+  managed exclude block") rather than given a stray `.git/info/`; a bare
+  root (design §4.3) has a `.git` and no working tree, so the block is
+  written inside it and hides nothing, harmlessly. One rule, two callers:
+- `CoreInstallPorts::install_destination_git` runs it at the destination
+  in **every mode**, after the remote-URL strip and before the pointer
+  (the port order the library fixes). A verbatim copy inherited the file
+  and the write is a no-op; a constructed destination gets the block it
+  would otherwise never have. `CoreInstallPorts` is now
+  `CoreInstallPorts<'_, B: GitBackend>` holding the handler's backend.
+- `create::clone_local` runs it at the **family root** under the family
+  lock, after `reread` and before the index is founded or rewritten, on
+  every create (the root's manifest is the capture's when the root is the
+  copy source, read when the source is a clone). A failure refuses with
+  `io_error` (`install_port_code(Configuration)`) and "nothing was
+  reserved": nothing founded, no row.
+- `handle_clone_local_workspace`'s `_backend` (unused since LCM1.1) is now
+  passed through `clone_local<B>` to the ports; the six test call sites
+  pass `Git2Backend::without_credential_helpers()`.
+
+**What the tests now prove** (`local_clone::tests::privacy`, a new Tier B
+slice on real workspaces built with `gwz-local-testrepo` and the public
+handlers; 5 rows, 0.86 s warm; plus one unit row in `git_config`):
+
+| Row | What it asserts |
+|---|---|
+| `every_family_file_is_ignored_by_the_destination_and_the_root_after_a_create` | after `root -> A`, at A and at the root: each of the four family paths, `.gwz`, `.gwz/locks/workspace.lock` and `.gwz/merge/open.yaml` is ignored (`is_path_ignored`, present or not); no `.gwz` entry in `git status` (untracked included, ignored excluded) nor in the index (`git ls-files`); the block exactly once, with `/.gwz/` and `/app/`; the member's own repository holds none; an operator line added to the source's exclude survives in both; A's exclude is byte-identical to the root's (the install's write is a no-op on an inherited block) and the root's is what the operator left (regenerating an identical block writes nothing) |
+| `the_tracked_configuration_carries_no_family_binding` | the pointer holds the family id and the root path and the index holds the family id and `../root-A` (the data exists, confined to `.gwz/`); every file under `gwz.conf/` at the root and at A contains none of: the family id, `../root-A`, `family`, the root path, A's path, the temporary tree's path; no recorded remote URL names one; A's manifest is the source's byte for byte |
+| `a_destination_gets_its_exclude_from_the_install_not_from_the_source` | `root -> A`; A's exclude removed (precondition asserted: A's pointer is not ignored and `git status` at A lists the record); `A -> B`: B ignores the record with the block once and `/app/`, while A still has no exclude -- the block came from the install, not the copy |
+| `every_create_regenerates_the_roots_exclude` | the root's exclude removed (precondition: the index path is not ignored); `root -> A` founds a family whose index is ignored, the block naming `/app/`, and A inherits it; removed again, `A -> B` (source A, not the root) regenerates it once more; B ignores the record |
+| `no_family_binding_is_a_git_remote_and_capture_and_repo_sync_write_none` | the source member carries an https origin, a filesystem-path remote at a sibling checkout (the shape a family binding would take if it were a remote) and a `file:` mirror; at A no remote URL of the root or `app` is `file:`, absolute, or names the sibling, the root or A; `origin` keeps its https URL; `remote.sibling.url` and `remote.mirror.url` are gone from A's config while their fetch refspecs stay; the source keeps all three; then `handle_capture` and `handle_repo_sync` on the root and on A leave `gwz.conf/` free of the family id, `../root-A`, `family`, the root path and A's path, and the record still private. The URL rule itself is `git_config::tests::filesystem_and_credential_urls_go_and_ordinary_origins_stay` and is not duplicated; this row proves the port runs on every repository of a real destination |
+| `git_config::tests::the_managed_exclude_block_needs_a_root_repository_and_is_idempotent` (unit) | a directory with no `.git` is refused typed and gains none; an existing repository gets the block once with the operator's lines kept, a second run changes nothing, and the four family paths plus `app/anything` are ignored while `README` is not |
+
+Already covered elsewhere and not duplicated: the helper's block semantics
+(`workspace_ops::tests::g12::exclude_*`: member paths, idempotence, user
+lines, the lock/manifest union) and `.git/info/exclude` being in the copy
+set (`adapters::exclusions` row).
+
+**Two observations from the remotes row.** libgit2 lists a remote by its
+`url`/`pushurl` keys, so once install strips them `sibling` and `mirror`
+vanish from `git remote` while their fetch refspecs stay in config; `repo
+sync` at A therefore reports `app` `Ok` and records only `origin` (no
+empty-URL row reaches the manifest's validator). And `repo sync` at the
+**root** records the operator's own `file:///srv/mirrors/app.git` mirror
+into `gwz.yml`, as it always has for git config -- the operator's binding,
+not the family's, so the row's markers name only family workspaces.
+
+### 15.3 Gates (final trees; Darwin 25.6.0 arm64, cargo 1.95.0, python3.13, from gwz-core unless noted)
+
+| Gate | Result |
+|---|---|
+| `cargo fmt --all -- --check` | clean |
+| `CLIPPY_CONF_DIR="$PWD" cargo clippy --all-targets --all-features --locked -- -D warnings` | clean |
+| `python3.13 scripts/checks/check_checked_artifact_boundaries.py` | ok (24 visible entries, 9 classified modules) |
+| `python3.13 scripts/checks/check_local_clone_boundaries.py` + `-m unittest scripts/checks/test_check_local_clone_boundaries.py` | ok (14 packages, 39 edges); 23 OK |
+| `python3.13 scripts/checks/check_bazel_pin_drift.py` + `-m unittest scripts/checks/test_check_bazel_pin_drift.py` | ok (3 pins, 3 dependencies, 3 labels); **15 OK** |
+| `python3.13 protocol/regen.py --check` | OK (the protocol did not move) |
+| `cargo test -p gwz-core --lib --locked local_clone` | **60 passed** (was 54; +6) |
+| Tier A of touched crates | none touched (every edit is under gwz-core `src/`, `scripts/`, `.github/`) |
+| lib remainder census (`--list`) | 1793 rows (was 1787); `checked_artifact::` 459 and `v1_lifecycle::` 266 unmoved; remainder 1068 listed = **1067 executed darwin**, and **MEASURED**: `cargo test -p gwz-core --lib --locked -- --skip checked_artifact:: --skip workspace_ops::merge::v1_lifecycle::` -> `1067 passed; 0 failed; 1 ignored` in 54.7 s; linux 1068 DERIVED (+6, no cfg gate) |
+| `run_r4bg_aggregate_gates.py` | re-pinned 1061/1062 -> **1067/1068 in the same commit as the rows** (`63f1332`); `--list` still parses |
+| `bazel query //...` (root, after the `MODULE.bazel` comment edit) and `bazel query //gwz-cli/...` (after the BUILD comment) | both resolve; no full `bazel build` (disk 8.4 GiB free, not needed) |
+| gwz-cli | comment-only edit; no cargo target changed |
+| `PYTHON=python3.13 scripts/checks/check_lane_commits.sh 8bb8804 HEAD` | `lane gate: ok` at `603d628` and `63f1332` |
+
+Not run: the 16-minute probe suites; Windows.
+
+### 15.4 Pins moved (old -> new)
+
+- `gwz-core/scripts/checks/run_r4bg_aggregate_gates.py`: lib remainder
+  1061 / 1062 -> 1067 / 1068 (census and measured; +6 rows, all
+  `local_clone::`, none cfg-gated; dated reason in the docstring).
+- No protocol pin moved (no message changed; `regen.py --check` OK).
+
+### 15.5 Left uncommitted for the lane owner (root repo)
+
+`MODULE.bazel` (the "check with" comment now names the gate and its home;
+a comment only -- `bazel query //...` resolves) and this record (§15). The
+member pins to record through `gwz`: gwz-core `63f1332`, gwz-cli `8fd6df6`,
+gwz-py `88f8d2b` (unchanged). No root `Cargo.lock` change.
+
+### 15.6 Residual risks and what the next lanes must know
+
+- **The gate's home** is the root repository; until the root has a gate
+  set it is a landing-gate-set command from gwz-core (§15.1). A lane that
+  bumps a gwz-cli dependency or runs `cargo update` at the root must run it
+  and re-pin `MODULE.bazel` (then `bazel mod deps --lockfile_mode=update`).
+- **Clean and bare** (LCM3.1 / LCM2.3) get the destination's block for free
+  through `install_destination_git`, which the port order already runs
+  after construction; the construction lane must not reorder it. A bare
+  root's block sits inside a bare `.git` and hides nothing -- if the bare
+  layout ever gains a working tree at the root, the block is already there.
+- **The root's block is regenerated by every create, not by `dispose` or
+  `disband`**, which remove record files rather than add them; a root
+  whose exclude is stripped between creates is healed by the next create
+  or any other mutation verb, as member paths always were.
+- **`remote.<name>.fetch` survives the URL strip** at a destination.
+  libgit2 lists a remote by its URL keys, so `gwz` and `repo sync` no
+  longer see it (measured: `repo sync` at A is `Ok`); plain `git remote`
+  still lists the section, and `git fetch <name>` there fails with
+  "'<name>' does not appear to be a git repository" -- the same message as
+  for a remote that never existed (measured on a scratch repository).
+  Harmless; whether install should drop the whole remote section rather
+  than its URL keys is a product call for the lane owner.
