@@ -1,11 +1,19 @@
 # Gwz local clone — Requirements & Design
 
-Status: **DRAFT 2026-09-06 revision 13** — records LCM1.2
+Status: **DRAFT 2026-09-06 revision 14** — records LCM2.1/LCM2.2
+(`GwzLocalClone-LCM1.0c-Checkpoint.md` §17, lane C): ordinary `gwz local
+dispose <name>` served end to end under §5's standing default (refuse
+unless history is verifiably preserved elsewhere), with three
+`GwzErrorCode` allocations for its outcomes, `unwaived_hazard` (69),
+`unknown_evidence` (70) and `disposal_incomplete` (71), the reuses beside
+them, and the deferral of gwz stash record decoding (§7, §11 item 27).
+Supersedes revision 13 (SHA-256 `bfcdcbb6eda6774895b4f5c2eaac7d9fddf6841238ac1c09e6348aeff499aedc`);
+revision 13 recorded LCM1.2
 (`GwzLocalClone-LCM1.0c-Checkpoint.md` §16, lane C): the family merge
 served end to end through the retained import, and two `GwzErrorCode`
 allocations for its import outcomes, `pairing_mismatch` (67) and
-`import_incomplete` (68), with the reuses beside them (§7, §11 item 26).
-Supersedes revision 12 (SHA-256 `afbfec613304bbb31cbe8b84982d2596372dfb3a31c354f8b9cfd37f76a3b1c0`);
+`import_incomplete` (68), with the reuses beside them (§7, §11 item 26),
+over revision 12 (SHA-256 `afbfec613304bbb31cbe8b84982d2596372dfb3a31c354f8b9cfd37f76a3b1c0`);
 revision 12 recorded LCM1.1's three fixes
 (`GwzLocalClone-LCM1.0c-Checkpoint.md` §14, lane C): four `GwzErrorCode`
 allocations for the local-create outcomes the wiring had folded into
@@ -659,6 +667,26 @@ GwzErrorCode.import_incomplete = 68           # the family merge's import stoppe
                                               # the import refs created so far are retained
                                               # and named (§6.2), no record was opened, a
                                               # retry mints a fresh transfer id
+GwzErrorCode.unwaived_hazard = 69             # ordinary dispose found a KNOWN hazard that
+                                              # --force did not name: open-merge (an open
+                                              # merge or unfinished native operation), dirty
+                                              # (uncommitted, untracked, ignored, suppressed
+                                              # or stashed work), unpreserved-history (a root
+                                              # preserved whole in no survivor); every
+                                              # finding named per repository; refused before
+                                              # `disposing`, nothing removed (LCM2.2, §5.2,
+                                              # §11 item 27)
+GwzErrorCode.unknown_evidence = 70            # the deletion tree's work or history evidence
+                                              # could not be established (unreadable path or
+                                              # store, unsupported index flag, uninterpretable
+                                              # layout or coordination record, a verifier
+                                              # limit); nothing removed; NO force name waives
+                                              # it (§5.1); --keep still detaches (LCM2.1)
+GwzErrorCode.disposal_incomplete = 71         # the removal stopped part-way; the row is
+                                              # `disposing` (local list: disposing/
+                                              # interrupted_disposal), the remainder named;
+                                              # no replay, a repeat refused (§5.2); manual
+                                              # cleanup then the stale-row removal, or --keep
 
 MergeRequest.source_ref = F(3, STR, optional=True)   # git ref; UNCHANGED
 MergeRequest.local_source_name = F(9, STR, optional=True)  # NEW; start only
@@ -1097,6 +1125,38 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
     after it. The lock scope is §3.2's: the family lock from before the
     source lock is read until the engine returns, no receiver workspace
     lock preheld (measured: the engine's own acquisition succeeds).
+27. Ordinary-disposal codes and what the evidence covers — **allocated**
+    (lane C, LCM2.1/LCM2.2, 2026-09-06; checkpoint §17): `unwaived_hazard`
+    (69) for §5.2 step 3's known hazards not named by `--force`, every
+    finding listed per repository under the waiver that covers it
+    (`open-merge` covers an open gwz merge, an unfinished native operation
+    and any other open coordination record; `dirty` covers staged,
+    unstaged, untracked, ignored, renamed, deleted, mode- and link-changed
+    entries, a suppressed path whose bytes differ or are absent, and native
+    stash entries; `unpreserved-history` covers every protected root of
+    every repository in the tree that no single surviving family
+    repository preserves whole); `unknown_evidence` (70) for §5.1's
+    unknown layouts and evidence, which no force name waives; and
+    `disposal_incomplete` (71) for a removal that stopped part-way, whose
+    row stays `disposing` and whose repeat is refused. Reused,
+    deliberately: `invalid_request` for the root, a target containing the
+    working directory, a path mismatch (a moved root, a replaced or
+    foreign target, an interrupted detach) and an incomplete or
+    interrupted row, `member_not_found`, `path_collision`,
+    `open_operation` and the store's codes. What §5.1 asked for and the
+    adapter now observes, for the root, every member and every unmanaged
+    nested repository — a `.git` entry or a bare Git directory, the
+    latter closing the gap checkpoint §13.8 recorded — is recorded in
+    checkpoint §17.1; GWZ's own runtime directory (`.gwz/`) and the
+    separately inspected repositories beneath a worktree are not that
+    worktree's work, and nothing else is filtered. A nested repository is
+    paired with no survivor, so its history is unpreserved until the
+    operator names the loss. **Deferred:** decoding gwz stash coordination
+    records into protected roots and verifying their surviving copies — a
+    present record refuses ordinary deletion as `unknown_evidence`, the
+    message says why and that `--keep` detaches (§17.4). No automatic
+    archive exists anywhere on the path (measured: no entry appears beside
+    the family after a deletion).
 
 ## 12. Acceptance cases for the implementation plan
 

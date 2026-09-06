@@ -1975,3 +1975,332 @@ refresh. No gwz-core `Cargo.toml`/`Cargo.lock` change.
   `ImportRequest` from `participants_of` and `qualify_selector` unchanged;
   `selected_keys` replicates the merge verb's defaults and must not be
   reused for a verb with different ones.
+
+## 17. LCM2.1/LCM2.2 (lane C, core integration): ordinary `gwz local dispose <name>`
+
+2026-09-06, lane C. The last slot of the create/work/integrate/retire loop
+stops refusing: `gwz local dispose <name>` without `--keep` deletes a
+lane, and refuses unless the lane's history is verifiably preserved in a
+surviving family repository or the operator named every known loss with
+`--force <hazard,...>` (the operator's standing default, design §5). A
+lane **was deleted** on real workspaces (§17.5: `a_clean_lane_whose_
+history_is_preserved_deletes_and_the_index_forgets_it`, and through both
+binaries), and a lane with unique history **was refused** with its tree
+byte-identical (`a_lane_with_a_unique_commit_reflog_entry_or_stash_
+refuses`). The library (`gwz-local-disposal`, lane D) owns the policy
+unchanged; core completed the evidence behind its ports, flipped the slot,
+translated its errors and proved it. The merge engine is untouched (`git
+diff 6d1a28e..HEAD -- src/workspace_ops/merge/` is empty).
+
+Commits (each on an explicit pathspec, no attribution trailer): gwz-core
+**two** -- `2b94952` the protocol allocation (codes 69-71, the moved
+fingerprint, regenerated bindings and catalog, the wire pins), `7b9ee45`
+the evidence, the slot, the error table, the Tier B rows and the
+lib-remainder re-pin **in the same commit as the rows**; gwz-cli **one**
+(`dc1b40f`); gwz-py **one** (`0b82604`).
+
+**Tuple.** gwz-core **`7b9ee45`** (on `6d1a28e`), gwz-cli **`dc1b40f`**
+(on `5e02709`), gwz-py **`0b82604`** (on `697173b`), root `ad9cc2d` plus
+the uncommitted files in §17.9. `PYTHON=python3.13
+scripts/checks/check_lane_commits.sh 6d1a28e HEAD`: `lane gate: ok` at
+`2b94952` and `7b9ee45`.
+
+### 17.1 What the evidence now covers (`adapters/disposal.rs::observe_target`, design §5.1)
+
+| Design §5.1 asks | Observed, per repository in the deletion tree |
+|---|---|
+| "every repository in the deletion tree, including root and unmanaged nested repositories" | `adapters::inventory::included_repositories`: the root, every manifest member (keyed by id), every unmanaged nested repository (`nested:<path>`) -- a `.git` entry **or a bare Git directory** (a `HEAD` file beside `objects/` and `refs/`, Git's own `is_git_directory` test; `IncludedRepository::bare`), the latter closing §13.8's recorded gap. A nested bare repository is inventoried and never descended into; a bare *root* is still walked, because a bare hub root (§4.3) holds its members beneath it. The create path shares the traversal: the source snapshot inspects the bare repository too, and the dest-complete check now finds the copied one (it looked for `<path>/.git`) |
+| "Unknown layouts/evidence refuse" | every inspector error is an `UnknownReason` in `TargetEvidence::unknown`, by kind (`Unsupported`/`NotARepository` -> `UnsupportedLayout`, `ReadFailed` -> `Unreadable`, `Unimplemented` -> `Unimplemented`), never omitted; an unwalkable tree is one `Unreadable` reason |
+| staged, unstaged, untracked **and ignored** work | `gwz-repo-inspect::observe_work` (unchanged, 88 tests): the status walk with ignored entries included, renames, deletions, mode and link changes, conflicts |
+| assume-unchanged / skip-worktree / other flags "inspect actual bytes without altering the index" | the same observer's byte comparison of every suppressed index entry, no index write; the classifier's table decides (a differing or absent assume-unchanged path is `dirty`; an absent skip-worktree path with no valid sparse absence, and an `Other` flag over matching bytes, are **unknown**) |
+| "Valid sparse absence requires explicit handling" | `sparse_absent` recorded only under `core.sparseCheckout`; classified clean by the detector, never as a deletion |
+| native operation state | `native_operation` from libgit2's repository state (merge, rebase, cherry-pick, revert, bisect, am) -> `open-merge` |
+| refs, HEAD, reflog roots, annotated objects, native stashes and older entries | `inventory_history` (unchanged): every ref, HEAD attached or detached, reflog entries that alone retain an object, annotated tag objects, every `refs/stash` entry |
+| GWZ merge records | the dispatch slot's probe (`classify_open_record`): open -> `open-merge`, unclassifiable -> unknown |
+| GWZ stash coordination records | **present -> `Unknown`** (deferred, §17.4) |
+
+**Structural entries are not work.** A workspace root's own status
+reports GWZ's runtime directory (`/.gwz/`, ignored by the managed exclude
+block) and every separately inventoried repository beneath it (`/app/`
+ignored by the same block; an unmanaged nested repository's directory
+untracked; a nested bare repository's `HEAD`, `objects/...` and `refs/...`
+untracked, because Git does not recognise a bare directory as a nested
+repository) as entries. Before this landing every lane therefore read as
+`dirty` by construction (the ports test measured it). `observe_target`
+now drops, from each repository's `entries` only, the paths at or under
+its structural set: for the root `.gwz`, `gwz.conf/.tmp` and every other
+inventoried repository's relative path; for a member, the nested
+repositories beneath it; for a nested repository, nothing
+(`structural_paths`, `strip_structural_work`). The runtime directory is
+GWZ's, not user data -- the family pointer and marker in it are exactly
+what disposal removes, and its coordination records reach the classifier
+through the GWZ evidence channel -- and a repository beneath is inspected
+on its own. Suppressed entries, sparse absences and per-path unknowns are
+never filtered, and neither is any other ignored entry: "ignored does not
+mean disposable" holds for a user's `build/` tree (measured in the unit
+row). What this does not surface: a stray user file placed under `.gwz/`,
+and the merge catalog and archived merge records under `.gwz/` (finished
+operation records; design §5.1 names only stash records) -- both in
+§17.10.
+
+**Witnesses** (`check_history`, unchanged from §13.1): one
+`gwz-history-check::check_history` call per surviving ready family
+repository, paired by identity -- `RepoKey::Root` with the family root's
+repository and every other ready member's root, `Member{id}` with the
+member of the same manifest id in each survivor, a `nested:` key with
+nothing. A nested repository is therefore unpreserved until the operator
+names the loss (measured: `a_nested_bare_repository_is_inventoried_and_
+its_history_protected`). Pairing nested repositories by relative path is
+the lever if that proves too strict (§17.10).
+
+### 17.2 The slot and the waiver map as wired
+
+`workspace_ops::handle_local_family` dispatches `Dispose { keep: false,
+waivers }` to `local_clone::dispose::delete`, which shares `open` with
+`keep`: the family observation (a workspace in no family answers
+`member_not_found` naming the verb, as `--keep` does), the family lock,
+the locked view, the target resolved lexically against the canonical root.
+The request is `DisposePolicy::Delete { waivers }` with the working
+directory canonicalised; `gwz_local_disposal::dispose` then runs design
+§5.2 in order -- validate name, pointer and path; observe the target;
+refuse every unknown; classify the target (an absent target takes the
+stale-row exit, an incomplete or interrupted row refuses, a mismatch
+refuses); classify the work per repository and ask the history port per
+repository; refuse every known hazard not named; write `disposing` and
+check it; remove the validated directory once; remove the pointer, then
+the row. The response message is `deleted local clone \`A\`: <target>
+removed, its row removed[; forced past: <names in the order given>]`, or
+`removed the stale row of local clone \`A\`: nothing stood at <target>; no
+file was removed`.
+
+| Force name | Waives (as the classifier and the port produce them) |
+|---|---|
+| `dirty` | `HazardKind::Work(*)` -- staged, unstaged, untracked, ignored, conflict, mode change, link change, renamed, deleted; `Suppressed` -- an assume-unchanged or skip-worktree path whose bytes differ, or an assume-unchanged path absent; `NativeStash` -- any `refs/stash` entry |
+| `open-merge` | `OpenGwzMerge` (the probe's open record), `OpenNativeOperation` (merge, rebase, cherry-pick, revert, bisect, am), `OpenGwzStash` and `OpenGwzRecord` (no producer in this build: stash records are unknown, `GwzEvidence::other` is empty) |
+| `unpreserved-history` | every `HistoryAnswer::Unpreserved` per repository -- a root preserved whole in no single surviving witness, and every root of a nested repository (no witness) |
+| **no name** | `DisposeError::Unknown` (every `UnknownKind`: an unreadable path or store, an unsupported index flag, an uninterpretable layout, a present stash record, a verifier limit, an unknown verdict without a reason), `PathMismatch` (a moved root, a replaced or foreign target, an interrupted detach, undecodable metadata, evidence from outside the tree), `WrongState` (a `creating` or `disposing` row), the root, a target containing the working directory, an overlapping recorded path, an empty, unknown or repeated name, `--keep` with a name |
+
+Every refusal's message names the typed cause, every finding as
+`` `<repository>` <waiver>: <hazards with paths, or the history detail> ``
+(capped at sixteen items per list, the rest counted), the recovery, and
+every completed effect; the refusal rows assert on the `<waiver>` tokens
+present and absent.
+
+### 17.3 Codes reused and allocated (`local_clone::errors::dispose_error_code`, one table for `--keep` and ordinary deletion)
+
+| Code | Outcome | Call site | Why its own code |
+|---|---|---|---|
+| `unwaived_hazard` (69) | known hazards not named by `--force`; nothing removed | `DisposeError::Hazards` | `permission_denied` (the keep-path placeholder that never fired) says the operator lacks a permission; the recovery is to preserve the history, finish the operation or move the work -- or to name each accepted loss, or `--keep` |
+| `unknown_evidence` (70) | evidence that could not be established; nothing removed; no force name waives it | `DisposeError::Unknown`, `DisposeError::Port(PortError::Evidence)` | `unsupported_operation` means exactly "not built yet" since fix 1, `io_error` would suggest a retry; the recovery is to make the evidence interpretable, or `--keep` |
+| `disposal_incomplete` (71) | the removal stopped part-way; the row is `disposing`, the remainder named | `DisposeError::RemovalStopped` | `io_error` would suggest a retry, which design §5.2 refuses (an interrupted deletion is not forceable); the recovery is manual cleanup and then the stale-row removal, or `--keep` |
+
+Reused, deliberately: `member_not_found` (`Refused(NotFound)`, no family),
+`invalid_request` (`RootImmutable`, `TargetContainsCwd`, `PathMismatch`
+-- `gwz local list` shows what was observed --, `Refused(WrongState)` for
+a `creating` or `disposing` row, the request-shape refusals),
+`path_collision` (`Refused(NestedPath)`), `io_error` (a removal port that
+could not start), `unsupported_operation` (a port that does not implement
+its operation), the store's codes (`Store`, including a store error after
+the directory is gone, when the message adds that the row is `disposing`
+and an explicit dispose removes it). Pins moved, one fingerprint of one
+schema: `protocol/check_log_additive.py`, gwz-py
+`scripts/check_protocol_drift.py`, `src/tests/test_log_protocol.py`:
+`ba55594f...` -> `e99ce51a85b439fb03bb43df5beb3a33156048b8212d3f2fc609ba2db163db32`,
+MEASURED additive (projection rendered on `6d1a28e`'s schema and the
+edited one, diffed: 3 added lines, 0 removed, 2 hunks, the three enum
+members as map keys; the old pin reproduced on the old schema).
+`regen.py --check` OK; gwz-py `check_protocol_drift.py` OK
+(`cfae044b...`). `docs/MessageCatalog.md` +3 rows; `docs/ErrorCatalog.md`
+an LCM2.1/LCM2.2 table; `docs/Protocol.md`, `docs/RustApi.md`, gwz-core
+`dev-docs/GWZDesign.md`; root design §7 and §11 item 27 (revision 14).
+`tests/protocol.rs` pins 69-71 and their distinctness; gwz-py
+`test_protocol.py` likewise. Both drivers render the codes generically;
+gwz-cli `g12.rs` and gwz-py `test_cli_local_family.py` (three `REFUSALS`
+rows, +15 cases) pin the presentation.
+
+### 17.4 Deferred: gwz stash coordination records
+
+Not decoded. `observe_target` counts the `*.yaml` records under
+`.gwz/stash/bundles` and reports any as `EvidenceState::Unknown`, which
+the classifier turns into `UninterpretableEvidence` (no force name) and
+the library refuses as `unknown_evidence`. The refusal message, verbatim
+from the adapter: `<n> gwz stash record(s) under <target>/.gwz/stash/
+bundles: this build does not decode gwz stash coordination records
+(design §5.1 needs their surviving copies and referenced objects
+verified), so the lane cannot be deleted while any exists; pop or drop
+the gwz stash in the lane first, or \`gwz local dispose <name> --keep\`
+detaches the lane and retains every file` -- followed by the slot's `no
+force name waives unknown evidence: make it interpretable, or --keep to
+detach and retain every file; nothing was removed` (measured:
+`unknown_work_or_history_refuses_and_no_force_name_waives_it`, with and
+without all three force names, then `--keep`). Why deferred: the honest
+decode is more than a parse -- `StashBundle` (`src/stash`) carries per
+member a `native_stash_object_id` and a `head_before`, which would become
+`gwz_repo_inspect::CoordinationRoot`s for the member's inventory and be
+verified like any root, plus the record's own state (a `Pending` restore
+is an open record -> `open-merge`; a closed one adds nothing the native
+stash inventory does not already protect) and §5.1's "surviving
+interpretable copies", which the verbatim copy never makes (`.gwz/stash/
+bundles` is a §4.1 exclusion) -- and each of those is a decision about
+what a record means after `pop`, `apply` or a failed push, which this lane
+did not want to make in the last hour of its budget. The shape is ready:
+`LocalRepoInspector::with_coordination_roots` is the seam, and
+`GwzEvidence::stash` the channel.
+
+### 17.5 Tests (`cargo test -p gwz-core --lib --locked local_clone::tests::dispose`, 15 rows, 2.7 s; real workspaces built with `gwz-local-testrepo` and the public handlers; every refusal row asserts the code, the target tree byte-identical before and after, and the row still standing)
+
+| Row | Proves |
+|---|---|
+| `a_dirty_lane_refuses_ordinary_deletion_naming_the_dirt_and_nothing_is_removed` | the dirt a verbatim clone carried (untracked `notes.txt`, unstaged `README`, the uncommitted `gwz.conf/`) is `<dirty>`, `unwaived_hazard`, with `--keep` and "nothing was removed" in the message; `<unpreserved-history>` is **not** named (a fresh clone's history is in its source); `--force open-merge,unpreserved-history` still refuses `<dirty>`; the pointer stands, the row is `ready` |
+| `a_lane_with_a_unique_commit_reflog_entry_or_stash_refuses` | on a clean fixture: a commit only in A's member -> `<unpreserved-history>` naming the id, not `<dirty>`; a commit then `reset --hard` in B -> refused naming the id and `Reflog`; a native stash in C -> `<dirty>` ("native stash") **and** `<unpreserved-history>` naming the stash commit, and `--force dirty` alone still refuses the history; all three lanes intact and listed |
+| `unknown_work_or_history_refuses_and_no_force_name_waives_it` | a gwz stash record file, a skip-worktree absence with no sparse checkout, and a nested gitfile layout each answer `unknown_evidence` with and without all three force names ("no force name waives", the record / `skip-worktree` `README` / `nested:vendor/thing` named), nothing removed; `--keep` detaches all three with every file retained |
+| `each_known_hazard_refuses_without_its_name_and_proceeds_with_it` | one lane with an untracked file, a `MERGE_HEAD` and a unique commit: no force names all three; `dirty` leaves `<open-merge>` and `<unpreserved-history>` and no longer names `<dirty>`; `dirty,open-merge` leaves only the history; `unpreserved-history,open-merge` leaves only `<dirty>`; all three **delete** the lane ("forced past: open-merge, dirty, unpreserved-history"), B and the root byte-identical |
+| `a_force_with_an_empty_unknown_or_repeated_name_refuses_before_any_effect` | `""`, `all`, `true`, `Dirty`, `dirty,dirty`, `dirty,open-merge,dirty` and `--keep --force dirty` are `invalid_request` with nothing touched |
+| `the_root_the_working_directory_a_moved_root_and_a_replaced_target_refuse` | `dispose root` ("never disposed"); standing in `A/app` ("working directory"); A's marker rewritten ("not the recorded target"); the root renamed (`A`'s pointer no longer names it: "not the recorded target", the row standing); every one `invalid_request`, nothing removed |
+| `a_creating_or_disposing_row_refuses_ordinary_deletion_but_accepts_keep` | an install cancelled before the manifest (`creating`) and a row marked `disposing` through the store session each refuse `invalid_request` naming the state, with and without all three names; `--keep` detaches both (only the pointer and the marker go; the manifest-less tree stays) |
+| `a_removal_error_part_way_stops_reports_the_remainder_and_leaves_the_row_disposing` (`#[cfg(unix)]`) | a read-only directory inside the lane: `disposal_incomplete`, "removal stopped", the held file named, "no replay", `--keep` in the message; the file retained, the row `disposing` (`local list` shows it), B untouched; a repeat with all three names is `invalid_request` and removes nothing more; `--keep` detaches the remainder |
+| `a_stale_row_for_an_absent_target_is_removed_after_validation` | the lane moved away: "removed the stale row ... nothing stood at ... no file was removed", the family forgets A, the moved tree byte-identical (its dangling pointer included), a repeat `member_not_found` |
+| `a_clean_lane_whose_history_is_preserved_deletes_and_the_index_forgets_it` | **the deletion**: A's directory gone, its row gone, `local list` from the root and from B = root, B; B byte-identical; the root byte-identical but for the index; no archive or backup appeared beside the family (directory count); a repeat `member_not_found`. Then C with a commit, D cloned from C: C **deletes** (its commit preserved in D, a lane, not the root), and D then refuses `<unpreserved-history>` naming the commit it alone holds |
+| `a_nested_bare_repository_is_inventoried_and_its_history_protected` | a bare repository under `vendor/` in the source is copied, inventoried as `nested:vendor/mirror.git` with `info.bare`, its commit a protected root; the slot refuses `<unpreserved-history>` naming it (no witness); `--force unpreserved-history` deletes; the source's copy stands |
+| `the_disposal_ports_observe_check_history_per_witness_and_remove` (extended) | the root's work now shows the unstaged `README` and **no** `.gwz`/`app` entry; the rest as §13.3 |
+| `keep_detaches_a_and_leaves_every_file`, `keep_detaches_an_incomplete_target_and_retains_its_remainder`, `disband_removes_pointers_and_the_index_and_leaves_the_trees` | unchanged (`--keep` exactly as it was) |
+
+Unit rows: `local_clone::adapters::disposal::tests::structural_entries_
+are_stripped_and_every_other_entry_stays` (the structural set per
+repository shape; `.gwzx`, `application.txt`, a user's ignored `build/`
+and `README` stay while `.gwz/`, `app/`, `vendor/mirror.git/HEAD` go; an
+unknown observation is left alone) and `::every_layout_error_is_an_
+unknown_reason_of_its_own_kind`; `local_clone::dispose::tests::a_delete_
+report_names_what_went_and_what_was_forced` and `::a_refusal_names_every_
+finding_the_recovery_and_the_effects` (the exact hazards message, the cap
+counting past sixteen, the removal message, the port code);
+`local_clone::errors::tests::disposal_failures_map_onto_the_three_
+disposal_codes` (every `DisposeError` variant, distinctness);
+`tests/protocol.rs::error_code_wire_values_are_pinned` extended (69-71).
+`local_clone::tests::request::local_family_ops_refuse_unsupported_without_
+writing` moved with core: ordinary dispose outside any family is
+`member_not_found` naming the verb, nothing written.
+
+**Drivers.** gwz-cli `tests/local_family_workflows.rs::ordinary_dispose_
+deletes_a_preserved_lane_and_refuses_unique_history_end_to_end`: `init`,
+`repo create app`, a commit, the root committed, `clone --local --name A`,
+`local dispose A` (exit 0, "deleted local clone `A`", the directory gone),
+`clone --local --name B`, a commit in B's member, `--json local dispose B`
+(exit 1, `UnwaivedHazard`, `<unpreserved-history>` and the id in the
+message, no listing) and the human channel (`gwz: UnwaivedHazard: ...`,
+the tree intact, HEAD unchanged), `local dispose B --force
+unpreserved-history` (exit 0, "forced past: unpreserved-history", the
+directory gone, `local list` = root); the three no-family dispose rows
+moved from `UnsupportedOperation` to `MemberNotFound`;
+`g12.rs::the_three_disposal_codes_are_presented_as_typed_refusals` and the
+no-family dispatch row. gwz-py `test_native_local_family.py::test_
+ordinary_dispose_deletes_a_preserved_lane_and_refuses_unique_history`
+through the native bridge (`clone_local_workspace`, `local_family(dispose,
+name="A")` deleting, a commit in B, the refusal raised as
+`GwzBridgeError` with `UnwaivedHazard: local dispose \`B\`` and the
+`<unpreserved-history>` finding, the tree intact, then
+`force_hazards=["unpreserved-history"]` deleting and the listing = root)
+-- the native module rebuilt with `maturin develop` (13 s) against this
+core. Both drivers reach the same outcome on the same loop; neither needed
+a presentation change (the Rust help text already described the served
+behaviour).
+
+### 17.6 Design §12's disposal rows
+
+| Row | Status | Evidence |
+|---|---|---|
+| Unique root/branch/reflog/tag/stash history: refuse until covered in a survivor | **pass** | unique commit, reflog-only commit, native stash (§17.5 row 2); a nested bare repository's commit (row 11); D after C (row 10). An annotated tag is protected by the inventory (`AnnotatedTag` root, 88 inspector tests) and verified by the same port; not exercised as its own Tier B row |
+| Edited assume-unchanged / present skip-worktree file: dirty or unknown; never silently clean | **pass** (unknown arm) | the skip-worktree absence refuses `unknown_evidence` (row 3); the differing-bytes arm is the classifier's (lane W, `Suppressed` -> `dirty`) and the observer's (lane I), both at their pinned suites; not exercised as its own Tier B row |
+| Unknown or oversized work/history inventory: refuse before disposing | **pass** | rows 3 (three unknown sources, every force name); the verifier limit is `HistoryAnswer::Unknown` from `Limits::default()` (lane D's `unknown_work_or_history_refuses_and_no_force_waives_it`), not reproduced on a real tree |
+| Clean intact lane with all protected history elsewhere: explicit dispose deletes without creating an archive | **pass** | row 10 (directory count unchanged but for the lane), both drivers |
+| Error/interruption during deletion: stop; retain/report remainder; no later automatic deletion | **pass** | row 8 (unix) |
+| Dirty/open/incomplete lane with keep: detach matching metadata and retain all remaining files | **pass** | rows 1-3, 7, 8 (`--keep` after every refusal), the two unchanged keep rows |
+| Two local-family mutation commands: the family lock makes one busy | not re-exercised | the lock is the store session, held from `open` to the response (unchanged from §13, §16) |
+
+### 17.7 Gates (final trees; Darwin 25.6.0 arm64, cargo 1.95.0, python3.13, from gwz-core unless noted)
+
+| Gate | Result |
+|---|---|
+| `cargo fmt --all -- --check` | clean (gwz-core; gwz-cli `cargo fmt -p gwz -- --check` clean) |
+| `CLIPPY_CONF_DIR="$PWD" cargo clippy --all-targets --all-features --locked -- -D warnings` | clean, exit 0 (both commits) |
+| `python3.13 scripts/checks/check_checked_artifact_boundaries.py` | ok (24 visible entries, 9 classified modules) |
+| `python3.13 scripts/checks/check_local_clone_boundaries.py` + its unittest | ok; OK |
+| `python3.13 scripts/checks/check_bazel_pin_drift.py` + its unittest | ok; OK |
+| `python3.13 protocol/regen.py --check` | OK (after the allocation) |
+| `protocol/.regen-venv/bin/python protocol/check_log_additive.py` | OK `e99ce51a...` |
+| `cargo test -p gwz-core --lib --locked local_clone` | **86 passed** (was 71; +15) |
+| `cargo test -p gwz-core --lib --locked local_clone::tests::dispose` | 15 passed, 2.7 s (was 5) |
+| `cargo test -p gwz-local-disposal --lib --locked` | 27 passed (untouched) |
+| `cargo test -p gwz-repo-inspect --lib --locked` | 88 passed (untouched) |
+| `cargo test -p gwz-core --test protocol --locked` | 37 passed (69-71 pinned) |
+| lib remainder census (`--list`) | 1819 rows (was 1804); `checked_artifact::` 459 and `v1_lifecycle::` 266 unmoved; remainder 1094 listed = **1093 executed darwin** (+15, measured by execution: `1093 passed; 1 ignored`, 63.9 s), linux 1094 DERIVED; `run_r4bg_aggregate_gates.py` re-pinned 1078/1079 -> 1093/1094 **in the same commit as the rows** (`7b9ee45`); `--list` still parses |
+| `git diff 6d1a28e..HEAD -- src/workspace_ops/merge/` | empty |
+| `PYTHON=python3.13 scripts/checks/check_lane_commits.sh 6d1a28e HEAD` | `lane gate: ok` at `2b94952` and `7b9ee45` |
+| gwz-cli `cargo test -p gwz --locked` (from gwz-cli) | **244 passed** (was 242; +2: lib 172, `local_family_workflows` 9) |
+| gwz-py `pytest src/tests/test_protocol.py test_codec.py test_log_protocol.py test_cli_local_family.py test_native_local_family.py` (`.venv/bin/python`) | **200 passed** (was 184; +15 refusal cases, +1 native) |
+| gwz-py `scripts/check_protocol_drift.py` | OK |
+| disk | 7.1 GiB free at the start, 5.1 GiB at the end; no `target/` pruning was needed |
+
+Not run: the 16-minute probe suites; the merge engine's own partitions
+(no file under `workspace_ops/merge/` changed); Bazel; Windows.
+
+### 17.8 Pins moved (old -> new)
+
+- `protocol/check_log_additive.py`, gwz-py `scripts/check_protocol_drift.py`,
+  gwz-py `src/tests/test_log_protocol.py`: `ba55594f...` -> `e99ce51a...`
+  (§17.3).
+- `scripts/checks/run_r4bg_aggregate_gates.py` lib remainder: 1078/1079
+  -> 1093/1094 (§17.7).
+
+### 17.9 Left uncommitted for the lane owner (root repo)
+
+`dev-docs/GwzLocalCloneDesign.md` (revision 14: status, §7 the three
+codes, §11 item 27; supersedes revision 13, whose SHA-256
+`bfcdcbb6eda6774895b4f5c2eaac7d9fddf6841238ac1c09e6348aeff499aedc` the
+status line records) and this record (§17). Pre-existing untracked:
+`dev-docs/GwzRemoteAuthProposal.md` (not this lane's). The member pins to
+record through `gwz`: gwz-core `7b9ee45`, gwz-cli `dc1b40f`, gwz-py
+`0b82604`. No root `Cargo.lock` change; no gwz-core, gwz-cli or gwz-py
+`Cargo.toml`/`Cargo.lock` change.
+
+### 17.10 Residual risks and what the next lanes must know
+
+- **gwz stash records refuse, undecoded** (§17.4). A lane holding one
+  cannot be deleted without popping or dropping the stash first; `--keep`
+  always works. Decoding is the remaining half of LCM2.1.
+- **A nested repository is paired with no witness**, so a lane holding
+  any unmanaged nested repository -- a `.git` directory or a bare Git
+  directory -- always needs `--force unpreserved-history`, even when the
+  source holds an identical copy at the same relative path. Pairing
+  `nested:<path>` with the same relative path in each survivor is the
+  lever (verification is by object graph, so a wrong pairing cannot
+  certify anything); this lane kept §13.1's recorded decision.
+- **Structural stripping** removes every entry at or under `.gwz/` from
+  the root's work. A user file placed there is not seen. The merge
+  catalog and archived merge records under `.gwz/` (finished operation
+  records) are not surfaced as evidence either; design §5.1 names only
+  stash records, and an open merge is the probe's.
+- **A moved lane is a stale row.** Nothing at the recorded path is
+  design §5.2 step 5's "contents already gone", so `dispose` removes the
+  row without any check and the moved tree keeps a pointer that names a
+  family it is no longer in. A moved *root* refuses (the pointer no
+  longer matches).
+- **An interrupted removal leaves a pointer-less tree**: the remover
+  walks in sorted order, so `.gwz/` (the pointer and marker) goes before
+  the members. `local list` shows `disposing`; `--keep` detaches the
+  remainder; the row is what identifies it.
+- **Bare hub roots** (LCM2.3) are inventoried and walked by construction
+  but never exercised.
+- **Windows** is unverified: the removal-error row is `#[cfg(unix)]`
+  (permission-based), the remainder pin does not cover Windows.
+- **gwz-py presents a native-bridge refusal as `GwzBridgeError`** with the
+  code label ahead of core's message, not as `GwzOperationError` with a
+  typed code; the CLI path is unaffected. A CP observation, unchanged here.
+- **Messages are bounded** at sixteen findings per list, the rest counted;
+  a very dirty lane's refusal names the first sixteen paths.
+- **Cost.** Every ordinary dispose inspects every repository in the tree
+  (status with ignored entries, every suppressed entry hashed) and walks
+  every protected root's graph once per witness (`Limits::default()`).
+  On the fixtures it is milliseconds; on a workspace the size of gwz-dev
+  it is seconds and scales with the object count and the number of
+  survivors; a limit is `unknown_evidence`, never a silent pass.
