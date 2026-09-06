@@ -1734,3 +1734,244 @@ gwz-py `88f8d2b` (unchanged). No root `Cargo.lock` change.
   for a remote that never existed (measured on a scratch repository).
   Harmless; whether install should drop the whole remote section rather
   than its URL keys is a product call for the lane owner.
+
+## 16. LCM1.2 (lane C, core integration): family merge through retained imports
+
+2026-09-06, lane C. Steps 5-6 of `src/local_clone/family_merge.rs` run for
+real: `gwz merge --remote <name> [<ref>]` pairs, captures, fetches into one
+retained ref per paired receiver, verifies, and delegates once to the
+public merge engine entry. This completes the plan's MVP: a local clone is
+created, worked in, and its commits integrated back by family name. The
+engine is untouched -- `git diff 63f1332..HEAD -- src/workspace_ops/merge/`
+is empty -- and its own suite is green (§16.6). Commits (each on an
+explicit pathspec, no attribution trailer): gwz-core **two** -- `a559f37`
+the protocol allocation (codes 67-68, the moved fingerprint, regenerated
+bindings and catalog, the wire pins), `6d1a28e` the wrapper, its errors and
+Tier B slice with the lib-remainder re-pin **in the same commit as the
+rows**; gwz-cli **one** (`5e02709`); gwz-py **one** (`fbd2120`).
+
+**Tuple.** gwz-core **`6d1a28e`** (on `63f1332`), gwz-cli **`5e02709`**
+(on `8fd6df6`), gwz-py **`fbd2120`** (on `88f8d2b`), root `2060cee` plus
+the uncommitted files in §16.7. `PYTHON=python3.13
+scripts/checks/check_lane_commits.sh 63f1332 HEAD`: `lane gate: ok` at
+`a559f37` and `6d1a28e`.
+
+### 16.1 The built request (design §6, §6.1, §6.2; §13.8's recorded call shape)
+
+`family_merge::prepare` builds `gwz_local_import::ImportRequest` as §13.8
+recorded, in this order, every step before the lock being a read:
+
+| Field | Built from |
+|---|---|
+| `transfer` | `adapters::member_paths::mint_transfer_id()`: `xfer_<32 hex>` from the same `getrandom` source as the family and allocation ids, because the ref outlives the process (an operation-counter id would collide with its own retained ref on the next invocation); `TransferId::import_ref()` is `refs/gwz/local-imports/<id>` |
+| `receivers` | the addressed workspace's lock (`artifact::read_lock`), one `Participant::new(RepoKey::Member { id }, entry.path, root.join(path))` per lock member in lock order, plus `Participant::root(root)` (`participants_of`) |
+| `sources` | the bound member's workspace read the same way: `family_root.join(bound.path)` canonicalised (the family root itself when the token is `root`), its lock read **under the family lock** |
+| `selected` | the verb's existing defaults, exactly as `merge/plan.rs` selects: `resolve_targets(manifest, selection, CommandDefaultTargets::Members, RootSelectionPolicy::Allow)`, the root joining only when the selection names `@root` explicitly (`@all` alone never selects it) -- `selected_keys` |
+| `selector` | qualified **once** before the request (`qualify_selector`): no ref or `HEAD` -> `SourceSelector::Head`; a name under `refs/` verbatim; any other name -> `refs/heads/<name>` (a tag is spelled `refs/tags/<name>`). Lane X's note holds: the selector reaches the port unchanged for the capture and as the refspec source |
+
+Before the lock and after resolution (step 4), still read-only: the
+addressed workspace's manifest and lock, `assert_workspace_id`, the
+selection, and the open-merge envelope (`open_merge_probe`) -- a start the
+engine's own gate would refuse is refused here as `open_operation` with
+"nothing was imported", so it leaves no ref. Under the lock: the family
+view is re-read and the token re-resolved (the locked truth), the source
+lock read, `pair_participants` run first (pure, aggregated), then the
+wrapper's own `source_id` cross-check (`identity_mismatches`: the same
+member id recorded under different source identities is not the same
+repository, which pairing by id alone cannot see), then `prepare_import`
+over `BackendLocalTransport`. Step 6 is one call:
+`handle_merge_with_events(backend, start, MergeRequest { local_source_name:
+None, source_ref: Some(import_ref), ..request }, operation_id, sink)`.
+
+**What the lock covers (design §3.2).** The family lock (`try_lock`, the
+store session) is taken after the read-only checks and held from the source
+lock read through the import and the delegation; it is dropped after the
+engine returns. No receiver workspace lock is preheld: the wrapper holds
+only the session, and the engine's own `guarded_workspace_root` acquisition
+succeeds (the slice's merges complete). Measured in the slice: on the
+engine's first `MemberStarted` the family lock is `Busy`; after the
+response it is free; `WorkspaceMutatorLock::try_acquire` succeeds
+afterwards.
+
+**Events.** The wrapper emits `OperationStarted` once, before the
+observation and the import. On a refusal before delegation it emits
+`OperationFinished` itself. On delegation it hands the engine a sink that
+withholds exactly the engine's own `OperationStarted` (`AfterStarted`),
+so a driver sees one lifecycle numbered from one origin (measured in the
+slice and through the gwz-cli `--jsonl` stream).
+
+**Response.** The engine's, unchanged; when the engine left `meta.message`
+empty the wrapper fills it with the import summary ("imported HEAD of
+family member `A` as refs/gwz/local-imports/xfer_... (mem_app=<id>, ...);
+the import ref is retained in every receiver and never pruned by gwz"). An
+engine refusal after the import travels unchanged with the retained refs
+named after its own message.
+
+### 16.2 Codes reused and allocated (`local_clone::errors::import_error_code`)
+
+Allocated after `destination_incomplete` (66), following §14.1's precedent
+-- each has a call site, and each would otherwise have folded into a code
+whose recovery text points the operator the wrong way:
+
+| Code | Outcome | Call site | Why its own code |
+|---|---|---|---|
+| `pairing_mismatch` (67) | the two workspaces are no longer the same shape: a member id on one side only, the same id at different recorded paths, the same id with a different `source_id`, a selected `@root` with no root; refused before any fetch, nothing written | `ImportError::PairingIncomplete` from `pair_participants`; `family_merge::identity_mismatches` | `member_not_found`'s recovery ("materialize the member, or correct selection") and `invalid_request`'s ("fix the request") are both wrong: the fix is in the family, and design §6 names this refusal |
+| `import_incomplete` (68) | the import stopped before the engine was entered -- a fetch or a receiver read failed, or a cancellation; the refs created before the stop are retained and named; no record opened; a retry mints a fresh id | `ImportError::TransferFailed`, `ImportError::Cancelled` (no producer in the wired slot -- `NeverCancelled` -- folded by shape, as the create's cancellation was) | `git_command_failed` says "reproduce with Git" about an anonymous-transport fetch and nothing about the retained refs, which the design makes the operator's accepted cost |
+
+Reused, deliberately: `invalid_request` (`ImportError::InvalidRequest`,
+a shape the library refuses); `merge_validation_failed`
+(`SourceMissing`: the selected ref resolves in no paired source -- design
+§6.1 refuses before transfer, and this is the engine's own start-validation
+code, where an ordinary merge lets libgit2 answer `git_command_failed` at
+planning time); `path_collision` (`RefCollision`: the fresh name already
+exists in a receiver, nothing written, the next invocation mints another
+id); `source_drift` (65, `VectorMismatch`: the received id differs from the
+captured one because the source moved between capture and fetch -- the
+cure is §2's quiescence, the refs created so far are retained and named).
+Every import refusal's message names the step, the source, the import
+name, the typed cause, every retained ref (or "no import ref was created;
+nothing was written") and that the engine was not entered.
+
+Pins moved, one fingerprint of one schema: `protocol/check_log_additive.py`,
+gwz-py `scripts/check_protocol_drift.py`, `src/tests/test_log_protocol.py`:
+`0a173de9...` -> `ba55594fa54123b865e06eb4bedfbf1eba4c9f52467a468831f9b699df0763a2`,
+MEASURED additive (projection rendered on `63f1332`'s schema and the edited
+one, diffed: 2 added lines, 0 removed, 2 hunks, the two enum members as
+map keys; the old pin reproduced on the old schema). `regen.py --check` OK;
+gwz-py packaged IR `sha256:7faf1b96...` OK. `docs/MessageCatalog.md` +2
+rows; `docs/ErrorCatalog.md` two rows and an LCM1.2 table in "Local Clone
+Family"; `docs/Protocol.md`, `docs/RustApi.md`, gwz-core
+`dev-docs/GWZDesign.md`; root design §7 and §11 item 26 (revision 13).
+`tests/protocol.rs` pins 67-68 and their distinctness; gwz-py
+`test_protocol.py` likewise. Both drivers render the codes generically
+(gwz-cli `{:?}` of the model enum, gwz-py the PascalCase label), so no
+rendering code changed; gwz-cli `g12.rs` and gwz-py
+`test_cli_local_family.py` (two `REFUSALS` rows, +10 cases) pin the
+presentation.
+
+### 16.3 Tests (`cargo test -p gwz-core --lib --locked local_clone::tests::family_merge`, 8 rows; real workspaces built with `gwz-local-testrepo` and the public handlers)
+
+| Row | Proves |
+|---|---|
+| `a_family_merge_by_name_integrates_the_clones_commits_through_a_retained_import` | root+`app`, clone `A`, a commit in `A/app`; `merge --remote A` at the root: `Completed`, `mem_app` `FastForwarded`, `source_ref` = `refs/gwz/local-imports/xfer_<32 hex>`, `source_commit` and `resulting_commit` = the clone's commit; the receiver's HEAD and the import ref hold it; no remote persisted; the lock published; the family lock `Busy` during the engine and free after; the mutator lock free after; one `OperationStarted`, one `OperationFinished`, sequences strictly increasing from 0 |
+| `an_explicit_source_ref_and_the_root_as_source_integrate_through_the_same_import` | `merge --remote A lane/agent-17` integrates a branch A's HEAD is not on (the import ref holds it, not HEAD); `lane/absent` refuses `merge_validation_failed` naming `mem_app` and `refs/heads/lane/absent`, nothing written; from inside A, `merge --remote root` integrates the root's commit through the pointer |
+| `every_paired_receiver_holds_the_common_import_name_with_its_own_captured_id` | `app`+`lib`, distinct commits in both; one `source_ref` for both participants, each receiver's ref holding its own captured id; both fast-forward in one engine run |
+| `a_conflicting_family_merge_stays_open_and_continues_from_the_imported_commit` | conflicting `README`: `Conflicted`, `AwaitingResolution`, the engine's record open; a second family start refuses `open_operation` ("nothing was imported"), still one ref; the source advances and detaches -- the import ref and `--status`'s `source_commit` unchanged; resolve + `--continue`: `Completed`, `Continued`, the merge commit's second parent is the imported commit (not the advanced source), the record archived, the ref retained |
+| `an_aborted_family_merge_keeps_its_import_ref_which_holds_the_objects_through_gc` | `--abort`: `Aborted`, HEAD and lock restored exactly, record archived, the ref retained; the clone deleted, `git gc --prune=now` in the receiver: the imported commit is still in the odb and the ref resolves; a plain (non-family) dry-run merge of the ref plans against local objects |
+| `a_pairing_set_mismatch_refuses_before_any_fetch` | A registers an extra member: `pairing_mismatch`, "unpaired: mem_extra", "nothing was written"; no import ref in any of the four repositories, no `.gwz/merge`, the family lock free, the receiver's HEAD unchanged |
+| `a_partial_import_leaves_its_refs_refuses_and_a_retry_succeeds_under_a_fresh_id` (`#[cfg(unix)]`) | `lib/.git/refs` read-only: `import_incomplete`, the message naming `mem_app <ref> = <id>` as retained and `mem_lib: transfer failed`, "the merge engine was not entered"; `app` holds the ref, `lib` none, no record; the retry succeeds under a different id, `app` holding both refs |
+| `an_ordinary_merge_is_the_engines_own_answer_and_touches_no_family_state` | twin workspaces, `merge feature/x` with no selector through `handle_merge_with_local_family` and through `handle_merge_with_events`: equal `merge_id`, `state`, `open`, `participant_counts`, `repos`, status and message; no family file, no import ref |
+
+Unit rows: `local_clone::family_merge::tests::the_source_selector_is_qualified_once`,
+`::a_refused_import_names_what_it_left_behind`,
+`local_clone::errors::tests::import_failures_map_onto_the_family_merge_codes`
+(every `ImportError` variant, distinctness); `member_paths` extended
+(`xfer_` prefix, length, `import_ref`, uniqueness). Nothing prunes: the
+transport port has no removal method (structural), and every row asserts
+the refs after success, abort and a failed retry.
+
+**Drivers.** gwz-cli `tests/local_family_workflows.rs::a_family_merge_by_name_integrates_the_clones_commits_end_to_end`:
+`init`, `repo create app`, a commit, `clone --local --name A`, work in A,
+`--json merge --remote A` (`Completed`, `FastForwarded`, the import ref as
+`source_ref`, the summary in `meta.message`, the receiver's HEAD and ref,
+no remote), more work and `--jsonl merge --remote A` (one `OperationStarted`,
+one `OperationFinished`, a fresh id beside the retained ref), then the
+human channel up to date ("app (mem_app)  up-to-date", the source column
+naming the import ref); `src/tests/g12.rs::the_two_family_merge_import_codes_are_presented_as_typed_refusals`.
+gwz-py `src/tests/test_native_local_family.py::test_a_family_merge_by_name_integrates_the_clones_commits`
+through the native bridge (`clone_local_workspace`, work in A,
+`merge(local_source_name="A")`: `completed`, `fast_forwarded`, the import
+ref, the summary, the receiver's HEAD and ref, no remote; a retry under a
+fresh id) -- the native module rebuilt with `maturin develop` (21 s
+incremental) against this core. Both drivers reach the same outcome on the
+same loop; neither needed a presentation change.
+
+### 16.4 MVP exit (plan §3 LCM1.2), row by row
+
+| Exit row | Status | Evidence |
+|---|---|---|
+| commit and merge by family name | **pass** | §16.3 rows 1-3; gwz-cli and gwz-py end-to-end rows |
+| conflict / continue / abort | **pass** | rows 4-5: the engine's own record, `Continued`, `Aborted`, archived |
+| source detach / advance after start | **pass** | row 4: the ref and `source_commit` unchanged; the merge's second parent is the captured commit |
+| retained imports after failed start | **pass** | row 7 (partial import, refs retained and named, retry under a fresh id); row 6 (nothing written before a fetch) |
+| source objects survive ordinary GC | **pass** | row 5: source deleted, `git gc --prune=now`, the object and ref survive |
+| run both drivers, ordinary non-family merges retain their behavior | **pass** | gwz-cli 242, gwz-py 184 (fast suites + native); row 8; the engine diff is empty; `workspace_ops::merge` 512 passed |
+| two independent lanes may each have an open merge | not exercised here | the family lock is released with the response (measured), so a second lane's start is not serialised behind an open merge; the engine's per-workspace record is what makes them independent |
+
+### 16.5 What still refuses
+
+`unsupported_operation`: a family `dry_run` (unchanged; before any lock),
+`--clean`/`--bare`, `--from`, ordinary `dispose`. `unknown_local` (62) for
+a token naming no ready member (unchanged). New refusals before any fetch:
+`open_operation` (an open merge record at the addressed workspace),
+`pairing_mismatch`, `merge_validation_failed` (unresolvable source ref),
+`path_collision` (import name taken). After a fetch: `import_incomplete`,
+`source_drift`, and every engine refusal unchanged with the retained refs
+named. A successful `merge --remote A` that is already up to date still
+imports (one more retained ref): resolving and importing precede the
+engine's up-to-date answer by design (§6.2), and the ref is the accepted
+cost.
+
+### 16.6 Gates (final trees; Darwin 25.6.0 arm64, cargo 1.95.0, python3.13, from gwz-core unless noted)
+
+| Gate | Result |
+|---|---|
+| `cargo fmt --all -- --check` | clean (gwz-core; gwz-cli `cargo fmt -p gwz -- --check` clean) |
+| `CLIPPY_CONF_DIR="$PWD" cargo clippy --all-targets --all-features --locked -- -D warnings` | clean, exit 0 |
+| `python3.13 scripts/checks/check_checked_artifact_boundaries.py` | ok (24 visible entries, 9 classified modules) |
+| `python3.13 scripts/checks/check_local_clone_boundaries.py` + its unittest | ok; 23 OK |
+| `python3.13 scripts/checks/check_bazel_pin_drift.py` + its unittest | ok (3 pins); 15 OK |
+| `python3.13 protocol/regen.py --check` | OK (after the allocation) |
+| `protocol/.regen-venv/bin/python protocol/check_log_additive.py` | OK `ba55594f...` |
+| `cargo test -p gwz-core --lib --locked local_clone` | **71 passed** (was 60; +11) |
+| `cargo test -p gwz-core --lib --locked workspace_ops::merge` | **512 passed**, 0 failed (720 s; the engine's own partitions, untouched) |
+| `cargo test -p gwz-local-import --lib --locked` | 22 passed (untouched) |
+| `cargo test -p gwz-core --test protocol --locked` | 37 passed (67-68 pinned) |
+| lib remainder census (`--list`) | 1804 rows (was 1793); `checked_artifact::` 459 and `v1_lifecycle::` 266 unmoved; remainder 1079 listed = **1078 executed darwin** (+11), linux 1079 DERIVED; `run_r4bg_aggregate_gates.py` re-pinned 1067/1068 -> 1078/1079 **in the same commit as the rows** (`6d1a28e`); `--list` still parses |
+| gwz-cli `cargo test -p gwz --locked` (from gwz-cli) | **242 passed** (was 240; +2: lib 171, `local_family_workflows` 8) |
+| gwz-py `pytest src/tests/test_protocol.py test_codec.py test_log_protocol.py test_cli_local_family.py test_native_local_family.py` (`.venv/bin/python`) | **184 passed** (183 fast + 1 native; the fast four were 173 at §14.5, +10 refusal cases) |
+| gwz-py `scripts/check_protocol_drift.py` | OK |
+| `PYTHON=python3.13 scripts/checks/check_lane_commits.sh 63f1332 HEAD` | `lane gate: ok` at `a559f37` and `6d1a28e` |
+
+Not run: the 16-minute probe suites; Bazel; Windows.
+
+### 16.7 Left uncommitted for the lane owner (root repo)
+
+`dev-docs/GwzLocalCloneDesign.md` (revision 13: status, §7 the two codes,
+§11 item 26; supersedes revision 12, whose SHA-256
+`afbfec613304bbb31cbe8b84982d2596372dfb3a31c354f8b9cfd37f76a3b1c0` the
+status line records) and this record (§16). Pre-existing untracked:
+`dev-docs/GwzRemoteAuthProposal.md` (not this lane's). The member pins to
+record through `gwz`: gwz-core `6d1a28e`, gwz-cli `5e02709`, gwz-py
+`fbd2120`. In gwz-py, `Cargo.lock` is left modified and **uncommitted**:
+`maturin develop` refreshed it with dependency edges earlier lanes added to
+the crates (`serde`/`serde_yaml` on the family store, `libc`/`rustix`/
+`windows-sys` on refcopy, `git2` on repo-inspect) -- stale before this
+lane, not caused by it; the lane owner decides whether to land the
+refresh. No gwz-core `Cargo.toml`/`Cargo.lock` change.
+
+### 16.8 Residual risks and what the next lanes must know
+
+- **An up-to-date family merge still imports** (§16.5): every `merge
+  --remote A` leaves one retained ref per paired receiver. The design's
+  accepted cost; a later explicit pruning feature is the lever, not the
+  wrapper.
+- **The source-ref rule is fixed once**: a bare name is a branch. A tag
+  must be spelled `refs/tags/<name>`; the refusal's message names the
+  qualified ref so the operator sees why.
+- **The `source_id` cross-check** is the wrapper's, beside the library's
+  pairing; the library's `Participant` carries no identity beyond the key.
+  If lane X folds identity into the contract, the wrapper's check retires.
+- **Engine refusals after the import** (a dirty member, drift) leave the
+  refs, as the design allows; the only engine-gate the wrapper pre-checks
+  is the open-merge envelope. A dirty-member precheck would duplicate the
+  engine's status calls and was not added.
+- **Cancellation** has no producer (`NeverCancelled`); it maps to
+  `import_incomplete` by shape, as the create's maps to
+  `destination_incomplete`.
+- **Windows** is unverified: the partial-import row is `#[cfg(unix)]`
+  (permission-based), and the remainder pin does not cover Windows.
+- **Pull/push `--remote` (LCM2.4 / LCM3.3)** can build their
+  `ImportRequest` from `participants_of` and `qualify_selector` unchanged;
+  `selected_keys` replicates the merge verb's defaults and must not be
+  reused for a verb with different ones.

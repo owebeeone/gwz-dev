@@ -1,12 +1,18 @@
 # Gwz local clone — Requirements & Design
 
-Status: **DRAFT 2026-09-06 revision 12** — records LCM1.1's three fixes
+Status: **DRAFT 2026-09-06 revision 13** — records LCM1.2
+(`GwzLocalClone-LCM1.0c-Checkpoint.md` §16, lane C): the family merge
+served end to end through the retained import, and two `GwzErrorCode`
+allocations for its import outcomes, `pairing_mismatch` (67) and
+`import_incomplete` (68), with the reuses beside them (§7, §11 item 26).
+Supersedes revision 12 (SHA-256 `afbfec613304bbb31cbe8b84982d2596372dfb3a31c354f8b9cfd37f76a3b1c0`);
+revision 12 recorded LCM1.1's three fixes
 (`GwzLocalClone-LCM1.0c-Checkpoint.md` §14, lane C): four `GwzErrorCode`
 allocations for the local-create outcomes the wiring had folded into
 `unsupported_operation` and `io_error` (§7, §11 item 23), the §4.0
 dest-complete walk as a bounded connectivity check with its measured cost
-(§11 item 24), and the cross-driver listing-path fixture (§11 item 25).
-Supersedes revision 11 (SHA-256 `94836f08cec5f16bd050b2135182715b3d200f34f9c3a312338bf36be2cbedab`);
+(§11 item 24), and the cross-driver listing-path fixture (§11 item 25),
+over revision 11 (SHA-256 `94836f08cec5f16bd050b2135182715b3d200f34f9c3a312338bf36be2cbedab`);
 revision 11 recorded the two text
 corrections LCM1.1's wiring proved necessary (`GwzLocalClone-LCM1.0c-Checkpoint.md`
 §13, lane C): the allocation marker lands with the pointer in step 3 of §4,
@@ -640,6 +646,19 @@ GwzErrorCode.destination_incomplete = 66      # a completion rule failed before 
                                               # recapture, the marker -- or the install was
                                               # cancelled; the row and directory are retained
                                               # (`local list`: creating/incomplete)
+GwzErrorCode.pairing_mismatch = 67            # the two workspaces are no longer the same
+                                              # shape: a lock member id on one side only,
+                                              # the same id at different recorded paths or
+                                              # with a different source_id, a selected
+                                              # @root with no root to pair (§6); refused
+                                              # before any fetch, nothing written (LCM1.2,
+                                              # §11 item 26)
+GwzErrorCode.import_incomplete = 68           # the family merge's import stopped before
+                                              # the engine was entered: a fetch or receiver
+                                              # read failed, or the import was cancelled;
+                                              # the import refs created so far are retained
+                                              # and named (§6.2), no record was opened, a
+                                              # retry mints a fresh transfer id
 
 MergeRequest.source_ref = F(3, STR, optional=True)   # git ref; UNCHANGED
 MergeRequest.local_source_name = F(9, STR, optional=True)  # NEW; start only
@@ -1050,6 +1069,34 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
     (gwz-py nested it under the root by splitting on `/` first); the fixture
     keeps the conventional answer -- the path as recorded -- and gwz-py's
     join was corrected. The wire never carries an absolute member path.
+26. Family-merge import codes — **allocated** (lane C, LCM1.2, 2026-09-06;
+    checkpoint §16): `pairing_mismatch` (67) for §6's set mismatch (a lock
+    member id on one side only, the same id at different recorded paths,
+    or — the wrapper's own check beside the library's pairing — the same id
+    with a different `source_id`; a selected `@root` with no root), refused
+    before any fetch with nothing written; `import_incomplete` (68) for an
+    import that stopped before the engine was entered (a fetch or receiver
+    read failed, or a cancellation, which has no producer in the wired
+    slot), with every retained import ref named in the message and a fresh
+    transfer id on retry. Reused, deliberately: `merge_validation_failed`
+    for a source ref that resolves in no paired source (§6.1's "missing
+    branches/refs refuse before transfer"; the engine's own start
+    validation code, where an ordinary merge lets libgit2 answer
+    `git_command_failed` at planning time), `path_collision` for the fresh
+    import name already existing in a receiver (nothing written; the next
+    invocation mints another id), and `source_drift` (65) for a received id
+    that differs from the captured one — the source moved between capture
+    and fetch, the cure is §2's quiescence, the refs created so far are
+    retained. The selector is qualified once before the request: no ref or
+    `HEAD` is the source's HEAD, a name under `refs/` is used verbatim, any
+    other name is `refs/heads/<name>` (a tag is spelled `refs/tags/<name>`).
+    Before any fetch the wrapper also refuses `open_operation` when the
+    addressed workspace already has an open merge record, so a start the
+    engine's own gate would refuse leaves no ref behind; every other engine
+    refusal after the import travels unchanged with the retained refs named
+    after it. The lock scope is §3.2's: the family lock from before the
+    source lock is read until the engine returns, no receiver workspace
+    lock preheld (measured: the engine's own acquisition succeeds).
 
 ## 12. Acceptance cases for the implementation plan
 
