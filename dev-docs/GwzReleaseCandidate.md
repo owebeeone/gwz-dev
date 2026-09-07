@@ -102,3 +102,9 @@ inventories; the baseline inventory is enumeration evidence, not an executed run
 
 rc.2 also ignores Cargo's generated `.cargo-ok` marker for provenance and aligns
 all package locks. Exact-tag validation and final packaged acceptance are pending.
+
+The Linux run 34104817033 passed all 1,884 core tests but exposed child Git
+stdout interleaving a libtest result line. The census now reconciles libtest's
+separate result file and retains the raw transcript for the required isolated
+helper proof. Eleven checker tests pass, including omission/duplicate/failure
+controls; a real 34-pass/one-ignored run verifies the new recording path.
