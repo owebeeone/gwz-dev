@@ -435,7 +435,7 @@ version = "0.1.0"
 
 [[package]]
 name = "gwz-core"
-version = "0.14.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "cap-fs-ext",
  "cap-std",
