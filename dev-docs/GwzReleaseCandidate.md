@@ -1,8 +1,41 @@
-# GWZ CLI 1.0.0-rc.4 release evidence
+# GWZ 1.0.0 release evidence
 
-The operator authorized an RC on 2026-09-07. Publication is pending completion of
-release verification. This record separates source checks from packaged-artifact
+The operator requested using the release scripts without further duplicate
+validation or a separate candidate publication cycle. The final core verification
+is already running; stable CLI 1.0.0 will consume that exact core commit once it
+passes. No GitHub release has been published yet. Earlier candidate history below
+is retained as an audit trail.
+
+
+The operator authorized candidate publication followed by stable promotion after
+artifact acceptance on 2026-09-07. Publication is pending release verification. This record separates source checks from packaged-artifact
 checks; a passing development build is not a published RC.
+
+## Current verification
+
+Final core source: `17e13ed2c0748cc40d0cf81bb1fad74fb176cd83`, package version
+`1.0.0`. No final core tag has been created. The CLI candidate will be
+`v1.0.0-rc.4`, consuming the verified core `v1.0.0` tag; stable CLI `v1.0.0`
+will consume the same core commit.
+
+- [Final core release gates](https://github.com/owebeeone/gwz-core/actions/runs/34114642480): pending.
+- [Final workspace tuple](https://github.com/owebeeone/gwz-dev/actions/runs/34114488458): passed on Linux and macOS,
+  root `a453971a0905ce5063bf85706eca87bbc3bf7ab1`.
+- [Python matrix and package smoke](https://github.com/owebeeone/gwz-py/actions/runs/34114461395): all twelve test jobs and three package-smoke jobs passed.
+- The immediately preceding [workspace tuple](https://github.com/owebeeone/gwz-dev/actions/runs/34110955264)
+  passed on Linux and macOS; the preceding [Python CI](https://github.com/owebeeone/gwz-py/actions/runs/34110929218)
+  passed all twelve test jobs and three package-smoke jobs.
+- Final workspace execution: macOS 1,866 core / 252 CLI / 798 Python passes;
+  Linux 1,884 core / 252 CLI / 798 Python passes. Each core census reconciled
+  execution and proved the isolated helper.
+- Final-source local privacy probes: nine tests passed, including all three
+  formerly failing positive compile controls. Release-workflow tests: nine passed.
+- Native Windows disposal assertions: 25 passed on Magenta; macOS: 28 passed.
+- Published candidate/stable artifacts: pending. The existing GitHub release is
+  still a draft. Earlier source tags remain unchanged.
+
+The sections below preserve preparation history. Their older pending statements,
+source versions and partial results do not describe the current verification.
 
 ## Corrections made during preparation
 

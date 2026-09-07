@@ -16,7 +16,9 @@ identities, local results and the status of publication.
 
 The global-author fixture failures and stale CLI lock are corrected. All 252 CLI
 tests pass with isolated HOME/XDG configuration; the versioned core full suite
-and 75 boundary checks pass locally. Exact rc.2 remote gates are in progress.
+and 75 boundary checks pass locally. The preceding full workspace and Python CI runs are green. Final core 1.0.0
+verification is now running before its tag is created; see the release evidence
+for the exact commit and current run links.
 
 Release docs correct unsupported local modes and record
 [XFS/ext4 measurements](GwzFilesystemComparison.md). Derived-marker status churn
