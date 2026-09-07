@@ -1,5 +1,14 @@
 # GWZ debt recovery plan
 
+Latest acceptance update (2026-09-07): the source was committed and pushed, then
+built natively on Dabeest/Windows. An initial signed-credential-bitmask compile
+failure was fixed and published (root `8f40897`, core `4d35577`). Untouched
+clone/disposal and root+member work → one default family merge → ordinary
+disposal passed without force. Separate detach/retain also passed. Windows
+network push remains blocked by credential acquisition; detached marker status
+and stale command prose need follow-up. See [the detailed acceptance record](GwzDabeestAcceptance.md).
+Earlier no-publication statements below describe the prior checkpoint.
+
 Date: 2026-09-06. Status: **local implementation verified; release acceptance and explicit deferrals remain**.
 
 The operator approved working through this plan on 2026-09-06, including its
