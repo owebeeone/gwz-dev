@@ -46,6 +46,21 @@ class EvidenceTests(unittest.TestCase):
         (self.root / 'publication.log').write_text('test result: ok. 0 passed; 0 failed;')
         with self.assertRaises(ValueError): evidence.check(self.root)
 
+    def test_full_cli_allows_only_known_empty_harnesses(self):
+        log = ("Running unittests src/lib.rs (target/debug/deps/gwz-123)\n"
+               "test result: ok. 178 passed; 0 failed;\n"
+               "Running unittests src/main.rs (target/debug/deps/gwz-456)\n"
+               "test result: ok. 0 passed; 0 failed;\n"
+               "Doc-tests gwz\n"
+               "test result: ok. 0 passed; 0 failed;\n")
+        (self.root / 'rust-driver.log').write_text(log)
+        evidence.check(self.root)
+        for bad in [log.replace('178 passed', '0 passed'),
+                    log.replace('src/main.rs', 'tests/local_workflows.rs'),
+                    log.replace('0 passed; 0 failed', '0 passed; 1 failed')]:
+            (self.root / 'rust-driver.log').write_text(bad)
+            with self.assertRaises(ValueError): evidence.check(self.root)
+
     def test_missing_required_command_refuses(self):
         (self.root / 'local-clone.log').unlink()
         with self.assertRaises(FileNotFoundError): evidence.check(self.root)

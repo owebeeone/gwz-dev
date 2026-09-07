@@ -144,3 +144,9 @@ including a full Linux run of 798 tests.
 The published rc.1/rc.2 source tags are preserved. The final CLI candidate advances
 to rc.3 and pins the unchanged core rc.2; release tooling now supports an explicit
 `--core-tag` for independently versioned components. No stable release is promoted.
+
+Full CLI execution includes empty main/documentation harnesses. Workspace
+evidence validation now allows those two named harnesses only; library and
+integration suites must remain nonempty, and an entirely empty command or any
+failure still refuses. Negative controls and the actual standalone CLI release
+log pass this check.

@@ -15,8 +15,28 @@ def check(directory):
             raise ValueError('member revision is not exact')
     for name in ['local-clone.log', 'publication.log', 'rust-driver.log', 'protocol.log']:
         output = (directory / name).read_text()
-        summaries = re.findall(r'test result: (\w+)\. (\d+) passed; (\d+) failed;', output)
-        if not summaries or any(state != 'ok' or int(passed) == 0 or int(failed) != 0 for state, passed, failed in summaries):
+        section = ""
+        executed = 0
+        summaries = 0
+        for line in output.splitlines():
+            line = line.strip()
+            if line.startswith(("Running ", "Doc-tests ")):
+                section = line
+            match = re.fullmatch(r'test result: (\w+)\. (\d+) passed; (\d+) failed;.*', line)
+            if not match:
+                continue
+            state, passed, failed = match.groups()
+            summaries += 1
+            executed += int(passed)
+            # Full cargo test includes the CLI's empty main harness and
+            # documentation harness. Named integration/library targets still
+            # must execute tests; an entirely empty command always refuses.
+            known_empty = name == 'rust-driver.log' and (
+                section.startswith('Running unittests src/main.rs (')
+                or section == 'Doc-tests gwz')
+            if state != 'ok' or int(failed) != 0 or (int(passed) == 0 and not known_empty):
+                raise ValueError(f'{name}: failed or zero-test command')
+        if not summaries or not executed:
             raise ValueError(f'{name}: failed or zero-test command')
     python = (directory / 'python-driver.log').read_text()
     if not re.search(r'\b[1-9][0-9]* passed\b', python) or re.search(r'\b[1-9][0-9]* (failed|errors?)\b', python):
