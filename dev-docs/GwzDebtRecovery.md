@@ -1,5 +1,27 @@
 # GWZ debt recovery plan
 
+## Release candidate preparation — 2026-09-07
+
+The operator authorized documentation, release verification and publication of
+`v1.0.0-rc.1`, followed by stable promotion after artifact acceptance. Windows
+publication and ARM64 Linux lifecycle acceptance are complete; statements below
+about pending platform acceptance describe earlier checkpoints. Focused runs do
+not replace the exact release tuple's required CI gates.
+
+The latest published workspace CI (`34097515928`) failed seven family-merge tests
+because fixture root repositories lacked a local Git author identity. Reproduced
+with an isolated empty home directory; fixtures are being corrected rather than
+adding a global runner identity that would hide the dependency. No RC has been
+tagged or published at this checkpoint.
+
+Release work also corrects help that advertised unsupported local modes, enables
+numbered RC tags in release tooling, and records [XFS/ext4 measurements](GwzFilesystemComparison.md).
+The generated-marker status display remains a documented limitation, while
+untouched disposal is supported. Exact encrypted-agent identity selection and
+mechanical file splitting remain explicitly deferred.
+
+### Earlier implementation and acceptance ledger
+
 Linux follow-up (2026-09-07): the Raspberry Pi's native ARM64 build and ext4
 untouched disposal / root+member commit / strict family merge / ordinary disposal /
 detach cycle passed. It used the same clean source digests as Magenta. See

@@ -1,0 +1,158 @@
+[
+  {
+    "round": 0,
+    "filesystem": "xfs",
+    "empty": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "xfs",
+      "used_bytes": 238202880,
+      "available_bytes": 10432106496,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 67461120
+    },
+    "source": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "xfs",
+      "used_bytes": 294645760,
+      "available_bytes": 10375663616,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 123596800
+    },
+    "after_clones": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "xfs",
+      "used_bytes": 296845312,
+      "available_bytes": 10373464064,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 123908096
+    },
+    "clone_seconds": [
+      1.2128601409494877
+    ],
+    "median_seconds": 1.2128601409494877,
+    "total_seconds": 1.2128601409494877
+  },
+  {
+    "round": 1,
+    "filesystem": "ext4",
+    "empty": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "ext4",
+      "used_bytes": 2121728,
+      "available_bytes": 9908252672,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 241602560
+    },
+    "source": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "ext4",
+      "used_bytes": 58585088,
+      "available_bytes": 9851789312,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 298070016
+    },
+    "after_clones": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "ext4",
+      "used_bytes": 114917376,
+      "available_bytes": 9795457024,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 354414592
+    },
+    "clone_seconds": [
+      1.3957811705768108
+    ],
+    "median_seconds": 1.3957811705768108,
+    "total_seconds": 1.3957811705768108
+  },
+  {
+    "round": 2,
+    "filesystem": "ext4",
+    "empty": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "ext4",
+      "used_bytes": 2121728,
+      "available_bytes": 9908252672,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 241602560
+    },
+    "source": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "ext4",
+      "used_bytes": 58580992,
+      "available_bytes": 9851793408,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 298065920
+    },
+    "after_clones": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "ext4",
+      "used_bytes": 114913280,
+      "available_bytes": 9795461120,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 354410496
+    },
+    "clone_seconds": [
+      1.2232914976775646
+    ],
+    "median_seconds": 1.2232914976775646,
+    "total_seconds": 1.2232914976775646
+  },
+  {
+    "round": 3,
+    "filesystem": "xfs",
+    "empty": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "xfs",
+      "used_bytes": 238202880,
+      "available_bytes": 10432106496,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 67461120
+    },
+    "source": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "xfs",
+      "used_bytes": 294645760,
+      "available_bytes": 10375663616,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 123863040
+    },
+    "after_clones": {
+      "mount": "/var/lib/gwz-fs-bench-1000/mnt",
+      "mounted": true,
+      "filesystem": "xfs",
+      "used_bytes": 296845312,
+      "available_bytes": 10373464064,
+      "image_exists": true,
+      "image_bytes": 10737418240,
+      "image_allocated_bytes": 123891712
+    },
+    "clone_seconds": [
+      1.2683396190404892
+    ],
+    "median_seconds": 1.2683396190404892,
+    "total_seconds": 1.2683396190404892
+  }
+]
