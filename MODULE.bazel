@@ -1,6 +1,6 @@
-# Bazel (bzlmod) + razel build for the gwz workspace. The crates' BUILD.bazel files use
-# @rules_rust//rust:defs.bzl, which razel resolves natively too, so they are shared by both
-# `bazel` and `razel`. External crates.io deps come from crate_universe hubs (@<hub>//:<name>);
+# Bazel (bzlmod) build for the gwz workspace. The crates' BUILD.bazel files use
+# @rules_rust//rust:defs.bzl. External crates.io dependencies come from
+# crate_universe hubs (@<hub>//:<name>);
 # workspace-internal deps are plain // labels.
 #
 # TWO Cargo workspaces (workspace layout Option A, operator ruling 2026-09-05; dev-docs/
@@ -11,14 +11,14 @@
 # crate_universe refuses manifests from different Cargo workspaces inside one `from_cargo`
 # ("manifests are not allowed to from from different workspaces"), so:
 #   @gwz_core_crates  from_cargo on //gwz-core:Cargo.lock; used by //gwz-core and
-#                     //gwz-core/crates/*. cargo and bazel/razel read the same lock: lockstep.
+#                     //gwz-core/crates/*. Cargo and Bazel read the same lock: lockstep.
 #   @crates           from_specs for gwz-cli's three direct crates.io deps, version-pinned by
 #                     hand to //:Cargo.lock; used by //gwz-cli. NOT resolved from the lock -- see
 #                     "Why the outer workspace cannot use from_cargo" below.
 # A BUILD.bazel takes third-party deps only from the hub of its own workspace and reaches
 # crates of the other workspace through their Bazel targets (gwz-cli -> //gwz-core:gwz_core),
 # never through the other hub. Neither hub writes a Cargo.lock back; cargo (`--locked`) owns
-# them. Regenerate MODULE.bazel.lock (which razel reads) with:
+# them. Regenerate MODULE.bazel.lock with:
 #     bazel mod deps --lockfile_mode=update
 #
 # Why the outer workspace cannot use from_cargo (rules_rust 0.70.0; unchanged through 0.74.0 and

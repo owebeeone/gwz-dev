@@ -87,6 +87,14 @@ jobs:
           cargo test -p gwz-core --lib workspace_ops::tests::g20 --locked
           cargo test -p gwz-core --lib workspace_ops::tests::g21 --locked
           cargo test -p gwz-core --lib named_push_reports_server_hook_rejection --locked
+      # Run alongside named/pinned gates until same-platform merge-base
+      # inventories are reviewed on both OSes.
+      - name: Generated core census and reconciled execution
+        working-directory: gwz-core
+        run: |
+          cargo test -p gwz-core --lib --no-run --message-format=json --locked > ../evidence/core-test-build.json
+          python scripts/checks/test_inventory.py --cargo-artifacts ../evidence/core-test-build.json --package gwz-core --profile debug --output ../evidence/core-inventory.json --run
+          cargo test -p gwz-core --test protocol --locked 2>&1 | tee ../evidence/protocol.log
       - name: Rust driver and build identity
         run: |
           cargo test -p gwz --lib --test local_family_workflows --test build_identity --locked 2>&1 | tee evidence/rust-driver.log

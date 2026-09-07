@@ -13,7 +13,7 @@ def check(directory):
     for row in tuple_data['members']:
         if not re.fullmatch('[0-9a-f]{40}', row.get('tested_revision', '')):
             raise ValueError('member revision is not exact')
-    for name in ['local-clone.log', 'publication.log', 'rust-driver.log']:
+    for name in ['local-clone.log', 'publication.log', 'rust-driver.log', 'protocol.log']:
         output = (directory / name).read_text()
         summaries = re.findall(r'test result: (\w+)\. (\d+) passed; (\d+) failed;', output)
         if not summaries or any(state != 'ok' or int(passed) == 0 or int(failed) != 0 for state, passed, failed in summaries):
@@ -26,6 +26,22 @@ def check(directory):
     for name in ['toolchain.txt', 'cargo-version.txt']:
         if not (directory / name).read_text().strip():
             raise ValueError(f'{name}: identity is missing')
+    inventory = json.loads((directory / 'core-inventory.json').read_text())
+    execution = inventory.get('execution', {})
+    tests = inventory.get('tests', [])
+    executed = execution.get('executed', [])
+    ignored = execution.get('ignored', [])
+    if (inventory.get('execution_checked') is not True
+            or inventory.get('executed_partition') != 'all'
+            or not executed or len(tests) != len(set(tests))
+            or len(executed) != len(set(executed))
+            or set(executed) & set(ignored)
+            or set(executed) | set(ignored) != set(tests)
+            or set(ignored) != set(inventory.get('ignored', []))):
+        raise ValueError('compiled core test census was not fully executed')
+    for prefix in ['local_clone::tests::', 'workspace_ops::tests::g08::']:
+        if not any(name.startswith(prefix) for name in executed):
+            raise ValueError(f'required core scenario family did not execute: {prefix}')
 
 
 if __name__ == '__main__':

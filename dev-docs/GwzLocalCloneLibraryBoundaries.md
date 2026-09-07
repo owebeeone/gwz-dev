@@ -17,6 +17,21 @@ unlocked-Tier-A guard is retired on its recorded condition. §1–§4 unchanged.
 
 ## 1. Scoped policy adoption
 
+Debt recovery adoption (2026-09-07): apply AgentProcessRules L1-23's cohesion
+review at roughly 1,000 lines. This is a responsibility review, not a line quota.
+Record the owner boundaries and either justify cohesion or schedule a split;
+prefer focused sibling test modules for substantial suites. Mechanical Rust
+moves use the established `rust-split` workflow and preserve test identities or
+record renames. Keep movement-only commits separate from behavior changes.
+The existing deferral on actual splitting remains in force. The [debt recovery checkpoint](GwzDebtRecoveryCheckpoint.md#maintenance-ownership-and-deferred-moves)
+records the required review without lifting it.
+
+For each new implementation brief, record the invariant and its owner, the
+narrow ports it consumes, executable acceptance evidence, and any file needing
+a cohesion review. State the proposed responsibility split or reason to retain
+the file, the test-identity treatment, and any deferred move's owner/trigger.
+Do not duplicate the full policy checklist in every brief.
+
 Adopt LBT-001 through LBT-012 from the canonical
 [Library Boundary and Testing Policy](../../glade-wz/dev-docs/LibraryBoundaryAndTestingPolicy.md)
 for **new local-clone libraries and their new public boundaries**. Read

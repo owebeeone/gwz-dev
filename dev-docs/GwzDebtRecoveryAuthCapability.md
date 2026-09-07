@@ -1,7 +1,8 @@
 # Native SSH identity capability investigation
 
-2026-09-07. Source inspection and six controlled SSH cases passed on macOS. Product
-transport integration remains pending; these are library capability results.
+2026-09-07. Source inspection, six library cases and ten production-backend
+SSH cases passed on macOS. File identity is implemented; exact encrypted-agent
+selection remains unsupported. These are local results, not platform acceptance.
 
 The current core lock selects git2 0.21.0, libgit2-sys 0.18.8+1.9.7 (libgit2
 1.9.7), and libssh2-sys 0.3.2. Inspection used the downloaded sources named by
@@ -28,8 +29,8 @@ a reviewed library extension or a dedicated agent protocol signer integrated
 through an appropriate safe binding. Adding a file-key constructor alone does
 not solve the reported multi-identity incident.
 
-The next bounded fixture must demonstrate two different agent identities in
-both orders, logging only public fingerprints and server acceptance. Then test
+The fixture demonstrates two different agent identities in both orders,
+logging public fingerprints and server acceptance. The remaining extension must test
 an exact-key signing route against the same server. No broad agent fallback may
 be presented as explicit-key support. If the safe-library extension cannot be
 completed in this recovery, ship an explicit unsupported result for that mode
@@ -69,3 +70,27 @@ credential/sign callback through a safe git2 API, implement bounded exact-key
 agent signing and lifecycle/error handling, then run these same fixtures with
 encrypted identities in both orders, wrong/missing identities, rejection and
 cancellation. File-key support cannot be marked as closing that incident.
+
+## Production integration and remaining estimate
+
+The same runner's `--product` mode invokes Git2Backend's real read-advertisement
+path, including its identity resolver, callbacks, host validation and observations.
+Ten cases pass: both ambient agent orders, explicit A with both agent orders,
+per-remote A and locally configured A with B first, wrong key, missing key,
+encrypted file with an unlocked agent key, and host-key mismatch. Success rows
+report offered/authenticated and agree with server fingerprints; host mismatch
+reports no credential offer. Evidence: `/tmp/gwz-debt-product-ssh-evidence.json`.
+The fixture's libgit2 home override is confined to the child probe; it does not
+change the operator's HOME, known-hosts file or agent. Human/JSON and native
+Python bridge tests are separate driver evidence, not an end-to-end SSH CLI run.
+
+A planning estimate for exact-agent support is 5–10 engineering days, excluding
+upstream review and release latency: 1–2 days for the safe custom-credential API
+and ownership contract, 2–4 for bounded agent enumeration/exact-key signing and
+error/cancellation handling, and 2–4 for adversarial fixtures and macOS/Linux
+validation. This is an estimate from the inspected API gaps, not measured work.
+Windows agent/provider integration needs its own capability investigation before
+an estimate or support promise. The extension must verify exact public-key
+selection with both agent orders, encrypted keys, missing/rejected identities,
+host rejection, cancellation and concurrent independent requests. Until then,
+`exact_agent_identity=false` is the accurate public capability.

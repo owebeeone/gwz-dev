@@ -2,6 +2,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 import yaml
 
 spec = importlib.util.spec_from_file_location('tuple_gate', Path(__file__).with_name('workspace-tuple.py'))
@@ -24,6 +25,22 @@ class TupleTests(unittest.TestCase):
         rows = gate.resolve(self.root, 'core', 'b' * 40)
         self.assertEqual({'core': 'b' * 40, 'cli': 'a' * 40}, {row['path']: row['tested_revision'] for row in rows})
         self.assertTrue(all(row['locked_revision'] == 'a' * 40 for row in rows))
+
+    def test_materialized_branch_heads_are_pinned_to_every_resolved_revision(self):
+        rows = gate.resolve(self.root, 'core', 'b' * 40)
+        heads = {'core': 'c' * 40, 'cli': 'd' * 40}
+        calls = []
+        def command(path, *args):
+            calls.append((path.name, args))
+            if args[1:3] == ('rev-parse', 'HEAD'):
+                return heads[path.name]
+            if args[1:3] == ('checkout', '--detach'):
+                heads[path.name] = args[3]
+            return ''
+        with patch.object(gate, 'command', side_effect=command):
+            gate.pin_revisions(self.root, rows)
+        self.assertEqual(heads, {'core': 'b' * 40, 'cli': 'a' * 40})
+        self.assertIn(('cli', ('git', 'fetch', '--no-tags', 'origin', 'a' * 40)), calls)
 
     def test_partial_unknown_and_floating_candidates_refuse(self):
         for member, sha in [('core', ''), ('', 'b' * 40), ('unknown', 'b' * 40), ('core', 'main')]:

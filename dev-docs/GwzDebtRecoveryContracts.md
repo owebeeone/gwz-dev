@@ -9,7 +9,7 @@ slot is recycled by this audit.
 
 `gwz-core/src/workspace_ops/target_selection.rs` owns normalization, action
 policy, frozen-open-merge selection and literal lifecycle selector grammar.
-The action match is exhaustive over the current 29 `ActionKind` variants.
+The action match is exhaustive over the current 30 `ActionKind` variants.
 Both drivers forward selections; `forall` calls `resolve_forall_targets`.
 The source tripwire and its negative fixtures reject direct handler rescans.
 It is a source check, not a Rust data-flow proof.
@@ -23,21 +23,22 @@ commit and push must still perform members before root publication.
 
 | Action | Suboperations / form | Default and root policy | Verification / exception |
 |---|---|---|---|
-| CreateWorkspace | create | Workspace structural operation | No target-set expansion; audit non-local ignored selection inputs before package closure. |
-| InitFromSources | initialize, update | Workspace structural operation | Source requests describe members; same remaining non-local input audit. |
-| AddExistingRepo | adopt existing repository | Workspace structural operation | Explicit source/path owns the new member. |
-| CreateRepo | create member | Workspace structural operation | Explicit source/path owns the new member. |
-| CloneRepoMember | clone member URL | Workspace structural operation | Explicit source/path owns the new member. |
+| CreateWorkspace | create | Workspace structural operation | Nonempty target selection refused before effects; empty envelopes accepted. |
+| InitFromSources | initialize, update | Workspace structural operation | Source operands define members; nonempty target selection refused before effects. |
+| AddExistingRepo | adopt existing repository | Workspace structural operation | Explicit source/path owns the new member; unused target selection refused. |
+| CreateRepo | create member | Workspace structural operation | Explicit source/path owns the new member; unused target selection refused. |
+| CloneRepoMember | clone member URL | Workspace structural operation | Explicit source/path owns the new member; unused target selection refused. |
 | DetachRepoMember | detach | Exactly one literal member id or path | No sets or exclusions; grammar is centralized. |
 | AttachRepoMember | attach | Exactly one literal member id | No sets, paths or exclusions; grammar is centralized. |
-| CloneWorkspace | URL clone | Whole destination workspace | No target-set expansion; dry-run remains the existing clone plan. |
+| CloneWorkspace | URL clone | Root clone, then selected supported members | Explicit selection validated against remote manifest before allocation; materialize policy owns member expansion. Dry-run remains refused. |
 | CloneLocalWorkspace | verbatim | Whole workspace; nonempty selection refused | Clean, bare and copy-source modes remain unsupported; local dry-run refused before effects. |
 | LocalFamily | list, dispose, disband | Whole family operation; nonempty selection refused | Empty envelopes accepted; list is read-only; other dry-runs remain unsupported. |
+| RemoteIdentity | get, set, unset | Members by default; root supported through common selection | Local Git configuration only; full local preflight; dry-run reports proposed settings; no network or transport options. |
 | Materialize | lock, head, named branch, tag | Active supported members | `@all` omits root; explicit surviving `@root` refuses. Existing tagged default subset is preserved. |
 | Snapshot | capture named snapshot | Members | Root unsupported by this action policy; member-only snapshot artifacts retain their existing owner. |
 | Capture | update recorded member states | Members | Root is not a selected repository; lock publication remains an effect of capture. |
 | PullSnapshot | materialize snapshot | Members | Same supported-member policy; explicit root refuses. |
-| ListSnapshots | list snapshot records | Workspace records | Does not select repositories; non-local selection-input audit remains. |
+| ListSnapshots | list snapshot records | Workspace records | Does not select repositories; nonempty selection refused before effects. |
 | RepoSync | reconcile repository configuration | Members | Supported-member policy; root not silently reconfigured. |
 | Status | inspect | Root and members | Shared resolver; read-only. |
 | Diff | working/index/tree/range | Root and members | Existing path routing and range semantics remain separate from target expansion. |
@@ -48,7 +49,7 @@ commit and push must still perform members before root publication.
 | Stage | add during an open merge | Frozen merge participants | Uses the record, not a moving manifest. Exclusion-only and unknown-token cases are tested. |
 | Commit | commit work and lock | Root and members | Member effects precede the root lock commit; explicit selection remains bounded. |
 | Push | selected refs, root-only, partial | Root and members | Member failures block root; committed-lock dependency proof also applies to omitted members. |
-| PullHead | head materialization / integration | Root and members | Both head preflight paths consume the shared policy; network identity preflight remains pending. |
+| PullHead | head materialization / integration | Root and members | Both head preflight paths consume the shared policy; network identity preflight precedes effects. |
 | Merge | ordinary start, family start | Root and members | Default/all and explicit member-only cases tested; default lane merge/disposal passes. |
 | Merge | status, continue, abort, preserve, GC | Existing operation record | Recovery participant vector is frozen; no fresh target expansion is authorized. |
 | Branch | list, create, create-and-switch, delete | Members; root supported | Root-only lifecycle tested. Combined switch refuses changed selected member identities in the destination root manifest. |
@@ -59,11 +60,16 @@ commit and push must still perform members before root publication.
 | Stash | list | Members plus discoverable root preservation bundles when unfiltered | Deliberate discovery exception: recovery stashes must remain visible. Explicit scopes constrain discovery. |
 | Stash | apply/pop/drop | Eligible participants of the chosen bundle when unfiltered | Explicit selection narrows the bundle; empty envelopes behave as unfiltered. Root push/list/pop and existing coordinated recovery tests pass. |
 
-Remaining matrix work: verify all non-local structural actions reject or explicitly
-consume selection, all intentional zero-target outcomes, every root-capable dry
-run, and all remote tag suboperations through both drivers. Member-only family
-merge diagnostics must explain any remaining root integration requirement without
-relaxing disposal. These are package exit obligations, not implied green cells.
+Current audit: non-local structural requests now either refuse unused selection or
+consume it explicitly. Root branch, tag and stash lifecycle tests also check dry-run
+non-mutation. Partial family merge diagnostics name the remaining root integration
+requirement without relaxing disposal. The shared resolver owns intentional empty
+results; platform/driver execution is reported separately rather than inferred from
+this policy table. Ordinary publication, root failure/retry/fresh clone and inactive
+fetch-only dependency cases have local executable coverage. There is no general
+remote-push cancellation API in the current protocol; termination cannot promise
+rollback of already accepted member refs. Root publication still requires its
+dependency barrier, and retry rechecks current availability.
 
 ## Error and recovery catalog
 
@@ -110,3 +116,30 @@ bindings together. Preserve all existing numeric/string slots and prove the
 additive projection before advancing the compatibility pins. Human and JSON
 fixtures must demonstrate the distinct recovery action, including already
 completed member effects when root publication is withheld.
+
+## Required coverage manifest
+
+The workspace job is `.github/workflows/debt-recovery.yml` / `workspace`, on
+ubuntu-24.04 and macos-14. It remains unactivated until a reviewed workspace
+revision is published and required checks are configured. Commands below are
+relative to the indicated repository. Generated census execution covers the
+entire core library; focused commands identify the invariant's owner without
+asserting that a filtered test alone constitutes release acceptance.
+
+| Invariant / owner | Executable check | Topology | Platform / required job |
+|---|---|---|---|
+| Derived-marker admission / local-clone installation and disposal | Core `cargo test --lib local_clone::tests::dispose::integrity` | Real root/member repositories, untouched and edited lanes, late drift | Linux/macOS workspace job; current macOS evidence |
+| Root-inclusive lifecycle / shared selection and family merge | CLI `cargo test --test local_family_workflows` and Python local-family tests | Member change, GWZ commit, default family merge, ordinary disposal | Linux/macOS workspace job; current macOS evidence |
+| Root branch, tag and stash / shared resolver plus verb owner | Core `workspace_ops::tests::g21`, `g17`, `g20` within full census | Root-only and mixed repositories; dry-run and recovery | Linux/macOS workspace job; current macOS evidence |
+| Publication barrier / publication.rs and native push_plan.rs | Core `cargo test --lib workspace_ops::tests::g08` and native prepared-push regression | Root/member bare remotes, rejection, inactive/omitted dependencies, callback drift, retry and fresh clone | Linux/macOS workspace job; current macOS evidence |
+| Explicit file identity / native transport owner | Python native read/mutation suites, core identity tests; `ssh_identity_probe.py --product` controlled fixture | Isolated keys/agent/loopback server; real production read transport | Unit/driver checks in workspace job; controlled SSH fixture locally measured, remote acceptance pending |
+| Protocol compatibility / taut owner | Core protocol integration test, additive projection, Python packaged-IR drift; aggregate `compatibility` battery | Generated bindings and both document-consistency gates | Workspace job plus existing core release gates |
+| Protected write authority / checked-artifact owner | `check_checked_artifact_boundaries.py` and its compiler/negative suite | Mutated throwaway source trees, compiler authority checks | Existing checked-artifact-boundary job; local suite recorded in checkpoint |
+| Exact build tuple / workspace CI helper | `test_workspace_tuple.py`, `test_workspace_evidence.py`, build identity tests and Cargo/Bazel provenance comparison | Exact locked siblings with optional candidate override | Workspace job; required-check activation pending |
+| Census completeness / test_inventory.py | Cargo artifact selection, frozen binary listing/run, reconciled identities and negative controls | Separate platform/package/profile inventories | Workspace job alongside old count pins; merge-base baselines and cutover require both platforms |
+
+Windows remains a separate existing core `release.yml` / `windows-matrix.yml`
+contract, including its CRLF/creation-time-filter sentinels. No Windows result is
+inferred from macOS, and the new workspace job does not claim Windows coverage.
+Exact encrypted-agent support and deferred mechanical splits have their explicit
+separate owners and acceptance criteria in the capability report and checkpoint.

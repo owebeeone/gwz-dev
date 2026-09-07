@@ -1,19 +1,19 @@
 # GWZ debt recovery plan
 
-Date: 2026-09-06. Status: **paused at operator request; implementation and verification incomplete**.
+Date: 2026-09-06. Status: **local implementation verified; release acceptance and explicit deferrals remain**.
 
 The operator approved working through this plan on 2026-09-06, including its
 recommended product decisions. Implementation owner: the current Codex task.
 Completion is recorded only with executable evidence; release and remote CI
 results are not implied by local implementation.
 
-Paused for quota exhaustion on 2026-09-07. See [the exact checkpoint](GwzDebtRecoveryCheckpoint.md) before resuming: authentication wiring is unfinished; the bounded callback batch now passes four focused tests and the core all-targets compile check.
+Resumed after quota reset on 2026-09-07. See [the exact checkpoint](GwzDebtRecoveryCheckpoint.md) before resuming: file-identity wiring, configuration, typed transport reporting and startup timeout support are implemented; captured publication and local verification are finished. Remote acceptance and explicitly deferred work remain open.
 
 ### Implementation ledger (2026-09-07, local macOS evidence)
 
 - DR-0: both reported lifecycle failures reproduced with real repositories;
   selected-member rejection also reproduced advancing the root remote.
-  [The contract audit](GwzDebtRecoveryContracts.md) now lists all 29 actions,
+  [The contract audit](GwzDebtRecoveryContracts.md) now lists all 30 actions,
   suboperation exceptions and the existing 0–71 error catalog; unresolved
   matrix cells remain explicit.
 - DR-2: canonical marker admission and byte-preserving manifest publication
@@ -21,15 +21,15 @@ Paused for quota exhaustion on 2026-09-07. See [the exact checkpoint](GwzDebtRec
   refused before allocation; suppressed status cannot authorize overwriting.
   All **13 integrity tests pass**, including late marker edits and new root
   history at the removal boundary. The preceding local-clone suite passed 63
-  tests; final broad verification remains pending.
+  tests; the completed broad run and corrected focused rechecks are accounted for below.
 - DR-3: centralized action policy, root-inclusive ordinary/family merge,
   root branch/tag/stash, materialize capability handling and direct `forall`
   resolution are implemented. Focused planner, merge lifecycle, branch, stash,
   listing and materialize suites pass. Rust CLI library **174 tests** and local
   workflow **9 tests** pass; Python local workflow **14 tests** pass. Python
   `forall` dry-run no longer executes commands. The additive protocol method
-  passes measured compatibility and packaged-IR drift checks. Remaining policy
-  audit, documentation and broader verification are pending.
+  passes measured compatibility and packaged-IR drift checks. The policy
+  audit and documentation are recorded in the contract/coverage manifest; platform acceptance remains pending.
   Mixed root/member branch switches now refuse a changed member identity before
   branch creation (12 branch tests pass). Partial family merges explain the
   remaining root integration/preservation action (10 family-merge tests pass).
@@ -38,7 +38,7 @@ Paused for quota exhaustion on 2026-09-07. See [the exact checkpoint](GwzDebtRec
   committed-lock dependency proof also covers root-only pushes and root tags.
   Real remote-ref regressions pass. A native server-hook test reproduced a
   falsely successful named push; the callback fix now reports RemoteRejected.
-  Wider dependency cases and authentication preflight remain pending.
+  Read-authentication preflight and source/destination capture now precede member transfers. Fifteen publication scenarios have green evidence, including root retry/fresh clone and inactive dependency checks; platform acceptance remains open.
 - DR-1/DR-6: Cargo's supported cleanup removed the separate workspace debug
   outputs, restoring about 27 GiB free. Cargo and Bazel now report matching package versions and CLI/core source
   digests, revision, dirty state and build system; both artifacts built and
@@ -47,10 +47,34 @@ Paused for quota exhaustion on 2026-09-07. See [the exact checkpoint](GwzDebtRec
   check configuration and platform acceptance remain pending.
 - DR-5: the pinned native libraries were inspected; broad agent authentication
   cannot enforce an exact-key promise. See [the capability report](GwzDebtRecoveryAuthCapability.md).
-  Six controlled loopback SSH cases passed with temporary keys and an isolated
-  agent, covering agent order, selected file key, wrong/missing key and encrypted
-  file key with the key unlocked in the agent. Product transport implementation
-  and exact agent selection remain open.
+  Ten controlled production-backend SSH cases passed with temporary keys and an isolated
+  agent, covering both agent orders, file/remote/configured selection, wrong/missing/encrypted
+  keys and host-key mismatch. Both drivers have identity configuration, structured
+  reporting and startup timeouts. Exact encrypted-agent selection remains a separately
+  scoped library extension; platform acceptance remains open.
+
+Current continuation evidence: Rust CLI library **177 passed**, lifecycle workflows
+**10 passed**, build identity **1 passed**. Python broad verification found 784
+passes and 13 identical local-family JSON compatibility failures; the correction
+passed all 195 affected tests, and the rebuilt native extension passed 208 affected
+checks. Core protocol **37 passed**; current all-targets Clippy, compatibility,
+document, source-boundary and pin gates pass. Captured push preserves ordinary
+tracking updates; root rejection/retry/fresh clone and inactive fetch-only
+lock-dependency checks pass. Root branch/tag/stash dry-runs preserve state.
+The broad core run completed with 1,863 passes, two stale guard failures and one
+intentionally ignored helper; both guards pass after correction. The boundary
+checker negative/compiler suite passed **all 75 tests**. See the checkpoint for
+precise broad-run and focused-rerun accounting. No known failure remains; no new
+commit or publication was made.
+
+CI now freezes the test executable selected from Cargo's artifact JSON, generates
+the platform census and reconciles full execution. The evidence gate refuses an
+unexecuted or incomplete census. Nine census controls and fifteen workspace
+helper tests pass. The current local census has **1,867 identities**, 23 added and
+none removed relative to the earlier local snapshot. That comparison is not a
+merge-base or Linux acceptance result; manual pins remain during the transition.
+
+Earlier checkpoint evidence (historical, before the continuation above):
 
 The generated inventory runner reconciled 1,118 executed remainder tests and
 one ignored helper against a frozen binary. Its eight negative/control tests
@@ -121,9 +145,8 @@ named Rust driver file in `gwz-cli/src/`.
 | SSH identity | Explicit identity means only that identity may authenticate. Unspecified identity retains current behavior. | Additive request/configuration support; no Git shell-out and no fallback to unrelated agent keys after an explicit identity fails. |
 
 These decisions close the open merge-default and root-tag choices rather than
-leaving implementation owners to choose separately. Their adoption is a design
-checkpoint, not a request to implement or release them as part of writing this
-plan.
+leaving implementation owners to choose separately. Their adoption was a design checkpoint; the operator subsequently authorized
+implementation. Release remains subject to the evidence and publication gates.
 
 ## 3. Delivery sequence and ownership
 

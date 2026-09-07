@@ -1,4 +1,4 @@
-# Root package. Keeps `//` a Bazel package (razel and `bazel query //...` expect one at the root)
+# Root package. Keeps `//` a Bazel package (`bazel query //...` expects one at the root)
 # and exports the OUTER Cargo workspace's manifest + lock so tooling can address them as labels.
 # No crate_universe hub reads them any more: the @crates hub for gwz-cli is a from_specs hub
 # pinned to this lock's versions by hand (MODULE.bazel explains why from_cargo cannot splice the

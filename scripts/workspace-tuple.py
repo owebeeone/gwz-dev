@@ -47,6 +47,20 @@ def command(root, *args):
     return subprocess.check_output(args, cwd=root, text=True).strip()
 
 
+def pin_revisions(root, rows):
+    # GWZ creates the workspace/member layout. In this ephemeral CI checkout,
+    # attach-to-branch materialization may follow upstream beyond the lock;
+    # explicitly detach every existing member at the resolved test revision.
+    for row in rows:
+        member = root / row["path"]
+        expected = row["tested_revision"]
+        if command(member, "git", "rev-parse", "HEAD") != expected:
+            command(member, "git", "fetch", "--no-tags", "origin", expected)
+            command(member, "git", "checkout", "--detach", expected)
+        if command(member, "git", "rev-parse", "HEAD") != expected:
+            raise ValueError(f'{row["path"]}: checkout does not match the resolved tuple')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bootstrap", required=True)
@@ -62,14 +76,7 @@ def main():
     # the ephemeral runner's Git configuration, never the shared GWZ artifacts.
     command(root, "git", "config", "--global", "url.https://github.com/.insteadOf", "git@github.com:")
     command(root, args.bootstrap, "materialize", "--lock")
-    if args.candidate_member:
-        member = root / args.candidate_member
-        command(member, "git", "fetch", "--no-tags", "origin", args.candidate_sha)
-        command(member, "git", "checkout", "--detach", args.candidate_sha)
-    for row in rows:
-        actual = command(root / row["path"], "git", "rev-parse", "HEAD")
-        if actual != row["tested_revision"]:
-            raise ValueError(f"{row['path']}: checkout does not match the resolved tuple")
+    pin_revisions(root, rows)
     report = {"workspace_revision": command(root, "git", "rev-parse", "HEAD"), "members": rows}
     args.output.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
