@@ -1,4 +1,4 @@
-# GWZ 1.0.0-rc.2 release evidence
+# GWZ CLI 1.0.0-rc.3 release evidence
 
 The operator authorized an RC on 2026-09-07. Publication is pending completion of
 release verification. This record separates source checks from packaged-artifact
@@ -108,3 +108,39 @@ stdout interleaving a libtest result line. The census now reconciles libtest's
 separate result file and retains the raw transcript for the required isolated
 helper proof. Eleven checker tests pass, including omission/duplicate/failure
 controls; a real 34-pass/one-ignored run verifies the new recording path.
+
+## rc.2 exact source verification
+
+- Core tag `v1.0.0-rc.2`: `0d646b46c766770df8802783dcf02f262c383991`.
+- CLI tag `v1.0.0-rc.2`: `2b7b45b09bccb0aaa2f6e65a0f53f2d98fc71ab0`.
+- CLI source digest: `069560869d547c414b7a05352cd6a8a5cf65df5a2b7865262b5768ff6d7d809b`.
+- Core source digest: `7582c28684963825413c10d664bd79d23a872f5e96f1dfbf9d52eea63d2908c1`.
+
+Both components report `dirty=false` after rebuilding the committed standalone
+CLI. All 252 standalone CLI tests, generated-reference and dependency-pin checks
+pass. The committed executable passes help/version, untouched clone/dispose,
+member edit/coordinated commit/default merge, root ancestry preservation, ordinary
+disposal and disband. Strict MkDocs generation passes.
+
+Exact core release verification: [34106676583](https://github.com/owebeeone/gwz-core/actions/runs/34106676583).
+Workspace tuple verification: [34106641112](https://github.com/owebeeone/gwz-dev/actions/runs/34106641112).
+Both were running/queued when this checkpoint was recorded; publication and
+packaged checks remain pending.
+
+## CLI rc.3 fixture correction
+
+The rc.2 Linux core census passed with the isolated harness recorder. The CLI
+workspace step then exposed a fixture commit relying on Git's automatic author
+detection. Its root/member fixture setup now writes a local author; reproducing
+with `user.useConfigOnly=true` and no system/global Git config makes the old
+fixture fail. Product Rust code is unchanged.
+
+The Windows Python matrix exposed 14 POSIX-only expected paths. Corrected
+expectations retain native separators without changing the renderer. Magenta
+reproduced all 14 failures and passed all 191 local-family tests after correction;
+the same 191 pass on macOS. Eight Linux/macOS matrix jobs had already passed,
+including a full Linux run of 798 tests.
+
+The published rc.1/rc.2 source tags are preserved. The final CLI candidate advances
+to rc.3 and pins the unchanged core rc.2; release tooling now supports an explicit
+`--core-tag` for independently versioned components. No stable release is promoted.

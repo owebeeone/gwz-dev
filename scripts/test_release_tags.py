@@ -30,3 +30,14 @@ class ReleaseTags(unittest.TestCase):
             self.assertTrue(module.reconcile_cargo_toml(root, 'v1.0.0-rc.1', '1.0.0-rc.1'))
             self.assertEqual((root/'BUILD.bazel').read_text().count('version = "1.0.0-rc.1"'), 2)
             self.assertFalse(module.reconcile_cargo_toml(root, 'v1.0.0-rc.1', '1.0.0-rc.1'))
+
+    def test_cli_can_pin_an_independently_versioned_core(self):
+        spec = importlib.util.spec_from_file_location('cli_release', ROOT/'gwz-cli/scripts/release.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        self.assertEqual(module.release_versions('v1.0.0-rc.3', 'v1.0.0-rc.2'),
+                         ('1.0.0-rc.3', 'v1.0.0-rc.2'))
+        self.assertEqual(module.release_versions('v1.0.0-rc.3', None),
+                         ('1.0.0-rc.3', 'v1.0.0-rc.3'))
+        with self.assertRaises(SystemExit):
+            module.release_versions('v1.0.0-rc.3', 'v1.0.0-rc.0')

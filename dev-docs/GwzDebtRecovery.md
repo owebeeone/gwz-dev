@@ -2,23 +2,27 @@
 
 ## Release candidate preparation — 2026-09-07
 
-The operator authorized documentation, release verification and publication of
-`v1.0.0-rc.1`, followed by stable promotion after artifact acceptance. Windows
-publication and ARM64 Linux lifecycle acceptance are complete; statements below
-about pending platform acceptance describe earlier checkpoints. Focused runs do
-not replace the exact release tuple's required CI gates.
+The operator authorized documentation, release verification and RC publication,
+followed by stable promotion after artifact acceptance. Windows publication and
+ARM64 Linux lifecycle acceptance are complete. Earlier pending statements below
+are checkpoint history; exact-tag CI and packaged acceptance remain required.
 
-The latest published workspace CI (`34097515928`) failed seven family-merge tests
-because fixture root repositories lacked a local Git author identity. Reproduced
-with an isolated empty home directory; fixtures are being corrected rather than
-adding a global runner identity that would hide the dependency. No RC has been
-tagged or published at this checkpoint.
+Current candidate: **CLI v1.0.0-rc.3 with core v1.0.0-rc.2**. The rc.1 core/CLI source tags are preserved,
+but no rc.1 GitHub release was published. Final review corrected stale release
+count pins with an audited 48-test addition census, and Cargo-generated marker
+provenance. The CI census now records libtest results separately from child
+process output. See [release evidence](GwzReleaseCandidate.md) for exact source
+identities, local results and the status of publication.
 
-Release work also corrects help that advertised unsupported local modes, enables
-numbered RC tags in release tooling, and records [XFS/ext4 measurements](GwzFilesystemComparison.md).
-The generated-marker status display remains a documented limitation, while
-untouched disposal is supported. Exact encrypted-agent identity selection and
-mechanical file splitting remain explicitly deferred.
+The global-author fixture failures and stale CLI lock are corrected. All 252 CLI
+tests pass with isolated HOME/XDG configuration; the versioned core full suite
+and 75 boundary checks pass locally. Exact rc.2 remote gates are in progress.
+
+Release docs correct unsupported local modes and record
+[XFS/ext4 measurements](GwzFilesystemComparison.md). Derived-marker status churn
+remains documented; untouched disposal is supported. Exact encrypted-agent key
+selection and mechanical file splitting remain explicitly deferred. Manual test
+count pins remain active. Stable 1.0.0 has not been published.
 
 ### Earlier implementation and acceptance ledger
 
