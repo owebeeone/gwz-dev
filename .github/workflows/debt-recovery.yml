@@ -97,7 +97,7 @@ jobs:
           cargo test -p gwz-core --test protocol --locked 2>&1 | tee ../evidence/protocol.log
       - name: Rust driver and build identity
         run: |
-          cargo test -p gwz --lib --test local_family_workflows --test build_identity --locked 2>&1 | tee evidence/rust-driver.log
+          cargo test -p gwz --locked 2>&1 | tee evidence/rust-driver.log
           target/debug/gwz --version > evidence/cargo-version.txt
           python -m unittest scripts/test_build_status.py scripts/test_workspace_tuple.py scripts/test_workspace_evidence.py scripts/test_release_tags.py -v
       - name: Python driver against this exact Rust binary
