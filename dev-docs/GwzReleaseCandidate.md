@@ -160,3 +160,17 @@ The test identities, safety assertions and production code are unchanged.
 The corrected native disposal suite and fresh main-commit release verification
 are required before tagging core rc.3. CLI rc.4 will pin that verified core tag.
 Earlier source tags are preserved; the GitHub release remains a draft.
+
+## Final core version and privacy gate
+
+The privacy probe copy omitted `build.rs` and `build_support`, so its three
+positive controls failed to compile the new provenance constant. Reproduced
+locally (nine tests, three failing subcases); copying the real build inputs fixes
+all nine privacy tests. Local Python environments and generated build output are
+excluded from probe copies. The same aggregate privacy gate now runs before the
+expensive boundary/full-test batteries, retaining its checks and failure status.
+
+Before creating another core tag, the final core package version is set to 1.0.0.
+The planned CLI rc.4 will pin that verified core, and stable CLI 1.0.0 will consume
+the same core tag and commit. This preserves exact core verification through
+promotion. No core rc.3 tag was created. All earlier published source tags remain.
