@@ -1,6 +1,18 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a07ac3-e408-7f52-9ee4-a25410dd8dcf
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+created_at: '1788766049626'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: b460568b76deb082c71df7dd0c1766836f67f579
+  branch: main
+selected_targets:
+- mem_gwz_core
+committed_targets:
+- mem_gwz_core
+- '@root'
 members:
   mem_gwz_cli:
     path: gwz-cli
@@ -12,13 +24,13 @@ members:
     dirty: false
     materialized: true
   mem_gwz_core:
-    dirty: false
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
     commit: bf58914476c6d2bf0aa28c8242c80d4c75b94039
     branch: main
     detached: false
+    dirty: false
     materialized: true
   mem_gwz_py:
     path: gwz-py
@@ -65,3 +77,16 @@ members:
     detached: false
     dirty: false
     materialized: true
+merge:
+  merge_id: merge_op_25838_1788766049569_0001
+  operation_id: op_25838_1788766049569
+  source_ref: refs/remotes/dabeest/codex/dabeest-acceptance-20260907
+  selected_targets:
+  - mem_gwz_core
+  participants:
+    mem_gwz_core:
+      target_kind: member
+      target_branch: main
+      before_commit: 4d35577c84ffe653accb21396ab23ae31b6cdb23
+      source_commit: bf58914476c6d2bf0aa28c8242c80d4c75b94039
+      resulting_commit: bf58914476c6d2bf0aa28c8242c80d4c75b94039
