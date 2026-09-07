@@ -1,5 +1,17 @@
 # Debt recovery checkpoint — local implementation verified
 
+Linux follow-up (2026-09-07): the Raspberry Pi's native ARM64 build and ext4
+untouched disposal / root+member commit / strict family merge / ordinary disposal /
+detach cycle passed. It used the same clean source digests as Magenta. See
+[Pi acceptance](GwzPiAcceptance.md). These focused platform runs do not replace
+the remaining release gates or same-platform merge-base census review.
+
+Magenta follow-up (2026-09-07): native Windows explicit-file authentication,
+publication to isolated branches, fresh checkout with all member locks verified,
+and local merge/disposal passed. This closes the Windows publication evidence
+gap; the Dabeest credential limitation remains machine-specific. Fresh checkout
+still exposes derived-marker status churn. See [Magenta acceptance](GwzMagentaAcceptance.md).
+
 Latest acceptance update (2026-09-07): the source was committed and pushed, then
 built natively on Dabeest/Windows. An initial signed-credential-bitmask compile
 failure was fixed and published (root `8f40897`, core `4d35577`). Untouched
