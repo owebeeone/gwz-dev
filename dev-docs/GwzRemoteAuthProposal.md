@@ -1,8 +1,9 @@
-# Gwz remote authentication: SSH identity selection, push preflight, and the ordering invariant
+# Gwz workspace-operation gaps: SSH identity selection, push ordering, and root-scoped tags
 
 Date: 2026-09-06. Status: **proposal, not adopted.** No code change is implied by this
-document. Written after a live incident pushing a three-repository workspace
-(`sdax-wz` + `sdax-rs` + `sdax-v1`) to GitHub.
+document. Written after two live incidents on the same workspace (`sdax-wz` + `sdax-rs` +
+`sdax-v1` + a read-only Python `sdax` member): pushing it to GitHub (§§ 1-4), and tagging it
+`code-complete` (§ 5).
 
 Owner ruling already recorded (2026-09-06): a **git-CLI transport fallback is a
 non-starter**; additional `gwz-cli` options are acceptable. This document therefore proposes
@@ -171,12 +172,112 @@ cause. On a five-member workspace that is the difference between a clear message
 Ranked **below** § 2 for that reason. Worth doing when the identity work is done, since both
 touch the same credential path.
 
-## 5. Explicitly rejected
+## 5. Tags cannot reach the workspace root, and three statements say they can
+
+Found 2026-09-06 tagging the `sdax-wz` workspace `code-complete`. Unlike § 2, this one is
+**not** operator error and gwz's diagnostics do not cover it.
+
+### 5.1 What was observed
+
+The milestone needed the tag in two places: on `sdax-rs`, and on the workspace root, whose
+commit is the thing that pins the member set. The member tag was one command. **The root tag
+could not be created with gwz at all.**
+
+| invocation | result |
+|---|---|
+| `gwz tag <name> --target mem_sdax_rs` | tags the member. Root **not** tagged |
+| `gwz tag <name> --target sdax-rs` (by path) | same |
+| `gwz tag <name>` (default selection) | tags all three members. Root **not** tagged |
+| `gwz tag <name> --target @root` | `InvalidRequest: selected command does not support @root` |
+| `gwz tag <name> --target @all` | same error |
+| every member deselected via `--no-target` | `status: Ok`, nothing tagged |
+
+`--target` itself is fine: it selects members correctly by id and by path. There is simply no
+selector that names the root for this verb.
+
+### 5.2 The implementation is deliberate; its documentation is wrong
+
+`workspace_ops/handle_tag.rs:60` builds the repo set and the root never enters it:
+
+```rust
+let repos: Vec<PathBuf> = member_roots.clone();
+```
+
+Selection at `handle_tag.rs:47` goes through `resolve_locked_selection`, which hard-codes
+`RootSelectionPolicy::Reject` and then filters `SelectedTarget::Root` out anyway
+(`target_selection.rs:62-70`). The handler says so itself at `handle_tag.rs:49`:
+
+> Root tag behavior is not specified in the target-selection rollout. Local and remote tag
+> operations span selected members only; explicit `@root` is rejected by selection.
+
+That is a coherent decision. **Three statements contradict it**, one of them user-facing:
+
+| where | claim | true? |
+|---|---|---|
+| `handle_tag.rs:11-12` (doc comment) | tags are "fanned out to the selected members + the root" | no |
+| `gwz tag --help` | "Local operations (create, list, delete) span the selected members plus the workspace root" | no |
+| `handle_tag.rs:146` (comment on the local-list arm) | "count every tag across root + members" | no — it iterates `repos`, which is `member_roots` |
+
+The third is disprovable in one command. With `code-complete` present on the root and on one
+member, `gwz tag --list` reports `code-complete (1 member)`: gwz cannot see a root tag, let
+alone create one.
+
+**Free to fix, alongside § 3.** The behaviour need not change for the help text to stop being
+wrong.
+
+### 5.3 `@all` is collateral damage, and this part is a bug
+
+`target_selection.rs:41-51` expands the includes, applies the excludes (`:44`), and *then*
+rejects if the resolved set still contains the root (`:46`). Since `@all` expands to root plus
+members, **any verb with the `Reject` policy refuses `@all` outright**:
+
+| verb | `--target @all` |
+|---|---|
+| `tag`, `branch`, `stash`, `materialize` (via `resolve_locked_selection`) | `InvalidRequest` |
+| `status`, `ls`, `commit` (`RootSelectionPolicy::Allow`) | accepted |
+
+For a verb that by design never touches the root, `@all` most usefully means *every member*.
+Refusing it teaches the user that `@all` is unreliable rather than that tags are member-scoped.
+
+A workaround exists today and follows from the ordering above — excludes are applied before the
+check, so the root can be subtracted back out:
+
+```sh
+gwz tag --list --target @all --no-target @root   # accepted
+```
+
+That works, and nothing says so. At minimum the error should name it.
+
+### 5.4 What it cost
+
+The root tag was created and published with plain git inside the root repo:
+
+```sh
+git tag -a code-complete -m '...'
+git push origin code-complete
+```
+
+That is precisely the per-repo git operation a workspace tool exists to remove, and
+`AGENTS_GWZ.md` tells contributors not to do it. Note that remote tag operations are
+members-only by design as well (`--push` skips the root), so a root tag created by any other
+means still could not be pushed by gwz.
+
+### 5.5 Proposed
+
+1. **Decide root tag behaviour.** The code calls it unspecified. Either fan tags out to the
+   root like `gwz commit` does, or state that tags are member-scoped — but state it once, in
+   the place users read.
+2. **Fix the three comments** regardless of which way 1 goes. Free, and one of them is
+   `--help`.
+3. **Make `@all` mean "every member" for root-rejecting verbs**, or have the error name the
+   `--no-target @root` subtraction instead of only refusing.
+
+## 6. Explicitly rejected
 
 **A git-CLI transport fallback** (`--transport=cli`, shelling out so `~/.ssh/config` is
 honoured for free). Owner ruling, 2026-09-06: non-starter. Recorded so it is not re-proposed.
 
-## 6. Summary
+## 7. Summary
 
 | # | item | value | cost | rank |
 |---|---|---|---|---|
@@ -184,7 +285,11 @@ honoured for free). Owner ruling, 2026-09-06: non-starter. Recorded so it is not
 | 2 | Report the identity used | makes a wrong-account push visible after the fact | small | with 1 |
 | 3 | Pin push's root-last ordering with a comment and a test | protects an invariant that already holds and is currently unguarded | very small | **cheapest** |
 | 4 | Push preflight | one clear refusal instead of N failures | moderate | after 1 |
-| 5 | git-CLI transport | — | — | rejected |
+| 5 | Correct the three "members + the root" statements about tags (§ 5.2), `--help` included | stops the tool describing a capability it does not have | a comment and a help string | **free** |
+| 6 | `@all` to mean "every member" on root-rejecting verbs, or name the `--no-target @root` subtraction in the error (§ 5.3) | `@all` currently fails on `tag`, `branch`, `stash`, `materialize` | small, in `target_selection.rs` | with 5 |
+| 7 | Decide root tag behaviour — fan out like `gwz commit`, or declare tags member-scoped (§ 5.5) | today a workspace milestone cannot be tagged or pushed without dropping to per-repo git | a design call, then either implementation or one sentence | after 5 and 6 |
+| 8 | git-CLI transport | — | — | rejected |
 
-Nothing here is urgent. Item 3 is nearly free and guards something real. Item 1 is the one
-with a genuine failure mode behind it.
+Nothing here is urgent. Items 3 and 5 are nearly free and each guards something real. Item 1
+is the one with a genuine failure mode behind it. Item 7 is the only one needing a decision
+before it can be sized: the code itself records root tag behaviour as unspecified.

@@ -1,0 +1,113 @@
+name: GWZ workspace recovery
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+    inputs:
+      workspace_sha:
+        type: string
+        required: true
+      candidate_member:
+        type: string
+        required: true
+      candidate_sha:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      candidate_member:
+        description: Existing member path to test instead of its locked commit
+        type: choice
+        options: ['', gwz-core, gwz-cli, gwz-py]
+        default: ''
+      candidate_sha:
+        description: Full candidate commit SHA; siblings remain locked
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  workspace:
+    name: Workspace tuple (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          repository: owebeeone/gwz-dev
+          ref: ${{ inputs.workspace_sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Resolve exact locked workspace and optional candidate
+        env:
+          CANDIDATE_MEMBER: ${{ inputs.candidate_member }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          python -m pip install PyYAML
+          mkdir -p evidence
+          bootstrap="$(python scripts/bootstrap-gwz.py "$RUNNER_TEMP/gwz-bootstrap")"
+          python scripts/workspace-tuple.py --bootstrap "$bootstrap" --candidate-member "$CANDIDATE_MEMBER" --candidate-sha "$CANDIDATE_SHA" --output evidence/tuple.json
+      - name: Toolchain identity
+        run: |
+          rustup toolchain install 1.95.0 --profile minimal
+          rustup default 1.95.0
+          rustc --version > evidence/toolchain.txt
+          cargo --version >> evidence/toolchain.txt
+          python --version >> evidence/toolchain.txt
+          uname -a >> evidence/toolchain.txt
+      - name: Complete compatibility, document and pin gates
+        working-directory: gwz-core
+        run: |
+          python scripts/checks/run_r4bg_aggregate_gates.py compatibility 2>&1 | tee ../evidence/compatibility.log
+          python scripts/checks/check_bazel_pin_drift.py
+          python -m unittest scripts/checks/test_check_bazel_pin_drift.py -v
+          python scripts/checks/check_build_identity.py
+          python scripts/checks/check_target_selection_boundary.py
+          python -m unittest scripts/checks/test_check_target_selection_boundary.py scripts/checks/test_test_inventory.py -v
+      - name: Native lifecycle and root publication
+        working-directory: gwz-core
+        run: |
+          cargo test -p gwz-core --lib local_clone::tests --locked 2>&1 | tee ../evidence/local-clone.log
+          cargo test -p gwz-core --lib workspace_ops::tests::g08 --locked 2>&1 | tee ../evidence/publication.log
+          cargo test -p gwz-core --lib workspace_ops::tests::g20 --locked
+          cargo test -p gwz-core --lib workspace_ops::tests::g21 --locked
+          cargo test -p gwz-core --lib named_push_reports_server_hook_rejection --locked
+      - name: Rust driver and build identity
+        run: |
+          cargo test -p gwz --lib --test local_family_workflows --test build_identity --locked 2>&1 | tee evidence/rust-driver.log
+          target/debug/gwz --version > evidence/cargo-version.txt
+          python -m unittest scripts/test_build_status.py scripts/test_workspace_tuple.py scripts/test_workspace_evidence.py -v
+      - name: Python driver against this exact Rust binary
+        env:
+          GWZ_RUST_BIN: ${{ github.workspace }}/target/debug/gwz
+        working-directory: gwz-py
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install maturin pytest pytest-asyncio setuptools-scm taut-proto==0.9.1
+          .venv/bin/python -m maturin develop
+          .venv/bin/python scripts/check_protocol_drift.py
+          .venv/bin/python -m pytest -q 2>&1 | tee ../evidence/python-driver.log
+      - name: Refuse missing or zero-test evidence
+        run: python scripts/check-workspace-evidence.py evidence
+      - name: Preserve tuple and executed evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gwz-workspace-${{ matrix.os }}-${{ github.run_id }}
+          path: evidence/
+          if-no-files-found: error

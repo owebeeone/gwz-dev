@@ -335,10 +335,21 @@ install removes from a verbatim copy is exactly what construction never
 writes (§11 item 22).
 
 Recapture may write `gwz.conf/gwz.lock.yml` before the manifest.
-Regenerate the conf-integrity marker for the final manifest and lock
-bytes as part of install; do not publish a copied marker vouching for
-superseded bytes. The source checks and destination object validation
+Publish the exact validated source manifest bytes in verbatim mode. Regenerate
+the conf-integrity marker for the final manifest and lock only when byte-level
+HEAD/index/worktree proof establishes that its source contents are committed
+and unsuppressed. Preserve uncommitted marker bytes when they still verify;
+otherwise refuse before allocation rather than overwriting source work.
+The source checks and destination object validation
 in §4.0 apply independently of this exclusion table.
+
+Debt recovery amendment (2026-09-06): disposal may discount a regenerated marker
+only with fresh canonical-byte proof against regular, unchanged manifest and
+lock files in HEAD, index and worktree. Staged changes, index suppression,
+conflicts, unknown observations, symlinks and noncanonical markers remain
+protected. The exemption never changes files or history requirements. Existing
+lanes use the same proof, without recreation or hidden commits. Missing baseline
+markers currently remain conservative refusals pending explicit legacy fixtures.
 
 **Open gwz merge:** **refuse verbatim** while source has an open gwz
 merge (checked before copy under the quiescence assumption). Dirt and

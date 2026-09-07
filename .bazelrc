@@ -1,0 +1,2 @@
+# Stamp only the GWZ artifacts with source identities from the actual workspace.
+build --workspace_status_command=scripts/build-status.py
