@@ -1,4 +1,4 @@
-# GWZ CLI 1.0.0-rc.3 release evidence
+# GWZ CLI 1.0.0-rc.4 release evidence
 
 The operator authorized an RC on 2026-09-07. Publication is pending completion of
 release verification. This record separates source checks from packaged-artifact
@@ -150,3 +150,13 @@ evidence validation now allows those two named harnesses only; library and
 integration suites must remain nonempty, and an entirely empty command or any
 failure still refuses. Negative controls and the actual standalone CLI release
 log pass this check.
+
+## Core rc.3 / CLI rc.4 preparation
+
+Core rc.2 Windows full execution reached 1,816 passes and two failed assertions.
+Both expected POSIX separators in generated nested-repository keys; inventory
+uses native relative paths. The expected keys now use native path components.
+The test identities, safety assertions and production code are unchanged.
+The corrected native disposal suite and fresh main-commit release verification
+are required before tagging core rc.3. CLI rc.4 will pin that verified core tag.
+Earlier source tags are preserved; the GitHub release remains a draft.

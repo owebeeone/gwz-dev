@@ -7,7 +7,7 @@ followed by stable promotion after artifact acceptance. Windows publication and
 ARM64 Linux lifecycle acceptance are complete. Earlier pending statements below
 are checkpoint history; exact-tag CI and packaged acceptance remain required.
 
-Current candidate: **CLI v1.0.0-rc.3 with core v1.0.0-rc.2**. The rc.1 core/CLI source tags are preserved,
+Planned candidate: **CLI v1.0.0-rc.4 with core v1.0.0-rc.3**, pending verification before tagging. The rc.1 core/CLI source tags are preserved,
 but no rc.1 GitHub release was published. Final review corrected stale release
 count pins with an audited 48-test addition census, and Cargo-generated marker
 provenance. The CI census now records libtest results separately from child
