@@ -1,7 +1,9 @@
 # GWZ operation context
 
-Status: proposed next step after the checked-artifact filesystem migration.
-This document designs the change; the factories remain in production today.
+Status: implementation in progress after the checked-artifact filesystem migration.
+The first batch introduces owned services and migrates the lease, catalog,
+journal-store and shared root-preservation paths. Compatibility factories remain
+for operation families whose entry points have not yet migrated.
 
 ## Decision
 
@@ -15,7 +17,7 @@ The useful change is ownership and lifetime. Merely putting `make_repository()`
 and `make_filesystem()` behind context methods would leave the global state and
 hidden construction in place.
 
-## Current constraints in this code
+## Starting constraints
 
 - `src/git/gitbackend/factory.rs` and `src/filesystem/factory.rs` construct
   adapters wherever callers need them. Production selection is native only;
@@ -45,8 +47,8 @@ pub(crate) struct OperationContext {
 }
 ```
 
-This is an ownership sketch, not an existing API. Audit the concrete repository
-implementations' thread bounds before adopting the exact declaration. Existing
+This shape is now implemented in `gwz-core/src/operation_context.rs`; the concrete
+repository implementations satisfy the thread bounds. Existing
 handlers that only borrow Git can accept `&(impl GitRepository + ?Sized)`;
 orchestration that needs both dependencies receives `&OperationContext`.
 Pure model functions receive neither.
@@ -126,3 +128,68 @@ not a promised speed improvement.
 
 Use ordinary targeted tests and the routine runners. Compiler mutation probes,
 expected test counts and repeated full-suite gates are outside this work.
+
+## First implementation batch — 2026-09-08
+
+Implemented:
+
+- `operation_context.rs` owns the two services. `TestWorld` constructs an
+  isolated compatible pair and reopens contexts sharing that pair. The existing
+  `operation::OperationContext` still carries request metadata; this batch does
+  not change its public fields or CLI/Python request signatures.
+- `BorrowedOperationContext` preserves a caller-supplied Git implementation.
+  The shared root-preservation protocol receives that view; the native and fake
+  Git adapters supply their own filesystem. Native transport configuration
+  retains that filesystem when constructing its configured repository.
+- `FsDirectory` and `FsFile` retain their filesystem owner. Reads, writes,
+  seeks, identity probes, locks, publication, checked residue and cleanup use
+  that owner. Memory adapters reject handles from another world. Windows fake
+  durable volume identities now distinguish worlds too.
+- The context-taking V1 lease acquires runtime locks, discovers and revalidates
+  Git relationships, activates/reopens the catalog and bootstraps merge parents.
+  Retained catalog witnesses carry the same context into provider callbacks.
+- Stored V1 records retain their context. Journal creation, rewrite, reload,
+  archive and temporary cleanup use supplied resources. The below-capability
+  publication and parent-bootstrap paths accept the filesystem explicitly too.
+- `scripts/checks/check_filesystem_boundary.py` rejects ambient factory lookup
+  in the migrated helper modules. `scripts/run_tests.py` includes the new
+  context contracts in its fake pair and native comparison runs.
+
+The contracts exercise independent histories, files and locks at identical
+paths in two memory worlds; handles surviving context drop; catalog and journal
+reopening; archive reconciliation; and root-preservation reopening between
+physical steps, including an interruption after source retirement and an
+idempotent stash retry. They share test bodies across backend selections.
+
+The remaining call-chain closure is explicit: whole merge-service and
+preservation-bundle orchestration still enter through compatibility constructors.
+Catalog batch acquisition and other workspace operation families also retain
+their old entry path. `FakeGitRepository::shared` and `FakeFileSystem::shared`
+remain solely to support those existing callers. Do not describe the entire
+core, or implementation step 3's complete service call chain, as migrated yet.
+Next, carry the context through that orchestration, preserving supplied Git
+authority with the borrowed view, then expand the guarded scope and remove the
+compatibility constructors when their last callers are gone.
+
+This batch demonstrates the actual plumbing cost: retained handles eliminate
+most downstream parameters, while path-based acquisition and Git relationship
+checks require an explicit context. It makes no test-speed improvement claim.
+
+Validation on macOS:
+
+- The ordinary library runner exercised 18 filesystem contracts, 126 migrated
+  cases and 1,863 native cases (plus the runner's native crosscheck). One native
+  source assertion still required the old factory spelling; it was updated and
+  passed its targeted rerun. No behavioral failure was found. The four runner
+  phases totaled 224.56 seconds, including recompilation and concurrent consumer
+  builds; this is not a controlled before/after performance comparison.
+- All four context contracts pass with fake Git/fake filesystem, fake Git/native
+  filesystem and native Git/native filesystem. The final native preservation
+  rerun passed 51 tests after removing the remaining native image-reader factory
+  calls. Core's four integration targets passed 58 tests.
+- CLI: 253 tests passed. The rebuilt Python extension and cross-driver checks:
+  56 tests passed. Both consumer runs used `GWZ_TEST_GIT=fake GWZ_TEST_FS=fake`
+  while their production core remained native.
+- `cargo clippy --all-targets -- -D warnings`, filesystem/context and
+  checked-artifact source guards, seven Python guard/runner tests, formatting
+  and whitespace checks passed. Compiler mutation tests were not run.
