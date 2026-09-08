@@ -1,4 +1,23 @@
-# Release status: v1.0.0 aborted
+# Current status — 2026-09-08
+
+Core v1.0.4, CLI v1.0.4 and Python v1.0.3 have been released; Python's
+corresponding core v1.0.3 tag exists. The workspace CLI rerun also succeeded.
+The aborted v1.0.0 preparation below is historical.
+
+The current implementation batch completes checked-artifact catalog activation,
+retained observation, mutation, publication and durable bundle handling through
+the shared filesystem interface. Both fake-only V1 lease returns are removed.
+See [filesystem progress](GwzFileSystemTestInterface.md#implementation-progress--catalog-and-durable-publication-2026-09-08)
+for validation and the remaining whole-core scope.
+
+Next priority, ahead of further Git fixture migration: review and implement the
+first slice of the [operation context plan](GwzOperationContextPlan.md). This
+replaces hidden resource construction with explicit ownership. Remaining direct
+core I/O callers, further Git fixture migration, encrypted SSH-agent identity
+selection and deferred file splitting are still open; this batch does not close
+those items.
+
+## Historical release status: v1.0.0 aborted
 
 The operator aborted v1.0.0 to prioritize test speed. Existing tags are preserved;
 no GitHub Release was published. Compiler-mutation tests are now manual-only, and
@@ -7,7 +26,7 @@ Earlier release plans below are historical and do not authorize publication.
 
 # GWZ debt recovery plan
 
-## Release candidate preparation — 2026-09-07
+## Historical release candidate preparation — 2026-09-07
 
 The operator authorized documentation, release verification and RC publication,
 followed by stable promotion after artifact acceptance. Windows publication and

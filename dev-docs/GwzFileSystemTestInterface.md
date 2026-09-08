@@ -261,15 +261,16 @@ it into a passing or silently skipped scenario.
   `make_filesystem()` for their worktree and exclude-file access. Both factories
   must see identical files. Git history/index/ref data stays in FakeGitRepository;
   file contents belong to FileSystem, not a second shadow worktree.
-- [ ] **Move journal I/O and locking.** Convert `v1_lifecycle/store/{rewrite,archive}.rs`,
+- [x] **Move journal I/O and locking.** Convert `v1_lifecycle/store/{rewrite,archive}.rs`,
   `checked.rs`, `durable_fs.rs`, `WorkspaceMutatorLock`, and the runtime lease's
   retained paths/advisory lock. Convert all reachable canonicalization and
   validation reads, including creation and drop paths. Keep CheckedV1Store and
   its serialization/recovery logic shared.
-- [ ] **Move checked-artifact and root-preservation I/O.** Convert retained
+- [x] **Move checked-artifact and root-preservation I/O.** Convert retained
   directories/files, platform identity observations, residue publication,
   namespace mutations, parent barriers and `gitbackend/preservation_root/parent.rs`.
   Include common artifact/stash read/write helpers reached by the matrices.
+  Other artifact/stash callers remain in the final core-caller migration below.
   Preserve existing fault boundaries and seals while replacing the native
   leaf operations. This is required for an entirely memory-backed matrix;
   converting the journal alone is an intermediate step.
@@ -281,7 +282,7 @@ it into a passing or silently skipped scenario.
   retain a small real/real cross-check and make full native comparison explicit.
   Keep the current scenario assertions and loops for this substitution so its
   performance/correctness effect can be measured separately from test reduction.
-- [ ] **Remove duplicate decoding/validation as a separate change.** Preserve
+- [x] **Remove duplicate decoding/validation as a separate change.** Preserve
   exact-byte drift checks and unknown-field behavior while avoiding revalidation
   of an already validated identical record. Run focused drift/round-trip tests
   and remeasure. The filesystem fake alone does not remove the profiled YAML CPU
@@ -302,8 +303,8 @@ GWZ_TEST_GIT=fake GWZ_TEST_FS=fake cargo test --locked --lib -- root_fault_matri
 ```
 
 The filesystem contract commands run the implemented operation set. Both root
-matrices now run with `GWZ_TEST_FS=fake`; checked-artifact catalog internals and
-remaining core callers still need migration.
+matrices now run with `GWZ_TEST_FS=fake`, including catalog activation through
+the shared implementation. Remaining core callers still need migration.
 
 ## CLI and Python compatibility is part of completion
 
@@ -789,3 +790,68 @@ commit edits. Their native and memory implementations sit behind the same
 assume-valid and skip-worktree suppression while exact checkout verification
 still rejects those semantic index flags; this matches the two distinct native
 observations exercised by rollback entry.
+
+## Implementation progress — catalog and durable publication, 2026-09-08
+
+The checked-artifact production tree now uses `FileSystem` throughout. Platform
+probes live in `filesystem/native/facts` and `filesystem/native/legacy_identity`;
+the catalog provider translates neutral filesystem facts into validated catalog
+identities. Legacy and catalog identity encodings are preserved separately so
+this refactor does not change existing persisted records.
+
+Retained catalog roots, files, index reads, bounded directory-name enumeration,
+mutation, publication and the Windows durability anchor use `FsDirectory` and
+`FsFile`. Stream operations and directory conveniences delegate to the same
+filesystem interface. Native handle extraction is private to the native adapter.
+The Windows implementation retains source-handle rename and write-through file
+opens, including reopening an existing scratch file.
+
+`V1MutationLease::acquire_activated` and `acquire_for_merge_start` no longer have
+fake early returns. A shared factory test verifies initial catalog creation,
+identity stability after reopening, and merge-start directory preparation. A
+shared filesystem contract verifies persistent facts across name replacement;
+Windows additionally checks publication of a retained source after replacement
+of its original name. Existing catalog and durability fault scenarios remain.
+
+The source guard covers every production module under `checked_artifact`, in
+addition to the existing migrated scopes. Test-only items are excluded without
+hiding production platform branches such as `cfg(any(windows, test))`. Native
+syscalls remain permitted only inside the filesystem adapter in this scope.
+
+This closes the catalog slice described above, not the whole-core migration.
+Direct I/O remains in workspace discovery/bootstrap, ordinary artifact/stash
+helpers, some merge consumers, local-clone adapters and Git transport helpers.
+Convert those by operation, preserving follow/no-follow, error and durability
+semantics; extend the guard as each scope is converted. Native Git and process
+integration tests remain intentional physical consumers.
+
+The next design step is [operation context ownership](GwzOperationContextPlan.md)
+before the next large Git fixture batch. The context plan is not implemented by
+this filesystem change.
+
+Validation for this batch:
+
+- The ordinary macOS core runner passed, with compiler mutation tests excluded.
+  Its phases totalled 285.64s including rebuilds while cross-platform fixes were
+  being made. The fake scenario phase itself took 14.55s, close to the preceding
+  14.02s; this is not evidence of a new speed improvement.
+- The complete CLI suite passed (253 tests). Python's full suite passed 798
+  tests and initially failed its exact CLI/extension provenance comparison:
+  concurrent builds had captured different source snapshots. Both artifacts
+  were rebuilt together; all 37 focused bridge/merge checks then passed,
+  including provenance. Running that recheck with both test selectors set to
+  fake still exercised real files through the production dependency.
+- The Raspberry Pi passed 479 native checked-artifact/filesystem/factory cases
+  on ext4 in 87.75s and the shared memory contracts in 0.20s. Its default `/tmp`
+  is volatile, so native disk-durability fixtures used an ext4 `TMPDIR`.
+- Windows passed 454 native checked-artifact/filesystem/factory cases in 191.12s
+  and all 20 shared memory contracts in 0.22s, including retained-source
+  replacement and catalog activation. Native checks caught and corrected path-only
+  metadata being used as though it contained handle identity. Windows metadata
+  now comes from a no-follow handle. The existing shared directory adapter
+  permits rename, so its stale name-pinning test now checks identity refusal
+  and preservation of both the original and substituted contents.
+  Retained no-replace rename now shares the working source-handle publication
+  primitive instead of maintaining a second Windows implementation.
+- macOS Clippy with warnings denied and the filesystem/checked-artifact source
+  guards passed. Raw logs and source archives stay outside the repositories.
