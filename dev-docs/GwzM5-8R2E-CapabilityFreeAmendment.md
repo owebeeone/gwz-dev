@@ -87,6 +87,15 @@ barriers, now through `FileSystem`. Its old raw-spelling/count inventory row is
 retired; the shared filesystem contract tests cover no-replace collision and
 publication semantics without enabling the durable-identity probe.
 
+The same revision applies to the workspace-operation drivers that now use the
+`FileSystem` port: create/add repository, init-from-sources, repository
+lifecycle, and stage have no remaining direct raw-spelling counts. Branch and
+commit route their workspace-boundary work through the port but retain their
+explicit capability-free lock/marker primitives, which remain pinned. Every
+inventory row remains so the boundary check rejects a direct raw writer from
+returning. This is a transport change, not a conversion onto the
+checked-artifact capability.
+
 | Row | Listed-operation writers today (tree cites) | Convertible forward arm (reached ONLY under `acquire_activated`) |
 | --- | --- | --- |
 | `:275` terminal archive | ALL of `store/archive.rs` (pin-reference counts `rename_noreplace` 2, `sync_dir` 7 — call sites 1 + 6 — plus four raw `std::fs` mutations incl. the `create_dir_all` at `:61`, the row's "when missing" bootstrap), reached via `respond()` from EVERY terminal disposition — completed start/resume (`start.rs:98,:169`), abort, preserve — always as `V1LifecycleRequest::Archive` on the PLAIN lease (`service.rs:120`). The LIVE GC deletion writer is `store/gc.rs:16-17` (`fs::remove_file`, `sync_dir`) and `store/retention.rs:37,41`, under `WorkspaceMutatorLock` only (`gc.rs:167`). `archive.rs::remove_archive` (`:191-208`, pin `sync_dir` 2) is a DEAD arm: its only route is the test-only `gc_archived` family behind the `archive.rs:108-111` allowance. | NONE — the forward runtime refuses archive actions (`forward.rs:71-76`); `Archive` is always plain |
