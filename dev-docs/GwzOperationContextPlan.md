@@ -1,9 +1,8 @@
 # GWZ operation context
 
-Status: implementation in progress after the checked-artifact filesystem migration.
-The first batch introduces owned services and migrates the lease, catalog,
-journal-store and shared root-preservation paths. Compatibility factories remain
-for operation families whose entry points have not yet migrated.
+Status: the V1 merge lifecycle and catalog acquisition now carry owned services
+through their complete call chains. Compatibility factories remain for the
+other workspace operation families and older test fixtures (steps 4–5).
 
 ## Decision
 
@@ -167,9 +166,8 @@ Catalog batch acquisition and other workspace operation families also retain
 their old entry path. `FakeGitRepository::shared` and `FakeFileSystem::shared`
 remain solely to support those existing callers. Do not describe the entire
 core, or implementation step 3's complete service call chain, as migrated yet.
-Next, carry the context through that orchestration, preserving supplied Git
-authority with the borrowed view, then expand the guarded scope and remove the
-compatibility constructors when their last callers are gone.
+The follow-up below closes that orchestration. Remove the remaining compatibility
+constructors as the other families migrate.
 
 This batch demonstrates the actual plumbing cost: retained handles eliminate
 most downstream parameters, while path-based acquisition and Git relationship
@@ -193,3 +191,72 @@ Validation on macOS:
 - `cargo clippy --all-targets -- -D warnings`, filesystem/context and
   checked-artifact source guards, seven Python guard/runner tests, formatting
   and whitespace checks passed. Compiler mutation tests were not run.
+
+## Merge and catalog call-chain completion — 2026-09-08
+
+The first batch was committed as core `cfa14b8`, workspace `39dab61`.
+
+V1 start/continue/abort/status entry points now construct services from the
+supplied merge backend. The existing sealed backend interface has a private
+service-sharing method: native Git clones its configured adapter, retaining its
+filesystem, credential selection and shared transport observations; test Git
+clones the same world. This adds no requirement to the open `GitRepository`
+interface or public CLI/Python request signatures. The borrowed context remains
+appropriate for adapter helpers already receiving borrowed dependencies.
+
+`CheckedV1Store` owns a context. Its default constructor is test-only. The service
+reuses that context for initial reads, leases, rechecks and journal commits.
+Checked records retain it for downstream observers. This avoids adding both a
+store and a separate context parameter throughout the service loop.
+
+Converted paths include:
+
+- Catalog batch preparation, common-Git/worktree association, deduplication,
+  final lock acquisition, revalidation and retained provider callbacks.
+- Crash-recovery admission, catalog-free and catalog-backed merge creation,
+  the lifecycle loop, optimistic status reads and archive reconciliation.
+- Root artifact observation, evidence rollback, root metadata rollback,
+  preservation-bundle observation/publication and finalization observations.
+- Raw marker/lock/boundary publication through the supplied filesystem.
+  These remain raw atomic replacements; dependency ownership does not introduce
+  a catalog requirement or change their existing recovery semantics.
+
+New contracts cover catalog batch contention and reopening; a service transition
+persisted into an isolated world; and the existing full dirty-root preservation
+scenario using an isolated `TestWorld`, followed by archive publication and a
+second destination-only archive acquisition. The same scenario runs with
+memory or native storage. The filesystem source guard now prohibits ambient
+factory lookup throughout the V1 lifecycle, reverse artifact helpers and catalog
+target/association helpers.
+
+The GitRepository and FileSystem contract suites also construct their own
+`TestWorld` now; reopening explicitly reuses that world instead of a fresh
+ambient factory call.
+
+Validation:
+
+- Ordinary library runner: 18 filesystem tests, 128 migrated cases, the native
+  crosscheck and 1,865 native tests passed; one existing test remains ignored.
+  The four phases took 196.14 seconds, including concurrent consumer work.
+- The final contract-fixture conversion passed 25 Git/filesystem contracts
+  with memory storage. The same contracts plus the full preservation/archive
+  scenario passed with native storage (26 cases); the mixed Git-memory/native-FS
+  run passed all 31 selected contracts and lifecycle cases.
+- CLI: 253 passed. Rebuilt Python bridge/merge/cross-driver checks: 56 passed.
+- Clippy with warnings denied, both source-boundary checks, seven Python
+  checker/runner tests, formatting and whitespace checks passed.
+- Compiler mutation tests were excluded. No release or push was performed.
+
+The build exhausted local disk during this work. `cargo clean -p gwz-core`
+removed rebuildable package outputs, leaving dependencies available; subsequent
+verification disabled incremental compilation to keep its cache from regrowing.
+
+Still outside this completed call chain:
+
+- Workspace bootstrap and the public branch/commit/stage/repo/pull/stash families
+  still enter through compatibility resource construction.
+- Public artifact read/write and canonical record-discovery wrappers still
+  construct their filesystem for callers that do not yet supply one.
+- Older fixture helpers and factory contracts still use the shared fake registry.
+  Those callers must move to owned worlds before deleting `shared()` and the
+  compatibility factories. The complete core-wide migration is not yet finished.
