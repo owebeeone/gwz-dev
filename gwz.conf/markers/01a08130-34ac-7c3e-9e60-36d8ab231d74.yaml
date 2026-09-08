@@ -1,33 +1,49 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a08130-34ac-7c3e-9e60-36d8ab231d74
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+created_at: '1788873814173'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 43622c86bb76074edeccef989fd6cddf9d357117
+  branch: main
+selected_targets:
+- mem_gwz_cli
+- mem_gwz_core
+- mem_gwz_py
+committed_targets:
+- mem_gwz_cli
+- mem_gwz_core
+- mem_gwz_py
+- '@root'
 members:
   mem_gwz_cli:
-    dirty: false
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
     commit: b2b03b5c881e8710cf8cb3ad58e4630f7932d3a3
     branch: main
     detached: false
+    dirty: false
     materialized: true
   mem_gwz_core:
-    detached: false
-    dirty: false
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
     commit: 226514b61028d2bfc03e8f0a8377b191c69a881a
     branch: main
+    detached: false
+    dirty: false
     materialized: true
   mem_gwz_py:
-    dirty: false
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
     commit: 932bab57045ea5dfe49b90ff1ce272edca99c8ba
     branch: main
     detached: false
+    dirty: false
     materialized: true
   mem_taut:
     path: taut
@@ -65,3 +81,30 @@ members:
     detached: false
     dirty: false
     materialized: true
+merge:
+  merge_id: merge_op_28286_1788873813239_0001
+  operation_id: op_28286_1788873813239
+  source_ref: refs/gwz/local-imports/xfer_9d536d9b24c80dc9a344f537b7fcb3af
+  selected_targets:
+  - mem_gwz_cli
+  - mem_gwz_core
+  - mem_gwz_py
+  participants:
+    mem_gwz_cli:
+      target_kind: member
+      target_branch: main
+      before_commit: cb54cc279731e6030c1bb0475fcc37d24b611b24
+      source_commit: b2b03b5c881e8710cf8cb3ad58e4630f7932d3a3
+      resulting_commit: b2b03b5c881e8710cf8cb3ad58e4630f7932d3a3
+    mem_gwz_core:
+      target_kind: member
+      target_branch: main
+      before_commit: fd7315a5c012011d629ab546631b0e0a922bdfef
+      source_commit: f2d0bb7946846494bf536ec799590d69f9dc8f62
+      resulting_commit: 226514b61028d2bfc03e8f0a8377b191c69a881a
+    mem_gwz_py:
+      target_kind: member
+      target_branch: main
+      before_commit: 213143c59413ca4846b155ae06d90f7f579c0ab1
+      source_commit: 932bab57045ea5dfe49b90ff1ce272edca99c8ba
+      resulting_commit: 932bab57045ea5dfe49b90ff1ce272edca99c8ba
