@@ -17,6 +17,13 @@ core I/O callers, further Git fixture migration, encrypted SSH-agent identity
 selection and deferred file splitting are still open; this batch does not close
 those items.
 
+Deferred local-family merge follow-up: `gwz merge --remote <lane> --dry-run`
+currently refuses explicitly as unsupported. A future implementation must provide
+a read-only preflight that resolves and pairs every selected root/member commit,
+checks import-ref collisions and merge hazards, and reports the engine outcome
+without creating import refs or other workspace state. It must not claim a dry-run
+plan until that preflight exists.
+
 ## Historical release status: v1.0.0 aborted
 
 The operator aborted v1.0.0 to prioritize test speed. Existing tags are preserved;
