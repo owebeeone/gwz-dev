@@ -1,3 +1,14 @@
+# Current test execution rule
+
+Use the normal test runner and its exit status. Do not add or restore expected
+pass-count pins, test-inventory comparisons, test-log reconciliation, or repeated
+partition runs as release gates. Earlier census/count requirements are retired
+by the operator's 2026-09-07 instruction.
+
+Source-mutation/compiler probes are manual-only. Do not invoke them from release
+scripts, ordinary test cycles, or push/PR CI; use gwz-core/scripts/run_compiler_tests.py
+only when explicitly requested.
+
 # Agent process rules
 
 Date: 2026-08-15

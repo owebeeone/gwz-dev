@@ -143,6 +143,22 @@ the exception's record plus §3's pins, not by a boundary routing.
 
 ## 3. The pins that make the exception fail-closed (E4.3-B's build)
 
+### 2026-09-08 filesystem-boundary revision
+
+The record-root exception governs publication semantics, not the Rust module
+that owns the operating-system call. `commit` still performs one atomic
+in-place replacement followed by a parent-directory durability barrier. Those
+operations now enter through `FileSystem::rename(Replace)` and
+`FileSystem::sync_directory`; the native adapter retains the platform-specific
+implementation. This does not route the record through the checked-artifact
+detach/publish operation and therefore does not create the discovery-dead
+window described in §2.
+
+The old `durable_fs` spelling/count pin is retired. The shared filesystem
+contract tests assert replacement behavior, and
+`tests/store/record_root_exception.rs` asserts the required replace-and-barrier
+shape at this caller.
+
 The exception is enforced, not narrated:
 
 - **P-1, the O13 pin row becomes PERMANENT-DOCUMENTED.**

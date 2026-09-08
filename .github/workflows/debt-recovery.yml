@@ -78,28 +78,15 @@ jobs:
           python -m unittest scripts/checks/test_check_bazel_pin_drift.py -v
           python scripts/checks/check_build_identity.py
           python scripts/checks/check_target_selection_boundary.py
-          python -m unittest scripts/checks/test_check_target_selection_boundary.py scripts/checks/test_test_inventory.py -v
-      - name: Native lifecycle and root publication
+          python -m unittest scripts/checks/test_check_target_selection_boundary.py -v
+      - name: Core tests
         working-directory: gwz-core
-        run: |
-          cargo test -p gwz-core --lib local_clone::tests --locked 2>&1 | tee ../evidence/local-clone.log
-          cargo test -p gwz-core --lib workspace_ops::tests::g08 --locked 2>&1 | tee ../evidence/publication.log
-          cargo test -p gwz-core --lib workspace_ops::tests::g20 --locked
-          cargo test -p gwz-core --lib workspace_ops::tests::g21 --locked
-          cargo test -p gwz-core --lib named_push_reports_server_hook_rejection --locked
-      # Run alongside named/pinned gates until same-platform merge-base
-      # inventories are reviewed on both OSes.
-      - name: Generated core census and reconciled execution
-        working-directory: gwz-core
-        run: |
-          cargo test -p gwz-core --lib --no-run --message-format=json --locked > ../evidence/core-test-build.json
-          python scripts/checks/test_inventory.py --cargo-artifacts ../evidence/core-test-build.json --package gwz-core --profile debug --output ../evidence/core-inventory.json --run
-          cargo test -p gwz-core --test protocol --locked 2>&1 | tee ../evidence/protocol.log
+        run: python3 scripts/run_tests.py 2>&1 | tee ../evidence/core-tests.log
       - name: Rust driver and build identity
         run: |
           cargo test -p gwz --locked 2>&1 | tee evidence/rust-driver.log
           target/debug/gwz --version > evidence/cargo-version.txt
-          python -m unittest scripts/test_build_status.py scripts/test_workspace_tuple.py scripts/test_workspace_evidence.py scripts/test_release_tags.py -v
+          python -m unittest scripts/test_build_status.py scripts/test_workspace_tuple.py scripts/test_release_tags.py -v
       - name: Python driver against this exact Rust binary
         env:
           GWZ_RUST_BIN: ${{ github.workspace }}/target/debug/gwz
@@ -110,8 +97,6 @@ jobs:
           .venv/bin/python -m maturin develop
           .venv/bin/python scripts/check_protocol_drift.py
           .venv/bin/python -m pytest -q 2>&1 | tee ../evidence/python-driver.log
-      - name: Refuse missing or zero-test evidence
-        run: python scripts/check-workspace-evidence.py evidence
       - name: Preserve tuple and executed evidence, including failures
         if: always()
         uses: actions/upload-artifact@v4

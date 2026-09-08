@@ -1,3 +1,17 @@
+# Release status: v1.0.0 aborted
+
+The operator aborted v1.0.0 to prioritize test speed. Existing tags are preserved;
+no GitHub Release was published. Compiler-mutation tests are now manual-only, and
+count/census gates are retired. See [the test-speed audit](GwzTestSpeedAudit.md).
+Earlier release plans below are historical and do not authorize publication.
+
+# Current cleanup — releases stopped
+
+The operator retired pass-count pins, generated test censuses, test-log
+reconciliation and repeated partition release gates. Ordinary test-runner exit
+status is authoritative. Version output is one line; `--build-info` is optional.
+The records below describe earlier work and do not impose release requirements.
+
 # GWZ 1.0.0 release evidence
 
 The operator requested using the release scripts without further duplicate

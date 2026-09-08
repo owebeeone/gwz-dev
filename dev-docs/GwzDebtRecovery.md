@@ -1,3 +1,10 @@
+# Release status: v1.0.0 aborted
+
+The operator aborted v1.0.0 to prioritize test speed. Existing tags are preserved;
+no GitHub Release was published. Compiler-mutation tests are now manual-only, and
+count/census gates are retired. See [the test-speed audit](GwzTestSpeedAudit.md).
+Earlier release plans below are historical and do not authorize publication.
+
 # GWZ debt recovery plan
 
 ## Release candidate preparation — 2026-09-07
@@ -23,8 +30,7 @@ for the exact commit and current run links.
 Release docs correct unsupported local modes and record
 [XFS/ext4 measurements](GwzFilesystemComparison.md). Derived-marker status churn
 remains documented; untouched disposal is supported. Exact encrypted-agent key
-selection and mechanical file splitting remain explicitly deferred. Manual test
-count pins remain active. Stable 1.0.0 has not been published.
+selection and mechanical file splitting remain explicitly deferred. Manual test-count pins and census reconciliation are retired. Stable 1.0.0 has not been published.
 
 ### Earlier implementation and acceptance ledger
 
@@ -121,7 +127,7 @@ the platform census and reconciles full execution. The evidence gate refuses an
 unexecuted or incomplete census. Nine census controls and fifteen workspace
 helper tests pass. The current local census has **1,867 identities**, 23 added and
 none removed relative to the earlier local snapshot. That comparison is not a
-merge-base or Linux acceptance result; manual pins remain during the transition.
+merge-base or Linux acceptance result; that transition requirement is retired.
 
 Earlier checkpoint evidence (historical, before the continuation above):
 
@@ -495,17 +501,9 @@ secret redaction and that auth failures leave DR-4's root barrier intact.
 
 ## 10. DR-6 — reduce recurring maintenance without losing protection
 
-**Test census (F4).** Replace hand-maintained pass-count equalities with a generated
-inventory of test identities per package/platform and explicit partition rules.
-Check that partitions are disjoint, cover the intended inventory and actually
-execute; account for ignored tests separately. Compare the candidate inventory
-with the merge-base inventory to report removals and renames requiring a reviewed
-reason. A runtime count alone misses a deleted test; a floor lets an addition hide
-a deletion. Preserve named critical fault scenarios and their executed evidence.
-Generate inventory on macOS and Linux rather than predicting Linux from Darwin.
-Run the replacement alongside existing pins until both platforms agree and
-negative fixtures catch deletion, omission, duplicate coverage and zero-test
-runs. Then retire the manual equalities and their repeated bookkeeping prose.
+**Test execution (F4).** Run ordinary tests and trust the test runner's exit
+status. Do not maintain expected pass counts, compare inventories, reconcile
+captured test output, or repeat full suites through partition gates.
 
 **Error taxonomy (F5).** Land the DR-0 catalog review before the next release tag
 and before the new refusal codes are frozen. Test representative failures through
@@ -574,3 +572,61 @@ refuse, selection is consistent, failed member publication cannot advance the
 root, and the required workspace checks run in CI. Keep DR-5 and deferred DR-6
 items explicitly open until their own evidence exists; a corrected test sheet or
 a green unit suite alone does not close the product failures.
+
+
+### 2026-09-08: Git repository factory, first migration batch
+
+The fixture-only GitRepository methods and shared factory are implemented. The
+two largest root-preservation matrices now arrange Git state through that
+interface and pass with both the fake and native backend. Runtime Git-directory
+and index observations on their production paths also use the factory; the
+production build contains no fake selector or fixture methods.
+
+The normal core test runner is `python scripts/run_tests.py`: migrated matrices
+use fake Git, remaining tests use native Git in another process, and small
+repository/root-preservation contracts cross-check both implementations. The
+full native matrix is available with `--compare`.
+
+This completes the first batch in [GwzGitRepositoryTestInterface.md](GwzGitRepositoryTestInterface.md),
+not the remaining test migration or the test-speed goal. Validation still took
+10m 29s for the fake matrices, with real journal synchronization prominent in a
+stack sample. See [GwzTestPerformance.md](GwzTestPerformance.md) for results and
+measurement limits. Address the journal/store boundary before assuming further
+Git fixture conversions will deliver a short test cycle. Release remains paused.
+
+### 2026-09-08: Filesystem runtime retention batch
+
+The checked-artifact runtime bootstrap now retains directories and lock files
+through `FileSystem`. Its private platform lock implementation has been removed;
+`FsLockGuard` owns the native or memory lock. Catalog lease target association,
+alias enumeration and repository membership use the filesystem and repository
+factories, and the production runtime files are protected by the filesystem
+source guard. The 31 native runtime tests and the 29 fake/fake reverse-rollback
+tests pass.
+
+The v1 mutation lease now acquires `WorkspaceMutatorLock` through the shared
+runtime in both modes. Catalog activation still returns early for the memory
+backend because `checked_artifact/capability/pre_catalog/provider/retained.rs`
+and the downstream leaf/mutation providers retain `cap_std` handles. Removing
+that return before converting those providers fails at pre-catalog directory
+observation, which fixes the next implementation boundary precisely. The next
+batch moves platform facts and pre-catalog retained handles into `FileSystem`,
+then removes the catalog and `entry.rs` fake branches. Release remains paused.
+
+### 2026-09-08: checked-artifact observation slice
+
+Three read-only checked-artifact entry points now use the same retained
+`FileSystem` algorithm in native and memory modes: selected-root artifact
+observation plus workspace-root and Git-directory preservation observation.
+The algorithm retains and revalidates the root, every parent component, the
+parent identity and the leaf identity around the read. Root-level files are a
+covered contract case. The exact import pin on `checked_artifact/entry.rs` was
+removed; the boundary checker continues to enforce the visible entry API and
+its authorized callers without treating routine private imports as an
+architectural invariant.
+
+This is a correctness and architecture milestone rather than a material test
+speed improvement. The 29-test fake/fake rollback group measured 13.80s against
+the preceding 14.25s sample, a provisional 3% change. Durable bundle
+observation, classification, mutation and pre-catalog retained providers still
+need conversion before the remaining fake branches can be deleted.

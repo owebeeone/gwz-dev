@@ -136,10 +136,12 @@ asserting that a filtered test alone constitutes release acceptance.
 | Protocol compatibility / taut owner | Core protocol integration test, additive projection, Python packaged-IR drift; aggregate `compatibility` battery | Generated bindings and both document-consistency gates | Workspace job plus existing core release gates |
 | Protected write authority / checked-artifact owner | `check_checked_artifact_boundaries.py` and its compiler/negative suite | Mutated throwaway source trees, compiler authority checks | Existing checked-artifact-boundary job; local suite recorded in checkpoint |
 | Exact build tuple / workspace CI helper | `test_workspace_tuple.py`, `test_workspace_evidence.py`, build identity tests and Cargo/Bazel provenance comparison | Exact locked siblings with optional candidate override | Workspace job; required-check activation pending |
-| Census completeness / test_inventory.py | Cargo artifact selection, frozen binary listing/run, reconciled identities and negative controls | Separate platform/package/profile inventories | Workspace job alongside old count pins; merge-base baselines and cutover require both platforms |
 
 Windows remains a separate existing core `release.yml` / `windows-matrix.yml`
 contract, including its CRLF/creation-time-filter sentinels. No Windows result is
 inferred from macOS, and the new workspace job does not claim Windows coverage.
 Exact encrypted-agent support and deferred mechanical splits have their explicit
 separate owners and acceptance criteria in the capability report and checkpoint.
+
+Version output: `gwz --version` and `gwz -V` print only the CLI package version.
+`gwz --build-info` is the opt-in diagnostic identity for CLI and core.

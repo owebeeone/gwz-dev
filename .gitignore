@@ -184,3 +184,6 @@ bazel-*
 /razel-bin
 /razel-out
 /razel-testlogs
+
+# Local test-performance measurements and profiler output.
+/dev-docs/evidence/test-performance-*/
