@@ -1,6 +1,18 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a08101-2e8a-76bb-bf46-c5019308686d
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+origin_url_hash: sha256:e35341f4b797aa8e57a066bf78413f40c277b3985e757118ca9aea8d390fbb9c
+created_at: unix-ms:1788870733489
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: f9447ba42d48b45c56e82264bdf72ba5cd6d5452
+  branch: main
+selected_targets:
+- '@root'
+committed_targets:
+- '@root'
 members:
   mem_gwz_cli:
     path: gwz-cli
