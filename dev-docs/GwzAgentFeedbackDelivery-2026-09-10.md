@@ -8,7 +8,7 @@ The operator authorized integration and the next patch release after validation.
 
 | Family name | Owner/model | Scope |
 | --- | --- | --- |
-| `fixpaths` | paths / GPT-5.6 Terra | Serialized invocation context, shared path resolution, absolute listings, routing and diagnostics |
+| `fixpaths` | paths / GPT-5.6 Terra | Serialized invocation context, shared path resolution, absolute listings, routing |
 | `fixpython` | Python / GPT-5.6 Terra | Native/client context propagation, submission capture and driver parity |
 | `fixoutcomes` | outcomes / GPT-5.6 Terra | Shared lock comparisons/reasons, sync and no-change results, both renderers |
 | `fixhelp` | help / GPT-5.6 Luna | Compact and structured CLI help, focused tests and generated reference |
@@ -51,5 +51,41 @@ paths: agents must use lane-local Python imports and rebuild their own binding.
    dispatch, so tag existence alone is not proof that builds started. Avoid
    dispatching a duplicate run.
 
-Completion, test results, integrated commits and release URLs remain to be
-recorded here after execution.
+## Integrated implementation and focused validation
+
+All four primary lanes were integrated through serial whole-family GWZ merges.
+Core path checkpoint `309b41a`, outcome checkpoint `b5e79a5`, Python native/client
+checkpoint `a910877`, CLI help checkpoint `8f6dd66`, and final help wording
+`9ca1063` are included. The combined taut generator's additive compatibility
+check passes with RequestMeta tag 9 (invocation) and MemberResponse tag 11
+(lock difference reasons); both driver bindings were regenerated together.
+
+Central additions:
+- Core `9b1b025`: rejected repository operands and PathEscape report caller,
+  resolved candidate and workspace facts. Selector-like directory hints apply
+  only after a failed manifest read; valid literal `@root`/`@all` roots remain
+  supported. Both new regressions failed on the original diagnostics, then
+  passed after the implementation (2/2).
+- Python `9281a9a`: actual Rust CLI/Python parity regression covers four root
+  forms, member/outside callers, absolute listing paths, add/diff routing,
+  human/JSON/JSONL error facts, dirty registration/status/sync and no-commit
+  outcomes. Eight cases passed. With native serialized-caller sync/submit and
+  client checks: 45 passed in 3.06 seconds.
+- Core `e3b9967`: integration exposed an index-order recovery defect. Disk and
+  in-memory indexes with identical path/stage/mode/OID entries can enumerate
+  differently. Sorting exact comparison rows repairs recovery without folding
+  case or suppressing content drift. A regression passed, and the real open
+  Python-lane merge recovered to ExpectedConflict and then completed after its
+  source-comment conflict was staged. The private evidence archive retains the
+  before/after status and read-only diagnostic.
+
+Windows prefix normalization is being corrected before native validation:
+canonicalized existing paths can gain a verbatim prefix that raw absolute
+pathspecs lack. No claim of Windows path-matrix completion is made yet.
+
+The actual scripts prepare/tag/push but do not create GitHub releases. Python's
+script additionally requires the same-version CLI tag to be remotely visible.
+Therefore tag preparation is core → CLI → Python; after the core release passes,
+CLI and Python hosted builds can overlap once those tags exist. v1.0.9 was
+verified unused in all three remotes before launch. Release URLs and final
+outcomes remain to be recorded after execution.
