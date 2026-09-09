@@ -142,3 +142,38 @@ Therefore tag preparation is core → CLI → Python; after the core release pas
 CLI and Python hosted builds can overlap once those tags exist. v1.0.9 was
 verified unused in all three remotes before launch. Release URLs and final
 outcomes remain to be recorded after execution.
+
+## Release execution
+
+Core v1.0.9 is tagged and pushed at `e3c5dd17f131f13366d529b7ffb9a565c6b96815`.
+Its release script passed with `--push --no-test`, reusing the recorded test
+runs and retaining all mandatory protocol/format/boundary/Clippy gates. The
+first attempt stopped before tagging on two lint findings; a braced let-chain
+and moving the existing test module to the end resolved them without behavior
+changes. The tag was never moved.
+
+[Core GitHub release](https://github.com/owebeeone/gwz-core/releases/tag/v1.0.9)
+is published; [release verification](https://github.com/owebeeone/gwz-core/actions/runs/34392227877)
+finished with Linux passing and Windows failing six test fixtures: five compare
+normalized Windows paths with the old verbatim spelling, and one supplies a
+rooted path without a drive as the invocation's absolute caller directory.
+CLI and Python release scripts have not started. Correct these fixtures, run
+the affected cases on Windows, and cut v1.0.10; leave v1.0.9 untouched.
+
+The separate [candidate validation](https://github.com/owebeeone/gwz-core/actions/runs/34392089509)
+also failed: its reviewed workspace baseline was still `089a4cc`, with old
+sibling source revisions and a Cargo lock that did not match the new core
+version. The repair updates `scripts/workspace-tuple.py` to exclude private
+members, retain exact public sibling revisions, and derive an explicitly
+recorded candidate Cargo lock. Baseline runs retain their committed Cargo lock.
+The workflow installs the pinned Rust toolchain before assembly and checks
+locked metadata before expensive tests. Six focused helper tests pass. Publish
+a compatible root checkpoint and update each product repository's
+`GWZ_WORKSPACE_REVISION` before treating candidate CI as repaired.
+
+The operator identified the additional `fsbench` lane before publication. Its
+two evidence commits (`3e1c9ac`, `90c3081`) and root metadata were integrated
+through a whole-family merge: seven participants unchanged, two merged, no
+conflicts. All product heads stayed unchanged, including the exact core tag.
+The archive verifier passed. The benchmark helper is retained evidence, not a
+new product dependency or a newly authorized privileged execution.

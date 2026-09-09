@@ -53,23 +53,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Resolve exact locked workspace and optional candidate
-        env:
-          CANDIDATE_MEMBER: ${{ inputs.candidate_member }}
-          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
-        run: |
-          python -m pip install PyYAML
-          mkdir -p evidence
-          bootstrap="$(python scripts/bootstrap-gwz.py "$RUNNER_TEMP/gwz-bootstrap")"
-          python scripts/workspace-tuple.py --bootstrap "$bootstrap" --candidate-member "$CANDIDATE_MEMBER" --candidate-sha "$CANDIDATE_SHA" --output evidence/tuple.json
       - name: Toolchain identity
         run: |
+          mkdir -p evidence
           rustup toolchain install 1.95.0 --profile minimal
           rustup default 1.95.0
           rustc --version > evidence/toolchain.txt
           cargo --version >> evidence/toolchain.txt
           python --version >> evidence/toolchain.txt
           uname -a >> evidence/toolchain.txt
+      - name: Resolve exact locked workspace and optional candidate
+        env:
+          CANDIDATE_MEMBER: ${{ inputs.candidate_member }}
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          python -m pip install PyYAML
+          bootstrap="$(python scripts/bootstrap-gwz.py "$RUNNER_TEMP/gwz-bootstrap")"
+          python scripts/workspace-tuple.py --bootstrap "$bootstrap" --candidate-member "$CANDIDATE_MEMBER" --candidate-sha "$CANDIDATE_SHA" --output evidence/tuple.json
+      - name: Locked Cargo metadata
+        run: cargo metadata --locked --format-version 1 > evidence/cargo-metadata.json
       - name: Complete compatibility, document and pin gates
         working-directory: gwz-core
         run: |

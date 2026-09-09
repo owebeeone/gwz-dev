@@ -119,11 +119,31 @@ completed member effects when root publication is withheld.
 
 ## Required coverage manifest
 
+### Candidate workspace assembly (2026-09-10 correction)
+
+The reviewed workspace revision fixes the public sibling source commits. A
+candidate replaces only its named member's source commit; no sibling may float
+to a branch head. Advance `GWZ_WORKSPACE_REVISION` after publishing a compatible
+workspace checkpoint, including its current Cargo lock.
+
+Private members are explicitly excluded from bootstrap materialization and
+revision pinning in public CI. A private member cannot be a candidate in this
+job. This works with the retained bootstrap binary even when it predates the
+manifest's private-member semantics; no manifest or GWZ lock is hand-edited.
+
+A baseline run must use the committed `Cargo.lock` unchanged. An explicit
+candidate may change package versions or dependencies, so its ephemeral Cargo
+graph is refreshed with `cargo update --workspace` under the pinned toolchain.
+The tuple report records that derivation and the resulting Cargo lock SHA-256,
+alongside the exact source commits. This does not certify the original graph
+as unchanged. All subsequent test commands retain `--locked`; locked metadata
+is checked before expensive tests so an inconsistent graph fails promptly.
+
 The workspace job is `.github/workflows/debt-recovery.yml` / `workspace`, on
-ubuntu-24.04 and macos-14. It remains unactivated until a reviewed workspace
-revision is published and required checks are configured. Commands below are
-relative to the indicated repository. Generated census execution covers the
-entire core library; focused commands identify the invariant's owner without
+ubuntu-24.04 and macos-14. The workflow is active; required-check enforcement is
+a separate repository setting. Commands below are relative to the indicated
+repository. The standard core runner excludes the separately scheduled compiler
+mutation tests; focused commands identify the invariant's owner without
 asserting that a filtered test alone constitutes release acceptance.
 
 | Invariant / owner | Executable check | Topology | Platform / required job |
