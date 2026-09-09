@@ -3,74 +3,74 @@ workspace_id: ws_default
 manifest_schema: gwz.workspace/v0
 members:
   mem_gwz_cli:
+    dirty: false
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
-    commit: 43b42ab68a814c13510c5bb704034f56558a0de8
+    commit: 68475d5409e5a3958d255f9d17bb8e9ee6219edf
     branch: main
     detached: false
-    dirty: false
     materialized: true
   mem_gwz_core:
+    dirty: false
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: ecd87cd6519307aefa58665fc0897daada0ca8c7
+    commit: 118218bc0798603b4e060e41af4ae204c7ba6bb4
     branch: main
     detached: false
-    dirty: false
     materialized: true
   mem_gwz_core_evidence:
+    dirty: false
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
     commit: 7b1012ce03580f8cc2af65788fc59f5e39ebf4fb
     branch: main
     detached: false
-    dirty: false
     materialized: true
   mem_gwz_py:
+    dirty: false
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
     commit: a910877dca5d451cde1e33e9d07027fd99da28e4
     branch: main
     detached: false
-    dirty: false
     materialized: true
   mem_taut:
+    dirty: false
     path: taut
     source_id: src_taut
     source_kind: git
     commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
     branch: main
     detached: false
-    dirty: false
     materialized: true
   mem_taut_shape:
+    dirty: false
     path: taut-shape
     source_id: src_taut_shape
     source_kind: git
     commit: 9a752094dbede65babcc6c44185f64cef4c6e974
     branch: main
     detached: false
-    dirty: false
     materialized: true
   mem_taut_shape_py:
+    dirty: false
     path: taut-shape-py
     source_id: src_taut_shape_py
     source_kind: git
     commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
     branch: main
     detached: false
-    dirty: false
     materialized: true
   mem_taut_shape_rs:
+    dirty: false
     path: taut-shape-rs
     source_id: src_taut_shape_rs
     source_kind: git
     commit: 4154bb7953c30c3695f125d15268de3d37980d4d
     branch: main
     detached: false
-    dirty: false
     materialized: true
