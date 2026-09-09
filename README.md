@@ -90,3 +90,7 @@ cargo fmt --check
 cargo test --workspace
 python gwz-py/run_tests.py
 ```
+
+## Campaign evidence
+
+See [EVIDENCE.md](EVIDENCE.md) for the private campaign archive, retention rules and replay instructions.

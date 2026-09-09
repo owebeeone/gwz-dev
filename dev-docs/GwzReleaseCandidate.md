@@ -1,5 +1,7 @@
 # Release status: v1.0.0 aborted
 
+Campaign evidence and experiment runners referenced here moved to the private [GWZ archive](https://github.com/owebeeone/gwz-core-evidence) on 2026-09-10. Recorded paths and commands remain historical; see the archive README and REPLAY.md for current locations and fresh-run setup.
+
 The operator aborted v1.0.0 to prioritize test speed. Existing tags are preserved;
 no GitHub Release was published. Compiler-mutation tests are now manual-only, and
 count/census gates are retired. See [the test-speed audit](GwzTestSpeedAudit.md).

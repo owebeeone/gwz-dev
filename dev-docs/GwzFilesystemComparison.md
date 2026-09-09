@@ -1,9 +1,16 @@
 # Pi local-clone comparison: XFS versus ext4
 
+Evidence links below point to private campaign archives and require repository access. Historical commands and recorded paths describe the original runs; see the archive README for replay setup.
+
 On 2026-09-07, XFS used approximately 96% less incremental filesystem space
 than ext4 for ten GWZ local clones. Across two rounds each, XFS took 24.79 seconds
 for 20 clones versus ext4's 37.99 seconds (35% less elapsed time). Median clone
 latency was 1.150 seconds versus 1.265 seconds (9% less).
+
+Those timings were measured on a debug build and are superseded. The same
+benchmark re-run on the released `gwz 1.0.8` binary reproduced every space
+figure and cut XFS elapsed time by 43.9%, widening the gap to 62.7%. See
+[Release-build verification](#release-build-verification-2026-09-09).
 
 | Measurement | XFS | ext4 |
 | --- | ---: | ---: |
@@ -60,8 +67,8 @@ amplification, merge speed, or raw native XFS partition performance.
 
 ## Evidence and cleanup
 
-[Raw measurements](evidence/fs-comparison-20260907/results.json),
-[exact Pi benchmark script](evidence/fs-comparison-20260907/benchmark.py), and forty
+[Raw measurements](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/filesystem-comparison/runs/fs-comparison-20260907/results.json),
+[exact Pi benchmark script](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/filesystem-comparison/runs/fs-comparison-20260907/benchmark.py), and forty
 per-clone JSON responses are retained alongside this report. The script is a
 record of this run with fixed Pi paths; its output-directory exclusivity prevents
 accidental reruns over existing evidence.
@@ -92,5 +99,67 @@ clone completing in roughly 1.2–1.4 seconds.
 Backing-image growth was 0.297/0.027 MiB on XFS versus 53.734 MiB on ext4;
 the earlier caution about consuming previously allocated image space applies.
 All four disposable images were destroyed after measurement.
-[Single-clone raw results](evidence/fs-single-comparison-20260907/results.json)
+[Single-clone raw results](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/filesystem-comparison/runs/fs-single-comparison-20260907/results.json)
 and the exact script and per-clone responses are retained beside them.
+
+## Release-build verification (2026-09-09)
+
+The 2026-09-07 numbers above were measured on a debug build, which that method
+note flags. On 2026-09-09 the whole benchmark was re-run on the same Pi against
+the released binary: `gwz 1.0.8`, installed from the README one-liner to
+`/home/gianni/.cargo/bin/gwz`, SHA-256
+`4d23cda364cfaa50fdb4c74192d1956f24b5407dd909f49107d1a4856406e729`. Source
+workspace, helper, round order, clone count and timing method were unchanged;
+only the binary path and the output directory differ from the original script.
+
+**The space results reproduce; the timing results do not.** Every space figure
+landed on the published value, and the reflink behaviour was identical — all
+twenty XFS clones reported 3,107 files copied natively and zero ordinarily, all
+twenty ext4 clones the reverse. The elapsed-time figures are superseded: the
+release build is much faster on XFS and barely faster on ext4.
+
+| Measurement | XFS | ext4 |
+| --- | ---: | ---: |
+| Median clone, 20 observations | 0.687 s | 0.811 s |
+| First ten-clone batch | 6.95 s | 18.13 s |
+| Second ten-clone batch | 6.94 s | 19.09 s |
+| Additional filesystem usage, ten clones | 20.50 MiB / 20.50 MiB | 537.15 MiB / 537.19 MiB |
+| Additional backing-image allocation, ten clones | 0.24 MiB / 0.23 MiB | 537.23 MiB / 537.27 MiB |
+
+On the release binary XFS took 13.90 seconds for 20 clones against ext4's 37.21
+seconds, **62.7% less elapsed time** rather than the 35% measured on the debug
+build. Median clone latency was 0.687 s against 0.811 s, 15.3% less. Additional
+filesystem usage was 96.18% less, matching the published 96%.
+
+| Change, debug → release | XFS | ext4 |
+| --- | ---: | ---: |
+| 20-clone elapsed | 24.79 s → 13.90 s (43.9% faster) | 37.99 s → 37.21 s (2.1% faster) |
+| Median clone | 1.150 s → 0.687 s | 1.265 s → 0.811 s |
+
+The asymmetry is the point. A reflink clone moves metadata, so optimizing the
+binary removes most of what it was spending; an ext4 clone writes 46.5 MB per
+invocation, so the same optimization is absorbed by the storage. ext4's median
+improved while its total did not, because its cost has moved into a heavy tail:
+six of twenty ext4 clones exceeded two seconds (worst 7.30 s) against a 0.74 s
+floor, while no XFS clone left the 0.67–0.74 s band. Quote the totals rather
+than the medians for ext4; the median now understates it.
+
+### Why the 0.23 MiB image figure is not the storage cost
+
+The original report cautioned against reading the backing-image delta as the
+space ten clones need. A separate flush-sensitivity round confirms that caution
+and supplies the mechanism. Measuring XFS image allocation immediately after the
+tenth clone gave 0.23 MiB; an explicit `sync` left it at 0.23 MiB; fifteen
+seconds later it was **21.53 MiB**. ext4 read 537.20 MiB at all three points.
+
+XFS therefore defers this allocation past an explicit flush, so the method note
+above — that helper `status` flushes the mounted filesystem and backing image —
+holds for ext4 but not for XFS metadata. The settled XFS figure converges on the
+20.50 MiB guest-filesystem delta, which is the number to quote. Raw values are in
+[flushcheck.json](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/filesystem-comparison/runs/fs-comparison-20260909/flushcheck.json).
+
+Forty per-clone JSON responses, [raw measurements](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/filesystem-comparison/runs/fs-comparison-20260909/results.json),
+the [re-run script](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/filesystem-comparison/runs/fs-comparison-20260909/benchmark.py) and the
+[flush-check script](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/filesystem-comparison/runs/fs-comparison-20260909/flushcheck.py) are retained.
+Both disposable images were destroyed; final helper status confirmed no image and
+no mount, and the source workspace was again only read.

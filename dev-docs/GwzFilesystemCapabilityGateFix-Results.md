@@ -1,5 +1,7 @@
 # Filesystem capability gate fix — 2026-09-10
 
+Evidence links below point to private campaign archives and require repository access. Historical commands and recorded paths describe the original runs; see the archive README for replay setup.
+
 Windows implementation and validation are complete. No release or installation
 was performed. Existing workspace changes were preserved.
 
@@ -75,5 +77,5 @@ cargo check was run; no local clone or full build was created.
   available but has no discovered Rust toolchain.
 
 Raw logs and the reusable CLI runner are in
-[evidence/capability-gate-20260910](evidence/capability-gate-20260910/).
+[evidence/capability-gate-20260910](https://github.com/owebeeone/gwz-core-evidence/tree/main/campaigns/filesystem-capability/runs/capability-gate-20260910).
 Windows build/source/fixture directories remain on Dabeest for review.

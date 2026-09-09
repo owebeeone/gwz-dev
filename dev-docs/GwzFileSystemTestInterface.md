@@ -1,5 +1,7 @@
 # FileSystem interface and test implementation
 
+Evidence links below point to private campaign archives and require repository access. Historical commands and recorded paths describe the original runs; see the archive README for replay setup.
+
 Status: first memory-backed root-matrix milestone completed, 2026-09-08. The
 filesystem boundary, retained-handle operations, fake Git worktree and both
 root-preservation matrices are implemented; whole-core migration remains open.
@@ -588,7 +590,7 @@ CLIPPY_CONF_DIR="$PWD/scripts/checks/filesystem_lints" \
   cargo clippy --locked --no-deps --lib --tests -- -D warnings
 ```
 
-Focused logs: [filesystem-interface-20260908](evidence/filesystem-interface-20260908/).
+Focused logs: [filesystem-interface-20260908](https://github.com/owebeeone/gwz-core-evidence/tree/main/campaigns/filesystem-interface/runs/filesystem-interface-20260908).
 
 ## Implementation progress — publication and fake-Git slice, 2026-09-08
 

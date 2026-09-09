@@ -1,4 +1,75 @@
-# Current status — 2026-09-08
+# Current debt scope — 2026-09-09, after v1.0.8
+
+Core, CLI and Python v1.0.8 are released; all three release workflows passed.
+The current, file-by-file decision aid is
+[GwzDebtRecoveryScope-2026-09-09.md](GwzDebtRecoveryScope-2026-09-09.md).
+
+The filesystem-name admission defect and its capability-based replacement are
+scoped in [GwzFilesystemCapabilityGateFix.md](GwzFilesystemCapabilityGateFix.md)
+(2026-09-10; implementation pending). This supersedes the historical exception
+that retained the Windows NTFS name gate.
+
+The next documentation/skill usability study is scoped in
+[GwzAgentUsabilityEvaluationPlan.md](GwzAgentUsabilityEvaluationPlan.md):
+full supported CLI/Python coverage, paired with/without-skill trials, independent
+state checks, and bounded local-model runs on Dabeest's E: drive. The sdax handoff
+is received; the plan pins v1.0.8 and specifies a JSON action adapter and proposed
+Windows Sandbox executor. Implementation/qualification remain open; no evaluation
+results are claimed yet.
+
+- Context consistency: **14 production factory calls in 6 files**, plus
+  **146 test/support factory calls in 39 files**. The snapshot also lists
+  64 identified production wrapper callers, 51 indirect test-helper calls and
+  15 test-only compatibility/shared-state constructor calls. Counts overlap by
+  file and are not counts of tests or independent operations.
+- Conditional scope: **108 conditional imports in 58 files** are the simplest
+  Rust batch. The wider declaration inventory is **258 sites in 114 files**;
+  additional expression/field/macro forms require grammar-aware classification.
+  The handwritten C++ benchmark helper has **83 unbraced control-flow bodies**.
+- Test cost: the successful Windows v1.0.8 native main-library pass took
+  **1,386.96 seconds** for 1,828 passing tests and one ignored test. Per-test hot
+  spots and the avoidable portion are not yet established by that release log.
+
+These are snapshot measurements for choosing work, not new count-pin gates.
+This documentation update does not implement any of the remaining migrations.
+
+## New follow-up — explicit conditional scopes (2026-09-09)
+
+**Standing rule adopted now; migration and automated enforcement remain open.**
+See the workspace `AGENTS.md` and global agent instructions. C-style control-flow
+bodies require braces even for one statement. Rust conditional sections must use
+explicit boundaries (`cfg_if!` blocks or enclosing platform modules), rather than
+conditional attributes on individual imports or other unbraced declarations.
+
+Failure: `gwz-core` commit `cfa14b8` ("Introduce operation-owned Git and filesystem
+services") removed `use crate::filesystem::FileSystem;` but left its
+`#[cfg(not(windows))]` attribute. The attribute silently attached to the following
+`use std::ffi::OsStr;` in both
+`src/checked_artifact/capability/pre_catalog/provider/mutation.rs` and
+`src/checked_artifact/capability/pre_catalog/provider/directory_mutation.rs`.
+macOS checks passed; the v1.0.5 Windows build failed. Removing those two orphaned
+attributes enabled the full Windows CLI build and the successful ReFS
+`gwz local clone` smoke test. This is a scope-safety defect in a mechanical edit;
+no merge conflict is required to trigger it.
+
+- [ ] Migrate vulnerable conditional imports/declarations across the GWZ repos
+  into explicit conditional scopes, keeping unconditional imports separate.
+  Apply the same compound-statement rule to handwritten C-style control flow.
+- [ ] Add a fast syntax-aware source/lint check to normal validation and CI.
+  Inspect all source branches without evaluating away disabled configurations;
+  reject conditional attributes on unbraced imports/declarations, including
+  equivalent `cfg_attr` forms. Reuse existing language lints where suitable.
+  Report paths and lines, not pinned counts of allowed sites.
+- [ ] Cover the actual failure with a tiny fixture: deleting a conditional
+  import must leave an empty bounded section or be rejected, never hide the next
+  unconditional import. Cover accepted bounded forms, multiline attributes,
+  comments/strings, and unbraced C-style control-flow bodies. These are source
+  checks, not compiler-mutation suites or temporary Git-repository tests.
+- [ ] Validate the migrated Rust code with targeted native and Windows compile
+  checks. Keep this follow-up separate from the already tested two-line fix;
+  adopting the rule does not mean the existing codebase is fully migrated.
+
+# Historical implementation checkpoint — 2026-09-08
 
 Core v1.0.4, CLI v1.0.4 and Python v1.0.3 have been released; Python's
 corresponding core v1.0.3 tag exists. The workspace CLI rerun also succeeded.
@@ -10,12 +81,12 @@ the shared filesystem interface. Both fake-only V1 lease returns are removed.
 See [filesystem progress](GwzFileSystemTestInterface.md#implementation-progress--catalog-and-durable-publication-2026-09-08)
 for validation and the remaining whole-core scope.
 
-Next priority, ahead of further Git fixture migration: review and implement the
-first slice of the [operation context plan](GwzOperationContextPlan.md). This
-replaces hidden resource construction with explicit ownership. Remaining direct
-core I/O callers, further Git fixture migration, encrypted SSH-agent identity
-selection and deferred file splitting are still open; this batch does not close
-those items.
+The first slice of the [operation context plan](GwzOperationContextPlan.md) and
+subsequent operation-entry composition have since landed. Remaining wrapper and
+fixture closure is enumerated in the current scope snapshot above. Further
+native-I/O/test-fixture migration, encrypted SSH-agent identity selection and
+deferred file splitting remain separate open items; the release does not close
+them.
 
 Deferred local-family merge follow-up: `gwz merge --remote <lane> --dry-run`
 currently refuses explicitly as unsupported. A future implementation must provide

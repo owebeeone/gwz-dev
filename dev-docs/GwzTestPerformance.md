@@ -1,5 +1,7 @@
 # Core test performance — 2026-09-07
 
+Evidence links below point to private campaign archives and require repository access. Historical commands and recorded paths describe the original runs; see the archive README for replay setup.
+
 This is a diagnostic measurement, not a new release gate. No count pins, test
 inventory comparison or source instrumentation was added. v1.0.0 remains aborted.
 
@@ -61,9 +63,9 @@ Root-matrix stacks included fixture construction, real Git operations, journal
 serialization and `File::sync_all`. This is a short sample, not a whole-run CPU
 percentage attribution. Sampling adds some overhead to the local run.
 
-Evidence: [CI timing excerpts](evidence/test-performance-20260907/ci-timing-excerpts.json)
-[stack summary](evidence/test-performance-20260907/stack-sample-summary.txt),
-and [tail stack summary](evidence/test-performance-20260907/tail-stack-summary.txt).
+Evidence: [CI timing excerpts](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/test-performance/runs/test-performance-20260907/ci-timing-excerpts.json)
+[stack summary](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/test-performance/runs/test-performance-20260907/stack-sample-summary.txt),
+and [tail stack summary](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/test-performance/runs/test-performance-20260907/tail-stack-summary.txt).
 
 ## Local measured results
 
@@ -89,8 +91,8 @@ These test durations overlap because the runner executes test functions in
 parallel. Do not add them to calculate wall-clock time. The root fault matrix
 alone took 11m 36s, despite the typical test taking a fraction of a second.
 
-Full per-test durations: [CSV](evidence/test-performance-20260907/macos-test-times.csv).
-Run metadata and top tests: [JSON](evidence/test-performance-20260907/macos-summary.json).
+Full per-test durations: [CSV](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/test-performance/runs/test-performance-20260907/macos-test-times.csv).
+Run metadata and top tests: [JSON](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/test-performance/runs/test-performance-20260907/macos-summary.json).
 
 ## Where to make the next change
 
@@ -332,7 +334,7 @@ The next speed work should target:
 No production source, test behavior, or durability semantics were changed by
 this profiling task. Full results, compressed raw stacks, the summarizer and
 methodology are in
-[evidence/test-performance-20260908-profile](evidence/test-performance-20260908-profile/README.md).
+[evidence/test-performance-20260908-profile](https://github.com/owebeeone/gwz-core-evidence/blob/main/campaigns/test-performance/runs/test-performance-20260908-profile/README.md).
 
 The proposed next implementation is documented in
 [FileSystem interface and test implementation](GwzFileSystemTestInterface.md).

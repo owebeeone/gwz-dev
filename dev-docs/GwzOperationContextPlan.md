@@ -1,8 +1,13 @@
 # GWZ operation context
 
-Status: the V1 merge lifecycle and catalog acquisition now carry owned services
-through their complete call chains. Compatibility factories remain for the
-other workspace operation families and older test fixtures (steps 4–5).
+Status as of 2026-09-09: V1 merge lifecycle and catalog acquisition carry owned
+services; several other workspace entry points now share their backend's
+services too. Remaining downstream wrappers and older fixtures still need
+closure. The exact current scope is in
+[the post-v1.0.8 inventory](GwzDebtRecoveryScope-2026-09-09.md): 14 production
+filesystem-factory calls in six files and 146 test/support factory calls in
+39 files, plus indirect helper/constructor callers. Earlier dated sections below
+are implementation history, not the current file list.
 
 ## Decision
 
@@ -251,12 +256,20 @@ The build exhausted local disk during this work. `cargo clean -p gwz-core`
 removed rebuildable package outputs, leaving dependencies available; subsequent
 verification disabled incremental compilation to keep its cache from regrowing.
 
-Still outside this completed call chain:
+Remaining scope, corrected against the 2026-09-09 checkout:
 
-- Workspace bootstrap and the public branch/commit/stage/repo/pull/stash families
-  still enter through compatibility resource construction.
-- Public artifact read/write and canonical record-discovery wrappers still
-  construct their filesystem for callers that do not yet supply one.
-- Older fixture helpers and factory contracts still use the shared fake registry.
-  Those callers must move to owned worlds before deleting `shared()` and the
-  compatibility factories. The complete core-wide migration is not yet finished.
+- Several bootstrap/branch/commit/stage/repo/stash/materialize entry points now
+  obtain `OperationServices::for_merge(backend)`. Do not redo that composition.
+  Some downstream calls still use ambient wrappers, so entry-point conversion
+  alone is not proof of a completely closed call chain.
+- Production factory calls remain in `src/artifact/{mod,conf_integrity}.rs`,
+  `src/durable_fs.rs`, `src/workspace_ops/handle_create_repo.rs`,
+  `src/workspace_ops/merge/record_wire/location.rs`, and
+  `src/workspace_ops/sync_workspace_boundary.rs`. The inventory names each
+  function and its identified callers.
+- Older fixture helpers and factory contracts still use shared fake state.
+  Migrate their arrangement, observations, reopen and cleanup to the same owned
+  world before deleting `shared()` and the compatibility factories.
+- `OperationServices::existing()` and `native()` are already test-only.
+  Preserve deliberate native tests and native adapter composition; eliminate
+  hidden compatibility lookups, not the real implementations or backend matrix.
