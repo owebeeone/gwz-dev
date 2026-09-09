@@ -1,6 +1,6 @@
 # Agent feedback fixes: delivery checkpoint
 
-Implementation is integrated; final regression checks and release are pending.
+Implementation and scoped regression checks are complete; release is starting.
 This is not a release completion record.
 Scope: [the fix plan](GwzAgentFeedbackFixPlan-2026-09-10.md).
 The operator authorized integration and the next patch release after validation.
@@ -121,6 +121,14 @@ reruns. The last local-family fixture now commits its source before cloning;
 merge assertions verify actual commits and import refs rather than obsolete
 message wording. Unmaterialized locked members report Unknown with their
 materialization hint retained.
+
+Final Windows delta rebuilt both drivers against core `470aab2`: Python parity
+passed 8/8 in 8.23 seconds and Windows routing passed 3/3. Exported CLI production
+source remained `0555d340`; later local CLI commits change only test fixtures.
+Python was `278b959`. Raw outputs and failed attempts are retained in the private
+`gwz-core-evidence/campaigns/agent-feedback-fixes/runs/2026-09-10-release-validation/`
+archive. No full suite was repeated after unrelated test-only corrections;
+targeted reruns cover each observed failure and the final diff/log change.
 
 Wire compatibility here means retaining established field numbers and enum
 values. Taut optional fields are nullable but still required map keys; an old
