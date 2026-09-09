@@ -1,9 +1,9 @@
 # Fix plan: paths and outcome reporting from agent trials
 
-Status: release fix scope; implementation is in progress across agents, but this
-plan does not certify completion or validation. Date: 2026-09-10.
-Code findings below describe the inspected defect baseline; reconcile with
-concurrent fixes before editing.
+Status: implementation integrated, final validation and patch release in progress.
+Date: 2026-09-10. Current commits, test results and limitations are recorded in
+[the delivery report](GwzAgentFeedbackDelivery-2026-09-10.md).
+Code findings below describe the original defect baseline, not outstanding work.
 
 The JSON-first trial completed 56 episodes without improving success rates.
 Its actionable findings are product contracts and diagnostics, not a need to

@@ -1,6 +1,7 @@
 # Agent feedback fixes: delivery checkpoint
 
-Implementation is in progress; this is not a release completion record.
+Implementation is integrated; final regression checks and release are pending.
+This is not a release completion record.
 Scope: [the fix plan](GwzAgentFeedbackFixPlan-2026-09-10.md).
 The operator authorized integration and the next patch release after validation.
 
@@ -30,6 +31,12 @@ copy primitive, not an independent extent-allocation measurement. Free space
 after the four clones was about 26.8 GiB. Build output is not evidence to commit.
 Copied virtual-environment launchers and editable installs may retain source
 paths: agents must use lane-local Python imports and rebuild their own binding.
+
+The integrated lanes remain on disk. An unforced disposal of `fixhelp` refused
+because copied ignored files, stashes and protected reflog history were not
+certified disposable/preserved. Nothing was removed or force-waived. This is
+cleanup follow-up, not missing integration; leave the unrelated `fsbench` lane
+and earlier detached `svc*` directories alone.
 
 ## Integration and release
 
@@ -79,9 +86,47 @@ Central additions:
   source-comment conflict was staged. The private evidence archive retains the
   before/after status and read-only diagnostic.
 
-Windows prefix normalization is being corrected before native validation:
-canonicalized existing paths can gain a verbatim prefix that raw absolute
-pathspecs lack. No claim of Windows path-matrix completion is made yet.
+Windows path normalization now treats DOS and verbatim DOS representations
+consistently without canonicalizing deleted operands. Native Windows validation
+on Dabeest passed the diagnostic case, three path-routing cases and two generated
+metadata merge cases against core `90ffa104`, CLI `0555d340`, Python `7b5722c5`.
+The Python parity matrix passed 8/8 in 5.95 seconds after rebuilding the native
+binding against that same source snapshot. Its later test-only overlay uses
+Python `e83a507` plus JSON decoding before comparing Windows diagnostic paths.
+Fixtures and reused build caches are on D:, outside the archive.
+
+Core `90ffa104` also repairs generated metadata conflicts during lane integration:
+when manifests agree and every conflict is in generated lock/marker files, keep
+the receiving metadata while retaining the ordinary merged tree. A real complete
+lane merge then succeeded with its root documentation changes preserved. Ordinary
+file conflicts and manifest disagreements retain normal conflict handling.
+
+Broader testing exposed stale test constructors/expectations and an HTTP fixture
+that could reset a socket after a partial request read. Core `a88ed90` updates
+those fixtures and removes a brittle source-text/count guard; behavioral filter
+tests remain. Python `e83a507` updates optional protocol constructor fields and
+keeps the original wire compatibility baseline by projecting out the two known
+additive extensions. Compiler-mutation tests have not been run.
+
+The complete Mac Python suite passed 816 tests in 86.02 seconds. Core `470aab2`
+then repairs physical path aliases in diff/log classification and routing:
+existing root/caller bases resolve to physical locations, while operands remain
+lexical so deleted paths still work. CLI diff integration passed 26/26; Python
+native diff/log and driver parity passed another 55 cases in 34.82 seconds.
+CLI library tests passed 183/183. Core's first broader pass had four failures;
+the corrected fixture/filter subset passed 10/10, the renamed unmaterialized
+status test passed separately, and all 58 core integration tests passed.
+All 75 CLI integration cases passed across the original run and targeted
+reruns. The last local-family fixture now commits its source before cloning;
+merge assertions verify actual commits and import refs rather than obsolete
+message wording. Unmaterialized locked members report Unknown with their
+materialization hint retained.
+
+Wire compatibility here means retaining established field numbers and enum
+values. Taut optional fields are nullable but still required map keys; an old
+binary request omitting new keys is not supported. The original compatibility
+baseline is unchanged. Drivers/core ship together; the direct Rust legacy entry
+points require an explicit absolute start. See the invocation path contract.
 
 The actual scripts prepare/tag/push but do not create GitHub releases. Python's
 script additionally requires the same-version CLI tag to be remotely visible.

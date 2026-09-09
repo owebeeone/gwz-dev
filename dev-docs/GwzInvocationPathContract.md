@@ -22,6 +22,14 @@ relative workspace root or operand is qualified at that adapter boundary; no
 core path resolver reads ambient cwd. A serialized request with an invocation
 context rejects a relative workspace root instead of applying this legacy rule.
 
+The CBOR schema emits every declared map key. Its `optional` fields are nullable
+keys, rather than keys that may be omitted: `RequestMeta.invocation` and
+`MemberResponse.lock_difference_reasons` are encoded as `null` when absent.
+Cross-version binary requests that omit a newly declared key are not supported;
+the core, CLI, and Python drivers release as an aligned protocol set. Legacy
+Rust wrappers instead supply an explicit absolute context before they enter the
+current request boundary.
+
 An executor on another host or in a container must only serialize a
 `caller_cwd` that exists in *its* accessible filesystem namespace. A desktop
 client path does not become meaningful merely by sending it to a remote daemon.
