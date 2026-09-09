@@ -71,9 +71,10 @@ Passed focused tests:
 - `workspace_ops::tests::g02::local_git_sources_bind_to_the_serialized_caller_but_remotes_do_not`
 - `tests::g09::serialized_context_keeps_an_outside_caller_distinct_from_workspace_root`
 
-The broad `cargo test invocation --lib` filter was not used as release evidence:
-it also selected two unrelated tests, both of which failed because their fixture
-workspace repository was missing:
+The broad `cargo test invocation --lib` filter initially exposed two lifecycle
+tests whose default fixture backend omitted the required repository. Rerunning
+them with `GWZ_TEST_GIT=real GWZ_TEST_FS=real` passed, confirming no product
+change is needed:
 
 - `workspace_ops::merge::v1_lifecycle::service::tests::preparation_failure_halts_and_returns_without_same_invocation_retry`
 - `workspace_ops::merge::v1_lifecycle::service::tests::failed_owned_action_is_not_executed_twice_in_one_invocation`
