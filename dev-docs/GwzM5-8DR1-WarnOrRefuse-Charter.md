@@ -1,3 +1,8 @@
+> Superseded 2026-09-10: the Windows `require_ntfs` exception and all
+> instructions below to retain it are historical.
+> [Filesystem capability admission fix](GwzFilesystemCapabilityGateFix.md)
+> requires capability flags and operation probes, independently of names.
+
 # DR-1 ship (1) — warn-or-refuse: crash recovery as a capability, not a gate
 
 **Status:** CHARTERED 2026-09-03 on the operator's instruction of the same date
@@ -58,7 +63,7 @@ it echoes the message — a design element of this charter (§3.5).
   included, onto the warning path. Network stays a warning REASON, never a
   name denylist.
 - **Deviations accepted for ship (1):** continue re-decides on the same
-  volume; Windows keeps `require_ntfs`; no per-attempt record field; no
+  volume; Windows kept `require_ntfs` at that time (superseded 2026-09-10); no per-attempt record field; no
   cross-invocation throttle (§7, §8 items 1-3 closed).
 - **Protocol as stated in §3.7:** request flag, response `crash_recovery`,
   `EventKind.diagnostic`. No version bump. No catalog or v1 record format
@@ -216,10 +221,12 @@ after this step: ext4, xfs, f2fs and any filesystem that answers
 `FS_IOC_GETFSUUID` with a nonzero 16-byte UUID and `name_to_handle_at`;
 btrfs (`ENOTTY`), pre-6.9 kernels, tmpfs/ramfs, and every network mount are
 `Unsupported`. macOS: unchanged (already capability-based). Windows:
-`require_ntfs` STAYS in ship (1) — its capability-flag replacement
-(`GetVolumeInformationByHandleW` flags `& FILE_SUPPORTS_OPEN_BY_FILE_ID`,
-which NTFS and ReFS set and FAT/exFAT do not) is named here as the follow-up
-and is not built blind from a host that cannot run the Windows matrix.
+the 2026-09-10 amendment replaces `require_ntfs` with
+`GetVolumeInformationByHandleW` flags `& FILE_SUPPORTS_OPEN_BY_FILE_ID`,
+plus successful nonzero 128-bit identity, local volume GUID and required
+case/handle probes. Names are diagnostics only; missing names do not refuse.
+The original ship (1) name-gate exception is historical and no longer applies.
+See GwzFilesystemCapabilityGateFix-Results.md for D:/E: native validation.
 
 ### 3.3 Volume description — name, locality, volatility
 
@@ -378,7 +385,8 @@ before any write. R0-L green on both architectures. No tag.
 
 1. "Uses what that start opened" is implemented as "decides the same way on
    the same volume" (§3.1); the literal rule needs a v1 record field.
-2. Windows keeps `require_ntfs` (§3.2) for one more step.
+2. Historical: Windows kept `require_ntfs` in ship (1); superseded by the
+   capability admission amendment on 2026-09-10 (§3.2).
 3. Protocol additions per the operator's later clarification (§0, §3.7).
 
 ## 8. Open decisions (one line each; defaults stated, none blocking)
@@ -387,7 +395,7 @@ before any write. R0-L green on both architectures. No tag.
    with dual, ~200 LOC) — default: not in ship (1).
 2. Cross-invocation throttling of the warning — default: none.
 3. Windows `FILE_SUPPORTS_OPEN_BY_FILE_ID` replacement of `require_ntfs` —
-   default: the next Windows-verified step.
+   implemented and Windows-validated 2026-09-10; see the fix results.
 4. An xfs row in R0-L — default: yes if `xfsprogs` installs on the runner,
    else deferred with a note.
 

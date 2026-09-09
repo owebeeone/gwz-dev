@@ -1,0 +1,70 @@
+   Compiling gwz-core v1.0.8 (D:\gwz-tests\capability-gate\source\gwz-core)
+warning: unused import: `native_name_charge_for_test`
+  --> src\checked_artifact\bootstrap\runtime\catalog_lease.rs:20:42
+   |
+20 |     MAX_CATALOG_ALIAS_PARENT_ENTRIES_V1, native_name_charge_for_test,
+   |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `RuntimeBootstrapFault` and `run_next_at`
+ --> src\checked_artifact\bootstrap\runtime\catalog_lease\tests.rs:5:27
+  |
+5 | use super::super::fault::{RuntimeBootstrapFault, run_next_at};
+  |                           ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^
+
+warning: unused imports: `RuntimeBootstrapFault` and `run_next_at`
+ --> src\checked_artifact\bootstrap\runtime\tests.rs:5:20
+  |
+5 | use super::fault::{RuntimeBootstrapFault, run_next_at};
+  |                    ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^
+
+warning: unused import: `super::*`
+ --> src\checked_artifact\bootstrap\runtime\tests.rs:6:5
+  |
+6 | use super::*;
+  |     ^^^^^^^^
+
+warning: unused import: `crate::filesystem::FileSystem`
+   --> src\checked_artifact\bootstrap\runtime\catalog_lease\tests\bounds.rs:210:9
+    |
+210 |     use crate::filesystem::FileSystem;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> src\checked_artifact\capability\pre_catalog\provider\tests_leaf_observation.rs:536:9
+    |
+536 |     let mut cases: Vec<(&str, Swap, LeafOther)> =
+    |         ----^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> src\checked_artifact\capability\pre_catalog\provider\tests_leaf_observation.rs:667:9
+    |
+667 |     let mut cases = vec![("a-directory-v1", LeafOther::WrongKind)];
+    |         ----^^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: function `repository_bytes` is never used
+    --> src\operation\commit_log\tests.rs:2368:4
+     |
+2368 | fn repository_bytes(git_dir: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
+     |    ^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `gwz-core` (lib test) generated 8 warnings (run `cargo fix --lib -p gwz-core --tests` to apply 6 suggestions)
+    Finished `test` profile [optimized] target(s) in 40.60s
+     Running unittests src\lib.rs (D:/gwz-tests/capability-gate/target\debug\deps\gwz_core-efbededbb1d84c64.exe)
+
+running 3 tests
+test filesystem::native::facts::windows::tests::a_unc_final_path_classifies_remote_and_a_volume_guid_path_does_not ... ok
+test filesystem::native::facts::windows::tests::capability_gate_requires_flag_and_successful_identity_probe ... ok
+test filesystem::native::facts::windows::tests::native_identity_survives_reopen_and_rename_but_distinguishes_replacement ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 1940 filtered out; finished in 0.00s
+

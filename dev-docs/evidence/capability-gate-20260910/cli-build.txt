@@ -1,0 +1,149 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   D:\gwz-tests\capability-gate\source\gwz-cli\Cargo.toml
+workspace: D:\gwz-tests\capability-gate\source\Cargo.toml
+     Locking 1 package to latest compatible version
+    Updating gwz-core v1.0.4 (D:\gwz-tests\capability-gate\source\gwz-core) -> v1.0.8
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.24
+   Compiling cfg-if v1.0.4
+   Compiling getrandom v0.4.3
+   Compiling stable_deref_trait v1.2.1
+   Compiling windows-link v0.2.1
+   Compiling find-msvc-tools v0.1.11
+   Compiling version_check v0.9.5
+   Compiling shlex v2.0.1
+   Compiling pkg-config v0.3.34
+   Compiling typenum v1.20.1
+   Compiling vcpkg v0.2.15
+   Compiling windows_x86_64_msvc v0.52.6
+   Compiling litemap v0.8.3
+   Compiling writeable v0.6.4
+   Compiling icu_properties_data v2.3.0
+   Compiling icu_normalizer_data v2.3.0
+   Compiling windows_x86_64_msvc v0.53.1
+   Compiling libc v0.2.189
+   Compiling utf8_iter v1.0.4
+   Compiling gwz-repo-contract v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\repo-contract)
+   Compiling smallvec v1.15.2
+   Compiling io-lifetimes v3.0.1
+   Compiling windows-sys v0.61.2
+   Compiling cpufeatures v0.2.17
+   Compiling serde_core v1.0.229
+   Compiling bitflags v2.13.1
+   Compiling io-lifetimes v2.0.4
+   Compiling gwz-family-model v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\family-model)
+   Compiling io-extras v0.19.0
+   Compiling cap-primitives v4.0.3
+   Compiling autocfg v1.5.1
+   Compiling percent-encoding v2.3.2
+   Compiling serde v1.0.229
+   Compiling generic-array v0.14.7
+   Compiling memchr v2.8.3
+   Compiling foldhash v0.2.0
+   Compiling once_cell_polyfill v1.70.2
+   Compiling ambient-authority v0.0.2
+   Compiling ipnet v2.12.1
+   Compiling hashbrown v0.17.1
+   Compiling gwz-family-store-contract v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\family-store-contract)
+   Compiling num-traits v0.2.19
+   Compiling form_urlencoded v1.2.2
+   Compiling windows-targets v0.53.5
+   Compiling anstyle v1.0.14
+   Compiling itoa v1.0.18
+   Compiling utf8parse v0.2.2
+   Compiling maybe-owned v0.3.4
+   Compiling cap-std v4.0.3
+   Compiling equivalent v1.0.2
+   Compiling aho-corasick v1.1.5
+   Compiling hashbrown v0.16.1
+   Compiling anstyle-query v1.1.5
+   Compiling gwz-copy-contract v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\copy-contract)
+   Compiling windows-targets v0.52.6
+   Compiling jobserver v0.1.35
+   Compiling cap-fs-ext v4.0.3
+   Compiling zmij v1.0.23
+   Compiling unsafe-libyaml v0.2.11
+   Compiling log v0.4.34
+   Compiling windows-sys v0.60.2
+   Compiling windows-sys v0.59.0
+   Compiling indexmap v2.14.1
+   Compiling anstyle-parse v1.0.0
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling getrandom v0.3.4
+   Compiling ryu v1.0.23
+   Compiling anstyle-wincon v3.0.11
+   Compiling colorchoice v1.0.5
+   Compiling cc v1.4.4
+   Compiling regex-syntax v0.8.11
+   Compiling tinyvec_macros v0.1.1
+   Compiling terminal_size v0.4.4
+   Compiling hashlink v0.11.1
+   Compiling gwz-work-detector v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\work-detector)
+   Compiling heck v0.5.0
+   Compiling once_cell v1.21.4
+   Compiling clap_lex v1.1.0
+   Compiling syn v3.0.4
+   Compiling syn v2.0.119
+   Compiling anstream v1.0.0
+   Compiling arraydeque v0.5.1
+   Compiling strsim v0.11.1
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling fs-set-times v0.20.3
+   Compiling winx v0.36.4
+   Compiling tinyvec v1.12.0
+   Compiling serde_json v1.0.151
+   Compiling fastrand v2.5.0
+   Compiling libz-sys v1.1.29
+   Compiling libssh2-sys v0.3.2
+   Compiling libgit2-sys v0.18.8+1.9.7
+   Compiling regex-automata v0.4.18
+   Compiling chrono v0.4.45
+   Compiling yaml-rust2 v0.11.1
+   Compiling gwz-local-disposal v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\local-disposal)
+   Compiling gwz-workspace-install v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\workspace-install)
+   Compiling gwz-refcopy v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\refcopy)
+   Compiling clap_builder v4.6.6
+   Compiling gwz-local-import v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\local-import)
+   Compiling gwz-history-check v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\history-check)
+   Compiling gwz-repo-factory v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\repo-factory)
+   Compiling digest v0.10.7
+   Compiling tempfile v3.27.0
+   Compiling taut-shape v0.9.1 (D:\gwz-tests\capability-gate\source\taut-shape-rs\crates\taut-shape)
+   Compiling encode_unicode v1.0.0
+   Compiling unicode-width v0.2.2
+   Compiling sha2 v0.10.9
+   Compiling unicode-normalization v0.1.25
+   Compiling sha1 v0.10.7
+   Compiling synstructure v0.13.2
+   Compiling console v0.16.4
+   Compiling gwz-core v1.0.8 (D:\gwz-tests\capability-gate\source\gwz-core)
+   Compiling gwz v0.2.0-dev (D:\gwz-tests\capability-gate\source\gwz-cli)
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling serde_derive v1.0.229
+   Compiling clap_derive v4.6.4
+   Compiling regex v1.13.1
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling clap v4.6.6
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.3
+   Compiling serde_yaml v0.9.34+deprecated
+   Compiling gwz-family-store v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\family-store)
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling tinystr v0.8.4
+   Compiling icu_locale_core v2.3.0
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling git2 v0.21.0
+   Compiling gwz-repo-inspect v0.1.0 (D:\gwz-tests\capability-gate\source\gwz-core\crates\repo-inspect)
+    Finished `dev` profile [unoptimized] target(s) in 41.38s

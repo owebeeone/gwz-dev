@@ -1,0 +1,8 @@
+
+running 3 tests
+test filesystem::native::facts::windows::tests::a_unc_final_path_classifies_remote_and_a_volume_guid_path_does_not ... ok
+test filesystem::native::facts::windows::tests::capability_gate_requires_flag_and_successful_identity_probe ... ok
+test filesystem::native::facts::windows::tests::native_identity_survives_reopen_and_rename_but_distinguishes_replacement ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 1940 filtered out; finished in 0.00s
+

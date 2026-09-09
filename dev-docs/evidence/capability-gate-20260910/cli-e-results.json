@@ -1,0 +1,676 @@
+[
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+      "init"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+      "--target",
+      "@root",
+      "add",
+      "."
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+      "--target",
+      "@root",
+      "commit",
+      "-m",
+      "fixture baseline"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "code": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+      "--target",
+      "@root",
+      "branch",
+      "--create",
+      "fixture-feature",
+      "--switch"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Switched fixture-feature 59e6794c2e496d7d104a8fe030cf43d981e56f03\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+      "--target",
+      "@root",
+      "add",
+      "."
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+      "--target",
+      "@root",
+      "commit",
+      "-m",
+      "fixture feature"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "git",
+      "switch",
+      "main"
+    ],
+    "code": 0,
+    "stdout": "",
+    "stderr": "Switched to branch 'main'\n"
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "code": 0,
+    "stdout": "59e6794c2e496d7d104a8fe030cf43d981e56f03\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+      "--json",
+      "--target",
+      "@root",
+      "merge",
+      "fixture-feature",
+      "--no-ff",
+      "--filesystem-strict"
+    ],
+    "code": 0,
+    "stdout": "{\"branch_repos\":null,\"errors\":[],\"kind\":\"response\",\"members\":[],\"merge\":{\"crash_recovery\":{\"filesystem\":null,\"gap\":null,\"handles_ok\":null,\"supported\":true},\"merge_id\":\"merge_op_8056_1788964590990_0001\",\"open\":false,\"operation_drift\":[],\"participant_counts\":{\"aborted\":0,\"conflicted\":0,\"continued\":0,\"failed\":0,\"fast_forwarded\":0,\"merged\":1,\"planned\":0,\"rolled_back\":0,\"total\":1,\"unattempted\":0,\"up_to_date\":0},\"preservation\":null,\"publication_step\":\"Complete\",\"record\":{\"acceptance\":{\"kind\":\"SupportedPersisted\",\"legacy_complete\":null,\"legacy_evidence\":null,\"legacy_source\":null,\"missing_gaps\":[],\"supported_persisted\":{\"kind\":\"V1\",\"v1\":{\"lock_sha256\":\"131632712db5ceb885de31b87eeb2622cc63ea673611b463d4d0325ada6c531e\",\"lock_yaml\":\"schema: gwz.lock/v0\\nworkspace_id: ws_default\\nmanifest_schema: gwz.workspace/v0\\nmembers: {}\\n\",\"members\":[],\"metadata_base\":{\"lock_sha256\":\"131632712db5ceb885de31b87eeb2622cc63ea673611b463d4d0325ada6c531e\",\"lock_yaml\":\"schema: gwz.lock/v0\\nworkspace_id: ws_default\\nmanifest_schema: gwz.workspace/v0\\nmembers: {}\\n\",\"manifest_sha256\":\"6672304ac7bf25f05ce58df73be2c47fc02187b9e3e5a47b15cb893e34e4d3fb\",\"manifest_yaml\":\"# Machine-managed by gwz. Hand edits to gwz.conf/ are detected and refused.\\n# Structural changes: `gwz repo <add|clone|create|detach|attach|sync>`.\\n# Already edited? Revert it, or `gwz init --update --force` to accept this state.\\nschema: gwz.workspace/v0\\nworkspace:\\n  id: ws_default\\nmembers: []\\n\",\"source\":\"SelectedRootResult\",\"source_commit\":\"85736c9da55e2061a72ff28565296a15e5ec7b84\"},\"operation_baseline_lock_sha256\":\"131632712db5ceb885de31b87eeb2622cc63ea673611b463d4d0325ada6c531e\",\"root\":{\"commit\":\"85736c9da55e2061a72ff28565296a15e5ec7b84\",\"kind\":\"BornAttached\",\"lock_commit_sha256\":\"131632712db5ceb885de31b87eeb2622cc63ea673611b463d4d0325ada6c531e\",\"lock_worktree_sha256\":\"131632712db5ceb885de31b87eeb2622cc63ea673611b463d4d0325ada6c531e\",\"manifest_commit_sha256\":\"6672304ac7bf25f05ce58df73be2c47fc02187b9e3e5a47b15cb893e34e4d3fb\",\"manifest_worktree_sha256\":\"6672304ac7bf25f05ce58df73be2c47fc02187b9e3e5a47b15cb893e34e4d3fb\",\"publication_branch\":\"main\",\"symbolic_branch\":\"main\"}}}},\"archived\":true,\"recovery\":null,\"source_version\":\"V1\",\"terminal_outcome\":\"Completed\"},\"repos\":[{\"abort_eligible\":null,\"before_commit\":\"59e6794c2e496d7d104a8fe030cf43d981e56f03\",\"conflict_paths\":[],\"continue_eligible\":null,\"drift\":[],\"error\":null,\"live_commit\":\"85736c9da55e2061a72ff28565296a15e5ec7b84\",\"path\":\".\",\"pending_action\":null,\"predicted\":\"FastForward\",\"prediction_complete\":true,\"resulting_commit\":\"85736c9da55e2061a72ff28565296a15e5ec7b84\",\"source_commit\":\"25bec90b977a6aa3e5e71ba104667da23046ae83\",\"source_ref\":\"fixture-feature\",\"state\":\"Merged\",\"target_branch\":\"main\",\"target_id\":\"@root\",\"target_kind\":\"Root\"}],\"state\":\"Completed\"},\"meta\":{\"action\":\"Merge\",\"aggregate_status\":\"Ok\",\"message\":null,\"operation_id\":\"op_8056_1788964590990\",\"request_id\":\"req_8056_1788964590990\",\"schema_version\":\"gwz.protocol/v0\"},\"stash_bundles\":null,\"workspace_git_status\":null}\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "code": 0,
+    "stdout": "b95f5477290e07955758970ca069bcca3f3b0496\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "git",
+      "rev-list",
+      "--min-parents=2",
+      "59e6794c2e496d7d104a8fe030cf43d981e56f03..HEAD"
+    ],
+    "code": 0,
+    "stdout": "85736c9da55e2061a72ff28565296a15e5ec7b84\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "git",
+      "merge-base",
+      "--is-ancestor",
+      "fixture-feature",
+      "HEAD"
+    ],
+    "code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\clean",
+      "status"
+    ],
+    "code": 0,
+    "stdout": "On branch main\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "init"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--target",
+      "@root",
+      "add",
+      "."
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--target",
+      "@root",
+      "commit",
+      "-m",
+      "fixture baseline"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "code": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--target",
+      "@root",
+      "branch",
+      "--create",
+      "fixture-feature",
+      "--switch"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Switched fixture-feature 60eb8ac2652d90e66b09d918258bdd6f35467e4c\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--target",
+      "@root",
+      "add",
+      "."
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--target",
+      "@root",
+      "commit",
+      "-m",
+      "fixture feature"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "git",
+      "switch",
+      "main"
+    ],
+    "code": 0,
+    "stdout": "",
+    "stderr": "Switched to branch 'main'\n"
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--target",
+      "@root",
+      "add",
+      "."
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--target",
+      "@root",
+      "commit",
+      "-m",
+      "fixture main"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "code": 0,
+    "stdout": "a4c00a62c4321cdda0ffeecf75dd2ce725dca451\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--json",
+      "--target",
+      "@root",
+      "merge",
+      "fixture-feature",
+      "--no-ff",
+      "--filesystem-strict"
+    ],
+    "code": 1,
+    "stdout": "{\"branch_repos\":null,\"errors\":[],\"kind\":\"response\",\"members\":[],\"merge\":{\"crash_recovery\":{\"filesystem\":null,\"gap\":null,\"handles_ok\":null,\"supported\":true},\"merge_id\":\"merge_op_12080_1788964592452_0001\",\"open\":true,\"operation_drift\":[],\"participant_counts\":{\"aborted\":0,\"conflicted\":1,\"continued\":0,\"failed\":0,\"fast_forwarded\":0,\"merged\":0,\"planned\":0,\"rolled_back\":0,\"total\":1,\"unattempted\":0,\"up_to_date\":0},\"preservation\":null,\"publication_step\":null,\"record\":{\"acceptance\":null,\"archived\":false,\"recovery\":null,\"source_version\":\"V1\",\"terminal_outcome\":null},\"repos\":[{\"abort_eligible\":true,\"before_commit\":\"a4c00a62c4321cdda0ffeecf75dd2ce725dca451\",\"conflict_paths\":[\"fixture.txt\"],\"continue_eligible\":false,\"drift\":[],\"error\":null,\"live_commit\":\"a4c00a62c4321cdda0ffeecf75dd2ce725dca451\",\"path\":\".\",\"pending_action\":null,\"predicted\":\"TrueMerge\",\"prediction_complete\":false,\"resulting_commit\":null,\"source_commit\":\"cecadbe515b43287b8a594076bc5d2b84e8f2b08\",\"source_ref\":\"fixture-feature\",\"state\":\"Conflicted\",\"target_branch\":\"main\",\"target_id\":\"@root\",\"target_kind\":\"Root\"}],\"state\":\"AwaitingResolution\"},\"meta\":{\"action\":\"Merge\",\"aggregate_status\":\"Conflicted\",\"message\":null,\"operation_id\":\"op_12080_1788964592452\",\"request_id\":\"req_12080_1788964592452\",\"schema_version\":\"gwz.protocol/v0\"},\"stash_bundles\":null,\"workspace_git_status\":null}\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "merge",
+      "--status"
+    ],
+    "code": 1,
+    "stdout": "action: merge\nstatus: Conflicted\nstate: awaiting-resolution\nmerge: merge_op_12080_1788964592452_0001 (open)\nrecord: v1 (open)\nparticipants: total 1; conflicted 1\nrecovery commands:\n  inspect:  gwz merge --status\n  continue: gwz merge --continue\n  abort:    gwz merge --abort\n  preserve: gwz merge --abort --preserve\nparticipants:\n  . (@root)  conflicted\n    source: fixture-feature @ cecadbe515b43287b8a594076bc5d2b84e8f2b08\n    recorded: branch main; before a4c00a62c4321cdda0ffeecf75dd2ce725dca451; result -\n    live: commit a4c00a62c4321cdda0ffeecf75dd2ce725dca451\n    recovery: continue blocked; abort eligible\n    conflicts: fixture.txt\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "--target",
+      "@root",
+      "add",
+      "fixture.txt"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "merge",
+      "--continue"
+    ],
+    "code": 0,
+    "stdout": "action: merge\nstatus: Ok\nstate: completed\nmerge: merge_op_12080_1788964592452_0001 (closed)\nrecord: v1 (archived)\nterminal outcome: completed\nacceptance: supported-persisted\nparticipants: total 1; continued 1\npublication: complete\nparticipants:\n  . (@root)  continued\n    source: fixture-feature @ cecadbe515b43287b8a594076bc5d2b84e8f2b08\n    recorded: branch main; before a4c00a62c4321cdda0ffeecf75dd2ce725dca451; result 4eddd468ec971f070ac7ddef4b8b50a1f84a63f7\n    live: commit unknown\n    recovery: continue unknown; abort unknown\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "code": 0,
+    "stdout": "8db82333cad13dc21485a2957be74756571b9d52\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "git",
+      "rev-list",
+      "--min-parents=2",
+      "a4c00a62c4321cdda0ffeecf75dd2ce725dca451..HEAD"
+    ],
+    "code": 0,
+    "stdout": "4eddd468ec971f070ac7ddef4b8b50a1f84a63f7\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "git",
+      "merge-base",
+      "--is-ancestor",
+      "fixture-feature",
+      "HEAD"
+    ],
+    "code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\continue",
+      "status"
+    ],
+    "code": 0,
+    "stdout": "On branch main\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "init"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "--target",
+      "@root",
+      "add",
+      "."
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "--target",
+      "@root",
+      "commit",
+      "-m",
+      "fixture baseline"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "code": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "--target",
+      "@root",
+      "branch",
+      "--create",
+      "fixture-feature",
+      "--switch"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Switched fixture-feature 0bc4febfe84956e77d8a81e6a6de3ea8bf66e54a\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "--target",
+      "@root",
+      "add",
+      "."
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "--target",
+      "@root",
+      "commit",
+      "-m",
+      "fixture feature"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "git",
+      "switch",
+      "main"
+    ],
+    "code": 0,
+    "stdout": "",
+    "stderr": "Switched to branch 'main'\n"
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "--target",
+      "@root",
+      "add",
+      "."
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "--target",
+      "@root",
+      "commit",
+      "-m",
+      "fixture main"
+    ],
+    "code": 0,
+    "stdout": "status: Ok\n@root . Ok\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "code": 0,
+    "stdout": "d617b97bd5383518431cb817ffb7d651871e3042\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "--json",
+      "--target",
+      "@root",
+      "merge",
+      "fixture-feature",
+      "--no-ff",
+      "--filesystem-strict"
+    ],
+    "code": 1,
+    "stdout": "{\"branch_repos\":null,\"errors\":[],\"kind\":\"response\",\"members\":[],\"merge\":{\"crash_recovery\":{\"filesystem\":null,\"gap\":null,\"handles_ok\":null,\"supported\":true},\"merge_id\":\"merge_op_11896_1788964596891_0001\",\"open\":true,\"operation_drift\":[],\"participant_counts\":{\"aborted\":0,\"conflicted\":1,\"continued\":0,\"failed\":0,\"fast_forwarded\":0,\"merged\":0,\"planned\":0,\"rolled_back\":0,\"total\":1,\"unattempted\":0,\"up_to_date\":0},\"preservation\":null,\"publication_step\":null,\"record\":{\"acceptance\":null,\"archived\":false,\"recovery\":null,\"source_version\":\"V1\",\"terminal_outcome\":null},\"repos\":[{\"abort_eligible\":true,\"before_commit\":\"d617b97bd5383518431cb817ffb7d651871e3042\",\"conflict_paths\":[\"fixture.txt\"],\"continue_eligible\":false,\"drift\":[],\"error\":null,\"live_commit\":\"d617b97bd5383518431cb817ffb7d651871e3042\",\"path\":\".\",\"pending_action\":null,\"predicted\":\"TrueMerge\",\"prediction_complete\":false,\"resulting_commit\":null,\"source_commit\":\"44d312288a747fea84ba5bedd05ccc1fd93dfcf4\",\"source_ref\":\"fixture-feature\",\"state\":\"Conflicted\",\"target_branch\":\"main\",\"target_id\":\"@root\",\"target_kind\":\"Root\"}],\"state\":\"AwaitingResolution\"},\"meta\":{\"action\":\"Merge\",\"aggregate_status\":\"Conflicted\",\"message\":null,\"operation_id\":\"op_11896_1788964596891\",\"request_id\":\"req_11896_1788964596891\",\"schema_version\":\"gwz.protocol/v0\"},\"stash_bundles\":null,\"workspace_git_status\":null}\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "merge",
+      "--status"
+    ],
+    "code": 1,
+    "stdout": "action: merge\nstatus: Conflicted\nstate: awaiting-resolution\nmerge: merge_op_11896_1788964596891_0001 (open)\nrecord: v1 (open)\nparticipants: total 1; conflicted 1\nrecovery commands:\n  inspect:  gwz merge --status\n  continue: gwz merge --continue\n  abort:    gwz merge --abort\n  preserve: gwz merge --abort --preserve\nparticipants:\n  . (@root)  conflicted\n    source: fixture-feature @ 44d312288a747fea84ba5bedd05ccc1fd93dfcf4\n    recorded: branch main; before d617b97bd5383518431cb817ffb7d651871e3042; result -\n    live: commit d617b97bd5383518431cb817ffb7d651871e3042\n    recovery: continue blocked; abort eligible\n    conflicts: fixture.txt\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "merge",
+      "--abort"
+    ],
+    "code": 0,
+    "stdout": "action: merge\nstatus: Noop\nstate: aborted\nmerge: merge_op_11896_1788964596891_0001 (closed)\nrecord: v1 (archived)\nterminal outcome: aborted\nacceptance: not-accepted\nparticipants: total 1; aborted 1\nparticipants:\n  . (@root)  aborted\n    source: fixture-feature @ 44d312288a747fea84ba5bedd05ccc1fd93dfcf4\n    recorded: branch main; before d617b97bd5383518431cb817ffb7d651871e3042; result -\n    live: commit unknown\n    recovery: continue unknown; abort unknown\n    conflicts: fixture.txt\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "code": 0,
+    "stdout": "d617b97bd5383518431cb817ffb7d651871e3042\n",
+    "stderr": ""
+  },
+  {
+    "cwd": "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+    "args": [
+      "D:/gwz-tests/capability-gate/target/debug/gwz.exe",
+      "--root",
+      "E:\\gwz-tests\\capability-gate\\cli-fixtures-final\\abort",
+      "status"
+    ],
+    "code": 0,
+    "stdout": "On branch main\n",
+    "stderr": ""
+  }
+]
