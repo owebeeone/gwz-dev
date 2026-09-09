@@ -171,6 +171,55 @@ locked metadata before expensive tests. Six focused helper tests pass. Publish
 a compatible root checkpoint and update each product repository's
 `GWZ_WORKSPACE_REVISION` before treating candidate CI as repaired.
 
+Root checkpoint `048ef84` published that assembly repair and became the reviewed
+baseline for core, CLI and Python. Hosted Linux/macOS runs passed assembly and
+locked metadata, then exposed one stale documentation check: it demanded the
+old `@root` lane recipe while the guide correctly selects `@all`. Core `3ccf917`
+corrects that assertion and the six Windows fixtures. The complete fast
+compatibility battery and the remaining pin/build-identity/selection checks pass.
+
+Core v1.0.10 is now tagged at `ca0f20cc788d706924b00e2b9e438428f69e44a6` after
+its release script passed all required gates with `--push --no-test`.
+[Core release](https://github.com/owebeeone/gwz-core/releases/tag/v1.0.10),
+[hosted release verification](https://github.com/owebeeone/gwz-core/actions/runs/34396246564)
+and [candidate validation](https://github.com/owebeeone/gwz-core/actions/runs/34396200893)
+are distinct. Publication completed; hosted release verification continues.
+The candidate run passed assembly, locked metadata and the corrected
+documentation checks on Linux/macOS. It was stopped after Python release
+preparation exposed a further stale drift checker in its pinned Python snapshot;
+a refreshed baseline replaces that run.
+
+All six affected Windows fixtures passed against the real backends on Dabeest
+after one libtest compilation, with no full Windows suite replay. The streamed
+source was core `e3c5dd1` plus the exact four Rust fixture edits committed in
+`3ccf917`; the other change in that commit is the documentation-check manifest.
+
+CLI v1.0.10 is tagged at `dfdec50bf09ecd95ade68a134951093e49c47970`. Its release
+script passed the standalone build and generated-reference check with
+`--push --no-test`.
+[CLI release](https://github.com/owebeeone/gwz-cli/releases/tag/v1.0.10) is
+published; [hosted builds](https://github.com/owebeeone/gwz-cli/actions/runs/34396414384)
+are running. Hosted documentation publication already passed.
+
+Python's first v1.0.10 attempt stopped before tagging: its release checker
+had not projected out the two protocol additions already handled by its unit
+tests. Python `34e4e0e` validates those exact additions before projecting them
+out, retains the original `8aa250…` baseline, and verifies historical shape
+changes are still detected. The drift check and four focused tests pass.
+The v1.0.10 retry passed protocol/regeneration, Cargo and installed-wheel package
+smoke gates. It tagged and pushed `6f405781765b2b3c7e5d134076d856f36b269f5a`.
+[Python release](https://github.com/owebeeone/gwz-py/releases/tag/v1.0.10) is
+published; [wheel/PyPI publication](https://github.com/owebeeone/gwz-py/actions/runs/34396801768)
+has started. This is not yet a claim that hosted artifacts or PyPI publication
+have completed.
+
+The final reviewed workspace baseline includes core `ca0f20c`, CLI main
+`5fec86d`, Python main `34e4e0e`, and the matching root Cargo lock. All three
+release tags remain v1.0.10 and both drivers pin core v1.0.10. CI variables must
+refer to the root commit containing this baseline; the fresh candidate run
+selects the exact core tag while retaining those siblings. Raw successful and
+failed release attempts and native Windows results remain in the private archive.
+
 The operator identified the additional `fsbench` lane before publication. Its
 two evidence commits (`3e1c9ac`, `90c3081`) and root metadata were integrated
 through a whole-family merge: seven participants unchanged, two merged, no
