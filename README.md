@@ -18,6 +18,18 @@ gwz status
 cargo test --workspace
 ```
 
+No SSH key? The manifest records the member remotes in the
+`git@github.com:...` form, which needs one. With gwz 1.0.11 or later, ask for
+the https form instead (`GWZ_URL_SCHEME=https` does the same):
+
+```sh
+gwz clone --url-scheme https https://github.com/owebeeone/gwz-dev.git gwz-dev
+```
+
+See [Clone An Existing Workspace](https://owebeeone.github.io/gwz-cli/QuickStart/#clone-an-existing-workspace)
+in the Quick Start for what is converted, what is remembered, and how private
+members are handled.
+
 New to the product? Read the
 [Quick Start](https://owebeeone.github.io/gwz-cli/QuickStart/). For the problem
 GWZ solves, its fit alongside tools such as vcstool, and its embeddable remote-
