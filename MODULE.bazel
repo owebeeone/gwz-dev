@@ -66,9 +66,10 @@ crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
 # the extension watches them (a feature change on a dependency alters a manifest but not the
 # lock). Workspace members are NOT spliced into spokes -- crate_universe expects them to be
 # Bazel targets -- which is why every crates/<name> is a package with its own rust_library.
-# taut-shape reaches this hub the way gwz-core's own lock says: the git rev pinned in
-# gwz-core/Cargo.toml (the outer workspace's [patch] to the sibling checkout is not visible
-# from inside gwz-core's workspace, for cargo or for Bazel).
+# taut-shape reaches this hub the way gwz-core's own lock says: the crates.io release named
+# in gwz-core/Cargo.toml. This hub is crate.from_cargo over that lock, so it follows the
+# registry version automatically (the outer workspace's [patch.crates-io] to the sibling
+# checkout is not visible from inside gwz-core's workspace, for cargo or for Bazel).
 crate.from_cargo(
     name = "gwz_core_crates",
     cargo_lockfile = "//gwz-core:Cargo.lock",

@@ -431,11 +431,11 @@ dependencies = [
 
 [[package]]
 name = "gwz-copy-contract"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "gwz-core"
-version = "1.0.10"
+version = "1.0.11"
 dependencies = [
  "cap-fs-ext",
  "cap-std",
@@ -473,11 +473,11 @@ dependencies = [
 
 [[package]]
 name = "gwz-family-model"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "gwz-family-store"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-family-model",
  "gwz-family-store-contract",
@@ -487,21 +487,21 @@ dependencies = [
 
 [[package]]
 name = "gwz-family-store-contract"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-family-model",
 ]
 
 [[package]]
 name = "gwz-history-check"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-repo-contract",
 ]
 
 [[package]]
 name = "gwz-local-disposal"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-family-model",
  "gwz-family-store-contract",
@@ -511,7 +511,7 @@ dependencies = [
 
 [[package]]
 name = "gwz-local-import"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-family-model",
  "gwz-repo-contract",
@@ -519,7 +519,7 @@ dependencies = [
 
 [[package]]
 name = "gwz-refcopy"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-copy-contract",
  "libc",
@@ -529,18 +529,18 @@ dependencies = [
 
 [[package]]
 name = "gwz-repo-contract"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "gwz-repo-factory"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-repo-contract",
 ]
 
 [[package]]
 name = "gwz-repo-inspect"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "git2",
  "gwz-repo-contract",
@@ -548,14 +548,14 @@ dependencies = [
 
 [[package]]
 name = "gwz-work-detector"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-repo-contract",
 ]
 
 [[package]]
 name = "gwz-workspace-install"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "gwz-copy-contract",
  "gwz-family-model",
@@ -1171,7 +1171,7 @@ dependencies = [
 
 [[package]]
 name = "taut-shape"
-version = "0.9.1"
+version = "0.9.2"
 
 [[package]]
 name = "tempfile"

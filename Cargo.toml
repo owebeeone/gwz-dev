@@ -10,9 +10,9 @@ members = [
     "gwz-cli",
 ]
 # taut-shape-rs is its own Cargo workspace (own workspace.package inheritance);
-# exclude it so this outer workspace does not absorb its members. The patch below
-# keeps local gwz-dev builds on the sibling checkout while gwz-core's released
-# manifest stays consumable as a Git dependency.
+# exclude it so this outer workspace does not absorb its members. The
+# [patch.crates-io] below builds this outer workspace against the sibling
+# taut-shape-rs checkout in place of the crates.io release gwz-core now depends on.
 # gwz-core is likewise its own Cargo workspace since LCM1.0c follow-up 2
 # (workspace layout Option A, operator ruling 2026-09-05; dev-docs/
 # GwzLocalCloneDesign.md §11 item 14): its members are the local clone family
@@ -25,5 +25,5 @@ exclude = [
     "gwz-core",
 ]
 
-[patch."https://github.com/owebeeone/taut-shape-rs"]
+[patch.crates-io]
 taut-shape = { path = "taut-shape-rs/crates/taut-shape" }
