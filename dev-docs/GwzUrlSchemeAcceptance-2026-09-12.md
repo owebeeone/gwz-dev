@@ -98,4 +98,51 @@ gwz-py at step 2.3 (`GWZ_RUST_BIN` set to the root workspace build): 838 passed,
 | 3.3 repo sync | gwz-core, gwz-cli | `d97704b`, `010b8df` | `443525b` |
 | 3.2 this note | root | (this commit) | (root) |
 
-No version bump, no tag, no push.
+Version bumps, tags and pushes came later, with the release; see section 7.
+
+## 7. Release 1.0.11 (2026-09-12)
+
+Cut with the documented scripts in the documented order (core, then CLI, then
+Python), with the owebeeone ssh-agent socket exported for the pushes. The
+default launchd agent on this Mac authenticates as `gripd`, which cannot push.
+
+| Repository | Release commit | Tag | Script gates |
+|---|---|---|---|
+| gwz-core | `a11dce4` on `main` | `v1.0.11` | regen check, rustfmt, lock, boundary scan, clippy before and after the bump; `--no-test`, as for 1.0.10, because the full suite ran at `d97704b` and the only later commit, `0ee569f`, is rustfmt output |
+| gwz-cli | `ea59204` on `release` | `v1.0.11` | merge main, pin gwz-core `v1.0.11`, `cargo build`, `cargo test` (every suite passed), lock pin check, CLI reference check |
+| gwz-py | `1dc0de8` on `release` | `v1.0.11` | merge main, pin gwz-core `v1.0.11`, protocol drift and regeneration checks, `cargo check`, `run_tests.py` (839 passed), wheel package smoke at 1.0.11 |
+
+Commits needed on `main` before the scripts would pass: gwz-core `0ee569f` and
+gwz-cli `ff2c020` apply rustfmt (the core script gates on it, and the feature
+work had not run it); gwz-py `ff0f5bb` makes the cross-driver merge test expect
+the conf-integrity marker as the fifth publication artifact, the behaviour core
+`a6469cc` introduced. Root lock commits `d19d72b`, `bc780e1`, `10bc4af`.
+
+GitHub releases were published on all three repositories with the same notes:
+
+- gwz-core v1.0.11: hosted verification run 34662509298 failed on Linux and
+  Windows with one test,
+  `local_clone::tests::create::integrity::clone_preserves_a_valid_marker_repair_and_its_index_state`,
+  while 1934 (Linux) and 1875 (Windows) other tests passed. The fixture
+  committed through the production backend without a local author identity and
+  so borrowed the developer's global git identity, which hosted runners lack.
+  Test-only. Reproduced locally with a global config carrying
+  `user.useConfigOnly = true`, fixed on `main` in gwz-core `f32814e` (root
+  `588edf1`), and a hosted verification of `main` was dispatched afterwards.
+  The v1.0.11 tag is unchanged; its product code is what the local suites and
+  the hosted runs exercised.
+- gwz-cli v1.0.11: release run 34662580114 succeeded (five targets, installers,
+  checksums, source archive, attestations); documentation run 34662580125
+  deployed the site from the tag.
+- gwz-py v1.0.11: publish run 34662809164 succeeded; PyPI `gwz` 1.0.11 carries
+  five wheels and the sdist.
+
+Not a release gate, but visible on every `main` push of gwz-core and gwz-cli
+since 2026-09-10: "Workspace candidate validation" fails because the
+`GWZ_WORKSPACE_REVISION` repository variable names a gwz-dev revision that
+predates the URL-scheme work, so the assembled tuple cannot compile against the
+new types. Pointing the variable at the current gwz-dev baseline is a
+repository setting for the owner to change.
+
+Post-release bookkeeping in this commit: gwz-py `main` Cargo.lock refreshed to
+gwz-core 1.0.11, so `gwz status` stays clean until the next version bump.
