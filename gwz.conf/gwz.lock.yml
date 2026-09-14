@@ -3,74 +3,74 @@ workspace_id: ws_default
 manifest_schema: gwz.workspace/v0
 members:
   mem_gwz_cli:
+    branch: main
     detached: false
     dirty: false
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
     commit: 31b14a3e2eaed3ea8875961486f82b41c4fcf27d
-    branch: main
     materialized: true
   mem_gwz_core:
+    branch: main
     detached: false
     dirty: false
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 32c44146c0049ea1ae42c3485eb1d6171e6b4dc8
-    branch: main
+    commit: 34cf67bee60549cf8228951d93d4852edf28e5a5
     materialized: true
   mem_gwz_core_evidence:
+    branch: main
     detached: false
     dirty: false
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
     commit: b2bf115eb01ca11e41a23340fb4070601974fbd6
-    branch: main
     materialized: true
   mem_gwz_py:
+    branch: main
     detached: false
     dirty: false
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
     commit: b97ff00add39c455298defec28857175084f2927
-    branch: main
     materialized: true
   mem_taut:
+    branch: main
     detached: false
     dirty: false
     path: taut
     source_id: src_taut
     source_kind: git
     commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
-    branch: main
     materialized: true
   mem_taut_shape:
+    branch: main
     detached: false
     dirty: false
     path: taut-shape
     source_id: src_taut_shape
     source_kind: git
     commit: 74f375c9d3521f3e98110862dcf89ec64a3b6d6c
-    branch: main
     materialized: true
   mem_taut_shape_py:
+    branch: main
     detached: false
     dirty: false
     path: taut-shape-py
     source_id: src_taut_shape_py
     source_kind: git
     commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
-    branch: main
     materialized: true
   mem_taut_shape_rs:
+    branch: main
     detached: false
     dirty: false
     path: taut-shape-rs
     source_id: src_taut_shape_rs
     source_kind: git
     commit: df1303656583121e043f7a925c02958571951735
-    branch: main
     materialized: true
