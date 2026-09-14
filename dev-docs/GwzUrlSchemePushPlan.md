@@ -4,8 +4,11 @@ Date: 2026-09-14. Status: **accepted at gwz-dev root `0136094` (gwz-core
 `c9c7a98`, gwz-cli `2c4c0ea`, gwz-py `334f53f`, other members unchanged) after
 `GwzUrlSchemePushPlan-ReviewConsistency-3.md` and
 `GwzUrlSchemePushPlan-ReviewSafety-3.md` reported GO; this accepts the plan
-text only, and no code exists yet. The round-3 P3 findings and residual wording
-were folded in afterwards without re-review, as both reports allow (§9).**
+text only. The round-3 P3 findings and residual wording were folded in
+afterwards without re-review, as both reports allow (§9).**
+Implementation: steps 1.1, 1.2, 3.1 and 3.2 landed on 2026-09-15, merged from
+parallel lanes (gwz-core `3f5ff1e`, gwz-cli `9fa3189`, gwz-py `2921d09`, root
+`a9ffadb`). §7 and step 3.2 were then corrected from what step 3.2 found.
 Step 0.2 ran on 2026-09-14.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
@@ -742,12 +745,16 @@ per D7.
 
 - Regenerate: `protocol/regen.py` (generated code and corpus),
   `docs/generate_message_catalog.py` (`docs/MessageCatalog.md`), and gwz-py's
-  `scripts/regen_protocol.py`. Move the drift pin in
-  `gwz-py/scripts/check_protocol_drift.py` with a dated note, as the parent
-  plan's step 1.2 did.
+  `scripts/regen_protocol.py`. Move all three fingerprint pins of the protocol
+  projection, each with a dated note, as the parent plan's step 1.2 did:
+  - gwz-core `protocol/check_log_additive.py`, which `regen.py` checks before
+    writing;
+  - gwz-py `scripts/check_protocol_drift.py`;
+  - gwz-py `src/tests/test_log_protocol.py`.
 - Fan-out: every `PushRequest { .. }` literal gains `remote_check: None`:
-  - gwz-core `handle_tag.rs` (3 matches of `PushRequest {`) and `tests/g08.rs`
-    (13 matches);
+  - gwz-core `src/workspace_ops/handle_tag.rs` (3 literals) and
+    `src/workspace_ops/tests/g08.rs` (11 literals; 13 grep matches of
+    `PushRequest {`, two of which are return types);
   - gwz-cli `src/clirequest/invocation.rs:255`.
 
   Check gwz-py's two `PushRequest(...)` calls in `src/gwz/client.py`
@@ -1068,9 +1075,16 @@ Step 0.2 ran on 2026-09-14.
 - **Stale last-known refs.** The default trusts them only to decide whether a
   member is checked for changes and pushed (§3.7); every contacted root is
   proven in the operation (D10).
-- **Mixed versions.** A core that predates `remote_check` either ignores the
-  field and contacts everything, as today, or rejects the request. Both are
-  safe. An old client talking to a new core gets `changed`, D7's default.
+- **Mixed versions.** Both directions are safe:
+  - A core that predates `remote_check` reads only the fields it knows, so it
+    ignores the new field and contacts everything, as today.
+  - A new core refuses an old client's request at decode. The generated
+    decoder requires every tag, so a request without tag 4 fails with
+    `MissingKey(4)`; the same rule already applies to `url_scheme`. Current
+    Rust and Python encoders always send the tag, with null for `None`.
+
+  Corrected on 2026-09-15: step 3.2's implementation found the earlier claim,
+  that such a request gets `changed`, to be wrong.
 - **The test seam.** Step 1.2 specifies everything later steps test on it,
   including one repository reached through several URLs, so the changes in 2.1,
   3.3 and 3.5 are measured against a pinned sequence. The
