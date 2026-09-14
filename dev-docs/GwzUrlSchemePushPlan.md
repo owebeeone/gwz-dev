@@ -1,12 +1,17 @@
 # GWZ push: prove root dependencies through the member's own destination, and contact only what changed
 
-Date: 2026-09-14. Status: **plan; decisions D1–D9 taken on 2026-09-14; no code yet.**
+Date: 2026-09-14. Status: **plan; decisions D1–D11 taken on 2026-09-14; round-1
+review remediation applied; no code yet.**
 Step 0.2 ran on 2026-09-14.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
 Base: gwz-core `c9c7a98` / root `aa97cc1` ("Skip the second availability read
 for members an ordinary push just published"). On 2026-09-14 that commit is
 local and not yet pushed.
+Reviews: round 1 at root `b64f691`, both NO-GO:
+`GwzUrlSchemePushPlan-ReviewConsistency.md` and
+`GwzUrlSchemePushPlan-ReviewSafety.md`. Remediation:
+`GwzUrlSchemePushPlan-RemPlan.md`.
 Work location: the root workspace `/Users/owebeeone/limbo/gwz-dev` directly.
 Use the installed `gwz 1.0.12` for every workspace operation, and never run a
 `target/` build against the workspace.
@@ -22,6 +27,9 @@ Owner direction (2026-09-14):
   behaviour of checking every remote. (Phase 3.)
 - **Check once.** A repository already checked in an operation is not contacted
   again when nothing changed. (Phase 3, in both modes.)
+- **Publishing the root always proves its dependencies** (D10, from the round-1
+  review). When a push publishes the root, this operation proves every member
+  commit the root's lock names; `origin/*` alone never does. (Phase 3.)
 
 ## 1. Goal and non-goals
 
@@ -30,13 +38,15 @@ Owner direction (2026-09-14):
 1. A workspace cloned with `gwz clone --url-scheme https` publishes with
    `gwz push` over https only, with zero SSH connections (Phase 2).
 2. By default, a push contacts only repositories whose branch differs from what
-   their origin last reported. A push with nothing to publish makes no
+   their origin last reported, plus each root-lock dependency once when it
+   publishes the root (D10). A push with nothing to publish makes no
    connections (Phase 3).
-3. With the option, a push checks every selected repository and every root
-   dependency, and contacts each destination once (Phase 3).
+3. With the option, a push reads every selected repository and every root
+   dependency at most once, and proves the root's lock even when the root has
+   nothing to push (Phase 3).
 
-Phase 2 changes nothing in a contributor's SSH workspace: it keeps reading its
-committed URLs.
+Under Phase 2, a contributor's SSH workspace whose member remotes equal their
+committed URLs keeps reading exactly those URLs.
 
 **Non-goals:**
 
@@ -44,6 +54,7 @@ committed URLs.
 - a `--url-scheme` option on push;
 - a command that rewrites existing remotes (the parent plan's §1 non-goal
   stands);
+- pruning remote-tracking refs during fetch or pull;
 - reusing one connection for the read and the push of the same repository;
 - read deduplication and change detection for tag publication;
 - protocol changes other than the one additive push option (step 3.2).
@@ -52,40 +63,59 @@ committed URLs.
 
 ### 2.1 Code
 
-All paths are in gwz-core at `c9c7a98`.
+Paths are in gwz-core at `c9c7a98` unless another repository is named.
 
 - **Where member pushes go.** Each member push goes to the member's configured
   destination. `prepare` captures the push remote's `pushurl`, or its `url`
-  when there is no `pushurl` (`src/git/gitbackend/push_plan.rs:12-17`).
+  when there is no `pushurl` (`src/git/gitbackend/push_plan.rs:12-17`), and
+  resolves each refspec source to an object id (`push_plan.rs:111-114`).
 - **Every captured push connects.** Each member with a captured plan is pushed
   (`push_member.rs:306-311`), even when the remote already holds its commit.
   `perform_push` skips the connection only when a plan has no refspecs
   (`transport.rs:485-490`).
+- **Push reports no `Noop` today.** A successful push sets `Ok`
+  (`push_member.rs:784-803`), so the all-`Noop` aggregate rule
+  (`push_member.rs:764`) is unreachable for push; step 0.2 recorded every row
+  `ok`. `PlannedChange { action: Noop, message }` exists
+  (`handle_repo_lifecycle.rs:338`). A `Noop` aggregate exits 0 (gwz-cli
+  `docs/MachineOutput.md:616-626`).
 - **Where root publication reads.** Root publication proves every lock member
   at the **committed URL**: the fetch remote that the committed root manifest
   records (`src/workspace_ops/publication.rs:289-297`). It reads that URL in
   three places:
   - identity validation, `validate_dependency_identity` (143-153);
-  - the pre-transfer read, `preflight_dependencies_with_reads` (192-216);
-  - the post-push proof, `checked_root_request` (68-108).
+  - the pre-transfer read, `preflight_dependencies_with_reads` (192-216), which
+    checks read access only;
+  - the post-push proof, `checked_root_request` (68-108), which accepts a
+    commit that is advertised or an ancestor of an advertised ref (86-99).
 - **Both shortcuts compare URLs exactly.**
   - The pre-transfer dedup keys on `(identity repo, remote, URL)`
     (`ReadPreflight`, 11-35). Member reads are recorded at
-    `push_member.rs:233-237`.
+    `push_member.rs:233-237`; unmaterialized dependencies are read without an
+    identity repo and not recorded (`publication.rs:199-203`).
   - The published shortcut requires `plan.url == dependency.url`
     (`dependency_was_published`, 116-133).
 - **Reads run one at a time.** The pre-transfer loop (`push_member.rs:222-257`)
   and the post-push proof read each destination in turn. Pushes already run
   through `par_map_per_host` (`src/operation/par_map_per_host.rs:39`) under
   `--jobs` and `--max-per-host`.
-- **Tracking refs follow gwz pushes.** `push_prepared` pushes through the named
-  remote when its configured URL matches the captured one, which "preserves
-  normal tracking updates" (`transport.rs:459-472`). The gwz-dev reflogs agree:
-  `refs/remotes/origin/main` records `update by push` at 14:21:38 on 2026-09-14
-  for gwz-core and gwz-cli, and 22 s later for the root.
+- **Tracking refs follow gwz pushes, and ignore the URL.** `push_prepared`
+  pushes through the named remote when its configured URL matches the captured
+  one, which "preserves normal tracking updates" (`transport.rs:459-472`).
+  libgit2 1.9.7 (the vendored `libgit2-sys-0.18.8+1.9.7` that gwz-core's
+  `Cargo.lock` pins) maps each accepted destination through the named remote's
+  fetch refspecs and writes it with reflog "update by push", without looking at
+  the push URL (`push.c:164-212`). The gwz-dev reflogs show `update by push` at
+  14:21:38 on 2026-09-14 for gwz-core and gwz-cli, and 22 s later for the root.
+- **Fetch never prunes.** gwz's fetch passes no prune option
+  (`transport.rs:69-104`, `transport_support.rs:66-90`), and libgit2 prunes only
+  when asked or when `remote.<name>.prune` or `fetch.prune` is set
+  (`remote.c:582-586`, `1420-1430`). A tracking ref for a branch deleted on the
+  remote survives `gwz pull` and a plain `git fetch`.
 - **No last-known-state query.** The backend contract has no query for a
   destination's remote-tracking ref or for ahead/behind state. `is_ancestor`
-  exists (`publication.rs:92`).
+  exists (`publication.rs:92`) and passes errors through
+  (`src/git/gitbackend/refs.rs:285-296`).
 - **The scheme-only predicate already exists.**
   `scheme_only_difference(manifest_url, observed_url)`
   (`src/git/url_scheme.rs:161-177`) is true exactly when deriving the manifest
@@ -97,7 +127,8 @@ All paths are in gwz-core at `c9c7a98`.
     are `derive(manifest, https)`.
 - **Scheme precedence.** `resolve_url_scheme` (`url_scheme_state.rs:72-91`)
   resolves the effective scheme from the request first, then
-  `.gwz/url-scheme.yml`, then `manifest`.
+  `.gwz/url-scheme.yml`, then `manifest`. The unreadable-file refusal names
+  `--url-scheme manifest` as its remedy (`url_scheme_state.rs:109-117`).
 - **Tag publication shares the proof.** Tag publication
   (`handle_tag.rs:125-130`, `151`, `163-175`, `287-298`) calls the same
   `root_dependencies`, `preflight_dependencies` and `checked_root_request`. It
@@ -108,15 +139,44 @@ All paths are in gwz-core at `c9c7a98`.
     (`transport_support.rs:195-235`). The production policy is
     `AllowConfigured` (`backend.rs:44`).
   - A per-remote SSH identity named for a non-SSH URL is refused
-    (`transport_support/identity.rs:200-204`).
-- **Push options and request types.** `gwz push` already has `--force` (a forced
-  push), `--partial`, `--sync <mode>` (workspace sync policy), `--jobs` and
-  `--max-per-host`. Request types are generated from `protocol/gwz.taut.py` by
-  `protocol/regen.py`.
-- **The test seam cannot see URLs.** The g01 tracking backend:
+    (`transport_support/identity.rs:200-204`); an invocation-wide default does
+    not affect https (`identity.rs:206-207`).
+- **Push options and request types.**
+  - `gwz push` has `--partial`, `--sync <mode>` (workspace sync policy),
+    `--jobs`, `--max-per-host` and the global `--force`.
+  - `--force` sets `OperationPolicy.destructive = Allow` (gwz-cli
+    `src/clirequest/invocation.rs:106`), which no push or publication code
+    reads.
+  - The Rust CLI builds `PushRequest` with `refspec: None`
+    (`invocation.rs:255`); gwz-py's push command passes only `remote`
+    (`cli_mutation.py:212-216`).
+  - A forced push exists only as a `+`-prefixed `PushRequest.refspec` from an
+    API caller, such as gwz-py `client.push(refspec=...)`; force is decided by
+    that prefix (`publication.rs:44`, `push_plan.rs:18`).
+  - Request types are generated from `protocol/gwz.taut.py` by
+    `protocol/regen.py`; `docs/MessageCatalog.md` by
+    `docs/generate_message_catalog.py`; the gwz-py bindings by gwz-py's
+    `scripts/regen_protocol.py`.
+- **The design promises proof at destinations.** `dev-docs/GWZDesign.md:96-98`:
+  push "waits for successful member transfers and proof that all member objects
+  named by the committed root lock are available at their destinations,
+  including partial and root-only pushes." gwz-cli `docs/commands/push.md:75-83`
+  and the module comment `publication.rs:1-3` say the same.
+- **The test seam is thin.** The g01 tracking backend:
   - has no remotes (`tests/g01/tracking_backend.rs:421-423`);
-  - makes up `ssh://<name>.invalid/repo.git` push URLs (453-467);
-  - ignores the URL passed to `ls_remote_url` (469-477).
+  - makes up `ssh://<name>.invalid/repo.git` push URLs and returns refspecs
+    unresolved (453-467);
+  - ignores the URL passed to `ls_remote_url` (469-477);
+  - serves no committed files (the contract default of `read_file_at_commit`
+    is unsupported, `contract.rs:312-319`), so root publication cannot run on
+    it;
+  - reports every path as a repository (198-200), has one fixed head
+    (413-419), and answers every ancestry question true (524-526);
+  - refuses transport options through the contract default `with_transport`
+    (`contract.rs:224-238`).
+
+  The g08 publication tests use the real `Git2Backend` with local bare
+  remotes, which records no calls.
 
 ### 2.2 Measurements
 
@@ -149,11 +209,15 @@ Phase 2, 2N of them are SSH.
 | push | `c9c7a98` | check once (3.3) | default (3.5) | with the option (3.5) |
 |---|---|---|---|---|
 | whole workspace, nothing to publish | 2N+2 (18) | N+1 (9) | 0 | N+1 (9) |
-| whole workspace, one member and the root changed | 2N+2 (18) | N+3 (11) | 4 | N+3 (11) |
-| root only, root changed | 2N+2 (18) | N+2 (10) | 2 | N+2 (10) |
+| whole workspace, one member and the root changed | 2N+2 (18) | N+3 (11) | N+3 (11) | N+3 (11) |
+| root only, root changed | 2N+2 (18) | N+2 (10) | N+2 (10) | N+2 (10) |
 
-The default column assumes each unchanged member's lock commit is at or behind
-its last-known ref (§3.5). Each dependency that is not adds one read.
+- The default saves connections when the root is not published. When it is,
+  D10 reads every root-lock dependency once, in the same parallel round as the
+  other reads (step 3.4).
+- The counts assume the CLI's `refs/heads/<branch>:refs/heads/<branch>`
+  refspec. The matching (`:`) and shorthand refspec forms make `prepare_push`
+  read the remote before classification (`push_plan.rs:31-43`, `76-87`).
 
 ## 3. Behaviour contract
 
@@ -194,9 +258,10 @@ committed fetch remote records. The first rule that applies wins:
 2. **Materialized member, fetch URL.** Otherwise, if that remote's fetch `url`
    is the same repository, use the fetch URL.
 3. **Member not materialized.** Use `derive(committed, effective scheme)`. The
-   scheme is resolved the way materialize resolves it: the request, then
-   `.gwz/url-scheme.yml`, then `manifest`. If the derivation is refused, use the
-   committed URL.
+   scheme is resolved as core resolves it for materialize: a scheme in the
+   request, then `.gwz/url-scheme.yml`, then `manifest`. Push clients send no
+   scheme; `GWZ_URL_SCHEME` is read client-side for clone and materialize only.
+   If the derivation is refused, use the committed URL.
 4. **Otherwise.** Use the committed URL, as today.
 
 Rule 1 checks the push destination before the fetch URL for a reason. A member
@@ -213,31 +278,52 @@ the next one.
 - **Proof refusal.** When the read URL differs from the committed URL, the
   refusal names it. For example: "... available at its committed fetch remote
   origin (read through https://github.com/o/r.git)".
-- **SSH identity with an https read URL.** A per-remote
+- **SSH identity with an https read URL (D4).** A per-remote
   `--remote-identity NAME=PATH` for a remote whose read URL is https is refused
-  before any transfer, with today's message. That member's own push is already
-  refused the same way (D4).
+  before any transfer, with today's message.
+  - For a member this operation pushes, that member's own push is already
+    refused the same way.
+  - A root-only push is newly refused: at `c9c7a98` it read the committed SSH
+    URL and succeeded.
+  - The refusal names the remedies that work: `--identity PATH` (an
+    invocation-wide SSH default does not affect https reads), or no override
+    for that remote.
+- **Malformed `.gwz/url-scheme.yml` (D3).** A push with an unmaterialized
+  dependency refuses. The refusal names remedies push can use: delete the file,
+  or run `gwz materialize --url-scheme manifest`.
 - Nothing else changes in JSON or human output.
 
 ### 3.4 What Phase 2 leaves alone
 
 - Push never writes the manifest, the lock or member remotes.
-- In an SSH workspace the read URLs equal the committed URLs, so Phase 2 leaves
-  its reads byte-identical to today's. Step 1.2 pins this until Phase 3 changes
-  the counts on purpose.
+- In an SSH workspace whose member remotes equal their committed URLs, the read
+  URLs equal the committed URLs, so Phase 2 leaves its reads byte-identical to
+  today's. Step 1.2 pins this until Phase 3 changes the counts on purpose.
 - A proof that cannot be made still refuses root publication.
 
 ### 3.5 Contacting a repository (Phase 3)
 
-Two definitions:
+Definitions:
 
 - **Kept advertisement:** the refs one read returned during this operation, for
-  one destination (identity repo, remote and read URL).
-- **Last-known ref:** the push destination mapped through the named remote's
-  fetch refspecs (`refs/heads/main` becomes `refs/remotes/origin/main`). gwz
-  uses it only when the remote's push URL is absent or is the same repository
-  as its fetch URL. It does not use the branch's configured upstream, which not
-  every checkout has.
+  one destination: identity repo (none for an unmaterialized dependency),
+  remote name and read URL.
+- **Same repository, between destinations:** two destination URLs reach the
+  same repository when they are equal, or when `scheme_only_difference` holds
+  in either direction.
+- **Last-known ref:** the destination `refs/heads/<branch>` mapped through the
+  named remote's fetch refspecs. gwz uses it only when all of these hold;
+  otherwise there is no last-known ref:
+  - the result lies under `refs/remotes/<remote>/`, and the remote's fetch
+    refspecs map `refs/heads/*` exactly into that namespace;
+  - no other configured remote's fetch refspec writes into that namespace;
+  - the remote's push URL is absent or is the same repository as its fetch URL.
+
+  gwz does not use the branch's configured upstream, which not every checkout
+  has.
+- **Forced:** a destination whose captured refspec starts with `+`
+  (`publication.rs:44`). `--force` sets `OperationPolicy.destructive`; it does
+  not make a push forced and does not affect classification.
 
 **Rule 1: check once (both modes).** gwz reads a destination at most once per
 operation and answers later questions from the kept advertisement:
@@ -245,61 +331,101 @@ operation and answers later questions from the kept advertisement:
 - A selected repository whose advertisement already shows every destination ref
   at its source object is `Noop` ("already on origin") and is not pushed.
 - The root dependency preflight answers from the kept advertisement.
-- The post-push proof answers from the kept advertisement for every destination
-  this operation did not push to (D9). For a destination it did push to, the
-  accepted push is the proof: it covers the pushed commit and every ancestor of
-  it (D8). Anything else is read, as today.
+- The post-push proof uses a kept advertisement only when it proves
+  availability (the commit is advertised, or is an ancestor of an advertised
+  ref), and only for a destination this operation did not push to (D9).
+  Otherwise it reads.
+- For a destination this operation pushed to, the accepted push proves the
+  pushed commit and every ancestor of it (D8).
+- **Forced or deleting transfers invalidate evidence.** If this operation makes
+  a forced or deleting transfer to a repository, every kept advertisement of
+  that repository and every D8 proof for it stop counting, whichever identity
+  repo or remote name reached it. Every dependency on that repository is read
+  after all transfers.
 
 **Rule 2: contact only what changed (default).** Before any read, gwz classifies
 each selected repository against its last-known ref:
 
 | local branch compared with the last-known ref | ordinary push | forced push |
 |---|---|---|
-| equal | `Noop`, not contacted | `Noop`, not contacted |
+| equal | `Noop`, not contacted | contacted |
 | behind | `Noop`, not contacted (D6) | contacted |
 | ahead | contacted | contacted |
 | diverged | contacted; the remote rejects it, as today | contacted |
-| no last-known ref | contacted | contacted |
+| no last-known ref, or an ancestry error | contacted | contacted |
 
+- Equality compares object ids. An ancestry error (missing objects, shallow
+  history) counts as unknown.
 - A root that is not contacted publishes nothing, so no dependency is proven.
-- When the root is published, a dependency whose lock commit is at or behind a
-  last-known ref of the remote chosen by §3.2 rules 1–2 is proven by that ref,
-  without a read. Dependencies under §3.2 rules 3–4 are read.
+- A contacted root that rule 1 does not make `Noop` is published. Every
+  root-lock dependency is then proven by this operation (D10): by a read before
+  any transfer, reused per rule 1, or by an accepted push (D8). Last-known refs
+  never prove a dependency.
 - Contacted repositories go through rule 1.
 
-**Rule 3: always check (the option).** The option (D7) skips the classification.
-Every selected repository and every root dependency is read once, and rule 1
-applies.
+**Rule 3: always check (the option).**
+
+- The option skips the classification. Every selected repository and every root
+  dependency is read at most once, and rule 1 applies.
+- A selected root that rule 1 makes `Noop` still runs the dependency proof after
+  member transfers, from the same evidence a published root uses. A failure
+  reports the root `Rejected` with today's message.
 
 `--dry-run` shows the classification and still makes no connections.
 
 ### 3.6 What the operator sees (Phase 3)
 
-- Every `Noop` row carries its reason: "already on origin" (read in this
-  operation), "up to date with origin/main as of the last fetch or push", or
-  "behind origin/main as of the last fetch or push".
-- Human output adds one summary line when repositories were not contacted, for
-  example "7 repositories unchanged since the last fetch or push, not contacted;
-  --check-remotes to verify".
-- The aggregate status is `Noop` when nothing was pushed, as today
-  (`push_member.rs:764`).
+- **Reasons (D11).** Every `Noop` row carries
+  `planned: PlannedChange { action: Noop, message }` with its reason:
+  - "already on origin" (read in this operation);
+  - "up to date with origin/<branch> as of the last fetch or push";
+  - "behind origin/<branch> as of the last fetch or push".
+- **Summary line.** Human output adds one line when repositories were not
+  contacted, for example "7 repositories unchanged since the last fetch or push,
+  not contacted; --check-remotes to verify".
+- **Missing dependency.** A root refused because a dependency is missing names
+  the member, the commit and the read URL. It suggests
+  `gwz push --check-remotes`, which re-checks the members and pushes those whose
+  remote lacks their commit.
+- **Machine-output compatibility change.**
+  - At `c9c7a98`, a push of an unchanged workspace reports every row and the
+    aggregate `ok` (step 0.2).
+  - After Phase 3, a repository with nothing to push reports a `noop` row, and
+    the aggregate is `noop` when nothing was pushed. The exit code stays 0.
+  - JSON tells a checked `noop` from an assumed one only by the message text. A
+    script that needs a result checked against the remote runs
+    `--check-remotes`.
+  - Step 4.1 records this in `MachineOutput.md`.
 
-### 3.7 The default's accepted risk
+### 3.7 The default's accepted risks (D5, narrowed by D10)
 
-A last-known ref records what the remote held at the last fetch or push.
+A last-known ref records what gwz last saw, and gwz fetch and pull never prune.
+Under the default, these refs decide only whether a member is contacted. A root
+publication is always proven by this operation (D10).
 
 - **Remote moved ahead** (someone else pushed): skipping is still right. There
-  is nothing to publish, and the lock commit is still on the remote.
-- **Remote rewound or deleted** since the last fetch or push: the default does
-  not notice. A root published on that basis can name a commit its member
-  remote no longer advertises. The option, or any fetch, closes the gap. The
-  owner accepted this on 2026-09-14 (D5).
+  is nothing to publish, and the member's commit is still on the remote.
+- **Remote rewound, or a branch deleted**, after its tracking ref was written:
+  - The default treats the member as up to date and does not push it.
+  - A fetch does not repair this, because gwz does not prune. It lasts until a
+    pruning fetch (`git fetch --prune`, or `fetch.prune`), a push that
+    recreates the branch, or `--check-remotes`.
+  - If a root being published needs that member's commit, the dependency read
+    finds it missing and refuses the root (§3.6).
+- **A tracking ref written from a different repository** (a push URL since
+  removed, a remote since re-pointed or renamed): the same consequence. The
+  §3.5 conditions exclude what the current configuration shows, not the history
+  of the ref.
+- **A published root that has since become unsound** (a member rewound after
+  the root was published): the default does not detect it, because an
+  unchanged root is not contacted. `--check-remotes` detects it (rule 3), and so
+  does `gwz tag --push`, which reads every dependency.
 - **Last-known ref left behind** (for example after a push through an anonymous
   remote, `transport.rs:471`): costs one contact, never a skipped push.
 
 ## 4. Decisions for the owner
 
-All nine were decided on 2026-09-14.
+All eleven were decided on 2026-09-14. D10 and D11 came from the round-1 review.
 
 - **D1 (decided 2026-09-14): what counts as the same repository** is only the
   rule in §3.1. Rejected for now: a canonical URL form that also folds case,
@@ -315,30 +441,45 @@ All nine were decided on 2026-09-14.
     its push URL, so a root-only push with `--check-remotes` reads it over SSH
     even though an https fetch URL exists.
 - **D3 (decided 2026-09-14): unmaterialized dependencies follow the effective
-  scheme.** A malformed `.gwz/url-scheme.yml` refuses push, as it already
-  refuses materialize. Rejected: always use the committed URL, which keeps one
-  SSH session for each unmaterialized member.
+  scheme.** A malformed `.gwz/url-scheme.yml` refuses a push that has an
+  unmaterialized dependency, as it already refuses materialize. Rejected: always
+  use the committed URL, which keeps one SSH session for each unmaterialized
+  member.
 - **D4 (decided 2026-09-14): an SSH identity override with an https read URL is
   refused.** Rejected: silently read the committed URL for that remote.
 - **D5 (decided 2026-09-14): contact only what changed by default,** with an
-  option that keeps today's check of every remote.
+  option that keeps today's check of every remote. Narrowed by D10.
 - **D6 (decided 2026-09-14): a branch behind its last-known ref is `Noop`
   without contact** on an ordinary push, with its reason shown. Rejected:
   contact the remote and let it reject the push, as today.
 - **D7 (decided 2026-09-14): the option is `--check-remotes`,** carried as an
   additive `remote_check` field on `PushRequest` (`changed`, the default, or
   `always`). Rejected: the working name `--force-check`, which reads as a kind
-  of `--force` (a forced push on `gwz push`).
+  of the global `--force` ("allow destructive behaviour").
 - **D8 (decided 2026-09-14): an accepted push of commit Y proves every ancestor
   of Y.** A remote accepts a ref update only with the full history of the new
   object. This relaxes the intentionally exact comparison in
-  `dependency_was_published` (`publication.rs:110-133`). Rejected: keep the
-  exact comparison and read.
+  `dependency_was_published` (`publication.rs:110-133`). Rule 1's invalidation
+  applies. Rejected: keep the exact comparison and read.
 - **D9 (decided 2026-09-14): the post-push proof reuses this operation's
-  pre-transfer advertisement** for destinations it did not push to. This
-  replaces the deliberate second read described at `publication.rs:187-191`.
-  Rejected: keep the second read, whose only extra coverage is a rewind by
-  someone else during the operation.
+  pre-transfer advertisement** when it proves availability, for destinations
+  this operation did not push to. This replaces the deliberate second read
+  described at `publication.rs:187-191`.
+  - That second read covered a rewind during the operation, either by someone
+    else or by a forced or deleting transfer in the same operation.
+  - Rule 1's invalidation turns the second kind back into a read.
+  - Rejected: keep the second read.
+- **D10 (decided 2026-09-14, from review finding Safety P1-1): publishing the
+  root always proves its dependencies in this operation.** The proof is a read
+  before any transfer (reused per D9) or an accepted push (D8); last-known refs
+  never prove a root dependency.
+  - Rejected: making tracking refs prune-aware and recording which repository
+    wrote them.
+  - Rejected: accepting the deleted-branch and re-pointed-remote cases as risk.
+- **D11 (decided 2026-09-14, from review finding Safety P2-4): a `Noop` row's
+  reason is carried in `planned.message`.** Rejected: a typed field saying
+  whether the result was checked or assumed, which would be a second protocol
+  change.
 
 ## 5. Phases and steps
 
@@ -360,7 +501,7 @@ All nine were decided on 2026-09-14.
 
 **Step 0.1: adoption and baseline.** Docs only.
 
-- D1–D9 were decided on 2026-09-14.
+- D1–D11 were decided on 2026-09-14.
 - Record the root and member heads, and confirm that `c9c7a98` is present.
 - Run the gwz-core suite once to get the reference count.
 - File this plan (root commit).
@@ -438,13 +579,25 @@ Unit tests are table-driven and cover:
 Depends on nothing. Leaf owner. Budget about 200 LOC. Commit: gwz-core.
 
 **Step 1.2: an observable seam and a characterization of today.** Extend
-`tests/g01/tracking_backend.rs`, or the backend the g08 publication tests build:
+`tests/g01/tracking_backend.rs` so it can express every case the later steps
+test on it:
 
-- remotes configurable per path (`name`, `url`, `push_url`);
-- `prepare_push` returns the configured destination when there is one, and
-  today's made-up URL otherwise;
+- remotes configurable per path (`name`, `url`, `push_url`, fetch refspecs);
+- committed files per root commit (`read_file_at_commit`: manifest and lock),
+  so root publication runs;
+- `prepare_push` resolving refspec sources to object ids, as `Git2Backend`
+  does (`push_plan.rs:111-114`), with the configured destination URL;
+- per-path materialization (`is_repository`), heads, an ancestry table
+  (`is_ancestor`, including errors), and advertisements per URL for
+  `ls_remote_url` that a recorded push can move;
 - recorded lists of `ls_remote_url` calls as `(path, url, remote, identity
-  repo)`, and of `push_prepared` calls with their URLs.
+  repo)`, and of `push_prepared` calls with their URLs and refspecs;
+- an overlap counter for `ls_remote_url`, like the existing fetch and push
+  trackers.
+
+Tests that need identity options (D4) run on the native `Git2Backend`, as g08
+does, because the contract default `with_transport` refuses transport options.
+Those refusals happen before any network.
 
 Pin today's read and push sequence with three tests:
 
@@ -456,7 +609,7 @@ Pin today's read and push sequence with three tests:
   today's SSH dependency and proof reads. This test is the gap, and step 2.1
   flips it.
 
-Depends on nothing. Leaf owner. Budget about 300 LOC. Commit: gwz-core.
+Depends on nothing. Leaf owner. Budget about 450 LOC. Commit: gwz-core.
 
 ### Phase 2: https end to end
 
@@ -474,6 +627,8 @@ Implementation:
   `checked_root_request` read `read_url`.
 - `dependency_was_published` compares `plan.url` with `read_url`.
 - The proof refusal names the read URL when it differs from the committed URL.
+- On the push path, the malformed-file refusal names the remedies of §3.3.
+- The identity refusal of §3.3 names `--identity`.
 - The push dry run (`push_member.rs:533-541`) and tag publication inherit the
   change through `root_dependencies`.
 
@@ -488,13 +643,17 @@ Tests on the step-1.2 seam:
 - An https remote on an unknown host reads the committed URL.
 - An unmaterialized dependency with `.gwz/url-scheme.yml` set to `https` reads
   the derived https URL with no identity repo.
-- A malformed `.gwz/url-scheme.yml` gets the existing refusal.
-- A per-remote SSH identity with an https read URL gets the existing identity
-  refusal before any transfer.
+- A malformed `.gwz/url-scheme.yml` refuses a push with an unmaterialized
+  dependency, naming the push remedies.
+- A proof refusal names the read URL.
 - `a_completed_member_push_counts_as_publication_with_or_without_force` is
   updated for the new field.
 
-Depends on 1.1 and 1.2. Integration owner. Budget about 350 LOC. Commit:
+Tests on the native backend: a per-remote SSH identity with an https read URL
+refuses before any transfer, for a whole push and for a root-only push, naming
+`--identity`.
+
+Depends on 1.1 and 1.2. Integration owner. Budget about 400 LOC. Commit:
 gwz-core.
 
 **Step 2.2: tag publication parity.** Tests only, unless they find a gap.
@@ -509,17 +668,20 @@ Depends on 2.1. Leaf owner. Budget about 150 LOC. Commit: gwz-core.
 
 ### Phase 3: contact only what changed
 
-Milestone: a push with nothing to publish makes no connections, and with the
-option each destination is read once.
+Milestone: a push with nothing to publish makes no connections; a push that
+publishes the root proves every dependency in the operation; with the option,
+each destination is read at most once and an unchanged root is still proven.
 
 **Step 3.1: last-known-state classification.** A pure function in a new
 `src/workspace_ops/push_state.rs`.
 
 - Inputs: the source object, the last-known ref's object if there is one,
-  whether the push is forced, and the ancestry of the two objects.
-- Output: equal, behind, ahead, diverged or unknown, with the contact decision
-  of §3.5 rule 2.
-- Unit tests cover every cell of the §3.5 table.
+  whether the captured refspec starts with `+`, and the ancestry answer (true,
+  false or error).
+- Output: equal, behind, ahead, diverged or unknown (no ref, or an ancestry
+  error), with the contact decision of §3.5 rule 2.
+- Equality compares object ids, never ancestry.
+- Unit tests cover every cell of the §3.5 table, including an ancestry error.
 
 Depends on nothing, so it can start alongside Phase 1. Leaf owner. Budget about
 150 LOC. Commit: gwz-core.
@@ -528,44 +690,65 @@ Depends on nothing, so it can start alongside Phase 1. Leaf owner. Budget about
 `always`; absent means `changed`) to `PushRequest` in `protocol/gwz.taut.py`,
 per D7.
 
-- Regenerate with `protocol/regen.py`: generated code, corpus and message
-  catalog.
-- Every `PushRequest { .. }` literal gains `remote_check: None`; there are three
-  in `handle_tag.rs` alone. The compiler finds them.
-- Regenerate the gwz-py bindings and move the drift pin in
+- Regenerate: `protocol/regen.py` (generated code and corpus),
+  `docs/generate_message_catalog.py` (`docs/MessageCatalog.md`), and gwz-py's
+  `scripts/regen_protocol.py`. Move the drift pin in
   `gwz-py/scripts/check_protocol_drift.py` with a dated note, as the parent
   plan's step 1.2 did.
+- Fan-out: every `PushRequest { .. }` literal gains `remote_check: None`:
+  - gwz-core `handle_tag.rs` (3 matches of `PushRequest {`) and `tests/g08.rs`
+    (13 matches);
+  - gwz-cli `src/clirequest/invocation.rs:255`.
+
+  Check gwz-py's two `PushRequest(...)` calls in `src/gwz/client.py`
+  (803, 813).
+- Gate: after the step's commits, `cargo build --locked --bin gwz` from the
+  gwz-dev root succeeds, and gwz-py's `run_tests.py` passes without
+  `GWZ_RUST_BIN`.
 
 Depends on nothing, so it can start alongside Phase 1. Integration owner, since
-it changes the contract. Budget about 150 hand-written LOC plus generated
-output. Commits: gwz-core, then gwz-py.
+it changes the contract. Budget about 160 hand-written LOC plus generated
+output. Commits: gwz-core, gwz-cli, then gwz-py.
 
-**Step 3.3: check once.** `ReadPreflight` keeps each advertisement it reads,
-keyed as today by identity repo, remote and read URL. Then, in `push_member.rs`
-and `publication.rs`:
+**Step 3.3: check once.** Implement §3.5 rule 1 in `publication.rs` and
+`push_member.rs`:
 
+- `ReadPreflight` keeps each advertisement it reads, keyed by identity repo
+  (none for an unmaterialized dependency), remote and read URL.
 - After the pre-transfer reads, a selected repository whose kept advertisement
   shows every destination ref at its source object is `Noop` ("already on
   origin") and is not pushed.
 - `preflight_dependencies_with_reads` answers from a kept advertisement instead
   of only skipping the read.
-- `checked_root_request` proves a dependency from its kept advertisement when
-  this operation did not push to that destination (D9). For a destination it
-  pushed to, `dependency_was_published` accepts a lock commit that is the pushed
-  source or one of its ancestors (D8). Anything else is read, as today.
+- `checked_root_request` proves a dependency from a kept advertisement that
+  proves availability, for a destination this operation did not push to (D9).
+  For a destination it pushed to, `dependency_was_published` accepts a lock
+  commit that is the pushed source or one of its ancestors (D8). Anything else
+  is read.
+- A forced or deleting transfer to a repository invalidates its kept
+  advertisements and D8 proofs across every identity repo and remote name that
+  reaches it; dependencies on that repository are read after all transfers.
+- Update the module comment at `publication.rs:1-3`.
 
 Tests on the step-1.2 seam:
 
 - the check-once counts of §2.3's second table, with N from the fixture; 1.2(a)
   and (b) move to these counts;
-- a destination pushed in this operation is never proven from its pre-push
-  advertisement;
+- a destination pushed in this operation is proven by D8 or by a read, never by
+  its pre-push advertisement;
 - an advertisement without the destination ref still pushes;
 - a member whose head is ahead of its lock commit is proven by its push, with
-  no read.
+  no read;
+- two members that reach one repository, a forced refspec and `always`: the
+  root is refused; the non-forced variant reuses the kept advertisement with no
+  extra read;
+- a forced push that rewinds a member's remote: the root is refused;
+- concurrent forced pushes of one repository from two members: the root is
+  refused;
+- under `always`, one unmaterialized dependency is read exactly once.
 
 Depends on 1.2 and 2.1, which edit the same functions. Integration owner.
-Budget about 350 LOC. Commit: gwz-core.
+Budget about 450 LOC. Commit: gwz-core.
 
 **Step 3.4: concurrent reads.** Run the pre-transfer reads
 (`push_member.rs:222-257`) and any remaining proof reads through
@@ -578,7 +761,7 @@ pushes.
   and no transfer starts.
 
 Tests: the report order is unchanged; failure aggregation is unchanged; the
-per-host limit holds (the tracking backend counts concurrent calls).
+per-host limit holds (the step-1.2 overlap counter).
 
 Depends on 3.3. Integration owner. Budget about 250 LOC. Commit: gwz-core.
 
@@ -586,47 +769,90 @@ Depends on 3.3. Integration owner. Budget about 250 LOC. Commit: gwz-core.
 
 - **Backend.** A contract query for a destination's last-known ref. It answers
   `None` by default, so fakes and every unknown case contact the remote. The
-  Git2 implementation maps the destination through the named remote's fetch
-  refspecs and answers only under §3.5's push-URL condition.
-- **Push.** With `remote_check` absent or `changed`, classify each selected
-  repository (step 3.1) before any read, and apply §3.5 rule 2. With `always`,
-  skip the classification (rule 3).
-- **Output.** The `Noop` reasons of §3.6, in JSON and in `--dry-run`.
+  Git2 implementation applies every §3.5 condition. The tracking backend gains
+  an override.
+- **Push.**
+  - With `remote_check` absent or `changed`, classify each selected repository
+    (step 3.1) before any read, and apply §3.5 rule 2.
+  - A contacted root that is published proves every root-lock dependency in the
+    operation (D10).
+  - With `always`, skip the classification, and prove a `Noop` root after member
+    transfers (rule 3).
+- **Output.** The `Noop` reasons of §3.6 in `planned.message`, in JSON and in
+  `--dry-run`, and the missing-dependency refusal of §3.6.
 
-Tests:
+Tests on the step-1.2 seam:
 
-- nothing changed: no transport calls;
-- one member and the root changed: reads and pushes for those two only;
-- a lock commit that no last-known ref contains is read, and refused when the
-  remote lacks it;
+- nothing changed: no transport calls; rows and aggregate `noop`, each row with
+  its reason;
+- one member and the root changed: those two are read and pushed, and every
+  other dependency is read once (N+3 in total);
 - `always` gives the check-once counts;
-- no last-known ref, a renamed remote, and a push URL that is a different
-  repository all contact the remote;
-- a forced push of a branch behind its last-known ref contacts the remote;
+- `--dry-run` reports the classification with no transport calls;
+- `policy.destructive = Allow` with `refspec: None`, on a branch behind its
+  last-known ref: `Noop` ("behind …"), no transport calls;
+- the same state with a `+` refspec: contacted;
+- a `+` refspec with an equal last-known ref and an advertisement at a
+  descendant: contacted and pushed;
+- a published root whose dependency was rewound, under `always`: root
+  `Rejected`, nothing pushed; the root-only variant gives the same result; the
+  sound variant gives root `Noop` with no extra reads;
+- no last-known ref, a remote renamed with `git remote rename fork origin`, a
+  push URL that is a different repository, and an ancestry error all contact the
+  remote;
 - a last-known ref left behind contacts the remote, then finds nothing to push.
 
-Depends on 3.1, 3.2 and 3.4. Integration owner. Budget about 400 LOC. Commit:
+Depends on 3.1, 3.2 and 3.4. Integration owner. Budget about 450 LOC. Commit:
 gwz-core.
 
-**Step 3.6: Rust CLI option.** `gwz push --check-remotes` (name per D7), mapped
-to `remote_check: always`.
+**Step 3.6: native tests for last-known refs and the root proof.** On the
+native `Git2Backend` with local bare remotes, as g08 does:
 
-- Help text, then regenerate the CLI reference with
-  `python scripts/generate_cli_reference.py --write` and confirm with
+- **A deleted remote branch.** A member branch pushed through gwz (which writes
+  the tracking ref) is deleted in the bare remote from another clone, and a
+  non-pruning fetch follows. The root lock names the member commit, and a
+  default push runs. Expected: the member is `Noop`, the dependency read refuses
+  the root with the §3.6 message, and the bare root ref is unchanged.
+- **A fork push URL, later removed.** Two bare remotes stand in for upstream and
+  fork. Push through the fork push URL, unset it, record the commit in the root
+  lock, and push. Expected: the dependency read of upstream refuses the root.
+- **Excluded layouts.** A second remote whose fetch refspec writes into
+  `refs/remotes/origin/*`, and a `+refs/heads/*:refs/heads/*` fetch refspec,
+  each give no last-known ref, so the member is contacted.
+- **A different-repository push URL.** A remote whose `pushurl` names another
+  repository, with an equal tracking ref, is contacted.
+
+Depends on 3.5. Integration owner. Budget about 250 LOC. Commit: gwz-core.
+
+**Step 3.7: Rust CLI option.** `gwz push --check-remotes` (D7), mapped to
+`remote_check: always`.
+
+- Help text, including the push help source behind `docs/commands/push.md`
+  "Publication and authentication":
+  - dependencies are proven by this operation's reads or accepted pushes;
+  - unchanged repositories are not contacted by default;
+  - what `--check-remotes` checks.
+- Regenerate the CLI reference with
+  `python scripts/generate_cli_reference.py --write`, and confirm with
   `--check`.
 - Human output: the summary line of §3.6, and each `Noop` reason under
   `--verbose`.
-- Tests in `gwz-cli/tests`: parsing, JSON passthrough, the summary line.
+- Tests in `gwz-cli/tests`:
+  - parsing, including that `push --force` still yields `refspec: None`;
+  - JSON goldens for an unchanged workspace under `changed` and under `always`
+    (rows, aggregate and reasons);
+  - the summary line.
 
 Depends on 3.2, and on 3.5 for the end-to-end assertions. Leaf owner. Budget
-about 200 LOC. Commit: gwz-cli.
+about 250 LOC. Commit: gwz-cli.
 
-**Step 3.7: gwz-py option.** The same option on gwz-py's push parser
-(`src/gwz/cli_shared.py` or `cli_mutation.py`), the request field, and rendering
-of the `Noop` reasons. Tests run through `run_tests.py`.
+**Step 3.8: gwz-py option.** Add the same option to gwz-py's push parser
+(`src/gwz/cli_shared.py` or `cli_mutation.py`) and the request field. Render
+both kinds of `Noop` reason and the §3.6 summary line. Tests run through
+`run_tests.py`.
 
-Depends on 3.2, and on 3.5 for the end-to-end assertions. Parallel with 3.6.
-Leaf owner. Budget about 150 LOC. Commit: gwz-py.
+Depends on 3.2, and on 3.5 for the end-to-end assertions. Parallel with 3.7.
+Leaf owner. Budget about 180 LOC. Commit: gwz-py.
 
 ### Phase 4: finish
 
@@ -635,43 +861,57 @@ Leaf owner. Budget about 150 LOC. Commit: gwz-py.
 
 - an https clone publishes over https end to end;
 - the rule for the URL the root proof reads, in one sentence;
-- how to switch an existing SSH workspace: either
-  `git -C <path> remote set-url origin https://github.com/<owner>/<repo>.git`
-  for the root and each member, or a fresh clone with `--url-scheme https`.
-  `gwz repo sync` keeps the manifest URL (parent plan §2.8);
-- the identity refusal of §3.3;
+- how to switch an existing SSH workspace:
+  - either `git -C <path> remote set-url origin https://github.com/<owner>/<repo>.git`
+    for the root and each member, or a fresh clone with `--url-scheme https`;
+  - a workspace switched by hand has no `.gwz/url-scheme.yml`, so unmaterialized
+    members keep reading their committed URLs until one is recorded;
+  - `gwz repo sync` keeps the manifest URL (parent plan §2.8);
+- the identity refusal of §3.3, and `--identity` as its remedy;
 - a push contacts only repositories that changed since the last fetch or push,
-  and what each `Noop` reason means;
+  what each `Noop` reason means, and that publishing the root still reads every
+  dependency;
 - `--check-remotes`, and when to use it: when someone else may have rewound a
-  remote, or before a release.
+  remote, before a release, or to check an unchanged root;
+- in Troubleshooting, that gwz does not prune: a branch deleted on the remote
+  keeps its member up to date until `git fetch --prune`, `fetch.prune`, a push
+  or `--check-remotes`.
 
-Also:
+Also, unconditionally:
 
-- If gwz-core `dev-docs/GWZDesign.md` names the committed URL as what the proof
-  reads, or describes the second read, update that paragraph.
-- Regenerate the CLI reference only if help text changes beyond step 3.6.
+- Update `dev-docs/GWZDesign.md:96-98` in gwz-core: dependencies are proven by
+  this operation's reads or accepted pushes, unchanged repositories are not
+  contacted by default, and `--check-remotes` proves an unchanged root.
+- In gwz-cli `docs/MachineOutput.md`, document push `noop` rows and aggregate,
+  their reasons, and the compatibility change of §3.6.
+- Grep gwz-core and gwz-cli docs for "available at their destinations" and
+  similar statements, and qualify any that remain.
 
-Depends on 2.1 and 3.6. Leaf owner. Budget about 180 LOC. Commits: gwz-cli, and
-gwz-core if `GWZDesign.md` changes.
+Depends on 2.1, 3.5 and 3.7. Leaf owner. Budget about 220 LOC. Commits: gwz-cli,
+then gwz-core.
 
 **Step 4.2: acceptance against GitHub.** The owner runs it with a binary built
 from the committed tree and installed to a scratch `--root`. It never replaces
 `~/.cargo/bin/gwz` and is never a `target/` build against gwz-dev.
 
 Capture JSON, poll sockets and record wall-clock time for every case. Each push
-has nothing to publish unless the owner names a real publication.
+has nothing to publish unless the owner names a real publication; run
+`--dry-run` first and stop if it shows anything to publish.
 
 1. A fresh `--url-scheme https` clone, whole push: no sockets.
 2. The same clone with `--check-remotes`: N+1 port-443 sessions (one read per
    repository), no port-22 sessions, and no pushes.
 3. The same clone, root-only push with `--check-remotes`: port-443 sessions
    only.
-4. gwz-dev itself (SSH), whole push with `--check-remotes`: N+1 port-22
-   sessions and no pushes.
+4. A fresh SSH clone of the published workspace
+   (`gwz clone git@github.com:owebeeone/gwz-dev.git <dir>`), whole push with
+   `--check-remotes`: N+1 port-22 sessions and no pushes. Record the clone's
+   path and root commit.
 5. A scratch member that fetches over https and pushes over SSH, with
    `--check-remotes`: that member is read over SSH only.
 6. One member and the root changed, default, as a real publication the owner
-   names: 4 sessions.
+   names: N+3 sessions (the member's read and push, the root's read and push,
+   and one read for each other dependency).
 7. Optional: a tag push, only for a tag the owner wants published.
 
 Write the results to `dev-docs/GwzUrlSchemePushAcceptance-<date>.md` (root
@@ -682,18 +922,20 @@ commit). Include:
 - the account each transport used;
 - what remains open.
 
-Depends on 0.2, 2.2, 3.5, 3.6, 3.7 and 4.1.
+Depends on 0.2, 2.2, 3.6, 3.8 and 4.1.
 
 ### Dependency summary
 
 ```text
 0.1 -> {1.1, 1.2} -> 2.1 -> {2.2, 3.3}
-3.3 -> 3.4 -> 3.5
+3.3 -> 3.4 -> 3.5 -> 3.6
 {3.1, 3.2} -> 3.5            (3.1 and 3.2 can start alongside Phase 1)
-3.2 -> {3.6, 3.7}            (end-to-end assertions after 3.5)
-{2.2, 3.5, 3.6, 3.7} -> 4.1 -> 4.2
-0.2 (ran 2026-09-14) -> 4.2
+3.2 -> {3.7, 3.8}            (end-to-end assertions after 3.5)
+{2.1, 3.5, 3.7} -> 4.1
+{0.2, 2.2, 3.6, 3.8, 4.1} -> 4.2
 ```
+
+Step 0.2 ran on 2026-09-14.
 
 ## 6. Test matrix (what "done" means)
 
@@ -703,16 +945,20 @@ Depends on 0.2, 2.2, 3.5, 3.6, 3.7 and 4.1.
 | today's read and push sequence over SSH, whole and root-only push | core, tracking backend | 1.2 |
 | https member remotes with SSH committed URLs: no SSH reads, dedup and shortcut hit | core | 2.1 |
 | fork, split fetch/push and unknown-host remotes resolve as §3.2 specifies | core | 2.1 |
-| unmaterialized dependency follows `.gwz/url-scheme.yml`; malformed file refuses | core | 2.1 |
-| SSH identity override with an https read URL refuses before any transfer | core | 2.1 |
+| unmaterialized dependency follows `.gwz/url-scheme.yml`; malformed file refuses with push remedies | core | 2.1 |
+| proof refusal names the read URL | core | 2.1 |
+| SSH identity override with an https read URL refuses before any transfer, whole and root-only, naming `--identity` | native | 2.1 |
 | SSH workspace reads unchanged by Phase 2 | core (1.2 tests unchanged) | 2.1 |
 | root tag push reads through the read URL | core | 2.2 |
-| last-known-state classification, every cell of §3.5 | unit | 3.1 |
-| `remote_check` round-trips; py drift pin | generated corpus, `check_protocol_drift.py` | 3.2 |
-| check once: §2.3 counts; no proof from a pre-push advertisement; an ahead member proven by its push | core, tracking backend | 3.3 |
+| classification, every cell of §3.5 including an ancestry error | unit | 3.1 |
+| `remote_check` round-trips; the catalog lists it; py drift pin; gwz-cli builds | generated corpus, catalog, `check_protocol_drift.py`, `cargo build` | 3.2 |
+| check once: counts; pushed destinations never proven from pre-push advertisements; ahead member proven by its push; forced-transfer invalidation; unmaterialized dependency read once | core, tracking backend | 3.3 |
 | concurrent reads: report order, failure aggregation, per-host limit | core | 3.4 |
-| default: no transport calls when nothing changed; only changed repositories contacted; unknown cases contact | core | 3.5 |
-| option parsing, JSON passthrough, human summary | gwz-cli and gwz-py tests | 3.6, 3.7 |
+| default: no transport calls when nothing changed; `noop` rows and reasons; publishing the root reads every dependency; `--dry-run`; `--force` and `+` refspec cases; `always` proves a `Noop` root | core, tracking backend | 3.5 |
+| deleted remote branch and removed fork push URL refuse the root; excluded refspec layouts and a different-repository push URL are contacted | native | 3.6 |
+| option parsing; `--force` keeps `refspec: None`; JSON goldens under `changed` and `always`; summary line | gwz-cli tests | 3.7 |
+| option, both `noop` reasons, summary line | gwz-py tests | 3.8 |
+| GWZDesign, push help, MachineOutput and Troubleshooting state the proof sources, `noop` compatibility and pruning | review of the step-4.1 diff | 4.1 |
 | real GitHub: nothing to publish makes no connections; the option reads each repository once over its own scheme | manual, acceptance note | 4.2 |
 
 ## 7. Risks and open points
@@ -736,12 +982,21 @@ Depends on 0.2, 2.2, 3.5, 3.6, 3.7 and 4.1.
     credentials, so the exposed case is a remote someone switched by hand.
   - The refusal names the read URL. The remedy is a credential helper, or
     reverting that remote.
-- **Stale last-known refs.** The default trusts them. §3.7 lists what that
-  misses, and D5 records the owner's choice.
-- **The test seam cannot see URLs today.** Step 1.2 exists so that the changes
-  in 2.1 and 3.3 are measured against a pinned sequence, not against memory.
+  - Rule 3's https reads of a private, unmaterialized member can start an
+    interactive credential helper during a push. This fails closed.
+- **Stale last-known refs.** The default trusts them only to decide whether a
+  member is contacted (§3.7); root publications are proven in the operation
+  (D10).
+- **Mixed versions.** A core that predates `remote_check` either ignores the
+  field and contacts everything, as today, or rejects the request. Both are
+  safe. An old client talking to a new core gets `changed`, D7's default.
+- **The test seam.** Step 1.2 specifies everything later steps test on it, so
+  the changes in 2.1, 3.3 and 3.5 are measured against a pinned sequence. The
+  Git2 last-known-ref mapping is tested natively in step 3.6.
 - **The base is unpushed.** If `c9c7a98` is reworked, 2.1's shortcut comparison
   follows the rework.
+- **Pre-existing, not this plan.** `GWZDesign.md:1601` lists a push `--refspec`
+  flag that gwz-cli does not have.
 - **Open: connection reuse.** A changed repository still costs one read and one
   push. Reusing the read's connection for the push is a separate item.
 - **Open: sockets, not transport rows.** `TransportObservation` carries no URL
