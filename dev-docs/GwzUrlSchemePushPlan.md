@@ -9,6 +9,10 @@ afterwards without re-review, as both reports allow (§9).**
 Implementation: steps 1.1, 1.2, 3.1 and 3.2 landed on 2026-09-15, merged from
 parallel lanes (gwz-core `3f5ff1e`, gwz-cli `9fa3189`, gwz-py `2921d09`, root
 `a9ffadb`). §7 and step 3.2 were then corrected from what step 3.2 found.
+Steps 2.1, 3.7 and 3.8 landed the same day from a second round of lanes
+(gwz-core `5bf8f1a`, gwz-cli `31b14a3`, gwz-py `b97ff00`, root `c5d970c`).
+Their findings are recorded as "As landed" notes under steps 2.1, 3.7 and 3.8,
+and as the row-status rule in step 3.5.
 Step 0.2 ran on 2026-09-14.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
@@ -708,6 +712,18 @@ refuses before any transfer, for a whole push and for a root-only push, naming
 Depends on 1.1 and 1.2. Integration owner. Budget about 400 LOC. Commit:
 gwz-core.
 
+As landed (gwz-core `5bf8f1a`, about 100 lines of code and 338 of tests):
+
+- The `--identity` remedy is in `transport_support/identity.rs`, so clone,
+  fetch and tag now show it as well as push. Step 4.1 can describe it once for
+  every command.
+- The three read sites take the identity repository from the read rule instead
+  of calling `is_repository` again.
+- `read_workspace_url_scheme` now takes the remedy text. Push asks for the file
+  to be deleted or repaired, and materialize keeps its own wording.
+- Step 2.1 corrected the first lines of the `publication.rs` module comment;
+  step 3.3 still owns its rewrite.
+
 **Step 2.2: tag publication parity.** Tests only, unless they find a gap.
 
 - In a workspace whose member remotes are https and whose committed URLs are
@@ -846,6 +862,13 @@ Depends on 3.3. Integration owner. Budget about 250 LOC. Commit: gwz-core.
     transfers (rule 3).
 - **Output.** The `Noop` reasons of §3.6 in `planned.message`, in JSON and in
   `--dry-run`, and the missing-dependency refusal of §3.6.
+- **Row status.** A row that carries a §3.6 `Noop` reason has status `Noop` and
+  `planned.action: Noop`, in a dry run as well. Pull's dry run already does
+  this for its no-op rows (`PullHeadPlan::planned_response`,
+  `pull_head_plan.rs:82-97`). The two CLIs pick summary rows differently: the
+  Rust CLI by status `Noop` (`gwz-cli/src/pushargs.rs`), gwz-py by
+  `planned.action` (`gwz-py/src/gwz/cli_render_parts/push.py`). Any other status
+  for these rows makes the CLIs disagree.
 
 Tests on the step-1.2 seam:
 
@@ -856,7 +879,8 @@ Tests on the step-1.2 seam:
   reason "up to date with origin/main as of the last fetch or push", and the
   summary line counts them as not checked for changes;
 - `always` gives the check-once counts;
-- `--dry-run` reports the classification with no transport calls;
+- `--dry-run` reports the classification with no transport calls, unchanged
+  rows with status `Noop`;
 - `policy.destructive = Allow` with `refspec: None`, on a branch behind its
   last-known ref: `Noop` ("behind …"), no transport calls;
 - the same state with a `+` refspec: contacted;
@@ -926,6 +950,16 @@ Depends on 3.5. Integration owner. Budget about 250 LOC. Commit: gwz-core.
 Depends on 3.2, and on 3.5 for the end-to-end assertions. Leaf owner. Budget
 about 250 LOC. Commit: gwz-cli.
 
+As landed (gwz-cli `31b14a3`, about 420 lines, 274 of them tests):
+
+- Parsing, help and summary-line tests are in
+  `src/tests/g02/push_check_remotes.rs`, not `tests/`, because the parser and
+  renderers are crate-private.
+- `docs/commands/push.md` has no generator, so it was edited directly, along
+  with `src/push_long.rs`.
+- The JSON goldens wait for 3.5. They belong in `tests/local_workflows.rs`,
+  against local bare remotes.
+
 **Step 3.8: gwz-py option.** Add the same option to gwz-py's push parser
 (`src/gwz/cli_shared.py` or `cli_mutation.py`) and the request field. Render
 both kinds of `Noop` reason and the §3.6 summary line. Tests run through
@@ -933,6 +967,16 @@ both kinds of `Noop` reason and the §3.6 summary line. Tests run through
 
 Depends on 3.2, and on 3.5 for the end-to-end assertions. Parallel with 3.7.
 Leaf owner. Budget about 180 LOC. Commit: gwz-py.
+
+As landed (gwz-py `b97ff00`, about 285 lines, 205 of them tests):
+
+- The two CLIs share the text, not the layout. gwz-py prints the summary line
+  after the status line and lists `<path>: <reason>` under `--verbose`. The
+  Rust CLI prints the summary last and adds the reason to each row under
+  `--verbose`.
+- No test compares the two CLIs: `test_cli_parity.py` runs gwz-py's parser
+  only. After 3.5, the owed end-to-end tests should also check that both CLIs
+  print the same summary text and the same JSON rows for one workspace.
 
 ### Phase 4: finish
 
