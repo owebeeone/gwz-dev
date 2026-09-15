@@ -13,9 +13,11 @@ Steps 2.1, 3.7 and 3.8 landed the same day from a second round of lanes
 (gwz-core `5bf8f1a`, gwz-cli `31b14a3`, gwz-py `b97ff00`, root `c5d970c`).
 Steps 2.2 and 3.3 followed from a third round (gwz-core `34cf67b`, root
 `2bac332`), step 3.4 from a fourth (gwz-core `d7b2d41`, root `fc69673`) and
-step 3.5 from a fifth (gwz-core `afeeadc`, root `77fe305`). What the lanes found
-is recorded as "As landed" notes under steps 2.1, 2.2, 3.3, 3.4, 3.5, 3.7 and
-3.8, and as the row-status rule in step 3.5.
+step 3.5 from a fifth (gwz-core `afeeadc`, root `77fe305`). Steps 3.6 and 4.1
+and the end-to-end tests owed by 3.7 and 3.8 followed from a sixth round
+(gwz-core `230998a`, gwz-cli `0c54380`, gwz-py `07d6735`, root `c1c9cc8`).
+What the lanes found is recorded as "As landed" notes under steps 2.1, 2.2,
+3.3, 3.4, 3.5, 3.6, 3.7, 3.8 and 4.1, and as the row-status rule in step 3.5.
 Step 0.2 ran on 2026-09-14.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
@@ -1076,6 +1078,36 @@ native `Git2Backend` with local bare remotes, as g08 does:
 
 Depends on 3.5. Integration owner. Budget about 250 LOC. Commit: gwz-core.
 
+As landed (gwz-core `d7d9c12`, merged as `230998a`; +375 test lines, mostly in
+`src/workspace_ops/tests/g08/last_known_refs.rs`):
+
+- **Cases.** All six pass on the native backend.
+  - **Refusal cases.** Each asserts four things:
+    - the member is `Noop`;
+    - the root is `RemoteRejected`, with a message that names `--check-remotes`;
+    - there are exactly three reads: the root, the dependency and one re-read;
+    - the bare root ref is unchanged.
+  - **Layout cases.** Each calls `last_known_ref` directly before and after the
+    change, then checks that a default push reads once.
+- **Mutation checks.**
+  - Dropping any one Git2 condition fails its matching layout case.
+  - Letting the root proof trust a last-known ref fails all three refusal
+    cases.
+- **Deviations.**
+  - Because of the defect below, the fork case pushes with `git push`, and the
+    push-URL layout case shows contact as a read.
+  - The `+refs/heads/*:refs/heads/*` refspec is `origin`'s only fetch refspec.
+    Next to the standard mapping, the query would still return a ref, because
+    that refspec does not write under `refs/remotes/origin/`.
+  - The tests need `git` on PATH.
+- **Defect found, not fixed.** On local-path remotes, a push through a remote
+  with a `pushurl` writes into the fetch-URL repository, and can overwrite a
+  branch there. In libgit2 1.9.7, `transports/local.c` opens the fetch URL for
+  a push. This needs its own fix.
+- **Pruning.** The backend fetch honours `fetch.prune`. So the plan's statement
+  that gwz fetch and pull never prune holds only without that setting;
+  `remote.<name>.prune=false` overrides it.
+
 **Step 3.7: Rust CLI option.** `gwz push --check-remotes` (D7), mapped to
 `remote_check: always`.
 
@@ -1107,8 +1139,14 @@ As landed (gwz-cli `31b14a3`, about 420 lines, 274 of them tests):
   renderers are crate-private.
 - `docs/commands/push.md` has no generator, so it was edited directly, along
   with `src/push_long.rs`.
-- The JSON goldens wait for 3.5. They belong in `tests/local_workflows.rs`,
-  against local bare remotes.
+- The JSON goldens landed in the sixth round (gwz-cli `e85e015`). Three tests
+  in `tests/local_workflows.rs` run against local bare remotes:
+  - an unchanged workspace under the default;
+  - an unchanged workspace under `--check-remotes`;
+  - one member plus the root changed.
+
+  Each checks rows, aggregate, reasons, transport observations and the human
+  summary line.
 
 **Step 3.8: gwz-py option.** Add the same option to gwz-py's push parser
 (`src/gwz/cli_shared.py` or `cli_mutation.py`) and the request field. Render
@@ -1124,9 +1162,30 @@ As landed (gwz-py `b97ff00`, about 285 lines, 205 of them tests):
   after the status line and lists `<path>: <reason>` under `--verbose`. The
   Rust CLI prints the summary last and adds the reason to each row under
   `--verbose`.
-- No test compares the two CLIs: `test_cli_parity.py` runs gwz-py's parser
-  only. After 3.5, the owed end-to-end tests should also check that both CLIs
-  print the same summary text and the same JSON rows for one workspace.
+- **End-to-end and parity tests** landed in the sixth round (gwz-py `07d6735`),
+  in `src/tests/test_push_end_to_end.py`.
+  - **End-to-end:** through gwz-py's CLI and native bridge, against local bare
+    remotes. Cases: an unchanged workspace, `--check-remotes`, one member and
+    the root changed, "behind", a dry run, and the missing-dependency refusal.
+  - **Parity:** for one workspace, both CLIs give the same normalised JSON
+    rows, summary text, `--verbose` reasons and `-h` help.
+  - `push --check-remotes` moved into `rust_accept`.
+- **Fixed in that round.** For a refused push, gwz-py printed only "gwz
+  operation returned rejected". It now prints each row error as
+  `<path>: <Code>: <message>` after the status line. The change is in `cli.py`,
+  `cli_render.py` and `cli_render_parts/push.py`.
+- **Normalised by the parity tests.**
+  - The Rust CLI puts the envelope at the top level; gwz-py wraps it in
+    `response`.
+  - Enum spelling differs.
+  - Empty fields are omitted.
+  - Concurrent observations arrive in varying order.
+
+  One difference is not normalised: a refused push exits 2 in the Rust CLI and
+  1 in gwz-py.
+- **Found, not fixed.** gwz-core rejects a path operand with `PathEscape` when
+  `--root` is spelled through a symlink, such as `/tmp` on macOS
+  (`pathspec_routing.rs:58`).
 
 ### Phase 4: finish
 
@@ -1165,6 +1224,37 @@ Also, unconditionally:
 
 Depends on 2.1, 3.5 and 3.7. Leaf owner. Budget about 220 LOC. Commits: gwz-cli,
 then gwz-core.
+
+As landed (gwz-cli `da9a297`, gwz-core `7427e6e`; +192/−9):
+
+- **gwz-cli docs.**
+  - **Concepts** gains a "Publication" section. It covers:
+    - https publishing end to end;
+    - the read-URL rule;
+    - switching an SSH workspace to https;
+    - contacting only what changed, with the reasons and the summary line;
+    - `--check-remotes`.
+  - **QuickStart** links that section from "Clone An Existing Workspace".
+  - **Troubleshooting**
+    - gains "Push Refuses Root Publication" and "Push Skips A Member Whose
+      Remote Changed";
+    - widens the identity refusal to clone, fetch, push and tag.
+  - **MachineOutput** gains "Push JSON". It shows the `Noop` row shape, the
+    three reasons, that a `Noop` aggregate exits 0 with no `meta.transport`,
+    and that 1.0.12 reported `Ok` instead.
+  - **`commands/push.md`** now says a push that contacts the root must prove
+    its dependencies.
+- **gwz-core.** `GWZDesign.md:96-98` no longer says dependencies are "available
+  at their destinations".
+- **Gates.** These pass: `generate_cli_reference.py --check`,
+  `check_merge_docs.py`, `check_local_clone_docs.py`, `mkdocs build --strict`
+  and `cargo test -p gwz`. `docs/CLI.md` and the help text are unchanged.
+- **Left open.**
+  - `GWZRequirements.md:23-24` says dependencies must be "available remotely"
+    before root publication; it could add "as proven by that operation".
+  - `docs/commands/auth.md:34-35` does not name the `--identity` remedy.
+  - It is undocumented that a root tag push needs `--target @root` or `--all`.
+  - The docs show the Rust CLI's human layout, which gwz-py does not match.
 
 **Step 4.2: acceptance against GitHub.** The owner runs it with a binary built
 from the committed tree and installed to a scratch `--root`. It never replaces

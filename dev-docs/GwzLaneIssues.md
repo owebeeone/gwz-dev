@@ -25,11 +25,12 @@ Occurrences:
 - 2026-09-15, round 3: lock-order, push-2-2 and push-3-3, forced.
 - 2026-09-15, round 4: push-3-4, forced.
 - 2026-09-15, round 5: push-3-5, forced.
+- 2026-09-16, round 6: push-3-6, push-4-1 and push-e2e, forced.
 
 **Symptom.** Every lane's work was already merged into gwz-dev. Even so,
 `gwz local dispose <lane>` exits 1 after 5–10 s with `UnwaivedHazard` and
 removes nothing. Round 2's push-2-1 reported the counts below, and the other two
-round-2 lanes reported the same two hazards. Every lane in rounds 3 to 5
+round-2 lanes reported the same two hazards. Every lane in rounds 3 to 6
 reported exactly these counts.
 
 | Repository | `dirty` entries | `unpreserved-history` roots |
@@ -61,7 +62,7 @@ anything the lane did.
   A lane copies gwz-dev's stashes and reflogs, so a lane of any repository that
   has either one refuses.
 
-**Remedy used (rounds 2 to 5).**
+**Remedy used (rounds 2 to 6).**
 
 1. Check that no lane holds anything gwz-dev lacks. For the root and each
    member, compare the lane with gwz-dev:
@@ -117,6 +118,25 @@ imported gwz-dev's source.
   `VIRTUAL_ENV` and `.venv/bin/python -m …`.
 - Merge a gwz-py change into gwz-dev only when no other lane is running gwz-py
   tests.
+
+**Found in round 6 (lane push-e2e).**
+- **Absolute paths.** 18 text files in the venv name the source workspace, and
+  all of them need rewriting:
+  - `gwz.pth`;
+  - five `activate*` scripts;
+  - ten console-script shebangs;
+  - `direct_url.json` and the SBOM.
+- **Native extension.** It is copied from the source workspace's build. Rebuild
+  it with `maturin develop`, passing `VIRTUAL_ENV` explicitly.
+- **Stale caches.** Copied `__pycache__` and `.pytest_cache` directories point
+  at the source workspace's test files. Remove them.
+- **`VIRTUAL_ENV`.** `run_tests.py` sets `VIRTUAL_ENV` only if it is unset. A
+  shell that inherited gwz-dev's `VIRTUAL_ENV` makes `maturin develop` install
+  into gwz-dev's venv, so always set it explicitly.
+- **Proof.** A lane tests its own code when all of these hold:
+  - `gwz.__file__` points into the lane;
+  - the native module's path points into the lane;
+  - the module's recorded revision matches the lane's gwz-core HEAD.
 
 ## L4: each merge rotates lock member fields
 
