@@ -11,8 +11,9 @@ parallel lanes (gwz-core `3f5ff1e`, gwz-cli `9fa3189`, gwz-py `2921d09`, root
 `a9ffadb`). §7 and step 3.2 were then corrected from what step 3.2 found.
 Steps 2.1, 3.7 and 3.8 landed the same day from a second round of lanes
 (gwz-core `5bf8f1a`, gwz-cli `31b14a3`, gwz-py `b97ff00`, root `c5d970c`).
-Their findings are recorded as "As landed" notes under steps 2.1, 3.7 and 3.8,
-and as the row-status rule in step 3.5.
+Steps 2.2 and 3.3 followed from a third round (gwz-core `34cf67b`, root
+`2bac332`). What the lanes found is recorded as "As landed" notes under steps
+2.1, 2.2, 3.3, 3.7 and 3.8, and as the row-status rule in step 3.5.
 Step 0.2 ran on 2026-09-14.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
@@ -734,6 +735,24 @@ As landed (gwz-core `5bf8f1a`, about 100 lines of code and 338 of tests):
 
 Depends on 2.1. Leaf owner. Budget about 150 LOC. Commit: gwz-core.
 
+As landed (gwz-core `19232d7`, 16 lines of code and 139 of tests):
+
+- **No gap.** Tag publication already validates, reads and proves each
+  dependency through the URL step 2.1 selects. A mutation check switched each
+  of the four sites back to the committed URL in turn: URL selection,
+  validation, preflight read and proof read. Each time the https test failed
+  and the all-SSH test still passed.
+- **Test seam.** `handle_tag` accepts only the sealed `MergeAuthorityBackend`,
+  which the recording test backend cannot implement. The body moved into a
+  crate-internal `handle_tag_in` that takes any `GitBackend`, as
+  `handle_push_with_events_in` does for push. The public entry point and the
+  seal are unchanged.
+- **Tests.** They are in `src/workspace_ops/tests/g26/tag_publication.rs` and
+  pin which URLs are read, not how many reads happen. The test backend now
+  models lightweight tags and records the URL passed to each identity check.
+- **Selection.** A root tag push needs `--target @root` or `--all`, because
+  tag selects only members by default. Step 4.2's tag case needs the same.
+
 ### Phase 3: contact only what changed
 
 Milestone: a push with nothing to publish makes no connections; a push that
@@ -831,6 +850,35 @@ Tests on the step-1.2 seam:
 
 Depends on 1.2 and 2.1, which edit the same functions. Integration owner.
 Budget about 450 LOC. Commit: gwz-core.
+
+As landed (gwz-core `f715672`; code +213/−83, tests +503/−97):
+
+- **Brought forward from 3.5.** A root already on origin is still proven, as at
+  `5bf8f1a`. Otherwise a published root with a rewound dependency would report
+  `noop` instead of being refused
+  (`a_root_already_on_origin_is_refused_when_a_dependency_is_missing`). This
+  costs no reads when every dependency is present.
+- **`noop` rows start here.** A repository already on origin reports `noop`
+  with "already on origin", so the §3.6 machine-output change begins with 3.3,
+  not 3.5. Neither CLI's summary line counts that reason.
+- **Forcing rules.**
+  - The root's own forced or deleting refspec also voids kept evidence.
+  - A forced refspec whose destination is already at its source is `Noop` and
+    voids nothing.
+  - Deletions and empty refspec lists are never `Noop`.
+- **Invalidation case (iv)** cannot happen through the product, because
+  `PushRequest.refspec` applies to every target. The test mixes forced and
+  ordinary transfers through `TrackingBackend::force_pushes` instead. The
+  host-alias cases use a `pushurl` on `origin`.
+- **Tag path.** `checked_root_request` now takes the operation's
+  `ReadPreflight`. Tag passes an empty one, so a tag's proof still reads every
+  dependency. Two unmaterialized dependencies with the same remote and read URL
+  are now read once in the tag preflight.
+- **Before 3.5.** The tests' "default" variants run the same path as `always`.
+  Case (v) guards only the D8/D9 boundary until 3.5 adds last-known refs.
+- **Integration.** The merge after 2.2 conflicted only in the test backend,
+  where both steps had added members. The conflict was resolved by keeping
+  both.
 
 **Step 3.4: concurrent reads.** Run the pre-transfer reads
 (`push_member.rs:222-257`) and any remaining proof reads through

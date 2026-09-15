@@ -12,7 +12,7 @@ Observed with the installed gwz 1.0.12; gwz-core source was at
 | L1 | Disposing a merged lane takes two gwz operations and a manual check | open |
 | L2 | An untracked file in a receiving member blocks every lane merge | open |
 | L3 | A verbatim lane's Python venv still points at the source workspace | open |
-| L4 | Each `gwz merge` rotates the fields of every lock member row | fix started |
+| L4 | Each `gwz merge` rotates the fields of every lock member row | fixed in source (gwz-core `44b24ee`), not yet released |
 
 ## L1: disposing a merged lane needs a loss waiver
 
@@ -22,11 +22,13 @@ Occurrences:
   audit).
 - 2026-09-15, round 1: push-1-1, push-1-2, push-3-1 and push-3-2, forced.
 - 2026-09-15, round 2: push-2-1, push-3-7 and push-3-8, forced.
+- 2026-09-15, round 3: lock-order, push-2-2 and push-3-3, forced.
 
 **Symptom.** Every lane's work was already merged into gwz-dev. Even so,
-`gwz local dispose <lane>` exits 1 after 7–10 s with `UnwaivedHazard` and
-removes nothing. Round 2's push-2-1 reported the following; the other two lanes
-reported the same two hazards.
+`gwz local dispose <lane>` exits 1 after 5–10 s with `UnwaivedHazard` and
+removes nothing. Round 2's push-2-1 reported the counts below, and the other two
+round-2 lanes reported the same two hazards. All three round-3 lanes reported
+exactly these counts.
 
 | Repository | `dirty` entries | `unpreserved-history` roots |
 | --- | --- | --- |
@@ -57,7 +59,7 @@ anything the lane did.
   A lane copies gwz-dev's stashes and reflogs, so a lane of any repository that
   has either one refuses.
 
-**Remedy used (round 2).**
+**Remedy used (rounds 2 and 3).**
 
 1. Check that no lane holds anything gwz-dev lacks. For the root and each
    member, compare the lane with gwz-dev:
@@ -68,7 +70,7 @@ anything the lane did.
 2. `gwz local dispose <lane>` refuses as shown above; its output names the
    hazards.
 3. `gwz local dispose <lane> --force dirty,unpreserved-history` succeeds in
-   30–34 s.
+   23–34 s.
 
 Removing a lane is therefore two gwz operations, plus a check that gwz does not
 make itself.
@@ -121,10 +123,11 @@ which only one member's commit actually changed.
 
 **Reason.**
 - `gwz commit` writes member fields in struct order: `path, source_id,
-  source_kind, commit, branch, detached, dirty, materialized`.
+  source_kind, commit, branch, detached, upstream, dirty, materialized`, leaving
+  out fields that are not set.
 - `gwz merge` rewrites each selected row in `render_complete_lock`
-  (`gwz-core/src/workspace_ops/merge/acceptance/v1/support.rs:187-203`) by
-  removing and re-inserting each field.
+  (`gwz-core/src/workspace_ops/merge/acceptance/v1/support.rs:187-203` at
+  `5bf8f1a`) by removing and re-inserting each field.
 - serde_yaml 0.9's `Mapping::remove` is `swap_remove`: it moves the row's last
   field into the gap. So each merge rotates the first seven fields by one place,
   and `materialized` stays last.
@@ -137,7 +140,27 @@ which only one member's commit actually changed.
 **Impact.** Noise only: the merge checks that the rendered YAML parses back to
 the same typed lock.
 
-**Remedy.** Nothing is needed per operation. The fix is `shift_remove`, with a
-test that compares the rendered bytes; it starts in lane `lock-order` on
-2026-09-15. The reordering continues until a gwz release with the fix is
-installed.
+**Remedy.** Nothing is needed per operation.
+
+**Fix.** gwz-core `44b24ee` (lane `lock-order`, merged on 2026-09-15) rebuilds
+each selected row instead of editing it in place:
+
+- Known fields come first, in the commit writer's order, then any fields gwz
+  does not know, in their original order. `shift_remove` would have put the
+  unknown fields first.
+- A new member row goes before the first row with a larger id.
+- Four tests check that:
+  - eight repeated renders stay byte-identical;
+  - the output equals the commit writer's bytes when rows are added;
+  - unknown fields follow the known ones;
+  - the renderer's field list matches `ResolvedMemberArtifact`.
+
+The merge renderer was the only lock writer with its own field order. Every
+other writer serializes the typed lock.
+
+**Limits.**
+
+- Rows that an earlier merge already rotated stay rotated until a later merge
+  selects them, or until a `gwz commit` that commits a member rewrites the lock.
+- Our lanes merge with the installed gwz 1.0.12, so the reordering continues
+  until a gwz release with the fix is installed.
