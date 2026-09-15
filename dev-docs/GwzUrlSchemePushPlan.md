@@ -12,8 +12,9 @@ parallel lanes (gwz-core `3f5ff1e`, gwz-cli `9fa3189`, gwz-py `2921d09`, root
 Steps 2.1, 3.7 and 3.8 landed the same day from a second round of lanes
 (gwz-core `5bf8f1a`, gwz-cli `31b14a3`, gwz-py `b97ff00`, root `c5d970c`).
 Steps 2.2 and 3.3 followed from a third round (gwz-core `34cf67b`, root
-`2bac332`). What the lanes found is recorded as "As landed" notes under steps
-2.1, 2.2, 3.3, 3.7 and 3.8, and as the row-status rule in step 3.5.
+`2bac332`), and step 3.4 from a fourth (gwz-core `d7b2d41`, root `fc69673`).
+What the lanes found is recorded as "As landed" notes under steps 2.1, 2.2,
+3.3, 3.4, 3.7 and 3.8, and as the row-status rule in step 3.5.
 Step 0.2 ran on 2026-09-14.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
@@ -894,6 +895,46 @@ Tests: the report order is unchanged; failure aggregation is unchanged; the
 per-host limit holds (the step-1.2 overlap counter).
 
 Depends on 3.3. Integration owner. Budget about 250 LOC. Commit: gwz-core.
+
+As landed (gwz-core `0495405`; code +298/−87, tests +328/−18):
+
+- **Push only.** `GitBackend` has no `Sync` supertrait, and the tag path accepts
+  any `GitBackend`. So the concurrent reads live in new push-only functions
+  bounded by `Sync`: `ReadPreflight::read_before_transfers` and
+  `checked_root_request_concurrently`.
+  - Tag still reads one at a time and stops at its first failure.
+  - `preflight_dependencies_with_reads` was folded into tag's
+    `preflight_dependencies`.
+  - No public signature changed.
+- **Planned rounds.** A push plans its reads, deduplicated by the
+  `ReadPreflight` key, and runs them all. `jobs` and `per_host` are resolved
+  once and shared with the transfers.
+  - Failures are reported as before: each target's first failure in the
+    target's own order, and the proof's first failure in lock order.
+  - A round with a failure still makes every planned read; the sequential
+    code stopped at the first failure.
+  - A failed destination shared by a member and a dependency is read once and
+    reported on both rows.
+- **Push proof dedup.** Two unmaterialized dependencies with the same remote and
+  read URL are read once in push's proof, as step 3.3 already does in tag's
+  preflight.
+- **Output.**
+  - Reads emit no events, so event order is unchanged.
+  - Git2's `meta.transport` rows for overlapping reads now appear in arrival
+    order, as they already did for pushes.
+  - Concurrent https reads can start several credential helpers at once.
+- **Tests.**
+  - Four new tests in `src/workspace_ops/tests/g26/concurrent_reads.rs` cover
+    report order, failure aggregation, the per-host and `--jobs` limits, and
+    concurrent proof reads after member transfers. Each passed 30 repeated
+    runs.
+  - The test backend gained a read-failure injector and a separate counter for
+    reads after a push.
+  - Two existing g26 tests asserted call order across two hosts, which
+    concurrent reads make vary. They now compare calls per host
+    (`calls_by_host`), still pinning every URL, count and within-host order.
+- **Integration.** Merged after gwz-core `45c72c94`, which adds only
+  `dev-docs/GwzRemoteTransportRequirements.md`. The merge changed neither side.
 
 **Step 3.5: contact only what changed.**
 

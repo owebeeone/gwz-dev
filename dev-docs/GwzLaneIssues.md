@@ -23,12 +23,13 @@ Occurrences:
 - 2026-09-15, round 1: push-1-1, push-1-2, push-3-1 and push-3-2, forced.
 - 2026-09-15, round 2: push-2-1, push-3-7 and push-3-8, forced.
 - 2026-09-15, round 3: lock-order, push-2-2 and push-3-3, forced.
+- 2026-09-15, round 4: push-3-4, forced.
 
 **Symptom.** Every lane's work was already merged into gwz-dev. Even so,
 `gwz local dispose <lane>` exits 1 after 5–10 s with `UnwaivedHazard` and
 removes nothing. Round 2's push-2-1 reported the counts below, and the other two
-round-2 lanes reported the same two hazards. All three round-3 lanes reported
-exactly these counts.
+round-2 lanes reported the same two hazards. Every round-3 and round-4 lane
+reported exactly these counts.
 
 | Repository | `dirty` entries | `unpreserved-history` roots |
 | --- | --- | --- |
@@ -59,7 +60,7 @@ anything the lane did.
   A lane copies gwz-dev's stashes and reflogs, so a lane of any repository that
   has either one refuses.
 
-**Remedy used (rounds 2 and 3).**
+**Remedy used (rounds 2 to 4).**
 
 1. Check that no lane holds anything gwz-dev lacks. For the root and each
    member, compare the lane with gwz-dev:
