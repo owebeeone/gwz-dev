@@ -26,11 +26,12 @@ Occurrences:
 - 2026-09-15, round 4: push-3-4, forced.
 - 2026-09-15, round 5: push-3-5, forced.
 - 2026-09-16, round 6: push-3-6, push-4-1 and push-e2e, forced.
+- 2026-09-16, round 7: fix-pushurl and fix-symlink-root, forced.
 
 **Symptom.** Every lane's work was already merged into gwz-dev. Even so,
 `gwz local dispose <lane>` exits 1 after 5–10 s with `UnwaivedHazard` and
 removes nothing. Round 2's push-2-1 reported the counts below, and the other two
-round-2 lanes reported the same two hazards. Every lane in rounds 3 to 6
+round-2 lanes reported the same two hazards. Every lane in rounds 3 to 7
 reported exactly these counts.
 
 | Repository | `dirty` entries | `unpreserved-history` roots |
@@ -62,7 +63,7 @@ anything the lane did.
   A lane copies gwz-dev's stashes and reflogs, so a lane of any repository that
   has either one refuses.
 
-**Remedy used (rounds 2 to 6).**
+**Remedy used (rounds 2 to 7).**
 
 1. Check that no lane holds anything gwz-dev lacks. For the root and each
    member, compare the lane with gwz-dev:
