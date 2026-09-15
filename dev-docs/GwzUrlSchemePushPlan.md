@@ -12,9 +12,10 @@ parallel lanes (gwz-core `3f5ff1e`, gwz-cli `9fa3189`, gwz-py `2921d09`, root
 Steps 2.1, 3.7 and 3.8 landed the same day from a second round of lanes
 (gwz-core `5bf8f1a`, gwz-cli `31b14a3`, gwz-py `b97ff00`, root `c5d970c`).
 Steps 2.2 and 3.3 followed from a third round (gwz-core `34cf67b`, root
-`2bac332`), and step 3.4 from a fourth (gwz-core `d7b2d41`, root `fc69673`).
-What the lanes found is recorded as "As landed" notes under steps 2.1, 2.2,
-3.3, 3.4, 3.7 and 3.8, and as the row-status rule in step 3.5.
+`2bac332`), step 3.4 from a fourth (gwz-core `d7b2d41`, root `fc69673`) and
+step 3.5 from a fifth (gwz-core `afeeadc`, root `77fe305`). What the lanes found
+is recorded as "As landed" notes under steps 2.1, 2.2, 3.3, 3.4, 3.5, 3.7 and
+3.8, and as the row-status rule in step 3.5.
 Step 0.2 ran on 2026-09-14.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
@@ -986,6 +987,66 @@ Tests on the step-1.2 seam:
 
 Depends on 3.1, 3.2 and 3.4. Integration owner. Budget about 450 LOC. Commit:
 gwz-core.
+
+As landed (gwz-core `afeeadc`; code +291/−30, tests +691/−18):
+
+- **Effect.** A default push with nothing changed makes no connections. Every
+  row and the aggregate are `Noop`, each row carries its reason, and a dry run
+  reports the same rows. With `--check-remotes`, every destination is read
+  once.
+- **Git2 last-known ref.** `last_known_ref` returns a ref only when all of the
+  following hold. Otherwise it returns `None`, and push contacts the remote.
+  - The destination is `refs/heads/<branch>`, and the remote exists.
+  - The remote has no push URL, or its push URL reaches the same repository as
+    its fetch URL.
+  - The remote's fetch refspecs include
+    `+refs/heads/*:refs/remotes/<remote>/*`.
+  - No other fetch refspec, in this remote or any other, can write under
+    `refs/remotes/<remote>/`.
+  - Every fetch entry is readable, and `refs/remotes/<remote>/<branch>` is a
+    direct ref.
+
+  Any other libgit2 error counts as unknown, so the remote is contacted. The
+  branch's upstream is never consulted. The same-remote exclusion is stricter
+  than §3.5 requires, so single-branch and shallow clone layouts are always
+  contacted.
+- **Core.**
+  - Classification runs in the row builders that `--dry-run` and the real
+    preflight share, before capture, and the `dead_code` allowance on
+    `push_state.rs` is gone.
+  - A `Noop` row is never captured, read or pushed.
+  - Only a single ordinary refspec is classified. Forced and deleting pushes
+    are contacted without classifying.
+  - Core re-checks the push-URL condition itself, so no backend can skip a
+    push whose URL reaches another repository.
+  - An uncontacted root is still validated for identity and dependencies. It
+    stays `Noop` even when a member push fails.
+- **Reasons.** They name the real remote:
+  - "already on `<remote>`"
+  - "up to date with `<remote>`/`<branch>` as of the last fetch or push"
+  - "behind `<remote>`/`<branch>` as of the last fetch or push"
+
+  Both CLIs match only the suffix.
+- **Refusal text.** A default push's missing-dependency refusal offers three
+  remedies: publish the member, fetch its advertised history and retry, or run
+  `gwz push --check-remotes`. The fetch remedy is new. When a collaborator has
+  pushed to an unchanged member, only a fetch fixes the proof. With
+  `--check-remotes`, and for tag, the message is as before, as rule 3 says.
+- **Tag path.** Unchanged. `handle_tag.rs` is untouched, and nothing on the tag
+  path reads `remote_check`.
+- **Tests.**
+  - `src/workspace_ops/tests/g26/contact_changed.rs` covers the plan's list
+    and adds a control for a push URL in the other scheme.
+  - A native g08 test checks that a push with nothing changed since the last
+    push makes no connections.
+  - Eight of the tests fail on the old code; six pass there as guards.
+- **For 3.6.**
+  - Test the Git2 conditions by calling `last_known_ref` directly, because core
+    rejects the push-URL case first.
+  - Match the long default refusal with `contains`.
+  - Expect one re-read before a refusal for a rewound or deleted branch.
+  - The renamed-remote and removed-fork-URL cases still return a ref; the D10
+    dependency read then refuses the root.
 
 **Step 3.6: native tests for last-known refs and the root proof.** On the
 native `Git2Backend` with local bare remotes, as g08 does:
