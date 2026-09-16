@@ -25,7 +25,7 @@ class ReleaseTags(unittest.TestCase):
         spec.loader.exec_module(module)
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root/'Cargo.toml').write_text('version = "0.2.0-dev"\ngwz-core = { git = "https://example.invalid/core", tag = "v0.14.0" }\n')
+            (root/'Cargo.toml').write_text('[package]\nversion = "0.2.0-dev"\n\n[dependencies]\ngwz-core = { git = "https://example.invalid/core", tag = "v0.14.0" }\n')
             (root/'BUILD.bazel').write_text('rust_library(\n    version = "0.2.0-dev",\n)\nrust_binary(\n    version = "0.2.0-dev",\n)\n')
             self.assertTrue(module.reconcile_cargo_toml(root, 'v1.0.0-rc.1', '1.0.0-rc.1'))
             self.assertEqual((root/'BUILD.bazel').read_text().count('version = "1.0.0-rc.1"'), 2)

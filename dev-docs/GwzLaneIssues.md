@@ -31,6 +31,8 @@ Occurrences:
   split-crates, forced. Same six dirty and four unpreserved-history members
   each. Plain refused in 5–16 s; forced took 28–44 s, except split-ca at
   238 s.
+- 2026-09-16, round 9: fix-refcopy, fix-g12 and fix-locks, forced. Same
+  counts. Plain refused in 6–15 s; forced took 27–33 s.
 
 **Symptom.** Every lane's work was already merged into gwz-dev. Even so,
 `gwz local dispose <lane>` exits 1 after 5–10 s with `UnwaivedHazard` and
