@@ -3,16 +3,17 @@
 Status: open register, started 2026-09-15. It records each problem met while
 running parallel agents in `gwz local clone` lanes of
 `/Users/owebeeone/limbo/gwz-dev`, with its reason and the remedy used.
-Observed with the installed gwz 1.0.12; gwz-core source was at
-`v1.0.12-13-g5bf8f1a`. Earlier investigation:
-`GwzLaneDisposalAudit-2026-09-10.md`.
+Observed with the installed gwz 1.0.12 through round 9; gwz-core source was at
+`v1.0.12-13-g5bf8f1a` when the register opened. gwz 1.0.13 was released and
+installed on 2026-09-16: it carries the L4 fix and changes nothing for L1 to
+L3. Earlier investigation: `GwzLaneDisposalAudit-2026-09-10.md`.
 
 | ID | Problem | Status |
 | --- | --- | --- |
-| L1 | Disposing a merged lane takes two gwz operations and a manual check | open |
+| L1 | Disposing a merged lane takes two gwz operations and a manual check | open; requirements draft in gwz-core `dev-docs/GwzLaneCleanFixes.md` |
 | L2 | An untracked file in a receiving member blocks every lane merge | open |
 | L3 | A verbatim lane's Python venv still points at the source workspace | open |
-| L4 | Each `gwz merge` rotates the fields of every lock member row | fixed in source (gwz-core `44b24ee`), not yet released |
+| L4 | Each `gwz merge` rotates the fields of every lock member row | fixed (gwz-core `44b24ee`), released in gwz 1.0.13 |
 
 ## L1: disposing a merged lane needs a loss waiver
 
@@ -191,5 +192,6 @@ other writer serializes the typed lock.
 
 - Rows that an earlier merge already rotated stay rotated until a later merge
   selects them, or until a `gwz commit` that commits a member rewrites the lock.
-- Our lanes merge with the installed gwz 1.0.12, so the reordering continues
-  until a gwz release with the fix is installed.
+- Lanes merged with gwz 1.0.12 (rounds 1 to 9) kept rotating rows. gwz 1.0.13,
+  installed 2026-09-16, carries the fix; merges from then on write the commit
+  writer's order.

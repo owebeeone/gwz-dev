@@ -19,6 +19,9 @@ and the end-to-end tests owed by 3.7 and 3.8 followed from a sixth round
 What the lanes found is recorded as "As landed" notes under steps 2.1, 2.2,
 3.3, 3.4, 3.5, 3.6, 3.7, 3.8 and 4.1, and as the row-status rule in step 3.5.
 Step 0.2 ran on 2026-09-14.
+Released: gwz 1.0.13 on 2026-09-16 (gwz-core `83626d24` tag `v1.0.13`, gwz-cli
+release `0be04bfa`, gwz-py release `56f0bfb2`) carries every landed step; it is
+the installed `gwz` since that day. Step 4.2 (acceptance) has not run.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
 Base: gwz-core `c9c7a98` / root `aa97cc1` ("Skip the second availability read
@@ -37,8 +40,9 @@ Reviews:
   (`GwzUrlSchemePushPlan-ReviewConsistency-3.md`) and Safety GO
   (`GwzUrlSchemePushPlan-ReviewSafety-3.md`).
 Work location: the root workspace `/Users/owebeeone/limbo/gwz-dev` directly.
-Use the installed `gwz 1.0.12` for every workspace operation, and never run a
-`target/` build against the workspace.
+Use the installed `gwz` for every workspace operation (1.0.12 while the plan
+was implemented, 1.0.13 since 2026-09-16), and never run a `target/` build
+against the workspace.
 
 Owner direction (2026-09-14):
 

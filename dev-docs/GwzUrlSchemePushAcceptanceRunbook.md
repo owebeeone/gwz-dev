@@ -19,8 +19,9 @@ owner's decisions (below). The workspace owner runs every step.
 
 ## Before you start: your decisions
 
-- **Binary deviation (§0).** Confirm that this run uses `gwz-alpha` rather than a
-  scratch `--root` install.
+- **Binary deviation (§0).** Confirm that this run uses the installed
+  `~/.cargo/bin/gwz` 1.0.13, the published release, rather than a scratch
+  `--root` install.
 - **Agent socket.** Before §1.1, set `OWB_SOCK` to the SSH agent socket that
   holds your publishing key: `export OWB_SOCK=<socket path>`.
 - **Case 5.** Choose the member that gets an SSH `pushurl`. The default is
@@ -41,8 +42,11 @@ owner's decisions (below). The workspace owner runs every step.
     is safe.
 - **After a closed terminal.** Run `. ~/limbo/accept-<date>/session.env`, then `cd`
   into the workspace the current case uses.
-- **The binary.** `$GA` is `/Users/owebeeone/.cargo/bin/gwz-alpha`. No step runs
-  `gwz`.
+- **The binary.** `$GA` is `/Users/owebeeone/.cargo/bin/gwz`, the installed gwz
+  1.0.13 (P1 pins it). Every measured command runs `$GA`; no step runs a
+  `target/` build. Where the text below says `gwz-alpha` (the pre-release build
+  the runbook was drafted against, since removed), it means the process `$GA`
+  starts.
 - **Recording.** Every gwz command in the cases runs under `sw` (sockwatch, §2). It
   keeps the JSON output, the sockets, a `connect()` log and the wall-clock time.
 - **Checking.** `chk` (gwzcheck, §2) reads that evidence back and prints `[PASS]` or
@@ -61,15 +65,17 @@ owner's decisions (below). The workspace owner runs every step.
 ## 0. Deviation, recorded up front
 
 Step 4.2 says the binary is "installed to a scratch `--root`". This run uses
-`~/.cargo/bin/gwz-alpha` instead. The owner confirms this deviation before
-starting.
+the installed `~/.cargo/bin/gwz` instead: gwz 1.0.13, released on 2026-09-16
+from the code the plan landed. The draft of this runbook was written against a
+pre-release local build (`gwz-alpha`), which was removed once 1.0.13 was
+installed. The owner confirms this deviation before starting.
 
 What the step protects still holds:
-- `~/.cargo/bin/gwz` (1.0.12) is not replaced;
+- the binary under test is the published release, not a `target/` build;
 - no `target/` build runs against gwz-dev;
 - every workspace used here is a scratch clone under `~/limbo/accept-<date>/`.
 
-P1 (§1.2) ties `gwz-alpha` to its source tree. The results note records this
+P1 (§1.2) ties the binary to the `v1.0.13` tags. The results note records this
 deviation.
 
 ## 1. Preconditions
@@ -93,7 +99,7 @@ export ACC_DATE="$ACC_DATE"
 export ACC="$ACC"
 export EV="$ACC/evidence"
 export TOOLS="$ACC/tools"
-export GA=/Users/owebeeone/.cargo/bin/gwz-alpha
+export GA=/Users/owebeeone/.cargo/bin/gwz
 export OWB_SOCK="$OWB_SOCK"
 export WS_HTTPS="$ACC/ws-https"
 export WS_SSH="$ACC/ws-ssh"
@@ -117,7 +123,7 @@ if [ -S "$OWB_SOCK" ]; then echo "OWB_SOCK is an agent socket"; else echo "STOP:
 **Harmless noise.** `/Users/owebeeone/.git` is an empty, read-only file, so a bare
 `git` run in `$ACC` (not a repository) says `fatal: invalid gitfile format`.
 - No step runs git there; every git command names its repository with `-C`.
-- While drafting, a copy of that layout in scratch did not affect `gwz-alpha clone`,
+- While drafting, a copy of that layout in scratch did not affect `$GA clone`,
   dry runs or `--check-remotes`.
 
 `CASE5_MEMBER` is the member case 5 configures. Change it in `session.env` before
@@ -128,31 +134,32 @@ case 5 if you prefer another member.
 <!-- local-block: p1 -->
 ```sh
 "$GA" --version | tee "$EV/00-preconditions/binary.txt"
-/Users/owebeeone/.cargo/bin/gwz --version | tee -a "$EV/00-preconditions/binary.txt"
-shasum -a 256 "$GA" /Users/owebeeone/limbo/gwz-dev/target/release/gwz /Users/owebeeone/.cargo/bin/gwz | tee -a "$EV/00-preconditions/binary.txt"
-ls -l "$GA" /Users/owebeeone/limbo/gwz-dev/target/release/gwz /Users/owebeeone/.cargo/bin/gwz | tee -a "$EV/00-preconditions/binary.txt"
+"$GA" --build-info | tee -a "$EV/00-preconditions/binary.txt"
+shasum -a 256 "$GA" | tee -a "$EV/00-preconditions/binary.txt"
+ls -l "$GA" | tee -a "$EV/00-preconditions/binary.txt"
 codesign -dv "$GA" 2>&1 | tee -a "$EV/00-preconditions/binary.txt"
-for m in gwz-core gwz-cli gwz-py; do git -C "/Users/owebeeone/limbo/gwz-dev/$m" log -1 --format="$m %H %ci %s"; done | tee -a "$EV/00-preconditions/binary.txt"
-grep -n -E '62f8afa0|0c54380|07d6735' /Users/owebeeone/limbo/gwz-dev/gwz.conf/gwz.lock.yml | tee -a "$EV/00-preconditions/binary.txt"
+git -C /Users/owebeeone/limbo/gwz-dev/gwz-cli rev-parse v1.0.13 | tee -a "$EV/00-preconditions/binary.txt"
+git -C /Users/owebeeone/limbo/gwz-dev/gwz-core rev-parse v1.0.13 | tee -a "$EV/00-preconditions/binary.txt"
 ```
 
-Expected values, as observed on 2026-09-16 after the last `gwz-alpha` rebuild:
+Expected values, as observed on 2026-09-16 after gwz 1.0.13 was installed:
 
 | check | expected |
 |---|---|
-| `gwz-alpha --version` | `gwz 0.2.0-dev` |
-| sha256 of `gwz-alpha` | `4837694b0017439b71f534711edc943952d05067e76f9346cb26eb169a28b976` |
-| sha256 of gwz-dev `target/release/gwz` | the same hash, file time 2026-09-16 03:20 |
-| `~/.cargo/bin/gwz` | `gwz 1.0.12`, sha256 `01fd966bff201a1b816baa7cd17504a4630ac8051b14488b0babf26a8e74d8a4` |
-| gwz-dev member heads | gwz-core `62f8afa0` (2026-09-16 03:13), gwz-cli `0c54380` (2026-09-15 17:35), gwz-py `07d6735` (2026-09-15 17:32), all before the build |
+| `$GA --version` | `gwz 1.0.13` |
+| `$GA --build-info`, `cli:` line | `revision=0be04bfa09af2ea591f19a636a5fbf3dcfbb0629 dirty=false` |
+| `$GA --build-info`, `core 1.0.13:` line | `revision=unavailable dirty=unknown source-sha256=23419038f240d3536d05f9f86b2a8bcd6410bef1b296741bdb0ba459045326f5` (gwz-core from crates.io) |
+| sha256 of `$GA` | `57edf42e371920aec04f1bc10d4160344876deb061257c19e8c642f4e2a96905` |
 | `codesign` flags | `0x20002(adhoc,linker-signed)`: no `runtime` flag, so `--interpose` can load |
-| gwz-dev `gwz.lock.yml` | names `0c54380e…`, `62f8afa0…` and `07d6735e…` |
+| gwz-cli tag `v1.0.13` | `0be04bfa09af2ea591f19a636a5fbf3dcfbb0629`, the `cli:` revision above |
+| gwz-core tag `v1.0.13` | `83626d247686ac0a989f789345615531f7bf2d1f` (`chore(release): gwz-core 1.0.13`) |
 
-`gwz-alpha -V --build-info` prints only the version, because the binary carries no
-source identity. The evidence is this chain instead:
-- the hash matches gwz-dev's release build;
-- that build is newer than the three commits;
-- the lock names those commits.
+`$GA --build-info` names the gwz-cli commit it was built from and a digest of the
+packaged gwz-core sources. The evidence is this chain:
+- the `cli:` revision is the commit gwz-cli's `v1.0.13` tag names;
+- the `core` line is 1.0.13, the version gwz-core's `v1.0.13` tag released to
+  crates.io;
+- the hash matches the table.
 
 **Stop** if any value differs.
 
@@ -356,12 +363,12 @@ to back, with a median gap of 29 ms and a maximum of 65 to 80 ms.
   command, and stop it with Ctrl-C afterwards:
 
   ```sh
-  nettop -L 0 -m tcp -n -x -s 1 -p gwz-alpha > "$EV/caseN/nettop-1.csv"
+  nettop -L 0 -m tcp -n -x -s 1 -p gwz > "$EV/caseN/nettop-1.csv"
   ```
 
   Then count distinct `<->` lines ending `:443` or `:22`. Replace `caseN` with the
   case directory. The name filter was tested on loopback with `-p Python`, not with
-  `gwz-alpha`.
+  `gwz`.
 
 ### 2.4 Install the tools (local)
 
@@ -1893,15 +1900,12 @@ Date: <date>. Plan: `GwzUrlSchemePushPlan.md`, step 4.2. Runbook:
 
 ## 1. Binary, workspace and method
 
-- **Binary.** `~/.cargo/bin/gwz-alpha`, `gwz 0.2.0-dev`, sha256
-  `4837694b0017439b71f534711edc943952d05067e76f9346cb26eb169a28b976`.
-  - It is byte-identical to gwz-dev `target/release/gwz`, built 2026-09-16 03:20
-    from gwz-core `62f8afa0`, gwz-cli `0c54380` and gwz-py `07d6735`. The published
-    gwz-dev lock names those commits.
-  - **Deviation from step 4.2:** it was installed as `gwz-alpha` next to `gwz`, not
-    into a scratch `--root`.
-  - `~/.cargo/bin/gwz` stayed `gwz 1.0.12` (sha256 `01fd966b…`), and no `target/`
-    build ran against gwz-dev.
+- **Binary.** `~/.cargo/bin/gwz`, `gwz 1.0.13`, sha256
+  `57edf42e371920aec04f1bc10d4160344876deb061257c19e8c642f4e2a96905`.
+  - `--build-info`: CLI revision `0be04bfa09…` (gwz-cli tag `v1.0.13`), core
+    1.0.13 from crates.io (gwz-core tag `v1.0.13` = `83626d24…`).
+  - **Deviation from step 4.2:** the installed release binary was used, not an
+    install into a scratch `--root`. No `target/` build ran against gwz-dev.
 - **Published workspace.** gwz-dev root `<case 1 root commit>`, with N = `<N>`
   members. Every local head in gwz-dev equalled GitHub before the run (P2).
 - **Clones.**
@@ -2046,11 +2050,11 @@ to 5 rely on the P2 declaration that nobody rewinds a remote during the run.
 Each runs only with its `gate.pass` present, after you type `PUBLISH`.
 
 **Never run:**
-- `gwz` (1.0.12) against the scratch clones, or `gwz-alpha` against
-  `/Users/owebeeone/limbo/gwz-dev`. P1 and P2 only read gwz-dev with `git`.
+- `$GA` against `/Users/owebeeone/limbo/gwz-dev`. P1 and P2 only read gwz-dev
+  with `git`.
 - Any `target/` build against gwz-dev, or `cargo install` without `--root <scratch>`.
   Nothing may write `~/.cargo/bin/gwz`.
-- `gwz-alpha tag --push` without a tag name (it pushes every gwz tag), or with
+- `$GA tag --push` without a tag name (it pushes every gwz tag), or with
   `--all` (it pushes members too).
 - `--force`, a `+` refspec, a hand-run `git push`, or any remote delete.
 - A measured push without its `gate.pass`.
