@@ -27,6 +27,10 @@ Occurrences:
 - 2026-09-15, round 5: push-3-5, forced.
 - 2026-09-16, round 6: push-3-6, push-4-1 and push-e2e, forced.
 - 2026-09-16, round 7: fix-pushurl and fix-symlink-root, forced.
+- 2026-09-16, round 8: fix-review, split-ops, split-ca, split-git and
+  split-crates, forced. Same six dirty and four unpreserved-history members
+  each. Plain refused in 5–16 s; forced took 28–44 s, except split-ca at
+  238 s.
 
 **Symptom.** Every lane's work was already merged into gwz-dev. Even so,
 `gwz local dispose <lane>` exits 1 after 5–10 s with `UnwaivedHazard` and
