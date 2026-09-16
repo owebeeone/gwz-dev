@@ -3,74 +3,74 @@ workspace_id: ws_default
 manifest_schema: gwz.workspace/v0
 members:
   mem_gwz_cli:
+    commit: 0c54380e156f2a0260bd606726aa0024f8bf4de8
     branch: main
     detached: false
     dirty: false
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
-    commit: 0c54380e156f2a0260bd606726aa0024f8bf4de8
     materialized: true
   mem_gwz_core:
+    commit: 91a18c06ae29c734bc27b952e5fb86f8f94fc318
     branch: main
     detached: false
     dirty: false
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: cdc829d39880dfd76277b029ebb078836e216343
     materialized: true
   mem_gwz_core_evidence:
+    commit: b2bf115eb01ca11e41a23340fb4070601974fbd6
     branch: main
     detached: false
     dirty: false
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
-    commit: b2bf115eb01ca11e41a23340fb4070601974fbd6
     materialized: true
   mem_gwz_py:
+    commit: ac28ef8890ca4cb8d1cd9e600bdbe5dece158b6e
     branch: main
     detached: false
     dirty: false
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
-    commit: ac28ef8890ca4cb8d1cd9e600bdbe5dece158b6e
     materialized: true
   mem_taut:
+    commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
     branch: main
     detached: false
     dirty: false
     path: taut
     source_id: src_taut
     source_kind: git
-    commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
     materialized: true
   mem_taut_shape:
+    commit: 74f375c9d3521f3e98110862dcf89ec64a3b6d6c
     branch: main
     detached: false
     dirty: false
     path: taut-shape
     source_id: src_taut_shape
     source_kind: git
-    commit: 74f375c9d3521f3e98110862dcf89ec64a3b6d6c
     materialized: true
   mem_taut_shape_py:
+    commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
     branch: main
     detached: false
     dirty: false
     path: taut-shape-py
     source_id: src_taut_shape_py
     source_kind: git
-    commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
     materialized: true
   mem_taut_shape_rs:
+    commit: df1303656583121e043f7a925c02958571951735
     branch: main
     detached: false
     dirty: false
     path: taut-shape-rs
     source_id: src_taut_shape_rs
     source_kind: git
-    commit: df1303656583121e043f7a925c02958571951735
     materialized: true
