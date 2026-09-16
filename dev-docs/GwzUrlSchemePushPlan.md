@@ -21,7 +21,11 @@ What the lanes found is recorded as "As landed" notes under steps 2.1, 2.2,
 Step 0.2 ran on 2026-09-14.
 Released: gwz 1.0.13 on 2026-09-16 (gwz-core `83626d24` tag `v1.0.13`, gwz-cli
 release `0be04bfa`, gwz-py release `56f0bfb2`) carries every landed step; it is
-the installed `gwz` since that day. Step 4.2 (acceptance) has not run.
+the installed `gwz` since that day. Step 4.2 ran on 2026-09-16 against that
+release: `GwzUrlSchemePushAcceptance-2026-09-16.md` accepts cases 1 to 5 on
+macOS and case 4 on Linux/aarch64 (goal 2 met: 0 connections and 0.037 s for
+an unchanged workspace, exactly N+1 concurrent reads with `--check-remotes`);
+the publishing cases 6 and 7 were skipped by decision and stay open.
 Parent: `GwzUrlSchemePlan.md` (clone and materialize) and its acceptance note
 `GwzUrlSchemeAcceptance-2026-09-12.md`.
 Base: gwz-core `c9c7a98` / root `aa97cc1` ("Skip the second availability read
@@ -1347,8 +1351,8 @@ Step 0.2 ran on 2026-09-14.
     with no helper; and a real pack upload over https, which the first real
     publication from an https workspace will cover.
 - **The account depends on the transport.**
-  - SSH with the default agent is `gripd`, which cannot push. SSH with the
-    explicit socket is `owebeeone`.
+  - SSH with the default agent is a different account, which cannot push. SSH
+    with the explicit publishing socket is `owebeeone`.
   - https through the `gh` helper is `owebeeone`.
   - The acceptance note names the account for each case.
 - **Private members over https.** An https read of a private member needs helper
