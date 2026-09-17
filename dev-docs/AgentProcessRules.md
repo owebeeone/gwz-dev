@@ -30,6 +30,9 @@ That document controls where it differs from this one.
 
 ## Changelog
 
+- 2026-09-18: amended L1-18 with the Surface axis (operator decision D7 in
+  `GwzOpenDecisions.md`) after the Claude Code hook surface review found two
+  interface-shape defects that two dual-review rounds had not.
 - 2026-08-15 (2): amended per `AgentProcessRules-ReviewF5.md` (corrected the
   Refactor.md section citations in L1-04/L3-03/L3-04, the L1-18 ledger
   citation, and the L1-17 grounding claim; added §14.1 item 6, §14.2 item 7,
@@ -399,6 +402,22 @@ procedural — historically both reviewers were the same model under different
 role prompts. Per the adopted `GwzProcessOptimization.md` §4.3, reviews now
 run cross-model (reviewer model ≠ implementer model) whenever two models are
 available.
+
+Amendment 2026-09-18 (operator decision D7, `GwzOpenDecisions.md`): a third
+axis, **Surface**, is mandatory at every interface freeze — any package that
+fixes a command family, a flag set, a settings block, a file format people
+edit, or an API. The Surface reviewer reads no code and no design document:
+only the object's `--help` at every level and its user-facing docs, compared
+against the existing families' help. It attacks command placement, names read
+cold, lifecycle pairs (install/uninstall, create/remove, write/undo), stated
+defaults, and a scripted first-day walkthrough from the help alone. Deferrals
+in any reviewer prompt cover a decision's outcome only, never its shape.
+Interface shape is a finding (P2 when it would need a compatibility break to
+fix after release, P3 otherwise), not style. Reason: the Claude Code hook
+surface passed two full dual-review rounds with a top-level command family
+for one integration and no uninstall; neither axis looks at that
+(`gwz-cli/dev-docs/GwzClaudeIntegration-ReviewSurface.md`). The review-loop
+skill carries the axis's prompt section.
 
 ### L1-19 — Use one severity and verdict contract
 
