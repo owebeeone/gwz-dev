@@ -14,6 +14,15 @@ L3. Earlier investigation: `GwzLaneDisposalAudit-2026-09-10.md`.
 | L2 | An untracked file in a receiving member blocks every lane merge | open |
 | L3 | A verbatim lane's Python venv still points at the source workspace | open |
 | L4 | Each `gwz merge` rotates the fields of every lock member row | fixed (gwz-core `44b24ee`), released in gwz 1.0.13 |
+| L5 | gwz-py's test runner prefers a stale `gwz-cli/target/debug/gwz` copied into the lane | open; the same binary is stale in gwz-dev itself |
+
+Round 10 (2026-09-17, gwz 1.0.13): three lanes (`r20-wait`, `clean-fixes`,
+`claude-hooks`) implementing GwzLaneCleanFixes R20 to R22, its Phase 1, and
+the Claude Code hook; created in 97 to 99 s each, merged in that order with
+no textual conflict, forced disposal 34 to 45 s each. Phase 1 of the clean-up
+(gwz-core `757ed57a` and after) is now merged but not released: the
+`unpreserved-history` half of L1 is expected to clear once it is in the
+installed gwz.
 
 ## L1: disposing a merged lane needs a loss waiver
 
@@ -34,6 +43,8 @@ Occurrences:
   238 s.
 - 2026-09-16, round 9: fix-refcopy, fix-g12 and fix-locks, forced. Same
   counts. Plain refused in 6–15 s; forced took 27–33 s.
+- 2026-09-17, round 10: r20-wait, clean-fixes and claude-hooks, forced
+  after the ancestor check in every repository. Forced took 34–45 s.
 
 **Symptom.** Every lane's work was already merged into gwz-dev. Even so,
 `gwz local dispose <lane>` exits 1 after 5–10 s with `UnwaivedHazard` and
@@ -146,6 +157,12 @@ imported gwz-dev's source.
   - the native module's path points into the lane;
   - the module's recorded revision matches the lane's gwz-core HEAD.
 
+**Found in round 10 (lane r20-wait).** The consequence is not only reads.
+`maturin develop` installs into the environment `gwz.pth` names, so a lane
+whose `.pth` still points at gwz-dev writes its `_gwz_core.abi3.so` **into
+the source workspace**. Repoint `gwz.pth` before running anything that
+builds. `run_tests.py`'s `PYTHONPATH` masks the import side only.
+
 ## L4: each merge rotates lock member fields
 
 **Symptom.** A lane commit shows a ~50-line diff of `gwz.conf/gwz.lock.yml`, in
@@ -195,3 +212,25 @@ other writer serializes the typed lock.
 - Lanes merged with gwz 1.0.12 (rounds 1 to 9) kept rotating rows. gwz 1.0.13,
   installed 2026-09-16, carries the fix; merges from then on write the commit
   writer's order.
+
+## L5: gwz-py's runner prefers a stale `gwz-cli/target/debug/gwz`
+
+**Symptom.** 2026-09-17, round 10, lane r20-wait, and again on gwz-dev
+itself after the merge: `gwz-py/run_tests.py` reports `10 failed, 866
+passed`, with `unexpected argument '--verbose'` and a provenance mismatch
+(extension `core 1.0.13`, CLI `core 1.0.0 revision=17e13ed2 dirty=true`).
+
+**Reason.** `run_tests.py` prefers `gwz-cli/target/debug/gwz` and falls back
+to the workspace's `target/debug/gwz` only when the former is missing. In
+this workspace cargo builds gwz-cli into the root `target/` (gwz-cli is a
+workspace member), so `gwz-cli/target/debug/gwz` is a standalone build from
+8 September that nothing refreshes, and every verbatim lane copies it. The
+runner then silently tests against a months-old CLI. This is R6 in
+`GwzLaneCleanFixes.md` (`gwz-cli/target`, untagged) seen from the other
+side.
+
+**Remedy used.** `GWZ_RUST_BIN=/Users/owebeeone/limbo/gwz-dev/target/debug/gwz`
+(or the lane's own root `target/debug/gwz`) pinned explicitly; the
+provenance assertion in the suite is what catches the mismatch. Not yet
+done: either delete `gwz-cli/target` in gwz-dev, or change the runner's
+preference to the workspace binary when gwz-cli is a workspace member.
