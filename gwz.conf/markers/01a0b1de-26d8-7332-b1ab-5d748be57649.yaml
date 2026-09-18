@@ -1,0 +1,168 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a0b1de-26d8-7332-b1ab-5d748be57649
+workspace_id: ws_default
+created_at: '1789690519399'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: f1142c7f1cb6d4538f0fe37c439695289947659f
+  branch: main
+selected_targets:
+- mem_gwz_cli
+- mem_gwz_core
+- mem_taut
+- mem_gwz_py
+- mem_taut_shape
+- mem_taut_shape_rs
+- mem_taut_shape_py
+- mem_gwz_core_evidence
+- '@root'
+committed_targets:
+- mem_gwz_cli
+- mem_gwz_core
+- mem_gwz_py
+- '@root'
+members:
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: 1c050fef3b6b3ef65aa3f55f57d926fb906111e5
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: f4816a7cad8da2fe274173e64086c756debaf7c7
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core_evidence:
+    path: gwz-core-evidence
+    source_id: src_gwz_core_evidence
+    source_kind: git
+    commit: b2bf115eb01ca11e41a23340fb4070601974fbd6
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: b619c1c4b35305505983a167a91e7b09541d7811
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 74f375c9d3521f3e98110862dcf89ec64a3b6d6c
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: df1303656583121e043f7a925c02958571951735
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+merge:
+  merge_id: merge_op_32932_1789690518971_0001
+  operation_id: op_32932_1789690518971
+  source_ref: refs/gwz/local-imports/xfer_bf23b8a37187e7eefa09d0dfef632643
+  selected_targets:
+  - mem_gwz_cli
+  - mem_gwz_core
+  - mem_taut
+  - mem_gwz_py
+  - mem_taut_shape
+  - mem_taut_shape_rs
+  - mem_taut_shape_py
+  - mem_gwz_core_evidence
+  - '@root'
+  participants:
+    '@root':
+      target_kind: root
+      target_branch: main
+      before_commit: b4b11571eb6345bc213b6ed43b9bd4499e58cff8
+      source_commit: f732a417602b0bf57e1a8657579b9d68bbe88302
+      resulting_commit: f1142c7f1cb6d4538f0fe37c439695289947659f
+    mem_gwz_cli:
+      target_kind: member
+      target_branch: main
+      before_commit: 87198cf07d608b9bbb78e14b8eed207648e3ada5
+      source_commit: 1c050fef3b6b3ef65aa3f55f57d926fb906111e5
+      resulting_commit: 1c050fef3b6b3ef65aa3f55f57d926fb906111e5
+    mem_gwz_core:
+      target_kind: member
+      target_branch: main
+      before_commit: 2ffe2a1a270d66b781b686ad6929a695dc39e281
+      source_commit: f4816a7cad8da2fe274173e64086c756debaf7c7
+      resulting_commit: f4816a7cad8da2fe274173e64086c756debaf7c7
+    mem_gwz_core_evidence:
+      target_kind: member
+      target_branch: main
+      before_commit: b2bf115eb01ca11e41a23340fb4070601974fbd6
+      source_commit: b2bf115eb01ca11e41a23340fb4070601974fbd6
+      resulting_commit: b2bf115eb01ca11e41a23340fb4070601974fbd6
+    mem_gwz_py:
+      target_kind: member
+      target_branch: main
+      before_commit: 4adc636312e4642e5f6fab17a5042eb6a8193465
+      source_commit: 5b76a404dd1d72fe8ad2fd07c86207c18bccd9ce
+      resulting_commit: b619c1c4b35305505983a167a91e7b09541d7811
+    mem_taut:
+      target_kind: member
+      target_branch: main
+      before_commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
+      source_commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
+      resulting_commit: 7a5f616c3a9f72e143b6e20dab41ffa6e20e240a
+    mem_taut_shape:
+      target_kind: member
+      target_branch: main
+      before_commit: 74f375c9d3521f3e98110862dcf89ec64a3b6d6c
+      source_commit: 74f375c9d3521f3e98110862dcf89ec64a3b6d6c
+      resulting_commit: 74f375c9d3521f3e98110862dcf89ec64a3b6d6c
+    mem_taut_shape_py:
+      target_kind: member
+      target_branch: main
+      before_commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
+      source_commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
+      resulting_commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
+    mem_taut_shape_rs:
+      target_kind: member
+      target_branch: main
+      before_commit: df1303656583121e043f7a925c02958571951735
+      source_commit: df1303656583121e043f7a925c02958571951735
+      resulting_commit: df1303656583121e043f7a925c02958571951735
+  root_merge_commit: f1142c7f1cb6d4538f0fe37c439695289947659f
