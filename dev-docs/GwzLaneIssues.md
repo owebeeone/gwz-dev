@@ -10,7 +10,7 @@ L3. Earlier investigation: `GwzLaneDisposalAudit-2026-09-10.md`. gwz 1.0.14, rel
 
 | ID | Problem | Status |
 | --- | --- | --- |
-| L1 | Disposing a merged lane takes two gwz operations and a manual check | open; requirements draft in gwz-core `dev-docs/GwzLaneCleanFixes.md` |
+| L1 | Disposing a merged lane takes two gwz operations and a manual check | fixed on gwz-core main (clean-up Phases 1 and 2, `c46fe4c7`): a merged verbatim lane disposes with no waiver, built in or not; unreleased as of 2026-09-18 (1.0.16 carries Phase 1 only) |
 | L2 | An untracked file in a receiving member blocks every lane merge | open |
 | L3 | A verbatim lane's Python venv still points at the source workspace | open |
 | L4 | Each `gwz merge` rotates the fields of every lock member row | fixed (gwz-core `44b24ee`), released in gwz 1.0.13 |
