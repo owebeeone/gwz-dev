@@ -416,7 +416,7 @@ Interface shape is a finding (P2 when it would need a compatibility break to
 fix after release, P3 otherwise), not style. Reason: the Claude Code hook
 surface passed two full dual-review rounds with a top-level command family
 for one integration and no uninstall; neither axis looks at that
-(`gwz-cli/dev-docs/GwzClaudeIntegration-ReviewSurface.md`). The review-loop
+(`gwz-cli/dev-docs/history/GwzClaudeIntegration-ReviewSurface.md`). The review-loop
 skill carries the axis's prompt section.
 
 ### L1-19 — Use one severity and verdict contract

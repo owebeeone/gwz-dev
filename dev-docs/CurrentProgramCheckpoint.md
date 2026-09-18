@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## Remote transport draft review — 2026-09-19
+
+Separate documentation lane: the four transport documents are committed in
+`gwz-core` at `3d2cc92c4a233e40ed049c8fe79bc555d39b272f` (base
+`c2ca71b7595a0ce332f6f7f4c47db9d0c62ac230`). Draft-stage tier: dual,
+Consistency + Safety, independent fresh contexts; no API/schema freeze or
+implementation acceptance. Operator requested this review via the review-loop
+skill. Model binding: cross-model `gpt-5.6-sol` reviewers, xhigh.
+Round 1 pending; remediation rounds used: 0. Reports/prompts use
+`dev-docs/GwzRemoteTransportDesign-Review*`. Other agents' staged retirement
+and protocol work are explicitly outside the immutable review object.
+The checkpoint commit preserved unrelated index entries. Next action: collect
+verbatim reports and merge verdicts before any acceptance claim.
+
+
 Date: 2026-08-22 (resumed)
 Status: **the single current-state authority for the GWZ merge program.
 Update at every checkpoint boundary; keep concise; history belongs in git,
@@ -2603,7 +2618,7 @@ fable token only where it makes a difference." Recorded consequences:
   R2-F plan (ledger + phases + OPEN-R1 as the owner's first decision,
   R2-E-plan shape); the remaining pool is reserve for emergencies
   only. Non-Fable work may proceed during the pause: the gwz log
-  project (gwz-cli/dev-docs/GwzLogRequirements.md +
+  project (gwz-cli/dev-docs/history/GwzLogRequirements.md +
   GwzLogAmbiguityRezo.md) implements on a non-Fable agent once the
   operator's Rezo comments land. **THE LEDGER
   IS CLOSED row-by-row in GwzM5-8R2E-E7-Acceptance.md**: O4-O10, O12

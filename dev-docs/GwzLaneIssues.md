@@ -238,7 +238,7 @@ preference to the workspace binary when gwz-cli is a workspace member.
 ## L6: a dispose refusal renders a protected ref in Rust debug form
 
 **Symptom.** 2026-09-18, the 1.0.17 docs Surface review (gwz-cli
-`dev-docs/GwzRelease1017Docs-ReviewSurface.md`, P3-4). A lane holding a
+`dev-docs/history/GwzRelease1017Docs-ReviewSurface.md`, P3-4). A lane holding a
 unique commit is refused with `unique to the lane 1: ... Head <oid>, Ref {
 name: "refs/heads/main" } <oid>`. The `Ref { name: ... }` part is an internal
 type's `{:?}` formatting, not a ref name a user can paste into git.
