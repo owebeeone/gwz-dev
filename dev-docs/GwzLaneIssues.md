@@ -234,3 +234,20 @@ side.
 provenance assertion in the suite is what catches the mismatch. Not yet
 done: either delete `gwz-cli/target` in gwz-dev, or change the runner's
 preference to the workspace binary when gwz-cli is a workspace member.
+
+## L6: a dispose refusal renders a protected ref in Rust debug form
+
+**Symptom.** 2026-09-18, the 1.0.17 docs Surface review (gwz-cli
+`dev-docs/GwzRelease1017Docs-ReviewSurface.md`, P3-4). A lane holding a
+unique commit is refused with `unique to the lane 1: ... Head <oid>, Ref {
+name: "refs/heads/main" } <oid>`. The `Ref { name: ... }` part is an internal
+type's `{:?}` formatting, not a ref name a user can paste into git.
+
+**Reason.** gwz-core's protected-root rendering in `src/local_clone/dispose.rs`
+formats the root's source with `Debug`. Released behaviour since 1.0.16; the
+docs in 1.0.17 describe the form as it prints and say it is not a path.
+
+**Remedy used.** None yet. Fix: print `refs/heads/main` (and `HEAD`) in the
+refusal and update the sample in gwz-cli `docs/LocalClones.md`; check the
+gwz-py test that asserts the refusal text. Not a docs change, so it was
+deferred out of the 1.0.17 documentation lane.
