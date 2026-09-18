@@ -102,3 +102,11 @@ members:
     url: git@github.com:owebeeone/gwz-core-evidence.git
     fetch: true
     push: true
+- id: mem_gwz_transport
+  path: gwz-transport
+  type: git
+  source_id: src_gwz_transport
+  active: true
+  desired:
+    local_only: true
+  remotes: []

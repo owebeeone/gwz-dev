@@ -23,6 +23,7 @@ members = [
 exclude = [
     "taut-shape-rs",
     "gwz-core",
+    "gwz-transport",
 ]
 
 [patch.crates-io]

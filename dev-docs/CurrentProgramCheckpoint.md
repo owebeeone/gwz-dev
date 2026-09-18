@@ -20,10 +20,10 @@ implementation acceptance, platform evidence or release is claimed.
 The [implementation plan](../gwz-core/dev-docs/GwzRemoteTransportPlan.md) is now
 accepted at the planning stage: first establish the independent gwz-transport package,
 exported schema/shared generated types and bidirectional taut carrier proof.
-The operator requested planning before execution; no repository creation or
-source implementation has started. This plan has not inherited the design's
-GO/GO. Source protocol work and archive moves in other lanes remain outside
-this review.
+The operator subsequently authorized implementation. Phase 1 is in progress:
+local gwz-transport member, generated schema/types, external Rust type generation
+and a test-only core consumer. No production CLI–core communication API changes.
+Source protocol work and archive moves in other lanes remain outside this review.
 
 Plan review update: [G46](../gwz-core/dev-docs/GwzRemoteTransportPlanReview-G46.md)
 returned combined draft-stage **NO-GO** (four P2, three P3). One documentation
@@ -33,9 +33,24 @@ The same reviewer's [re-verdict](../gwz-core/dev-docs/GwzRemoteTransportPlanRevi
 is **GO**, closing all seven findings with no new findings on plan SHA-256
 `55120dd1af7b77818eb71fda609818b6c1bb2539a08ec9f025ab01f7d4899b99`.
 Two combined draft-stage rounds, one merged remediation; not a dual peer-blind
-gate. The plan now differs only by acceptance/next-action annotations. No
-execution has begun; next action awaits the operator's execution request.
-This plan review does not alter the accepted design's status.
+gate. Implementation then began. Operator clarification: the CLI–core communication
+layer is handled elsewhere and its current interface must not change. The custom
+four-byte framing proposal at core `914a4406998856abce0d980372b41635f7c52940`
+is superseded; its framing adapter and process fixture were removed. Continue
+message/schema work against the supplied interface. Earlier GO reports remain
+historical evidence, not approval of the current unfinished implementation.
+Further operator clarification: emulate streams through discrete messages using
+asynchronous send/receive. Prefer optional fields on existing taut messages and
+existing request ids; no new CLI command or core service surface is required.
+
+The operator next prioritized the in-memory stream implementation and seeded
+Monte Carlo tests, with no physical transport in gwz-transport. The
+[memory checkpoint](../gwz-core/dev-docs/GwzRemoteTransportMemoryImplementation.md)
+is implemented pending dual Code/State review by the original reviewers.
+It includes the active-stream machine, executor-independent async facade,
+bounded credit/buffering, lifecycle tests and deterministic randomized replay.
+The source-schema generator extension and core consumer remain separate pending
+work; neither Phase 1 nor Phase 2 is declared complete or frozen.
 
 
 Date: 2026-08-22 (resumed)
