@@ -2,17 +2,21 @@
 
 ## Remote transport draft review — 2026-09-19
 
-Separate documentation lane: the four transport documents are committed in
-`gwz-core` at `3d2cc92c4a233e40ed049c8fe79bc555d39b272f` (base
-`c2ca71b7595a0ce332f6f7f4c47db9d0c62ac230`). Draft-stage tier: dual,
-Consistency + Safety, independent fresh contexts; no API/schema freeze or
-implementation acceptance. Operator requested this review via the review-loop
-skill. Model binding: cross-model `gpt-5.6-sol` reviewers, xhigh.
-Round 1 pending; remediation rounds used: 0. Reports/prompts use
-`dev-docs/GwzRemoteTransportDesign-Review*`. Other agents' staged retirement
-and protocol work are explicitly outside the immutable review object.
-The checkpoint commit preserved unrelated index entries. Next action: collect
-verbatim reports and merge verdicts before any acceptance claim.
+Separate documentation lane. Initial exact core object:
+`3d2cc92c4a233e40ed049c8fe79bc555d39b272f`. Draft-stage dual Consistency +
+Safety returned **NO-GO/NO-GO**, with one P1 and five P2 total, all discovered
+before implementation. Reports are verbatim under
+`dev-docs/GwzRemoteTransportDesign-Review{Consistency,Safety}.md`.
+The [review checkpoint](GwzRemoteTransportDesign-ReviewCheckpoint.md) records
+the tuple and checks; [RemPlan](GwzRemoteTransportDesign-RemPlan.md) maps every
+blocker to one correction and closure scenario. Remediation round 1 of 2 is
+prepared as one patch; no blocker is self-closed. The changed proposed
+interfaces require fresh round-2 reviewers plus original-counterexample closure.
+No schema/API freeze, implementation acceptance, platform evidence or release
+is claimed. No transport design gate accepted yet. Next action: pin revised
+object and run the re-reviews. Source protocol work and archive moves in other
+lanes remain outside this review. Sessions to date: one drafting session, one
+review session; draft review rounds: 1; escaped defects: not applicable.
 
 
 Date: 2026-08-22 (resumed)
