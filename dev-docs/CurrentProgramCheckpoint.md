@@ -46,15 +46,20 @@ existing request ids; no new CLI command or core service surface is required.
 The operator next prioritized the in-memory stream implementation and seeded
 Monte Carlo tests, with no physical transport in gwz-transport. The
 [memory checkpoint](../gwz-core/dev-docs/GwzRemoteTransportMemoryImplementation.md)
-is implemented pending dual Code/State review by the original reviewers.
+is accepted at transport `aa9ecae65d6c0d568c5f4d738f9930d49f684f56`
+after [Code](GwzRemoteTransportMemory-ReviewCode-1.md) and
+[State](GwzRemoteTransportMemory-ReviewState-1.md) GO from the original reviewers.
 It includes the active-stream machine, executor-independent async facade,
 bounded credit/buffering, lifecycle tests and deterministic randomized replay.
 The initial Code/State gate returned NO-GO with five P2 findings (four distinct
 roots; both axes found erased failure detail) and one P3. The
 [merged remediation](GwzRemoteTransportMemory-RemPlan.md) corrects negotiated
 admission, authentication combinations, structured failures and dispatcher
-capacity, with depth/accounting parity and packaging fixes. Original reviewers
-must verify the corrected counterexamples before this checkpoint is accepted.
+capacity, with depth/accounting parity and packaging fixes. The original
+reviewers verified every closure and found no new findings. Two completed
+review rounds, one remediation round; acceptance is limited to the in-memory
+checkpoint. The [acceptance record](GwzRemoteTransportMemory-Checkpoint.md)
+contains the exact reviewed tuple and test/replay evidence.
 The source-schema generator extension and core consumer remain separate pending
 work; neither Phase 1 nor Phase 2 is declared complete or frozen.
 
