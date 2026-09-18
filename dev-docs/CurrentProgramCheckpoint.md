@@ -49,6 +49,12 @@ Monte Carlo tests, with no physical transport in gwz-transport. The
 is implemented pending dual Code/State review by the original reviewers.
 It includes the active-stream machine, executor-independent async facade,
 bounded credit/buffering, lifecycle tests and deterministic randomized replay.
+The initial Code/State gate returned NO-GO with five P2 findings (four distinct
+roots; both axes found erased failure detail) and one P3. The
+[merged remediation](GwzRemoteTransportMemory-RemPlan.md) corrects negotiated
+admission, authentication combinations, structured failures and dispatcher
+capacity, with depth/accounting parity and packaging fixes. Original reviewers
+must verify the corrected counterexamples before this checkpoint is accepted.
 The source-schema generator extension and core consumer remain separate pending
 work; neither Phase 1 nor Phase 2 is declared complete or frozen.
 
