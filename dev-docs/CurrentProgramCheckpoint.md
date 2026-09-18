@@ -17,9 +17,25 @@ its unfinished output was not used. Two completed draft review rounds, one of
 two permitted remediation rounds used, all defects discovered before
 implementation; escaped defects not applicable. No schema/API freeze,
 implementation acceptance, platform evidence or release is claimed.
-Next work is design §12's qualification and implementation planning; no source
-implementation is started by this documentation lane. Source protocol work and
-archive moves in other lanes remain outside this review.
+The [implementation plan](../gwz-core/dev-docs/GwzRemoteTransportPlan.md) is now
+accepted at the planning stage: first establish the independent gwz-transport package,
+exported schema/shared generated types and bidirectional taut carrier proof.
+The operator requested planning before execution; no repository creation or
+source implementation has started. This plan has not inherited the design's
+GO/GO. Source protocol work and archive moves in other lanes remain outside
+this review.
+
+Plan review update: [G46](../gwz-core/dev-docs/GwzRemoteTransportPlanReview-G46.md)
+returned combined draft-stage **NO-GO** (four P2, three P3). One documentation
+revision addresses all seven, mapped in the
+[plan remediation record](../gwz-core/dev-docs/GwzRemoteTransportPlan-RemPlan.md).
+The same reviewer's [re-verdict](../gwz-core/dev-docs/GwzRemoteTransportPlanReview-G46-1.md)
+is **GO**, closing all seven findings with no new findings on plan SHA-256
+`55120dd1af7b77818eb71fda609818b6c1bb2539a08ec9f025ab01f7d4899b99`.
+Two combined draft-stage rounds, one merged remediation; not a dual peer-blind
+gate. The plan now differs only by acceptance/next-action annotations. No
+execution has begun; next action awaits the operator's execution request.
+This plan review does not alter the accepted design's status.
 
 
 Date: 2026-08-22 (resumed)
