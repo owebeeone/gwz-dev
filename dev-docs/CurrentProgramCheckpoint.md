@@ -2,21 +2,24 @@
 
 ## Remote transport draft review — 2026-09-19
 
-Separate documentation lane. Initial exact core object:
-`3d2cc92c4a233e40ed049c8fe79bc555d39b272f`. Draft-stage dual Consistency +
-Safety returned **NO-GO/NO-GO**, with one P1 and five P2 total, all discovered
-before implementation. Reports are verbatim under
-`dev-docs/GwzRemoteTransportDesign-Review{Consistency,Safety}.md`.
+Status: **accepted at gwz-core `05842b38e55f109ed3663555680751811a72eb9b`
+after [Consistency round 2](GwzRemoteTransportDesign-ReviewConsistency-2.md)
+and [Safety round 2](GwzRemoteTransportDesign-ReviewSafety-2.md) reported GO;
+this accepts the four-document design draft for implementation planning only**.
+Root prior-round inputs: `3a0b8fa975bc013673ee919b087f69da9f3853ff`.
 The [review checkpoint](GwzRemoteTransportDesign-ReviewCheckpoint.md) records
-the tuple and checks; [RemPlan](GwzRemoteTransportDesign-RemPlan.md) maps every
-blocker to one correction and closure scenario. Remediation round 1 of 2 is
-prepared as one patch; no blocker is self-closed. The changed proposed
-interfaces require fresh round-2 reviewers plus original-counterexample closure.
-No schema/API freeze, implementation acceptance, platform evidence or release
-is claimed. No transport design gate accepted yet. Next action: pin revised
-object and run the re-reviews. Source protocol work and archive moves in other
-lanes remain outside this review. Sessions to date: one drafting session, one
-review session; draft review rounds: 1; escaped defects: not applicable.
+the full tuple, verification and routing override.
+
+The original reviewers closed all six findings (one P1, five P2) in one merged
+remediation and found no new issues in changed-range interactions. Operator:
+**"use the old reviewers"**. The fresh pair was stopped without final verdicts;
+its unfinished output was not used. Two completed draft review rounds, one of
+two permitted remediation rounds used, all defects discovered before
+implementation; escaped defects not applicable. No schema/API freeze,
+implementation acceptance, platform evidence or release is claimed.
+Next work is design §12's qualification and implementation planning; no source
+implementation is started by this documentation lane. Source protocol work and
+archive moves in other lanes remain outside this review.
 
 
 Date: 2026-08-22 (resumed)

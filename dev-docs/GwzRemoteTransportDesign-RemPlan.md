@@ -1,6 +1,7 @@
 # Remote transport design — merged remediation plan
 
-Date: 2026-09-19. Status: **remediation round 1; closure pending review**.
+Date: 2026-09-19. Status: **remediation round 1 complete; all six findings reviewer-closed at core
+`05842b38e55f109ed3663555680751811a72eb9b`**.
 Review object: gwz-core `3d2cc92c4a233e40ed049c8fe79bc555d39b272f`.
 The [Consistency report](GwzRemoteTransportDesign-ReviewConsistency.md) and
 [Safety report](GwzRemoteTransportDesign-ReviewSafety.md) are filed verbatim.
@@ -30,13 +31,16 @@ for implementation acceptance, not invented evidence for this review.
 
 ## Review routing and cap
 
-The correction changes the proposed binding/handshake/lifecycle interface, so
-review-loop step 5.5 requires a new numbered round with fresh reviewers.
-Run fresh Consistency and Safety contexts on the revised exact tuple, blind to
-each other's new reports. Original reviewers also verify their own original
-counterexamples for closure; their focused closure notes are separate from the
-fresh round-2 verdicts. Keep the merged plan and round-1 reports as legitimate
-shared inputs, and do not share current round-2 output between reviewers.
+Operator override (2026-09-19): **"use the old reviewers"**. This supersedes
+review-loop step 5.5's fresh-context rule for this draft. The fresh pair was
+stopped without a completed report or verdict; its unfinished work is not used.
+Continue the original Consistency and Safety agents, preserving their context.
+They both closed their original counterexamples and checked changed-range
+interactions, returning full axis GO re-verdicts in
+[Consistency round 2](GwzRemoteTransportDesign-ReviewConsistency-2.md) and
+[Safety round 2](GwzRemoteTransportDesign-ReviewSafety-2.md). Peer-blindness still applies within this
+round. Both original reports and this merged plan are legitimate prior-round
+inputs. No review round is counted for an abandoned attempt without a report.
 
 Remediation rounds used after this patch: 1 of 2. Reviewers classify any new
 architectural root cause. No third architectural remediation patch is
