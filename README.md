@@ -30,6 +30,12 @@ See [Clone An Existing Workspace](https://owebeeone.github.io/gwz-cli/QuickStart
 in the Quick Start for what is converted, what is remembered, and how private
 members are handled.
 
+Working on this workspace with Claude Code? Its worktree hooks give a session a
+whole-workspace lane instead of a member-less worktree of the root. See
+[Claude Code](https://owebeeone.github.io/gwz-cli/ClaudeCode/) for the settings
+block, the lane lifecycle, and how lanes are retired; it needs gwz 1.0.14 or
+later.
+
 New to the product? Read the
 [Quick Start](https://owebeeone.github.io/gwz-cli/QuickStart/). For the problem
 GWZ solves, its fit alongside tools such as vcstool, and its embeddable remote-
