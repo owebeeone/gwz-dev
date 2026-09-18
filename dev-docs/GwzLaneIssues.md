@@ -6,7 +6,7 @@ running parallel agents in `gwz local clone` lanes of
 Observed with the installed gwz 1.0.12 through round 9; gwz-core source was at
 `v1.0.12-13-g5bf8f1a` when the register opened. gwz 1.0.13 was released and
 installed on 2026-09-16: it carries the L4 fix and changes nothing for L1 to
-L3. Earlier investigation: `GwzLaneDisposalAudit-2026-09-10.md`.
+L3. Earlier investigation: `GwzLaneDisposalAudit-2026-09-10.md`. gwz 1.0.14, released and installed 2026-09-18, carries the lane clean-up's Phase 1 steps S1.1 to S1.4 (gwz-core `757ed57a` and after): the `unpreserved-history` half of L1 is expected to clear for lanes made from then on; the `dirty` half remains until Phase 1's S1.5 to S1.8 and Phase 2 land.
 
 | ID | Problem | Status |
 | --- | --- | --- |
@@ -14,7 +14,7 @@ L3. Earlier investigation: `GwzLaneDisposalAudit-2026-09-10.md`.
 | L2 | An untracked file in a receiving member blocks every lane merge | open |
 | L3 | A verbatim lane's Python venv still points at the source workspace | open |
 | L4 | Each `gwz merge` rotates the fields of every lock member row | fixed (gwz-core `44b24ee`), released in gwz 1.0.13 |
-| L5 | gwz-py's test runner prefers a stale `gwz-cli/target/debug/gwz` copied into the lane | open; the same binary is stale in gwz-dev itself |
+| L5 | gwz-py's test runner prefers a stale `gwz-cli/target/debug/gwz` copied into the lane | fixed (gwz-py `4adc636`, released in gwz 1.0.14); the stale directory in gwz-dev is deleted |
 
 Round 10 (2026-09-17, gwz 1.0.13): three lanes (`r20-wait`, `clean-fixes`,
 `claude-hooks`) implementing GwzLaneCleanFixes R20 to R22, its Phase 1, and
