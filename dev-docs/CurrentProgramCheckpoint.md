@@ -68,7 +68,11 @@ The operator authorized connection pooling next. The
 [pool checkpoint](../gwz-core/dev-docs/GwzRemoteTransportPoolImplementation.md)
 is implemented with fake connections, a controlled clock and seeded lifecycle
 schedules. Its dual Code/State implementation review uses the original reviewers;
-no pool API freeze or network integration is claimed. Scope includes exclusive
+the initial gate returned three P2 findings (two Code, one State). One
+[merged remediation](GwzRemoteTransportPool-RemPlan.md) corrects spontaneous
+idle disposal, session-scoped cancellation and cross-port user/host capacity.
+Focused re-review is pending; no pool API freeze or network integration is claimed.
+Scope includes exclusive
 leases, shared limits, identity eligibility, idle expiry, bounded waiting,
 cancellation, helper time and cleanup acknowledgements. All physical I/O remains
 host-owned; the existing CLI/core interface is unchanged.
