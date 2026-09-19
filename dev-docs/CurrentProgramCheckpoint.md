@@ -3,7 +3,7 @@
 ## Remote transport Phase 3c — nonblocking SSH channel, 2026-09-20
 
 Core candidate: `b77f4fef5dbb6958789dd8160fbb74eb67a3f47e`.
-Status: **candidate ready for settled review**. Continue the authorized adapter work after
+Status: **remediation round 1 ready for settled re-review**. Continue the authorized adapter work after
 the accepted foundation. Core `GwzRemoteTransportSshChannel.md` scopes ownership
 of an already trusted/authenticated nonblocking ssh2 Session through command
 open, simultaneous stdout/stderr and request I/O, EOF, close and wait-close.
@@ -20,6 +20,16 @@ known host before authentication. Missing sshd is a gate failure, not a skip.
 Compile-red (missing source module) preceded implementation; behavioral tests
 were completed against the candidate, not all written before it. No throughput,
 pack transfer or production trust/credential parity is claimed.
+
+Correction core: `f03f5f79bae73d378e575273af0b9ed2a87c052d`.
+Original Code and State independently reported NO-GO for nonblocking native
+cleanup losing EAGAIN; Surface GO. Reports are filed verbatim. Lane owner found
+one additional P2: native channel flush discards unread incoming bytes. The
+merged RemPlan corrects both: socket-owning connection lifetime, retryable and
+forced disposal, plus nondestructive Write::flush. Five native tests pass,
+including exact advertisement preservation and twice-blocked cleanup followed
+by forced termination. The fixture guard resumes stopped owned processes during
+unwind. Original reviewers must close findings; no production activation.
 
 ## Remote transport Phase 3b — adapter foundation, 2026-09-20
 
