@@ -2,7 +2,7 @@
 
 ## Remote transport Phase 3b — adapter foundation, 2026-09-20
 
-Status: **settled candidate for review**. Operator "Go" authorizes dependency and
+Status: **accepted foundation after Code / State / Surface GO**. Operator "Go" authorizes dependency and
 adapter work. Core `dev-docs/GwzRemoteTransportAdapterFoundation.md` scopes a
 local versioned git2 fork candidate and the blocking std::io bridge. Distribution
 is not publication; production manifests remain stock until activation gates.
@@ -20,6 +20,16 @@ pass. Source-module missing-file compile red preceded implementation. Only the
 core fixture compiles the bridge so far; no active core/CLI dependency or
 behavior changed. No SSH implementation, registry release or native parity is
 claimed.
+All three original reviewers returned GO with zero P0–P3 on root
+`687e2d3c21a5fca0cfff81216eff4bdac9f855ca` and the core candidate above;
+transport `28f5afb3938a2aa8af0e1e8d5b07779add6ab776` and taut
+`733e8a78897a90f017f4726e4331aed95e8cb977` remain unchanged. Reports are filed
+verbatim as `GwzRemoteTransportAdapterFoundation-Review{Code,State,Surface}.md`.
+One three-axis review, zero remediation rounds, no blocking findings, no blind
+convergence or known escapes. Current core documentation descendant:
+`60daef8ca7a471d3e4d1acfd653678676ae1fef9`. Next implementation is the endpoint
+SSH session owner and trust/authentication/pool integration. The local fork is a
+qualified distribution option, not an approved or completed registry release.
 
 ## Remote transport Phase 3a — native binding qualification, 2026-09-20
 
