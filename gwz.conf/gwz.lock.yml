@@ -15,7 +15,7 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 3b4b632dfba5b0f2f154f50b45d9056a21a9ce99
+    commit: 435e936b593476f24fad4cc4e70f5d06b784ed7d
     branch: main
     detached: false
     dirty: false
@@ -51,7 +51,7 @@ members:
     path: taut
     source_id: src_taut
     source_kind: git
-    commit: 3b8436508ecc6b74b5efa0f1e642d0698b708bf7
+    commit: 733e8a78897a90f017f4726e4331aed95e8cb977
     branch: main
     detached: false
     dirty: false

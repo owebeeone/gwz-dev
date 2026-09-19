@@ -1,6 +1,6 @@
 # Shared-schema transport integration checkpoint — 2026-09-19
 
-Status: **settled for dual Code/State review; not yet accepted**.
+Status: **first Code/State reviews returned NO-GO; merged remediation 1 settled for focused re-verdicts**.
 The reviewed scope will be the taut external Rust type generator, test-only core
 consumer, archive/regeneration proofs and draft pool host contract. This is an
 implementation checkpoint within Phase 1, not a Phase 1/2 interface freeze.
@@ -11,9 +11,16 @@ implementation checkpoint within Phase 1, not a Phase 1/2 interface freeze.
 | gwz-core consumer and controlling pool/interface draft | `3b4b632dfba5b0f2f154f50b45d9056a21a9ce99` |
 | gwz-transport unchanged accepted implementation | `e8b9a1c5408cc9ea9528939b3a602acbeb697814` |
 
-The generated review prompts additionally pin the workspace commit containing
-this checkpoint. Taut baseline is `7a5f616c3a9f72e143b6e20dab41ffa6e20e240a`;
+The first review's workspace commit is `5559184c118d937cff01c57fb202cb4affb92b91`.
+Taut baseline is `7a5f616c3a9f72e143b6e20dab41ffa6e20e240a`;
 core baseline is `e21250ce0d6e9b5fce02154595db5ba2e451ae4c`.
+
+Corrected review object: taut `733e8a78897a90f017f4726e4331aed95e8cb977`,
+core `435e936b593476f24fad4cc4e70f5d06b784ed7d`, unchanged transport as above.
+The re-review prompts pin the workspace commit containing the reports and
+merged correction. Corrected local evidence is 40 tooling tests and nine
+isolated Rust consumer tests, plus regeneration and formatting, all passing.
+The initial evidence counts below describe the first reviewed tuple.
 
 ## Scope and ownership
 
@@ -57,10 +64,14 @@ archive is supplied; the standalone archive proof is the required success gate.
 
 Reuse the original Code and State reviewers under the operator's explicit
 direction. They review independently against one committed tuple using prompts
-generated from the review-loop template. This checkpoint has no completed review
-rounds or reviewer findings yet. Local completion fixes were caught before
-review: provenance checking, extraction paths, source drift, manifest identity
-and encoded-payload coverage. None is a known production escape.
+generated from the review-loop template. The first [Code](GwzRemoteTransportIntegration-ReviewCode.md)
+and [State](GwzRemoteTransportIntegration-ReviewState.md) reviews returned NO-GO
+with four P2 findings (four distinct roots; no blind convergence, P0, P1 or P3).
+The [merged remediation](GwzRemoteTransportIntegration-RemPlan.md) addresses
+generator/runtime option compatibility, exact imported-source provenance,
+clock-origin/timer duties and final Pool ownership. Findings remain open pending
+the original reviewers' closure checks. One completed review round, one of two
+permitted remediation rounds in progress; no observed production escape.
 
 Phase 1 still needs the complete message/admission integration evidence and CI
 drift wiring. Phase 2 still needs active-I/O clock semantics and its remaining

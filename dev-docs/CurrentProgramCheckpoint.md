@@ -2,10 +2,10 @@
 
 ## Remote transport shared-schema integration — 2026-09-19
 
-Status: **implementation checkpoint settled for original Code/State
-review; no new acceptance or interface freeze yet**. The live-work audit found
+Status: **first Code/State review returned NO-GO; one merged remediation is in
+settled for re-verdicts, with no new acceptance or interface freeze yet**. The live-work audit found
 an existing uncommitted prototype and continued that work. Taut now supports
-externally owned Rust types at `3b8436508ecc6b74b5efa0f1e642d0698b708bf7`.
+externally owned Rust types at `733e8a78897a90f017f4726e4331aed95e8cb977`.
 The [test-only consumer](../gwz-core/tests/transport_consumer/README.md) composes
 the exported schema and reuses `gwz_transport::protocol` types. Ordinary Cargo
 builds use checked-in output; explicit regeneration pins the owner schema and
@@ -29,7 +29,14 @@ Fresh verification passed: 21 generator regression tests, 14 consumer tooling
 tests, six isolated package tests and the normal 66-test transport suite. The
 [integration checkpoint](GwzRemoteTransportIntegration-Checkpoint.md) pins the
 tuple, commands and scope. Core consumer/draft:
-`3b4b632dfba5b0f2f154f50b45d9056a21a9ce99`. Review is the next action.
+`3b4b632dfba5b0f2f154f50b45d9056a21a9ce99`. The original reviewers found four
+P2 roots: incompatible generator/runtime options, imported-source provenance,
+clock initialization/snapshot duties and final Pool-owner shutdown. No blind
+convergence or P0/P1/P3. The [merged correction](GwzRemoteTransportIntegration-RemPlan.md)
+maps each finding to a regression and original-reviewer closure; transport
+source stays unchanged. Corrected core is `435e936b593476f24fad4cc4e70f5d06b784ed7d`;
+40 tooling tests, nine isolated consumer tests, regeneration and formatting pass.
+Findings remain open until the re-verdicts.
 
 ## Remote transport draft review — 2026-09-19
 
