@@ -2,41 +2,40 @@
 
 ## Remote transport shared-schema integration — 2026-09-19
 
-Status: **first Code/State review returned NO-GO; one merged remediation is in
-settled for re-verdicts, with no new acceptance or interface freeze yet**. The live-work audit found
-an existing uncommitted prototype and continued that work. Taut now supports
-externally owned Rust types at `733e8a78897a90f017f4726e4331aed95e8cb977`.
-The [test-only consumer](../gwz-core/tests/transport_consumer/README.md) composes
-the exported schema and reuses `gwz_transport::protocol` types. Ordinary Cargo
-builds use checked-in output; explicit regeneration pins the owner schema and
-generator inputs. The isolated archive proof verifies its digest and Cargo
-source-revision metadata, rejects dirty archives, and needs no sibling source.
+Status: **accepted after original Code and State reviewers both reported GO**.
+This accepts the shared-schema integration implementation and draft pool host
+contract only; it does not freeze the Phase 1 schema or Phase 2 runtime API.
 
-The [runtime and pool interface draft](../gwz-core/dev-docs/GwzRemoteTransportPool-InterfaceGate.md)
-records host ownership, limits, clocks and cleanup duties. Current review scope
-is the shared-type integration implementation plus this draft; it does not close
-the Phase 1 schema or Phase 2 runtime/pool freeze. Active I/O clock semantics,
-complete message/encoded-contract evidence and CI drift wiring remain open
-before those phase exits. There is no registry publication, production CLI/core
-integration or physical adapter. The accepted transport source remains
-`e8b9a1c5408cc9ea9528939b3a602acbeb697814` and was not changed.
+The [integration checkpoint](GwzRemoteTransportIntegration-Checkpoint.md) records
+the exact reviewed tuple: taut `733e8a78897a90f017f4726e4331aed95e8cb977`, core
+`435e936b593476f24fad4cc4e70f5d06b784ed7d`, transport
+`e8b9a1c5408cc9ea9528939b3a602acbeb697814` and workspace review inputs
+`23617273932031a346c6fd772e1df99fd68e2706`.
 
-Review tier: dual Code/State because this checkpoint establishes cross-package
-type and codec ownership. Reuse the original reviewers per operator direction;
-the economical integration drafter remains separate. This is not an interface
-freeze; the plan's later freeze gates, including Surface review, still apply.
-Fresh verification passed: 21 generator regression tests, 14 consumer tooling
-tests, six isolated package tests and the normal 66-test transport suite. The
-[integration checkpoint](GwzRemoteTransportIntegration-Checkpoint.md) pins the
-tuple, commands and scope. Core consumer/draft:
-`3b4b632dfba5b0f2f154f50b45d9056a21a9ce99`. The original reviewers found four
-P2 roots: incompatible generator/runtime options, imported-source provenance,
-clock initialization/snapshot duties and final Pool-owner shutdown. No blind
-convergence or P0/P1/P3. The [merged correction](GwzRemoteTransportIntegration-RemPlan.md)
-maps each finding to a regression and original-reviewer closure; transport
-source stays unchanged. Corrected core is `435e936b593476f24fad4cc4e70f5d06b784ed7d`;
-40 tooling tests, nine isolated consumer tests, regeneration and formatting pass.
-Findings remain open until the re-verdicts.
+Core's test consumer composes the exported schema and uses native transport
+Rust types and the owner's CBOR runtime. Generation pins the canonical source
+checkout, imported modules, owner schema and formatter; normal Cargo builds use
+checked-in output. The isolated archive proof verifies package/digest/revision
+metadata without a sibling checkout. Typed and encoded exchanges preserve data
+and wait for endpoint cleanup before close. Three host fixtures qualify clock
+origin, earlier deadlines and final Pool-owner shutdown. All 40 tooling tests,
+nine isolated consumer tests, regeneration and formatting pass; the unchanged
+transport also passed its normal 66-test suite in this run.
+
+The initial dual review found four P2 roots: incompatible generator/runtime
+options, imported-source provenance, clock-origin/timer duties and final Pool
+ownership. One [merged remediation](GwzRemoteTransportIntegration-RemPlan.md)
+corrected all four. The original [Code](GwzRemoteTransportIntegration-ReviewCode-1.md)
+and [State](GwzRemoteTransportIntegration-ReviewState-1.md) reviewers verified
+closure and reported no new findings. Two completed rounds, one remediation,
+no blind convergence or known production escapes. Reports are filed verbatim.
+
+Next: complete the remaining Phase 1 message/admission and encoded-contract
+proofs plus CI drift wiring, and Phase 2 active-I/O clock semantics, before the
+named interface freezes (including Surface review). The
+[pool host contract](../gwz-core/dev-docs/GwzRemoteTransportPool-InterfaceGate.md)
+remains a draft. No production CLI/core surface, physical carrier, adapter,
+registry publication or native-platform qualification is established here.
 
 ## Remote transport draft review — 2026-09-19
 

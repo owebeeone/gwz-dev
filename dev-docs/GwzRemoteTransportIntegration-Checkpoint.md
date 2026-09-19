@@ -1,25 +1,28 @@
 # Shared-schema transport integration checkpoint — 2026-09-19
 
-Status: **first Code/State reviews returned NO-GO; merged remediation 1 settled for focused re-verdicts**.
-The reviewed scope will be the taut external Rust type generator, test-only core
+Status: **accepted at the tuple below after original
+[Code](GwzRemoteTransportIntegration-ReviewCode-1.md) and
+[State](GwzRemoteTransportIntegration-ReviewState-1.md) reviewers reported GO;
+this accepts the shared-schema implementation checkpoint and draft host contract only**.
+The reviewed scope is the taut external Rust type generator, test-only core
 consumer, archive/regeneration proofs and draft pool host contract. This is an
 implementation checkpoint within Phase 1, not a Phase 1/2 interface freeze.
 
 | Review object | Revision |
 |---|---|
-| taut generator and documentation | `3b8436508ecc6b74b5efa0f1e642d0698b708bf7` |
-| gwz-core consumer and controlling pool/interface draft | `3b4b632dfba5b0f2f154f50b45d9056a21a9ce99` |
+| taut generator and documentation | `733e8a78897a90f017f4726e4331aed95e8cb977` |
+| gwz-core consumer and controlling pool/interface draft | `435e936b593476f24fad4cc4e70f5d06b784ed7d` |
 | gwz-transport unchanged accepted implementation | `e8b9a1c5408cc9ea9528939b3a602acbeb697814` |
+| workspace review inputs and merged correction | `23617273932031a346c6fd772e1df99fd68e2706` |
 
 The first review's workspace commit is `5559184c118d937cff01c57fb202cb4affb92b91`.
 Taut baseline is `7a5f616c3a9f72e143b6e20dab41ffa6e20e240a`;
 core baseline is `e21250ce0d6e9b5fce02154595db5ba2e451ae4c`.
 
-Corrected review object: taut `733e8a78897a90f017f4726e4331aed95e8cb977`,
-core `435e936b593476f24fad4cc4e70f5d06b784ed7d`, unchanged transport as above.
-The re-review prompts pin the workspace commit containing the reports and
-merged correction. Corrected local evidence is 40 tooling tests and nine
-isolated Rust consumer tests, plus regeneration and formatting, all passing.
+Both original reviewers independently verified the corrected tuple and all
+finding closures. Corrected local evidence is 40 tooling tests and nine
+isolated Rust consumer tests, plus regeneration and formatting, all passing;
+both reviewers independently reproduced those results.
 The initial evidence counts below describe the first reviewed tuple.
 
 ## Scope and ownership
@@ -69,9 +72,12 @@ and [State](GwzRemoteTransportIntegration-ReviewState.md) reviews returned NO-GO
 with four P2 findings (four distinct roots; no blind convergence, P0, P1 or P3).
 The [merged remediation](GwzRemoteTransportIntegration-RemPlan.md) addresses
 generator/runtime option compatibility, exact imported-source provenance,
-clock-origin/timer duties and final Pool ownership. Findings remain open pending
-the original reviewers' closure checks. One completed review round, one of two
-permitted remediation rounds in progress; no observed production escape.
+clock-origin/timer duties and final Pool ownership. The original reviewers
+verified their counterexamples on the corrected tuple and closed all four
+findings, with no new findings or architectural roots. Two completed review
+rounds, one of two permitted remediation rounds used; no open findings or
+observed production escape. All reports are filed verbatim. Subsequent
+documentation commits record acceptance without changing reviewed source.
 
 Phase 1 still needs the complete message/admission integration evidence and CI
 drift wiring. Phase 2 still needs active-I/O clock semantics and its remaining

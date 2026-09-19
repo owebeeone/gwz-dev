@@ -1,6 +1,9 @@
 # Shared-schema integration — merged remediation 1
 
-Status: **correction implemented and verified locally; findings remain open until their original reviewers verify closure**.
+Status: **complete; all four findings closed by their original reviewers on the corrected tuple**.
+The [Code re-verdict](GwzRemoteTransportIntegration-ReviewCode-1.md) and
+[State re-verdict](GwzRemoteTransportIntegration-ReviewState-1.md) both report GO,
+with no new findings or architectural roots. Closure is reviewer-verified.
 The first [Code](GwzRemoteTransportIntegration-ReviewCode.md) and
 [State](GwzRemoteTransportIntegration-ReviewState.md) reviews returned NO-GO on
 workspace `5559184c118d937cff01c57fb202cb4affb92b91`, taut
@@ -26,7 +29,7 @@ generator pin/hashes, and settle the complete core/root tuple before either
 re-review. These ordered dependency commits form one correction round.
 The original reviewers then independently recheck their counterexamples and
 changed-range interactions. No adapter work or interface freeze is authorized
-by this correction. One of two permitted remediation rounds is in progress.
+by this correction. One of two permitted remediation rounds was used.
 
 ## Corrected object and local evidence
 
