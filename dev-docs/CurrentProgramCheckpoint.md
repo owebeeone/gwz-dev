@@ -2,8 +2,10 @@
 
 ## Remote transport Phase 3c — nonblocking SSH channel, 2026-09-20
 
-Core candidate: `b77f4fef5dbb6958789dd8160fbb74eb67a3f47e`.
-Status: **remediation round 1 ready for settled re-review**. Continue the authorized adapter work after
+Accepted implementation: `f03f5f79bae73d378e575273af0b9ed2a87c052d`.
+Current core documentation descendant: `6081880420a54e0b82e1e33c63194e2664f3d148`.
+Initial candidate: `b77f4fef5dbb6958789dd8160fbb74eb67a3f47e`.
+Status: **accepted preactivation primitive after Code / State / Surface GO**. Continue the authorized adapter work after
 the accepted foundation. Core `GwzRemoteTransportSshChannel.md` scopes ownership
 of an already trusted/authenticated nonblocking ssh2 Session through command
 open, simultaneous stdout/stderr and request I/O, EOF, close and wait-close.
@@ -11,8 +13,8 @@ Only complete cleanup permits session extraction for reuse. A standalone local
 SSH fixture uses temporary keys/server/repository, never user SSH configuration.
 Budgets: 250 primitive source lines, 350 fixture lines. Preactivation module only;
 production connect/authentication/pool/message pumping and native parity remain
-unclaimed. Original Code/State and Surface review follows qualification.
-The 221-line primitive and 311-line fixture pass two real loopback tests on
+unclaimed. Original Code/State and Surface reviews are complete.
+The initial 221-line primitive and 311-line fixture passed two real loopback tests on
 macOS arm64 with OpenSSH10.3p1 and ssh2 0.9.6. Two receive-pack command channels
 reuse one authenticated session; upload-pack, early extraction refusal, active
 abort and shell quoting also pass. The fixture independently verifies its own
@@ -29,7 +31,28 @@ merged RemPlan corrects both: socket-owning connection lifetime, retryable and
 forced disposal, plus nondestructive Write::flush. Five native tests pass,
 including exact advertisement preservation and twice-blocked cleanup followed
 by forced termination. The fixture guard resumes stopped owned processes during
-unwind. Original reviewers must close findings; no production activation.
+unwind. Original reviewers closed findings at root
+`6076c6153f2b4fb74da5179b0ec6ffd2765d81ad`, core correction above, unchanged
+transport `28f5afb3938a2aa8af0e1e8d5b07779add6ab776` and taut
+`733e8a78897a90f017f4726e4331aed95e8cb977`. Reports filed verbatim as
+`GwzRemoteTransportSshChannel-Review{Code,State,Surface}-1.md`.
+One three-axis review plus one merged correction/re-review; two distinct P2
+root causes found before acceptance, including one blind Code/State convergence;
+zero open findings and zero known post-acceptance escapes. One continued work
+session; wall time not instrumented. Preactivation source: 323 lines in two files.
+Five native tests and formatting/diff gates pass. No production activation.
+
+Next: host message-to-SSH pump behind existing transport API. Keep bounded
+incoming byte mirrors, validate before forwarding, and consume Stream.read only
+after SSH accepts that prefix so Window/Flushed cannot get ahead of sink progress.
+Keep reverse data/control pumping independently, drain stderr, preserve EOF/close
+ordering, discard pending mirrors on cancellation, and classify actual backend
+I/O separately from backpressure. Proposed slice: private ssh_pump module around
+250–350 lines plus 300–400 lines of deterministic partial-I/O and clock tests.
+No gwz-transport wire/API change or CLI/core communication change is needed for
+that slice. Physical pool resource driver, production identity/trust setup, per-
+remote Git integration, native parity and activation coverage remain subsequent
+Phase 3 work; this checkpoint does not advertise endpoint support.
 
 ## Remote transport Phase 3b — adapter foundation, 2026-09-20
 

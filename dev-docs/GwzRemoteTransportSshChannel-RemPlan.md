@@ -1,6 +1,9 @@
 # SSH channel remediation, round 1
 
-Status: correction in progress, not accepted. Original reviewed root
+Status: **closed by original Code/State/Surface GO at core
+f03f5f79bae73d378e575273af0b9ed2a87c052d, root
+6076c6153f2b4fb74da5179b0ec6ffd2765d81ad**. Original reports and closure reports
+are preserved as `GwzRemoteTransportSshChannel-Review{Code,State,Surface}[-1].md`. Original reviewed root
 823ffdf50686bae2a222f80d673e7ad122780684, core
 b77f4fef5dbb6958789dd8160fbb74eb67a3f47e. Original Code and State independently
 found the same cancellation-disposal defect; Surface GO. Preserve all reports.
