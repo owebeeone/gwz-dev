@@ -1,5 +1,49 @@
 # Current program checkpoint
 
+## Remote transport Phase 1/2 completion — 2026-09-19
+
+Status: **implemented candidate; local gates pass, interface reviews pending**.
+Current candidate: transport `163feebe439edd5d1fbaf11e163882e80d4f2257`, core
+`ce3bb967f9696b1791fcbefb65b6ccdd0c8ab618`, unchanged taut
+`733e8a78897a90f017f4726e4331aed95e8cb977`. The
+[interface checkpoint](GwzRemoteTransportInterfaces-Checkpoint.md) records
+archive provenance, scope, TDD disclosure and executed evidence. The complete
+Rust 1.95 suite (including normal seeded replay), both regeneration checks,
+formatting, tooling tests and clean-archive consumer proof pass. Remote CI is
+not claimed. This is not yet a GO or interface freeze.
+Operator authorized the bounded design addition, implementation and review.
+Baseline is clean workspace `d6aefddbf3093d14a346896c7fff8de6bfe0d756`,
+core `435e936b593476f24fad4cc4e70f5d06b784ed7d`, transport
+`e8b9a1c5408cc9ea9528939b3a602acbeb697814`, taut
+`733e8a78897a90f017f4726e4331aed95e8cb977`.
+
+Scope: existing design §10.1 defines host-reported active-I/O and cumulative
+helper clocks; implement those stream controls and fake-host tests, complete
+consumer message/admission and typed/encoded contract proofs, qualify explicit
+regeneration and prepare the owner's standalone CI workflow. No physical
+carrier, adapters, production CLI/core method changes or publication.
+The owner's workflow can be checked in locally, but remote execution and the
+cross-repository consumer CI lane require source/artifact availability; neither
+is claimed by local tests.
+
+Ownership: economical runtime drafter owns `gwz-transport/src/stream/**` and
+new clock/seam tests (350 production / 650 test LOC, 9 files provisional
+ceilings); original economical integration drafter owns consumer admission and
+conformance tests (500 added LOC provisional ceiling). The lane owner owns
+design, public documentation, generation checks, CI declaration and evidence.
+Schema tags/types remain unchanged. A pre-freeze compatibility contact found
+that the prototype cannot represent native timeout zero (disabled) or the full
+positive i32 range. Design §10.2 now defines that mapping, including optional
+connect deadlines and tightening-only overrides. Scope is expanded to pool
+clock representation, codec deadline admission and focused consumer fixtures
+(250 additional production / 250 test LOC ceiling); other pool semantics stay
+fixed. This follows the existing requirement to preserve native policy, not a
+new operator policy decision. Review tier:
+original Code and State reviewers plus an independent Surface reviewer for the
+public API contract; no fresh replacement for the retained original reviewers.
+The exact member tuple, measured change and executed evidence are recorded
+in the interface checkpoint; generated prompts pin the root review-input SHA. No new phase is accepted by this progress entry.
+
 ## Remote transport shared-schema integration — 2026-09-19
 
 Status: **accepted after original Code and State reviewers both reported GO**.
