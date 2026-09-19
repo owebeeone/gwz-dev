@@ -1,6 +1,6 @@
 # Transport interface candidate — merged remediation 1
 
-Date: 2026-09-19. Status: implementation authorized; closure pending reviewers.
+Date: 2026-09-19. Status: all findings closed by originating reviewers; accepted after re-verdict GO.
 Baseline: root `9bb74ace2fca56f770af34b6ec1bdf6bab4e695e`, core
 `ce3bb967f9696b1791fcbefb65b6ccdd0c8ab618`, transport
 `163feebe439edd5d1fbaf11e163882e80d4f2257`, taut unchanged
@@ -67,3 +67,12 @@ for that evidence-only change. The fresh Python setup was reproduced in a
 new temporary environment with only taut-proto==0.9.1 installed; source-pinned
 consumer regeneration passed. Final clean-archive qualification and reviewer
 closure are recorded in the interface checkpoint.
+
+## Closure
+
+Code P2-1 and P3-1, State P3-1, and Surface P3-1 are all closed at transport
+`28f5afb3938a2aa8af0e1e8d5b07779add6ab776` / core
+`ace269896ad80aee923e2e8fd31e565c43de57ed` / root review inputs
+`9d0dc7ef5c616d64d52c296ea2fa34d83d21d73e`, after all three original reviewers
+returned GO in their `Review*-1.md` reports. No new findings. One remediation
+round used. No production or public-signature changes followed the reviewed tuple.

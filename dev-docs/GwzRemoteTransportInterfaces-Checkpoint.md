@@ -1,9 +1,43 @@
 # Remote transport Phase 1/2 interface checkpoint
 
-Status: **remediation 1 qualified locally; focused re-verdicts pending**.
+Status: **accepted; Phase 1 schema/admission/message-handoff and Phase 2 runtime interfaces frozen**.
 Date: 2026-09-19.
 
-## Current review disposition
+## Acceptance
+
+Accepted at root review inputs `9d0dc7ef5c616d64d52c296ea2fa34d83d21d73e`,
+core `ace269896ad80aee923e2e8fd31e565c43de57ed`, transport
+`28f5afb3938a2aa8af0e1e8d5b07779add6ab776` and taut
+`733e8a78897a90f017f4726e4331aed95e8cb977`, after
+[Code](GwzRemoteTransportInterfaces-ReviewCode-1.md),
+[State](GwzRemoteTransportInterfaces-ReviewState-1.md) and
+[Surface](GwzRemoteTransportInterfaces-ReviewSurface-1.md) all reported GO.
+All four findings are closed by their originating reviewers; none are deferred
+or self-closed. Reports are filed verbatim. Acceptance records and core plan/gate
+status updates are documentary descendants of the reviewed implementation.
+
+Current core documentation descendant: `9303eb86914aa5770b4f951613270b14b2108f73`; its diff
+from the reviewed core contains only the plan and interface-gate status records.
+
+This freezes the named Phase 1 schema/types, negotiated admission and message
+handoff contract and Phase 2 stream/pool runtime API only. It does not advertise
+SSH/HTTPS support, a production host, native platforms, registry availability or
+remote CI. Remaining programme work begins with Phase 3 safe per-remote git2
+callback qualification and the host SSH adapter; production placement and HTTPS
+follow under their existing gates. No wire carrier belongs in gwz-transport.
+
+Metrics: two completed review rounds, one merged remediation, one P2 and three
+P3 findings discovered at interface review, all closed before acceptance; zero
+new findings at re-review, no blind convergence on the blocking defect, no known
+production escapes. This acceptance completed in the resumed 2026-09-19 task;
+exact end-to-end wall time/session count across prior interruptions was not
+instrumented and is not estimated. Local evidence is 89 owner tests, 18 isolated
+consumer tests, normal seeded replay, generation/format/tooling checks and clean
+archive verification. The re-reviewers independently repeated focused gates;
+Surface reproduced setup in its own fresh environment. Remote/platform outcomes
+remain explicitly unqualified.
+
+## Initial review disposition (historical)
 
 The initial exact-tuple review returned Code **NO-GO** (P2-1 negotiated
 Open admission, P3-1 host timeout-policy evidence), State **GO** (P3-1 clock-only
@@ -11,10 +45,10 @@ wake amplification), and Surface **GO** (P3-1 Python setup documentation).
 Reports are filed verbatim in the adjacent ReviewCode/ReviewState/ReviewSurface
 files. The merged `GwzRemoteTransportInterfaces-RemPlan.md` accepts all four
 findings as one bounded correction. No schema or public signature changes.
-One review round completed; first remediation underway; no blind convergence
+At this initial checkpoint, one review round was completed and remediation was pending; no blind convergence
 on the blocking root. No production escapes are known. The candidate evidence
 below describes the initial tuple and must not be read as acceptance or as
-closure of the review findings. Final revised-tuple qualification follows here.
+closure of the review findings. Revised-tuple qualification and acceptance are recorded above and below.
 
 ## Remediation 1 qualification
 

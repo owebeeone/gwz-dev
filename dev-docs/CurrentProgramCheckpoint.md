@@ -1,58 +1,41 @@
 # Current program checkpoint
 
-## Remote transport Phase 1/2 completion — 2026-09-19
+## Remote transport Phase 1/2 interface acceptance — 2026-09-19
 
-Status: **first merged remediation locally qualified; focused re-verdicts pending**.
-Code found one P2: Open admission falls back to default limits instead of the
-negotiated receiver limits. State and Surface reported GO with one P3 each;
-Code also identified a missing host timeout-policy proof. All four findings
-are accepted in `GwzRemoteTransportInterfaces-RemPlan.md`; the same reviewers
-will verify the revised tuple. No API/schema expansion is planned.
-Revised candidate: transport `28f5afb3938a2aa8af0e1e8d5b07779add6ab776`, core
-`ace269896ad80aee923e2e8fd31e565c43de57ed`; all 89 owner tests and 18 isolated
-archive consumer tests pass. Owner/consumer regeneration, formatting and tooling
-checks pass. The setup walkthrough also passed in a fresh Python environment.
-No finding is self-closed; original Code, State and Surface reviewers re-verify.
-Initial candidate: transport `163feebe439edd5d1fbaf11e163882e80d4f2257`, core
-`ce3bb967f9696b1791fcbefb65b6ccdd0c8ab618`, unchanged taut
-`733e8a78897a90f017f4726e4331aed95e8cb977`. The
-[interface checkpoint](GwzRemoteTransportInterfaces-Checkpoint.md) records
-archive provenance, scope, TDD disclosure and executed evidence. The complete
-Rust 1.95 suite (including normal seeded replay), both regeneration checks,
-formatting, tooling tests and clean-archive consumer proof pass. Remote CI is
-not claimed. This is not yet a GO or interface freeze.
-Operator authorized the bounded design addition, implementation and review.
-Baseline is clean workspace `d6aefddbf3093d14a346896c7fff8de6bfe0d756`,
-core `435e936b593476f24fad4cc4e70f5d06b784ed7d`, transport
-`e8b9a1c5408cc9ea9528939b3a602acbeb697814`, taut
-`733e8a78897a90f017f4726e4331aed95e8cb977`.
+Status: **accepted and frozen after Code / State / Surface GO**.
+Accepted implementation: transport `28f5afb3938a2aa8af0e1e8d5b07779add6ab776`,
+core `ace269896ad80aee923e2e8fd31e565c43de57ed`, unchanged taut
+`733e8a78897a90f017f4726e4331aed95e8cb977`; root review inputs
+`9d0dc7ef5c616d64d52c296ea2fa34d83d21d73e`.
+The [interface checkpoint](GwzRemoteTransportInterfaces-Checkpoint.md) pins
+archive provenance, contracts, qualification and all three re-verdicts.
+Current core documentation descendant: `9303eb86914aa5770b4f951613270b14b2108f73`.
+The acceptance commits update documentation only; source and tests remain the
+reviewed implementation. Phase 1 schema/types, negotiated admission and message
+handoff, and Phase 2 stream/pool runtime API are frozen within that scope.
 
-Scope: existing design §10.1 defines host-reported active-I/O and cumulative
-helper clocks; implement those stream controls and fake-host tests, complete
-consumer message/admission and typed/encoded contract proofs, qualify explicit
-regeneration and prepare the owner's standalone CI workflow. No physical
-carrier, adapters, production CLI/core method changes or publication.
-The owner's workflow can be checked in locally, but remote execution and the
-cross-repository consumer CI lane require source/artifact availability; neither
-is claimed by local tests.
+The initial review found one P2 (Open admission silently using default limits)
+and three P3s (host timeout-policy evidence, clock-only wake amplification,
+consumer setup instructions). One merged remediation closed all four. The same
+Code and State reviewers and the Surface reviewer verified their closures and
+returned GO with no new findings. Reports are filed verbatim. Two review rounds,
+one remediation; four findings discovered before acceptance, no blind convergence
+on the blocking root and no known production escapes. Acceptance finished in the
+resumed 2026-09-19 task; exact elapsed time across prior interruptions was not
+instrumented.
 
-Ownership: economical runtime drafter owns `gwz-transport/src/stream/**` and
-new clock/seam tests (350 production / 650 test LOC, 9 files provisional
-ceilings); original economical integration drafter owns consumer admission and
-conformance tests (500 added LOC provisional ceiling). The lane owner owns
-design, public documentation, generation checks, CI declaration and evidence.
-Schema tags/types remain unchanged. A pre-freeze compatibility contact found
-that the prototype cannot represent native timeout zero (disabled) or the full
-positive i32 range. Design §10.2 now defines that mapping, including optional
-connect deadlines and tightening-only overrides. Scope is expanded to pool
-clock representation, codec deadline admission and focused consumer fixtures
-(250 additional production / 250 test LOC ceiling); other pool semantics stay
-fixed. This follows the existing requirement to preserve native policy, not a
-new operator policy decision. Review tier:
-original Code and State reviewers plus an independent Surface reviewer for the
-public API contract; no fresh replacement for the retained original reviewers.
-The exact member tuple, measured change and executed evidence are recorded
-in the interface checkpoint; generated prompts pin the root review-input SHA. No new phase is accepted by this progress entry.
+Qualification: 89 owner tests pass on Rust 1.95, including normal seeded stream
+and pool replay; 18 isolated consumer tests pass against the committed package
+archive; owner and exact-source consumer regeneration, formatting and tooling
+checks pass. Fresh Python setup and archive proof were independently reproduced
+by Surface. The two opt-in extended campaigns were not rerun for this gate.
+
+Next: Phase 3 safe per-remote git2 callback/owned-context qualification, followed
+by the host SSH adapter and native evidence. No physical carrier belongs in
+transport. Production host dispatch/timers, placement, HTTPS, native-platform
+qualification, registry resolution and remote CI remain later gates. The local
+owner CI workflow is prepared; no remote execution, publication, push or remote
+provisioning is claimed. Existing CLI/core service interfaces remain unchanged.
 
 ## Remote transport shared-schema integration — 2026-09-19
 
