@@ -1,5 +1,36 @@
 # Current program checkpoint
 
+## Remote transport shared-schema integration — 2026-09-19
+
+Status: **implementation checkpoint settled for original Code/State
+review; no new acceptance or interface freeze yet**. The live-work audit found
+an existing uncommitted prototype and continued that work. Taut now supports
+externally owned Rust types at `3b8436508ecc6b74b5efa0f1e642d0698b708bf7`.
+The [test-only consumer](../gwz-core/tests/transport_consumer/README.md) composes
+the exported schema and reuses `gwz_transport::protocol` types. Ordinary Cargo
+builds use checked-in output; explicit regeneration pins the owner schema and
+generator inputs. The isolated archive proof verifies its digest and Cargo
+source-revision metadata, rejects dirty archives, and needs no sibling source.
+
+The [runtime and pool interface draft](../gwz-core/dev-docs/GwzRemoteTransportPool-InterfaceGate.md)
+records host ownership, limits, clocks and cleanup duties. Current review scope
+is the shared-type integration implementation plus this draft; it does not close
+the Phase 1 schema or Phase 2 runtime/pool freeze. Active I/O clock semantics,
+complete message/encoded-contract evidence and CI drift wiring remain open
+before those phase exits. There is no registry publication, production CLI/core
+integration or physical adapter. The accepted transport source remains
+`e8b9a1c5408cc9ea9528939b3a602acbeb697814` and was not changed.
+
+Review tier: dual Code/State because this checkpoint establishes cross-package
+type and codec ownership. Reuse the original reviewers per operator direction;
+the economical integration drafter remains separate. This is not an interface
+freeze; the plan's later freeze gates, including Surface review, still apply.
+Fresh verification passed: 21 generator regression tests, 14 consumer tooling
+tests, six isolated package tests and the normal 66-test transport suite. The
+[integration checkpoint](GwzRemoteTransportIntegration-Checkpoint.md) pins the
+tuple, commands and scope. Core consumer/draft:
+`3b4b632dfba5b0f2f154f50b45d9056a21a9ce99`. Review is the next action.
+
 ## Remote transport draft review — 2026-09-19
 
 Status: **accepted at gwz-core `05842b38e55f109ed3663555680751811a72eb9b`
