@@ -1,5 +1,26 @@
 # Current program checkpoint
 
+## Remote transport Phase 3b — adapter foundation, 2026-09-20
+
+Status: **settled candidate for review**. Operator "Go" authorizes dependency and
+adapter work. Core `dev-docs/GwzRemoteTransportAdapterFoundation.md` scopes a
+local versioned git2 fork candidate and the blocking std::io bridge. Distribution
+is not publication; production manifests remain stock until activation gates.
+Bridge code remains preactivation, compiled by the isolated archive consumer.
+Budgets: 160 packaging runner lines, 150 bridge lines, 300 test lines. Original
+Code/State and Surface reviewers qualify the settled result. Host SSH worker,
+trust/authentication parity, pool lifecycle and native platforms remain next.
+Core candidate `46bbc932ac25d9b1762c77351293ea1c0ac7dcbb` adds a 108-line
+blocking adapter and a pinned local `gwz-git2` package recipe. The package archive
+has SHA-256 `2c0544413ee18231fb9185ad29cb82ffa34c223245cd044523be1515897f68af`.
+Seven native tests pass against both staging and the package; 21 archive-backed
+consumer tests pass, including three new blocking cases. Three packaging,
+two native provenance and nine archive-admission Python tests and formatting
+pass. Source-module missing-file compile red preceded implementation. Only the
+core fixture compiles the bridge so far; no active core/CLI dependency or
+behavior changed. No SSH implementation, registry release or native parity is
+claimed.
+
 ## Remote transport Phase 3a — native binding qualification, 2026-09-20
 
 Status: **accepted local prerequisite after Code / State / Surface GO; no production activation**. Operator "go"
