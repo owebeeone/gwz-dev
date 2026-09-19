@@ -64,6 +64,15 @@ The source-schema generator extension and core consumer remain separate pending
 work; neither Phase 1 nor Phase 2 is declared complete or frozen.
 
 
+The operator authorized connection pooling next. The
+[pool checkpoint](../gwz-core/dev-docs/GwzRemoteTransportPoolImplementation.md)
+is implemented with fake connections, a controlled clock and seeded lifecycle
+schedules. Its dual Code/State implementation review uses the original reviewers;
+no pool API freeze or network integration is claimed. Scope includes exclusive
+leases, shared limits, identity eligibility, idle expiry, bounded waiting,
+cancellation, helper time and cleanup acknowledgements. All physical I/O remains
+host-owned; the existing CLI/core interface is unchanged.
+
 Date: 2026-08-22 (resumed)
 Status: **the single current-state authority for the GWZ merge program.
 Update at every checkpoint boundary; keep concise; history belongs in git,
