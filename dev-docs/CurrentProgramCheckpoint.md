@@ -1,5 +1,27 @@
 # Current program checkpoint
 
+## Remote transport Phase 3a — native binding qualification, 2026-09-20
+
+Status: **settled candidate for review; no production activation**. Operator "go"
+authorizes the next Phase 3 prerequisite. Baseline root `d86c7d079b524537f6cdfdc5352b930a0202389b`,
+core `9303eb86914aa5770b4f951613270b14b2108f73`; accepted transport unchanged.
+`gwz-core/dev-docs/GwzRemoteTransportNativeBinding.md` defines the bounded
+safe binding extension and qualification. Keep production dependency/lockfiles
+unchanged; retain a pinned two-file git2 patch and isolated public test runner.
+Qualify owned context, error/panic, fresh versus retained remotes, stateful
+service continuity and unrelated transport coexistence before host SSH work.
+No physical message carrier or new CLI/core API. Budgets: 150 production patch
+LOC, 550 Rust test LOC, 200 runner LOC plus concise docs. Retained economical
+drafter owns tests; lane owner patch/runner/docs. Exact-tuple Code/State review
+uses the original reviewers; add Surface for the new public safe binding method.
+Core candidate `fe815856291a93fa4ecdf0ab5879984d7b5ba1ee` adds the
+72-line binding patch, 569 lines of Rust integration fixtures (within the 20%
+allowance), and 106-line isolated runner. Seven integration tests, two Python
+provenance tests and formatting pass on Rust 1.95/macOS. The stock binding
+provided the expected missing-method compile red. No production dependencies
+changed. Native platform/SSH/production activation remains a subsequent gate.
+
+
 ## Remote transport Phase 1/2 interface acceptance — 2026-09-19
 
 Status: **accepted and frozen after Code / State / Surface GO**.
