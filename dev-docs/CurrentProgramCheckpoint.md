@@ -2,8 +2,18 @@
 
 ## Remote transport Phase 1/2 completion — 2026-09-19
 
-Status: **implemented candidate; local gates pass, interface reviews pending**.
-Current candidate: transport `163feebe439edd5d1fbaf11e163882e80d4f2257`, core
+Status: **first merged remediation locally qualified; focused re-verdicts pending**.
+Code found one P2: Open admission falls back to default limits instead of the
+negotiated receiver limits. State and Surface reported GO with one P3 each;
+Code also identified a missing host timeout-policy proof. All four findings
+are accepted in `GwzRemoteTransportInterfaces-RemPlan.md`; the same reviewers
+will verify the revised tuple. No API/schema expansion is planned.
+Revised candidate: transport `28f5afb3938a2aa8af0e1e8d5b07779add6ab776`, core
+`ace269896ad80aee923e2e8fd31e565c43de57ed`; all 89 owner tests and 18 isolated
+archive consumer tests pass. Owner/consumer regeneration, formatting and tooling
+checks pass. The setup walkthrough also passed in a fresh Python environment.
+No finding is self-closed; original Code, State and Surface reviewers re-verify.
+Initial candidate: transport `163feebe439edd5d1fbaf11e163882e80d4f2257`, core
 `ce3bb967f9696b1791fcbefb65b6ccdd0c8ab618`, unchanged taut
 `733e8a78897a90f017f4726e4331aed95e8cb977`. The
 [interface checkpoint](GwzRemoteTransportInterfaces-Checkpoint.md) records

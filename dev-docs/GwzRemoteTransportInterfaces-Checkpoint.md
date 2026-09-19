@@ -1,7 +1,77 @@
 # Remote transport Phase 1/2 interface checkpoint
 
-Status: **implemented candidate, local gates passed; independent reviews pending**.
+Status: **remediation 1 qualified locally; focused re-verdicts pending**.
 Date: 2026-09-19.
+
+## Current review disposition
+
+The initial exact-tuple review returned Code **NO-GO** (P2-1 negotiated
+Open admission, P3-1 host timeout-policy evidence), State **GO** (P3-1 clock-only
+wake amplification), and Surface **GO** (P3-1 Python setup documentation).
+Reports are filed verbatim in the adjacent ReviewCode/ReviewState/ReviewSurface
+files. The merged `GwzRemoteTransportInterfaces-RemPlan.md` accepts all four
+findings as one bounded correction. No schema or public signature changes.
+One review round completed; first remediation underway; no blind convergence
+on the blocking root. No production escapes are known. The candidate evidence
+below describes the initial tuple and must not be read as acceptance or as
+closure of the review findings. Final revised-tuple qualification follows here.
+
+## Remediation 1 qualification
+
+Revised transport: `28f5afb3938a2aa8af0e1e8d5b07779add6ab776`.
+Revised core: `ace269896ad80aee923e2e8fd31e565c43de57ed`.
+Taut remains `733e8a78897a90f017f4726e4331aed95e8cb977`.
+The generated re-review prompts pin the root commit containing this record.
+Owner archive SHA-256:
+`986033108eab2967028dc52c69f94e859ed6cbb78384648f03e88d9703383191`.
+
+Binding now enforces installed receiver limits. The consumer's single fake host
+effect boundary validates negotiated typed or encoded admission, ownership and
+captured connect/I/O policy first. Its metadata matrix covers three 256/257-byte
+field boundaries, and its native-policy matrix independently rejects disabled
+or lengthened finite connect/I/O requests. Accepted values feed exact pool and
+stream inputs, with capped cumulative helper remainder. The encoded receiver
+actually runs the bounded decoder; no default-cap rejection proxy is claimed.
+Host policy remains test-only; no production dispatcher or identity resolver is
+implemented. Public signatures and generated schema artifacts are unchanged.
+
+Clock-only pool ticks, helper pause/resume, stream classification and peer-byte
+progress no longer wake unrelated callers. Terminal/data readiness still wakes;
+cleanup abort work becomes runnable at its exact deadline. Host timer snapshots
+and recomputation duties stay unchanged. The consumer README now supplies fresh
+Python setup, the exact package and formatter/toolchain selection.
+
+Executed final correction checks:
+
+- Rust 1.95 complete owner suite: **89 passed, 0 failed, 2 opt-in campaigns
+  ignored**, including normal 3,000 stream / 2,000 pool seeded cases.
+- Focused admission, binding, wake, timeout and async tests: passed.
+- Owner generation: four artifacts match; consumer exact-source generation:
+  passed in a newly created temporary environment containing taut-proto 0.9.1.
+- Consumer tooling tests: **17 passed**. Owner/consumer formatting and whitespace
+  checks passed. No new conditional-compilation declarations were introduced.
+- Clean committed owner package built and verified on Rust 1.95.
+- **18 isolated consumer tests passed** against that exact archive, offline and
+  locked, using the fresh Python environment and Rust 1.96 selection documented
+  in the README. Its source revision and digest were checked by the proof runner.
+
+Reproduction (from workspace root, using the README prerequisites):
+
+```sh
+gwz-core/protocol/.regen-venv/bin/python \
+  gwz-core/tests/transport_consumer/package_proof.py \
+  --archive gwz-transport/target/package/gwz-transport-0.1.0.crate \
+  --archive-sha256 986033108eab2967028dc52c69f94e859ed6cbb78384648f03e88d9703383191 \
+  --source-revision 28f5afb3938a2aa8af0e1e8d5b07779add6ab776
+```
+
+Correction size: transport production +28/-10 across three source files;
+owner tests +232 across two files; consumer tests +349/-17 in one cohesive
+admission fixture (688 total lines). Documentation changes are separate.
+All fit the remplan ceilings. Red/green and evidence-only disclosures are in
+the remplan. Initial reports remain verbatim evidence; the old qualification
+and metrics below describe that original candidate, not the revised acceptance
+status. No remote CI, native adapter, publication or new large campaign is claimed.
 
 ## Object and authority
 
