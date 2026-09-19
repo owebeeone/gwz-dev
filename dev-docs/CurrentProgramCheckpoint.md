@@ -1,5 +1,26 @@
 # Current program checkpoint
 
+## Remote transport Phase 3c — nonblocking SSH channel, 2026-09-20
+
+Core candidate: `b77f4fef5dbb6958789dd8160fbb74eb67a3f47e`.
+Status: **candidate ready for settled review**. Continue the authorized adapter work after
+the accepted foundation. Core `GwzRemoteTransportSshChannel.md` scopes ownership
+of an already trusted/authenticated nonblocking ssh2 Session through command
+open, simultaneous stdout/stderr and request I/O, EOF, close and wait-close.
+Only complete cleanup permits session extraction for reuse. A standalone local
+SSH fixture uses temporary keys/server/repository, never user SSH configuration.
+Budgets: 250 primitive source lines, 350 fixture lines. Preactivation module only;
+production connect/authentication/pool/message pumping and native parity remain
+unclaimed. Original Code/State and Surface review follows qualification.
+The 221-line primitive and 311-line fixture pass two real loopback tests on
+macOS arm64 with OpenSSH10.3p1 and ssh2 0.9.6. Two receive-pack command channels
+reuse one authenticated session; upload-pack, early extraction refusal, active
+abort and shell quoting also pass. The fixture independently verifies its own
+known host before authentication. Missing sshd is a gate failure, not a skip.
+Compile-red (missing source module) preceded implementation; behavioral tests
+were completed against the candidate, not all written before it. No throughput,
+pack transfer or production trust/credential parity is claimed.
+
 ## Remote transport Phase 3b — adapter foundation, 2026-09-20
 
 Status: **accepted foundation after Code / State / Surface GO**. Operator "Go" authorizes dependency and
