@@ -2,7 +2,7 @@
 
 ## Remote transport Phase 3a — native binding qualification, 2026-09-20
 
-Status: **Code / State / Surface GO; minor Surface help correction pending verification**. Operator "go"
+Status: **accepted local prerequisite after Code / State / Surface GO; no production activation**. Operator "go"
 authorizes the next Phase 3 prerequisite. Baseline root `d86c7d079b524537f6cdfdc5352b930a0202389b`,
 core `9303eb86914aa5770b4f951613270b14b2108f73`; accepted transport unchanged.
 `gwz-core/dev-docs/GwzRemoteTransportNativeBinding.md` defines the bounded
@@ -23,8 +23,22 @@ changed. Reviews are filed verbatim as
 `GwzRemoteTransportNativeBinding-Review{Code,State,Surface}.md`. Code and State
 found no P0–P3; Surface found only P3-1, the unstated toolchain default. Core
 `7b03091941f047c61f8261fd12c451bca6db49d7` corrects help/README only; the reviewed
-binding patch, pins and Rust fixtures are identical. Surface will verify that
-bounded correction. Native platform/SSH/production activation remains a subsequent gate.
+binding patch, pins and Rust fixtures are identical. The original Surface
+reviewer verified that correction and closed P3-1 in `-ReviewSurface-1.md`.
+Current core documentation descendant: `30616010f23a7e4ae7dc96b03268a3d950dfe215`.
+Reviewed implementation tuple: core `fe815856291a93fa4ecdf0ab5879984d7b5ba1ee`,
+root `d7b1b04d35acd73dd85ec553a68d4e498c120f21`, transport
+`28f5afb3938a2aa8af0e1e8d5b07779add6ab776`, taut
+`733e8a78897a90f017f4726e4331aed95e8cb977`; help correction review root
+`d798d201b4d9d0e8f02d55b415efd3c725bfee3a`.
+One three-axis review and one focused Surface closure; zero blocking findings,
+one pre-acceptance P3 corrected, no blind convergence or known production
+escapes. The binding adds 72 lines across two upstream files. Final runner is
+107 lines; no new production runtime owner. No remote CI or native parity is
+claimed. Next: distributable binding dependency selection and endpoint SSH
+adapter integration with the accepted stream/pool API, followed by native
+trust/authentication and complete network-entry qualification. Existing CLI/core
+communication interfaces remain unchanged.
 
 
 ## Remote transport Phase 1/2 interface acceptance — 2026-09-19
