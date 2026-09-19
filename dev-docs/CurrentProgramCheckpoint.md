@@ -71,8 +71,15 @@ schedules. Its dual Code/State implementation review uses the original reviewers
 the initial gate returned three P2 findings (two Code, one State). One
 [merged remediation](GwzRemoteTransportPool-RemPlan.md) corrects spontaneous
 idle disposal, session-scoped cancellation and cross-port user/host capacity.
-Focused re-review is pending; no pool API freeze or network integration is claimed.
-Scope includes exclusive
+The original [Code](GwzRemoteTransportPool-ReviewCode-1.md) and
+[State](GwzRemoteTransportPool-ReviewState-1.md) reviewers both returned GO,
+verified all closures and found no new issues. The pool checkpoint is accepted
+at transport `e8b9a1c5408cc9ea9528939b3a602acbeb697814`; the
+[acceptance record](GwzRemoteTransportPool-Checkpoint.md) pins the full tuple,
+66-test suite, 50,000-case campaign and independent review evidence. Two completed
+rounds, one remediation; the usage-limit interruption yielded no verdict and
+was resumed on the same tuple. No pool API freeze or network integration is
+claimed. Scope includes exclusive
 leases, shared limits, identity eligibility, idle expiry, bounded waiting,
 cancellation, helper time and cleanup acknowledgements. All physical I/O remains
 host-owned; the existing CLI/core interface is unchanged.

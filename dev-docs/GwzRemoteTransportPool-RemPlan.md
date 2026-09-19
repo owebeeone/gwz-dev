@@ -1,6 +1,8 @@
 # Endpoint pool remediation — round 1, 2026-09-19
 
-Status: **merged correction implemented and locally verified; awaiting original reviewers**.
+Status: **verified closed by original Code and State reviewers on transport
+`e8b9a1c5408cc9ea9528939b3a602acbeb697814`; see the
+[acceptance record](GwzRemoteTransportPool-Checkpoint.md)**.
 
 Inputs: transport `554384f5808264009b3af016452290cacefab855`, core
 `3522a1cc11991d81f9376c6ff134900233d3b4c1`, root
