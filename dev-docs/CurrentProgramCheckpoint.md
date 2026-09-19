@@ -2,7 +2,7 @@
 
 ## Remote transport Phase 3a — native binding qualification, 2026-09-20
 
-Status: **settled candidate for review; no production activation**. Operator "go"
+Status: **Code / State / Surface GO; minor Surface help correction pending verification**. Operator "go"
 authorizes the next Phase 3 prerequisite. Baseline root `d86c7d079b524537f6cdfdc5352b930a0202389b`,
 core `9303eb86914aa5770b4f951613270b14b2108f73`; accepted transport unchanged.
 `gwz-core/dev-docs/GwzRemoteTransportNativeBinding.md` defines the bounded
@@ -19,7 +19,12 @@ Core candidate `fe815856291a93fa4ecdf0ab5879984d7b5ba1ee` adds the
 allowance), and 106-line isolated runner. Seven integration tests, two Python
 provenance tests and formatting pass on Rust 1.95/macOS. The stock binding
 provided the expected missing-method compile red. No production dependencies
-changed. Native platform/SSH/production activation remains a subsequent gate.
+changed. Reviews are filed verbatim as
+`GwzRemoteTransportNativeBinding-Review{Code,State,Surface}.md`. Code and State
+found no P0–P3; Surface found only P3-1, the unstated toolchain default. Core
+`7b03091941f047c61f8261fd12c451bca6db49d7` corrects help/README only; the reviewed
+binding patch, pins and Rust fixtures are identical. Surface will verify that
+bounded correction. Native platform/SSH/production activation remains a subsequent gate.
 
 
 ## Remote transport Phase 1/2 interface acceptance — 2026-09-19
