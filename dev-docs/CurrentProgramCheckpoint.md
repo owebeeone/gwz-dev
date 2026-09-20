@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## Git library Q3 — native consumer execution in progress, 2026-09-21
+
+Bounded [scope](../gwz-core/dev-docs/GwzGitLibraryNativeConsumers.md) and public
+fixture committed at core `b68d3c5aa53165e868acbae2f5cc13699951c8e0`.
+Same accepted Q2 composition; temporary instrumentation in external consumer
+copies only. Stock-C 1.9.7 must fail specifically at noncommit-hint fetch,
+then all five patched consumers exercise native identity, SHA1/SHA256 objects,
+local fetch and raw diagnostics. No production sources or dependencies change.
+Aggregate tier: retained dual Code/State, at most two remediation rounds.
+Current platform is macOS arm64 only; other native targets, distribution and
+activation remain pending. Fixture and runner ceilings are in the scope.
+
+
 ## Git library Q2 — local evidence accepted, 2026-09-21
 
 [Candidate scope/results](../gwz-core/dev-docs/GwzGitLibraryCandidate.md): core
