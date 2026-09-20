@@ -1,6 +1,6 @@
 # G0 merged remediation and bounded source amendment
 
-Date: 2026-09-21. Status: **scope amendment awaiting retained Code/State review**.
+Date: 2026-09-21. Status: **scope accepted; corrected implementation awaiting re-verdict**.
 Initial tuple: root `3a6d28f77591acec00334a64877b6411d29f8231`, core
 `039eb1f315339a61d3d4f1cf5db5b79dce74c4ce`, library
 `fcf5296095d230f46c8409a8d6d47b44f4ad918b`, Rust fork
@@ -49,3 +49,9 @@ findings; State reviews raw-header extraction and new source composition;
 Surface checks revised qualification instructions. Implementation may proceed
 only after the bounded scope amendment is reviewed. One remediation round;
 no completed closure or new architectural root cause claimed by the owner.
+
+Scope at root `409d86d8e1c61831dfd52d6dd57d71b386c920b4` received
+[Code GO](GwzGitLibraryG0-RemPlan-ReviewCode.md) and
+[State GO](GwzGitLibraryG0-RemPlan-ReviewState.md) before implementation.
+Both reports are filed verbatim. Runtime findings remain open until retained
+reviewers verify the corrected tuple.

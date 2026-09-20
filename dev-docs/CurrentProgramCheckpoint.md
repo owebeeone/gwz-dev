@@ -1,22 +1,30 @@
 # Current program checkpoint
 
-## gwz-git G0 — implementation review candidate, 2026-09-21
+## gwz-git G0 — corrected implementation review candidate, 2026-09-21
 
-Provisioned `mem_gwz_git` through `gwz repo create gwz-git`. Independent sibling
-Cargo workspace, no remote or production consumption. Accepted foundation API
-implemented in 326 Rust lines; 11 maintained library files plus generated lock,
-568 test lines. [Execution record](../gwz-core/dev-docs/GwzGitLibraryG0.md).
+Provisioned local member `mem_gwz_git`; foundation implemented without production
+consumption. Initial Code review: two P2 (stored parents rewritten by traversal;
+native error class loss) and one P3 (unaccepted error traits). Initial State and
+Surface: GO. The bounded [remediation scope](GwzGitLibraryG0-RemPlan.md) received
+retained Code/State GO at root `409d86d8e1c61831dfd52d6dd57d71b386c920b4`.
+Reports are filed verbatim; original runtime findings await reviewer closure.
 
-macOS arm64: fmt/check/clippy pass; eleven integration tests and three doctests
-pass. Source-byte proof passed before and after library testing, eight native
-tests per run. Rust/C sources remain `4c1caabbce7d56426c763dd94114052302b23e4c`
-and `b172e3d187a4b6866fd9f696f40a1b8e7f56d348`. Metadata verifies one local
-git2/sys provider, vendored SHA256 with no SSH/HTTPS; runtime asserts C 1.9.7.
+Corrected library: 367 source lines, 652 test lines, 11 maintained files plus
+lock. macOS arm64 fmt/check/clippy, 13 integration tests and 7 documentation
+checks pass. Source proof before/after: 9 tests each; archive: 9; Python guards:
+10; isolated binding raw-class/replay unit: 1. New regressions failed on old
+source before correction. [Execution record](../gwz-core/dev-docs/GwzGitLibraryG0.md).
 
-Next: retained Code/State/Surface review of the committed implementation tuple.
-No fallback removal, wire change, core/CLI dependency activation or publication.
-Other platforms and clean remote-only reconstruction remain pending. This
-supersedes G0-as-next-implementation below; design authority remains unchanged.
+Rust fork `ce78628308e11b4e8901d5061602619109bce21a` changes only
+`src/error.rs` from prior accepted pin. C remains
+`b172e3d187a4b6866fd9f696f40a1b8e7f56d348`. Proof runner, versions,
+features, locks, existing per-remote binding files and C gitlink unchanged.
+Metadata verifies one local git2/sys provider, vendored SHA256, no SSH/HTTPS.
+
+Next: retained reviewers verify the committed correction. No fallback removal,
+wire change, core/CLI dependency activation or publication. Other platforms and
+clean remote-only reconstruction remain pending. This supersedes earlier G0
+next actions below; design authority includes the reviewed bounded amendment.
 
 ## Rust Git library boundary — accepted design, 2026-09-21
 
