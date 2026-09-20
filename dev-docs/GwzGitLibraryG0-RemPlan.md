@@ -1,6 +1,6 @@
 # G0 merged remediation and bounded source amendment
 
-Date: 2026-09-21. Status: **scope accepted; corrected implementation awaiting re-verdict**.
+Date: 2026-09-21. Status: **scope accepted; all implementation findings closed after re-verdict**.
 Initial tuple: root `3a6d28f77591acec00334a64877b6411d29f8231`, core
 `039eb1f315339a61d3d4f1cf5db5b79dce74c4ce`, library
 `fcf5296095d230f46c8409a8d6d47b44f4ad918b`, Rust fork
@@ -53,5 +53,11 @@ no completed closure or new architectural root cause claimed by the owner.
 Scope at root `409d86d8e1c61831dfd52d6dd57d71b386c920b4` received
 [Code GO](GwzGitLibraryG0-RemPlan-ReviewCode.md) and
 [State GO](GwzGitLibraryG0-RemPlan-ReviewState.md) before implementation.
-Both reports are filed verbatim. Runtime findings remain open until retained
-reviewers verify the corrected tuple.
+Both reports are filed verbatim. Retained [Code](GwzGitLibraryG0-ReviewCode-1.md),
+[State](GwzGitLibraryG0-ReviewState-1.md) and
+[Surface](GwzGitLibraryG0-ReviewSurface-1.md) returned GO at root
+`699c584a93185ef5e73dc96318603e25354018e2`, core
+`2a5bd773df04450148c7630e01913edba2bbedb8`, library
+`aa77c2ce5ad0bf6b4f4b64b2d8fd75e8547c3b4c`, fork
+`ce78628308e11b4e8901d5061602619109bce21a`, unchanged C. Original Code
+reviewer closed P2-1, P2-2 and P3-1. One merged remediation round; no open findings.

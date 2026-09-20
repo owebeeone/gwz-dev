@@ -1,30 +1,42 @@
 # Current program checkpoint
 
-## gwz-git G0 — corrected implementation review candidate, 2026-09-21
+## gwz-git G0 — local foundation accepted, 2026-09-21
 
-Provisioned local member `mem_gwz_git`; foundation implemented without production
-consumption. Initial Code review: two P2 (stored parents rewritten by traversal;
-native error class loss) and one P3 (unaccepted error traits). Initial State and
-Surface: GO. The bounded [remediation scope](GwzGitLibraryG0-RemPlan.md) received
-retained Code/State GO at root `409d86d8e1c61831dfd52d6dd57d71b386c920b4`.
-Reports are filed verbatim; original runtime findings await reviewer closure.
+Accepted tuple: root `699c584a93185ef5e73dc96318603e25354018e2`, core
+`2a5bd773df04450148c7630e01913edba2bbedb8`, library
+`aa77c2ce5ad0bf6b4f4b64b2d8fd75e8547c3b4c`, Rust fork
+`ce78628308e11b4e8901d5061602619109bce21a`, C
+`b172e3d187a4b6866fd9f696f40a1b8e7f56d348`. Retained
+[Code](GwzGitLibraryG0-ReviewCode-1.md),
+[State](GwzGitLibraryG0-ReviewState-1.md) and
+[Surface](GwzGitLibraryG0-ReviewSurface-1.md): GO, zero open P0–P3.
+Original Code reviewer closed two P2 and one P3 in one merged remediation;
+source scope amendment reviewed before implementation. Reports filed verbatim.
 
-Corrected library: 367 source lines, 652 test lines, 11 maintained files plus
-lock. macOS arm64 fmt/check/clippy, 13 integration tests and 7 documentation
-checks pass. Source proof before/after: 9 tests each; archive: 9; Python guards:
-10; isolated binding raw-class/replay unit: 1. New regressions failed on old
-source before correction. [Execution record](../gwz-core/dev-docs/GwzGitLibraryG0.md).
+Local member `mem_gwz_git` provides exact repository opening, SHA1/SHA256 IDs,
+owned stored commit records and owned errors. 367 source lines, 652 test lines,
+11 maintained files plus lock. macOS arm64 fmt/check/clippy, 13 integration tests
+and 7 documentation checks pass. Source proof before/after: 9 tests each;
+archive: 9; Python guards: 10; isolated native-class/replay unit: 1. Regressions
+failed on the original source before correction.
+[Execution and acceptance record](../gwz-core/dev-docs/GwzGitLibraryG0.md).
 
-Rust fork `ce78628308e11b4e8901d5061602619109bce21a` changes only
-`src/error.rs` from prior accepted pin. C remains
-`b172e3d187a4b6866fd9f696f40a1b8e7f56d348`. Proof runner, versions,
-features, locks, existing per-remote binding files and C gitlink unchanged.
-Metadata verifies one local git2/sys provider, vendored SHA256, no SSH/HTTPS.
+Versions/features/locks and C unchanged by remediation; one local git2/sys
+provider with vendored SHA256 and no network features. Fork correction changes
+only `src/error.rs`; the existing per-remote binding files are unchanged.
 
-Next: retained reviewers verify the committed correction. No fallback removal,
-wire change, core/CLI dependency activation or publication. Other platforms and
-clean remote-only reconstruction remain pending. This supersedes earlier G0
-next actions below; design authority includes the reviewed bounded amendment.
+Next: define bounded packages for L1 qualification/distribution hardening,
+L3 commit/tag characterization and API design, and L4 history characterization
+and API design. These can proceed with disjoint ownership; each needs its own
+paths, ceiling and review checkpoint. No production dependency activation,
+fallback removal, wire change or publication occurred. Other native platforms
+and clean remote-only reconstruction remain gates before activation.
+
+Metrics: one implementation review plus one merged remediation; two P2 and
+one P3 discovered at implementation review, all closed, no known escaped
+defects or blind convergence. Elapsed time not instrumented. Acceptance
+annotations change no reviewed runtime bytes. This supersedes prior G0 next
+actions below; controlling design includes the reviewed source amendment.
 
 ## Rust Git library boundary — accepted design, 2026-09-21
 
