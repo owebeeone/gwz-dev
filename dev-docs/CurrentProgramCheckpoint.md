@@ -1,5 +1,42 @@
 # Current program checkpoint
 
+## No-fallback plan acceptance — 2026-09-20
+
+Status: **plan accepted after retained Consistency / Safety GO; implementation
+paused by the operator**. This supersedes earlier transport checkpoint wording
+that directs immediate continuation: the transport implementation is paused
+while the dependency/no-fallback work is planned. No runtime work resumed.
+
+Reviewed core: `bf9446762a7c51358679ed04e147aa51dedfb2bc`; root review inputs:
+`57a0aba0a808417cb4c72a796ddb8926ce85179b`; unchanged transport
+`28f5afb3938a2aa8af0e1e8d5b07779add6ab776` and taut
+`733e8a78897a90f017f4726e4331aed95e8cb977`.
+[Plan](../gwz-core/dev-docs/GwzNoFallbackPlan.md),
+[Consistency closure](GwzNoFallbackPlan-ReviewConsistency-1.md),
+[Safety re-verdict](GwzNoFallbackPlan-ReviewSafety-1.md), and
+[merged remediation](GwzNoFallbackPlan-RemPlan.md).
+
+Four lanes: local-fetch investigation/replacement; per-remote Rust API;
+commit/tag orchestration; path-filtered history. Preparation registers the
+existing `owebeeone/git2-rs` fork through GWZ and establishes compatibility.
+A reviewed P2 checkpoint must freeze shared ownership, interfaces, numeric
+package ceilings and review tiers before lane implementation. Lane 2 first
+qualifies isolated consumption; an all-consumer/platform/package gate and a
+separate review precede any production dependency switch. Actual SSH/pool
+activation remains governed by the transport program.
+
+Review record: two peer-blind axes reused at the operator's request, followed
+by one merged remediation and focused re-verdicts on the same revision. Two P2
+findings discovered during plan review, both closed; zero open P0–P3, no blind
+convergence and no known escaped defects. One review session; elapsed time not
+instrumented. Link and whitespace checks pass; no code tests apply. Reports
+are filed verbatim. Acceptance annotations change no plan-body semantics.
+
+Next, once the operator resumes work: P0/P1 preparation and design, then the
+reviewed P2 ownership/scope checkpoint, then independent lane implementation.
+No fork clone, workspace membership change, source change, dependency activation,
+publication, tag or push was performed in this planning/review cycle.
+
 ## Remote transport Phase 3c — nonblocking SSH channel, 2026-09-20
 
 Accepted implementation: `f03f5f79bae73d378e575273af0b9ed2a87c052d`.
