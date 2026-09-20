@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## Git library Q2 — isolated candidate in progress, 2026-09-21
+
+Bounded scope: [source keys and consumer composition](../gwz-core/dev-docs/GwzGitLibraryCandidate.md),
+core `f70f4a74037bf291c9c6e1e72a7fb29676e4ab3f`.
+Windows path-key regression/correction uses existing admission machinery;
+a private campaign will prepare independent root/core/CLI/Python/library
+copies with the patched sources. Production manifests and locks stay unchanged.
+Aggregate checkpoint tier is retained dual Code/State review, with at most
+two remediation rounds. Scope records owned paths and numeric ceilings.
+No new user-facing API, source publication, native platform acceptance or
+production activation is included. C1/H1/Q1 acceptance below remains current.
+
+
 ## Git library C1/H1/Q1 — evidence accepted, 2026-09-21
 
 [Scope](../gwz-core/dev-docs/GwzGitLibraryNextPackages.md) accepted at core
