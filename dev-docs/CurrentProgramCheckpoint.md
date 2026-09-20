@@ -1,5 +1,22 @@
 # Current program checkpoint
 
+## Rust Git library boundary — design review candidate, 2026-09-20
+
+[Design](../gwz-core/dev-docs/GwzGitLibraryDesign.md) and
+[API guide](../gwz-core/dev-docs/GwzGitLibraryApi.md) propose `gwz-git` as a
+separate sibling member. Core retains workspace policy and its existing backend
+trait; the new library owns supported single-repository behavior. First package
+G0 is a read-only repository/object-ID/commit-data foundation, 600 production
+lines and 12 maintained library files. No repository was created, code moved,
+dependency activated or fallback removed in this design package.
+
+Next: retained Code/State/Surface design review on one committed tuple. G0
+implementation review is Code/State plus Surface examples; future operation
+APIs need separate characterization and freezes. L3/L4 remaining evidence and
+L1 type-consistency/publication hardening are explicit gates. G0 prepared-local
+qualification does not claim remote-only reconstruction or platform parity.
+This candidate supersedes the design-as-next-action below only after acceptance.
+
 ## Separate Rust Git library — operator direction, 2026-09-20
 
 Keep upstream-facing libgit2/git2-rs changes minimal and retain patched 1.9.7 as
