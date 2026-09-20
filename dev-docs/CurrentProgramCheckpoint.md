@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## SSH integration resumed; remaining qualification batched later — 2026-09-21
+## SSH local pool/per-remote integration accepted; qualification batched later — 2026-09-21
 
 Operator directs postponing the outstanding platform and selected-source checks
 as one later batch and continuing SSH pooling/per-remote integration now.
@@ -12,7 +12,18 @@ waived; preserve Q5 State P3-1 for correction before runner reuse in that batch.
 Implemented: message-to-SSH pump, physical pool ownership and per-remote native
 Git composition on controlled local fixtures. All 21 focused local tests pass;
 five clone/push/fetch service channels reuse one authenticated connection across
-two repositories. Retained Code/State acceptance review is next. Preserve existing message/wire APIs,
+two repositories. Retained [Code](GwzRemoteTransportSshIntegration-ReviewCode.md)
+and [State](GwzRemoteTransportSshIntegration-ReviewState.md) both returned GO with
+no findings after independent reruns. Accepted root
+`d1273951ec5b2746f9215206440e5ffb56232293`, core
+`f39a6ed260332534aee8b0cf73955803b6a5bf81`, evidence
+`359d4fbf236182192f035ca8e42e3eb756c1a4ad`; frozen transport/Rust/C pins unchanged.
+750 production-source lines in three internal modules, 1,144 added test/support
+lines. One aggregate review, no remediation; development API/cleanup corrections
+and raw evidence recorded in the continuation scope. No known escaped defect.
+Next: bounded production endpoint wiring, trusted credential setup, URL/identity
+resolution, worker scheduling and all-network-entry routing. The new modules
+are currently compiled by the isolated fixture, not production module wiring. Preserve existing message/wire APIs,
 exclusive physical ownership, consume-after-sink flow control and no client Git
 subprocess fallback. Full production trust/credential setup and network-entry
 coverage remain explicit work; do not advertise endpoint support prematurely.
