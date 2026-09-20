@@ -1,17 +1,27 @@
 # Current program checkpoint
 
-## Git library Q3 — native consumer execution in progress, 2026-09-21
+## Git library Q3 — native execution awaiting review, 2026-09-21
 
-Bounded [scope](../gwz-core/dev-docs/GwzGitLibraryNativeConsumers.md) and public
-fixture committed at core `b68d3c5aa53165e868acbae2f5cc13699951c8e0`.
-Same accepted Q2 composition; temporary instrumentation in external consumer
-copies only. Stock-C 1.9.7 must fail specifically at noncommit-hint fetch,
-then all five patched consumers exercise native identity, SHA1/SHA256 objects,
-local fetch and raw diagnostics. No production sources or dependencies change.
-Aggregate tier: retained dual Code/State, at most two remediation rounds.
-Current platform is macOS arm64 only; other native targets, distribution and
-activation remain pending. Fixture and runner ceilings are in the scope.
+[Scope/results](../gwz-core/dev-docs/GwzGitLibraryNativeConsumers.md): core
+`468fd5e41fe369cc2892a330c8b2df9241023d38`; private evidence
+`9c2daec1652f22b1c135e8205f794f38db514f37`. Same G0 native/library and Q1 CLI/Python pins.
+Public fixture: 168 Rust lines; private runner 196 and parser tests 41 lines.
 
+Stock-C 1.9.7 built and failed specifically at the known noncommit-hint fetch
+(InvalidSpec -12). All five instrumented patched consumer artifacts passed
+native version/vendor/features, SHA1/SHA256 object/hash/record checks, corrected
+local fetch and raw class 36/code -1. Core/library downstream examples,
+root/standalone CLI executables and loaded Python extension ran on macOS arm64.
+All source/lock/artifact checks held. Three parser tests and fixture formatting
+pass. Complete run retained with frozen inputs, exact instrumentation and hashes.
+
+Retained dual Code/State aggregate review pending. Production sources,
+manifest/lock selection, native forks and public interfaces remain unchanged.
+Other native platforms, full operation parity, uninstrumented package behavior,
+source distribution/publication and activation remain separate gates. Next is
+platform/distribution qualification; transport pump and remaining behavior lanes
+still follow their existing scopes. Q3 is not a production speedup or fallback
+removal. No runtime qualification failure beyond the intended control occurred.
 
 ## Git library Q2 — local evidence accepted, 2026-09-21
 
