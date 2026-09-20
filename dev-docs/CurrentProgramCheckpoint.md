@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## Git library Q4 — native Windows State remediation awaiting closure, 2026-09-21
+## Git library Q4 — bounded native Windows qualification accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzGitLibraryWindows.md). Final fixture
 core `5f6cc919c880f7c540013bbfbc3bcb0fa81f2ec8`; G0 library/Rust/C pins unchanged.
@@ -18,7 +18,16 @@ Initial Code GO; State P2-1 required Cargo ancestor config isolation.
 The corrected private runner237 lines and config guard37 lines refuse both
 Cargo config names through the search chain. Fresh windows-f passes every row,
 with recorded before/after configuration absence; public source is unchanged.
-[Remediation](GwzGitLibraryWindows-RemPlan.md): focused State closure pending.
+[Remediation](GwzGitLibraryWindows-RemPlan.md): State P2-1 closed after the
+original reviewer verified the counterexample and fresh native run.
+[Code GO](GwzGitLibraryWindows-ReviewCode.md) and
+[State closure GO](GwzGitLibraryWindows-ReviewState-1.md) accept this bounded
+checkpoint at root `5d11a6c3444d4a58c774fc083db1dbbd4e621fd8`.
+One aggregate round, one focused remediation; no open findings or known escaped
+defects. Owner qualification found two source/test portability issues and two
+checkout-preparation issues; review found the Cargo-config isolation defect.
+No blind convergence; elapsed time not measured. Reports filed verbatim;
+acceptance annotations change no executable statements.
 Revised core `f1029847cd964a012ccec12495f897f444acdcd1`, evidence
 `040e3ab4db7871350650382d01d4f7c5f62d7615`.
 Initial review core `44d27ad665796cce669083bb8f03b2f194198f42`, evidence
