@@ -1,21 +1,40 @@
 # Current program checkpoint
 
-## Rust Git library boundary — design review candidate, 2026-09-20
+## Rust Git library boundary — accepted design, 2026-09-21
 
 [Design](../gwz-core/dev-docs/GwzGitLibraryDesign.md) and
-[API guide](../gwz-core/dev-docs/GwzGitLibraryApi.md) propose `gwz-git` as a
+[API guide](../gwz-core/dev-docs/GwzGitLibraryApi.md) select `gwz-git` as a
 separate sibling member. Core retains workspace policy and its existing backend
 trait; the new library owns supported single-repository behavior. First package
 G0 is a read-only repository/object-ID/commit-data foundation, 600 production
 lines and 12 maintained library files. No repository was created, code moved,
 dependency activated or fallback removed in this design package.
 
-Next: retained Code/State/Surface design review on one committed tuple. G0
-implementation review is Code/State plus Surface examples; future operation
-APIs need separate characterization and freezes. L3/L4 remaining evidence and
-L1 type-consistency/publication hardening are explicit gates. G0 prepared-local
-qualification does not claim remote-only reconstruction or platform parity.
-This candidate supersedes the design-as-next-action below only after acceptance.
+Accepted core `3efc1a79a1e5044b6e2495ed392a5c43d8f90b64`, root
+`bba620ed7806628cdde26254261043eb9266b0f9`; unchanged fork
+`4c1caabbce7d56426c763dd94114052302b23e4c`, C
+`b172e3d187a4b6866fd9f696f40a1b8e7f56d348`.
+[Code](GwzGitLibraryDesign-ReviewCode-1.md),
+[State](GwzGitLibraryDesign-ReviewState-1.md),
+[Surface](GwzGitLibraryDesign-ReviewSurface-1.md): GO, no open P0–P3.
+[Remediation](GwzGitLibraryDesign-RemPlan.md) closed one P2 by freezing
+Repository as Send, !Sync, !Clone; sequential transfer is allowed. A SHA backend
+concern was dismissed after source inspection proved the pinned fix exists.
+
+Next: provision the local sibling with `gwz repo create gwz-git`, implement G0
+TDD-first within its scoped ownership/budget, verify native source and SHA1/SHA256
+read/trait/concurrency behavior. G0 implementation review is Code/State plus
+Surface examples. Future operation APIs need separate characterization/freezes;
+L3/L4 remaining evidence and L1 type-consistency/publication hardening remain
+gates. No platform parity, remote-only reconstruction, fallback removal or
+production activation is claimed. This supersedes design-as-next-action below.
+
+Metrics: one design session spanning the date boundary; elapsed time not
+instrumented. Initial review plus one focused remediation; one P2 at design
+review, closed by its original reviewer. No implementation-contact/settled-code
+defects, no known escaped defects or blind convergence. All six reports filed
+verbatim. Local documentation links and changed-range whitespace checks pass;
+no code tests apply to this documentation-only package.
 
 ## Separate Rust Git library — operator direction, 2026-09-20
 
