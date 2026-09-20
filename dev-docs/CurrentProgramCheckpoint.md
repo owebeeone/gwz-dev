@@ -1,19 +1,38 @@
 # Current program checkpoint
 
-## Native correction package — design accepted
+## Native correction and isolated Rust integration — accepted 2026-09-20
 
-Operator “ok go” authorizes preparing the C correction and isolated Rust/native
-integration. [Scoped package](../gwz-core/dev-docs/GwzNoFallbackNativeFix.md)
-records N1/N2 ownership, budgets and retained Code/State design and acceptance
-gates, with Surface for changed proof inputs. No production activation or
-publication. Design accepted at core `e45025d`, root `179231ad` after retained Code/State
-GO. One P2 propagation-claim correction closed; one nonblocking P3 fetch oracle
-corrected. N1/N2 candidate implementation is complete; final settled review is pending.
-C main candidate `fe618d0`,1.9.7 backport `b172e3d`,Rust candidate `4c1caab`.
-Both native offline suites and source/archive Rust proofs pass; ten Python
-admission/lock guards pass. Production activation and publication remain gated. Existing type-mismatched
-tag suppression is characterized, not fixed; hardening remains required before
-fallback-removal decisions.
+N1/N2 accepted after retained Code, State and Surface GO on one exact tuple:
+root `62c2f122c28ededdefb7af32058f4b058b018dcb`, core
+`01d6f6624472620c215693243f7ac3865aeb31a4`, Rust fork
+`4c1caabbce7d56426c763dd94114052302b23e4c`, C 1.9.7 backport
+`b172e3d187a4b6866fd9f696f40a1b8e7f56d348`, upstream-facing C patch
+`fe618d0f5de9e506b9714643afc42d2fcba6e984`.
+[Scope and evidence](../gwz-core/dev-docs/GwzNoFallbackNativeFix.md),
+[Code](GwzNoFallbackNativeFix-ReviewCode.md),
+[State](GwzNoFallbackNativeFix-ReviewState.md),
+[Surface](GwzNoFallbackNativeFix-ReviewSurface.md).
+
+One native condition corrected; identical 243-line regression additions on main
+and 1.9.7. Both focused and full offline C suites pass. Rust/sys now composes the
+accepted binding with exact published sys 0.18.8+1.9.7 sources and the patched C
+submodule. Both isolated Rust modes pass eight tests; ten Python guards pass.
+Surface independently reran both Rust modes. Local macOS arm64 evidence only.
+All production manifests, fallback paths and transport activation remain unchanged.
+Both forks are unpublished; remote-only reproduction is not yet available.
+
+Metrics: one implementation session; wall-clock not instrumented. Design: one
+initial review plus one focused remediation, closing one P2 overstatement and
+one nonblocking P3 test-oracle correction. Acceptance: one round, zero findings,
+zero remediation rounds, no known escaped defects. Reports are filed verbatim.
+
+Next: assess main's new commit/signing and path-history APIs before implementing
+remaining lanes; main and 1.9.7 are divergent lines with significant API changes,
+so no upgrade is implied. Preserve existing publication, all-consumer/platform,
+and production-dependency activation gates. Existing ENOTFOUND ambiguity for
+missing/mismatched tag targets is explicitly characterized; type-consistency
+hardening remains a prerequisite to the fallback-removal decision. Cancellation
+and broader publication semantics remain under the accepted no-fallback plan.
 
 ## Native C fork registered — 2026-09-20
 
