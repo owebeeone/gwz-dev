@@ -1,5 +1,26 @@
 # Current program checkpoint
 
+## No-fallback implementation resumed — 2026-09-20
+
+Operator "go" resumes the accepted four-lane plan. P0 cloned and registered
+`git@github.com:owebeeone/git2-rs.git` as `mem_git2_rs`, path `git2-rs`, through
+`gwz repo clone`. Initial fork HEAD:
+`f42a01267a3042b26d30e9d8acf286c6c739bd8a`. The fork's path sys dependency is
+1.9.6 while current qualification uses 1.9.7; do not activate the cloned HEAD.
+[Preparation baseline](../gwz-core/dev-docs/GwzNoFallbackPreparation.md) records
+exact published Rust/sys source identities, consumer features and platform gates.
+
+P1/P2 preparation is active. Three economical read-only lane helpers are
+inspecting local fetch, commit/tag and filtered history; the lead owns binding
+baseline and integration. No implementation/fixture edits precede reviewed P2.
+No production dependency switch, network activation, publication or push has
+occurred. The capability inventory remains a discussion artifact and does not
+expand this implementation's supported command/options scope.
+
+Next: settle and review the P2 ownership/interface/budget checkpoint, then
+execute its bounded lane packages under the accepted plan. This section
+supersedes the pause recorded below; prior review acceptance remains unchanged.
+
 ## No-fallback plan acceptance — 2026-09-20
 
 Status: **plan accepted after retained Consistency / Safety GO; implementation

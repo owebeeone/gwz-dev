@@ -110,3 +110,15 @@ members:
   desired:
     local_only: true
   remotes: []
+- id: mem_git2_rs
+  path: git2-rs
+  type: git
+  source_id: src_git2_rs
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/git2-rs.git
+    fetch: true
+    push: true
