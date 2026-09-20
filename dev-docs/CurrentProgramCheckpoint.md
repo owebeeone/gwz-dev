@@ -1,12 +1,19 @@
 # Current program checkpoint
 
-## Native correction package — design review pending
+## Native correction package — design accepted
 
 Operator “ok go” authorizes preparing the C correction and isolated Rust/native
 integration. [Scoped package](../gwz-core/dev-docs/GwzNoFallbackNativeFix.md)
 records N1/N2 ownership, budgets and retained Code/State design and acceptance
 gates, with Surface for changed proof inputs. No production activation or
-publication. Implementation waits for this bounded design gate.
+publication. Design accepted at core `e45025d`, root `179231ad` after retained Code/State
+GO. One P2 propagation-claim correction closed; one nonblocking P3 fetch oracle
+corrected. N1/N2 candidate implementation is complete; final settled review is pending.
+C main candidate `fe618d0`,1.9.7 backport `b172e3d`,Rust candidate `4c1caab`.
+Both native offline suites and source/archive Rust proofs pass; ten Python
+admission/lock guards pass. Production activation and publication remain gated. Existing type-mismatched
+tag suppression is characterized, not fixed; hardening remains required before
+fallback-removal decisions.
 
 ## Native C fork registered — 2026-09-20
 
