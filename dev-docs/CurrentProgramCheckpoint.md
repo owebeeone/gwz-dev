@@ -1,5 +1,27 @@
 # Current program checkpoint
 
+## Git library Q4 — native Windows execution awaiting review, 2026-09-21
+
+[Scope/results](../gwz-core/dev-docs/GwzGitLibraryWindows.md). Final fixture
+core `5f6cc919c880f7c540013bbfbc3bcb0fa81f2ec8`; G0 library/Rust/C pins unchanged.
+Windows x86_64 MSVC Rust1.95 passed 13 Python guards (one POSIX-only skip),
+nine native-binding tests, 13 G0 integration tests/seven documentation checks,
+and the instrumented SHA1/SHA256 library probe. All source/lock/artifact checks
+passed; IDs match Q3. MacOS native-proof and both-format probe regression pass.
+
+Q4 fixes Windows executable-bit admission and test-only file URL construction.
+Git checkout preparation retains exact symlink targets and pins LF text; bytes,
+source types, links and source identities remain enforced. Raw windows-a/b/c/d
+failures and final windows-e pass are retained in the private git-library
+campaign. New verifier5 lines, Python tests44, Rust fixture34 added/4 replaced;
+private runner213 lines. Review tier: retained dual Code/State, pending.
+Settled review core `44d27ad665796cce669083bb8f03b2f194198f42`, evidence
+`b9456f7a8ba328dd3a35ab7577c0e66d3464cdc9`.
+
+No product/fork/library code, production manifest/lock selection, publication,
+endpoint or fallback changed. Complete Windows consumer matrix, remaining
+platforms, remote-only source distribution and activation remain separate gates.
+
 ## Git library Q3 — instrumented native execution accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzGitLibraryNativeConsumers.md): core
