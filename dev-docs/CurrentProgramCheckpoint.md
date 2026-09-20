@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## Git library Q2 — local evidence awaiting review, 2026-09-21
+## Git library Q2 — local evidence accepted, 2026-09-21
 
 [Candidate scope/results](../gwz-core/dev-docs/GwzGitLibraryCandidate.md): core
 `ea059ba89b1b61201b75c26708a99c7ca780d2a9`; private evidence
@@ -17,7 +17,15 @@ build run is claimed. Raw failed attempts remain retained. Initial update
 caused an unrelated edge refresh (refused); lock-preserving resolution fixed
 that invocation. Python requires maturin plus root-visible source patches.
 
-Retained dual Code/State aggregate review pending. No production manifests,
+Accepted at root `7c017a5f1c3db1a743e5e1a0a62413fa5130755b` and the
+core/evidence tuple above after retained [Code](GwzGitLibraryCandidate-ReviewCode.md)
+and [State](GwzGitLibraryCandidate-ReviewState.md): GO, zero P0–P3 findings.
+Reports filed verbatim; both independently reran the 12 guards. One aggregate
+round, no remediation rounds or known escaped defects. Three invocation issues
+were found during owner execution and corrected before review; no production
+behavior defect or blind-convergent review finding. Elapsed time not measured.
+Acceptance annotations change no executable statements from the reviewed tuple.
+No production manifests,
 locks, call sites, source publication, fallback or transport activation changed.
 Native Windows and all-consumer identity/object-format/platform qualification,
 remote-only source reconstruction and later activation remain gated. The
