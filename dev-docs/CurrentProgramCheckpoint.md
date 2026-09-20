@@ -18,13 +18,22 @@ no open findings. [Checkpoint](../gwz-core/dev-docs/GwzNoFallbackCheckpoint.md)
 freezes exact paths, retained contracts and numeric first-package budgets.
 Code/State reports are `GwzNoFallbackCheckpoint-Review{Code,State}.md`.
 
-Proceed with L1-A local-fetch characterization (State review), L2-A binding
-port/source proof (Code/State/Surface), L3-A commit/tag characterization/design
-(State), and L4-A history characterization/design (Code). Three economical
-helpers own the characterization packages; lead owns binding and shared wiring.
-Later replacements and production activation require their own gates. No push,
-publication or dependency activation. Capability inventory remains discussion
-input and does not expand the implementation's command/options scope.
+L2-A is accepted as an unpublished external-consumption candidate at core
+`5eb29f073a536901b23f96c3d4b1d05ac59ac01c`, fork
+`e883be38abeb845a776d5e0a8c9bbf5ef8e0bc68`, root
+`a02f91f66b4efe483e44c3fa4e85dfb6d94c19e0`. Retained Code/State GO after one
+P2 source-admission correction; Surface GO on unchanged public interface.
+Seven Python guards and seven native tests in each source/archive mode pass.
+No GWZ production dependency, native pin, protocol, package publication or
+runtime activation changed. Original fork main is preserved; candidate lives
+on `codex/per-remote-transport` from the qualified git2 0.21.0 release.
+
+L1-A local-fetch, L3-A commit/tag and L4-A history characterization candidates
+are being settled for their named reviews (State, State, Code respectively).
+Lead's L4 wiring handoff nests the new tests under existing tests.rs to reuse
+private helpers, avoiding any visibility change; reviewer checks that handoff.
+Later replacements and production activation require their own design/budget
+gates. Capability inventory does not expand command/options scope.
 
 ## No-fallback plan acceptance — 2026-09-20
 
