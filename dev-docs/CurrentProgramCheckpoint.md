@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## gwz-git G0 — implementation review candidate, 2026-09-21
+
+Provisioned `mem_gwz_git` through `gwz repo create gwz-git`. Independent sibling
+Cargo workspace, no remote or production consumption. Accepted foundation API
+implemented in 326 Rust lines; 11 maintained library files plus generated lock,
+568 test lines. [Execution record](../gwz-core/dev-docs/GwzGitLibraryG0.md).
+
+macOS arm64: fmt/check/clippy pass; eleven integration tests and three doctests
+pass. Source-byte proof passed before and after library testing, eight native
+tests per run. Rust/C sources remain `4c1caabbce7d56426c763dd94114052302b23e4c`
+and `b172e3d187a4b6866fd9f696f40a1b8e7f56d348`. Metadata verifies one local
+git2/sys provider, vendored SHA256 with no SSH/HTTPS; runtime asserts C 1.9.7.
+
+Next: retained Code/State/Surface review of the committed implementation tuple.
+No fallback removal, wire change, core/CLI dependency activation or publication.
+Other platforms and clean remote-only reconstruction remain pending. This
+supersedes G0-as-next-implementation below; design authority remains unchanged.
+
 ## Rust Git library boundary — accepted design, 2026-09-21
 
 [Design](../gwz-core/dev-docs/GwzGitLibraryDesign.md) and

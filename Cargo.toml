@@ -24,6 +24,7 @@ exclude = [
     "taut-shape-rs",
     "gwz-core",
     "gwz-transport",
+    "gwz-git",
 ]
 
 [patch.crates-io]

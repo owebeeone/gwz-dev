@@ -134,3 +134,11 @@ members:
     url: git@github.com:owebeeone/libgit2.git
     fetch: true
     push: true
+- id: mem_gwz_git
+  path: gwz-git
+  type: git
+  source_id: src_gwz_git
+  active: true
+  desired:
+    local_only: true
+  remotes: []
