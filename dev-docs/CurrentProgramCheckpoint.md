@@ -1,5 +1,24 @@
 # Current program checkpoint
 
+## Git library Q5 — Windows consumers executed, review pending, 2026-09-21
+
+[Scope/results](../gwz-core/dev-docs/GwzGitLibraryWindowsConsumers.md).
+Workspace CLI, standalone CLI, standalone core example and Python native
+extension all pass independent locked Windows MSVC builds and the shared
+SHA1/SHA256 native probe. Python explicit load/health also passes. Source core
+`95ad5b6cca0b2692598cbf8ae3d0381567658603`; library/Rust/C pins unchanged.
+Five native guards, four Mac consumer guards and both-host source preparation
+guards pass. Source/link/lock/helper/artifact checks pass; all IDs match Q3.
+
+Private runner191 lines, guards59; unchanged Q2/Q3/Q4 helpers. Evidence runs
+`2026-09-21-q5-composition-a` and `2026-09-21-q5-windows-a` retain exact inputs,
+instrumentation, commands and results. No failed native attempt or product
+correction occurred. Retained Code/State acceptance reviews pending at a
+settled tuple; no acceptance is claimed yet. Q4+Q5 covers the five Windows
+instrumented consumer shapes only. Other platforms, ordinary command/package
+parity, remote-only source distribution and activation remain separate gates.
+No production source/manifest/lock, publication, endpoint or fallback changed.
+
 ## Git library Q4 — bounded native Windows qualification accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzGitLibraryWindows.md). Final fixture
