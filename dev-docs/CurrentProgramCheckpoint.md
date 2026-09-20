@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## Git library Q5 — Windows consumers executed, review pending, 2026-09-21
+## Git library Q5 — Windows consumers accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzGitLibraryWindowsConsumers.md).
 Workspace CLI, standalone CLI, standalone core example and Python native
@@ -13,8 +13,18 @@ guards pass. Source/link/lock/helper/artifact checks pass; all IDs match Q3.
 Private runner191 lines, guards59; unchanged Q2/Q3/Q4 helpers. Evidence runs
 `2026-09-21-q5-composition-a` and `2026-09-21-q5-windows-a` retain exact inputs,
 instrumentation, commands and results. No failed native attempt or product
-correction occurred. Retained Code/State acceptance reviews pending at a
-settled tuple; no acceptance is claimed yet. Q4+Q5 covers the five Windows
+correction occurred. Retained
+[Code GO](GwzGitLibraryWindowsConsumers-ReviewCode.md) and
+[State GO](GwzGitLibraryWindowsConsumers-ReviewState.md) accept root
+`97b01e752a6ac7709970f49daa24f017e762aebf`, core
+`54a04a381272806d9f6bddd2c319294ff63bcc79`, evidence
+`0c1c34b85064bff2d8e75536ce3351063f74316b`. No P0–P2 findings.
+State P3-1 remains open: a post-command configuration rejection can discard
+completed-command diagnostics. It fails closed and does not affect this pass;
+fix and regress completion/timeout retention before runner reuse for release
+judgments. One aggregate round, no remediation, no blind convergence or known
+escaped defects; elapsed time not measured. Reports filed verbatim;
+acceptance annotations change no executable statements. Q4+Q5 covers the five Windows
 instrumented consumer shapes only. Other platforms, ordinary command/package
 parity, remote-only source distribution and activation remain separate gates.
 No production source/manifest/lock, publication, endpoint or fallback changed.
