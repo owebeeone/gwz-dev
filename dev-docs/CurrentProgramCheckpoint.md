@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## Separate Rust Git library — operator direction, 2026-09-20
+
+Keep upstream-facing libgit2/git2-rs changes minimal and retain patched 1.9.7 as
+our current baseline. Put the additional Git behavior GWZ requires in a separate,
+long-lived Rust library above git2-rs. New upstream capabilities may simplify
+that library later; adopting main is not a prerequisite to its implementation.
+[Direction record](../gwz-core/dev-docs/GwzNoFallbackPlan.md) names the boundaries.
+
+Next: design the library's scope/API, ownership, package placement and migration
+of the remaining no-fallback lanes, then review the shared interface and budgets.
+This supersedes the older “assess main first” next action below and in NativeFix.
+It records operator intent only; no new interface freeze, member provisioning,
+code movement, dependency activation or publication is claimed. Accepted N1/N2
+and all compatibility, qualification and activation gates remain in force.
+
 ## Native correction and isolated Rust integration — accepted 2026-09-20
 
 N1/N2 accepted after retained Code, State and Surface GO on one exact tuple:
