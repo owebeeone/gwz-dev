@@ -1,5 +1,13 @@
 # Current program checkpoint
 
+## Native correction package — design review pending
+
+Operator “ok go” authorizes preparing the C correction and isolated Rust/native
+integration. [Scoped package](../gwz-core/dev-docs/GwzNoFallbackNativeFix.md)
+records N1/N2 ownership, budgets and retained Code/State design and acceptance
+gates, with Surface for changed proof inputs. No production activation or
+publication. Implementation waits for this bounded design gate.
+
 ## Native C fork registered — 2026-09-20
 
 Operator created `owebeeone/libgit2` following the agreed sibling-member layout.
