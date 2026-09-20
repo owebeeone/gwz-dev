@@ -1,5 +1,22 @@
 # Current program checkpoint
 
+## Native C fork registered — 2026-09-20
+
+Operator created `owebeeone/libgit2` following the agreed sibling-member layout.
+Registered through `gwz repo clone git@github.com:owebeeone/libgit2.git libgit2`
+as `mem_libgit2`, path `libgit2`, origin the operator's fork. Initial main HEAD:
+`0551dfd4ad989b6a3d5683c0d4cf326c6efef929`. The faulty local-fetch comparison
+remains present. Qualified native v1.9.7 commit
+`49e408b3208bc3093757a1c2db938d3590f3f412` is available in this checkout.
+
+This is provisioning only; no source, Rust dependency, submodule pin, upstream
+PR or production activation change. Existing git2 candidate stays at `e883be38`.
+Next package must scope/review the upstream C regression/fix and 1.9.7 backport,
+then align the Rust fork's in-tree sys package to qualified 0.18.8+1.9.7 before
+connecting its C submodule to the patched fork commit. Upstream-facing work and
+GWZ's pinned-version backport remain separate branches. The existing first-
+package acceptance and remaining no-fallback gates below remain authoritative.
+
 ## No-fallback implementation resumed — 2026-09-20
 
 Operator "go" resumes the accepted four-lane plan. P0 cloned and registered

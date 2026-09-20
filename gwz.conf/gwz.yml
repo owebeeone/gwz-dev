@@ -122,3 +122,15 @@ members:
     url: git@github.com:owebeeone/git2-rs.git
     fetch: true
     push: true
+- id: mem_libgit2
+  path: libgit2
+  type: git
+  source_id: src_libgit2
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/libgit2.git
+    fetch: true
+    push: true
