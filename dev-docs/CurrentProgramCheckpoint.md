@@ -10,16 +10,21 @@ Operator "go" resumes the accepted four-lane plan. P0 cloned and registered
 [Preparation baseline](../gwz-core/dev-docs/GwzNoFallbackPreparation.md) records
 exact published Rust/sys source identities, consumer features and platform gates.
 
-P1/P2 preparation is active. Three economical read-only lane helpers are
-inspecting local fetch, commit/tag and filtered history; the lead owns binding
-baseline and integration. No implementation/fixture edits precede reviewed P2.
-No production dependency switch, network activation, publication or push has
-occurred. The capability inventory remains a discussion artifact and does not
-expand this implementation's supported command/options scope.
+P2 accepted after retained Code/State GO on core
+`dd47810ece5980cfa35017ae0dfd7a8f33701e80`, root
+`d98922e03b837d030477f1d9a696fef2464b8b17`; unchanged fork/transport/taut
+pins are recorded in the filed reports. One P2 review-entry correction closed;
+no open findings. [Checkpoint](../gwz-core/dev-docs/GwzNoFallbackCheckpoint.md)
+freezes exact paths, retained contracts and numeric first-package budgets.
+Code/State reports are `GwzNoFallbackCheckpoint-Review{Code,State}.md`.
 
-Next: settle and review the P2 ownership/interface/budget checkpoint, then
-execute its bounded lane packages under the accepted plan. This section
-supersedes the pause recorded below; prior review acceptance remains unchanged.
+Proceed with L1-A local-fetch characterization (State review), L2-A binding
+port/source proof (Code/State/Surface), L3-A commit/tag characterization/design
+(State), and L4-A history characterization/design (Code). Three economical
+helpers own the characterization packages; lead owns binding and shared wiring.
+Later replacements and production activation require their own gates. No push,
+publication or dependency activation. Capability inventory remains discussion
+input and does not expand the implementation's command/options scope.
 
 ## No-fallback plan acceptance — 2026-09-20
 
