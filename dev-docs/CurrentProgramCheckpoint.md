@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## Git library C1/H1/Q1 — evidence candidate, 2026-09-21
+## Git library C1/H1/Q1 — evidence accepted, 2026-09-21
 
 [Scope](../gwz-core/dev-docs/GwzGitLibraryNextPackages.md) accepted at core
 `6586768396886fe1aeb1371bbd3064377cfa70ec`, root
@@ -11,7 +11,7 @@ C1: seven hermetic identity/date/message tests, 394 new test lines and one
 braced test-only module declaration. H1: two member/bare attribute tests,
 325 added test lines, two replaced baseline lines. Combined locked Rust1.95
 characterization run: 17 passed, none ignored, including eight existing tests.
-Initial fixture assumptions exposed index cache refresh, parsed-message leading
+Initial fixture assumptions exposed raw index-byte change, parsed-message leading
 blank-line loss, and H-INFO selection of base only; corrected tests inspect the
 actual stored bytes/content and exact current/native sequences. No product fix.
 
@@ -21,8 +21,29 @@ CLI locks record sys 0.18.5+1.9.4, unlike root/core's 0.18.8+1.9.7; only library
 uses patched local sources. Windows source-proof path keys need correction.
 All consumers/platforms/distribution/activation remain separate gates.
 
-Next: State reviews C1; Code reviews H1 and Q1 on the committed candidate.
-No production API, dependency/lock, fallback or transport activation changed.
+Accepted results: core `deba48c93a04e6aaf0bab36066b12d1547d5469e`, root
+`9fc664de8389ea334f36bc41135cd59448893e05`, unchanged G0 library/fork/C,
+CLI and Python pins. [State C1](GwzGitLibraryEvidence-ReviewState.md) and
+[Code H1/Q1](GwzGitLibraryEvidence-ReviewCode.md): GO. Both reran the
+17-test suite; Code independently checked all four resolved metadata graphs.
+No P0–P2 implementation findings. Owner corrected two nonblocking P3s:
+stale H1 pending-run wording and overattributing first raw-index change to a
+specific extension. Exact fresh per-variant administrative transitions remain
+an explicit future evidence row. All reports filed verbatim.
+
+Next: bounded native-proof Windows path-key correction and isolated consumer
+composition proposal; remaining commit/tag helper and history fan-out/magic
+characterization before freezing mutation/traversal APIs. C1/H1 evidence does
+not close signer/filter/ref-transaction/interruption/SHA256 mutation or broader
+history matrices. No production API, dependency/lock, fallback or transport
+activation changed. Do not treat the G0 and C1/H1 gates as production readiness.
+
+Metrics: one scope correction closed one State P2; one implementation review
+per assigned axis, zero blocking findings, two P3 owner text corrections.
+Initial run failures corrected three fixture/evidence assumptions, not product
+behavior. No known escaped defects or blind convergence; elapsed time not
+instrumented. Acceptance annotations and one test comment change no executable
+statements from the reviewed tuple.
 
 ## gwz-git G0 — local foundation accepted, 2026-09-21
 
