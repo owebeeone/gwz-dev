@@ -1,5 +1,29 @@
 # Current program checkpoint
 
+## Git library C1/H1/Q1 — evidence candidate, 2026-09-21
+
+[Scope](../gwz-core/dev-docs/GwzGitLibraryNextPackages.md) accepted at core
+`6586768396886fe1aeb1371bbd3064377cfa70ec`, root
+`3589aa05092abb7c38d90747384954565510301f`, retained Code/State GO.
+One scope P2 (omitted Python graph) closed in one text-only correction.
+
+C1: seven hermetic identity/date/message tests, 394 new test lines and one
+braced test-only module declaration. H1: two member/bare attribute tests,
+325 added test lines, two replaced baseline lines. Combined locked Rust1.95
+characterization run: 17 passed, none ignored, including eight existing tests.
+Initial fixture assumptions exposed index cache refresh, parsed-message leading
+blank-line loss, and H-INFO selection of base only; corrected tests inspect the
+actual stored bytes/content and exact current/native sequences. No product fix.
+
+Q1: [consumer/source readiness map](../gwz-core/dev-docs/GwzGitLibraryQualification.md).
+Root/core/library/Python metadata passes independently. Python and standalone
+CLI locks record sys 0.18.5+1.9.4, unlike root/core's 0.18.8+1.9.7; only library
+uses patched local sources. Windows source-proof path keys need correction.
+All consumers/platforms/distribution/activation remain separate gates.
+
+Next: State reviews C1; Code reviews H1 and Q1 on the committed candidate.
+No production API, dependency/lock, fallback or transport activation changed.
+
 ## gwz-git G0 — local foundation accepted, 2026-09-21
 
 Accepted tuple: root `699c584a93185ef5e73dc96318603e25354018e2`, core
