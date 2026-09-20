@@ -28,12 +28,27 @@ No GWZ production dependency, native pin, protocol, package publication or
 runtime activation changed. Original fork main is preserved; candidate lives
 on `codex/per-remote-transport` from the qualified git2 0.21.0 release.
 
-L1-A local-fetch, L3-A commit/tag and L4-A history characterization candidates
-are being settled for their named reviews (State, State, Code respectively).
-Lead's L4 wiring handoff nests the new tests under existing tests.rs to reuse
-private helpers, avoiding any visibility change; reviewer checks that handoff.
-Later replacements and production activation require their own design/budget
-gates. Capability inventory does not expand command/options scope.
+L1-A, L3-A and L4-A characterization is accepted at core
+`c63f497df29d51ad5d864738fa0056b513c3ab7d`, root
+`9592320ddf95fe53eef0619398b1f8170943a4cc`, after recorded State/State/Code GO.
+Reports: `GwzNoFallbackCharacterization-Review{State,Code}.md`. Eleven focused
+tests pass across the three packages, including clean L3 child executions.
+Two nonblocking P3 owner corrections: L4 documentation whitespace; L3 explicit
+post-rejection staged-blob assertion and rerun. No additional blocking review
+round. No known escaped defects; no runtime replacement was activated.
+
+Findings: native local-fetch failure is reproduced when receiver tree refs name
+objects present at the source and a new commit forces negotiation. The broader
+25-row unrelated-object matrix passes. Commit/tag hooks and effective signing
+configuration require orchestration. Path-history attribute magic currently
+loses worktree context; ordered range/first-parent fixtures match native Git.
+
+Next: separately scope and review the local native-fix package, commit/tag
+identity/signing orchestration and history traversal/pathspec replacement.
+Complete binding packaging, all-consumer/features/native platforms before
+separate production activation. First packages are complete; the full
+no-fallback program and transport activation remain in progress. Inventory
+work did not expand the product's command/options scope.
 
 ## No-fallback plan acceptance — 2026-09-20
 
