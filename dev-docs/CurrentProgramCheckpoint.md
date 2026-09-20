@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## Git library Q3 — native execution awaiting review, 2026-09-21
+## Git library Q3 — instrumented native execution accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzGitLibraryNativeConsumers.md): core
 `468fd5e41fe369cc2892a330c8b2df9241023d38`; private evidence
@@ -15,7 +15,14 @@ root/standalone CLI executables and loaded Python extension ran on macOS arm64.
 All source/lock/artifact checks held. Three parser tests and fixture formatting
 pass. Complete run retained with frozen inputs, exact instrumentation and hashes.
 
-Retained dual Code/State aggregate review pending. Production sources,
+Accepted at root `9008e13262d4e24f1cbef150a3717dd79ca31a22` and the
+core/evidence tuple above after retained [Code](GwzGitLibraryNativeConsumers-ReviewCode.md)
+and [State](GwzGitLibraryNativeConsumers-ReviewState.md) reviews: both GO,
+zero P0–P3 findings. Reports filed verbatim; both independently reran the
+three parser tests. One aggregate round, no remediation rounds or known escaped
+defects. The stock-C failure is the intended behavioral control, not an escaped
+defect. Elapsed time not measured. Acceptance annotations change no executable
+statements from the reviewed tuple. Production sources,
 manifest/lock selection, native forks and public interfaces remain unchanged.
 Other native platforms, full operation parity, uninstrumented package behavior,
 source distribution/publication and activation remain separate gates. Next is
