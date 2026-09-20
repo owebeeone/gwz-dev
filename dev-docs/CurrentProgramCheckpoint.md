@@ -1,5 +1,22 @@
 # Current program checkpoint
 
+## SSH integration resumed; remaining qualification batched later — 2026-09-21
+
+Operator directs postponing the outstanding platform and selected-source checks
+as one later batch and continuing SSH pooling/per-remote integration now.
+[Continuation scope](../gwz-core/dev-docs/GwzRemoteTransportSshIntegration.md)
+records the batch, implementation order and local gates. This supersedes the
+earlier qualification-as-next-action wording below. Checks are deferred, not
+waived; preserve Q5 State P3-1 for correction before runner reuse in that batch.
+
+Implemented: message-to-SSH pump, physical pool ownership and per-remote native
+Git composition on controlled local fixtures. All 21 focused local tests pass;
+five clone/push/fetch service channels reuse one authenticated connection across
+two repositories. Retained Code/State acceptance review is next. Preserve existing message/wire APIs,
+exclusive physical ownership, consume-after-sink flow control and no client Git
+subprocess fallback. Full production trust/credential setup and network-entry
+coverage remain explicit work; do not advertise endpoint support prematurely.
+
 ## Git library Q5 — Windows consumers accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzGitLibraryWindowsConsumers.md).
