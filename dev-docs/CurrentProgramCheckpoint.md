@@ -1,17 +1,27 @@
 # Current program checkpoint
 
-## Git library Q2 — isolated candidate in progress, 2026-09-21
+## Git library Q2 — local evidence awaiting review, 2026-09-21
 
-Bounded scope: [source keys and consumer composition](../gwz-core/dev-docs/GwzGitLibraryCandidate.md),
-core `f70f4a74037bf291c9c6e1e72a7fb29676e4ab3f`.
-Windows path-key regression/correction uses existing admission machinery;
-a private campaign will prepare independent root/core/CLI/Python/library
-copies with the patched sources. Production manifests and locks stay unchanged.
-Aggregate checkpoint tier is retained dual Code/State review, with at most
-two remediation rounds. Scope records owned paths and numeric ceilings.
-No new user-facing API, source publication, native platform acceptance or
-production activation is included. C1/H1/Q1 acceptance below remains current.
+[Candidate scope/results](../gwz-core/dev-docs/GwzGitLibraryCandidate.md): core
+`ea059ba89b1b61201b75c26708a99c7ca780d2a9`; private evidence
+`c82e38394947611b3848c9e73701ac378ae2917c`. Library/fork/C and CLI/Python
+pins remain those in Q1. Verifier uses portable keys; 12 Python guards pass.
+14 added runner and 86 added test lines; 231-line private composition runner.
 
+Five independent candidate graphs pass locked metadata/source/feature/lock
+checks. Root/standalone CLI builds and version/help, core build plus 17
+characterization tests, library build plus 13 integration/seven documentation
+checks pass in local-b. Python wheel build/import/health passes in python-d.
+Final runner metadata passes all five rows in metadata-e; no single all-green
+build run is claimed. Raw failed attempts remain retained. Initial update
+caused an unrelated edge refresh (refused); lock-preserving resolution fixed
+that invocation. Python requires maturin plus root-visible source patches.
+
+Retained dual Code/State aggregate review pending. No production manifests,
+locks, call sites, source publication, fallback or transport activation changed.
+Native Windows and all-consumer identity/object-format/platform qualification,
+remote-only source reconstruction and later activation remain gated. The
+candidate is local composition evidence, not readiness for production.
 
 ## Git library C1/H1/Q1 — evidence accepted, 2026-09-21
 
