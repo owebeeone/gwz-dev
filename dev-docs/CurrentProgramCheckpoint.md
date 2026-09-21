@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## SSH N3a — local endpoint assembly, implementation review pending, 2026-09-22
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN3a.md) composes accepted
+N1/N2b into one endpoint with agent and selected-key routes and operation-specific
+success observers. Full isolated SSH suite and scoped formatting pass. Retained
+Code/State dual aggregate review is required before acceptance.
+
+N3b operation/failure observations and backend clone/nested-scope ownership, then
+N3c complete network-driver attachment remain. Native Remote objects must be fresh
+when changing operation context; the endpoint is shared across them. Production
+dependency/route activation remains gated by the operator-deferred platform and
+selected-source batch. No new wire or public surface is introduced.
+
 ## SSH N2b — accepted selected admission and pool/worker integration, 2026-09-22
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN2b.md) accepted at
