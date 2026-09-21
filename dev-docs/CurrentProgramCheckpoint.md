@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## SSH agent A3 — local implementation, aggregate review pending, 2026-09-21
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA3.md). Supervised
+setup now feeds the physical pool/shared worker and internal per-operation Route
+receipts. Cleanup failure stops admission; unfinished pools retain physical
+charges under the existing bounded supervisor after worker/endpoint exit. Native
+reuse, cancellation, failure, deadline, overrun, panic and cap tests pass with
+the complete isolated locked Rust 1.95 suite. One owner-discovered panic ledger
+defect corrected before review. 627 production additions/seven files, 37 removed;
+481 new test lines/two files. Retained Code/State dual acceptance review next.
+Production setup discovery/activation and backend observation sink attachment
+remain later work. Platform/selected-source qualification stays deferred.
+
 ## SSH agent A2 — accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA2.md). Accepted
