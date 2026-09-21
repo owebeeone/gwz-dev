@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## SSH N2a — implementation checkpoint, 2026-09-21
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN2a.md): bounded selected
+key reservations/snapshots, exact-byte candidate interning, fixed-scratch container
+preflight and native in-memory authentication. Full isolated SSH suite passes.
+Aggregate retained Code/State gate is pending; no acceptance or activation claim.
+Production553/600 lines in three files, tests603/900 in two files. Owner corrected
+armor mismatch and native failure drop order before review; raw TDD evidence saved.
+N2b worker/pool ownership follows acceptance. Platform/selected-source checks stay
+in the operator-deferred batch; N3 attachment/activation remain outstanding.
+
 ## SSH N2 — selected identity design accepted, 2026-09-21
 
 [Design](../gwz-core/dev-docs/GwzRemoteTransportSshSelectedIdentityDesign.md)
