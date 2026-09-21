@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## SSH agent A2 — implemented, review pending, 2026-09-21
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA2.md). Private
+Unix native signing bridge authenticates with Ed25519/RSA SHA-2, bounds agent and
+network waits, contains callback panic and transfers only after helper join.
+61 focused executions pass (seven new A2). 246 production lines/one file; 552
+test/support lines/two files, test ceiling refined to 560 for native fixtures.
+Retained Code/State acceptance review follows the settled tuple. A3 physical-pool
+integration and production discovery/activation remain later work; platform and
+selected-source checks stay in the deferred batch.
+
 ## SSH agent A1 — accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA1.md). Accepted
