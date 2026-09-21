@@ -1,6 +1,32 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a0c429-5e05-7e44-bc33-002f1d06be6e
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+origin_url_hash: sha256:e35341f4b797aa8e57a066bf78413f40c277b3985e757118ca9aea8d390fbb9c
+created_at: unix-ms:1789997441402
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: c33005d576e59ef46222e465285ae1eccf7ceedd
+  branch: main
+selected_targets:
+- '@root'
+- mem_gwz_cli
+- mem_gwz_core
+- mem_taut
+- mem_gwz_py
+- mem_taut_shape
+- mem_taut_shape_rs
+- mem_taut_shape_py
+- mem_gwz_core_evidence
+- mem_gwz_transport
+- mem_git2_rs
+- mem_libgit2
+- mem_gwz_git
+committed_targets:
+- mem_gwz_core
+- mem_gwz_core_evidence
+- '@root'
 members:
   mem_git2_rs:
     path: git2-rs

@@ -5,8 +5,10 @@
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN2a.md): bounded selected
 key reservations/snapshots, exact-byte candidate interning, fixed-scratch container
 preflight and native in-memory authentication. Full isolated SSH suite passes.
-Aggregate retained Code/State gate is pending; no acceptance or activation claim.
-Production553/600 lines in three files, tests603/900 in two files. Owner corrected
+Initial Code review found two P2s; State GO found a bounded P3. One merged
+correction is implemented and full focused suite passes; retained closure pending.
+No acceptance or activation claim. Production598/600 lines in three files,
+tests868/900 in two files. Owner corrected
 armor mismatch and native failure drop order before review; raw TDD evidence saved.
 N2b worker/pool ownership follows acceptance. Platform/selected-source checks stay
 in the operator-deferred batch; N3 attachment/activation remain outstanding.
