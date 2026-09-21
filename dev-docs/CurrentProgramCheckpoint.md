@@ -1,5 +1,15 @@
 # Current program checkpoint
 
+## SSH N1 — implementation review pending,2026-09-21
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN1.md). Native DNS/TCP/
+handshake/trust setup now composes with accepted A2/A3 in the isolated fixture.
+Full focused suite passes:88 executed tests. Two owner-discovered native parity
+defects corrected with red/green regressions before review.348 production lines/
+one file,652 test lines/one file; test ceiling refined650→660, with N2/N3 excluded.
+Retained Code/State aggregate review next. Production activation and the deferred
+platform/source batch remain unclaimed.
+
 ## SSH production setup — design accepted; N1 implementation, 2026-09-21
 
 [Design](../gwz-core/dev-docs/GwzRemoteTransportSshProductionSetup.md) accepted
