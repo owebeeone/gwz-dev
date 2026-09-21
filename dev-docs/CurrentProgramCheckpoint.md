@@ -1,5 +1,30 @@
 # Current program checkpoint
 
+## SSH N2b — accepted selected admission and pool/worker integration, 2026-09-22
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN2b.md) accepted at
+root `9459ae4c2f5ad5061a2eaba92785a1f87bece938`, core
+`6616a2cd66d64f04f9eb3c370e8a3a677fba1c36`, evidence
+`593d2c36780d6278eee21e67dc0cc102673ed887`, and transport
+`16a383e7d1c0e7e3234006688986afc2c6e54ca5`. Retained [Code GO](GwzRemoteTransportSshN2b-ReviewCode-1.md)
+and [State GO](GwzRemoteTransportSshN2b-ReviewState-1.md) close both original
+P2 findings in one remediation round.
+
+The accepted fixture-attached slice admits selected key files before pool
+lookup, preserves one absolute deadline through admission, checkout,
+interaction and handoff, retains snapshot authority through resource disposal,
+and contains pending admissions with the physical pool during shutdown.
+Deterministic barrier tests prove stalled expiry, late-result disposal,
+truthful pending-admission reporting, combined cleanup, and existing-stream
+progress. The full locked/offline Rust 1.95 SSH and transport suites pass, and
+the remediation evidence is archived in the private campaign run
+`2026-09-22-selected-key-n2b-rem1`.
+
+No production route or backend attachment is activated by this checkpoint.
+Next: N3 production module and backend entry-point attachment. The operator-
+deferred platform and selected-source qualification batch, HTTPS, and
+capability activation remain outstanding.
+
 ## SSH N2a — accepted selected-key snapshot/authentication, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN2a.md) accepted at root
