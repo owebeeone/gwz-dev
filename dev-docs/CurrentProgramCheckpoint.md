@@ -1,5 +1,17 @@
 # Current program checkpoint
 
+## Phase 4 endpoint-placement interface — draft review, 2026-09-22
+
+The [placement amendment](../gwz-core/dev-docs/GwzRemoteTransportPlacementDesign.md)
+and [embedding guide](../gwz-core/docs/TransportPlacement.md) define additive
+attachments, endpoint identity preflight, typed terminal facts and v2 conversation
+negotiation. Design-only gate: retained Consistency/Safety plus Surface; one
+combined package, at most two merged corrections. No code or capability activation.
+The current CLI uses direct handler calls; real supplied-carrier evidence remains
+outstanding and does not authorize implementing a carrier. Platform/selected-source
+checks remain one later batch. Next after acceptance: schema/mux lifecycle batch A,
+then full SSH host/backend integration batch B.
+
 ## SSH N3 — aggregate backend attachment accepted, 2026-09-22
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN3.md) completes the
