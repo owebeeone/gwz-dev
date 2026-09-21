@@ -5,10 +5,12 @@
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN2a.md): bounded selected
 key reservations/snapshots, exact-byte candidate interning, fixed-scratch container
 preflight and native in-memory authentication. Full isolated SSH suite passes.
-Initial Code review found two P2s; State GO found a bounded P3. One merged
-correction is implemented and full focused suite passes; retained closure pending.
+Initial Code review found two P2s; State GO found a bounded P3. The merged
+production correction passes the full suite and both axes are GO. State found an
+evidence-only P3 during re-review; a second, test-only correction now passes the
+focused container gate, with final retained closure pending.
 No acceptance or activation claim. Production598/600 lines in three files,
-tests868/900 in two files. Owner corrected
+tests876/900 in two files. Owner corrected
 armor mismatch and native failure drop order before review; raw TDD evidence saved.
 N2b worker/pool ownership follows acceptance. Platform/selected-source checks stay
 in the operator-deferred batch; N3 attachment/activation remain outstanding.
@@ -3399,13 +3401,13 @@ fable token only where it makes a difference." Recorded consequences:
   epoch, like every other unique-name site in the crate; no
   production change, no count move; darwin gates re-run green,
   remainder re-measured 979). Both matrices + push legs
-  re-dispatched at cc7c625 (Windows 33188777003, Platform
-  33188779600); v0.11.1 cuts from cc7c625 on their green.
+  re-dispatched at cc7c625 (Windows 33188767003, Platform
+  33188769600); v0.11.1 cuts from cc7c625 on their green.
 
   **v0.11.1 IS RELEASED (2026-08-29) — both repos tagged,
   published, verified; THE LINUX PINS ARE NOW EXECUTED.** CI
-  closed green at cc7c625 (Windows 33188777003 with the fixture
-  fix, Platform 33188779600, boundary 33188777639;
+  closed green at cc7c625 (Windows 33188767003 with the fixture
+  fix, Platform 33188769600, boundary 33188767639;
   retained-readers path-filtered out legitimately, its 9a64ce9
   green covering the untouched surface). gwz-core released via
   scripts/release.py v0.11.1 --push: full local gate in a clean
@@ -3936,7 +3938,7 @@ fable token only where it makes a difference." Recorded consequences:
   266, remainder 1114 + 1, g23 130 — every pin matched; the focused
   re-verify after the doc folds: fmt/clippy/boundary green, v1 266;
   per-commit lane gate ok at all three; M4 map and merge-docs green.
-  Dispatched: Windows `33575785509`, Platform `33575787725`; push CI
+  Dispatched: Windows `33575785509`, Platform `33575787625`; push CI
   boundary `33575785383`, retained readers `33575785323`. The reviewed
   pre-rebase shas (`086f7c0`/`b31a229`) stay reachable on the LOCAL
   branch `e4/e4-4-6b-capfree-pins`. PROCESS NOTE filed: write stop-
@@ -3944,7 +3946,7 @@ fable token only where it makes a difference." Recorded consequences:
   lines OR a change outside `tests/`" as a conjunction. NEXT: E4.5-B
   launches now from the staged brief at base `f563446`; then E4.7; then
   DR-1 once the operator names its home. *[CI CLOSED at `f563446`:
-  Windows `33575785509`, Platform `33575787725`, boundary `33575785383`,
+  Windows `33575785509`, Platform `33575787625`, boundary `33575785383`,
   retained readers `33575785323` — all GREEN.]*]*
 
   **POSITION 2026-09-02 (E4.5-B) — STOP-TRIGGER (5) FIRED; A DIFFERENT
