@@ -1,5 +1,15 @@
 # Current program checkpoint
 
+## Interruptible SSH agent helper — design review pending, 2026-09-21
+
+Operator selects helper threads with owned, cancellable agent I/O.
+[Design](../gwz-core/dev-docs/GwzRemoteTransportSshAgentDesign.md) specifies
+bounded waits, exclusive native ownership, joined completion, helper caps and
+observable cleanup failure. This refines the prior candidate agent/signing route;
+no new implementation or production activation is claimed. Dual design review
+uses retained Consistency/Safety reviewers. Platform/source qualification remains
+the deferred batch; physical capability freeze requires its native proof.
+
 ## Shared SSH worker and destination routing — accepted, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshWorker.md). Accepted
