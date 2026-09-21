@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## Phase 4 batch B — implemented candidate, pending review, 2026-09-22
+## Phase 4 batch B — correction 1, pending re-review, 2026-09-22
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementB.md) now covers the
 core host facade, scoped backend, endpoint-owned identity/SSH/pooling and all N3
@@ -11,7 +11,11 @@ explicitly recorded in the private evidence. Next is one settled aggregate
 Code/State gate with retained reviewers and Surface closure on the guide.
 Platform/selected-source checks remain in the operator-deferred batch; supplied
 carrier qualification C, HTTPS and release remain separate. Four old N2b prompts
-are untouched. No B acceptance claim before the review reports.
+are untouched. Initial Code/State reviews found three distinct P2 roots (fetch independently
+converged); Surface GO. The consolidated correction adds fetch-wide identity
+preflight, deadline-independent check completion and pre-arithmetic policy checks.
+Causal regressions pass; host25/SSH137 with one ignored/fetch9/backend7 and default
+check pass. Retained re-verdicts pending; no B acceptance claim.
 
 ## Phase 4 batch A — accepted, 2026-09-22
 
