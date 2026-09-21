@@ -15,7 +15,10 @@ Platform/source qualification remains deferred as one integrated batch.
 Local fixture: 35 tests pass, including native push/clone/push/fetch on one
 authenticated connection and isolation of a failed concurrent service.
 664 new production lines across three files plus five pump lines; formal
-aggregate dual review follows settlement.
+aggregate dual review found two independent P2s (SCP compatibility and queued
+expiry classification). Merged remediation 1 reproduces and corrects both;
+38 focused executions pass, retained reviewer closure pending.
+Updated source additions: 685 new-file lines plus five pump lines.
 
 ## SSH local pool/per-remote integration accepted; qualification batched later — 2026-09-21
 
