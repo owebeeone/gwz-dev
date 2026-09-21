@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## SSH N2 — selected identity design review pending, 2026-09-21
+
+[Draft](../gwz-core/dev-docs/GwzRemoteTransportSshSelectedIdentityDesign.md)
+refines pre-lookup admission versus native proof, bounded immutable snapshots,
+nonrecycled tokens, worker admission Jobs, one deadline and retained endpoint
+cleanup spanning admissions and pool. G1 explicitly records new key-input bounds.
+Retained Consistency/Safety dual review on a settled document tuple is next;
+P0–P2 block, at most two merged remediation rounds. No implementation activation.
+N2a authority/native bridge and N2b worker integration have separate bounded gates;
+N3 backend attachment and deferred platform/source qualification remain later.
+
 ## SSH N1 — accepted local connection/trust integration, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN1.md). Accepted root
