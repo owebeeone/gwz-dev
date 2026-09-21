@@ -1,6 +1,6 @@
 # SSH agent A1 — merged remediation 1
 
-Status: implemented; retained focused re-review pending after independent Code and State NO-GO on core 3096966.
+Status: accepted after retained Code/State GO on the corrected tuple after independent Code and State NO-GO on core 3096966.
 No architecture or scope expansion. Retained reviewers re-check their own findings.
 
 | Finding | Disposition | Closure |

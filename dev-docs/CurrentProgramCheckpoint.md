@@ -1,15 +1,26 @@
 # Current program checkpoint
 
-## SSH agent A1 — remediation 1, re-review pending, 2026-09-21
+## SSH agent A1 — accepted, 2026-09-21
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA1.md). Retained
-Code/State found two independent P2s (channel state escape and permanent failure
-of supervisor initialization), plus missing deterministic cancellation boundaries.
-One merged correction is implemented; 54 focused executions pass, 16 A1 tests.
-557 production lines/three files, 742 test lines/two files (test ceiling refined
-to 750 for review regressions). Initial startup regression reproduced the failure.
-Retained reviewers must close their own findings on the settled corrected tuple.
-No native signing, pool/backend activation or platform/source-batch claim.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA1.md). Accepted
+implementation root `d552bbda5c5b8c14291243cdf73b1c1955443222`, core
+`14409399bc7404446200192ffaf585f9969eec49`, evidence
+`d5605a5ad81feff445d0d712940ba050c849dec3`; other pins unchanged/in reports.
+Retained [Code GO](GwzRemoteTransportSshAgentA1-ReviewCode-1.md) and
+[State GO](GwzRemoteTransportSshAgentA1-ReviewState-1.md) close two independent
+P2s (channel state escape, permanently failed supervisor startup) and one P3
+(cancellation-boundary coverage) after one merged remediation. No blind
+convergence; no known escaped defect. 54 focused executions pass, including
+16 A1 tests. 557 production lines/three files; 742 test lines/two files, with
+ceiling refined to 750 for the requested regressions. Original red/green logs
+and final fingerprints remain in the private ssh-integration evidence campaign.
+
+Next: A2 minimal native signing callback and authenticated session handoff with
+fixture-trusted native connections. Prove cancellation during signing, algorithm
+selection, native retry/allocator ownership, and bounded connection destruction.
+A3 integrates supervised setup and cleanup observation into the physical pool
+and backend. No production activation yet; platform/source qualification remains
+the operator-deferred batch. A1 acceptance does not claim those later gates.
 
 ## Interruptible SSH agent helper — design accepted, 2026-09-21
 
@@ -22,8 +33,8 @@ and [Safety GO](GwzRemoteTransportSshAgentDesign-ReviewSafety.md) at root
 One dual design round; zero blocking findings; Consistency P3-1 authority wording
 corrected without behavioral changes. No new build/test or capability claim.
 
-Next: A1 bounded agent codec/client and helper lifecycle, with fake-agent,
-cancellation, join, cap-exhaustion and overrun/reap tests. A2 native signing and
+A1 is now accepted above with fake-agent, cancellation, join, cap-exhaustion
+and overrun/reap tests. A2 native signing and
 A3 production integration are separate gates. The design requires exclusive
 setup ownership, joined completion and a bounded supervisor retaining any cleanup
 overrun; caller timeout alone never proves helper disposal. This refines the
