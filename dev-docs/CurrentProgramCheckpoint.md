@@ -1,5 +1,26 @@
 # Current program checkpoint
 
+## SSH N3 — aggregate backend attachment awaiting review, 2026-09-22
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN3.md) combines the
+remaining N3b/N3c work into one operator-requested batch and one retained dual
+Code/State gate. Shared backend endpoint ownership, per-request failure facts,
+all common SSH callback funnels and nested driver observations are implemented
+in an isolated full-core candidate. Default dependency selection/routing remains
+unchanged. The additive pool correlation accessor is included in this gate.
+
+Executed: candidate backend/driver gate5 pass, ordinary backend gate8 pass,
+isolated SSH suite123 pass/1 ignored, transport suite94 pass/2 ignored. Ignored
+extended campaigns are not claimed. Raw failures and results are retained in the
+private SSH evidence run `2026-09-22-backend-n3`. Review pending; no acceptance or
+whole-core/platform qualification claimed. Platform, selected sources and
+production activation remain deferred to the agreed later batch. HTTPS and
+CLI-hosted placement remain later phases.
+
+Next: review one committed tuple with the retained Code and State reviewers,
+consolidate findings, and file acceptance. This entry supersedes the separate
+N3b/N3c checkpoint sequencing below, without revising accepted N3a behavior.
+
 ## SSH N3a — accepted local endpoint assembly, 2026-09-22
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN3a.md) composes accepted
