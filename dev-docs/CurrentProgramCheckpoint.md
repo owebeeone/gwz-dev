@@ -1,14 +1,23 @@
 # Current program checkpoint
 
-## Interruptible SSH agent helper — design review pending, 2026-09-21
+## Interruptible SSH agent helper — design accepted, 2026-09-21
 
 Operator selects helper threads with owned, cancellable agent I/O.
-[Design](../gwz-core/dev-docs/GwzRemoteTransportSshAgentDesign.md) specifies
-bounded waits, exclusive native ownership, joined completion, helper caps and
-observable cleanup failure. This refines the prior candidate agent/signing route;
-no new implementation or production activation is claimed. Dual design review
-uses retained Consistency/Safety reviewers. Platform/source qualification remains
-the deferred batch; physical capability freeze requires its native proof.
+[Design](../gwz-core/dev-docs/GwzRemoteTransportSshAgentDesign.md) accepted after
+retained [Consistency GO](GwzRemoteTransportSshAgentDesign-ReviewConsistency.md)
+and [Safety GO](GwzRemoteTransportSshAgentDesign-ReviewSafety.md) at root
+`efb0d2a698755f3c1804f67495c4c9ded48e547d`, core
+`a91846eb0328106cb76cc0aa90846590aafd72df`; other pins unchanged and in reports.
+One dual design round; zero blocking findings; Consistency P3-1 authority wording
+corrected without behavioral changes. No new build/test or capability claim.
+
+Next: A1 bounded agent codec/client and helper lifecycle, with fake-agent,
+cancellation, join, cap-exhaustion and overrun/reap tests. A2 native signing and
+A3 production integration are separate gates. The design requires exclusive
+setup ownership, joined completion and a bounded supervisor retaining any cleanup
+overrun; caller timeout alone never proves helper disposal. This refines the
+accepted worker's bounded setup seam. Platform/source qualification remains the
+deferred batch; physical capability freeze requires native proof.
 
 ## Shared SSH worker and destination routing — accepted, 2026-09-21
 
