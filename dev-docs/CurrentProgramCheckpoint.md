@@ -1,16 +1,42 @@
 # Current program checkpoint
 
-## Phase 4 endpoint-placement interface — draft review, 2026-09-22
+## Phase 4 endpoint-placement interface — accepted, 2026-09-22
 
 The [placement amendment](../gwz-core/dev-docs/GwzRemoteTransportPlacementDesign.md)
-and [embedding guide](../gwz-core/docs/TransportPlacement.md) define additive
-attachments, endpoint identity preflight, typed terminal facts and v2 conversation
-negotiation. Design-only gate: retained Consistency/Safety plus Surface; one
-combined package, at most two merged corrections. No code or capability activation.
-The current CLI uses direct handler calls; real supplied-carrier evidence remains
-outstanding and does not authorize implementing a carrier. Platform/selected-source
-checks remain one later batch. Next after acceptance: schema/mux lifecycle batch A,
-then full SSH host/backend integration batch B.
+and [embedding API guide](../gwz-core/docs/TransportPlacement.md) are accepted at
+root `a4c5b22299be9128fef4fd212b374c669353be14`, core
+`6c9abaef8ef2257371637a3f02d0771cd84bab34`; remaining six pins are unchanged and
+recorded in the reports. Retained [Consistency GO](GwzRemoteTransportPlacementDesign-ReviewConsistency-1.md),
+[Safety GO](GwzRemoteTransportPlacementDesign-ReviewSafety-1.md) and
+[Surface GO](GwzRemoteTransportPlacementDesign-ReviewSurface-1.md) close all
+blocking findings after [one merged correction](GwzRemoteTransportPlacementDesign-RemPlan.md).
+
+Accepted: additive GWZ attachments/placement/capabilities/observations, v2 owner
+identity checks and typed terminal facts, receiver-affinity admission, complete
+bootstrap cancellation, endpoint-local identity preflight and concrete application
+port/runtime API. No carrier, executable change or production activation.
+The CLI remains a direct handler caller until a communication layer is supplied.
+
+Review metrics: one initial three-axis gate plus one focused correction; initial
+Consistency twoP2, Safety oneP1/oneP2, Surface oneP2/oneP3. Both design axes
+independently found the bootstrap race (four distinct blocking root causes).
+All blockers and original P3 closed; re-review Surface P3-1 is nonblocking and
+assigned to batch A: name the Attachment tuple's request_id and document
+core.next_message -> client.deliver and the reverse, tested in the example fixture.
+No known released escaped defect. Wall time not captured. Production/test LOC 0;
+this is documentation/design admission, with no compiled API/test-pass claim.
+
+Owner checks: package links, balanced fences and core document whitespace pass.
+The broader check_merge_docs.py still fails on unchanged gwz-cli/docs/Releases.md
+(missing releases_unreleased_compatibility); unrelated documentation debt remains.
+
+Next: batch A shared schema/missing-field compatibility + bounded mux/check/failure
+lifecycle and in-memory regressions, then batch B complete SSH host/backend integration.
+A public schema/API implementation gate is aggregate Code/State plus Surface closure;
+B is one aggregate Code/State review, not a gate per command. Real supplied-carrier
+qualification is batch C. Keep platform and selected-source checks together in the
+operator-deferred later batch. Production dependencies/routes, HTTPS and release
+remain gated; no push/publication. Four older N2b prompt files remain untouched.
 
 ## SSH N3 — aggregate backend attachment accepted, 2026-09-22
 
