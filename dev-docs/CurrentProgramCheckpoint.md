@@ -1,16 +1,28 @@
 # Current program checkpoint
 
-## SSH agent A2 — remediation 1, re-review pending, 2026-09-21
+## SSH agent A2 — accepted, 2026-09-21
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA2.md). Initial
-State GO; Code P2-1 found ambiguous native PUBLICKEY_UNVERIFIED treated as key
-refusal. Corrected to terminate with a non-credential error; only explicit
-AUTHENTICATION_FAILED permits another identity. Native disconnect regression
-reproduced a second-key call before correction and now passes. 62 full focused
-executions pass (eight A2). One merged remediation; retained closure pending.
-267 source lines/one file including test entry; 617 test/support lines, ceiling
-refined to 620 for native regression. A3 pool/backend integration and production
-activation remain later work; platform/source qualification stays deferred.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA2.md). Accepted
+implementation root `53d60168cf2e2e5dc59cb4fa831276a5f69884fd`, core
+`61da27a63a8df42ee92eab909be23d31db665005`, evidence
+`e242351237c2a1bc006c8f6c795f2b56b5ef947f`; other pins unchanged/in reports.
+Retained [Code GO](GwzRemoteTransportSshAgentA2-ReviewCode-1.md) and
+[State GO](GwzRemoteTransportSshAgentA2-ReviewState-1.md) accept Unix fixture
+native signing and joined authenticated connection handoff. Ed25519 and RSA
+SHA-256/512 succeed, including an initial rejected key and a subsequent Git
+exchange. Agent/native waits remain cancellable and use the shared deadline.
+
+One Code P2 (overloaded native error advancing to another key) closed after one
+merged remediation and a native red/green disconnect regression. Only explicit
+AUTHENTICATION_FAILED advances; ambiguous PUBLICKEY_UNVERIFIED terminates with a
+non-credential error. No blind convergence or known escaped defect. 62 focused
+executions pass, eight A2. 267 source lines including test-only entry; 617 test/
+support lines, ceiling refined to 620 for the review regression.
+
+Next: A3 supervised setup resource in the physical pool, observable cleanup
+failure and shutdown, retained physical capacity until disposal, and correct
+new/reused authentication observations. Production discovery/activation remains
+later work; platform/source qualification stays in the operator-deferred batch.
 
 ## SSH agent A1 — accepted, 2026-09-21
 
@@ -27,9 +39,9 @@ convergence; no known escaped defect. 54 focused executions pass, including
 ceiling refined to 750 for the requested regressions. Original red/green logs
 and final fingerprints remain in the private ssh-integration evidence campaign.
 
-Next: A2 minimal native signing callback and authenticated session handoff with
-fixture-trusted native connections. Prove cancellation during signing, algorithm
-selection, native retry/allocator ownership, and bounded connection destruction.
+A2 native signing and authenticated session handoff are now accepted above,
+including cancellation, algorithm selection, native retry/allocator ownership
+and concrete connection cleanup evidence.
 A3 integrates supervised setup and cleanup observation into the physical pool
 and backend. No production activation yet; platform/source qualification remains
 the operator-deferred batch. A1 acceptance does not claim those later gates.

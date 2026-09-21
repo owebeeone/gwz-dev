@@ -1,6 +1,6 @@
 # SSH agent A2 — remediation 1
 
-Status: implemented; retained re-review pending. State GO; Code NO-GO on core 131989bc.
+Status: accepted after retained Code/State GO on the corrected tuple. State GO; Code NO-GO on core 131989bc.
 
 | Finding | Disposition | Closure |
 |---|---|---|
