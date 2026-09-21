@@ -1,6 +1,6 @@
 # SSH production setup — merged remediation 1
 
-Status: implemented in controlling documents; retained re-review pending.
+Status: closed after retained Consistency/Safety GO at core9acf508aefe4ef974e52f19016f33ecf4bf56b34.
 
 | Finding | Disposition | Closure gate |
 |---|---|---|
@@ -11,4 +11,6 @@ Status: implemented in controlling documents; retained re-review pending.
 One merged documentation patch. Trust-input mismatch is independent blind
 convergence on the same compatibility boundary, with stricter-refusal and broader
 admission counterexamples. Concrete code/tests remain provisional outside the
-workspace until this design gate passes. No implementer self-closure claimed.
+workspace until this design gate passes. Both original reviewers verified closure. Nonblocking Consistency P3-1
+was corrected by ordering trust admission before DNS; N1 tests must prove
+zero resolver calls on rejected size/encoding.

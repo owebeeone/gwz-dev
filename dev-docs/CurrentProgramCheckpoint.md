@@ -1,17 +1,22 @@
 # Current program checkpoint
 
-## SSH production setup — design remediation 1, 2026-09-21
+## SSH production setup — design accepted; N1 implementation, 2026-09-21
 
-[Draft](../gwz-core/dev-docs/GwzRemoteTransportSshProductionSetup.md) refines the
-accepted helper design: supervised OS DNS/file admission retains capacity after
-logical timeout; native connect/handshake/trust precedes authentication. N1
-network/trust, N2 explicit authority admission, N3 backend attachment. No new
-production activation or platform/source qualification claim. Retained
-Consistency/Safety re-review precedes N1 implementation; A3 stays accepted below.
-Initial reviews found unenumerated trust-input compatibility changes (independent
-convergence) and ambiguous whole-connection-vs-key retry wording. One merged
-patch amends G1 and specifies differential native input gates; no executable
-change yet. See GwzRemoteTransportSshProductionSetup-RemPlan-1.md.
+[Design](../gwz-core/dev-docs/GwzRemoteTransportSshProductionSetup.md) accepted
+at root `eadf8dc25f93b3f8d9d9c4f3660732367861559f`, core
+`9acf508aefe4ef974e52f19016f33ecf4bf56b34`, unchanged transport pin. Retained
+[Consistency GO](GwzRemoteTransportSshProductionSetup-ReviewConsistency-1.md) and
+[Safety GO](GwzRemoteTransportSshProductionSetup-ReviewSafety-1.md) close all P2s
+in one merged remediation. Both identified trust-input compatibility changes;
+G1 now explicitly admits bounded stores/complete lines and requires differential
+native tests. A2 ordered-key progression remains; whole-connection replay does
+not. Nonblocking P3 operation-order wording corrected: trust admission before DNS.
+
+N1 native network/trust implementation is in progress with TDD. OS DNS/file calls
+stay in capped supervised helpers, retaining ownership after logical timeout.
+N2 explicit authority admission and N3 backend attachment remain later scoped
+work. No production routing or platform/source qualification claim; the operator's
+later batch remains required before activation. A3 stays accepted below.
 
 ## SSH agent A3 — accepted local integration, 2026-09-21
 
