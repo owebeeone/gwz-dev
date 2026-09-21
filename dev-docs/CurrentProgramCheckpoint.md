@@ -1,14 +1,27 @@
 # Current program checkpoint
 
-## SSH N1 — remediation 1 re-review pending, 2026-09-21
+## SSH N1 — accepted local connection/trust integration, 2026-09-21
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN1.md). Retained Code
-reported two P2s; State GO with no findings. One merged correction separates
-socket failure from Control termination and preserves native CR trust bytes.
-Owner independently reproduced the CR defect while reviewers were blind. Tests
-also prove CRLF line bounds, socket-error retry and cancellation/expiry precedence.
-Full focused suite passes91 executions; production350/350 lines, tests764/770.
-Retained focused re-verdicts follow. No activation or platform/source batch claim.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN1.md). Accepted root
+`398ca8350a88723b24660b96f7f00a0fd3e02199`, core
+`5ff531cedf244e9e86d3cf33d73559b2c23bf1a9`, evidence
+`e842abf855e58de3c4381855fbc1b8374485a7cd`; other pins unchanged/in reports.
+Retained [Code GO](GwzRemoteTransportSshN1-ReviewCode-1.md) and
+[State GO](GwzRemoteTransportSshN1-ReviewState-1.md) close both Code P2 findings
+in one merged remediation. Socket failures now defer to Control for overall
+termination; native CR trust bytes are preserved while CRLF size is measured once.
+
+Owner full focused gate91 pass; both reviewers independently reran18 network
+tests. Production350/350 lines; tests764/770. Two owner parity fixes before
+review, two Code findings at settled review (CR independently reproduced by
+owner), one correction-stage boundary regression. No dual-axis blind convergence
+or known escaped defect. Raw failures, final green and native fixture penalty
+diagnosis retained in private evidence. Acceptance filing changes no code.
+
+Next: N2 concrete design/review for supervised selected-key admission, snapshot/
+token bounds and deadline propagation before every pool lookup; then N3 backend
+attachment. Production activation remains inactive. Platform/selected-source
+qualification stays in the operator-deferred batch and remains required.
 
 ## SSH production setup — design accepted; N1 implementation, 2026-09-21
 
@@ -22,7 +35,7 @@ G1 now explicitly admits bounded stores/complete lines and requires differential
 native tests. A2 ordered-key progression remains; whole-connection replay does
 not. Nonblocking P3 operation-order wording corrected: trust admission before DNS.
 
-N1 native network/trust implementation is in progress with TDD. OS DNS/file calls
+N1 native network/trust implementation is accepted above. OS DNS/file calls
 stay in capped supervised helpers, retaining ownership after logical timeout.
 N2 explicit authority admission and N3 backend attachment remain later scoped
 work. No production routing or platform/source qualification claim; the operator's

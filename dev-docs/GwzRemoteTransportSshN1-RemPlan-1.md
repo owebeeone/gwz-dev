@@ -1,6 +1,6 @@
 # SSH N1 — merged remediation 1
 
-Date: 2026-09-21. Status: implementation and focused re-review pending.
+Date: 2026-09-21. Status: accepted after retained Code/State GO.
 Base: root `b759ced42b18efd674aca8699819a6eafdba2f7b`, core
 `9b3d596f6f230b99ceabf9337d9c17376c2e9762`, evidence
 `16a9aef10b9216cc0988d3af7e0e483948bf03d2`; other pins unchanged.
@@ -43,4 +43,5 @@ network-n1-rem-1 run retains socket/CR/boundary reds, intermediate failed attemp
 final green and a native sshd penalty diagnostic. Parse-time length rechecking
 was removed because pre-resolution admission already measures the exact bound;
 preserving CR bytes must not count the CRLF terminator a second time. No changes
-to the accepted compatibility policy. Re-verdicts remain required.
+to the accepted compatibility policy. Retained Code and State re-verdicts report GO on the corrected tuple; both
+original Code P2s are closed. See ReviewCode-1 and ReviewState-1 filed verbatim.
