@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## Phase 4 batch B — implemented candidate, pending review, 2026-09-22
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementB.md) now covers the
+core host facade, scoped backend, endpoint-owned identity/SSH/pooling and all N3
+network funnels. Candidate only: no carrier or production activation. Host23,
+backend7, SSH134/one ignored, preparation4, regeneration, guide compilation and
+default library check pass locally. Initial TDD red capture is incomplete and
+explicitly recorded in the private evidence. Next is one settled aggregate
+Code/State gate with retained reviewers and Surface closure on the guide.
+Platform/selected-source checks remain in the operator-deferred batch; supplied
+carrier qualification C, HTTPS and release remain separate. Four old N2b prompts
+are untouched. No B acceptance claim before the review reports.
+
 ## Phase 4 batch A — accepted, 2026-09-22
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementA.md) accepted at
