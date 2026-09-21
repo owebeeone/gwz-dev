@@ -1,24 +1,33 @@
 # Current program checkpoint
 
-## Shared SSH worker and destination routing — implemented, review pending, 2026-09-21
+## Shared SSH worker and destination routing — accepted, 2026-09-21
 
-Operator authorized proceeding with endpoint wiring. Controlling scope:
-[Shared worker](../gwz-core/dev-docs/GwzRemoteTransportSshWorker.md). Replace the
-fixture-only worker with a bounded shared endpoint, isolate exchange failures,
-and bind validated SSH destinations plus per-request identity eligibility to
-the per-remote bridge. Native setup and production callback activation remain
-next: an executed fake-agent characterization shows session nonblocking mode and
-its network timeout do not bound libssh2's local-agent read. Candidate remedy is
-a separately qualified nonblocking signing callback, not an implicit blocking
-call inside the shared worker. No authentication or endpoint-support claim yet.
-Platform/source qualification remains deferred as one integrated batch.
-Local fixture: 35 tests pass, including native push/clone/push/fetch on one
-authenticated connection and isolation of a failed concurrent service.
-664 new production lines across three files plus five pump lines; formal
-aggregate dual review found two independent P2s (SCP compatibility and queued
-expiry classification). Merged remediation 1 reproduces and corrects both;
-38 focused executions pass, retained reviewer closure pending.
-Updated source additions: 685 new-file lines plus five pump lines.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshWorker.md). Accepted
+root `60623f2a10895dd970595c5b818a68e5900a72a3`, core
+`073395b5a265c4d2a60265470cd5ba173243cc64`, evidence
+`5ea96433628b3bec8a8365525f8ee314d01cce99`; transport/Rust/C pins unchanged.
+Retained [Code GO](GwzRemoteTransportSshWorker-ReviewCode-1.md) and
+[State GO](GwzRemoteTransportSshWorker-ReviewState-1.md) close both independent
+P2 findings after one merged remediation (SCP grammar and queued-timeout
+classification). No blind convergence or known escaped defect. Public/source
+changes: 685 lines across three new internal files plus five pump lines;
+1,054 new test/support lines plus pump regression. Test ceiling refinement is
+recorded in the merged remediation plan. One aggregate review plus one remediation.
+
+All 38 local focused test executions pass, including native push/clone/push/fetch
+on one authenticated connection, concurrent service failure isolation, shutdown,
+identity admission and deterministic exact/past queued expiry. The ignored fake
+agent child is executed by its passing parent. Raw red/green evidence and exact
+source hashes live in the private ssh-integration worker-a/worker-rem-1 runs.
+
+Next: bounded production credential/setup implementation (host trust, selected-key
+proof and ambient agent cancellation), followed by per-operation authentication
+observations and all-network-entry routing. The native agent read ignores session
+nonblocking/timeout settings; qualify the libssh2 signing-callback and bounded
+agent-client seam before using it in this worker. Backend clones and nested
+with_transport scopes must preserve the shared endpoint while keeping operation
+observations accurate on reuse. Production dependencies/callbacks remain inactive.
+Platform and selected-source qualification remain the operator-deferred later batch.
 
 ## SSH local pool/per-remote integration accepted; qualification batched later — 2026-09-21
 
