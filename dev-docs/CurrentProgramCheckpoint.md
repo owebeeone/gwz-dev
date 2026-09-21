@@ -1,17 +1,28 @@
 # Current program checkpoint
 
-## SSH agent A3 — local implementation, aggregate review pending, 2026-09-21
+## SSH agent A3 — accepted local integration, 2026-09-21
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA3.md). Supervised
-setup now feeds the physical pool/shared worker and internal per-operation Route
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA3.md). Accepted
+root `fe68d36f939de8cba2bc8a509f85a24cefe85db5`, core
+`e92c5d1ec09dd64a397dbacf6c78888955e4ae12`, evidence
+`dd5b5f144c4db29968d578655ca279a7f74c1119`; remaining pins unchanged/in reports.
+Retained [Code GO](GwzRemoteTransportSshAgentA3-ReviewCode.md) and
+[State GO](GwzRemoteTransportSshAgentA3-ReviewState.md): zero P0–P3 findings.
+Supervised setup feeds the physical pool/shared worker and internal operation
 receipts. Cleanup failure stops admission; unfinished pools retain physical
-charges under the existing bounded supervisor after worker/endpoint exit. Native
-reuse, cancellation, failure, deadline, overrun, panic and cap tests pass with
-the complete isolated locked Rust 1.95 suite. One owner-discovered panic ledger
-defect corrected before review. 627 production additions/seven files, 37 removed;
-481 new test lines/two files. Retained Code/State dual acceptance review next.
-Production setup discovery/activation and backend observation sink attachment
-remain later work. Platform/selected-source qualification stays deferred.
+charges under the bounded supervisor after worker/endpoint exit. Reuse retains
+authentication proof while clearing the new-credential-offer flag.
+
+Full isolated Rust 1.95 locked/offline gate passes, independently rerun by State:
+73 tests passed. One owner-discovered factory-panic ledger defect corrected
+before review; one aggregate review, no remediation or known escaped defect.
+627 production additions/seven files, 37 removed; 481 new test lines/two files.
+Reports filed verbatim; acceptance filing changes no executable statements.
+
+Next: bounded production setup discovery/connect/handshake/trust and explicit-key
+handling, then backend observation-sink/all-network-entry attachment. Production
+routing remains inactive. Platform/selected-source qualification stays in the
+operator-deferred batch and remains required before capability activation.
 
 ## SSH agent A2 — accepted, 2026-09-21
 
