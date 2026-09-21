@@ -1,6 +1,6 @@
 # SSH N2 selected identity design — remediation 1
 
-Date: 2026-09-21. Status: focused retained re-review pending.
+Date: 2026-09-21. Status: closed after retained Consistency/Safety GO.
 Base root `6cb03c3049aae85b66a254208a6084e41d04a027`, core
 `120fb9f1379025c66ea00cbdfd5af7f5815859db`; other pins unchanged.
 
@@ -53,3 +53,10 @@ three modules; its focused test allowance800→900 is for this adversarial matri
 Initial Consistency GO/no findings and Safety NO-GO/one P2 are filed verbatim.
 Owner P2-O1 is independent, not blind reviewer convergence. No design acceptance
 preceded either finding. Both retained axes re-review this single corrected tuple.
+
+## Closure
+
+Both retained axes returned GO at root `a9ad12dcafb51d77e7d0fbd28fac97934e070b09`,
+core `35df881b7075d7031082f61e0b99b838341149e1`. Safety closes P2-1 and both axes
+close owner P2-O1. See the verbatim ReviewConsistency-1 and ReviewSafety-1 reports.
+No executable changes or new native-test results are claimed by this design gate.

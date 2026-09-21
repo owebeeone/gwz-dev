@@ -1,17 +1,25 @@
 # Current program checkpoint
 
-## SSH N2 — selected identity design review pending, 2026-09-21
+## SSH N2 — selected identity design accepted, 2026-09-21
 
-[Draft](../gwz-core/dev-docs/GwzRemoteTransportSshSelectedIdentityDesign.md)
-refines pre-lookup admission versus native proof, bounded immutable snapshots,
-nonrecycled tokens, worker admission Jobs, one deadline and retained endpoint
-cleanup spanning admissions and pool. G1 explicitly records new key-input bounds.
-Safety P2-1 encrypted-KDF admission and owner first-fan-out token incompatibility
-are corrected in one design remediation before acceptance. Retained focused
-Consistency/Safety re-review on the revised tuple follows.
-P0–P2 block, at most two merged remediation rounds. No implementation activation.
-N2a authority/native bridge and N2b worker integration have separate bounded gates;
-N3 backend attachment and deferred platform/source qualification remain later.
+[Design](../gwz-core/dev-docs/GwzRemoteTransportSshSelectedIdentityDesign.md)
+accepted at root `a9ad12dcafb51d77e7d0fbd28fac97934e070b09`, core
+`35df881b7075d7031082f61e0b99b838341149e1`; remaining pins unchanged/in reports.
+Retained [Consistency GO](GwzRemoteTransportSshSelectedIdentityDesign-ReviewConsistency-1.md)
+and [Safety GO](GwzRemoteTransportSshSelectedIdentityDesign-ReviewSafety-1.md).
+
+One merged design remediation closes Safety's encrypted-KDF admission P2 and the
+owner's first-fan-out token incompatibility P2. Identical same-Key snapshots now
+share a candidate token, while only authenticated reusable physical resources
+supply leases. A bounded unencrypted-container classifier refuses unsupported
+KDF work before native auth. G1 records caps and representation restrictions.
+No blind dual-axis convergence, executable change or new native-test claim.
+
+Next: N2a snapshot registry/reservations, fixed-scratch container preflight and
+native in-memory key authentication. TDD; retained aggregate Code/State gate;
+600 production/900 test lines as scoped. N2b worker admission and combined retained
+cleanup follow (500/900 bounds). N3/backend attachment and the operator-deferred
+platform/selected-source batch remain later gates before capability activation.
 
 ## SSH N1 — accepted local connection/trust integration, 2026-09-21
 
