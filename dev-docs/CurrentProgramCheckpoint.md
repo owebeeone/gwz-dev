@@ -1,5 +1,30 @@
 # Current program checkpoint
 
+## Phase 4 batch A — implementation drafted, 2026-09-22
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementA.md) contains the
+shared v2 schema, opt-in missing-field compatibility, bounded request mux,
+application ports, typed terminal failure and isolated full-core candidate schema.
+The current object is DRAFT pending aggregate Code/State plus Surface review.
+Taut prerequisite pin is `bcf98b64d465fc54841121b6d1a2d46940f81a3c`.
+The prior design acceptance below remains the controlling interface authority.
+
+Local gates: transport121 passed/two ignored, Taut68 passed, existing SSH126
+passed/one ignored when serial, and backend candidate7 passed. The first parallel
+SSH gate had one address-fallback failure, preserved with the passing serial run;
+no cause or platform qualification is inferred. Consumer Rust31/Python28 and
+regeneration pass; the exact settled tuple is filed with the aggregate review. The initial Taut red was not
+captured (declared TDD deviation); causal mux regressions are archived.
+
+The guide now labels request_id and forwarding directions with a working lower-
+level port fixture, addressing prior Surface P3-1 for re-verification. The core
+`transport_host` facade and complete guide example remain batch B; no production
+capabilities, schema/dependency activation, carrier or release is claimed.
+Next after A acceptance: one complete SSH host/backend integration batch B.
+Real supplied-carrier qualification C and operator-deferred platform/selected-
+source batch remain outstanding. Four old N2b prompts remain untouched.
+
+
 ## Phase 4 endpoint-placement interface — accepted, 2026-09-22
 
 The [placement amendment](../gwz-core/dev-docs/GwzRemoteTransportPlacementDesign.md)
