@@ -1,19 +1,28 @@
 # Current program checkpoint
 
-## SSH N2a — implementation checkpoint, 2026-09-21
+## SSH N2a — accepted selected-key snapshot/authentication, 2026-09-21
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN2a.md): bounded selected
-key reservations/snapshots, exact-byte candidate interning, fixed-scratch container
-preflight and native in-memory authentication. Full isolated SSH suite passes.
-Initial Code review found two P2s; State GO found a bounded P3. The merged
-production correction passes the full suite and both axes are GO. State found an
-evidence-only P3 during re-review; a second, test-only correction now passes the
-focused container gate, with final retained closure pending.
-No acceptance or activation claim. Production598/600 lines in three files,
-tests876/900 in two files. Owner corrected
-armor mismatch and native failure drop order before review; raw TDD evidence saved.
-N2b worker/pool ownership follows acceptance. Platform/selected-source checks stay
-in the operator-deferred batch; N3 attachment/activation remain outstanding.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN2a.md) accepted at root
+`06c74a31fc61f5a70bb02b01786f099c6ba198f9`, core
+`3fa6a23a2a05732ed9368e77048ba0caaf7e508d`, evidence
+`8af0f7ce002148ed31d16c52e830308faaf9e5de`; other pins unchanged/in reports.
+Retained [Code GO](GwzRemoteTransportSshN2a-ReviewCode-2.md) and
+[State GO](GwzRemoteTransportSshN2a-ReviewState-2.md); no open findings.
+
+N2a provides bounded reservations/immutable key snapshots, exact-byte unproven
+candidate interning, fixed-scratch unencrypted-container preflight and native
+in-memory authentication with joined-live proof promotion. Full isolated suite
+passes for final production; final six-test container gate and both independent
+causal-regression reruns pass. Production598/600 lines in three files; tests876/900
+in two files. One dual aggregate gate plus two merged corrections, the second
+confined to test/evidence. Initial Code twoP2/State oneP3; State then found the
+noncausal regression missed by Code. All closed; no dual-axis blind convergence,
+third architectural cause, or known escaped defect. Reports filed verbatim.
+
+Next: N2b worker admission before pool lookup, resource snapshot pins and combined
+retained cleanup under the existing accepted design (500/900 bounds), with a
+capacity-one first-fan-out reuse test. N3 attachment and operator-deferred platform/
+selected-source batch remain outstanding. Production routing remains inactive.
 
 ## SSH N2 — selected identity design accepted, 2026-09-21
 
