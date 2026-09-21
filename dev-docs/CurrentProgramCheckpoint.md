@@ -1,13 +1,14 @@
 # Current program checkpoint
 
-## SSH agent A1 — implemented, review pending, 2026-09-21
+## SSH agent A1 — remediation 1, re-review pending, 2026-09-21
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA1.md). Bounded
-agent codec/client, Unix socket adapter and globally capped helper supervisor
-are implemented behind the isolated fixture. 52 focused executions pass, including
-14 new A1 tests. 550 production lines/three files, 560 test lines/two files.
-Retained Code/State aggregate review follows settlement. Raw development failures
-and exact final fingerprints are in private ssh-integration/agent-a1 evidence.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA1.md). Retained
+Code/State found two independent P2s (channel state escape and permanent failure
+of supervisor initialization), plus missing deterministic cancellation boundaries.
+One merged correction is implemented; 54 focused executions pass, 16 A1 tests.
+557 production lines/three files, 742 test lines/two files (test ceiling refined
+to 750 for review regressions). Initial startup regression reproduced the failure.
+Retained reviewers must close their own findings on the settled corrected tuple.
 No native signing, pool/backend activation or platform/source-batch claim.
 
 ## Interruptible SSH agent helper — design accepted, 2026-09-21
