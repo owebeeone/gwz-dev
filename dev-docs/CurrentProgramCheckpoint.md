@@ -1,5 +1,14 @@
 # Current program checkpoint
 
+## SSH production setup — design review pending, 2026-09-21
+
+[Draft](../gwz-core/dev-docs/GwzRemoteTransportSshProductionSetup.md) refines the
+accepted helper design: supervised OS DNS/file admission retains capacity after
+logical timeout; native connect/handshake/trust precedes authentication. N1
+network/trust, N2 explicit authority admission, N3 backend attachment. No new
+production activation or platform/source qualification claim. Retained
+Consistency/Safety review precedes N1 implementation; A3 stays accepted below.
+
 ## SSH agent A3 — accepted local integration, 2026-09-21
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA3.md). Accepted
