@@ -1,15 +1,16 @@
 # Current program checkpoint
 
-## SSH agent A2 — implemented, review pending, 2026-09-21
+## SSH agent A2 — remediation 1, re-review pending, 2026-09-21
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA2.md). Private
-Unix native signing bridge authenticates with Ed25519/RSA SHA-2, bounds agent and
-network waits, contains callback panic and transfers only after helper join.
-61 focused executions pass (seven new A2). 246 production lines/one file; 552
-test/support lines/two files, test ceiling refined to 560 for native fixtures.
-Retained Code/State acceptance review follows the settled tuple. A3 physical-pool
-integration and production discovery/activation remain later work; platform and
-selected-source checks stay in the deferred batch.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA2.md). Initial
+State GO; Code P2-1 found ambiguous native PUBLICKEY_UNVERIFIED treated as key
+refusal. Corrected to terminate with a non-credential error; only explicit
+AUTHENTICATION_FAILED permits another identity. Native disconnect regression
+reproduced a second-key call before correction and now passes. 62 full focused
+executions pass (eight A2). One merged remediation; retained closure pending.
+267 source lines/one file including test entry; 617 test/support lines, ceiling
+refined to 620 for native regression. A3 pool/backend integration and production
+activation remain later work; platform/source qualification stays deferred.
 
 ## SSH agent A1 — accepted, 2026-09-21
 
