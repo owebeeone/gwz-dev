@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## Phase 4 batch A — correction 1 awaiting re-review, 2026-09-22
+## Phase 4 batch A — correction 2 awaiting re-review, 2026-09-22
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementA.md) contains the
 shared v2 schema, opt-in missing-field compatibility, bounded request mux,
@@ -11,6 +11,10 @@ loss. Surface GO identified one P3 construction-example gap. One
 [merged correction](GwzRemoteTransportPlacementA-RemPlan.md) fixes these with
 causal regressions; retained re-verdicts are pending. Transport131 plus one README
 compile doctest pass on the correction, two extended campaigns remain ignored.
+Round-one Code closed both initial P2s but found a new rejection error-domain
+P2; State and Surface returned GO. [Correction 2](GwzRemoteTransportPlacementA-RemPlan-2.md)
+restricts bootstrap rejections to their frozen negotiation domain and fails invalid
+local configuration before bootstrap. Retained focused re-verdicts are pending.
 Taut prerequisite pin is `bcf98b64d465fc54841121b6d1a2d46940f81a3c`.
 The prior design acceptance below remains the controlling interface authority.
 
