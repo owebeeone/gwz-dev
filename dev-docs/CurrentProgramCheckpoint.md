@@ -1,38 +1,50 @@
 # Current program checkpoint
 
-## Phase 4 batch A — correction 2 awaiting re-review, 2026-09-22
+## Phase 4 batch A — accepted, 2026-09-22
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementA.md) contains the
-shared v2 schema, opt-in missing-field compatibility, bounded request mux,
-application ports, typed terminal failure and isolated full-core candidate schema.
-Initial Code/State NO-GO found two distinct P2 roots: both independently found
-terminal retirement dropping queued results; Code also found typed BindRejected
-loss. Surface GO identified one P3 construction-example gap. One
-[merged correction](GwzRemoteTransportPlacementA-RemPlan.md) fixes these with
-causal regressions; retained re-verdicts are pending. Transport131 plus one README
-compile doctest pass on the correction, two extended campaigns remain ignored.
-Round-one Code closed both initial P2s but found a new rejection error-domain
-P2; State and Surface returned GO. [Correction 2](GwzRemoteTransportPlacementA-RemPlan-2.md)
-restricts bootstrap rejections to their frozen negotiation domain and fails invalid
-local configuration before bootstrap. Retained focused re-verdicts are pending.
-Taut prerequisite pin is `bcf98b64d465fc54841121b6d1a2d46940f81a3c`.
-The prior design acceptance below remains the controlling interface authority.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementA.md) accepted at
+root `d20e168bb93cbe6bf5238b0b0295f0cd51f5cd20`, core
+`28f667c0462c74798761ec9710de793c697c7fb8`, transport
+`03d3011b3ae9b8205bcf07f7f7862194af114856`, Taut
+`bcf98b64d465fc54841121b6d1a2d46940f81a3c`, evidence
+`acdd2f98f395e51c60014c8faa82e315a48c0ada`; unchanged CLI/Python/fork
+pins are recorded in the retained [Code GO](GwzRemoteTransportPlacementA-ReviewCode-2.md),
+[State GO](GwzRemoteTransportPlacementA-ReviewState-2.md) and
+[Surface GO](GwzRemoteTransportPlacementA-ReviewSurface-2.md). No open A findings.
+This accepts A only; annotation commits do not expand the reviewed implementation.
 
-Local gates: transport121 passed/two ignored, Taut68 passed, existing SSH126
-passed/one ignored when serial, and backend candidate7 passed. The first parallel
-SSH gate had one address-fallback failure, preserved with the passing serial run;
-no cause or platform qualification is inferred. Consumer Rust31/Python28 and
-regeneration pass; the exact settled tuple is filed with the aggregate review. The initial Taut red was not
-captured (declared TDD deviation); causal mux regressions are archived.
+Delivered: shared v2 schema, opt-in missing-field compatibility, bounded request
+mux/application ports, typed terminal failure, and isolated full-core candidate
+schema/receiver-affinity fixtures. The existing CLI/core carrier interface is
+unchanged. Production schema/dependencies/routes/capabilities remain inactive.
+Core transport_host facade, scoped backend and endpoint workers remain batch B.
 
-The guide now labels request_id and forwarding directions with a working lower-
-level port fixture, addressing prior Surface P3-1 for re-verification. The core
-`transport_host` facade and complete guide example remain batch B; no production
-capabilities, schema/dependency activation, carrier or release is claimed.
-Next after A acceptance: one complete SSH host/backend integration batch B.
-Real supplied-carrier qualification C and operator-deferred platform/selected-
-source batch remain outstanding. Four old N2b prompts remain untouched.
+Final local transport gate: 134 tests plus one README compile doctest passed;
+two extended campaigns ignored. Initial aggregate gates: Taut68, consumer Rust31/
+Python28 plus regeneration, existing SSH126/one ignored serially, backend7 and
+four generator checks passed. Initial parallel SSH address-fallback failure is
+preserved beside the passing serial run; no cause/platform qualification inferred.
+Initial Taut red was not captured (declared TDD deviation); causal mux/admission
+reds and final source hashes are in the private evidence campaign. Public builds
+do not require it. Archive verifier passes5004 migration records and no build caches.
+Unchanged CLI release-document checker debt remains; no global docs-pass claim.
 
+Review metrics: one aggregate Code/State/Surface gate and two consolidated
+corrections. Initial Code twoP2, State oneP2 share terminal-retirement blind
+convergence (two distinct roots); Surface oneP3 construction example. Re-review
+Code found one changed-range P2 bootstrap-error-domain defect; round2 closes it.
+No released escaped defect claimed. Wall time was not captured. Automated source
+classifier across core/transport/Taut baselines counts authored implementation
+1593 added/34 deleted lines across27 files; generated/retained output and test
+harness are counted separately, not authored production growth.
+
+Next: one complete SSH host/backend integration batch B, including scoped backend
+metadata enforcement, endpoint-local identity preflight, all N3 network funnels,
+request guard/physical cleanup ownership and full guide example compilation.
+Then supplied-carrier qualification C. Keep platform and selected-source checks
+in the operator-deferred single batch. HTTPS, publication, production activation
+and release remain later gates. No carrier construction or remote push authorized.
+Four old N2b prompt files remain untouched.
 
 ## Phase 4 endpoint-placement interface — accepted, 2026-09-22
 

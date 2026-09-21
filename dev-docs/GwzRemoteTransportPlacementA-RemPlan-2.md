@@ -16,3 +16,11 @@ Retained Code reviewer verifies its counterexample and changed range. Retained
 State checks that strengthened admission leaves its lifecycle proof valid on the
 same tuple. Surface docs are unchanged; its prior GO carries only over unchanged
 surface bytes. No third implementation round is planned.
+
+## Closure
+
+Accepted after retained [Code GO](GwzRemoteTransportPlacementA-ReviewCode-2.md),
+[State GO](GwzRemoteTransportPlacementA-ReviewState-2.md) and
+[Surface GO](GwzRemoteTransportPlacementA-ReviewSurface-2.md) on the exact tuple
+recorded in those reports. P2-3 is closed; prior findings remain closed. Two
+consolidated correction rounds complete. This accepts only Placement A.
