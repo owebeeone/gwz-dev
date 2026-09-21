@@ -1,25 +1,26 @@
 # Current program checkpoint
 
-## SSH N3 — aggregate backend attachment awaiting review, 2026-09-22
+## SSH N3 — aggregate backend attachment in remediation review, 2026-09-22
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN3.md) combines the
-remaining N3b/N3c work into one operator-requested batch and one retained dual
-Code/State gate. Shared backend endpoint ownership, per-request failure facts,
-all common SSH callback funnels and nested driver observations are implemented
-in an isolated full-core candidate. Default dependency selection/routing remains
-unchanged. The additive pool correlation accessor is included in this gate.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN3.md) combines remaining
+N3b/N3c into one operator-requested batch. Initial retained Code/State review found
+three P2 defects: failure-cached construction, lost service refusal, and an earlier
+key rejection overriding timeout. [Remediation1](GwzRemoteTransportSshN3-RemPlan.md)
+corrects them together with deterministic and native backend regressions.
 
-Executed: candidate backend/driver gate5 pass, ordinary backend gate8 pass,
-isolated SSH suite123 pass/1 ignored, transport suite94 pass/2 ignored. Ignored
-extended campaigns are not claimed. Raw failures and results are retained in the
-private SSH evidence run `2026-09-22-backend-n3`. Review pending; no acceptance or
-whole-core/platform qualification claimed. Platform, selected sources and
-production activation remain deferred to the agreed later batch. HTTPS and
-CLI-hosted placement remain later phases.
+Backend shared ownership, request-specific facts, all common callback funnels and
+nested driver integration are implemented in the isolated full-core candidate.
+The additive pool correlation API is included. Initial gates5/8/123/94 passed;
+corrected backend gate7 passes with constructor recovery and private-member denial.
+Final aggregate evidence and changed-range review remain pending; no acceptance or
+whole-core/platform qualification is claimed. Raw evidence is private campaign
+runs `2026-09-22-backend-n3` and `2026-09-22-backend-n3-rem1`.
 
-Next: review one committed tuple with the retained Code and State reviewers,
-consolidate findings, and file acceptance. This entry supersedes the separate
-N3b/N3c checkpoint sequencing below, without revising accepted N3a behavior.
+Next: same retained reviewers verify all three closures on the corrected committed
+tuple, then file acceptance. Default routing/dependencies, production activation,
+platform and selected-source qualification remain in the deferred later batch.
+HTTPS and CLI-hosted placement remain later phases. This entry supersedes separate
+N3b/N3c checkpoint sequencing below without revising N3a acceptance.
 
 ## SSH N3a — accepted local endpoint assembly, 2026-09-22
 
