@@ -1,14 +1,14 @@
 # Current program checkpoint
 
-## SSH N1 — implementation review pending,2026-09-21
+## SSH N1 — remediation 1 re-review pending, 2026-09-21
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN1.md). Native DNS/TCP/
-handshake/trust setup now composes with accepted A2/A3 in the isolated fixture.
-Full focused suite passes:88 executed tests. Two owner-discovered native parity
-defects corrected with red/green regressions before review.348 production lines/
-one file,652 test lines/one file; test ceiling refined650→660, with N2/N3 excluded.
-Retained Code/State aggregate review next. Production activation and the deferred
-platform/source batch remain unclaimed.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshN1.md). Retained Code
+reported two P2s; State GO with no findings. One merged correction separates
+socket failure from Control termination and preserves native CR trust bytes.
+Owner independently reproduced the CR defect while reviewers were blind. Tests
+also prove CRLF line bounds, socket-error retry and cancellation/expiry precedence.
+Full focused suite passes91 executions; production350/350 lines, tests764/770.
+Retained focused re-verdicts follow. No activation or platform/source batch claim.
 
 ## SSH production setup — design accepted; N1 implementation, 2026-09-21
 
