@@ -1,5 +1,22 @@
 # Current program checkpoint
 
+## Shared SSH worker and destination routing — implemented, review pending, 2026-09-21
+
+Operator authorized proceeding with endpoint wiring. Controlling scope:
+[Shared worker](../gwz-core/dev-docs/GwzRemoteTransportSshWorker.md). Replace the
+fixture-only worker with a bounded shared endpoint, isolate exchange failures,
+and bind validated SSH destinations plus per-request identity eligibility to
+the per-remote bridge. Native setup and production callback activation remain
+next: an executed fake-agent characterization shows session nonblocking mode and
+its network timeout do not bound libssh2's local-agent read. Candidate remedy is
+a separately qualified nonblocking signing callback, not an implicit blocking
+call inside the shared worker. No authentication or endpoint-support claim yet.
+Platform/source qualification remains deferred as one integrated batch.
+Local fixture: 35 tests pass, including native push/clone/push/fetch on one
+authenticated connection and isolation of a failed concurrent service.
+664 new production lines across three files plus five pump lines; formal
+aggregate dual review follows settlement.
+
 ## SSH local pool/per-remote integration accepted; qualification batched later — 2026-09-21
 
 Operator directs postponing the outstanding platform and selected-source checks
