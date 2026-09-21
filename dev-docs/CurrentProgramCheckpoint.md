@@ -6,7 +6,9 @@
 refines pre-lookup admission versus native proof, bounded immutable snapshots,
 nonrecycled tokens, worker admission Jobs, one deadline and retained endpoint
 cleanup spanning admissions and pool. G1 explicitly records new key-input bounds.
-Retained Consistency/Safety dual review on a settled document tuple is next;
+Safety P2-1 encrypted-KDF admission and owner first-fan-out token incompatibility
+are corrected in one design remediation before acceptance. Retained focused
+Consistency/Safety re-review on the revised tuple follows.
 P0–P2 block, at most two merged remediation rounds. No implementation activation.
 N2a authority/native bridge and N2b worker integration have separate bounded gates;
 N3 backend attachment and deferred platform/source qualification remain later.
