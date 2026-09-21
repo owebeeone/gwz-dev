@@ -1,5 +1,15 @@
 # Current program checkpoint
 
+## SSH agent A1 — implemented, review pending, 2026-09-21
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportSshAgentA1.md). Bounded
+agent codec/client, Unix socket adapter and globally capped helper supervisor
+are implemented behind the isolated fixture. 52 focused executions pass, including
+14 new A1 tests. 550 production lines/three files, 560 test lines/two files.
+Retained Code/State aggregate review follows settlement. Raw development failures
+and exact final fingerprints are in private ssh-integration/agent-a1 evidence.
+No native signing, pool/backend activation or platform/source-batch claim.
+
 ## Interruptible SSH agent helper — design accepted, 2026-09-21
 
 Operator selects helper threads with owned, cancellable agent I/O.
