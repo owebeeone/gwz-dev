@@ -1,6 +1,7 @@
 # Placement B — consolidated correction 1
 
-Status: correction implemented and focused gates passed; reviewer closure pending. Initial tuple root ba32b3af,
+Status: accepted; retained Code/State re-reviews close every finding at core
+`4f06384397a67d3dcae4856a93fd032499fda5dc`; Surface confirms GO on unchanged docs. Initial tuple root ba32b3af,
 core 6b9be8a2. Code two P2; State two P2; Surface GO. Code P2-1 and State
 P2-1 independently converge on the same fetch preflight root (three roots total).
 

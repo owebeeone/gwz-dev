@@ -1,21 +1,36 @@
 # Current program checkpoint
 
-## Phase 4 batch B — correction 1, pending re-review, 2026-09-22
+## Phase 4 batch B — accepted, 2026-09-22
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementB.md) now covers the
-core host facade, scoped backend, endpoint-owned identity/SSH/pooling and all N3
-network funnels. Candidate only: no carrier or production activation. Host23,
-backend7, SSH134/one ignored, preparation4, regeneration, guide compilation and
-default library check pass locally. Initial TDD red capture is incomplete and
-explicitly recorded in the private evidence. Next is one settled aggregate
-Code/State gate with retained reviewers and Surface closure on the guide.
-Platform/selected-source checks remain in the operator-deferred batch; supplied
-carrier qualification C, HTTPS and release remain separate. Four old N2b prompts
-are untouched. Initial Code/State reviews found three distinct P2 roots (fetch independently
-converged); Surface GO. The consolidated correction adds fetch-wide identity
-preflight, deadline-independent check completion and pre-arithmetic policy checks.
-Causal regressions pass; host25/SSH137 with one ignored/fetch9/backend7 and default
-check pass. Retained re-verdicts pending; no B acceptance claim.
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementB.md) accepted at
+root `93334058352828b1069b198d795c5860a395dc81`, core
+`4f06384397a67d3dcae4856a93fd032499fda5dc`, evidence
+`a2180f71f9f4f16ecc639eecd25125b980ea54f3`; all nine pins are recorded there.
+Retained [Code GO](GwzRemoteTransportPlacementB-ReviewCode-1.md),
+[State GO](GwzRemoteTransportPlacementB-ReviewState-1.md) and
+[Surface GO](GwzRemoteTransportPlacementB-ReviewSurface-1.md) close all findings.
+Annotation commits do not expand the reviewed implementation. Candidate only.
+
+Delivered: core host facade, request-scoped backend, endpoint-owned identity/SSH
+pooling, all N3 network funnels, bounded cancellation/cleanup and exact guide
+compilation. No physical carrier or production activation. Local gates: host25
+including50 concurrent streams, SSH137/one ignored, fetch9, backend7, preparation4,
+regeneration and default library check pass. No whole-core/platform pass claim.
+
+One aggregate gate plus one consolidated correction; initial Code twoP2 and State
+twoP2 share the fetch preflight root (three roots total). Correction adds full
+fetch identity preflight, logical check timeout independent of disposal and
+policy checks before deadline arithmetic. Causal regressions and retained focused
+rechecks pass. No new re-review findings or known released escaped defect.
+Initial B TDD red capture was incomplete; failures and final source hashes are
+preserved in private evidence. Final implementation3397 additions/65 deletions
+across36 files; tests/harness2628 additions across17, documentation separate.
+Wall time not captured. Archive verifier passes5004 records with no build caches.
+
+Next: Placement C qualification with a supplied message connection, without
+creating a new carrier/interface. Platform and selected-source checks remain in
+the operator-deferred single batch. HTTPS, activation, publication and release
+remain separate. Four old N2b prompt files are untouched.
 
 ## Phase 4 batch A — accepted, 2026-09-22
 
