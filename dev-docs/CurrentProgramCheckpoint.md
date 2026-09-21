@@ -1,11 +1,16 @@
 # Current program checkpoint
 
-## Phase 4 batch A — implementation drafted, 2026-09-22
+## Phase 4 batch A — correction 1 awaiting re-review, 2026-09-22
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementA.md) contains the
 shared v2 schema, opt-in missing-field compatibility, bounded request mux,
 application ports, typed terminal failure and isolated full-core candidate schema.
-The current object is DRAFT pending aggregate Code/State plus Surface review.
+Initial Code/State NO-GO found two distinct P2 roots: both independently found
+terminal retirement dropping queued results; Code also found typed BindRejected
+loss. Surface GO identified one P3 construction-example gap. One
+[merged correction](GwzRemoteTransportPlacementA-RemPlan.md) fixes these with
+causal regressions; retained re-verdicts are pending. Transport131 plus one README
+compile doctest pass on the correction, two extended campaigns remain ignored.
 Taut prerequisite pin is `bcf98b64d465fc54841121b6d1a2d46940f81a3c`.
 The prior design acceptance below remains the controlling interface authority.
 
