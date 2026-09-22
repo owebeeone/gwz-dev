@@ -1,5 +1,17 @@
 # Current program checkpoint
 
+## Explicit local alpha exception — installed, 2026-09-22
+
+Operator requested `/Users/owebeeone/.cargo/bin/gwz-alpha` with candidate transport.
+Installed `0.2.0-alpha.ssh-transport`, SHA256
+`b64a67eb19f57059d9e122da8a2607ab23553f9f9d3a618bca57aae20324858c`.
+Enables automatic local SSH per-remote streams/pooling using the patched Git stack.
+HTTPS remains native; host/carried frontend activation is not included.
+Disposable SSH clone/fetch and installed help/build-info pass. A one-line CLI
+TransportOptions default initializer fixes compilation against candidate fields.
+Private build/manifests/logs: transport-qualification/runs/2026-09-22-alpha-ssh.
+Normal gwz is unchanged. This exception does not resume Q6 review or wider rollout.
+
 ## Q6 platform/source and local performance — paused by operator, 2026-09-22
 
 [Batch scope, results and limits](../gwz-core/dev-docs/GwzRemoteTransportQualification.md).
