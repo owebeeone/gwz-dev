@@ -1,5 +1,14 @@
 # Current program checkpoint
 
+## Placement C — proof implemented, pending review, 2026-09-22
+
+[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementC.md): existing
+request/response attachment embedding at the CLI direct-call message boundary
+and through the actual gwz-py codec in the same Rust process. No frontend activation
+or physical wire proof. Host33 and Python preparation/compatibility13 pass, with
+regeneration/default build/formatting checks. Next: one retained Code/State
+aggregate gate. The operator scope below controls; iroh stays outside this cycle.
+
 ## Placement C scope — operator clarification, 2026-09-22
 
 Next gate: prove transport envelopes embedded in the existing Taut messages for
