@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## HTTPS detailed design — correction 1 pending review, 2026-09-22
+## HTTPS detailed design — correction 2 pending review, 2026-09-22
 
 [HTTPS endpoint design](../gwz-core/dev-docs/GwzRemoteTransportHttpsDesign.md)
 initial Consistency/Safety NO-GO is addressed by
@@ -12,8 +12,10 @@ roots and one P3 are recorded, not self-closed.
 
 The correction also makes GET Opened identify its final connection, admits truthful
 HTTPS per-request offered facts on TLS reuse, and requires shared aggregate pool
-capacity. Next: retained Consistency/Safety re-verdicts plus retained Surface on
-observation meaning. No implementation or passing-test claim. Platform and
+capacity. Correction1 Safety/Surface are GO and original Consistency findings are closed.
+One new Consistency P2-4 used Failed before Opened; correction2 uses existing
+OpenFailed and adds the H1 real-mux oracle. Next: focused retained closure and
+confirmation of unchanged prior verdicts. No implementation or passing-test claim. Platform and
 selected-source qualification remain deferred together; wire/iroh outside cycle.
 H1/H2 candidate implementation follows design acceptance; activation stays separate.
 

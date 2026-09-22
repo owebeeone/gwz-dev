@@ -33,3 +33,18 @@ finding. This is the first consolidated correction. Documentary closure now mean
 implementable, coherent requirements; all listed behavioral tests remain H1/H2
 obligations, not tests claimed to have run. Platform/selected-source checks remain
 operator-deferred together; wire/iroh, production activation and release stay out.
+
+## Correction 2 — retained Consistency P2-4
+
+All initial findings are closed by their raising reviewers at correction1.
+Consistency identified one newly introduced message-lifecycle defect: the delayed
+GET Opened path named Failed during Opening. Replace it with existing v2 OpenFailed
+and Failure.facts. This is a bounded protocol-name/lifecycle correction, not a
+new architecture or interface. H1's added oracle sends401,403/404,5xx, malformed
+headers, trust/loss and exhausted-budget cases through the real mux, accepting
+OpenFailed with available facts and no Opened/Stream transition. Typed first
+receipt must remain usable for the explicit authentication transition.
+
+This is the second consolidated correction. Consistency rechecks its original
+counterexample; Safety and Surface only confirm their prior GO remains applicable
+at the revised tuple (public guide bytes unchanged). No implementation tests run.
