@@ -1,18 +1,34 @@
 # Current program checkpoint
 
-## HTTPS H2 — correction 2 in progress, 2026-09-22
+## HTTPS H2 — accepted private host/command integration, 2026-09-22
 
-[Scope and live limitations](../gwz-core/dev-docs/GwzRemoteTransportHttpsH2.md).
-H1 remains accepted. Correction 1 closed all three initial blocking roots:
-[Code re-review](GwzRemoteTransportHttpsH2-ReviewCode-1.md) confirms both prior
-findings closed; [State GO](GwzRemoteTransportHttpsH2-ReviewState-1.md) closes its
-two. Code found one new architectural root: route-gate wait replenishes allocation
-time. [Correction 2](GwzRemoteTransportHttpsH2-RemPlan-2.md) charges it to the
-existing deadline and adds a short-budget regression. No H2 acceptance or activation.
-Correction-2 host52, endpoint69, observation3, binding2, default core and scoped
-format/conditional gates pass; the runtime red and full per-command fingerprints
-are retained in private H2 correction-2 evidence. Retained Code/State review of correction 2 follows
-focused gates and a settled tuple. Platform and selected-source checks stay deferred.
+[Scope, evidence and exact nine-repository tuple](../gwz-core/dev-docs/GwzRemoteTransportHttpsH2.md).
+Accepted at root `2380a234bf620bacf73a1924f4ac23000385f758`, core
+`c92abc4110fc7c1ef89600118284724c942f8985`, evidence
+`3302b5d03f56590a6d521b1b52db302861775e15` after retained
+[Code GO](GwzRemoteTransportHttpsH2-ReviewCode-2.md) and
+[State GO](GwzRemoteTransportHttpsH2-ReviewState-2.md).
+Annotation commits do not expand the accepted implementation.
+
+Accepted: H1 HTTPS endpoint through local and carried host paths, all network
+command funnels, Rust/Python same-process messages, shared SSH+HTTPS physical
+capacity, authentication observations, refusal classification and cleanup ownership.
+Placement C State P3-1 is closed by cleanup snapshots and gated physical disposal.
+Host52, endpoint69, observation3, binding2, default core and scoped format/conditional
+checks pass. Raw evidence, runtime reds and exact fingerprints are private.
+No open H2 findings; no public activation, production or release claim.
+
+One aggregate gate, two corrections. Initial Code2P2/State2P2 converged on retry
+correlation (three unique blocking roots); correction-1 Code found one new
+architectural allocation-budget root, verified closed in correction 2. Draft-stage
+corrections and TDD/evidence limits are retained in H2. No known released escape.
+Production-bearing files including inline tests: +1541/-130, 12 files; separate
+test/fixture files: +2571/-24, 12 files. End-to-end wall time was not captured.
+
+Next: Phase 6 local aggregate measurement/tuning and rollout readiness. Platform
+and selected-source checks remain deferred together. Public construction and
+production activation, physical wire/iroh, real accounts and release stay separate.
+Four old N2b prompts remain untouched.
 
 ## HTTPS H1 — accepted private endpoint/RPC candidate, 2026-09-22
 
@@ -91,7 +107,7 @@ build and scoped formatting pass. Both reviewers reran the eight embedding cases
 No full frontend activation, physical wire, platform or whole-core passing claim.
 
 One aggregate gate, zero corrections; Code zero findings, State one settled-review
-P3. **Open State P3-1:** assert cleanup accounting and retained-work retirement
+P3. **Historical State P3-1 (closed by H2 above):** assert cleanup accounting and retained-work retirement
 before citing this fixture as physical-cleanup evidence at activation. Current
 proof establishes waiter release and teardown return. No known released escaped
 defect. Captured TDD red is an implementation-stage unimplemented-boundary failure;

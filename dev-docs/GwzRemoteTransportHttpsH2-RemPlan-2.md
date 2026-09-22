@@ -1,6 +1,7 @@
 # HTTPS H2 — consolidated correction 2
 
-Status: in progress; Code P2-3 remains open until the raising reviewer verifies closure.
+Status: closed by retained Code/State GO in ReviewCode-2 and ReviewState-2 at
+core `c92abc4110fc7c1ef89600118284724c942f8985`; exact tuple in H2 acceptance record.
 
 Correction 1 closed all three original blocking roots (four findings). State GO
 and Code NO-GO are filed verbatim in ReviewState-1 and ReviewCode-1. Code found
