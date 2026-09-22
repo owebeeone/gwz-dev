@@ -1,23 +1,31 @@
 # Current program checkpoint
 
-## HTTPS H1 — correction 2 preparing final re-review, 2026-09-22
+## HTTPS H1 — accepted private endpoint/RPC candidate, 2026-09-22
 
-[Implementation and replay](../gwz-core/dev-docs/GwzRemoteTransportHttpsH1.md).
-Initial aggregate Code/State NO-GO found six distinct P2 roots (including blind
-convergence on operation-route retirement) and two bounded P3s. One consolidated
-[correction](GwzRemoteTransportHttpsH1-RemPlan.md) implements scoped helper/shutdown
-ownership, dependent route lifetimes, independent timeout domains, actual mux
-opening/stream composition and complete typed failure facts.
+[Scope, evidence and exact nine-repository tuple](../gwz-core/dev-docs/GwzRemoteTransportHttpsH1.md).
+Accepted at root `63ef26308979b6ce2e2925d71a96f42afcde2645`, core
+`e29e799ee65fb9794ac2fad7972d94707262b4cb`, evidence
+`fc1caa478c1fcd9539b2c061c51be17b64924d7c` after retained
+[Code GO](GwzRemoteTransportHttpsH1-ReviewCode-2.md) and
+[State GO](GwzRemoteTransportHttpsH1-ReviewState-2.md).
+Documentation annotations do not expand the accepted implementation.
 
-Correction1 received retained dual GO. Before acceptance, owner audit reproduced
-a child-reaper abort/arrival accounting gap. [Correction2](GwzRemoteTransportHttpsH1-RemPlan-2.md)
-adds guarded reap ownership and final snapshot ordering. Endpoint66, formatting
-and conditional-boundary checks pass; earlier default-core and transport gates
-remain applicable. Final acceptance awaits the retained reviewers.
-H2 still owns host/all-command embedding and shared SSH+HTTPS authority injection.
-Platform/selected-source checks remain deferred together; physical wire/iroh,
-public production construction and release stay separate. Four old N2b prompts
-remain untouched. See H1 report for process deviations and exact evidence.
+Accepted: HTTPS Gh-only authenticated endpoint, TLS/proxy ownership, physical
+pooling, per-remote native Git RPC, real mux opening/stream composition,
+independent timeout domains, scoped helper/operation cleanup and truthful facts.
+Endpoint66, default core check, formatting and conditional-boundary gates pass;
+full transport gate remains applicable at unchanged sources. No open H1 findings.
+
+One aggregate gate and two corrections. Initial Code3P2+2P3 and State4P2 shared
+one route-lifetime root (six distinct blocking roots). Owner audit after
+correction1 dual GO found a reaping/accounting continuation; both reviewers
+verified it closed in correction2 and classified it nonarchitectural. No released
+escape is claimed. Process/evidence deviations are retained in the H1 report.
+
+Next: H2 host/all-command Rust/Python embedding, shared SSH+HTTPS authority
+injection and Placement C cleanup-accounting P3. Platform/selected-source checks
+remain deferred together. Physical wire/iroh, production construction/activation
+and release remain separate. Four old N2b prompts remain untouched.
 
 
 ## HTTPS detailed design — accepted, 2026-09-22

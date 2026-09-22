@@ -16,3 +16,9 @@ No released defect is claimed: H1 remains a nonactivated candidate. No new
 protocol, public interface, dependency or platform work. Retained State reviewer
 checks this exact counterexample and changed-range interactions; retained Code
 reviewer confirms the prior verdict carries to the corrected tuple.
+
+Closure: retained Code and State correction2 reports both return GO at root
+`63ef26308979b6ce2e2925d71a96f42afcde2645`, core
+`e29e799ee65fb9794ac2fad7972d94707262b4cb`. Both classify Owner P2-1 as a bounded
+continuation of helper ownership/accounting, not a new architectural root.
+All H1 findings are reviewer-closed. Endpoint66 and scoped checks pass.
