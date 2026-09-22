@@ -1,6 +1,9 @@
 # HTTPS design — consolidated correction 1
 
-Status: implemented documentation correction, pending retained verdicts.
+Status: **closed after correction2**, retained Consistency/Safety/Surface GO at
+root bcdca800ab19fb767f6e7d2ab8107f12dab48810 / core
+2ea02835a15a9f56afdda43ccbcadec66b5b776e. Final -Review*-2 reports close all
+findings. Documentary closure only; implementation oracles remain H1/H2 work.
 Initial object: root c17b93b1e6197b1f40e2bb7f25ade8c478971c64 / core
 bcc2ebf6f6652d4f37429c5cbb6e68f987006b94. Initial reports are filed verbatim.
 No code/tests/dependencies changed. The operator requested retained reviewers.

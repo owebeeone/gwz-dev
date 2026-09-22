@@ -1,23 +1,36 @@
 # Current program checkpoint
 
-## HTTPS detailed design — correction 2 pending review, 2026-09-22
+## HTTPS detailed design — accepted, 2026-09-22
 
-[HTTPS endpoint design](../gwz-core/dev-docs/GwzRemoteTransportHttpsDesign.md)
-initial Consistency/Safety NO-GO is addressed by
-[one correction](GwzRemoteTransportHttpsDesign-RemPlan.md): explicit controlling
-amendments for discovery authentication retry, redirect query grammar and HTTPS
-repository refusal; write-once redirect routes; complete HTTP status policy.
-Both axes independently found the no-replay contradiction. Four distinct blocking
-roots and one P3 are recorded, not self-closed.
+[Design, exact nine-repository tuple and implementation gates](../gwz-core/dev-docs/GwzRemoteTransportHttpsDesign.md)
+accepted at root `bcdca800ab19fb767f6e7d2ab8107f12dab48810`, core
+`2ea02835a15a9f56afdda43ccbcadec66b5b776e` after retained
+[Consistency GO](GwzRemoteTransportHttpsDesign-ReviewConsistency-2.md),
+[Safety GO](GwzRemoteTransportHttpsDesign-ReviewSafety-2.md), and
+[Surface GO](GwzRemoteTransportHttpsDesign-ReviewSurface-2.md). No open design
+findings. Annotation commits do not expand the reviewed design.
 
-The correction also makes GET Opened identify its final connection, admits truthful
-HTTPS per-request offered facts on TLS reuse, and requires shared aggregate pool
-capacity. Correction1 Safety/Surface are GO and original Consistency findings are closed.
-One new Consistency P2-4 used Failed before Opened; correction2 uses existing
-OpenFailed and adds the H1 real-mux oracle. Next: focused retained closure and
-confirmation of unchanged prior verdicts. No implementation or passing-test claim. Platform and
-selected-source qualification remain deferred together; wire/iroh outside cycle.
-H1/H2 candidate implementation follows design acceptance; activation stays separate.
+Accepted: HTTP/1 per-connection adapter using existing gwz-transport streams/pool;
+endpoint-local gh/TLS/proxy ownership; body completion and early-failure lifecycle;
+bounded discovery auth/redirect behavior, immutable operation routes, precise
+HTTP status/refusal rules and truthful request-scoped HTTPS authentication facts.
+No new fields, production activation, public constructors or wire implementation.
+
+One initial dual gate and two consolidated corrections, with retained Surface
+added for exposed observation semantics. Initial Consistency3P2 and Safety2P2
+shared the no-replay root (four distinct blocking roots), plus Safety1P3 status
+grammar. Correction1 introduced one ConsistencyP2 pre-open message defect;
+correction2 closed it. All findings verified closed by raising reviewers.
+Owner correction clarified final connection identity and shared pool capacity.
+No known released escaped defect; production/test code LOC0. Documentation links,
+fences and whitespace checks pass; no implementation test claim, TDD starts H1.
+Wall time not captured.
+
+Next: H1 complete HTTPS endpoint/RPC candidate plus local fixtures, then H2
+host/all-command integration and Placement C cleanup-accounting P3 closure.
+Use substantial aggregate review batches. Platform and selected-source checks
+remain one operator-deferred batch. Production activation/public constructors,
+physical wire/iroh and release stay separate. Four old N2b prompts untouched.
 
 ## Placement C — accepted in-process proof, 2026-09-22
 
