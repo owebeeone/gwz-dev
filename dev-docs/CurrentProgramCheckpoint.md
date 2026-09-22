@@ -1,15 +1,21 @@
 # Current program checkpoint
 
-## HTTPS detailed design — pending review, 2026-09-22
+## HTTPS detailed design — correction 1 pending review, 2026-09-22
 
 [HTTPS endpoint design](../gwz-core/dev-docs/GwzRemoteTransportHttpsDesign.md)
-settles the candidate HTTP client/physical pool boundary, gh-only credential
-lookup, anonymous discovery, RPC body completion, redirects, bounded workers,
-observations and H1/H2 implementation gates. Existing Taut schema/stream API
-is reused. Next: retained Consistency/Safety document gate at the committed tuple.
-No production activation or new public constructor/settings freeze; platform and
-selected-source qualification remain deferred together, wire/iroh outside cycle.
+initial Consistency/Safety NO-GO is addressed by
+[one correction](GwzRemoteTransportHttpsDesign-RemPlan.md): explicit controlling
+amendments for discovery authentication retry, redirect query grammar and HTTPS
+repository refusal; write-once redirect routes; complete HTTP status policy.
+Both axes independently found the no-replay contradiction. Four distinct blocking
+roots and one P3 are recorded, not self-closed.
 
+The correction also makes GET Opened identify its final connection, admits truthful
+HTTPS per-request offered facts on TLS reuse, and requires shared aggregate pool
+capacity. Next: retained Consistency/Safety re-verdicts plus retained Surface on
+observation meaning. No implementation or passing-test claim. Platform and
+selected-source qualification remain deferred together; wire/iroh outside cycle.
+H1/H2 candidate implementation follows design acceptance; activation stays separate.
 
 ## Placement C — accepted in-process proof, 2026-09-22
 
