@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## HTTPS H1 — correction 1 preparing focused re-review, 2026-09-22
+## HTTPS H1 — correction 2 preparing final re-review, 2026-09-22
 
 [Implementation and replay](../gwz-core/dev-docs/GwzRemoteTransportHttpsH1.md).
 Initial aggregate Code/State NO-GO found six distinct P2 roots (including blind
@@ -9,9 +9,11 @@ convergence on operation-route retirement) and two bounded P3s. One consolidated
 ownership, dependent route lifetimes, independent timeout domains, actual mux
 opening/stream composition and complete typed failure facts.
 
-Corrected local gate: endpoint64, default core check, formatting and conditional
-boundary inspection pass. Full transport gate remains valid at unchanged sources.
-Acceptance awaits retained reviewers; no finding is implementer-closed.
+Correction1 received retained dual GO. Before acceptance, owner audit reproduced
+a child-reaper abort/arrival accounting gap. [Correction2](GwzRemoteTransportHttpsH1-RemPlan-2.md)
+adds guarded reap ownership and final snapshot ordering. Endpoint66, formatting
+and conditional-boundary checks pass; earlier default-core and transport gates
+remain applicable. Final acceptance awaits the retained reviewers.
 H2 still owns host/all-command embedding and shared SSH+HTTPS authority injection.
 Platform/selected-source checks remain deferred together; physical wire/iroh,
 public production construction and release stay separate. Four old N2b prompts
