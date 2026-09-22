@@ -1,16 +1,18 @@
 # Current program checkpoint
 
-## HTTPS H2 — correction 1 in progress, 2026-09-22
+## HTTPS H2 — correction 2 in progress, 2026-09-22
 
 [Scope and live limitations](../gwz-core/dev-docs/GwzRemoteTransportHttpsH2.md).
-H1 remains accepted. H2 initial Code2P2/State2P2 NO-GO converged on retry
-correlation; three blocking roots total including cancellation handoff and
-pre-send effect classification. [Consolidated correction](GwzRemoteTransportHttpsH2-RemPlan-1.md)
-is in progress, with runtime reds captured for concurrent retry and queued Opened.
-Correction-1 host50, endpoint69, observation3, binding2, default core and scoped
-format/conditional gates pass. Next: settled retained changed-range re-verdicts. No H2 acceptance or activation.
-Platform and selected-source checks remain deferred together.
-
+H1 remains accepted. Correction 1 closed all three initial blocking roots:
+[Code re-review](GwzRemoteTransportHttpsH2-ReviewCode-1.md) confirms both prior
+findings closed; [State GO](GwzRemoteTransportHttpsH2-ReviewState-1.md) closes its
+two. Code found one new architectural root: route-gate wait replenishes allocation
+time. [Correction 2](GwzRemoteTransportHttpsH2-RemPlan-2.md) charges it to the
+existing deadline and adds a short-budget regression. No H2 acceptance or activation.
+Correction-2 host52, endpoint69, observation3, binding2, default core and scoped
+format/conditional gates pass; the runtime red and full per-command fingerprints
+are retained in private H2 correction-2 evidence. Retained Code/State review of correction 2 follows
+focused gates and a settled tuple. Platform and selected-source checks stay deferred.
 
 ## HTTPS H1 — accepted private endpoint/RPC candidate, 2026-09-22
 
