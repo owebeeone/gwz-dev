@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## HTTPS detailed design — pending review, 2026-09-22
+
+[HTTPS endpoint design](../gwz-core/dev-docs/GwzRemoteTransportHttpsDesign.md)
+settles the candidate HTTP client/physical pool boundary, gh-only credential
+lookup, anonymous discovery, RPC body completion, redirects, bounded workers,
+observations and H1/H2 implementation gates. Existing Taut schema/stream API
+is reused. Next: retained Consistency/Safety document gate at the committed tuple.
+No production activation or new public constructor/settings freeze; platform and
+selected-source qualification remain deferred together, wire/iroh outside cycle.
+
+
 ## Placement C — accepted in-process proof, 2026-09-22
 
 [Scope/results and exact nine-repository tuple](../gwz-core/dev-docs/GwzRemoteTransportPlacementC.md)
