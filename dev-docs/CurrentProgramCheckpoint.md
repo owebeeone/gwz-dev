@@ -1,6 +1,6 @@
 # Current program checkpoint
 
-## Q6 platform/source and local performance — review pending, 2026-09-22
+## Q6 platform/source and local performance — paused by operator, 2026-09-22
 
 [Batch scope, results and limits](../gwz-core/dev-docs/GwzRemoteTransportQualification.md).
 Portable transport passes on macOS ARM64, Linux x86-64 and Windows x86-64.
@@ -11,11 +11,17 @@ large repeated HTTPS clones now survive the five-second cleanup boundary.
 Qualification found one post-acceptance P2: repeated logical mux retirement closed
 healthy shared sessions. Monotonic retirement fix has a deterministic runtime-red
 regression and corrected green suites. Q5 State P3-1 diagnostic-retention correction
-also passes locally/natively Windows. Retained Code/State review follows settlement.
+also passes locally/natively Windows. Retained Code/State review has NOT been dispatched. Operator requested a pause
+to conserve weekly quota. Resume with the bounded Q6 review, not another test sweep.
 No released escape, activation or release. Full Phase6 remains open: Windows
 integrated implementation, unavailable ARM64 Linux/Intel Mac rows, distribution,
 both-placement aggregate operations, coalescing/default tuning and sustained memory.
 This current section supersedes older platform/source deferrals below.
+
+Resume guide: [release readiness and exact handoff](GwzRemoteTransportReleaseReadiness.md).
+Core correction/source-results checkpoint: `a2a7878d` (full tuple in the guide).
+Raw evidence has been preserved in the private Q6 campaign. No tests remain running.
+Four old untracked N2b prompt files remain untouched.
 
 ## HTTPS H2 — accepted private host/command integration, 2026-09-22
 
