@@ -1,13 +1,34 @@
 # Current program checkpoint
 
-## Placement C — proof implemented, pending review, 2026-09-22
+## Placement C — accepted in-process proof, 2026-09-22
 
-[Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementC.md): existing
-request/response attachment embedding at the CLI direct-call message boundary
-and through the actual gwz-py codec in the same Rust process. No frontend activation
-or physical wire proof. Host33 and Python preparation/compatibility13 pass, with
-regeneration/default build/formatting checks. Next: one retained Code/State
-aggregate gate. The operator scope below controls; iroh stays outside this cycle.
+[Scope/results and exact nine-repository tuple](../gwz-core/dev-docs/GwzRemoteTransportPlacementC.md)
+accepted at root `f3ad29ae5aa55ebd4e558f3f11a078e6b837196e`, core
+`c5dd307142e6958160efabf36a8521b5f104c157`, evidence
+`d096a9dcf0d43e79ea32bced5b802bf8a877ce1d` after retained
+[Code GO](GwzRemoteTransportPlacementC-ReviewCode.md) and
+[State GO](GwzRemoteTransportPlacementC-ReviewState.md). Annotation commits do
+not expand the reviewed implementation. No blocking findings.
+
+Existing request/response attachments carry live SSH exchanges at the CLI's
+current typed direct-call boundary and through the actual gwz-py codec embedded
+in the Rust process. Host33 and Python13 pass; regeneration, default library
+build and scoped formatting pass. Both reviewers reran the eight embedding cases.
+No full frontend activation, physical wire, platform or whole-core passing claim.
+
+One aggregate gate, zero corrections; Code zero findings, State one settled-review
+P3. **Open State P3-1:** assert cleanup accounting and retained-work retirement
+before citing this fixture as physical-cleanup evidence at activation. Current
+proof establishes waiter release and teardown return. No known released escaped
+defect. Captured TDD red is an implementation-stage unimplemented-boundary failure;
+compiler-attempt source hashes were not all captured. Test/harness581 additions/2
+deletions across7 files; docs94 additions across2; production implementation0.
+Wall time not captured. Archive verification passed5004 records, no build caches.
+
+Next: Phase5 HTTPS adapter/authentication design and interface review. Keep
+platform and selected-source checks in their operator-deferred single batch.
+Frontend/production activation and release remain separate. Physical wire and
+iroh stay outside this cycle. Four old N2b prompt files remain untouched.
 
 ## Placement C scope — operator clarification, 2026-09-22
 
