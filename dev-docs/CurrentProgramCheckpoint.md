@@ -1,5 +1,22 @@
 # Current program checkpoint
 
+## HTTPS H1 — implementation checkpoint preparing aggregate review, 2026-09-22
+
+[Implementation and replay](../gwz-core/dev-docs/GwzRemoteTransportHttpsH1.md).
+Candidate HTTPS endpoint/RPC, endpoint-local gh/TLS/proxy ownership, physical
+pooling and shared scheme reservation wrapper, plus local smart-Git and fault
+fixtures are implemented. Existing transport fields remain unchanged; mux binds
+reused Gh credential offers to HTTPS/Gh authority. No production activation.
+
+Local gates: endpoint45, full transport suite, default core library check, scoped
+formatting and private archive verification pass. Review tier: aggregate retained
+Code/State, same settled tuple; acceptance pending.
+H2 still owns host/all-command embedding and one injected SSH+HTTPS authority.
+Platform/selected-source checks remain deferred together; physical wire/iroh,
+public production construction and release stay separate. Four old N2b prompts
+remain untouched. See H1 report for process deviations and exact evidence.
+
+
 ## HTTPS detailed design — accepted, 2026-09-22
 
 [Design, exact nine-repository tuple and implementation gates](../gwz-core/dev-docs/GwzRemoteTransportHttpsDesign.md)
