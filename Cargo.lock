@@ -421,6 +421,7 @@ dependencies = [
 name = "gwz"
 version = "0.2.0-dev"
 dependencies = [
+ "cfg-if",
  "clap",
  "console",
  "git2",

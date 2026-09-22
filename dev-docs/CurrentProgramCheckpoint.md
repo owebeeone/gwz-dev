@@ -1,5 +1,13 @@
 # Current program checkpoint
 
+## Local HTTPS alpha — review pending, 2026-09-22
+
+Operator authorized HTTPS activation for the local alpha only.
+[Scope/configuration and focused tests](../gwz-core/dev-docs/GwzRemoteTransportAlpha.md).
+Actual-binary HTTPS clone/fetch/push, gh failure/proxy refusal and SSH regression
+pass. Retained bounded Code/State review precedes installation. Broader Q6 remains
+paused; the SSH-only alpha entry below is historical once replacement is installed.
+
 ## Explicit local alpha exception — installed, 2026-09-22
 
 Operator requested `/Users/owebeeone/.cargo/bin/gwz-alpha` with candidate transport.
