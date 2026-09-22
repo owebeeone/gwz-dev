@@ -108,8 +108,12 @@ members:
   source_id: src_gwz_transport
   active: true
   desired:
-    local_only: true
-  remotes: []
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/gwz-transport.git
+    fetch: true
+    push: true
 - id: mem_git2_rs
   path: git2-rs
   type: git
@@ -140,5 +144,9 @@ members:
   source_id: src_gwz_git
   active: true
   desired:
-    local_only: true
-  remotes: []
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/gwz-git.git
+    fetch: true
+    push: true
