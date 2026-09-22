@@ -1,5 +1,15 @@
 # Current program checkpoint
 
+## Alpha SSH setup-timeout plan — accepted as text, 2026-09-22
+
+[Plan](../gwz-core/dev-docs/GwzRemoteTransportAlphaTimeoutPlan.md). Draft review,
+dual Consistency and Safety. Round 1 NO-GO on plan SHA-256
+`773639e1b545eeba776c3faeac1b0785aef50ee33faa0ba1e984b5ec214cac4a`; both axes
+converged on a scripted stall test that could pass while live setup stayed one
+cumulative budget. One remediation. Re-verdicts GO on
+`cfdf028fb18557960da18a4682cb10f3e9e638ff197c4784efb76ac9a526984b`. Accepts the
+plan text only. No timeout implementation, alpha rebuild, or Q6 resume.
+
 ## Alpha GitHub compatibility correction — installed, 2026-09-22
 
 [Fix and exact acceptance](../gwz-core/dev-docs/GwzRemoteTransportAlphaGitHubFix.md).
