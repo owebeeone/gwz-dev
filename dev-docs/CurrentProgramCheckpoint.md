@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## HTTPS H2 — implementation in progress, 2026-09-22
+
+[Scope and live limitations](../gwz-core/dev-docs/GwzRemoteTransportHttpsH2.md).
+H1 remains accepted. H2 implementation and retained cleanup coverage are ready for aggregate review;
+no new acceptance or activation claim. Host45, endpoint68, observation3, binding2,
+identity6, default core check and scoped format/conditional gates pass. Initial
+compiler red and intermediate failures are archived. A smaller debug profile
+avoided deleting any preceding build cache. Next: settled retained Code/State gate.
+Platform and selected-source checks remain deferred together.
+
+
 ## HTTPS H1 — accepted private endpoint/RPC candidate, 2026-09-22
 
 [Scope, evidence and exact nine-repository tuple](../gwz-core/dev-docs/GwzRemoteTransportHttpsH1.md).
