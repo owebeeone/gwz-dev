@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## Placement C scope — operator clarification, 2026-09-22
+
+Next gate: prove transport envelopes embedded in the existing Taut messages for
+both CLI/core and gwz-py/core **within the same process**. Preserve ordinary calls
+and existing request IDs; verify asynchronous two-way progress, backpressure,
+cancellation and logical closure through both consumer bindings. The wire story
+needs a plausible documented mapping only. Physical wire, separate-process and
+iroh implementation/qualification are outside this development cycle. This
+operator direction supersedes the earlier supplied-carrier prerequisite; it does
+not claim C implemented or revise the accepted A/B code tuple. See the
+[placement design clarification](../gwz-core/dev-docs/GwzRemoteTransportPlacementDesign.md#operator-scope-clarification--2026-09-22).
+Platform/selected-source checks remain deferred together, with production
+activation, HTTPS and release still separate.
+
+
 ## Phase 4 batch B — accepted, 2026-09-22
 
 [Scope/results](../gwz-core/dev-docs/GwzRemoteTransportPlacementB.md) accepted at
@@ -27,8 +42,8 @@ preserved in private evidence. Final implementation3397 additions/65 deletions
 across36 files; tests/harness2628 additions across17, documentation separate.
 Wall time not captured. Archive verifier passes5004 records with no build caches.
 
-Next: Placement C qualification with a supplied message connection, without
-creating a new carrier/interface. Platform and selected-source checks remain in
+Next: Placement C in-process message embedding for CLI/core and gwz-py/core,
+under the operator clarification above; future wire plausibility only. Platform and selected-source checks remain in
 the operator-deferred single batch. HTTPS, activation, publication and release
 remain separate. Four old N2b prompt files are untouched.
 
