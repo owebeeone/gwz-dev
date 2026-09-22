@@ -1,17 +1,18 @@
 # Current program checkpoint
 
-## HTTPS H1 — implementation checkpoint preparing aggregate review, 2026-09-22
+## HTTPS H1 — correction 1 preparing focused re-review, 2026-09-22
 
 [Implementation and replay](../gwz-core/dev-docs/GwzRemoteTransportHttpsH1.md).
-Candidate HTTPS endpoint/RPC, endpoint-local gh/TLS/proxy ownership, physical
-pooling and shared scheme reservation wrapper, plus local smart-Git and fault
-fixtures are implemented. Existing transport fields remain unchanged; mux binds
-reused Gh credential offers to HTTPS/Gh authority. No production activation.
+Initial aggregate Code/State NO-GO found six distinct P2 roots (including blind
+convergence on operation-route retirement) and two bounded P3s. One consolidated
+[correction](GwzRemoteTransportHttpsH1-RemPlan.md) implements scoped helper/shutdown
+ownership, dependent route lifetimes, independent timeout domains, actual mux
+opening/stream composition and complete typed failure facts.
 
-Local gates: endpoint45, full transport suite, default core library check, scoped
-formatting and private archive verification pass. Review tier: aggregate retained
-Code/State, same settled tuple; acceptance pending.
-H2 still owns host/all-command embedding and one injected SSH+HTTPS authority.
+Corrected local gate: endpoint64, default core check, formatting and conditional
+boundary inspection pass. Full transport gate remains valid at unchanged sources.
+Acceptance awaits retained reviewers; no finding is implementer-closed.
+H2 still owns host/all-command embedding and shared SSH+HTTPS authority injection.
 Platform/selected-source checks remain deferred together; physical wire/iroh,
 public production construction and release stay separate. Four old N2b prompts
 remain untouched. See H1 report for process deviations and exact evidence.
