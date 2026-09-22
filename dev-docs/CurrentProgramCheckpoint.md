@@ -1,5 +1,14 @@
 # Current program checkpoint
 
+## Alpha GitHub compatibility correction — installed, 2026-09-22
+
+[Fix and exact acceptance](../gwz-core/dev-docs/GwzRemoteTransportAlphaGitHubFix.md).
+Removed noncanonical SSH `--` separator, preserving quoting and rejecting
+option-shaped paths. Runtime-red regression, three channel tests and live GitHub
+fetch verified. Retained Code GO; corrected gwz-alpha installed. Private evidence
+access fails with both alpha and stable in the agent tool environment; this is
+not claimed resolved. No timeout reproduced. Broader Q6 remains paused.
+
 ## Local HTTPS alpha — accepted and installed, 2026-09-22
 
 Operator authorized HTTPS activation for the local alpha only.
