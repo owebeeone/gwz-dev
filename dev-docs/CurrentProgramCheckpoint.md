@@ -1,13 +1,14 @@
 # Current program checkpoint
 
-## HTTPS H2 — implementation in progress, 2026-09-22
+## HTTPS H2 — correction 1 in progress, 2026-09-22
 
 [Scope and live limitations](../gwz-core/dev-docs/GwzRemoteTransportHttpsH2.md).
-H1 remains accepted. H2 implementation and retained cleanup coverage are ready for aggregate review;
-no new acceptance or activation claim. Host45, endpoint68, observation3, binding2,
-identity6, default core check and scoped format/conditional gates pass. Initial
-compiler red and intermediate failures are archived. A smaller debug profile
-avoided deleting any preceding build cache. Next: settled retained Code/State gate.
+H1 remains accepted. H2 initial Code2P2/State2P2 NO-GO converged on retry
+correlation; three blocking roots total including cancellation handoff and
+pre-send effect classification. [Consolidated correction](GwzRemoteTransportHttpsH2-RemPlan-1.md)
+is in progress, with runtime reds captured for concurrent retry and queued Opened.
+Correction-1 host50, endpoint69, observation3, binding2, default core and scoped
+format/conditional gates pass. Next: settled retained changed-range re-verdicts. No H2 acceptance or activation.
 Platform and selected-source checks remain deferred together.
 
 
