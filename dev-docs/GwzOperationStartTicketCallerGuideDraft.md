@@ -28,7 +28,7 @@ A ticket is the **start identity**. Keep it even if a task awaiting it is cancel
 
 `ticket.state` reports `preparing`, `prepared`, `committing`, `accepted`, `refused`, `cancelled`, or `unknown_or_expired`. `accepted()` is repeatable: once acceptance is known, every call returns the same operation handle/ID, including after a waiter is cancelled. Before acceptance it waits for admission, then raises the original typed refusal/cancellation if one occurred. `result()` has the same admission behavior, then awaits the accepted operation's result. Neither method consumes the ticket. `ticket.wait_cleanup()` is a bounded, repeatable read for a cancelled/refused start even if no operation handle exists; an accepted ticket delegates to its handle. It returns local cleanup progress, not a claim about remote rollback. A stateless no-slot refusal is already locally complete because no permit or work existed.
 
-`await ticket.cancel()` works before and after acceptance and waits at most five seconds. Before a server permit is received, it prevents a commit from being sent; a late prepare reply cannot start work. During server admission, cancellation seals only that start's owner and may return pending local cleanup. After acceptance it cancels exactly that operation and returns its operation ID plus cleanup progress. If acceptance won the race, the original handle and terminal stay readable. Cancelled Python **waiters** do not cancel tickets; callers invoke `ticket.cancel()` when they want to stop work. A second healthy ticket is unaffected:
+`await ticket.cancel()` works before and after acceptance and waits at most five seconds. It always returns `StartCancelProgress` with `phase`, `operation_id: str | None`, and `cleanup: OperationCleanupProgress`. Before a server permit is received, it prevents a commit from being sent; a late prepare reply cannot start work, `operation_id` is `None`, and local cleanup is complete. During server admission, cancellation seals only that start's owner and may return pending local cleanup. After acceptance it cancels exactly that operation and returns its ID in `operation_id`; the `cleanup` field can still be pending. If acceptance won the race, the original handle and terminal stay readable. Cancelled Python **waiters** do not cancel tickets; callers invoke `ticket.cancel()` when they want to stop work. A second healthy ticket is unaffected:
 
 ```python
 first = client.start_fetch(request_id="fetch-a")
@@ -37,14 +37,21 @@ second = client.start_fetch(request_id="fetch-b")
 first_handle = await first.accepted()
 second_handle = await second.accepted()
 progress = await first.cancel()       # only first; bounded wait
-second_response = await second.result()
-print(second_response.repos)
-await second_handle.release()          # peer is free even if first never stops
+print(progress.operation_id, progress.cleanup.local_completion_confirmed)
+try:
+    second_response = await second.result()
+    print(second_response.repos)
+except GwzOperationError as exc:
+    print(exc.code)                    # still retire this settled peer
+finally:
+    await second_handle.terminal()
+    await second.release()
 
-progress = await first_handle.wait_cleanup()  # another bounded observation
-if progress.local_completion_confirmed:
-    first_outcome = await first_handle.terminal()
-    await first_handle.release()
+cleanup = progress.cleanup
+while not cleanup.local_completion_confirmed:
+    cleanup = await first.wait_cleanup()  # each observation waits at most 5 s
+await first_handle.terminal()
+await first.release()
 ```
 
 Cancelling a wait cannot lose the start identity, including when request IDs are omitted or equal across Clients:
@@ -59,27 +66,68 @@ try:
 except asyncio.CancelledError:
     pass
 progress = await a.cancel()  # never selects b by request_id
-b_response = await b.result()
+recovered = client.ticket(a.start_seq)  # retain identity before its TTL
 b_handle = await b.accepted()
-await b_handle.release()
+try:
+    b_response = await b.result()
+except GwzOperationError as exc:
+    print(exc.code)
+finally:
+    await b_handle.terminal()
+    await b.release()
 
 # The cancelled waiter did not consume a's identity or acceptance.
-recovered = client.ticket(a.start_seq)
 try:
     a_handle = await recovered.accepted()  # same handle if acceptance won
 except GwzOperationError as exc:
     if exc.code != "OperationCancelled":
         raise  # an unknown/expired start needs inspection, not this path
-    await recovered.wait_cleanup()          # pre-accept refusal/cancel
+    cleanup = await recovered.wait_cleanup()
+    while not cleanup.local_completion_confirmed:
+        cleanup = await recovered.wait_cleanup()
     await recovered.release()
 else:
     cleanup = await a_handle.wait_cleanup()
-    if cleanup.local_completion_confirmed:
-        await a_handle.terminal()
-        await a_handle.release()
+    while not cleanup.local_completion_confirmed:
+        cleanup = await a_handle.wait_cleanup()
+    await a_handle.terminal()
+    await recovered.release()
 ```
 
+These loops may remain pending if native work never stops. You may stop polling, but keep the Client and ticket reachable; their charged owner remains until real cleanup. A five-second observation alone is never a reason to release a live handler. In either example, once a handle's terminal is available, release in a `finally` path even if its `result()` raised.
+
 The Client sends a no-effect prepare first and sends commit **only after** receiving a server permit. Prepare reserves one bounded result/status slot for all later outcomes. If no slot exists, it returns a stateless `RetainedCapacityFull`: even if that reply is lost, this Client has not received a permit and cannot have sent commit, so retrying prepare is safe. If a prepare reply is lost, the Client retries the same sequence without sending commit. An old prepared permit can expire before that retry; the ticket then reports expiry, but the Client knows it sent no commit and may offer a **new** ticket after an explicit caller retry. If a commit reply is lost, the Client uses its known permit and owner-checked server status. It never starts Git work twice. A prepared but never committed permit expires after 60 seconds. Once commit has been sent, an unknown/expired server status is **not** proof of no effects and the Client never automatically resubmits that action. `accepted()` and `result()` raise `GwzStartUnknownError` (code `StartUnknownOrExpired`, numeric 83) with `start_seq`, `commit_sent`, `effects.local`, `effects.remote`, optional known `accepted_operation_id`, and optional `local_completion_confirmed`. If no permit was received and no commit sent, both effects are `none`; if commit was sent and no terminal proof survives, each domain the action can mutate is conservatively `may_have_applied`. For fetch, `remote` remains `none` because fetch cannot mutate remote Git state, while `local` may have applied. The optional operation ID never authorizes a replacement Client to inspect it. `wait_cleanup()` raises the same error when no retained cleanup record remains. This state requires inspection before any new action; it never triggers an automatic retry. A server result/refusal after commit remains retained under the reserved slot for its published retention period.
+
+| Ticket state | `cancel()` | `wait_cleanup()` | `release()` |
+| --- | --- | --- | --- |
+| `preparing` or `prepared` | Seals the start; if a permit exists, sends owner-bound cancellation. Returns `StartCancelProgress(operation_id=None, cleanup=local_complete)`. | Reports current bounded local progress. | Refuses until the start settles. |
+| `committing` | Signals that admission owner; returns the same `StartCancelProgress` shape, with an ID only if acceptance won. | Bounded read of the pre-accept owner. | Refuses until admission settles. |
+| `accepted` | Cancels that operation; returns its ID and bounded cleanup progress. | Delegates to its handle. | Delegates to handle release; refuses before terminal. |
+| `refused` or `cancelled` before acceptance | Idempotent, with no operation ID and truthful local progress. | Reads its retained cleanup owner, even if no handle exists. | Retires local ticket/status; active physical cleanup remains charged. |
+| `unknown_or_expired`, **no commit sent** | Seals local admission, best-effort cancels a still-reachable permit, returns no ID and proved local completion. | Reports proved local completion; no effectful admission ran. | Retires the local ticket; a remote prepared permit, if any, expires without Git work. |
+| `unknown_or_expired`, **commit sent** | Raises `GwzStartUnknownError` if owner status cannot be recovered; it cannot claim cancellation. | Raises the same error without a retained cleanup record. | Retires **only** the local ticket and its 64-slot charge; server work/cleanup ownership is untouched. |
+
+Both unknown states count as locally settled for `ticket.release()`, even though the committed case has uncertain Git effects. Save the exception details before releasing: `Client.ticket(start_seq)` then fails, and a replacement Client cannot reattach. For example:
+
+```python
+ticket = client.start_fetch()
+try:
+    handle = await ticket.accepted()
+except GwzStartUnknownError as exc:
+    if exc.commit_sent:
+        print(exc.effects.local, exc.effects.remote)  # inspect affected Git state
+        # No automatic retry; cancel/wait cannot promise to reach a lost owner.
+    else:
+        progress = await ticket.cancel()
+        assert progress.operation_id is None
+    await ticket.release()  # local slot only in the commit-sent case
+else:
+    try:
+        await handle.result()
+    finally:
+        await handle.terminal()
+        await ticket.release()
+```
 
 After `ticket.accepted()`, each operation handle has `operation_id`, `events(after_sequence=None)`, `result()`, `terminal()`, `cancel()`, `wait_cleanup()` and `release()`. `events()` is an async iterator of generated `OperationEvent` in increasing sequence order, ending when that operation's stream ends. By default it starts at acceptance cursor zero. If events expired before a first or later read, it raises `EventCursorGap` with `oldest_retained_cursor`; pass `after_sequence=oldest_retained_cursor - 1` to resume at the oldest retained event, or read `terminal()` for the final outcome. Missing events never erase the terminal. A request ID is **not** a cancellation handle.
 
@@ -97,9 +145,35 @@ For **fetch**, remote reads and object transfer do not mutate remote Git state, 
 
 `handle.release()` frees a completed terminal and event log, not a pending cleanup owner or its capacity charge. A live operation refuses release. Calling it again on the same Python handle succeeds from its local cache; a different/raw terminal lookup after release gets `OperationExpired`. A reachable handle can still `wait_cleanup()` after terminal release. Once cleanup is final, its small report remains readable for 60 seconds after local completion, or while its terminal remains retained; after release and that period it expires. A completed terminal otherwise has a 10-minute sliding, 30-minute hard retention limit. Foreign Clients cannot read or control it even if they use the same request ID.
 
-`ticket.release()` retires its local ticket slot after admission has settled. For an accepted ticket it delegates to `handle.release()`; for a pre-accept refusal/cancellation it releases the retained status while preserving any still-active cleanup owner. A pending prepare/commit refuses release. Repeating release on the same ticket succeeds from its local cache. A released ticket no longer appears in `Client.tickets()` or `Client.ticket(start_seq)`, although that same ticket object may still read a retained cleanup marker until its 60-second expiry. Stateless no-slot refusals can be released immediately. Unreleased settled refusals expire 60 seconds **after local cleanup completes**; accepted ticket/terminal retention slides for 10 minutes with a 30-minute hard limit. An effect-uncertain committed ticket stays charged until explicit release or the hard limit; expiry never discards active physical work. Keep the object until you have observed the outcome you need, then release it to restore the 64-slot local budget.
+`ticket.release()` retires its local ticket slot after admission has settled, including a locally settled `unknown_or_expired` state. For an accepted ticket it delegates to `handle.release()`; for a pre-accept refusal/cancellation it releases the retained status while preserving any still-active cleanup owner; for an unknown committed ticket it releases **only** the local slot and leaves any server owner untouched. A pending prepare/commit refuses release. Repeating release on the same ticket succeeds from its local cache. A released ticket no longer appears in `Client.tickets()` or `Client.ticket(start_seq)`, although that same ticket object may still read a retained cleanup marker until its 60-second expiry. Stateless no-slot refusals can be released immediately. Unreleased settled refusals expire 60 seconds **after local cleanup completes**; accepted ticket/terminal retention slides for 10 minutes with a 30-minute hard limit. An effect-uncertain committed ticket stays charged until explicit release or the hard limit; expiry never discards active physical work. Keep the object until you have observed the outcome you need, then release it to restore the 64-slot local budget.
 
-`await client.close()` stops admission and cancels **all** outstanding handles and pre-accept starts on that Client. It does not collapse their distinct results into one aggregate outcome. Each call waits at most five seconds; `GwzOperationError(code="ClosePending")` carries current charged progress in `exc.progress` and means a later `close()` can join the same task. A final close means all of that Client's handlers, pre-accept work and local physical tasks ended; `peer_cleanup_confirmed` may still be false. After close starts and after final close, that **same Client** remains usable for `tickets()`, `ticket(start_seq)`, `result()`, `terminal()`, `wait_cleanup()`, `events()` over retained events, and `release()` until each record's expiry; it cannot submit new operations. A retained closed-session read-only binding is charged with the records, not a new live endpoint. This also holds when `async with Client(...)` exits. Its exit propagates `ClosePending` if cleanup remains pending and preserves a body exception as context; a still-reachable Client can be queried and closed again. Dropping the Client transfers unfinished work to the receiver's cleanup owner but gives the caller no later reattachment path. Keep a Client reference if you need to inspect outcomes after close. A replacement route/Client cannot retrieve them.
+`await client.close()` stops admission and cancels **all** outstanding handles and pre-accept starts on that Client. It does not collapse their distinct results into one aggregate outcome. Each call waits at most five seconds; `GwzOperationError(code="ClosePending")` carries current charged progress in `exc.progress` and means a later `close()` can join the same task. A final close means all of that Client's handlers, pre-accept work and local physical tasks ended; `peer_cleanup_confirmed` may still be false. After close starts and after final close, that **same Client** remains usable for `tickets()`, `ticket(start_seq)`, repeated ticket `accepted()`/`result()`, `terminal()`, `wait_cleanup()`, `events()` over retained events, and `release()` until each record's expiry; it cannot submit new operations. `accepted()` returns the same handle for a retained accepted ticket, raises the original typed refusal/cancellation for a settled pre-accept ticket, and raises `GwzStartUnknownError` for an unknown ticket. A retained closed-session read-only binding is charged with the records, not a new live endpoint. This also holds when `async with Client(...)` exits. Its exit propagates `ClosePending` if cleanup remains pending and preserves a body exception as context; a still-reachable Client can be queried and closed again. Dropping the Client transfers unfinished work to the receiver's cleanup owner but gives the caller no later reattachment path. Keep a Client reference if you need to inspect outcomes after close. A replacement route/Client cannot retrieve them.
+
+For example, if an acceptance waiter was cancelled just before close, keep the original Client and sequence. A pending `close()` does not consume the ticket:
+
+```python
+ticket = client.start_fetch()
+seq = ticket.start_seq
+waiter = asyncio.create_task(ticket.accepted())
+waiter.cancel()                 # cancels this Python wait only
+try:
+    await client.close()
+except GwzOperationError as exc:
+    if exc.code != "ClosePending":
+        raise
+recovered = client.ticket(seq)
+try:
+    handle = await recovered.accepted()  # same ID if acceptance won
+except GwzStartUnknownError as exc:
+    print(exc.effects.local, exc.effects.remote)  # inspect before any retry
+    await recovered.release()
+except GwzOperationError:
+    await recovered.wait_cleanup()       # pre-accept close/cancel outcome
+    await recovered.release()
+else:
+    await handle.terminal()              # may wait while handler is still pending
+    await recovered.release()
+```
 
 Admission errors are typed and occur before `Accepted`; later Git/transport failures appear in `result()`/`terminal()`. A capacity refusal is `GwzOperationError` with `exc.capacity` containing `resource`, `scope`, `limit`, `in_use`, `retry_condition` and minimum `retry_after_ms=1000`; `exc.progress` is absent. `ClosePending` has `exc.progress` and no capacity context. These are typed Taut error fields, never parsed from error-message text. Neither context exposes another Client's operation IDs or credentials. Caller-owned blocker IDs may be present. `retry_after_ms` is a minimum backoff, not a promise that capacity will recover; for a blocker owned elsewhere, use exponential backoff with jitter capped at 30 seconds or stop retrying.
 
@@ -107,7 +181,7 @@ Admission errors are typed and occur before `Accepted`; later Git/transport fail
 | --- | --- | --- |
 | `CapacityBusy` | Completion of charged operation, worker, endpoint-constructor or physical cleanup; await a listed caller-owned handle when available, otherwise back off. | Releasing a terminal alone while physical work is still pending. |
 | `CapacityBusy(resource=start-ticket)` | Release or let a completed ticket expire, then start a new ticket. This refusal occurs synchronously and sends nothing. | Repeating the same `start_fetch()` call while all 64 ticket slots remain held. |
-| `RetainedCapacityFull` | This prepare refusal has no permit or Git work. If all slots hold cleanup-only markers, `resource=cleanup-marker` and only their 60-second expiry frees a slot. With terminal records or mixed terminal/marker occupancy, `resource=terminal-record`; release an owned completed terminal where possible or wait for record/marker expiry. Release the refused local ticket too. | Calling the same handle's cached `release()` again does not free a cleanup-only marker. |
+| `RetainedCapacityFull` | This prepare refusal has no permit or Git work. The typed context selects a real remedy from occupied slots: `terminal-record/record_release_or_expiry` for a prepared or settled record whose retention expiry frees a slot; `cleanup-marker/marker_expiry` only for a locally final cleanup-only marker with its 60-second TTL running; `cleanup-record` or `operation-scope` with `owned_cleanup`/`external_cleanup` for active work. Release the refused local ticket too. | An active cleanup owner has no 60-second expiry; releasing a terminal can leave its marker charged. Repeating a cached `release()` does not free that marker. |
 | `SessionCapacityFull` | Close/expiry of a live logical session within the relevant route/receiver limit. | Changing `jobs`. |
 | `CapacityConflict` | All admitted/orphaned scopes and physical cleanup in the installed capacity epoch actually become quiescent; then a later request may install higher caps. | Releasing a result, a five-second timeout, or merely losing a route. |
 | `PlacementUnavailable` | Bind a supported placement through a separately reviewed API, or choose local placement. | Retrying the same unbound `cli` request. |
