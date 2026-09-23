@@ -18,9 +18,19 @@ and unaccepted**. Do not install an alpha or call this a v1.1.0 release.
   working source. Scheduler focused 21+3 and CLI help1 passed. Pool19 passed.
   Candidate host capacity1 passed. An actual Python SSH clone/fetch across one
   session passes after admission stopped treating a healthy idle SSH socket as
-  unfinished cleanup. Private evidence: `2026-09-23-retry-scheduler` and
-  `2026-09-23-python-native-integration`. Real queued cancellation wiring,
+  unfinished cleanup. A new core regression now proves two sequential local
+  requests reuse the same physical SSH connection. A separate red/green core
+  regression proves an overlapping request with identical capacity is refused
+  while the first holds a live physical lease; the prior sibling-with-no-lease
+  test still passes. Private evidence: `2026-09-23-retry-scheduler`,
+  `2026-09-23-python-native-integration`, and
+  `2026-09-23-admission-clock-followup`. Real queued cancellation wiring,
   end-to-end pool cap assertions and complete Phase 2/3 retry gates remain.
+- Phase 2's 9-second stall and independent 30-second aggregate are now in the
+  CLI default/help, pool default, candidate factory and focused SSH/HTTPS
+  deadline tests. The candidate factory and both deadline tests pass; rendered
+  CLI help passes. The accepted retry plan's named older design clauses were
+  updated. These are working-tree changes, not reviewed release acceptance.
 - Python's long-lived native `TransportSession`, lazy construction, per-request
   cancellation and public close API are in working source. Three actual native
   lifecycle probes and one SSH reuse probe pass. Its optional `max_retries`
