@@ -1,0 +1,21 @@
+# Python transport session v2 implementation checkpoint
+
+Date: 2026-09-24. Status: **candidate foundation in progress; no implementation or activation GO**. The accepted contract is [GwzPyTransportSessionV2Design.md](GwzPyTransportSessionV2Design.md). This checkpoint describes only the code changes prepared in this work cycle and is not a substitute for the contract or the required settled Code/State gate.
+
+## Implemented in the candidate path
+
+- Core accepts an equal physical pool capacity without reinstalling it, including under a live lease. A different capacity is refused before consuming the caller's request ID, so the same ID can be retried after live work and cleanup end. Installation leadership remains serialized.
+- The Python native session has per-Client operation stores, independent public operation IDs with a random session nonce and serial, an eight-operation admission/worker ceiling, and a 64-issued-record count ceiling. An unstarted issued ID does not occupy one of the eight worker slots. Native cancellation and release distinguish operation IDs; terminal result publication waits for transport finish.
+- Native `submit()` does not return `Accepted` before core request registration. A pre-acceptance worker error is recorded before its error is returned. The bridge no longer serializes network calls through a Python event-loop lock, and it can mint an ID synchronously before a call. Python validates request-ID grammar at construction and preserves native close reporting across repeated task cancellation.
+- An outer native-worker unwind boundary now terminalizes a panicking worker and wakes admission, cancel, close and result waiters with physical cleanup marked unconfirmed. Session lookups distinguish foreign/never-issued IDs from released issued IDs using the nonce and high-water serial; the Python bridge delegates ID ownership to the native session rather than retaining an unbounded ID cache. This is fail-closed bookkeeping, not yet a proof of full physical cleanup after arbitrary panic.
+- The GWZ Taut error enum has append-only `cancelled=73` and `transport_record_limit=74` projections and a focused round-trip test. These represent the accepted design's intended terminal vocabulary; terminal production is not yet implemented.
+
+## Required before public handles or activation
+
+1. Complete the session ledger: 4 KiB unstarted and 8 MiB admitted reservations, 64 MiB aggregate and 2 MiB event bounds, terminal overflow, primary and optional reader accounting, 15-minute timed expiry, and bounded recovery descriptors. Current code only caps record **count**; result/event bytes remain unbounded. The native cancellation map is bounded by retained records but has no timer eviction yet.
+2. Expose and test all synchronous `start_*` factories, one-shot `accepted()`, `OperationHandle`, `OperationStream`, typed cancellation/error effects, `recent_operations()`, and post-close release/result/event behavior. The bridge's synchronous ID issuance is an internal foundation, not the public API.
+3. Prove native worker panic, spawn failure, admission cancellation and close races fail closed with exactly one retained terminal and complete physical cleanup. The unwind path now wakes waiters conservatively, but its physical cleanup and fault-injection tests are incomplete. Prove combined top-level/member worker and queue ceilings under load.
+4. Implement quiescent rollover after 256 registered core IDs from captured endpoint configuration and prove old cancellation authority cannot target a later-generation request. The current runtime still reaches its fixed lifetime ID limit.
+5. Add SSH/HTTPS and cross-loop stress proofs, possible-effect push cancellation and early-abandoned stream recovery tests. Then run the settled Code/State review and deferred platform/source/host gates before any release decision.
+
+The candidate path stays behind `gwz_transport_candidate`; ordinary package builds and the released Python API must not advertise concurrent-session v2 yet.
