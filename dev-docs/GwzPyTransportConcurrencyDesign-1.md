@@ -1,6 +1,6 @@
 # Python concurrent transport session — correction 1
 
-Date: 2026-09-24. Status: **DRAFT for a new Consistency, Safety and docs-only Python Surface review. No implementation or Phase 6/7 activation authority.** This is the one corrected design object required by [the merged round-1 verdict](GwzPyTransportConcurrency-RemPlan-1.md). The rejected [first draft](GwzPyTransportConcurrencyRemPlan.md) remains historical. This design addresses the operator's [P2-1 finding](GwzPyTransportConcurrencyNoGo.md) and every blocking finding in the three first-round reports. Review GO accepts this contract only; a separate settled Code/State gate must accept implementation.
+Date: 2026-09-24. Status: **REJECTED after two remediation rounds; no implementation or Phase 6/7 activation authority.** The [second re-verdict](GwzPyTransportConcurrencyDesign-Verdict-2.md) records the blocking outcome-ownership and terminal-representation defects. The operator authorized a bounded redesign as the new [session v2 design object](GwzPyTransportSessionV2Design.md). The text below remains the exact reviewed historical draft; it is not implementation authority.
 
 ## 1. Scope and precedence
 
