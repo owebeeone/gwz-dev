@@ -1,0 +1,7 @@
+# GWZ internal Taut compatibility amendment — verdict
+
+Date: 2026-09-24. **GO for the internal transport Envelope compatibility amendment only.** Reviewed tuple: gwz-core `343cccc4032be47f8369c4eb297e3a6f50c87f11`, workspace `ac72a3c984348d9c9a8c7bc56c4590fee17bf378`, gwz-transport `46e65a9a888fbd4a5bbeace946996581dcf23333`.
+
+The first peer-blind [Consistency](GwzTransportInternalTautCompatibilityAmendment-ReviewConsistency.md) review found one P2: the draft could have waived the separate GWZ request/response compatibility rule. [Safety](GwzTransportInternalTautCompatibilityAmendment-ReviewSafety.md) returned GO. The [single correction](GwzTransportInternalTautCompatibilityAmendment-RemPlan.md) restricted the waiver to internal `gwz-transport` Envelope bytes and readers. Fresh peer-blind [Consistency](GwzTransportInternalTautCompatibilityAmendment-ReviewConsistency-1.md) and [Safety](GwzTransportInternalTautCompatibilityAmendment-ReviewSafety-1.md) re-reviews both returned GO with no open P0–P3 findings.
+
+This accepts lockstep regeneration of the internal Taut Envelope without historical transport-byte or old transport-reader qualification. It preserves current profile-1/2 functional behavior, same-build Rust/Python consumer checks, version refusal before effects, bounded validation, and the distinct GWZ ordinary-local request/response compatibility contract. It does not accept implementation, activation, physical wire or release.
