@@ -1,0 +1,10 @@
+# Python session v2 — bounded third correction
+
+Date: 2026-09-24. Status: **NO-GO pending focused re-verdict**. Reviewed tuple: root `5b39c6f360506844695cbd658a20a57f8bda430a`, core `7a8b8efb7f9a08d9d0055cb860071a36b26c3d9d`, Python `53075fbf56856e51cc1aac3f146ab7f7c84cdfc5`. [Consistency](GwzPyTransportSessionV2-ReviewConsistency-3.md) and [Safety](GwzPyTransportSessionV2-ReviewSafety-3.md) each reported one bounded P2. Both explicitly classified their finding as **not a new architectural root cause**. This third correction is confined to those two contract details under the review-loop cap.
+
+| Finding | Disposition | Closure evidence |
+| --- | --- | --- |
+| Consistency-3 P2-2 | Match Python synchronous request-ID validation to core's existing `identifier`: nonempty, at most 128 UTF-8 bytes, no Unicode control characters. Do not widen core. | A valid 128-byte ID reaches registration; 129-byte and control-containing IDs refuse synchronously before issuance or endpoint construction. |
+| Safety-3 P2-1 (continued Safety-2 P2-1) | Reserve 4 KiB required identity/discovery/close-summary metadata within each unstarted record; atomically upgrade it to a total 8 MiB operation allowance that includes the same 4 KiB. Transfer the close-summary charge into retained Client reporting and keep it charged until Client drop. Required recovery reads use the already-reserved descriptor; optional copies may refuse. | Eight full admissions consume exactly 64 MiB including recovery metadata. Drop a possibly effective stream, discover its ID and effect, close with all eight live, and retrieve every close summary without post-effect capacity refusal. Validate near-limit retained results and expiry accounting. |
+
+The other prior findings are closed in the document contract. Commit this one correction and ask the same two reviewers to re-trace only these cases and new changed-range defects. Any newly identified architectural root cause now stops this object for operator redesign-or-accept; no implementation starts before GO.
