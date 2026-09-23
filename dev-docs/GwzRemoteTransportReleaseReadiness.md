@@ -1,5 +1,13 @@
 # Remote transport release readiness — operator pause
 
+Current status (2026-09-23): the operator has resumed work under the accepted
+[v1.1.0 plan](../gwz-core/dev-docs/GwzV110Plan.md). The accepted
+[retry plan](../gwz-core/dev-docs/GwzRemoteTransportRetryPlan.md) and
+[Python session design](../gwz-py/dev-docs/GwzPyTransportDesign.md) are being
+implemented in parallel. See [the current checkpoint](CurrentProgramCheckpoint.md)
+for exact acceptance boundaries. The pause and source tuple below are historical;
+no new release or alpha acceptance is implied.
+
 Date: 2026-09-22. Status: **paused to conserve weekly GPT quota**.
 Do not resume agents, tests or implementation until requested. No reviews were
 started for Q6. No push, publication, activation, tag or release was performed.

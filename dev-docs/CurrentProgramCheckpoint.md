@@ -1,5 +1,50 @@
 # Current program checkpoint
 
+## Transport implementation checkpoint — 2026-09-23, review pending
+
+The operator authorized implementation. Retained GPT-6 Sol workers implemented
+parallel chunks until their weekly usage limit stopped them; the lane owner
+continued focused integration fixes. The **product source remains uncommitted
+and unaccepted**. Do not install an alpha or call this a v1.1.0 release.
+
+- Typed `Failure.setup_cause` (taut key 4, fixed values 1–7) and SSH/HTTPS
+  propagation are implemented. The temporary use of key fingerprint for timeout
+  reasons is removed. Transport schema/pool21, strict library lint, doctest,
+  pinned regeneration, candidate host6, cause2, cancellation1 and actual SSH
+  timeout endpoint1 passed in the scoped runs. Private evidence:
+  `2026-09-23-typed-setup-causes` and `2026-09-23-timeout-clock-baseline`.
+- The jobs-bounded, fallible worker scheduler and 100/32 defaults, CLI help,
+  callsite error propagation, pool capacity resize and host admission are in
+  working source. Scheduler focused 21+3 and CLI help1 passed. Pool19 passed.
+  Candidate host capacity1 passed. An actual Python SSH clone/fetch across one
+  session passes after admission stopped treating a healthy idle SSH socket as
+  unfinished cleanup. Private evidence: `2026-09-23-retry-scheduler` and
+  `2026-09-23-python-native-integration`. Real queued cancellation wiring,
+  end-to-end pool cap assertions and complete Phase 2/3 retry gates remain.
+- Python's long-lived native `TransportSession`, lazy construction, per-request
+  cancellation and public close API are in working source. Three actual native
+  lifecycle probes and one SSH reuse probe pass. Its optional `max_retries`
+  field cannot be wired until the core policy schema is generated. The
+  reported ordinary Python suite (861 passing) loaded the installed normal
+  extension and is not candidate proof.
+- A core no-change HTTPS fetch regression passes after a completed Git
+  advertisement no longer discards the stream merely because Git skipped a
+  zero-byte read. The actual Python private-gh fixture still shows a new
+  authenticated TCP connection for each fetch because the preceding anonymous
+  `401` challenge discards the leased socket. The [gh challenge reuse amendment]
+  (../gwz-core/dev-docs/GwzRemoteTransportGhChallengeReuseAmendment.md) is a draft,
+  requiring retained Consistency/Safety review before any code change there.
+  Final real-extension run: **4 passed, 1 failed**, source/binary provenance
+  and raw trace in `2026-09-23-python-native-integration`.
+
+Next: review the small gh amendment when strong reviewers are available;
+complete its causal fixture and adverse cases if GO. Then finish RetryPlan S1
+physical caps/queued cancellation and S2/S3 setup retry machine, generate
+`max_retries` for Python, rerun one candidate SSH+HTTPS test gate, settle the
+exact code/evidence tuple and run the retained aggregate review. Q6 aggregate,
+platform/package matrix, normal-binary activation and release remain open.
+No push, tag, publish, alpha overwrite or live account fetch was performed.
+
 ## Retry/concurrency and Python lanes — authorized, 2026-09-23
 
 Operator authorized parallel work after the recommended dependency split.
