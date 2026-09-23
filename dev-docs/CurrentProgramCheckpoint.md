@@ -1,5 +1,37 @@
 # Current program checkpoint
 
+## Retry/concurrency and Python lanes — authorized, 2026-09-23
+
+Operator authorized parallel work after the recommended dependency split.
+Retry plan accepted as text at core `ef29f8907875928b6e6891a2db12cbe3ca781fee`,
+SHA-256 `08e198e00c5f6ff697dca6b71f8117ce8963afb91126a30af2b5ea94a6ac6619`;
+Consistency-3, Safety-3 and Surface-3 report GO. Existing retry rules/defaults
+remain the reviewed plan; implementation is not yet accepted.
+
+GPT-6 Sol owns implementation drafting: one timeout-baseline worker, one retry
+owner, and one Python design owner. Python starts with v1.1.0 S1 design/review;
+shared core/pool changes belong to the retry owner. RequestMeta.policy carries
+resolved operation limits and max_retries; Python introduces no duplicate pool,
+retry machine or clock. Runtime request admission and cleanup remain Rust-owned.
+
+Timeout baseline review preparation found a late-completion stall-reset defect;
+a deterministic regression and correction are in progress. A second owner-found
+issue overloads the authentication fingerprint with a timeout reason. A bounded
+typed setup-failure amendment is being drafted before retry classification or
+alpha acceptance. No further alpha rebuild, release activation, push or publish
+has occurred. Q6 aggregate and broader platform/package gates remain open.
+
+## GWZ 1.1.0 plan — accepted as text, 2026-09-23
+
+[Plan](../gwz-core/dev-docs/GwzV110Plan.md). Dual Consistency and Safety.
+Round 1 NO-GO on `a52cd7a8…`. Round 2 NO-GO on `6ec8f7e7…`. Both axes GO on
+`9d49af85bd340addc1c35e6c11eefe3e4ab9f2bc2a9143b8f13f3af5a7fc8f62`. Accepts
+the plan text only. It is the resume of the paused transport release gate,
+aimed at v1.1.0. The timeout-plan S5.1/S5.2 close and the Q6 aggregate
+review are steps inside that plan (S3.1–S3.3). They are not done. No tag,
+publish, or implementation is authorized by this acceptance. The older
+"paused, do not resume" wording below is historical relative to this plan.
+
 ## Alpha SSH setup-timeout plan — accepted as text, 2026-09-22
 
 [Plan](../gwz-core/dev-docs/GwzRemoteTransportAlphaTimeoutPlan.md). Draft review,
