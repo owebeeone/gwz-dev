@@ -8,6 +8,9 @@ This is the candidate correction for the session/request/result boundary found i
 does not authorize implementation or revise the `gwz-transport` stream-message
 protocol. It defines application messages and receiver ownership; they can run
 inside today's process and can later be carried over a CLI/core connection.
+The [candidate caller guide](GwzOperationSessionCallerGuideDraft.md) is part of
+this review object so the Python Surface axis can assess the proposed API from
+caller-facing documentation without reading source or internal design.
 
 ## 1. Problem and boundary
 
