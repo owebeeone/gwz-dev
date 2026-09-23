@@ -1,6 +1,6 @@
 # Python transport concurrency — remediation plan and draft design amendment
 
-Date: 2026-09-23. Status: **DRAFT for adversarial review; implementation and gwz-py Phase 6/7 remain NO-GO**. This plan addresses [P2-1](GwzPyTransportConcurrencyNoGo.md). Review of this text can approve the revised design only; it cannot accept code or lift the release gate.
+Date: 2026-09-23. Status: **REJECTED at the first design review; implementation and gwz-py Phase 6/7 remain NO-GO**. This is the preserved first draft addressing [P2-1](GwzPyTransportConcurrencyNoGo.md), not implementation authority. The independent [Consistency](GwzPyTransportConcurrency-ReviewConsistency.md) and [Safety](GwzPyTransportConcurrency-ReviewSafety.md) NO-GO reports and the [merged remediation](GwzPyTransportConcurrency-RemPlan-1.md) require a broader correction before re-review. The [Surface report](GwzPyTransportConcurrency-ReviewSurface.md) also says NO-GO but disclosed a docs-only method deviation.
 
 ## 1. Outcome and authority
 
