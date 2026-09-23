@@ -403,29 +403,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "git2"
-version = "0.21.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ddddbf932745a6be37109b6112d3ee09696106f848449069d3a57bba937ab82e"
-dependencies = [
- "bitflags",
- "libc",
- "libgit2-sys",
- "log",
- "openssl-probe",
- "openssl-sys",
- "url",
-]
-
-[[package]]
 name = "gwz"
 version = "0.2.0-dev"
 dependencies = [
  "cfg-if",
  "clap",
  "console",
- "git2",
  "gwz-core",
+ "gwz-git2",
  "serde_json",
  "sha2",
 ]
@@ -443,11 +428,11 @@ dependencies = [
  "cfg-if",
  "chrono",
  "getrandom 0.3.4",
- "git2",
  "gwz-copy-contract",
  "gwz-family-model",
  "gwz-family-store",
  "gwz-family-store-contract",
+ "gwz-git2",
  "gwz-history-check",
  "gwz-local-disposal",
  "gwz-local-import",
@@ -494,10 +479,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "gwz-git2"
+version = "0.21.0"
+dependencies = [
+ "bitflags",
+ "gwz-libgit2-sys",
+ "libc",
+ "log",
+ "openssl-probe",
+ "openssl-sys",
+ "url",
+]
+
+[[package]]
 name = "gwz-history-check"
 version = "0.0.8"
 dependencies = [
  "gwz-repo-contract",
+]
+
+[[package]]
+name = "gwz-libgit2-sys"
+version = "0.18.8+1.9.7"
+dependencies = [
+ "cc",
+ "libc",
+ "libssh2-sys",
+ "libz-sys",
+ "openssl-sys",
+ "pkg-config",
 ]
 
 [[package]]
@@ -543,7 +553,7 @@ dependencies = [
 name = "gwz-repo-inspect"
 version = "0.0.8"
 dependencies = [
- "git2",
+ "gwz-git2",
  "gwz-repo-contract",
 ]
 
@@ -798,20 +808,6 @@ name = "libc"
 version = "0.2.189"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
-
-[[package]]
-name = "libgit2-sys"
-version = "0.18.8+1.9.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f7c568b25d7489bc3fb2988ed69ab111d2944d2f5fec3d5c987fe545ea97b50"
-dependencies = [
- "cc",
- "libc",
- "libssh2-sys",
- "libz-sys",
- "openssl-sys",
- "pkg-config",
-]
 
 [[package]]
 name = "libssh2-sys"
