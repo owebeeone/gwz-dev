@@ -1,0 +1,13 @@
+# Python transport concurrency — release-gate NO-GO
+
+Date: 2026-09-23. Status: **NO-GO for gwz-py Phase 6 completion and Phase 7 activation**. This is an operator-directed post-design finding, not a retroactive edit to the independent 2026-09-23 Consistency, Safety, and Surface reports. Their GO remains evidence for the interfaces and lifecycle issues they examined. It does not close the product limitation found here.
+
+## P2-1 — One Python client cannot run overlapping network operations
+
+The accepted [Python design](../gwz-py/dev-docs/GwzPyTransportDesign.md) §2–3 explicitly waits for one `TransportRequest.finish()` before admitting the next and requires Rust to refuse a second active operation. The candidate implements this in `gwz-py/native/src/transport_session.rs` with singular `admitting` and `active` slots, and `gwz-py/src/gwz/bridge.py` adds a Python network lock. `submit()` can return an accepted response before its worker finishes, so a subsequent fetch or push on the same `Client` receives a busy error while the first runs. Separate member-repo workers inside one operation do not remove this top-level restriction.
+
+This conflicts with the [remote transport plan](../gwz-core/dev-docs/GwzRemoteTransportPlan.md) Phase 2 exit evidence, which requires overlapping operation contexts with different per-host limits to respect physical ceilings without evicting one another. The accepted [retry plan](../gwz-core/dev-docs/GwzRemoteTransportRetryPlan.md) later makes capacity installation dynamic and forbids raising capacity under a non-idle lease. That later rule means concurrent admission needs a defined capacity-compatibility rule; it does not justify blanket refusal of all overlapping Python operations.
+
+**Concrete case:** `submit(fetch A)` returns `Accepted`; before A's Git work and `finish()` complete, `submit(fetch B)` on the same client is refused even when both use default policy and the host has spare capacity. Users cannot compose independent async network tasks on one client. This is a public Python parity and concurrency defect, not merely a missed optimization.
+
+**Required correction:** one native host must support multiple independently identified live request scopes, request-specific cancellation and close, and compatible concurrent admission. A differing pool-capacity request must fail before opening a stream or mutating capacity while an incompatible request is live. The bounded [remediation plan](GwzPyTransportConcurrencyRemPlan.md) defines the exact contract and gates. Until it has design-review GO, implementation evidence and settled implementation review, Phase 6 and Phase 7 remain NO-GO. No published 1.0.17 behavior or prior review report is rewritten here.
