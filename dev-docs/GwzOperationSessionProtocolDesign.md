@@ -1,6 +1,6 @@
 # GWZ operation-session protocol revision
 
-Date: 2026-09-23. Status: **DRAFT correction 1 after round-1 NO-GO; design
+Date: 2026-09-23. Status: **DRAFT correction 2 after two NO-GO rounds; design
 re-review required before implementation**.
 
 This is the candidate correction for the session/request/result boundary found in
@@ -53,9 +53,18 @@ operation execution scope exists for **every** accepted local or network
 operation. It owns worker start, cancellation, terminal recording and join.
 Network work additionally owns a `TransportRequest`; local-only work does not
 construct an endpoint. A successful close never reports completion while a
-local handler can still mutate the workspace. If the close wait times out, it
-returns typed `ClosePending`, retains the shared close task and session charge,
-and a later close joins it; it does not claim a final cleanup report.
+local handler can still mutate the workspace. **Version-1 admission requires
+the handler to implement a proved bounded cancellation/termination contract.**
+Any local handler without that proof, including today's asynchronous local
+clone path, is refused before `Accepted` with `UnsupportedOperation`; its
+existing unary version-0 call remains separately available under its existing
+call semantics. The version-1 feature cannot activate while it accepts a
+nonterminable local handler. A close wait timeout returns typed
+`ClosePending`, retains the shared close task and session charge, and a later
+close joins it; it does not claim a final cleanup report. Qualified local
+handlers must retire within the published termination bound after
+cancellation, including owner/route loss. A merely timed-out wait does not
+count as cancellation proof.
 
 ## 2. Taut application contract, version 1
 
@@ -67,13 +76,13 @@ schema patch, not by hand in generated files.
 
 | Message or method | Contract |
 | --- | --- |
-| `operation_session.open` | The receiver creates a cheap logical session after checking the receiver/route session budgets in §4. It returns an opaque `session_id`, selected contract version and finite published budgets. It does not build an SSH/HTTPS endpoint or inspect credentials/proxy/CA. On first network use the session captures its endpoint environment as the accepted Python design requires. |
+| `operation_session.open` | The receiver checks session budgets and returns an opaque `session_id`, version, placement availability and finite budgets through a **cheap capability path**. It does not call existing `transport_capabilities`, build an SSH/HTTPS endpoint or read credential/proxy/CA environment. Unsupported placement is refused here or before subsequent endpoint construction. On first admitted network use the session captures its endpoint environment. |
 | `RequestMeta.session_id?` | A version-1 request carries the session selected at open. The receiver also checks its route binding. Local-only operations may use the session without constructing a network endpoint. Legacy requests without this field remain on the version-0 path only. |
 | `ResponseMeta.operation_id?` | For a submitted operation, the receiver allocates a fresh opaque ID independently of `request_id` and returns it at admission. It is unique within the session's lifetime and never reused there. `request_id` remains caller correlation, not authority or a lookup key. |
 | `operation.events_v1` | A Taut shape-log read keyed by `session_id` and `operation_id`. The existing shape-log cursor, tail, end and retention semantics apply; no second bespoke cursor protocol. Reads are owner checked. |
 | `operation.result_v1` | A terminal read keyed by both IDs. Before completion it waits or reports typed pending according to the chosen call form; after completion it returns the immutable terminal record defined below; after release or retention expiry it reports `OperationExpired`. |
 | `operation.cancel_v1` | A control request keyed by both IDs. It signals only that execution scope, joins its handler and optional `TransportRequest.finish()`, and returns its cleanup report. Repeating it while the terminal record is retained returns the same report. |
-| `operation.release_v1` | Idempotently releases a retained terminal record and its event log. A live operation is not destroyed by releasing a reader; the caller must cancel it or close the session. |
+| `operation.release_v1` | Releases a completed terminal record and its event log. A live operation refuses release with `InvalidRequest`; cancellation/close are separate. A later protocol read/release sees `OperationExpired`. Python's same `OperationHandle.release()` caches successful completion and is idempotent without a server-side tombstone. |
 | `operation_session.close` | Stops admissions, cancels and joins every admitted execution scope, then shuts down the one session host. Repeated calls join one shared completion and return the same cleanup report while the session close record is retained. A bounded wait may return `ClosePending`, never a false completed report. |
 
 One retained terminal record owns the existing `OperationResult`, the full
@@ -90,51 +99,89 @@ existing generated response class; Rust can do the same. Fetch retains
 and other actions retain all of their action-specific fields. A normal
 successful `handle.result()` returns that generated response; a failed or
 cancelled operation raises `GwzOperationError` with the terminal
-`OperationResult` and code attached. `handle.terminal()` exposes the whole
+`OperationResult`, stable code **and the decoded original action response in
+`exc.response` whenever that response exists**. This is required equally for
+handle, unary and stream forms, including rejected, failed, partial, dirty
+and conflicted outcomes. A conflicted merge therefore preserves the
+`MergeResponse` recovery fields in `exc.response`. `handle.terminal()` exposes the whole
 immutable terminal record for callers that need status or cleanup details.
 `cancel()` separately returns the retained `TransportCleanup` on completion.
+`OperationTerminalKindV1` has `succeeded`, `failed`, `cancelled` and
+`output_limited` variants. `cancelled` maps to stable
+`GwzErrorCode.operation_cancelled`; `output_limited` maps to
+`result_limit_exceeded`. The existing aggregate status stays in the
+`OperationResult` when available and does not substitute for this discriminant.
 
 If the full action response would exceed a published byte budget, the
 receiver stores a small `ResultLimitExceeded` terminal instead of a partial
 or falsely successful response. It identifies action, request, operation,
 observed effect as `none`/`may_have_applied`/`applied`, and the limit that was
 hit. It remains readable until release/expiry and `handle.result()` raises a
-typed error; the caller must not infer rollback. The result serializer writes
+typed `GwzOperationError` with `response=None`,
+`code=ResultLimitExceeded`, its bounded terminal summary and effect. The
+caller must not infer rollback. The result serializer writes
 into a charged bounded buffer and switches to this reserved small terminal
 before exceeding its per-record or aggregate limit. A 4 KiB fallback charge
 is reserved at `Accepted` for every operation. Full response, summary and
 cleanup share one release/expiry boundary. No second process-global merge
-response store is reachable by version-1 lookup.
+response store is reachable by version-1 lookup. The fallback's only
+caller-controlled text is the already validated `request_id` (at most 256
+UTF-8 bytes). Generated session and operation IDs are at most 64 ASCII bytes
+each; the fixed error message is at most 512 UTF-8 bytes. Action, effect,
+kind and code are numeric enums; the fallback omits member lists and any
+action response. Including CBOR field/type/length overhead and the fixed
+cleanup fields, its worst-case encoded charge is required to remain below
+2 KiB, leaving at least 2 KiB of the reserved 4 KiB for allocator/accounting
+overhead. A generated-schema measurement must assert this bound before
+activation; if it cannot, the admission charge must rise before any work is
+accepted. No accepted oversized result may lack its fallback terminal.
 
 The new role-out methods do **not** replace the version-0 scalar
 `events.subscribe(operation_id)` and `operation.result(operation_id)` for an
-existing client. Their legacy registry and any module-level Python compatibility
-functions remain isolated from version-1 records; a legacy lookup must never
-fall through into a version-1 session. A version-1 caller cannot silently
+existing client. **Version 0 also needs owner binding**: every v0 write and
+every event, result and merge-response read is scoped to the originating
+Client/route, including two clients that choose the same caller `request_id`.
+The currently process-global `OperationStore` cannot be retained as a public
+lookup keyed only by `operation_id`. Built-in Python Client/bridge calls must
+route v0 reads through a bound native session; unowned module-level lookup
+functions fail closed with `UnsupportedOperation` in a version-1-capable
+build. Any trusted internal compatibility use must have an explicit owner
+context that an unrelated Client cannot supply. Legacy and v1 records remain
+isolated in addition to those owner checks; neither lookup may fall through
+to the other's store. This v0 hardening is an activation precondition, not
+permission to leave the antecedent P0 reachable. A version-1 caller cannot silently
 downgrade when the peer lacks the capability: it receives `UnsupportedOperation`
-before submitting work. The `transport_capabilities` response or an equivalent
-schema-negotiated handshake advertises the selected version before the first
-operation. The exact Taut method names above are proposed names, not a claim
+before submitting work. **Only the cheap `operation_session.open` path**
+advertises/negotiates the selected operation-session version and placement;
+it must complete or refuse before any call to the existing
+`transport_capabilities` path, because that path can construct an endpoint.
+An unbound `cli` request is refused as `PlacementUnavailable` before reading
+endpoint environment, TLS/proxy configuration, helper or credential data.
+The exact Taut method names above are proposed names, not a claim
 that they exist today. This candidate allocates the following additive schema
 slots for codegen review; no generated source is hand-edited:
 
 - `RequestMeta.session_id?` uses field 10 and optional
   `RequestMeta.placement?` uses field 11 with `local=0`, `cli=1`; current
   fields 1–9 keep their meanings. Omitted placement means local.
-  `TransportCapabilitiesResponse.operation_sessions_version?` uses
-  field 3; absence means version 0 only. `ResponseMeta.operation_id?` already
-  uses field 5 and is not renumbered.
-- `OperationSessionOpenRequest` has `schema_version` field 1.
+  `ResponseMeta.operation_id?` already uses field 5 and is not renumbered.
+- `OperationSessionOpenRequest` has `schema_version` field 1 and optional
+  requested placement field 2 (default local). The receiver checks placement
+  from its already bound routing table before reading endpoint environment.
   `OperationSessionOpenResponse` has `session_id` field 1, `version` field 2
-  and `limits` field 3. `OperationSessionLimitsV1` uses fields 1–22 for,
+  `limits` field 3 and available placements field 4. A legacy peer's
+  unknown-method refusal selects no version-1 session and causes the caller
+  to fail closed, never to fall back after partial work.
+  `OperationSessionLimitsV1` uses fields 1–23 for,
   respectively: receiver sessions, route sessions, session active operations,
   session queued operations, receiver accepted operations, session operation
   workers, receiver operation workers, session member workers, receiver member
   workers, session retained records, receiver retained records, per-record
   terminal bytes, session terminal bytes, receiver terminal bytes, per-record
   event bytes, session event bytes, receiver event bytes, completed-record
-  sliding TTL, completed-record hard TTL, idle-session TTL, closed-report TTL
-  and close-wait duration. All counts/bytes are positive integers; durations
+  sliding TTL, completed-record hard TTL, idle-session TTL, closed-report TTL,
+  close-wait duration and local-handler cancellation bound. All counts/bytes
+  are positive integers; durations
   are nonnegative milliseconds.
 - Version-1 event/result/cancel/release calls use `session_id` field/parameter
   1 and `operation_id` field/parameter 2. Close takes `session_id` field 1.
@@ -143,13 +190,15 @@ slots for codegen review; no generated source is hand-edited:
   field 1. `OperationTerminalV1` has operation ID 1, caller request ID 2,
   action 3, status 4, optional `OperationResult` 5, optional validated
   response message name 6, optional canonical CBOR response bytes 7,
-  optional cleanup 8, optional typed error 9 and observed effect 10.
+  optional cleanup 8, optional typed error 9, observed effect 10 and
+  `OperationTerminalKindV1` 11 (`succeeded=0`, `failed=1`,
+  `cancelled=2`, `output_limited=3`).
 - Extend `GwzErrorCode` after current value 72 with stable values:
   `session_capacity_full=73`, `capacity_busy=74`,
   `retained_capacity_full=75`, `capacity_conflict=76`,
   `placement_unavailable=77`, `operation_expired=78`,
   `result_limit_exceeded=79`, `close_pending=80`, and
-  `event_cursor_gap=81`. Existing values are unchanged. Python exception
+  `event_cursor_gap=81`, `operation_cancelled=82`. Existing values are unchanged. Python exception
   classes may map these codes to CamelCase names but must preserve the
   numeric/code identity.
 
@@ -169,9 +218,12 @@ explicit separately reviewed authorization and retention contract.
 
 ## 3. Admission, result and caller semantics
 
-The receiver checks, in this order, the bound session, duplicate **live**
-`request_id` within that session, available operation/worker/queue/result
-budget, placement support, and the physical-capacity rule in §4. It reserves
+The receiver checks, in this order, the bound session, **UTF-8 byte length
+of caller `request_id` at most 256**, duplicate **live** `request_id` within
+that session, handler cancellation qualification, available
+operation/worker/queue/result budget, placement support, and the
+physical-capacity rule in §4. A 257-byte or longer ID is `InvalidRequest`
+before `Accepted`, regardless of character count. It reserves
 the execution scope and fallback terminal charge, allocates the opaque
 operation ID, and, for network work, registers the transport request scope
 before replying `Accepted`. Local work uses no transport request. No Git
@@ -203,6 +255,13 @@ iterator. The handle is the documented way for another task to cancel a
 high-level operation before its first event. A caller-supplied request ID alone
 is not a cancellation handle. The existing `Client.cancel_operation(id)` may
 remain as a convenience, but resolves through **that Client's** bound session.
+The handle also stores its acceptance cursor, initially sequence zero.
+`events(after_sequence: int | None = None)` defaults to that cursor, not the
+oldest currently retained event.
+If records have been evicted before the **first** read or a later read, the
+shape-log returns `EventCursorGap` with the oldest retained cursor; the caller
+may resume explicitly from there or inspect `terminal()`. It never silently
+starts with a suffix.
 
 An admission refusal is a typed exception from `await start/submit`, before an
 operation ID exists. A unary convenience call raises it at invocation; a stream
@@ -259,7 +318,14 @@ For explicit in-process `cli` placement, the bound CLI endpoint must perform
 the same capacity check **before** handler dispatch or remote Open. If it
 cannot, the version-1 session refuses that placement at admission with
 `PlacementUnavailable`; local placement remains usable. No Python-only guard
-is claimed to protect a different physical owner.
+is claimed to protect a different physical owner. The ordinary v1 Python
+`Client.start_fetch` API exposes **local placement only**. `cli` in the Taut
+field is reserved for an internally bound CLI endpoint; no public Python
+binding API is claimed. If an internal caller requests unbound `cli`, the
+cheap session-open/placement check refuses it before the older
+`transport_capabilities` preflight can construct a local endpoint or inspect
+proxy/credential environment. A public CLI-placement binding requires its
+own later interface review.
 
 The transport mux's current 256-ID ceiling is a lifetime tombstone bound, not
 a live-operation budget. The host must rotate to a fresh transport generation
@@ -292,6 +358,7 @@ accounting purpose.
 | Completed record lifetime | 10 minutes | — | Since completion or last successful owned read, with a hard 30-minute maximum since completion. Explicit release frees it sooner. |
 | Idle session lifetime | 10 minutes | — | No live work or readers and no owned activity; expiry starts close. |
 | Closed-session report lifetime | 60 seconds | — | Repeat close joins/returns report during this interval; then `OperationExpired`. |
+| Local-handler termination after cancellation | 30 seconds | — | A handler lacking proof of this bound is not admitted to version-1 async execution. |
 
 The receiver and route limits apply **before** creating a logical session.
 Owner drop or route loss starts close immediately, even if operations remain;
@@ -300,9 +367,15 @@ work. Close may report `ClosePending` after five seconds but keeps its session,
 worker and byte charges until all child work actually joins; repeat close
 can observe the eventual final report. A session whose route is gone cannot
 be reattached or controlled from the replacement route. If local work cannot
-yet provide bounded cancellation checkpoints, its worker stays charged and
-close remains pending rather than claiming success; implementation acceptance
-must prove it cannot mutate after a successful close.
+provide the 30-second termination proof, it is refused **before Accepted**;
+the current async local clone is such a case until redesigned. For admitted
+work, route/owner loss starts cancellation immediately; qualified local
+workers join within 30 seconds and the bounded endpoint cleanup takes at
+most five more seconds, so the receiver retires an orphaned session charge
+within 35 seconds. The five-second close wait can return `ClosePending`
+without releasing that charge early. Implementation acceptance must prove
+the bound and no mutation after successful close; a failed bound is a gate
+failure, not a documented indefinitely pending state.
 
 At admission each operation reserves the 4 KiB fallback terminal charge.
 If full retained-record slots or byte reservations prevent that, the request
@@ -325,17 +398,22 @@ This is a protocol design draft, not a release GO. Before implementation:
    Safety verdicts and a **docs-only** Python Surface verdict. The first
    round's NO-GO reports remain evidence, not acceptance of this revision.
 2. Apply the accepted Taut field allocation through generated Rust/Python
-   code and fingerprint checks. Keep version-0 dispatch/storage isolated;
-   test both version selections and explicit refusal of downgrade. No
+   code and fingerprint checks. Make version-0 dispatch/storage owner-bound
+   and version-1-isolated; test both version selections, legacy foreign
+   event/result/merge reads and explicit refusal of downgrade. No
    generated file is hand-maintained.
 3. Implement the session-bound store and API, then test two clients using the
    same explicit request ID with opposite completion orders; foreign lookups;
    repeated caller IDs within one session; full fetch/merge typed response
-   retention and bounded output-limit terminals; accepted worker-launch and
-   handler failure paths; early handle cancellation; same-client overlapping
-   operations; blocked local-only cancel/close; aggregate member worker and
+   retention and bounded output-limit terminals at the 256-byte caller-ID
+   boundary; accepted worker-launch and handler failure paths; early handle
+   cancellation and delayed first event read after eviction; same-client
+   overlapping operations; qualified blocked local-only cancel/close plus
+   refusal of unqualified local async handlers; aggregate member worker and
    queue ceilings; capacity and placement refusals before Open; close-waiter
-   cancellation; session/route limit+1 and abandonment; finite event/result
+   cancellation; cheap unbound-CLI refusal with poisoned proxy/CA state;
+   session/route limit+1 and abandonment within the termination bound;
+   finite event/result
    byte retention; and more than 256 sequential operations with delayed
    stale transport messages.
 4. Keep `gwz-py` Phase 6/7 and release activation NO-GO until implementation
