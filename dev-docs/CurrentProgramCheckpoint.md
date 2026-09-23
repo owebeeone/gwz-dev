@@ -8,18 +8,27 @@ SHA-256 `08e198e00c5f6ff697dca6b71f8117ce8963afb91126a30af2b5ea94a6ac6619`;
 Consistency-3, Safety-3 and Surface-3 report GO. Existing retry rules/defaults
 remain the reviewed plan; implementation is not yet accepted.
 
-GPT-6 Sol owns implementation drafting: one timeout-baseline worker, one retry
-owner, and one Python design owner. Python starts with v1.1.0 S1 design/review;
-shared core/pool changes belong to the retry owner. RequestMeta.policy carries
-resolved operation limits and max_retries; Python introduces no duplicate pool,
-retry machine or clock. Runtime request admission and cleanup remain Rust-owned.
+GPT-6 Sol owns three parallel implementation chunks: jobs-bounded fallible
+scheduler/defaults; typed setup causes plus shared core host APIs; and Python's
+long-lived native session. Python owns only gwz-py, the scheduler owner only core
+operation/CLI files for now, and the timeout owner transport schema/pool plus core
+endpoint/host files. Full retry/pool policy integration follows the shared foundation.
 
-Timeout baseline review preparation found a late-completion stall-reset defect;
-a deterministic regression and correction are in progress. A second owner-found
-issue overloads the authentication fingerprint with a timeout reason. A bounded
-typed setup-failure amendment is being drafted before retry classification or
-alpha acceptance. No further alpha rebuild, release activation, push or publish
-has occurred. Q6 aggregate and broader platform/package gates remain open.
+The paired setup-failure and Python designs have Consistency/Safety/Surface GO at
+root `00827c75afb93f5855ee77019df7cb459c12754a`, core
+`479926c18265276e5a45659c4523a13a71f4a51f`, Python
+`259f73cc030c0da0bf29903bab258de0463b7d02`, transport
+`aa40936d0805e8cb60f8027615abe20d4f2045e4`. Reports are
+`GwzTransportParallelInterfaces-Review{Consistency,Safety,Surface}-1.md`.
+The accepted corrections freeze enum wire values and race-safe Python close/cancel.
+No product implementation acceptance is implied by design GO.
+
+Timeout baseline corrections now pass focused native SSH, actual endpoint stall,
+and candidate driver/configuration gates. Raw logs and source patch are in the
+private evidence run `transport-qualification/runs/2026-09-23-timeout-clock-baseline`.
+The typed cause implementation must still remove the temporary fingerprint overload
+before acceptance. No alpha rebuild, release activation, push or publish occurred.
+Q6 aggregate and broader platform/package gates remain open.
 
 ## GWZ 1.1.0 plan — accepted as text, 2026-09-23
 
