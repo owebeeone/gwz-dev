@@ -1,0 +1,16 @@
+# Python transport session v2 foundation — consolidated remediation
+
+Date: 2026-09-24. The [Code](GwzPyTransportSessionV2Foundation-ReviewCode.md) and [State](GwzPyTransportSessionV2Foundation-ReviewState.md) reviews of root `9cb11fd5d561ee108525357cdaafc11af611a137`, core `dfb7533ba8cd2eba59fc1d8ba8365a74b7413371`, Python `33a1f3f4e2ab9a7b97fd03246f7bb3f1905dfead` both returned **NO-GO**. Their P1s converge on the same cancelled-queued-worker identity defect. This is one correction package, not two independent fixes. The candidate remains disabled.
+
+| Finding | Disposition and correction | Closure proof |
+| --- | --- | --- |
+| Code P1-1; State P1-1 | Bind an issued operation ID to the queued native call itself. Cancellation marks that exact ID before entry; the delayed worker refuses without minting another ID or registering with core. | Real native call and submit held behind a blocked executor, cancelled, then released; one serial, no registration/effect, attributed pre-effect terminal. |
+| Code P2-1 | Native-session bridge lookups always enter their own session validator; only bridges without a session use the module legacy store. | Legacy result plus two Clients; no cross-read through result/event/merge; foreign ID is typed InvalidRequest. |
+| Code P2-2 | Every pre-effect refusal settles its issued record. An internally issued helper whose ID is not exposed releases the record after its typed refusal is detached; a public handle retains it. | More than 64 ordinary refusals and same-request-ID retry after conflict; retained handle refusal is inspectable and terminates. |
+| Code P2-3 | Check explicit CLI placement before endpoint construction and return typed UnsupportedOperation. | Direct and submitted CLI requests with and without HOME; identical early refusal, no endpoint or core registration. |
+| State P2-1 | Guard construction state through unwind; after accepted panic without proven finish, stop admission and drain the runtime. Completion remains conservative. | Inject construction and post-acceptance panic; close terminates, peers wake, new admission refuses. |
+| State P2-2 | Couple dispatch failure recording with native completion: no active removal, cancel/close completion, or release until one terminal is published after transport finish. | Pause between finish and failure publication; race cancel, close, result and release. |
+| State P2-3 | On thread-spawn failure, write a retained typed pre-effect refusal and wake waiters before dropping admission or returning. | Inject spawn failure; no Accepted/effects, one terminal/refusal, slot recovered. |
+| State P2-4 | Start one cancellable five-second deadline before admission leadership; cover all installation stages and let equal installed capacity join when the stable shared physical state permits it. | Hold capacity installation/retirement and queue equal waiters; each joins or times out from arrival, cancellation consumes no ID. |
+
+The full 64 MiB ledger, timer, public handles, generation rollover and platform gates remain the separately stated next implementation stages in [the checkpoint](GwzPyTransportSessionV2ImplementationCheckpoint.md). A corrected foundation needs focused race/fault tests and same-reviewer re-verdicts before those layers are built on it.
