@@ -1,6 +1,10 @@
 # GWZ client, core and transport — clean-slate proposals
 
-Date: 2026-09-24. Status: **DRAFT proposals for an operator decision; not reviewed; no design, implementation or activation authority.** The Python concurrency design train was retired to [history](history/) on 2026-09-24. It ran from the concurrency NO-GO finding through the v4 foundation draft, and its reviews, verdicts and remediation plans went with it, together with the draft transport-delivery amendments paired with it. This document starts again from the documented architecture and the facts of the current code. It reuses none of the retired designs' text.
+Date: 2026-09-24. Status: **DRAFT proposals; not reviewed; no design, implementation or activation authority.**
+
+Revised on 2026-09-24 after operator direction. gwz-py keeps running core in-process through its extension (G10) and keeps its public API (G11), and the in-process session shape in §8 is the recommendation. The decisions listed in §8 remain open.
+
+The Python concurrency design train was retired to [history](history/) on 2026-09-24. It ran from the concurrency NO-GO finding through the v4 foundation draft, and its reviews, verdicts and remediation plans went with it, together with the draft transport-delivery amendments paired with it. This document starts again from the documented architecture and the facts of the current code. It reuses none of the retired designs' text.
 
 ## 1. Why start again
 
@@ -30,6 +34,8 @@ These are taken as given. Striking or changing one is an operator decision.
 | G7 | In a library client, every call that can wait is asynchronous, and only asynchronous. | operator, 2026-09-24 |
 | G8 | Existing GWZ Taut messages and the gwz-transport virtual-stream protocol keep their meaning; additions are append-only. | GWZ outer protocol compatibility rule |
 | G9 | One client session runs several network operations at once, each with its own identity, events, result and cancellation, within bounded per-session resources. | the 1.1.0 Phase 6 NO-GO ([Python transport design](../gwz-py/dev-docs/GwzPyTransportDesign.md) status; [1.1.0 plan](../gwz-core/dev-docs/GwzV110Plan.md) S6.3) |
+| G10 | gwz-py runs core in-process through its native `gwz-core` extension. It never shells out to the `gwz` executable, and its wheels do not bundle it. A core hosted elsewhere is reached only through a remote adapter on the same typed message boundary. | [gwz-py design](../gwz-py/dev-docs/GwzPyDesign.md), "Review Of The Old Plan" and "Non-Goals"; [gwz-py README](../gwz-py/README.md); REQ-011 |
+| G11 | The Python public API keeps its current shape: the `Client`, its methods, the typed messages and the errors. Changes happen beneath it. | operator, 2026-09-24 |
 
 ## 3. What exists and what is missing
 
@@ -39,21 +45,25 @@ Assets:
 - **Core's transport host (candidate builds only):**
   - a driver session where libgit2's transports open virtual streams;
   - a local endpoint session with SSH and HTTPS workers and pools;
-  - an in-process forwarding thread between the two;
+  - an in-process forwarding thread (the transport pump) between the two;
   - a client endpoint session for client placement, which only tests connect.
+- **gwz-cli's per-command transport path** ([local_command.rs](../gwz-core/src/transport_host/local_command.rs)): one runtime, one request, the handler, then finish and shutdown. It is proven for one operation per process.
 - **The GWZ Taut service** ([gwz.taut.py](../gwz-core/protocol/gwz.taut.py)):
   - every operation method;
   - `events.subscribe`, a taut-shape log;
   - `operation.result`;
   - `ResponseMeta.operation_id` with an `accepted` aggregate status for long-running work.
 - **taut-shape:** delivery-shape engines, the log among them, in Rust and pure Python. Its length-prefixed tagged-CBOR framing already carries an interop matrix between the two languages ([taut-shape](../taut-shape/README.md)).
+- **gwz-py's bridge.** The `CoreBridge` abstraction in `bridge.py` already separates the `Client` from the native extension, and Python already encodes requests and decodes responses as Taut CBOR.
 - **Core's unused `OperationRuntime`**, with `submit`, `subscribe` and `wait`.
-- **gwz-cli's per-command transport wrapper** ([local_command.rs](../gwz-core/src/transport_host/local_command.rs)), proven for one operation per process.
 
 Missing:
 
-- a channel abstraction, with an in-process adapter and a byte-stream adapter;
-- a core session host that owns the operations it receives over a channel;
+- **A plugin boundary that carries only messages.** Today's native calls are mostly bytes in and bytes out, but some behave in ways no wire can reproduce:
+  - `call` and `submit` block Python thread-pool threads that core borrows to run Git;
+  - `cancel_operation` blocks until the operation has finished;
+  - `reserve_operation` mints IDs in native memory.
+- a core session host, shared by gwz-cli and gwz-py, that owns the operations it receives;
 - `cancel` and `release` in the GWZ service;
 - clients that use the message path;
 - a host for client placement;
@@ -78,7 +88,7 @@ Missing:
 **Two flows.**
 - The operation flow runs between client and core session and uses the GWZ Taut service.
 - The transport flow runs between core and the endpoint and uses gwz-transport envelopes.
-- When the endpoint is local, the transport flow stays inside core's process. When the endpoint is in the client, it rides the channel.
+- When the endpoint is local, the transport flow stays inside core's process and its pump is Rust. When the endpoint is in the client, the flow rides the channel.
 
 **Ownership.**
 - Core owns an operation from the moment its request is received until the operation is released or the session ends. Admission, execution, cancellation, timeouts and retention are core's decisions.
@@ -103,7 +113,9 @@ Missing:
 - Reconnection and replay are out of scope.
 
 **Execution in core.**
-- The session host never blocks on an operation. It runs the channel, timers and the transport runtime on an asynchronous executor, and dispatches handlers to a bounded worker pool it owns.
+- The session host never blocks on an operation.
+- Each operation runs on its own worker thread, owned by core and bounded in number.
+- The host runs the channel and timers without blocking.
 - Per-session limits (top-level operations, retained records, event bytes) are session-host policy.
 - Whether a session shares one transport runtime across its operations or gives each operation its own is internal to core and invisible to clients.
 
@@ -111,117 +123,111 @@ Missing:
 
 ## 6. Proposals
 
-### P1 — Embedded session
+### P1 — Embedded session (recommended; §8 gives its exact shape)
 
 ```text
-gwz-cli:  CLI ── in-process channel ── core session host ── local endpoint
-gwz-py:   asyncio API ── pump thread ── FFI (open, send, recv, close) ── in-process channel ── core session host ── local endpoint
-remote:   either client ── byte-stream channel ── core session host (same code)
+gwz-cli:  CLI ── in-process channel ── core session host ── per-operation workers ── transport runtime + pump (Rust)
+gwz-py:   unchanged Client API ── NativeCoreBridge ── extension: open, send, recv, close ── in-process channel ── core session host ── (as above)
+proof:    unchanged Client API ── stream bridge ── byte stream ── test-only core host binary ── core session host
 ```
 
-Core links into each client, and each client talks to its core session only through the in-process channel.
-
-- **gwz-cli** builds a request, sends it, and prints the reply and events, as G2 describes.
-- **gwz-py's native extension** shrinks to four calls: open a session, send a frame, receive a frame, and close.
-  - One pump thread receives, blocking with the GIL released, and wakes asyncio futures on their own event loops.
-  - Everything else is Python.
-- **The endpoint** stays local. Client placement comes later over a transport lane.
-
-**Strengths:** no packaging change, one process, and the lowest cost per call.
-
-**Costs:**
-- The byte-stream adapter runs only in a dedicated CI test.
-- Core's threads, and any native crash or hang, live in the client's process.
-- gwz-py keeps a native extension.
-
-### P2 — Core process for language bindings
-
-```text
-gwz-py:   asyncio API ── subprocess pipes (byte-stream channel) ── gwz core process: session host ── local endpoint
-gwz-cli:  embedded as in P1 locally; the same core process over SSH for a remote core
-```
-
-gwz-py starts one core process per Client, running the gwz binary in a stdio core mode (name to be decided). It speaks the session protocol over the process's pipes using asyncio streams.
-
-- **gwz-py becomes pure Python for every operation, local or network.** It needs no native extension, no GIL boundary and no thread pool.
-- **The gwz binary ships inside the gwz-py wheel,** so client and core versions always match. gwz-cli's release process already builds per-platform binaries.
-- **Closing the Client closes the channel.** The core process then cancels its operations and exits. If it has not exited within a bound, the client terminates it. The operating system is the last-resort arbiter, as it already is for gwz-cli.
-- **The core process is not a daemon** (G1). It lives and dies with its Client.
-- **gwz-cli stays embedded locally,** as in P1. The same stdio mode gives it a remote core over SSH.
+Core links into each client, and each client talks to its core session only through a channel. For gwz-py, the channel is the extension's boundary. The transport runtime and its pump stay in Rust inside the process, as they are for gwz-cli.
 
 **Strengths:**
-- The wire is Python's everyday path, so G3 is exercised continuously.
-- A hung or crashed core cannot stall the Python process.
-- The Python client is plain asyncio, which satisfies G7 directly.
-- A remote core needs no extra adapter.
+- It satisfies G10 and G11.
+- There is no packaging change and no process start.
+- In-process locks can serialize mutating operations on the same member.
+- The byte-stream path is proven by CI through a second bridge.
 
 **Costs:**
-- Per-platform binaries in the wheels.
-- One process start per Client (to be measured).
-- The child inherits the user's environment and credentials. That is the intended local-placement behaviour, the same as today's in-process runtime.
+- Cancellation is cooperative. It fails the operation's network I/O, but a handler stuck anywhere else keeps its thread until it returns.
+- A panic is caught at the worker boundary and reported as a failed operation. Nothing can forcibly stop a native hang.
+
+### P2 — Separately hosted core (remote adapter only)
+
+```text
+remote:   client ── stream bridge ── byte stream (for example SSH) ── core host on another machine ── core session host
+```
+
+G10 excludes P2's local form: gwz-py must not run the `gwz` executable, and its wheels must not bundle it. What remains is the remote adapter G10 allows. A core hosted elsewhere speaks the same messages over a byte stream, and the client uses a stream bridge. P1's CI proof uses exactly this shape against a test-only host binary, so the remote adapter needs no separate design, only a deployment.
 
 ### P3 — Client-held endpoint
 
 ```text
 gwz-cli:  CLI + endpoint ── channel (operations lane + transport lane) ── core session host (no network access)
-gwz-py:   asyncio API + endpoint in the native extension ── in-process channel ── core session host
+gwz-py:   Client API + endpoint in the extension ── in-process channel ── core session host
 ```
 
-The endpoint always runs in the client. Core never opens a network connection, and every transport message rides the channel's transport lane, including in-process.
+The endpoint always runs in the client. Core never opens a network connection, and every transport message rides the channel's transport lane, including in-process. For gwz-py the endpoint and its pump live in the extension, in Rust, consistent with G10.
 
 - **One transport path,** used by every operation, instead of two placements.
 - **Core never holds credentials,** in any deployment. That is the security model a remote core needs, applied by default.
 - **The channel needs lanes with independent credit from the start.** The accepted sequenced-stream design (profile 3) already lets each virtual stream restore its own order, so lanes may interleave freely.
-- **For gwz-py, P3 combines only with P1,** because the endpoint (Rust) must run inside the Python process.
-
-**Strengths:** one transport path, no credentials in core, and ready for a remote core.
 
 **Costs:**
 - All Git network data crosses the channel. That is cheap in-process but uses the client's bandwidth when core is remote.
 - Lanes and control priority must be built before anything ships.
-- A remote core loses its own network access, for example a server fetching over its fast link, unless that is added back.
+- A remote core loses its own network access unless that is added back.
 
 ## 7. Comparison
 
-| | P1 Embedded | P2 Core process for bindings | P3 Client-held endpoint |
+| | P1 Embedded session | P2 Remote adapter | P3 Client-held endpoint |
 | --- | --- | --- | --- |
-| Wire exercised in normal use | only by a CI test | yes, on every Python call | only with a remote core |
-| Core threads in the Python process | yes | no | yes |
-| Python native extension | four calls | none | yes, including the endpoint |
-| Isolation from a hung or crashed core | none | process boundary | none |
-| Packaging change | none | gwz binary in the wheel | none |
-| Transport placements to maintain | two (local now, client later) | two (local now, client later) | one |
+| Allowed as gwz-py's local path | yes | no (G10) | yes, with the endpoint in the extension |
+| Wire exercised | by CI through a second bridge | in every remote deployment | only with a remote core |
+| Native extension | message channel: open, send, recv, close | not applicable | channel plus endpoint |
+| Isolation from a hung or crashed core | cooperative cancellation; panics contained per worker | process boundary | as P1 |
+| Packaging change | none | a core host deployment on the remote side | none |
+| Transport placements to maintain | two (local now, client later) | as P1 | one |
 | Channel lanes needed before first ship | no | no | yes |
-| Remote core | through P2's stdio core mode | same binary over SSH | native fit |
-| Work before Python concurrency ships | session host, in-process adapter, FFI pump | session host, stdio core mode, Python client | session host, lanes, client endpoint host |
+| Work before Python concurrency ships | session host, channel, thin bridge, two-bridge CI | not on that path | session host, lanes, client endpoint host |
 
-## 8. Recommendation and decisions
+## 8. Recommendation: the in-process session shape
 
-Recommendation: **P2 for gwz-py and P1 for gwz-cli.** Both run on one core session host and one session protocol, with the endpoint local. The transport lane is reserved in the frame format now and put to use, as in P3, when a remote core is scheduled.
+1. **A core session host in gwz-core,** shared by gwz-cli and gwz-py. gwz-py's design already asks for a shared core dispatch API, so the CLI and the extension stop keeping parallel routing tables. The host:
+   - owns each operation from the moment its request arrives;
+   - gives each operation its own core-owned worker, running gwz-cli's per-command path: `with_local_transport`, the handler, then finish;
+   - bounds the number of workers;
+   - sends a cancel message to that worker's transport cancellation;
+   - when the session closes, cancels every worker and waits for them within a bound;
+   - keeps events and results until they are released or the session closes.
+2. **The extension's boundary becomes a message channel:** open, send, receive and close. Requests, responses, events, results, cancel, release and close all cross it as messages. Nothing else crosses: no borrowed Python threads, no callbacks and no synchronous state reads.
+3. **`NativeCoreBridge` becomes a thin client.** It encodes and sends. One pump thread receives with the GIL released, decodes, and wakes waiting futures on their own event loops. These are the bounded async-safe queues that gwz-py's design already requires.
+4. **The transport runtime and its pump stay in Rust in the extension,** as in gwz-cli, so no transport message reaches Python. For client placement later, the extension hosts the endpoint and pumps transport messages between the channel and the endpoint's port, also in Rust.
+5. **The Python public API is unchanged (G11).** Concurrency needs no new API: overlapping calls such as `await client.fetch(...)` are simply several requests in flight, each running on its own core worker.
+6. **Proof of G3:**
+   - A second bridge speaks the same messages over a byte stream to a test-only core host binary.
+   - CI runs gwz-py's whole test suite through both bridges.
+   - The in-process path already passes encoded bytes, so the only differences over a real stream are framing and the carrier.
+   - The wheel ships no `gwz` executable.
 
-- Python is the client that needs concurrency. Under P2 it gets concurrency with the wire as its everyday path, with no FFI and no core threads in the Python process.
-- The CLI stays one process and keeps its speed.
-- All core work is shared: the session host, the protocol additions, the worker pool, retention and closure. Both clients therefore prove the same code.
+Costs of this shape:
+- Cancellation is cooperative.
+- A native hang cannot be forcibly stopped.
+- With one transport runtime per operation, connections are not reused across operations. Eight overlapping operations could open up to 8×32 connections to one host.
 
-Decisions needed:
+Decisions still open:
 
-1. **Which proposal, or combination,** to take forward.
-2. **Transport runtime scope inside core.** There are two options:
-   - One runtime per session reuses connections across operations, but needs its shared-generation rules specified.
-   - One runtime per operation is gwz-cli's proven path. Connections are not reused across operations, and eight overlapping operations could open up to 8×32 connections to one host.
-3. **The protocol additions:** `operation.cancel`, `operation.release` and the frame lane.
-4. **Channel closure:** cancel live operations (recommended), or let them finish.
-5. **P2 only:** bundle the gwz binary in the wheel (recommended), or require one on `PATH`.
+1. **Transport runtime scope inside core.** One runtime per operation is gwz-cli's proven path and the recommended start. One runtime per session reuses connections across operations, but its shared-generation rules would need specifying.
+2. **The protocol additions:** `operation.cancel`, `operation.release` and the frame lane.
+3. **Channel closure:** cancel live operations (recommended), or let them finish.
+4. **Per-session limits:** the number of concurrent top-level operations and retained records, and whether mutating operations on the same member are serialized with in-process member locks.
 
-## 9. After the decision
+## 9. After the decisions
 
-1. **A contract design for the chosen proposal,** reviewed as a new object by fresh reviewers. It covers the protocol additions, the channel contract and adapters, the session host's ownership and limits, closure, and the Python API shape. The retired v2 caller guide is available as input for the API shape.
+1. **A contract design for the in-process session shape,** reviewed as a new object by fresh reviewers. It covers:
+   - the protocol additions;
+   - the channel contract and its two adapters;
+   - the session host's ownership, workers and limits;
+   - closure;
+   - how the unchanged Python API maps onto messages.
 2. **A phased plan:**
-   1. the core session host and in-process adapter, proven with local operations;
+   1. the core session host and in-process channel, proven with local operations;
    2. network operations;
-   3. the clients;
-   4. the byte-stream test (under P2, Python's own test suite);
-   5. client placement, when a remote core is scheduled.
+   3. the thin `NativeCoreBridge` and the extension's message channel;
+   4. the two-bridge CI proof;
+   5. gwz-cli onto the session host;
+   6. client placement, when a remote core is scheduled.
 
 ## Appendix: what was retired on 2026-09-24
 
