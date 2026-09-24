@@ -215,7 +215,7 @@ Decisions still open:
 
 ## 9. After the decisions
 
-1. **A contract design for the in-process session shape,** reviewed as a new object by fresh reviewers. It covers:
+1. **A contract design for the in-process session shape,** reviewed as a new object by fresh reviewers. The draft is [GwzCoreSessionDesign.md](GwzCoreSessionDesign.md). It covers:
    - the protocol additions;
    - the channel contract and its two adapters;
    - the session host's ownership, workers and limits;
