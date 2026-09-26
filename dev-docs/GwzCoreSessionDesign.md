@@ -1,8 +1,8 @@
 # GWZ core session — contract design
 
-Date: 2026-09-25. Status: **DRAFT contract design, revision 2; review required; no implementation or activation authority.**
+Date: 2026-09-25. Status: **DRAFT contract design, revision 3; focused re-verdict required; no implementation or activation authority.**
 
-Revision 1 applied the [first remediation plan](GwzCoreSessionDesign-RemPlan.md) to the revision the [first verdict](GwzCoreSessionDesign-Verdict.md) reviewed (root `e4b8d43`). Revision 2 applies the [second remediation plan](GwzCoreSessionDesign-RemPlan-1.md) as one patch to revision 1 (root `cb5d6f2`), which the [second verdict](GwzCoreSessionDesign-Verdict-1.md) reviewed.
+Revision 1 applied the [first remediation plan](GwzCoreSessionDesign-RemPlan.md) to the revision the [first verdict](GwzCoreSessionDesign-Verdict.md) reviewed (root `e4b8d43`). Revision 2 applied the [second remediation plan](GwzCoreSessionDesign-RemPlan-1.md) as one patch to revision 1 (root `cb5d6f2`), which the [second verdict](GwzCoreSessionDesign-Verdict-1.md) reviewed. The [third verdict](GwzCoreSessionDesign-Verdict-2.md) accepted revision 2 (root `58ea74b`) as a design contract and carried ten nonblocking findings forward. Revision 3 applies their corrections, at the operator's direction. It also moves gwz-transport's process-global check into gwz-core, which builds against gwz-transport, so that gwz-transport's CI no longer checks out its own consumer.
 
 This contract gives the shape recommended in [the clean-slate proposals §8](GwzClientCoreTransportProposals.md) exact behaviour, under that document's fixed requirements G1–G11. It pairs with DRAFT paragraphs in gwz-core's [GWZDesign](../gwz-core/dev-docs/GWZDesign.md) and [GWZRequirements](../gwz-core/dev-docs/GWZRequirements.md), as gwz-core's `AGENTS.md` requires before core behaviour expands. It also adds pointers in gwz-py's [package design](../gwz-py/dev-docs/GwzPyDesign.md) and [transport design](../gwz-py/dev-docs/GwzPyTransportDesign.md).
 
@@ -56,7 +56,7 @@ This contract adopts the proposals' recommended answers to their open decisions,
 | --- | --- | --- |
 | Channel | between one client and one session host | frames in transit; delivery only |
 | Session host | gwz-core, one per channel | every call from receipt to its reply; every operation record from admission to release, eviction or session end; the session context (§5.6); admission, locks and retention |
-| Host context | created by the driver and shared by the sessions it opens (§5.6) | the SSH setup supervisor and its budgets, the HTTPS helper slots, the member lock manager and the registry of detached workers |
+| Host context | created by the driver and shared by the sessions it opens (§5.6) | the SSH setup supervisor and its budgets, the HTTPS helper slots, the member lock manager and the workspace registry of running writes, pushes and detached workers |
 | Worker | one thread per running operation or direct call, created and owned by the session host | the running operation: its transport runtime, handler and finish, all reached through its operation gate (§5.6) |
 | Client bridge | gwz-py's `NativeCoreBridge`, gwz-cli's driver, a test bridge | its outstanding calls and their waiters, and its own view of results; nothing inside core |
 
@@ -79,7 +79,7 @@ Nine rules follow. Every later section applies them.
   - The bridge registers each call's waiter under its `call_id` before calling `send`, so a fast reply always finds its waiter.
   - When the session host reads a call's frame, it creates the call's record, its cancellation token and its gate. That happens before admission, before any `accepted` reply and before any worker exists (§5.1). The worker receives the token and the gate as arguments.
 - **O8 — Resources are reached through a gate.** A worker never holds session state or session resources directly. Its gate knows the operation's token and the session's lifetime. After cancellation, effectful requests through it fail with `Cancelled`. After revocation, reports through it are ignored as well (§5.6).
-- **O9 — Context, not globals.** Everything session-relevant travels in the session context, created at `open` and reached through the gate, or in the host context the driver passes to `open`. Code on the session path reads no environment variable and no process-global mutable state, other than the inventoried `permanent` entries. Those carry no session-relevant state or are imposed by a dependency, such as libgit2's server timeout in ordinary builds. The session's child processes get only its environment snapshot. The remaining state is inventoried in §5.7, and a check in the gwz-core, gwz-py and gwz-transport test runs keeps new state out.
+- **O9 — Context, not globals.** Everything session-relevant travels in the session context, created at `open` and reached through the gate, or in the host context the driver passes to `open`. Code on the session path reads no environment variable and no process-global mutable state, other than the inventoried `permanent` entries. Those carry no session-relevant state or are imposed by a dependency, such as libgit2's server timeout in ordinary builds. The session's child processes get only its environment snapshot. The remaining state is inventoried in §5.7, and a check keeps new state out: gwz-core's test run applies it to gwz-core and to the gwz-transport that core builds against, and gwz-py's test run applies it to gwz-py. In ordinary builds libgit2 still reads some process state itself, which §5.8 names.
 
 ## 3. The channel
 
@@ -149,8 +149,8 @@ Direct methods behave as unary calls. They run on the session's direct workers (
 **Log reads** cover `events.subscribe`, `diff.output` and `log.output`.
 - **Read** (`log_verb = read`): the `request` is taut-shape's `LogReadRequest`. Its `log_id` carries the method's handle: the operation ID for `events.subscribe`, the log ID for `diff.output` and `log.output`. Its `stream_id` names the reader, as `diff.output`'s stream ID does today. It also carries a cursor, optional record and byte limits (1 MiB by default), and a wait of at most 30 seconds.
 - The reply is taut-shape's `LogReadResponse`: the records after the cursor, the next cursor, and the log's state, including whether it is complete.
-- The session host holds a read until a record is available, the log completes, the wait elapses or the session ends. A read that returns no records and an incomplete log is simply read again.
-- **End stream** (`log_verb = end_stream`): the `request` is taut-shape's `LogEndStream`. It ends that reader's stream. On `events.subscribe` it releases nothing. On `log.output` it also releases the log and deletes its spool, which is today's `log_output_release`, and repeating it is harmless. A `diff.output` log is released as §5.4 describes.
+- The session host holds a read, parked without blocking any thread (§5.1), until a record is available, the log completes, the wait elapses or the session ends. A read that returns no records and an incomplete log is simply read again.
+- **End stream** (`log_verb = end_stream`): the `request` is taut-shape's `LogEndStream`. It ends that reader's stream. On `events.subscribe` it releases nothing. On `log.output` it also releases the log and deletes its spool, which is today's `log_output_release`, and repeating it is harmless. A `diff.output` log is released as §5.4 describes; there, an end stream naming a stream that never read the log ends nothing.
 - These logs belong to the session (§5.4).
 
 **Results:** `operation.result(operation_id)` keeps its existing declaration and replies with the `OperationResult` once the operation is terminal.
@@ -162,7 +162,7 @@ Direct methods behave as unary calls. They run on the session's direct workers (
   - Cancelling a call not yet admitted, or a direct call still waiting for a worker, settles it `Cancelled` before it runs.
   - It replies once the target is terminal, with that operation's cleanup report (the fields of today's `TransportCleanup`).
   - Cancelling an operation that is already terminal replies at once with its retained report.
-  - A target that the session never admitted gets `operation_not_found`. Because call IDs increase, the host can tell an unseen `call_id` from a spent one.
+  - A target the session never received gets `operation_not_found`: a `call_id` above the highest received, or an `operation_id` the session never issued. Because call IDs increase, the host can tell an unseen `call_id` from a spent one.
   - A released or evicted record, or a unary call that has already been answered, gets `operation_expired`. The bridge treats `operation_expired` as "already finished".
   - A `call_id` of a read, result or control call gets `invalid_request`.
 - **`operation.release(operation_id)`** discards a terminal record and replies. A live operation gets `open_operation`. A repeat, or an evicted record, gets `operation_expired`.
@@ -189,7 +189,7 @@ Direct methods behave as unary calls. They run on the session's direct workers (
 - For a method that acts on an existing workspace, the session host resolves that workspace's root before admission. A method that creates a workspace is keyed by its target path instead.
 - Resolution and the class decision run on the host's admission thread, in receipt order.
 - A request that fails validation or resolution is refused before any effect, and its record is settled with the refusal.
-- **Control frames and reads never wait for admission.** The reading thread handles `operation.cancel`, `session.close` and log reads at once. A cancel naming a call not yet admitted cancels its token, and admission then settles that call `Cancelled` before any effect.
+- **Control frames and reads never wait for admission.** The reading thread handles `operation.cancel`, `session.close` and log reads without blocking. A read that must wait is parked as a waiter on its log, and the log's next gated append, its completion, the read timer or session end completes it. A cancel naming a call not yet admitted cancels its token, and admission then settles that call `Cancelled` before any effect. Resolution never holds the table lock that the reading thread takes to settle a cancel (§5.3).
 - A hung resolution therefore delays later admissions in its session, but never control frames or reads (§16).
 
 **Classes.** Every method belongs to exactly one class. The class table lives in core, and any method missing from it counts as W.
@@ -202,8 +202,8 @@ Direct methods behave as unary calls. They run on the session's direct workers (
 
 **Serialization.**
 - Each fetch or push member step, meaning that member's network exchange and ref update, takes the member lock for that workspace and member. The member lock manager lives in the host context (§5.6), so even sessions that share a host context never update the same member's refs at once. The lock manager blocks rather than refusing, and recovers from poisoning, so one panic cannot fail later operations. A lock wait in progress wakes on cancellation, because it is a gate crossing.
-- Push also takes the existing cross-process workspace mutator lock, as W operations do. That lock is a try-lock. A later push on the same workspace waits in the queue. A session never starts a second push on a workspace while one runs, or a push beside a W on its workspace. "Already held" can therefore come only from another process, a session with another host context, or a worker detached from a closed session. The refusal names the detached worker when the host context knows it.
-- **Detached workers** are registered in the host context (§8). While one runs, a W on its workspace, or an N step on its member, waits in the queue, from any session sharing that host context, until the worker ends.
+- Push also takes the existing cross-process workspace mutator lock, as W operations do. That lock is a try-lock, so the host never lets two operations that take it meet on one workspace. A session never starts a second push on a workspace while one runs, or a push beside a W on its workspace, and the workspace registry extends that to every session sharing its host context. "Already held" can therefore come only from another process or from a session with another host context, including a worker detached from such a session. The refusal names the lock's possible holders.
+- **The workspace registry** in the host context records each workspace on which a W operation or a push is running, in any session sharing that host context, and each worker detached at a close bound (§8). A W operation or a push on a recorded workspace waits in its own session's queue until the recorded work ends, and so does an N step on a detached worker's member. A waiting operation stays cancellable, like any queued one.
 
 **Limits.**
 - At most 8 operations run at once per session.
@@ -259,11 +259,13 @@ Direct methods behave as unary calls. They run on the session's direct workers (
 - **A unary record** is discarded once its reply is sent.
 - **An operation's event log** follows GWZDesign's event-buffer rule unchanged. It is a ring of at most 4096 events. On overflow, older incremental events are dropped and a reset event is kept, followed by later events, so readers know the history is incomplete. The final `OperationResult` is kept separately and is never dropped. Today's `OperationRuntime` clears the whole buffer on overflow, so it must be brought to this rule when it is reused.
 - **`diff.output` and `log.output` logs** belong to the session that created them and live in its context (§5.6).
-  - A log is open from its creation until it is released. It is released in three ways, and its spool is deleted then:
+  - A log is open from its creation until it is released. It is released in four ways, and its spool is deleted then:
     - when its producer has sealed or closed it and its last reader stream has ended, through the existing `DiffLogRegistry::release`;
     - for `log.output`, by an end stream;
+    - to make room: when an open would exceed the limit below, the oldest log that its producer has sealed and that has no reader stream open is released first, as the operation table evicts delivered records;
     - when the session ends.
-  - At most 64 are open at once. The next open is refused with `transport_session_full` before any effect.
+  - At most 64 are open at once. An open that finds no log to release that way is refused with `transport_session_full` before any effect.
+  - A later read of a log released to make room gets `operation_expired`.
   - Another session cannot read them: it gets `operation_not_found`.
 
 ### 5.5 Timeouts
@@ -282,15 +284,15 @@ Workers run under core's existing transport deadlines, such as admission, bootst
 Every operation reaches the context only through its gate. Code on the session path reads no environment variable and no process-global mutable state (O9).
 
 **The endpoint environment is captured by the driver and passed in.**
-- The driver captures the process environment once, at its edge, and passes it to `open` in `options`. gwz-cli captures it at startup. The Python bridge takes it from `os.environ` when it opens the session.
+- The driver captures the process environment once, at its edge, and passes it to `open` in `options`. gwz-cli captures it at startup. The Python bridge captures it when it opens the session.
 - Core and the extension never read the environment themselves.
 - The snapshot is kept as captured. Each network operation derives its endpoint configuration from it: the SSH home and agent socket, TLS roots, proxies, and the `gh` environment.
 - An invalid proxy or CA setting therefore refuses only network operations, and local-only operations never parse it, as gwz-py's transport design already requires.
-- A later change to the process environment does not change a session's credentials or trust context.
+- A later change to the process environment does not change a session's credentials or trust context, except through what libgit2 reads itself in ordinary builds (§5.8).
 - **The snapshot is secret-bearing.** It is never serialized into a frame, event, result, error message or log. It goes only to the processes that need it (below), and it is dropped when the session ends.
-- It is captured losslessly: from `os.environb` on POSIX and `os.environ` on Windows.
+- It is captured losslessly, as byte-string pairs on every platform: from `os.environb` on POSIX, and on Windows from `os.environ`, encoded as WTF-8 so that unpaired surrogates survive.
 - It fixes environment values and the paths they name, not the contents of those files. A CA bundle named by `GIT_SSL_CAINFO` is read when each network operation derives its configuration.
-- **Child processes** on the session path are spawned with `env_clear()` plus the snapshot, as the `gh` helper already is. That covers `git tag`, `git commit`, the local-import `git fetch` fallback and the commit-log path walk's `git rev-list`.
+- **Child processes** on the session path are spawned with `env_clear()` plus the snapshot, as the `gh` helper already is. That covers `git tag`, `git commit`, the local-import `git fetch` fallback, the commit-log path walk's `git rev-list`, and the credential helpers that libgit2 spawns today (§5.8).
 
 **Timeouts.** `configure_transport_runtime` changes the context's timeouts for operations admitted after its reply. It never touches another session or a running operation. In transport builds, `git://`, `http://` and `file://` remotes still use libgit2's native transports and its process-wide timeout (§5.8).
 
@@ -298,11 +300,11 @@ Every operation reaches the context only through its gate. Code on the session p
 - the SSH setup supervisor, with its helper and cleanup budgets;
 - the HTTPS helper slots;
 - the member lock manager (§5.1);
-- the registry of workers detached at a close bound (§8).
+- the workspace registry: the workspaces on which its sessions run W operations and pushes, and the workers detached at a close bound (§5.1, §8).
 
 The driver creates it and passes it to every session it opens:
 - gwz-cli creates one at startup.
-- The Python bridge creates one per process on first use. `NativeCoreBridge` also accepts one to share, and `Client` is unchanged.
+- The Python bridge creates one per process, exactly once: its first open creates it under a process-wide lock, so concurrent first opens share it. `NativeCoreBridge` also accepts one to share, and `Client` is unchanged. The bridge passes `open` the host context given to `NativeCoreBridge`, or else its default, so no session gets a host context of its own by accident.
 - No static holds a host context. Dropping it stops its supervisor thread once its jobs have finished.
 - With one host context per driver process, the SSH setup budgets and the single supervisor loop hold per process, as the SSH agent design states.
 
@@ -320,12 +322,12 @@ The gate has two further states:
 
 ### 5.7 Process-global state
 
-The authoritative inventory is three allowlists: gwz-core's `scripts/checks/process_globals_allowlist.json`, and the `scripts/process_globals_allowlist.json` of gwz-py and of gwz-transport. gwz-core's `check_process_globals.py` checks all three repositories:
+The authoritative inventory is three allowlists. gwz-core keeps two: `scripts/checks/process_globals_allowlist.json` for its own code, and `scripts/checks/process_globals_allowlist_gwz_transport.json` for gwz-transport, which it builds against. gwz-py keeps `scripts/process_globals_allowlist.json`. gwz-core's `check_process_globals.py` checks each code base from the side that depends on it:
 - gwz-core, from its `scripts/run_tests.py` and its CI boundary job;
-- gwz-py, from its `test_process_globals.py`, using the sibling gwz-core checkout;
-- gwz-transport, from its `scripts/test_process_globals.py`, which its CI runs with a gwz-core checkout beside it.
+- gwz-transport, from gwz-core's `scripts/run_tests.py`, on the gwz-transport checkout beside gwz-core, which is the one core's transport build uses. gwz-transport depends on nothing, so it carries no gwz-core tooling and its CI checks out no gwz-core;
+- gwz-py, from its `test_process_globals.py`, using the gwz-core checkout beside it, which gwz-py builds against.
 
-The check fails on any unlisted static, thread-local, environment read, libgit2 global option, process-wide hook or child-process spawn. It also fails on any listed item that no longer exists, so the lists only shrink. Code compiled only under `cfg(test)` is outside the check. O9 is met when no allowlist holds a `debt` entry on the session path.
+The check fails on any unlisted static, thread-local, environment read, libgit2 global option, process-wide hook or child-process spawn, including the credential-helper spawn libgit2 performs for `Cred::credential_helper`. It also fails on any listed item that no longer exists, so the lists only shrink. Code compiled only under `cfg(test)` is outside the check. O9 is met when no allowlist holds a `debt` entry on the session path.
 
 | Item | Disposition |
 | --- | --- |
@@ -338,6 +340,7 @@ The check fails on any unlisted static, thread-local, environment read, libgit2 
 | The other ambient reads in core: `with_local_transport`'s whole-environment snapshot (`local_command.rs`), `~/` identity resolution (`identity.rs`) and repo-inspect's `Environment::Process` | Taken from the environment the driver passes in. |
 | gwz-py's working-directory reads (`lib.rs`, `transport_session.rs`) | The Python API passes the start directory with each call (§10). |
 | Session-path child processes that inherit the live environment: `git tag` and `git tag -d` (`refs.rs`), `git commit` (`repository.rs`), the local-import `git fetch` fallback (`transport.rs`) and the commit-log `git rev-list` (`commit_log/mod.rs`) | Spawned with `env_clear()` plus the snapshot (§5.6). The `gh` helper already is, and is a `permanent` entry. |
+| libgit2's credential-helper spawn, `Cred::credential_helper` (`transport_support.rs`), which runs git's configured helpers with the live environment | Core runs `git credential fill` itself, spawned with `env_clear()` plus the snapshot (§5.8). A `debt` entry until then. |
 | Test hooks compiled into production builds (`V1_PRESERVATION_IMAGE_CAPTURES`, gwz-py's `GWZ_PY_TEST_EVENT_DELAY_MS`) | Gated with `cfg(test)`, or moved behind a test-only hook. |
 | ID counters (the transport session serial, temp-file sequences, gwz-transport's pool IDs), and fault hooks compiled only under `cfg(test)` | Kept. They carry no session-relevant state. The counters are `permanent` allowlist entries. |
 
@@ -349,6 +352,8 @@ Without the transport, handlers run with the default backend.
 - `transport_capabilities` reports whether cancellation is supported, in a field appended to its response (§13), so the bridge promises no promptness it cannot deliver.
 - `configure_transport_runtime` keeps today's process-wide behaviour. libgit2's server timeouts are process-wide: they can be set before the first backend exists and are refused afterwards. This contract makes no session-isolation claim for them.
 - The same process-wide timeout also governs `git://`, `http://` and `file://` remotes in transport builds, which libgit2 still handles natively.
+- **libgit2's own reads.** libgit2 and libssh2 read some process state themselves: the SSH agent socket when they connect, and the home directory that locates git's global configuration. The environment stability of §5.6 does not extend to these reads, which gwz's check cannot see, and this contract makes no session-isolation claim for them. They apply equally to the remotes libgit2 handles natively in transport builds.
+- **Credential helpers are the exception core removes.** Today the default backend's credential callback calls `Cred::credential_helper`, and libgit2 spawns git's configured helpers with the live environment. Core instead runs `git credential fill` itself, spawned with `env_clear()` plus the snapshot and never prompting, as libgit2's lookup never does, and hands libgit2 the credential it returns. The check lists `Cred::credential_helper` as a `debt` spawn until then (§5.7).
 
 ## 6. Events and results
 
@@ -389,7 +394,7 @@ A unary call is one `SessionCall(fetch, unary)` followed by one reply when the o
 2. settles every call not yet admitted, every queued operation and every direct call still waiting for a worker `Cancelled`, with no effect. It does not wait beyond the close bound for an admission thread stuck in resolution;
 3. cancels the token of every running operation and direct call;
 4. waits for their workers to report terminals, up to `close_wait` (60 seconds by default, set at `open`);
-5. revokes the gate of every worker still running at the bound, settles its operation `Cancelled` with cleanup unconfirmed and the detached marker (§6), and registers the worker in the host context until it ends;
+5. revokes the gate of every worker still running at the bound, settles its operation `Cancelled` with cleanup unconfirmed and the detached marker (§6), and records the worker in the host context's workspace registry until it ends;
 6. answers every outstanding call: held reads return whatever records remain and completion, and results and cancels return terminals;
 7. releases the session's `diff.output` and `log.output` logs and deletes their spools;
 8. answers the close with the close report, which sums the operations' cleanup reports and counts each detached worker in `pending_local_work`, with `peer_cleanup_confirmed` false when any worker was detached;
@@ -407,8 +412,8 @@ The extension exposes a host-context constructor and one session object with fou
 
 | Operation | Behaviour |
 | --- | --- |
-| `HostContext()` | creates a host context (§5.6). The bridge creates one per process and passes it to every `open`. |
-| `open(options)` | creates the session host, its session context and its in-process channel. `options` carry the limits of §1, which `open` validates, the endpoint environment captured by the bridge (§5.6), and the host context to use. |
+| `HostContext()` | creates a host context (§5.6). The bridge creates one per process, once, and passes it to every `open`. |
+| `open(options)` | creates the session host, its session context and its in-process channel. `options` carry the limits of §1, which `open` validates, the endpoint environment captured by the bridge, as byte-string pairs on every platform (§5.6), and the host context to use. |
 | `send(frame)` | non-blocking. Fails with `transport_session_full` on a full queue, and fails once the session has ended. |
 | `recv()` | blocks with the GIL released; returns a frame, or `None` once the session has ended |
 | `close()`, or dropping the object | closes the channel |
@@ -442,13 +447,13 @@ Whether the extension keeps them for compatibility is an implementation choice. 
 **Calls.**
 - The bridge allocates each `call_id`, registers the call's waiter under it and sends the frame under one lock, so its IDs reach the host in increasing order and a fast reply always finds its waiter (O7).
 - Every request carries the caller's start directory in `InvocationContext.caller_cwd`, as the Python client already sends it.
-- The bridge creates one host context per process the first time it opens a session, and passes it to every session it opens. `NativeCoreBridge` also accepts a host context to share. `Client` is unchanged.
-- The bridge captures the environment snapshot losslessly when it opens a session: from `os.environb` on POSIX and `os.environ` on Windows.
+- The bridge creates one host context per process, under a process-wide lock, the first time any of its sessions opens, and passes it to every session it opens. `NativeCoreBridge` also accepts a host context to share. `Client` is unchanged.
+- The bridge captures the environment snapshot when it opens a session, losslessly and as byte-string pairs (§5.6).
 - A `SessionError` becomes a `GwzBridgeError` exactly as today's native error does: code, member ID, member path, target kind, detail and record context from `GwzError`, `machine_message` from `GwzError.message`, and `response_meta` from `ResponseMeta`.
 
 **The pump.** One daemon thread per session calls `recv()`.
-- For each reply it completes the waiting future on the event loop that issued the call, using `call_soon_threadsafe`. If that loop has closed, including a close that races the call, the reply is dropped and the pump continues.
-- A result reply whose waiter was cancelled is not dropped. The bridge keeps it in its view of that operation until release, and a later `operation_result` returns it.
+- For each reply it completes the waiting future on the event loop that issued the call, using `call_soon_threadsafe`. If that loop has closed, including a close that races the call, the reply is dropped and the pump continues, unless it is a result or response reply (next).
+- A result or response reply is never dropped, even when its waiter was cancelled or its loop has closed. The bridge keeps it in its view of that operation, and a later `operation_result` or `merge_operation_response` returns it from there. The view holds at most as many operations as the session's operation table and drops the oldest first. An operation's entry also goes when the operation is released, or when a call on it reports `operation_expired`.
 - A reply payload that does not decode as its call's expected response fails only that call, with a protocol error.
 - When `recv()` returns `None`, every outstanding call fails with a typed closed-session error.
 - The pump never exits silently. Any exception in its loop, or a frame whose tag or CBOR body does not decode:
@@ -571,6 +576,7 @@ Assertions check typed fields and codes only.
    - A second live operation with the same `request_id` is refused with `invalid_request` before any effect.
    - `remote_identity get`, submitted while a materialize runs on the same workspace, waits in the queue and then answers. `remote_identity set` queues behind a running W. No W operation in the session fails with "already held" because of a `remote_identity` call.
    - A core test asserts that no R method's handler acquires the workspace mutator lock.
+   - Two Clients in one process submit W operations on one workspace, and pushes on another. Each pair completes in turn, with no `UnsupportedOperation`.
 5. **Cancellation.**
    - Core test: an operation blocked opening a stream to a latch-held endpoint is cancelled through its token. The cancel returns within the admission deadline with a cleanup report, and the handler's I/O fails with `Cancelled`.
    - Core test: the token is cancelled while the runtime is being built. Registration fails with `Cancelled`, no handler runs, and the operation settles `Cancelled`.
@@ -581,6 +587,7 @@ Assertions check typed fields and codes only.
    - A cancelled queued submit and a cancelled running fetch show `aggregate_status = failed` and `errors[0].code == cancelled` on both bridges.
    - With resolution latched for one submit, a cancel of that submit settles it `Cancelled` and its handler never runs. A cancel of another, running operation and a close both complete within their own bounds.
    - Cancelling a queued unary call, and a direct call still waiting for a worker, yields `SessionError{cancelled}` for both, on both bridges.
+   - A cancel naming a `call_id` above the highest received gets `operation_not_found`.
 6. **Panics.**
    - A handler panic yields `Failed` (`internal_error`), and the next call succeeds.
    - A fault-injected panic in finish after a handler panic yields `Failed`; the next call succeeds and the process stays alive.
@@ -591,14 +598,17 @@ Assertions check typed fields and codes only.
    - An event log that overflows keeps its reset event and later events, and the result stays readable.
    - With 64 logs open, the next open is refused. Session end releases them and leaves the spool directory empty. Another session reading one of their IDs gets `operation_not_found`.
    - 65 sequential diffs read to EOF on one session succeed. With 64 diffs' streams left open, the next is refused, and ending those streams admits it.
+   - 65 byte-format diffs whose output is never read all succeed. A log with an open reader stream is never released to make room, and a later read of one that was released gets `operation_expired`.
    - A merge handle's result under a full table still returns its response. A cancelled result wait followed by a retry returns the result. 200 streams abandoned early do not exhaust admission.
 8. **Session context.**
    - Two sessions in one process: A sets a zero timeout, and B's next operation keeps B's own deadline.
-   - After `open`, changing `HOME`, `SSH_AUTH_SOCK` or `GIT_SSL_CAINFO` leaves a later operation's endpoint configuration equal to the one captured at open.
+   - In transport builds, after `open`, changing `HOME`, `SSH_AUTH_SOCK` or `GIT_SSL_CAINFO` leaves a later operation's endpoint configuration equal to the one captured at open.
+   - In both builds, the credential helper that a later HTTP fetch runs is the one the snapshot's configuration names, and it sees the snapshot, even after `HOME` changes.
+   - On POSIX, an environment value containing a byte that is not valid UTF-8 reaches a session-path child process unchanged.
    - With an invalid proxy in the captured environment, local-only operations succeed and a network operation is refused.
    - An error raised for an invalid proxy or CA setting contains no environment value, and the snapshot is unreachable after close.
    - After `open`, changing `GIT_CONFIG_GLOBAL` leaves a later `commit`'s committer identity unchanged.
-   - `check_process_globals.py` passes in gwz-core, gwz-py and gwz-transport. A new unlisted `Command::new`, or a static injected into gwz-transport, fails its repository's check.
+   - `check_process_globals.py` passes over gwz-core, gwz-transport and gwz-py. A new unlisted `Command::new` or `Cred::credential_helper` call fails gwz-core's check, and a static injected into gwz-transport fails gwz-core's run over it. gwz-transport's own CI checks out no gwz-core.
 9. **Closure.**
    - With a handler blocked on a test latch, `session.close()` answers within the bound, with `pending_local_work == 1` and unconfirmed cleanup.
    - Releasing the latch afterwards: the worker's events and terminal are ignored, its next member-lock or transport request fails with `Cancelled`, and session state is unchanged.
@@ -606,11 +616,12 @@ Assertions check typed fields and codes only.
    - A `log` producer detached at the close bound and released afterwards writes nothing to its spool path, and the registry holds no entry for it.
    - After a close with a latched W worker, a new session sharing the host context submits a W on the same workspace, and it queues until the latch is released. A session with another host context gets a refusal naming the lock's possible holders, never only "another process".
    - Two Clients in one process share the SSH helper budget.
+   - 32 Clients opened at once from 32 threads share one host context: one supervisor and one helper budget.
    - Repeated close returns the same report, including a close issued after the channel has closed.
    - The byte-stream host closes its channel.
    - Dropping the channel without close performs the same shutdown.
 10. **Channel.**
-    - 1024 held reads plus a cancel and a close complete without host blocking or reply loss.
+    - 1024 reads parked on idle logs, plus a cancel and a close, complete without host blocking or reply loss.
     - 1024 outstanding unary calls whose tasks are all cancelled: every cancel is delivered and answered.
     - `send` on a full queue raises `transport_session_full`; it never blocks or drops.
     - A frame over 64 MiB ends the session.
@@ -622,7 +633,8 @@ Assertions check typed fields and codes only.
     - gwz-py's Client-level and native-integration tests pass through `NativeCoreBridge`.
     - A cancelled unary call cancels and joins.
     - Calls issued from different event loops complete on their own loops.
-    - Replies for closed loops are dropped.
+    - Replies for closed loops are dropped, except result and response replies. With the issuing loop closed before its result reply arrives, `operation_result` from another loop returns the result.
+    - 1000 cancelled result waits with no release leave at most the operation-table size of results in the bridge's view.
 13. **Wire proof.** The same tests pass through `StreamCoreBridge`.
 14. **gwz-cli.** Its suite passes when it runs through the in-process session (§11). A pseudo-terminal test shows the progress line still appears.
 15. **Ordinary builds.** Cancelling a running fetch returns after it completes, with `Completed`. `transport_capabilities` reports no cancellation support.
@@ -631,6 +643,7 @@ Assertions check typed fields and codes only.
 
 - Cancellation is cooperative in-process. A handler that never returns is detached at the close bound. It keeps its thread, and any cross-process lock it holds, until it returns. Sessions sharing its host context wait for it; other processes see the lock held.
 - A hung workspace resolution delays later admissions in its session, but never control frames or reads.
+- In ordinary builds, libgit2's own SSH agent connection and configuration discovery read the process, not the snapshot (§5.8).
 - O7's two legacy exceptions, `TransportRequest::cancellation_handle()` and the legacy `TransportSession` entry points, return control handles after launch. They are deprecated. Their removal is tied to gwz-cli's and gwz-py's move onto the session (proposals §9, phases 3 and 5).
 - Process exit does not join a detached worker. A local write it has in progress can be torn by exit, the same exposure the CLI has under Ctrl-C.
 - Connections are not reused across operations. Eight overlapping operations may open up to 8×32 connections to one host.
