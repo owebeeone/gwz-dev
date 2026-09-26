@@ -1,0 +1,136 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a0dda5-ba3b-7859-b898-8acbf780a4e7
+workspace_id: ws_default
+origin_url_hash: sha256:e35341f4b797aa8e57a066bf78413f40c277b3985e757118ca9aea8d390fbb9c
+created_at: unix-ms:1790425021368
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 5a5d6cffac57558681ab9f712ebf88bcffc3bd11
+  branch: main
+selected_targets:
+- '@root'
+- mem_gwz_cli
+- mem_gwz_core
+- mem_taut
+- mem_gwz_py
+- mem_taut_shape
+- mem_taut_shape_rs
+- mem_taut_shape_py
+- mem_gwz_core_evidence
+- mem_gwz_transport
+- mem_git2_rs
+- mem_libgit2
+- mem_gwz_git
+committed_targets:
+- '@root'
+members:
+  mem_git2_rs:
+    path: git2-rs
+    source_id: src_git2_rs
+    source_kind: git
+    commit: 08786281876889d42e73ad5a63111d07ef5be8b1
+    branch: codex/per-remote-transport
+    detached: false
+    dirty: true
+    materialized: true
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: e926b2b5b1363128712e0301474b8b160eabf54c
+    branch: main
+    detached: false
+    dirty: true
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: e8509c321cdf646d9ab0946f6db3dbfc2778ca74
+    branch: main
+    detached: false
+    dirty: true
+    materialized: true
+  mem_gwz_core_evidence:
+    path: gwz-core-evidence
+    source_id: src_gwz_core_evidence
+    source_kind: git
+    commit: 90740fe07b12a5300967e66b9efd7521960aa573
+    branch: main
+    detached: false
+    dirty: true
+    materialized: true
+  mem_gwz_git:
+    path: gwz-git
+    source_id: src_gwz_git
+    source_kind: git
+    commit: b43fae2ede31f96a7d920093fe1c12a067eb42dd
+    branch: main
+    detached: false
+    dirty: true
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 851c2e2966b66ba45dbfc522e30c25400b72ffb2
+    branch: main
+    detached: false
+    dirty: true
+    materialized: true
+  mem_gwz_transport:
+    path: gwz-transport
+    source_id: src_gwz_transport
+    source_kind: git
+    commit: a7a36aec0ec6d31e38647b61567166d612f5d2c5
+    branch: main
+    detached: false
+    dirty: true
+    materialized: true
+  mem_libgit2:
+    path: libgit2
+    source_id: src_libgit2
+    source_kind: git
+    commit: b172e3d187a4b6866fd9f696f40a1b8e7f56d348
+    branch: codex/local-fetch-noncommit-1.9.7
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: bcf98b64d465fc54841121b6d1a2d46940f81a3c
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 74f375c9d3521f3e98110862dcf89ec64a3b6d6c
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: 864ca0b69eacf3aee9abf4b101c7192fb19903ae
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: df1303656583121e043f7a925c02958571951735
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
