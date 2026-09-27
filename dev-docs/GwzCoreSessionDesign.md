@@ -1,8 +1,11 @@
 # GWZ core session — contract design
 
-Date: 2026-09-25. Status: **DRAFT contract design, revision 3; focused re-verdict required; no implementation or activation authority.**
+Date: 2026-09-27. Status: **accepted as a design contract at revision 4, the sixteen working-tree files that [Verdict-4](GwzCoreSessionDesign-Verdict-4.md) lists by SHA-256, after [Consistency-4](GwzCoreSessionDesign-ReviewConsistency-4.md) and [Safety-4](GwzCoreSessionDesign-ReviewSafety-4.md) reported GO; this accepts the design contract only**.
+- This status sentence was added after that GO.
+- So were two corrections the reviewers cleared without a further round, which Verdict-4 records.
+- The acceptance authorizes no implementation, activation, platform proof or release.
 
-Revision 1 applied the [first remediation plan](GwzCoreSessionDesign-RemPlan.md) to the revision the [first verdict](GwzCoreSessionDesign-Verdict.md) reviewed (root `e4b8d43`). Revision 2 applied the [second remediation plan](GwzCoreSessionDesign-RemPlan-1.md) as one patch to revision 1 (root `cb5d6f2`), which the [second verdict](GwzCoreSessionDesign-Verdict-1.md) reviewed. The [third verdict](GwzCoreSessionDesign-Verdict-2.md) accepted revision 2 (root `58ea74b`) as a design contract and carried ten nonblocking findings forward. Revision 3 applies their corrections, at the operator's direction. It also moves gwz-transport's process-global check into gwz-core, which builds against gwz-transport, so that gwz-transport's CI no longer checks out its own consumer.
+Revision 1 applied the [first remediation plan](GwzCoreSessionDesign-RemPlan.md) to the revision the [first verdict](GwzCoreSessionDesign-Verdict.md) reviewed (root `e4b8d43`). Revision 2 applied the [second remediation plan](GwzCoreSessionDesign-RemPlan-1.md) as one patch to revision 1 (root `cb5d6f2`), which the [second verdict](GwzCoreSessionDesign-Verdict-1.md) reviewed. The [third verdict](GwzCoreSessionDesign-Verdict-2.md) accepted revision 2 (root `58ea74b`) as a design contract and carried ten nonblocking findings forward. Revision 3 applied their corrections, at the operator's direction. It also moved gwz-transport's process-global check into gwz-core, which builds against gwz-transport, so that gwz-transport's CI no longer checks out its own consumer. Revision 4 applies the [third remediation plan](GwzCoreSessionDesign-RemPlan-2.md) as one patch to revision 3 (root `5a5d6cf`), which the [fourth verdict](GwzCoreSessionDesign-Verdict-3.md) reviewed, at the operator's direction of 2026-09-27, with all ten of its P3 corrections.
 
 This contract gives the shape recommended in [the clean-slate proposals §8](GwzClientCoreTransportProposals.md) exact behaviour, under that document's fixed requirements G1–G11. It pairs with DRAFT paragraphs in gwz-core's [GWZDesign](../gwz-core/dev-docs/GWZDesign.md) and [GWZRequirements](../gwz-core/dev-docs/GWZRequirements.md), as gwz-core's `AGENTS.md` requires before core behaviour expands. It also adds pointers in gwz-py's [package design](../gwz-py/dev-docs/GwzPyDesign.md) and [transport design](../gwz-py/dev-docs/GwzPyTransportDesign.md).
 
@@ -79,7 +82,7 @@ Nine rules follow. Every later section applies them.
   - The bridge registers each call's waiter under its `call_id` before calling `send`, so a fast reply always finds its waiter.
   - When the session host reads a call's frame, it creates the call's record, its cancellation token and its gate. That happens before admission, before any `accepted` reply and before any worker exists (§5.1). The worker receives the token and the gate as arguments.
 - **O8 — Resources are reached through a gate.** A worker never holds session state or session resources directly. Its gate knows the operation's token and the session's lifetime. After cancellation, effectful requests through it fail with `Cancelled`. After revocation, reports through it are ignored as well (§5.6).
-- **O9 — Context, not globals.** Everything session-relevant travels in the session context, created at `open` and reached through the gate, or in the host context the driver passes to `open`. Code on the session path reads no environment variable and no process-global mutable state, other than the inventoried `permanent` entries. Those carry no session-relevant state or are imposed by a dependency, such as libgit2's server timeout in ordinary builds. The session's child processes get only its environment snapshot. The remaining state is inventoried in §5.7, and a check keeps new state out: gwz-core's test run applies it to gwz-core and to the gwz-transport that core builds against, and gwz-py's test run applies it to gwz-py. In ordinary builds libgit2 still reads some process state itself, which §5.8 names.
+- **O9 — Context, not globals.** Everything session-relevant travels in the session context, created at `open` and reached through the gate, or in the host context the driver passes to `open`. Code on the session path reads no environment variable and no process-global mutable state, other than the inventoried `permanent` entries. Those carry no session-relevant state or are imposed by a dependency, such as libgit2's server timeout in ordinary builds. The session's child processes get nothing from the live environment beyond its environment snapshot. A spawn may remove prompt hooks from the snapshot and add prompt-disabling settings, as §5.8 states. The remaining state is inventoried in §5.7, and a check keeps new state out. gwz-core's test run applies it to gwz-core and to the gwz-transport that core builds against, and fails closed without a gwz-transport checkout. gwz-core's boundary CI job applies it to gwz-core and, at the commit its allowlist records, to gwz-transport; that commit moves only under §5.7's bump rule. gwz-py's test run applies it to gwz-py. gwz-transport's own CI carries no O9 gate. In ordinary builds, and for the remotes libgit2 handles natively in transport builds, libgit2 still reads some process state itself, which §5.8 names.
 
 ## 3. The channel
 
@@ -262,10 +265,10 @@ Direct methods behave as unary calls. They run on the session's direct workers (
   - A log is open from its creation until it is released. It is released in four ways, and its spool is deleted then:
     - when its producer has sealed or closed it and its last reader stream has ended, through the existing `DiffLogRegistry::release`;
     - for `log.output`, by an end stream;
-    - to make room: when an open would exceed the limit below, the oldest log that its producer has sealed and that has no reader stream open is released first, as the operation table evicts delivered records;
+    - to make room: when an open would exceed the limit below, the oldest log whose producer sealed or closed it at least the fixed read wait (30 seconds) earlier, and that has no reader stream open, is released first; with none, the open is refused with `transport_session_full`;
     - when the session ends.
   - At most 64 are open at once. An open that finds no log to release that way is refused with `transport_session_full` before any effect.
-  - A later read of a log released to make room gets `operation_expired`.
+  - A later read of a log this session has released, in any way, gets `operation_expired`.
   - Another session cannot read them: it gets `operation_not_found`.
 
 ### 5.5 Timeouts
@@ -288,11 +291,11 @@ Every operation reaches the context only through its gate. Code on the session p
 - Core and the extension never read the environment themselves.
 - The snapshot is kept as captured. Each network operation derives its endpoint configuration from it: the SSH home and agent socket, TLS roots, proxies, and the `gh` environment.
 - An invalid proxy or CA setting therefore refuses only network operations, and local-only operations never parse it, as gwz-py's transport design already requires.
-- A later change to the process environment does not change a session's credentials or trust context, except through what libgit2 reads itself in ordinary builds (§5.8).
+- A later change to the process environment does not change a session's credentials or trust context, except through what libgit2 reads itself in ordinary builds, and for the remotes libgit2 handles natively in transport builds (§5.8).
 - **The snapshot is secret-bearing.** It is never serialized into a frame, event, result, error message or log. It goes only to the processes that need it (below), and it is dropped when the session ends.
 - It is captured losslessly, as byte-string pairs on every platform: from `os.environb` on POSIX, and on Windows from `os.environ`, encoded as WTF-8 so that unpaired surrogates survive.
 - It fixes environment values and the paths they name, not the contents of those files. A CA bundle named by `GIT_SSL_CAINFO` is read when each network operation derives its configuration.
-- **Child processes** on the session path are spawned with `env_clear()` plus the snapshot, as the `gh` helper already is. That covers `git tag`, `git commit`, the local-import `git fetch` fallback, the commit-log path walk's `git rev-list`, and the credential helpers that libgit2 spawns today (§5.8).
+- **Child processes** on the session path are spawned with `env_clear()` plus the snapshot, as the `gh` helper already is. A spawn may remove prompt hooks from the snapshot and add prompt-disabling settings, as §5.8 states and the `gh` helper already does. Nothing else from the live environment reaches a child. That covers `git tag`, `git commit`, the local-import `git fetch` fallback, the commit-log path walk's `git rev-list`, and the credential helpers that libgit2 spawns today (§5.8).
 
 **Timeouts.** `configure_transport_runtime` changes the context's timeouts for operations admitted after its reply. It never touches another session or a running operation. In transport builds, `git://`, `http://` and `file://` remotes still use libgit2's native transports and its process-wide timeout (§5.8).
 
@@ -324,10 +327,13 @@ The gate has two further states:
 
 The authoritative inventory is three allowlists. gwz-core keeps two: `scripts/checks/process_globals_allowlist.json` for its own code, and `scripts/checks/process_globals_allowlist_gwz_transport.json` for gwz-transport, which it builds against. gwz-py keeps `scripts/process_globals_allowlist.json`. gwz-core's `check_process_globals.py` checks each code base from the side that depends on it:
 - gwz-core, from its `scripts/run_tests.py` and its CI boundary job;
-- gwz-transport, from gwz-core's `scripts/run_tests.py`, on the gwz-transport checkout beside gwz-core, which is the one core's transport build uses. gwz-transport depends on nothing, so it carries no gwz-core tooling and its CI checks out no gwz-core;
+- gwz-transport, from the same two places in gwz-core. gwz-transport depends on nothing, so it carries no gwz-core tooling, its CI checks out no gwz-core, and its CI carries no O9 gate.
+  - `scripts/run_tests.py` checks the gwz-transport checkout that `GWZ_TRANSPORT_CHECKOUT` names, or else the one beside gwz-core, which is the one core's transport build uses. With neither, the run fails and names both ways. A named checkout that is missing fails; it is never a reason to use the sibling. `--skip-transport-globals` skips the check and prints `SKIPPED GATE` with the reason; only CI jobs that have no gwz-transport checkout pass it.
+  - The boundary job checks out gwz-transport beside gwz-core, at exactly the commit that the gwz-transport allowlist records as `reconciled_commit`, and runs the check over it. It cannot skip it. `reconciled_commit` is the gwz-transport commit the allowlist's entries were last reconciled against, and it must already be on gwz-transport's GitHub `main`.
+  - **Bump rule:** a gwz-core commit that changes the gwz-transport allowlist sets `reconciled_commit` in the same commit, to a gwz-transport commit that is already pushed. Upstream goes first.
 - gwz-py, from its `test_process_globals.py`, using the gwz-core checkout beside it, which gwz-py builds against.
 
-The check fails on any unlisted static, thread-local, environment read, libgit2 global option, process-wide hook or child-process spawn, including the credential-helper spawn libgit2 performs for `Cred::credential_helper`. It also fails on any listed item that no longer exists, so the lists only shrink. Code compiled only under `cfg(test)` is outside the check. O9 is met when no allowlist holds a `debt` entry on the session path.
+The check fails on any unlisted static, thread-local, environment read, libgit2 global option, process-wide hook or child-process spawn, including the credential-helper spawn libgit2 performs for `Cred::credential_helper`. Both spellings of that spawn count, as the one `Cred::credential_helper` occurrence: `Cred::credential_helper` and git2's `CredentialHelper::new`, which it wraps. It also fails on any listed item that no longer exists, so the lists only shrink. Code compiled only under `cfg(test)` is outside the check. O9 is met when no allowlist holds a `debt` entry on the session path.
 
 | Item | Disposition |
 | --- | --- |
@@ -340,7 +346,7 @@ The check fails on any unlisted static, thread-local, environment read, libgit2 
 | The other ambient reads in core: `with_local_transport`'s whole-environment snapshot (`local_command.rs`), `~/` identity resolution (`identity.rs`) and repo-inspect's `Environment::Process` | Taken from the environment the driver passes in. |
 | gwz-py's working-directory reads (`lib.rs`, `transport_session.rs`) | The Python API passes the start directory with each call (§10). |
 | Session-path child processes that inherit the live environment: `git tag` and `git tag -d` (`refs.rs`), `git commit` (`repository.rs`), the local-import `git fetch` fallback (`transport.rs`) and the commit-log `git rev-list` (`commit_log/mod.rs`) | Spawned with `env_clear()` plus the snapshot (§5.6). The `gh` helper already is, and is a `permanent` entry. |
-| libgit2's credential-helper spawn, `Cred::credential_helper` (`transport_support.rs`), which runs git's configured helpers with the live environment | Core runs `git credential fill` itself, spawned with `env_clear()` plus the snapshot (§5.8). A `debt` entry until then. |
+| libgit2's credential-helper spawn, `Cred::credential_helper` (`transport_support.rs`), which runs git's configured helpers with the live environment | Core runs `git credential fill` itself, spawned with `env_clear()` plus the snapshot, adjusted as §5.8 states. A `debt` entry until then. |
 | Test hooks compiled into production builds (`V1_PRESERVATION_IMAGE_CAPTURES`, gwz-py's `GWZ_PY_TEST_EVENT_DELAY_MS`) | Gated with `cfg(test)`, or moved behind a test-only hook. |
 | ID counters (the transport session serial, temp-file sequences, gwz-transport's pool IDs), and fault hooks compiled only under `cfg(test)` | Kept. They carry no session-relevant state. The counters are `permanent` allowlist entries. |
 
@@ -353,7 +359,16 @@ Without the transport, handlers run with the default backend.
 - `configure_transport_runtime` keeps today's process-wide behaviour. libgit2's server timeouts are process-wide: they can be set before the first backend exists and are refused afterwards. This contract makes no session-isolation claim for them.
 - The same process-wide timeout also governs `git://`, `http://` and `file://` remotes in transport builds, which libgit2 still handles natively.
 - **libgit2's own reads.** libgit2 and libssh2 read some process state themselves: the SSH agent socket when they connect, and the home directory that locates git's global configuration. The environment stability of §5.6 does not extend to these reads, which gwz's check cannot see, and this contract makes no session-isolation claim for them. They apply equally to the remotes libgit2 handles natively in transport builds.
-- **Credential helpers are the exception core removes.** Today the default backend's credential callback calls `Cred::credential_helper`, and libgit2 spawns git's configured helpers with the live environment. Core instead runs `git credential fill` itself, spawned with `env_clear()` plus the snapshot and never prompting, as libgit2's lookup never does, and hands libgit2 the credential it returns. The check lists `Cred::credential_helper` as a `debt` spawn until then (§5.7).
+- **Credential helpers are the exception core removes.** Today the default backend's credential callback calls `Cred::credential_helper`, and libgit2 spawns git's configured helpers with the live environment. Core instead runs `git credential fill` itself and hands libgit2 the credential it returns.
+  - The spawn has `env_clear()` plus the snapshot without `GIT_ASKPASS` and `SSH_ASKPASS`. It adds:
+    - `GIT_TERMINAL_PROMPT=0`;
+    - `-c core.askPass=`, an empty override that git treats as no program on every version;
+    - `-c credential.interactive=false`, which older gits ignore.
+
+    With these, git itself never prompts on any version, and a configured helper sees `credential.interactive=false`.
+  - It is killed on drop, bounded like the `gh` helper, and killed when the token is cancelled or the gate revoked.
+  - Its output is secret-bearing under §5.6: only `username` and `password` are read, other lines are tolerated and never logged, and `approve` and `reject` are not called, as libgit2's lookup does not call them today.
+  - The check lists `Cred::credential_helper` as a `debt` spawn until then (§5.7).
 
 ## 6. Events and results
 
@@ -453,7 +468,7 @@ Whether the extension keeps them for compatibility is an implementation choice. 
 
 **The pump.** One daemon thread per session calls `recv()`.
 - For each reply it completes the waiting future on the event loop that issued the call, using `call_soon_threadsafe`. If that loop has closed, including a close that races the call, the reply is dropped and the pump continues, unless it is a result or response reply (next).
-- A result or response reply is never dropped, even when its waiter was cancelled or its loop has closed. The bridge keeps it in its view of that operation, and a later `operation_result` or `merge_operation_response` returns it from there. The view holds at most as many operations as the session's operation table and drops the oldest first. An operation's entry also goes when the operation is released, or when a call on it reports `operation_expired`.
+- A result or response reply is never dropped, even when its waiter was cancelled or its loop has closed. The bridge keeps it in its view of that operation, and a later `operation_result` or `merge_operation_response` returns it from there. The view holds at most as many operations as the session's operation table and drops the oldest first. An operation's entry also goes when the operation is released, or when `operation.release` reports `operation_expired`. Another call reporting `operation_expired` leaves it.
 - A reply payload that does not decode as its call's expected response fails only that call, with a protocol error.
 - When `recv()` returns `None`, every outstanding call fails with a typed closed-session error.
 - The pump never exits silently. Any exception in its loop, or a frame whose tag or CBOR body does not decode:
@@ -556,7 +571,7 @@ Assertions check typed fields and codes only.
 
 1. **One reply per call.**
    - Every call receives exactly one reply.
-   - A call whose client stops waiting still completes, and its reply is dropped.
+   - A call whose client stops waiting still completes, and its reply is dropped, except a result or response reply, which the bridge keeps (§10). The test cancels a unary call; §15.12 tests a kept result.
    - A stream-bridge test sends a duplicate outstanding `call_id`, and another sends a lower one. Each ends the session, and the original call fails with the closed-session error, never `invalid_request`.
 2. **Error codes.**
    - A `SessionError` carrying each code this contract names survives a round trip through the Rust and Python projections as the same member.
@@ -596,19 +611,22 @@ Assertions check typed fields and codes only.
    - With the table full of unread terminal records, a new request is refused before any effect. After results are read or released, admission resumes.
    - Release refuses live operations with `open_operation`.
    - An event log that overflows keeps its reset event and later events, and the result stays readable.
-   - With 64 logs open, the next open is refused. Session end releases them and leaves the spool directory empty. Another session reading one of their IDs gets `operation_not_found`.
+   - With 64 logs open, none of them releasable to make room (§5.4), the next open is refused. Session end releases them and leaves the spool directory empty. Another session reading one of their IDs gets `operation_not_found`.
    - 65 sequential diffs read to EOF on one session succeed. With 64 diffs' streams left open, the next is refused, and ending those streams admits it.
-   - 65 byte-format diffs whose output is never read all succeed. A log with an open reader stream is never released to make room, and a later read of one that was released gets `operation_expired`.
+   - 65 byte-format diffs whose output is never read all succeed once the oldest log was sealed at least 30 seconds before the last one opens. With 64 unread logs whose producers closed them at least 30 seconds earlier, with and without an error, the next open releases one. A log sealed within the last second is kept, and its first read succeeds. A log with an open reader stream is never released to make room. A later read of a released log gets `operation_expired`, whether it was released after its last reader stream ended, by a `log.output` end stream or to make room.
    - A merge handle's result under a full table still returns its response. A cancelled result wait followed by a retry returns the result. 200 streams abandoned early do not exhaust admission.
 8. **Session context.**
    - Two sessions in one process: A sets a zero timeout, and B's next operation keeps B's own deadline.
-   - In transport builds, after `open`, changing `HOME`, `SSH_AUTH_SOCK` or `GIT_SSL_CAINFO` leaves a later operation's endpoint configuration equal to the one captured at open.
+   - In transport builds, after `open`, changing `HOME`, `SSH_AUTH_SOCK` or `GIT_SSL_CAINFO` leaves a later operation's endpoint configuration equal to the one captured at open, on an `ssh://` or `https://` remote, which gwz-transport handles. An assertion for an `http://` remote, which libgit2 handles natively, records the exception (§5.8).
    - In both builds, the credential helper that a later HTTP fetch runs is the one the snapshot's configuration names, and it sees the snapshot, even after `HOME` changes.
-   - On POSIX, an environment value containing a byte that is not valid UTF-8 reaches a session-path child process unchanged.
+   - With `GIT_ASKPASS` naming a recorder, and again with `core.askPass` naming it in the snapshot's global configuration, and no helper configured, an HTTP fetch fails with an authentication error and the recorder never runs. The `core.askPass` case also runs on a git older than 2.40. A helper that sleeps is killed when the operation is cancelled.
+   - On POSIX, an environment value containing a byte that is not valid UTF-8 reaches a session-path child process unchanged. A session-path child's environment contains no variable from the live process environment that is absent from the snapshot.
    - With an invalid proxy in the captured environment, local-only operations succeed and a network operation is refused.
    - An error raised for an invalid proxy or CA setting contains no environment value, and the snapshot is unreachable after close.
    - After `open`, changing `GIT_CONFIG_GLOBAL` leaves a later `commit`'s committer identity unchanged.
-   - `check_process_globals.py` passes over gwz-core, gwz-transport and gwz-py. A new unlisted `Command::new` or `Cred::credential_helper` call fails gwz-core's check, and a static injected into gwz-transport fails gwz-core's run over it. gwz-transport's own CI checks out no gwz-core.
+   - `check_process_globals.py` passes over gwz-core, gwz-transport and gwz-py. A new unlisted `Command::new`, `Cred::credential_helper` or `CredentialHelper::new` call fails gwz-core's check, and a static injected into gwz-transport fails gwz-core's run over it. gwz-transport's own CI checks out no gwz-core and carries no O9 gate.
+   - With no gwz-transport beside gwz-core and no `GWZ_TRANSPORT_CHECKOUT`, `run_tests.py` exits non-zero and names both ways. With `--skip-transport-globals`, and the rest of the run green, it exits zero and prints `SKIPPED GATE`. `GWZ_TRANSPORT_CHECKOUT` is honoured.
+   - `reconciled_commit` is a full 40-character SHA, and the boundary job's gwz-transport checkout takes its ref from it. That job's run over gwz-transport is not skipped, and it fails when `reconciled_commit` is not on gwz-transport's `main` (§5.7's bump rule).
 9. **Closure.**
    - With a handler blocked on a test latch, `session.close()` answers within the bound, with `pending_local_work == 1` and unconfirmed cleanup.
    - Releasing the latch afterwards: the worker's events and terminal are ignored, its next member-lock or transport request fails with `Cancelled`, and session state is unchanged.
@@ -635,6 +653,7 @@ Assertions check typed fields and codes only.
     - Calls issued from different event loops complete on their own loops.
     - Replies for closed loops are dropped, except result and response replies. With the issuing loop closed before its result reply arrives, `operation_result` from another loop returns the result.
     - 1000 cancelled result waits with no release leave at most the operation-table size of results in the bridge's view.
+    - After a cancelled result wait, the host evicts the record and `cancel_operation` reports `operation_expired`; `operation_result` still returns the result from the view.
 13. **Wire proof.** The same tests pass through `StreamCoreBridge`.
 14. **gwz-cli.** Its suite passes when it runs through the in-process session (§11). A pseudo-terminal test shows the progress line still appears.
 15. **Ordinary builds.** Cancelling a running fetch returns after it completes, with `Completed`. `transport_capabilities` reports no cancellation support.
@@ -643,7 +662,7 @@ Assertions check typed fields and codes only.
 
 - Cancellation is cooperative in-process. A handler that never returns is detached at the close bound. It keeps its thread, and any cross-process lock it holds, until it returns. Sessions sharing its host context wait for it; other processes see the lock held.
 - A hung workspace resolution delays later admissions in its session, but never control frames or reads.
-- In ordinary builds, libgit2's own SSH agent connection and configuration discovery read the process, not the snapshot (§5.8).
+- In ordinary builds, and for the remotes libgit2 handles natively in transport builds, libgit2's own SSH agent connection and configuration discovery read the process, not the snapshot (§5.8).
 - O7's two legacy exceptions, `TransportRequest::cancellation_handle()` and the legacy `TransportSession` entry points, return control handles after launch. They are deprecated. Their removal is tied to gwz-cli's and gwz-py's move onto the session (proposals §9, phases 3 and 5).
 - Process exit does not join a detached worker. A local write it has in progress can be torn by exit, the same exposure the CLI has under Ctrl-C.
 - Connections are not reused across operations. Eight overlapping operations may open up to 8×32 connections to one host.
