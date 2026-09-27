@@ -1,0 +1,365 @@
+# GWZ connection reuse across operations — design
+
+Date: 2026-09-27. Status: **DRAFT design; review required; no implementation or activation authority.** This is TR1.2 of the transport release plan ([gwz-core/dev-docs/GwzTransportReleasePlan.md](../gwz-core/dev-docs/GwzTransportReleasePlan.md)). Its review waits on the session contract's revision 4.
+
+A later network operation may use an idle SSH or HTTPS connection that an earlier operation left in the same host context, when the two operations' endpoint configurations are equal. Through a `gwz server` that is reuse across commands and clients; in one Python process, across its operations; in an in-process CLI command, within the command, as today. The design shares endpoint instances and their pools, and keeps everything else per operation. It answers the thirteen questions of the plan's TR1.2 (revision 1), closes the plan reviewers' Safety P2-5 and P3-6, and amends the [session contract](GwzCoreSessionDesign.md) (revision 3; revision 4 once TR1.1 applies it) and the documents §13 lists.
+
+**Reading notes.** Code was read at root `9a65306`, gwz-core `b13bbadb`, gwz-transport `a7a36ae`, gwz-py `4ad2b07` and gwz-cli `ebbea90`. `TH/` is `gwz-core/src/transport_host/`, `EP/` is `gwz-core/src/git/endpoint/`, `GB/` is `gwz-core/src/git/gitbackend/` and `POOL/` is `gwz-transport/src/pool/`. CS is the contract, SRV the [server design](GwzCoreServerDesign.md) and TRP the release plan. In `gwz-core/dev-docs/`: PLD is the placement design, HTTPS the HTTPS design, RETRY the retry plan, REQ the transport requirements, DES the transport design, PLAN the transport plan, N2 the selected-identity design, AGENT the SSH agent design, A3 its A3 slice, PSET the SSH production setup and GHA the gh challenge-reuse amendment.
+
+## 1. What exists
+
+**The requirements already require reuse.** An endpoint "MUST reuse eligible idle SSH connections across repositories, phases and successive operations while it remains alive" (REQ C1, REQ:205-207). "The pool MUST belong to the endpoint, not an operation" (C6, REQ:231-234; D1, REQ:328). The accepted placement design has one runtime per backend family: "Healthy pooling survives operations within a runtime, not its teardown" (PLD:68-72, 99-101).
+
+**The code already reuses inside one runtime.** Sequential SSH requests on one `TransportRuntime` share a connection (TH/driver_tests.rs:83-121); sequential HTTPS fetches open no second TLS connection (TH/https_tests.rs:316-373); a live lease admits an overlapping request of equal capacity (TH/driver_tests.rs:123-146). An idle entry is leased when its key, identity and reusability match (POOL/allocation.rs:19-25). A command reuses nothing from earlier commands only because `with_local_transport` builds a runtime per command and shuts it down (TH/local_command.rs:12-32), and the contract adopted "one transport runtime per operation" (CS:30).
+
+**Why a runtime cannot simply be kept alive.**
+1. *Lifetime registrations.* A runtime has one mux session, which admits at most 256 request registrations ever; tombstones are never pruned (TH/session.rs:481-486, 685-688; gwz-transport/src/mux/mod.rs:242-269). No rollover exists.
+2. *One Bind.* The driver mux sends its single Bind on the first `begin` (gwz-transport/src/mux/mod.rs:270-293); the endpoint session creates its only mux on that Bind and replays its registrations (TH/session.rs:864-898).
+3. *Configuration fixed at construction.* HOME, SSH_AUTH_SOCK, the CA file, proxies, the whole environment for `gh` and the timeouts are captured once per runtime (TH/local_command.rs:33-46; TH/mod.rs:47-64), and `gh` is spawned with that snapshot (EP/https_auth.rs:317-333). No configuration type has equality (TH/mod.rs:39, 72). The pool keys only scheme, user, host, port and identity.
+4. *Capacity is runtime-wide.* A differing `--jobs` or `--max-per-host` is refused with `TransportCapacityConflict` while any registration is live (TH/session.rs:487-505; TH/tests.rs:55-80); a failed resize closes the runtime (TH/session.rs:663-672).
+5. *Failure scope is the runtime.* An engine step error, a mux error or a failed send closes the whole endpoint session (TH/session/driver.rs:256-313, 427, 463). A sticky cleanup failure stops the SSH worker and disconnects every active exchange (EP/ssh_worker.rs:862-869, 879, 907).
+6. *Process-wide budgets.* 64 setup jobs, 64 live-endpoint cleanup permits and 8 `gh` slots are statics shared by every runtime; the `gh` slot is try-acquired and fails at once with Capacity (EP/agent_job.rs:13-14, 578-602; EP/https_auth.rs:313-315, 519-522).
+7. *No idle liveness.* A dead idle HTTPS socket fails its open with Io (EP/https_pool.rs:151-153); nothing calls the pool's `idle_closed`.
+8. *Cross-scheme starvation.* Idle entries keep their shared-authority reservation, a failed reservation returns Capacity, and each scheme's pool evicts only its own idle entries (EP/shared_reservation.rs:68-134; POOL/allocation.rs:95-130).
+9. *Ambient reuse never asks the agent again.* The agent handle is dropped after authentication (EP/agent_auth.rs:121), and the trusted host key is not kept (EP/ssh_local.rs:70-98).
+10. *A second sharing path.* A backend without a host context lazily builds an SSH endpoint from HOME and SSH_AUTH_SOCK and shares it across its operations (GB/transport_binding.rs:36-49, 88-98).
+
+**Why the retired Python designs failed.** Each kept one long-lived binding for overlapping operations, and so had to share that binding's per-operation state: first-request bootstrap, the 256 lifetime registrations and their rollover, capacity transitions, generation-level waits and closes, and request provenance (GwzClientCoreTransportProposals.md:11-20, 76; history/GwzPyTransportSessionV2Design.md:29, 39). v2's rollover needed quiescence and closed healthy idle connections; the v3 and v4 foundations stopped on owners of shared waits. This design shares none of that state.
+
+## 2. Ownership: endpoint instances and per-operation bindings
+
+**Share the endpoint, not the binding.** The host context (CS §5.6) owns an **endpoint registry**. Each entry is an **endpoint instance**: the endpoint side of today's runtime, built from one endpoint configuration (§3) and immutable after construction. Each network operation gets its own **binding**, created at the operation's start and finished at its end, as the per-operation runtime is today. Operations share only instances' pools, and through them idle connections.
+
+| Part | Owner | Contents |
+| --- | --- | --- |
+| Endpoint instance | the host context's registry | the SSH worker thread, its pool and key registry (EP/ssh_worker.rs:321-408; EP/ssh_key_snapshot.rs:48-50); the HTTPS thread, runtime, pool and helper-cleanup `AuthOwner` (TH/https_endpoint.rs:63-116; EP/https_worker.rs:76-101); the shared authority; the endpoint ID; the configuration |
+| Binding | one network operation | driver session and mux, link, endpoint-side mux, request registrations and their 256-lifetime limit, Bind/Bound, generation, streams and checks, the per-request tables of today's `PlacementEndpoint` and `HttpsEndpoint`, cancellation, the Q6 retirement record, the retry machine (§9), the operation's limits (§5), observations, the cleanup report, and its session's snapshot, reached through the gate |
+
+```text
+host context
+├─ setup supervisor · 64 setup jobs · 64 cleanup permits · 8 gh slots     (CS §5.6, §5.7)
+├─ member lock manager · workspace registry
+└─ endpoint registry (at most 16 instances)
+   ├─ instance E1, config C1: SSH worker + pool + keys │ HTTPS pool + AuthOwner │ authority
+   │   ├─ binding b4 (session S1, operation 7): driver mux ─ link ─ endpoint mux, tables, retry, limits
+   │   └─ binding b6 (session S2, operation 3): ...
+   └─ instance E2, config C2: ...
+       └─ binding b5 (session S1, operation 8): ...
+```
+
+- **The main core change.** An instance accepts several bindings at once. Today the endpoint session has one mux, created on the first Bind (TH/session.rs:864-898). Each binding keeps its own bootstrap: its driver mux sends its one Bind, and the instance creates that binding's endpoint mux with the instance's `EndpointConfig`, so every binding names the same endpoint ID. No gwz-transport envelope or mux change is needed.
+- **Keys include the binding.** Every instance table keyed by request, stream, operation or route name is also keyed by binding: `PlacementEndpoint`'s `(request, stream)` key (EP/placement_endpoint.rs:32), `HttpsEndpoint`'s (TH/https_endpoint.rs:23), and its operations and routes. A `request_id` is unique only among one session's live operations (CS:180), so two bindings may carry the same one.
+- **Limits stay per operation.** The bridge limits (64 requests, 16 queued inputs, 64 outbound, 8 open jobs: EP/placement_endpoint.rs:28-31) and the HTTPS client's 64 request slots and 64 routes (EP/https_worker.rs:87-93) become per binding, so an operation gets what its own runtime gives it today. The host context's 64 setup jobs bound their sum.
+- **Faults stay where they arise.** A binding's failures close only that binding; an instance's physical failures fault the instance (§8).
+- **No cross-waiting.** No binding lock is held while another binding or the instance's physical owners are stepped, and the instance never waits on a binding (PLD §4's pump rule).
+- **Threads.** The SSH worker, the HTTPS thread and one supervisor are per instance. A binding keeps today's driver-session and link threads (TH/session.rs:314-333, 955-1007), unless the implementation merges them.
+
+**Rejected alternatives.**
+- *One long-lived binding with rollover* (the retired v2). The 256 lifetime registrations force rollover, which needed zero live operations, zero non-idle leases and completed cleanup, and closed healthy idle connections (history/GwzPyTransportSessionV2Design.md:39). Bootstrap belongs to whichever request comes first, and its cancellation or a watchdog closes the generation for every waiter (PLD:189-205; the v3 and v4 foundation verdicts). Reuse would depend on quiescence.
+- *A process-global pool.* Forbidden (PLAN:52-58; CS O9; "No static holds a host context", CS:308). It would also break the per-host-context budgets and the fork rule (§7).
+- *Per-operation runtimes,* as the contract has them. No reuse: it misses C1 and D1 in a long-lived host, and TRP §1's outcome.
+- *One runtime per host context, with the configuration in the pool key.* The agent address, the known_hosts path, the TLS settings and the deadline ceilings are construction-time state of the connector and worker (EP/ssh_local.rs:34-60; TH/session.rs:388-404; EP/ssh_worker.rs:624-649). Keying them per request rebuilds that state per request, and one configuration's fault would fault every configuration.
+
+## 3. Endpoint configuration and eligibility
+
+**Configuration ownership by selection.** At the transport entry, before any effect, each network operation derives its endpoint configuration from its own session's snapshot and timeouts (CS §5.6). The registry selects the usable instance whose configuration is equal, or builds one (§7). An instance serves a request only when its configuration is byte-equal to the one derived from the requester's own snapshot, so no request runs under a value taken from another session's snapshot or from the server's environment (SRV:138). This replaces `environment_config` (TH/local_command.rs:33-46), `SshEndpointConfig::from_environment` (TH/mod.rs:47-64) and the lazy endpoint (§11). An invalid proxy or CA refuses only network operations (CS:290), before selection.
+
+| Field, in canonical order | Derived from |
+| --- | --- |
+| format version; core build | constants; the build never differs inside one process and keeps the encoding self-describing |
+| SSH home | `HOME`, absolute (TH/mod.rs:48-51); on Windows `USERPROFILE` when `HOME` is unset (SRV §11) |
+| known_hosts path | `<home>/.ssh/known_hosts` (TH/session.rs:390); the contents are read per new connection and per cross-operation lease (§4) |
+| agent source | `SSH_AUTH_SOCK` when non-empty (TH/mod.rs:52-54); on Windows the session's one agent source, as kind and address (TRP TR1.3); absence is a value |
+| CA certificates | the file named by `GIT_SSL_CAINFO` or `SSL_CERT_FILE`, read at derivation, at most 1 MiB (TH/local_command.rs:85-97), reduced to its `CERTIFICATE` blocks |
+| proxy | host, port and TLS flag from `https_proxy` … `ALL_PROXY` (TH/local_command.rs:98-130) |
+| no-proxy list | `no_proxy` or `NO_PROXY`, ASCII-lower-cased, sorted and deduplicated; matching is already case-insensitive and order-free (EP/https_connection.rs:104-119) |
+| stall and aggregate | the session's timeouts; the aggregate is 0 when the stall is 0 (TH/mod.rs:34-38) |
+
+- **Excluded.** The `gh` environment, applied per request (§6). Capacity, per operation (§5). Identity selection and HTTPS policy, which travel in each Open. The pool constants (idle 60 s, allocation 30 s, interaction 120 s, cleanup 5 s: POOL/mod.rs:47-51), which are instance constants; a constant that becomes session-derived joins the configuration.
+- **No secrets, required.** The configuration holds paths, an agent address, public certificates, a proxy host and timeouts. The proxy parser refuses URL credentials (TH/local_command.rs:106-116) and never sets proxy authorization (:128); the registry refuses a configuration that carries it. Only the CA file's certificate blocks are kept, so a mis-assembled bundle cannot put a key into an instance. The configuration is never logged, serialized or observed; agent paths and known_hosts are redacted evidence (TRP §2).
+- **Equality.** The canonical encoding is deterministic CBOR, the contract's frame encoding (CS §3), of the fields above in that order: paths and values as byte strings (WTF-8 on Windows, as CS:293), absent distinct from empty. Two configurations are equal exactly when their encodings are byte-equal. Equality is lexical: no path normalization and no symlink resolution. The registry indexes instances by the SHA-256 of the encoding and compares the full encoding on a digest hit, so a collision cannot select another instance.
+- **Consequences.** Sessions with different agents, homes, CA bytes, proxies or timeouts never share an instance, so never a connection of either scheme. A session's timeouts never govern another's connection (CS:604 holds unchanged).
+
+**Eligibility inside an instance, unchanged.** The pool key is scheme, user, host and effective port, with no repository (POOL/mod.rs:84-110). A connection is reused only when idle, reusable, of the same key and of the same identity (POOL/allocation.rs:19-25). Ambient never serves explicit, or the reverse (gwz-core/tests/transport_ssh/tests/local_endpoint.rs:286-345). An explicit identity's token names exact key bytes inside one instance's registry, and the file is re-read before every lookup, reuse included (EP/ssh_admission.rs:50-65; EP/ssh_key_snapshot.rs:87-137; N2:13-18). HTTPS identity is always `Https`; accounts are per request (EP/https_pool.rs:114-124).
+
+**The agent's identity** (TRP TR1.2 question 3). The registry selects by agent address, the only agent datum comparable without I/O, and treats an equal address as nothing more. What authorizes a pooled connection is the agent's possession of the connection's key, proven at every cross-operation lease (§4). A different agent behind the same path, a withdrawn key and a key that needs confirmation are all decided there. This departs from the wording of TR1.2's question 3 and of its Phase 6 exit row for a swapped agent; §13 amends both.
+
+## 4. Cross-operation revalidation
+
+Within one operation, reuse proceeds exactly as today. Before a connection that a different binding leased last is leased again (the pool reports it, §14 T3), the instance checks it for the requesting binding:
+
+- **SSH, ambient identity: possession, now.** At setup the connection records the public key the server accepted, the agent identity for which authentication returned 0 (EP/agent_auth.rs:82-124), and the trusted host key from `ssh_network::establish` (EP/ssh_local.rs:70-98). The check draws a fresh 32-byte random nonce and connects to the instance's agent address, which equality makes the requesting session's (EP/agent_socket.rs:33). It asks the agent to sign the OpenSSH SSHSIG signed-data blob with the recorded key (EP/agent_client.rs:60-94): the `SSHSIG` preamble, a fixed gwz namespace in the `name@domain` form PROTOCOL.sshsig recommends, an empty reserved field, `sha512`, and the SHA-512 of the nonce, with `rsa-sha2-512` for RSA keys. Only a signature that verifies against the recorded key allows the lease.
+  - The preamble and namespace keep the blob from parsing as SSH user-authentication data, which begins with the session identifier (EP/agent_auth.rs:265-293). Neither signature can stand in for the other.
+  - It proves that the agent now behind the address holds the key. It asks for an `ssh-add -c` key's confirmation again, and fails once the key has been removed or its `ssh-add -t` lifetime has ended.
+  - It runs as a supervised setup job under the host context's cap, and under the request's stall clock and absolute deadline, as an authentication sign wait does; a prompt does not pause the clock (AGENT §6).
+- **SSH, explicit identity.** The N2 re-read before the lookup is unchanged. The re-read key's public key must equal the connection's authenticating key. Token equality already implies it, since a token names exact bytes; the lease asserts it.
+- **SSH host trust, either identity.** The retained host key is checked again against known_hosts: the same path, by equality, read now, a regular file of at most 4 MiB (EP/ssh_network.rs:39-64, 235-284). A changed or removed entry refuses reuse.
+- **HTTPS.** Nothing beyond configuration equality. A TLS connection carries no account, and authorization is per request (HTTPS:246-260; GHA:55-59).
+
+**Per-binding proofs.** A binding remembers a passed possession proof per authenticating key, and a passed trust check per host, port and host key, for its own life. Concurrent leases that need one proof share one job. This is today's within-operation rule applied once per operation, and it bounds the cost: at most one local agent round trip per operation and key (one human confirmation for a confirm key), and one local known_hosts read per operation and host key. It sends nothing over the network.
+
+| Outcome | The connection | The request |
+| --- | --- | --- |
+| The proofs pass | leased; the exchange starts | continues |
+| The agent refuses, lacks the key, returns a bad signature or is unreachable; or the host key is no longer trusted | retired with reason `Revoked`, together with every idle connection of the instance that has the same authenticating key (possession failures) or the same host and host key (trust failures) | continues with a fresh checkout that takes no idle connection, within its deadlines; the new connection fails as it would today if the session cannot authenticate |
+| The request is cancelled, or its deadline passes | returned to idle | fails `Cancelled` or `Timeout` |
+| No setup job can start | returned to idle | fails with Capacity, as a setup that cannot start does |
+
+**Why retire.** Every binding of the instance asks the same agent address and reads the same known_hosts. A negative answer means that no session on the instance can show the connection's authority now; keeping the connection would only preserve withdrawn authority and ask again. The cost is one handshake for the operation that last used it, if it is still live. Retiring the idle connections that share the key stops a denied confirmation from being asked once per pooled connection.
+
+**Presence keys.** Transport authentication admits only `ssh-ed25519` and `rsa-sha2-256`/`-512` agent signatures (EP/agent_auth.rs:186-188), so `sk-*` presence keys and ECDSA keys cannot authenticate a transport connection today. The proof covers what authentication admits, and widens with it (§16.2).
+
+## 5. Capacity and the shared authority
+
+**Capacity per operation, no transitions.** Each operation's resolved limits belong to its binding, which the host creates from the operation's policy: `per_user_host` and `per_host` from `--max-per-host` (default 32), `total` = max(256, `--jobs`), `max_requests` = max(1024, `--jobs`) (TH/mod.rs:209-224; RETRY §6). They travel with every pool request the binding makes; no wire field is needed.
+
+- **Accounting.** Each scheme's pool counts opening and leased entries per owner, as today's per-runtime caps are counted per scheme. The owner is the binding: `Owner.session` is the binding's session ID for both schemes (SSH uses a worker-scoped owner today, EP/ssh_worker.rs:859, 938-942). Leasing an idle entry or opening one requires the owner to be below its `per_user_host` for that user and host, its `per_host` for that host, and its `total`. An owner's outstanding requests stay below its `max_requests`. Idle entries belong to no operation.
+- **Instance ceilings.** The instance has only physical ceilings, `C_total` and `C_host`, across both schemes, kept by the shared authority. A new connection for a request needs fewer than max(`C_total`, its `total`) entries in the instance, and fewer than max(`C_host`, its `per_host`) to its host. Taking the larger value keeps a lone operation's limits exactly as today, as the retry plan's no-clamp rule requires (RETRY:39-41); overlapping operations share the ceilings. The provisional values, until S5.4 chooses them, are `C_total` = `C_host` = 256: today's default total (POOL/mod.rs:45), and the contract's bound of eight operations at 32 per host (CS:649). S5.4 weighs the open-file limit, which gwz never raises (no `setrlimit` in gwz-core, gwz-cli or gwz-py).
+- **Nothing is installed.** No capacity is installed, resized or refused for differing limits. These go: `admit_client_request`'s comparison and its `TransportCapacityConflict` (TH/session.rs:487-505), `install_capacity` and `CapacityMutation` (TH/session.rs:240-250, 514-679), `Pool::install_capacity_pair` and `can_install_capacity` (POOL/asynchronous.rs:94-130; POOL/machine.rs:114-168), and `Authority::install_capacity` (EP/shared_reservation.rs:196-209). The SSH worker's `set_request_capacity` (EP/ssh_worker.rs:684) becomes an instance constant.
+- **Consequences.**
+  - An operation's admission and concurrency are what its own runtime gives it today, up to the instance ceilings. The only new effect is that a new-connection request may be satisfied by an idle connection.
+  - A lower limit never evicts another operation's connections, and operations with different limits are both admitted while a lease is non-idle (PLAN:212-214; TRP Phase 6).
+  - Overlapping operations may each open up to their own limits (CS:649), bounded by the ceilings; beyond them a request waits within its allocation deadline (REQ C4).
+  - Fan-out semantics do not change (PLAN:361-362). `--jobs` and `--max-per-host` keep their meanings; waiting for a physical slot is capacity, not fan-out.
+  - Fairness is FIFO among waiting requests, within per-owner limits. An operation whose own limits exceed the ceilings can hold an instance up to its limits (§17).
+  - The session host's bounds (8 running and 64 queued operations per session, CS §5.1) stay independent of `max_requests`.
+
+**Shared authority and eviction.** Idle connections of one scheme must not starve the other.
+- The pool asks the authority for a reservation before it issues Connect (§14 T5). A full authority defers the connect without failing it and without starting its connect clock.
+- A full authority asks the pool that holds the oldest idle entry of either scheme in the constrained group (the host for `C_host`, any host for `C_total`) to retire it. The waiting request proceeds when disposal frees the reservation; slots free only on actual disposal (POOL/lifecycle.rs:144-158; EP/shared_reservation.rs:121-134).
+- With nothing idle to evict, the request waits until its allocation deadline, then fails as an allocation timeout, never with an immediate Capacity.
+
+## 6. HTTPS authentication and the gh environment
+
+- **Per request.** A Gh request's lookup uses its own binding's `gh` configuration: the executable `gh`, found through the snapshot's `PATH`, and the session's snapshot. The helper is spawned as today: `env_clear()` plus the snapshot, `GH_PROMPT_DISABLED=1`, `GIT_TERMINAL_PROMPT=0` and working directory `/` (EP/https_auth.rs:317-333). The instance holds no `gh` environment. This supersedes the HTTPS design's construction-time snapshot (HTTPS:153-155).
+- **Unchanged.** Every Gh request, redirect hops included, looks credentials up afresh (EP/https_worker.rs:425-452), with no token cache (HTTPS:160-168). Authorization never crosses origins or requests. An authenticated request may reuse a TLS connection that an anonymous request, or another session's, left, and inherits neither credentials nor `authenticated = true` from it (HTTPS:259-260). The challenge carry, the Gh pin and the route pins stay per operation, in the binding (TH/https_endpoint.rs:211-228; HTTPS:134-140, 196-207).
+- **Helper slots.** The host context's 8 slots (CS §5.7) are awaited within the request's helper budget, and a wait is cancellable. They replace both the per-endpoint permit (EP/https_worker.rs:436) and the process-wide try-acquire that fails at once (EP/https_auth.rs:313-315), which a server with many clients would meet.
+- **Cleanup.** Helper children belong to the instance's `AuthOwner` (CS:311). A retained child keeps its process and its slot, not the snapshot (EP/https_auth.rs:34-37).
+- **Snapshot lifetime.** A binding reaches its session's snapshot only through the gate. Close cancels tokens (CS §8 step 3), which cancels any lookup in flight, before it revokes gates (step 5). A session's snapshot can therefore be dropped, and zeroized in a server (SRV:128), when the session ends.
+
+## 7. Lifetime, staleness and bounds
+
+**Instances.**
+- An instance is built on first use, by an operation whose configuration matches no usable instance. Construction does no network, trust, key or agent I/O (EP/ssh_local.rs:1-2) and takes one of the host context's cleanup permits (EP/ssh_worker.rs:332).
+- Selection and construction run under the operation's admission deadline (5 s, TH/session.rs:456). Operations with the same configuration wait for one construction. A failed construction fails them before any effect and leaves no instance.
+- An instance is disposed when it has no binding and no connection (both pools empty, nothing retained), or when its host context drops. Disposal shuts both pools down within the 5 s cleanup bound, and unfinished work stays under the supervisor with its permit (A3:24-40). Disposal is reported to the host context's owner (below).
+- **Bound: 16 instances per host context.** Each SSH instance holds one of the host context's 64 cleanup permits until its disposal completes, and for good if disposal overruns (A3:33-40; PSET:25-28). Sixteen live instances leave 48 permits for disposals in progress or stuck. Turnover then never starves construction, and the host context fails closed only after 48 stuck disposals; recreation cannot evade that bound. Sixteen also bounds threads (three per instance: the SSH worker, the HTTPS thread and the supervisor) and key registries (64 slots and 16 MiB each). Beyond the bound, the least-recently-used instance with no binding is disposed; if every instance has a binding, the operation is refused before any effect with `transport_session_full`.
+
+**Idle expiry.** 60 s from release (POOL/mod.rs:47; POOL/clock.rs:50-55), unchanged. TRP §2 forbids a change without amendment; §16.1 records the decision.
+
+**Stale idle replacement.** A reused connection that fails before the request's first byte is sent is discarded, and the open continues with another idle entry or a new connection, within the same request deadlines. The observation reports the connection actually used. This is replacement before send (REQ C3), not a retry attempt. Reuse across commands makes stale idle connections common, so it is required.
+- *SSH:* a failure while the channel opens (`SshChannel` phase Open, EP/ssh_channel.rs:88-98). Today `Opened` is built at attach, before the channel opens (EP/ssh_worker.rs:1078-1150); on a reused connection it now waits for the open channel, so a replacement is invisible to the driver. The exec request is the request's first byte; a failure from exec on is not replaced.
+- *HTTPS:* a checkout of an idle connection that is no longer reusable (its driver ended, it was cancelled, or its sender is not ready: EP/https_connection.rs:340-347) discards it and checks out again within the allocation budget; today it fails with Io (EP/https_pool.rs:151-153). Once the request reaches Hyper, nothing is replaced (HTTPS §6).
+- Each replacement consumes an idle entry or ends at a new connection, which is never replaced, so the loop is bounded. The host may also call `idle_closed` (POOL/lifecycle.rs:162) when an idle HTTPS connection's driver ends.
+
+**Host context and server shutdown.**
+- Dropping a host context disposes its instances concurrently within one cleanup bound and reports what remains.
+- The in-process CLI has one host context per command. Its instance is disposed at command end, and the command's cleanup report is its binding's report plus that disposal, as runtime shutdown is today (TH/local_command.rs:53-68).
+- The server's shutdown (SRV §6) gains a step after its step 3: dispose every instance within the close bound, and log pending counts, never configuration values.
+
+**Statics.** The setup-job cap and supervisor (`COUNT`, `HUB`, `INIT`), the cleanup permits (`CLEANUPS`) and the `gh` slots (`SLOTS`) move to the host context (CS §5.7; session plan CS3.5 and CS3.6). This design depends on that move.
+
+**Fork.** A child's host context is its own. The child never uses or disposes an inherited instance, whose threads do not exist in the child. Dropping it would join a worker thread that is not there (EP/ssh_worker.rs:74-86), or shut down a socket shared with the parent: `shutdown(2)` acts on the socket, not the descriptor (EP/ssh_connection.rs:37-51). The at-fork handler therefore forgets the inherited host context instead of dropping it; session plan CS4.5 says "drops".
+
+## 8. Cancellation, failure and cleanup isolation
+
+- **Cancellation.** The token (CS §5.3) cancels only its operation's request. The binding's cancel touches its own mux, table entries, leases and waiting pool requests; `cancel_session` on the binding's session ID is the backstop when a binding is abandoned (POOL/lifecycle.rs:80-107). Idle connections and other bindings are untouched.
+- **Binding failures.** A mux protocol error, an exhausted waiter or outbound bound (TH/session.rs:186, 918-920; EP/placement_endpoint.rs:934-936) or a panicked request task (TH/https_endpoint.rs:277) closes only that binding and discards its leases. Today each closes the whole endpoint session (TH/session/driver.rs:256-313, 427, 463).
+- **Q6 per binding.** The monotonic retirement record lives in the binding's registration (TH/session.rs:123-129; TH/session/driver.rs:470-517). The close at the cleanup deadline, when retirement never completed, closes that binding only. Pending physical work is reported and never closes anything shared.
+- **Cleanup reports.** A binding reports the pending work of its own requests (streams, checks, jobs, `gh` children) within the 5 s bound. Idle connections belong to no operation and are not in it. A session's close report sums its operations' binding reports (CS §8); a session with no network operation still reports `(0, false)`.
+- **Instance faults.** A failure of an instance's physical owners faults the instance: a sticky cleanup or key-admission failure (EP/ssh_worker.rs:879, 907; A3:24-31), the SSH worker or HTTPS thread ending, or a panic caught at an instance entry point (EP/ssh_shutdown.rs:59). The registry stops selecting it and new opens on it fail. Exchanges already active on other connections run to their own terminal, and the instance is disposed when its last binding detaches. Today the worker stops and disconnects every active exchange (EP/ssh_worker.rs:862-869); A3's text asks only that admission close. A later operation builds a fresh instance within the cleanup-owner budget, which recreation cannot evade (A3:33-40); with the budget spent, it is refused before any effect.
+- **Panics.** The worker catches a handler panic first, then finishes the request and detaches the binding under their own `catch_unwind`, never from `Drop` while unwinding (CS §5.2). The instance is not shut down. A panic inside binding code faults the binding; one inside instance code faults the instance.
+
+## 9. Retry
+
+- The retry plan's per-key machine (RETRY §5) stays per operation. It lives in the binding, keyed by pool key, so one operation's authentication failure closes a key for that operation only.
+- Leasing an idle connection is not a setup: it uses no attempt and does not change the key's state. While a key is Cold, the operation's members may lease eligible idle connections; only new setups wait for the one probe. This reads RETRY:225-227's "They do not open a connection" as "a new connection".
+- A Closed key stops reuse too, for that operation: a later member "is finished with the recorded failure" (RETRY:236-242).
+- A failed revalidation (§4) and a stale replacement (§7) are not attempts. The fresh setup after either is an ordinary setup under the machine.
+- Whether a started exchange on a reused connection marks a Cold key Healthy is §16.1's decision 12.
+
+## 10. Observations
+
+- Observations stay per operation and per binding: each Open's callbacks feed that operation's attempt (GB/transport_binding.rs:183-237), and each request backend starts with fresh observations (TH/mod.rs:235).
+- A reused connection's row reports `reused = true`, its `connection_id` (`ssh-worker-{w}-{seq}` or `https-{ConnectionId}`: EP/ssh_worker.rs:1078-1081; EP/https_pool.rs:179) and the instance's `endpoint_id`. For SSH, `credential_offered = false`, and the method and `authenticated = true` come from the connection's setup (EP/ssh_setup.rs:290-296, 353-366; EP/ssh_worker.rs:1082-1088). That setup may have happened in another operation or in another client's session; across operations, §4 re-proved it before the lease. For HTTPS, the method, the offer and `authenticated` describe this request only (HTTPS §7; HTTPS §10 item 4).
+- Nothing crosses operations. Pool keys hold no path (POOL/mod.rs:84-90). Rows are built from the current operation's selection (GB/transport_observations.rs:53-88). HTTPS routes are keyed by binding and retire with their request. Private-member suppression acts on the operation's own rows (GB/transport_observations.rs:41-51). No configuration value appears in a row. The opaque endpoint and connection IDs show only that an instance is shared, between sessions of one user.
+- No field is added. A connection whose rows in an operation are all `reused = true` came from another operation, and for SSH it was revalidated; a failed revalidation leaves no reused row. An explicit field would need a new `Opened` or `Facts` field in gwz-transport's schema (§16.1, decision 13).
+- `--verbose` adds one summary line per operation, derived from its rows: physical connections (distinct `connection_id`s), new ones (those with a `reused = false` row), inherited ones (the rest) and exchanges. The Phase 6 exit asks for these counts. gwz-cli renders no connection fields today (gwz-cli/src/response_meta_json.rs:16-69).
+
+## 11. Where reuse happens
+
+| Driver | Host context | Reuse |
+| --- | --- | --- |
+| In-process gwz-cli | one per command (CS §11) | within the command, as today; no cross-operation lease, so no revalidation |
+| gwz-py in process | one per process (CS §5.6; session plan CS4.5) | across the process's operations and Clients whose sessions derive equal configuration |
+| `gwz server`, `gwz-py server` | one per server (SRV §6) | across commands and clients whose sessions derive equal configuration |
+| A forked child | its own (§7) | never with its parent |
+| An ordinary build, without the transport | no registry | none; unchanged (CS §5.8) |
+
+- **Two partitions compose.** The `auto` key partitions servers by the must-match values (SRV:106-110, 147-149); the registry partitions instances by endpoint configuration inside one server. Under `auto`, HOME is equal across a server's sessions, so its instances differ by agent, CA, proxy and timeouts. TR1.3 records this. It also records that `--idle-exit` (SRV:206) needs no pool rule: instances empty themselves 60 s after their last use, and shutdown disposes the rest.
+- **Client placement** is not in this release (TRP §2). A `cli`-placed endpoint would belong to its command, never to the registry.
+- **The lazy endpoint retires.** The backend-local SSH endpoint (GB/transport_binding.rs:22-49, 88-98, 239-254) and its allowlist `debt` entry (gwz-core/scripts/checks/process_globals_allowlist.json:40-41) go, so every transport-build network operation's endpoint comes from the registry. A transport-build SSH open without a binding is refused before any effect. Before removing the lazy endpoint, the step audits `transport_meta` (gwz-cli/src/globalargs/dispatch.rs:353-369) against every handler that reaches `transport_binding::configure`.
+
+## 12. Security and trust
+
+- **Who can use a pooled connection.** Only an operation bound to its instance: an operation of a session that shares the host context and derived an equal configuration. Through a server that is the same user on the same machine, outside any sandbox (SRV §4); in Python, the same process; in the CLI, the same command. No request names a connection; the pool chooses by key and identity.
+- **The claim.** Reuse grants the requesting session nothing that its own local credentials and trust inputs do not grant it at that moment, except that it skips the network handshake. The session's configuration is its own (§3). It uses an SSH connection that another operation left only after its own agent proves possession of the authenticating key now, or its own re-read key file matches, and its own known_hosts trusts the host key now (§4). HTTPS authorization comes per request from its own `gh` (§6). The skipped handshake includes DNS, TCP and TLS setup, and the SSH server's fresh decision on the key: the server's decision at setup stands, as for any pooled or multiplexed SSH connection. §16.1 decision 5 bounds its age.
+- **Retained state.** No snapshot is stored in an instance. A binding reaches its session's snapshot through the gate for the operation's life, and zeroization is unchanged (SRV:126-128). An instance keeps its configuration (no secrets, §3), each connection's authenticating public key and host key (public data), and SSH session state. One exception exists today: an explicit-identity connection pins its key snapshot, private key text included, until disposal (N2:181-182; EP/ssh_key_snapshot.rs:39-45; EP/ssh_setup.rs:154-161, 185-188). With reuse across commands, key text read for one session can stay in a server's memory for the connection's life. §16.1 decision 10 removes that exception.
+- **Proof material.** Nonces and signatures are never logged, stored, or placed in rows or errors; the proof stays endpoint-local, like every agent exchange (AGENT §7).
+- **Logs.** The registry and instances log counts and IDs, never configuration values.
+
+## 13. Amendments
+
+Each item names the superseded clause, quotes it briefly with its location, and gives what replaces it. Contract lines are revision 3's; the same text in revision 4 is amended.
+
+**Session contract (CS).**
+- §1 (CS:25): "connection reuse across operations" leaves the out-of-scope list. (CS:26): "any change to gwz-transport" excepts the pool changes of §14; envelopes and the virtual-stream protocol stay unchanged.
+- §1 (CS:30): "one transport runtime per operation" becomes one transport binding per operation, over endpoint instances the host context shares.
+- §2 (CS:59): the host context also owns the endpoint registry and its instances. (CS:60): "its transport runtime, handler and finish" becomes "its transport binding, handler and finish".
+- §4.2 (CS:173): "never produces `TransportCapacityConflict`, since each operation has its own runtime" becomes: never produces it, because operations carry their own limits and nothing installs capacity (§5). The mapping stays.
+- §4.3 (CS:180): the text stands. Each binding registers only its operation's `request_id`, so the mux's lifetime uniqueness holds per binding, and two bindings may carry one ID.
+- §5.2 (CS:222, 226): "builds the operation's own runtime …" and "shuts the runtime down" become: derives the endpoint configuration and obtains a binding to the instance the registry selects or builds; finishes the binding. (CS:235): "runs finish and shutdown" becomes "finishes the request and detaches the binding".
+- §5.5 (CS:273): the transport deadlines gain instance selection within the admission deadline; bootstrap is per binding.
+- §5.6: the host context's list (CS:299-303) gains the registry. The gate's "transport runtime construction" (CS:316) becomes "binding creation". The derivation sentence (CS:289) stands, with the `gh` environment applied per request (§6). Dropping a host context (CS:308) also disposes its instances.
+- §5.7 (CS:335-340): the environment-read rows are closed by §3's derivation and §11's retirement. The `SLOTS` row adds "awaited within the request's helper budget".
+- §7 (CS:376): "runtime, handler" becomes "binding, handler".
+- §8 (CS:400): the close report sums the operations' binding reports; instance disposal is reported by the host context's owner (§7).
+- §13 (CS:515): stands; this design adds no schema field.
+- §14 (CS:522): "per-operation transport runtimes" becomes per-operation bindings over shared endpoint instances. (CS:534): gwz-py's "one host and pool across operations" is replaced by the host context's registry, not by per-operation runtimes. (CS:541): the physical-session-reuse test is replaced by §15's reuse rows. (CS:549): "each on its own runtime" becomes "each on its own binding". (CS:551): the placement guide's runtime premise is replaced by the registry.
+- §15.5 (CS:582): "while the runtime is being built" becomes "while its binding is being obtained, including a wait for another operation's construction of the same instance". §15 gains §15.16, this design's §15.
+- §16 (CS:649): "Connections are not reused across operations. Eight overlapping operations may open up to 8×32 connections to one host." becomes: connections are reused across the operations of one host context whose configurations are equal; overlapping operations each open up to their own limits, bounded by the instance ceilings. (CS:656): the per-operation cost is now a binding's driver and link threads; instance threads are per instance; the cost is still measured.
+
+**GWZDesign**, the core session host DRAFT paragraph (gwz-core/dev-docs/GWZDesign.md:11): "its own transport runtime" becomes "its own transport binding; endpoint instances and their pools belong to the host context and are shared by operations whose sessions derive equal endpoint configuration". GWZRequirements needs no change: "Operation observations remain isolated even when authenticated physical connections survive between operations."
+
+**Placement design §2.** (PLD:68): "The host creates a transport runtime once per backend family." becomes: the host context's registry creates endpoint instances per configuration, and each operation has a binding. (PLD:90): "Separate clients have separate runtime/binding namespaces." becomes: separate operations and clients have separate binding namespaces; clients whose sessions derive equal configuration share instances through their host context. (PLD:99-101): "A replacement uses a new session id and fresh endpoint instance … Healthy pooling survives operations within a runtime, not its teardown." becomes: a replacement binding has a new session ID and inherits no lease, message or exchange; it may attach to an existing instance of equal configuration and use its idle connections after §4's checks; healthy pooling survives bindings, not an instance's disposal. The **embedding guide** (gwz-core/docs/TransportPlacement.md:26-28, 182-188, 194), "Keep the returned runtime owner alive across operations to reuse connections" and "create a new runtime for local binding exhaustion", follows the registry.
+
+**HTTPS design.** §4 (HTTPS:153-155): "Snapshot the endpoint environment at runtime construction, allow gh to use that environment" becomes the requesting session's snapshot, per request (§6). §5 (HTTPS:222-223): "Configuration reload recreates the endpoint and disposes old connections." becomes: a session with a different configuration selects or builds another instance; the old instance's connections are never used under the new configuration, and they expire or are disposed with their instance. §6 (HTTPS:241-246): the shared authority reserves before connect and evicts across schemes (§5).
+
+**Retry plan.** §3 item 7 (RETRY:127-133): "At operation start, when no lease is non-idle, the operation installs its resolved `--max-per-host` and `--jobs` … While a lease is non-idle, a request cannot raise them; that operation is refused." §6 (RETRY:325-339): "Caps are installed when an operation starts … If any lease is non-idle, the new operation is refused with a typed error." S1.4 (RETRY:415): "Install the resolved caps at operation start … Refuse the operation when a non-idle lease exists." All three are superseded for the transport host by §5. S1.4's removal of the 4096 and 16384 bounds, and `Config::default`'s 32 and 32, stand. §5 (RETRY:225-227) reads as §9 says.
+
+**Requirements, design, setup and agent.** REQ C3 (REQ:221-222): "Existing SSH connections are authenticated sessions, not a fresh host-trust or credential check on every lease." and DES §7.1 (DES:486-488): "They do not reauthenticate or re-read known_hosts on every lease. Endpoint shutdown/reconfiguration clears the pool" gain: except a lease across operations, which re-checks host trust and proves possession locally (§4); the server never re-authenticates; a different configuration selects another instance. PSET:69-70's "Already authenticated pooled sessions retain their trust until disposal" gains the same exception. DES §7.2 (DES:494-503), as RETRY §3 item 7 replaced it, is replaced by §5. AGENT §2 (AGENT:46-47): "only the agent operations needed for authentication: list public keys and sign" adds the namespace-bound possession proof.
+
+**Server design.** §1 (SRV:33): "Connection reuse across operations (contract §1)" leaves the out-of-scope list. §4 (SRV:125): "gains nothing it couldn't already do by running gwz itself" stands, and adds why: a session uses a pooled connection only after its own agent or key file and its own known_hosts re-prove it, and what it saves is the handshake (§12). §4 (SRV:128) keeps the snapshot zeroized at session end, and adds that an instance's configuration may outlive the session until the instance is disposed. That configuration is derived from a session's snapshot and holds no secret (§3). §6 (SRV:200-204) gains §7's disposal step. §10 (SRV:308): "Reusing connections across operations remains out of scope (contract §1), but the server is where it would live." becomes: reuse happens here. TR1.3 applies these.
+
+**gwz-transport README** (gwz-transport/README.md:195-196): "Construction fixes these ceilings; operation fan-out limits cannot resize the pool." becomes: construction fixes the instance ceilings; each request carries its operation's limits, counted per owner, and no request resizes the pool.
+
+**Plans.** Two clauses of the release plan (TRP) change:
+- **TR1.2 question 3.** "the agent itself, identified by the agent's own identity rather than its socket path" becomes: the agent is selected by address, and authorized by proof of possession of the connection's key at each cross-operation lease (§3, §4).
+- **The Phase 6 exit row.** "the agent behind one socket path, swapped between two sessions: no reuse" becomes two cases:
+  - swapped for an agent that lacks the connection's key: no reuse, and the connection is retired;
+  - swapped for one that holds the key: reuse after one sign request (§15 item 2a).
+
+The release plan's Phase 6 exit rows map to §15. The 1.1.0 amendment's no-reuse notes (gwz-core/dev-docs/GwzV110PlanAmendment.md:33, 121, 137) retire under TRP §4. The session plan's "each on its own runtime" (GwzCoreSessionPlan.md:16, 280, 324), its R4 (:658) and CS4.5's at-fork "drops" go to TR1.4b.
+
+## 14. Changes by repository
+
+Steps for TR1.4b, each aimed at under 500 lines. The T-steps are foundational; only T2 needs another (T1).
+
+**gwz-transport (pool), released in Phase 10.**
+- **T1 — per-owner accounting.** `Request` gains the operation's limits (`Capacity`). The machine counts opening and leased entries per `Owner.session` and admits a lease or a new connection only below them; outstanding requests per owner stay below `max_requests`. Idle entries have no owner.
+- **T2 — ceilings by the max rule.** `Config`'s `total`, `per_host` and `max_requests` become instance ceilings, applied as max(ceiling, request limit). `install_capacity`, `install_capacity_pair`, `can_install_capacity` and their use of `ActiveOperation` go, and the README paragraph changes (§13).
+- **T3 — cross-owner leases.** An idle entry keeps its last owner, and a lease reports whether its previous owner differs from its current one.
+- **T4 — host hooks.** `retire_idle(connection, reason)` closes a named idle entry, with a new `CloseReason::Revoked`. A `fresh` request takes no idle entry.
+- **T5 — reserve before connect.** The machine asks the host for a physical reservation before Connect and connects once it is granted. While it waits, the entry counts as opening, with no connect clock, under the allocation deadline.
+
+**gwz-core.**
+- **C1 — endpoint configuration.** The type, its derivation from the session snapshot and timeouts, the canonical encoding and digest, and the no-secret rules (§3).
+- **C2 — several bindings per instance,** in three steps: (a) `PlacementEndpoint`'s request tables and limits per binding; (b) `HttpsEndpoint`'s entries, operations, slots and routes per binding, over one shared client; (c) the endpoint `Session` split into instance and binding, where a binding's Bind creates only its own endpoint mux and binding failures close only the binding (§8).
+- **C3 — registry.** Selection or construction by configuration, one construction per configuration under the admission deadline, attach and detach, disposal with no binding and no connection, the 16-instance bound with least-recently-used disposal, faulted instances, host-context drop and the server's shutdown hook.
+- **C4 — transport entry.** The session variant of `with_local_transport` obtains a binding with the operation's limits instead of building a runtime; finish detaches it; the panic path of §8. `TransportRuntime`'s public candidate constructors (TH/mod.rs:103-116) become a wrapper over a private host context, or go. Coordinated with the session plan's CS3.7.
+- **C5 — capacity plumbing.** Remove the capacity install path and the production of `TransportCapacityConflict` (§5), and set `Owner.session` to the binding's session ID for SSH and HTTPS.
+- **C6 — the per-request `gh` environment** (§6).
+- **C7 — `gh` slots awaited** in the host context within the helper budget, after CS3.6.
+- **C8 — retained keys.** Record the authenticating public key (agent: the accepted identity; explicit: the key's public key) and the trusted host key on the authenticated connection (EP/ssh_setup.rs:26-31).
+- **C9 — revalidation** (§4): the setup job, SSHSIG signing and verification, the known_hosts re-check, the per-binding proofs, and retirement through T4. Verification needs Ed25519 and RSA SHA-2 signature checks, which core lacks: gwz-core/Cargo.toml has `sha2` and `getrandom` and no verifier. The crate is chosen under the release's pin rules (§16.2).
+- **C10 — stale replacement** (§7): `Opened` after the channel opens on a reused SSH connection, and a new checkout after a dead idle socket, for both schemes.
+- **C11 — authority** (§5): reservations through T5, cross-scheme eviction and the provisional ceilings.
+- **C12 — instance fault scope** (§8): admission closes and active exchanges drain, in EP/ssh_worker.rs and the HTTPS thread.
+- **C13 — the retry machine per binding** (§9), on top of TR2.1.
+- **C14 — the lazy endpoint retires** (§11).
+- **Prerequisites:** session plan CS3.5 and CS3.6, which move the statics into the host context.
+- **Conditional compilation.** The registry and instance types are transport-build members of the host context. They sit inside the `cfg_if` boundary that gates `transport_host` (gwz-core/src/lib.rs:49-53), grouped as one transport member of the host context, with its ordinary-build counterpart in the same `cfg_if` block. No `#[cfg]` goes on an individual field or import. A step that edits GB/backend.rs also moves its `#[cfg(test)] use super::*;` (backend.rs:1-2) into a `cfg_if` boundary.
+
+**gwz-cli.** Beyond the session plan's steps, only §10's `--verbose` summary line and connection fields, which are rendering.
+
+**gwz-py.** Nothing beyond the session plan's steps, except that CS4.5's at-fork handler forgets the inherited host context (§7).
+
+**Order.** T1–T5, C1, C2 and C8 can start at once. C3 follows C2, and C4 follows C3. C5 follows T1, T2 and C2; C11 follows T5 and C2; C6, C10 and C13 follow C2. C9 follows C3, C8, T3 and T4. C12 follows C3, and C14 follows C4.
+
+## 15. Verification
+
+A new contract §15.16, "Connection reuse". Assertions check typed fields, codes and fixture counters. The fixtures are disposable: a local sshd, fixture agents that count sign requests and can deny them, a local TLS smart-Git server, and a fake `gh` that records its environment.
+
+1. **Configuration ownership (closes Safety P2-5).** Two sessions on one host context, with different `GH_TOKEN` and different `SSH_AUTH_SOCK`, run SSH and HTTPS operations. Every `gh` invocation sees its own session's token, each new SSH connection's sign requests reach its own session's agent, no `connection_id` appears in both sessions' rows, and the registry holds two instances. With only `GH_TOKEN` different, the sessions share TLS connections, and each request's `Authorization` carries its own session's token.
+2. **Agent identity and per-use authorization (closes Safety P3-6).** (a) Session A authenticates through agent 1 behind a symlinked path. The path is repointed to agent 2, which lacks the key. Session B does not reuse, the connection is retired, and B's new connection signs through agent 2. With agent 2 holding the same key, B reuses and agent 2 records one sign request. (b) A confirm-required key: the second command triggers exactly one fresh confirmation and reuses. With the fixture denying, it does not reuse, the connection is retired, and its new connection asks again.
+3. **Sharing.** Two sessions with equal configuration run sequential operations over one physical connection, for SSH and for HTTPS. The second row has `reused = true` and the first row's `connection_id`, and the fixtures' accept counts do not change.
+4. **Partition.** A differing HOME, agent, CA content (one path, an edited file), proxy or timeout gives separate instances and no shared connection. No-proxy lists that differ only in order and case share one. A different explicit identity never shares a connection. A configuration with proxy authorization is refused, and a CA file holding a private-key block keeps only its certificates.
+5. **Withdrawn authority.** A key removed from the agent, or a key whose `ssh-add -t` lifetime ends, between commands: no reuse, and the connection and its same-key idle connections are retired. A changed explicit key file: no reuse (N2). A known_hosts entry changed or removed between commands: no reuse, and retirement; once the entry is restored, reuse passes.
+6. **Isolation.** Cancelling A while B holds a lease on the same instance: B completes, A's lease closes, idle connections survive, and B's next request reuses one. A binding fault in A (an injected mux protocol error, an exhausted outbound bound) and a handler panic in A leave B and the instance usable. Q6: backdated cleanup ages on A's binding close neither B nor the instance, and a later operation reuses. An injected instance fault stops selection, B's active exchange completes, and a later operation builds a fresh instance; with the cleanup-owner budget spent, that operation is refused before any effect.
+7. **Capacity.** Operations with `--max-per-host` 4 and 32 are both admitted while a lease is non-idle. The first never exceeds 4 opening or leased per host; neither closes the other's connections; no `TransportCapacityConflict` occurs. With test ceilings of 8, a lone operation at 16 gets 16, and two operations at 8 share those 8. Retry S1.3's pool rows still pass.
+8. **Retry.** A's authentication failure closes the key for A only; B on the same instance still leases and opens. Revalidation failures and replacements consume no attempt.
+9. **Stale idle replacement.** SSH: the server drops an idle connection; the next operation's channel open fails, the open completes on another connection within its deadlines, and the row reports that connection. HTTPS: the same, with a closed TLS socket at checkout. A failure after the request reaches Hyper is not replaced.
+10. **Cross-scheme eviction.** Idle SSH connections filling the authority do not stop an HTTPS open: the oldest idle SSH connection is retired and the open proceeds. The same holds the other way.
+11. **Bounds and lifetime.** An instance with no binding is disposed after its last idle connection expires (injected clock); its threads end and its permit returns. A 17th configuration disposes the least-recently-used unbound instance; with 16 bound, it is refused with `transport_session_full` before any effect. Server shutdown disposes every instance within the close bound.
+12. **`gh` slots.** Nine concurrent lookups across two sessions: the ninth waits and completes within its helper budget; one whose budget expires while it waits fails `Timeout`.
+13. **Fork.** A Client opened in a forked child has its own host context, and the parent's pooled connection stays usable after the child exits (Linux, macOS).
+14. **Observations.** B's rows contain no sentinel member path, remote or URL from A, and no configuration value. `--verbose` prints physical, new and inherited connections and exchanges. CS §15.8's timeout test passes unchanged.
+15. **Lazy endpoint.** A transport-build SSH open without a binding is refused before any effect, and the checker's allowlist holds no `transport_binding` environment entry.
+
+**Rewritten tests.** TH/tests.rs:12-54 (caps reinstalled per request), 55-80 (capacity conflict) and 128-164 (a dropped staged install) are replaced by item 7. TH/driver_tests.rs:123-146 generalizes to differing capacities.
+
+**Phase 6 exit.** Its rows, in the plan's order, map to items 3, 1, 4, 2a, 2b, 5, 6, 7, 7 and 14.
+
+**Design §11 cells (1.1.0 S5.6 rows).** Each is marked per platform with evidence or as unsupported.
+
+| Cell | Evidence kind |
+| --- | --- |
+| Reuse across operations in one host context, SSH and HTTPS | CI fixture (items 3, 9); measurement (TR8.2) |
+| Configuration partition and the per-request `gh` environment | CI fixture (items 1, 4); for the advertised cell, a real-account `gh` operation through a server |
+| Revalidation: agent possession, explicit key, host trust | CI fixture (items 2, 5) on macOS and Linux; on Windows, OpenSSH-agent and, if selected, Pageant fixtures, or unsupported |
+| Per-operation capacity, ceilings and cross-scheme eviction | unit and CI fixture (items 7, 10) |
+| Isolation and instance faults | CI fixture (item 6) |
+| Instance lifetime and bounds | unit (item 11) |
+
+## 16. Open decisions and points
+
+### 16.1 Decisions, each with a recommendation
+
+1. **The idle default for reuse across commands.** Recommended: keep 60 s, and let TR8.2 measure how often back-to-back commands through a server fall within it. A longer value amends TRP §2's row and the sentences TR1.2's question 10 lists, needs Surface, and needs a keepalive design first: a silently dropped idle connection costs a stall on SSH and a failed request on HTTPS (§17).
+2. **The instance bound.** Recommended: 16, with least-recently-used disposal of unbound instances (§7). 8 halves the resources; 32 leaves only 32 permits for stuck disposals.
+3. **Revalidation failure.** Recommended: retire the connection and the idle connections with the same key or host key, and continue the request fresh (§4). Leaving them idle for their own session keeps withdrawn authority until idle expiry and asks again per connection.
+4. **Revalidation within one operation after N minutes.** Recommended: no. Decision 5 bounds a connection's age instead, and an operation keeps today's within-operation rule.
+5. **A maximum connection age.** Recommended: an internal constant of 10 minutes, applied at release, with no flag: an older connection is closed instead of returning to idle. S5.4 may tune it. It bounds how long the server's decision at setup is relied on (§12); without it, a connection reused at least once a minute lives indefinitely.
+6. **Proof scope.** Recommended: one proof per binding and key, and per binding and host key (§4). A proof per lease would repeat confirmations within one operation.
+7. **Timeouts in the configuration.** Recommended: keep them, so that sessions with different timeouts never share. They could leave it once every connection- and exchange-scoped clock is shown to come from the request (EP/ssh_worker.rs:884-899, 1065-1070 suggest most do) and the instance runs with its ceilings disabled.
+8. **The ceiling rule.** Recommended: max(ceiling, the request's own limit), provisionally 256 and 256 (§5). A hard ceiling would clamp `--jobs` and `--max-per-host`, and needs RETRY §1 amended.
+9. **Instance fault scope.** Recommended: close admission and drain active exchanges (§8). Today's stop-everything fails other operations' live exchanges in a shared instance.
+10. **Explicit key text.** Recommended: after authentication a pooled connection keeps only what reuse needs, its token, a SHA-256 of the key bytes (in memory only, never in errors: N2:89-90) and the public key, and the private key text lives only with requests that are setting up a connection. This amends N2's registry (EP/ssh_key_snapshot.rs:101-137) and makes §12's retained-state answer hold without exception.
+11. **Network operations without a binding.** Recommended: refuse SSH before any effect (§11). HTTPS without a host context takes the native route today (GB/transport_binding.rs:184-186); decide both in 1.1.0 S7.1's ledger work.
+12. **Reuse and a Cold key.** Recommended: a reused SSH connection whose channel opens, or a reused HTTPS connection that returns a response, marks the key Healthy for the operation, since it proves the host reachable. The alternative keeps the key Cold until a new setup succeeds.
+13. **An explicit revalidation field in rows.** Recommended: none (§10). A field needs an `Opened` or `Facts` addition in gwz-transport's schema and an amendment of CS §13.
+14. **Surface.** Recommended: add a Surface review for §10's `--verbose` line, and for decision 1 if the idle default changes.
+
+### 16.2 Open points found while drafting
+
+- **Presence and ECDSA keys** cannot authenticate a transport connection today (EP/agent_auth.rs:186-188; AGENT §5). The presence-key case of TR1.2's question 4 is moot until a design admits them, and the proof must then support them.
+- **Confirmation under the stall clock.** An agent prompt spends the request's stall (AGENT §6). A confirmation answered after 9 s fails authentication today, and fails revalidation alike; item 2b's fixture answers within the stall.
+- **A signature verifier** is a new dependency (C9).
+- **The agent's "own identity"** (TR1.2 question 3) has no stable form: a socket path can be repointed, and an agent's peer credentials name a process, not its keys. §3 selects by address, and §4 authorizes by possession.
+- **SSH `Opened` precedes the channel open** today (EP/ssh_worker.rs:1078-1150); stale replacement needs it deferred on reused connections (§7).
+- **Endpoint-wide limits.** Today's bridge and HTTPS request limits are per endpoint; shared, they would lower an operation's concurrency, so C2 makes them per binding (§2).
+- **gwz-cli** is otherwise untouched, but the Phase 6 counts need a rendering change there (§10).
+- **Fork.** CS4.5's at-fork handler must forget, not drop (§7). Which inherited objects a drop would reach is not verified.
+- **The CA bundle.** `native_tls::Certificate::from_pem` adds only a bundle's first certificate (EP/https_connection.rs:214-218). Configuration equality compares the whole bundle, which only lowers reuse; the first-certificate behaviour is an HTTPS parity item, not this design's.
+
+## 17. Risks
+
+- **Shared state.** The multi-binding endpoint is the main change, in the area where four Python designs failed. Mitigations: only pools are shared, every per-operation structure stays in the binding, and review precedes code (TRP §8).
+- **Silent idle death.** A NAT that drops an idle connection without a reset is detected only by the stall on the SSH channel open, which costs up to 9 s before the replacement, and an HTTPS request already sent fails without replacement. The 60 s idle default keeps this unlikely.
+- **Instance faults** still stop admission for every operation on an instance until a fresh one is built.
+- **Server-side revocation** of a key is not seen by a pooled connection (§12); decision 5 bounds it. Changes to the platform trust store and to DNS are likewise not re-checked for a pooled connection, as within a runtime today.
+- **Revalidation cost.** One agent round trip per operation and key, one confirmation for a confirm key, and a setup-job slot per proof.
+- **Fairness.** Under the max rule, an operation whose limits exceed the ceilings can hold an instance up to its own limits, while other operations wait within their allocation deadlines.
+- **Resources.** Sixteen instances can hold 48 threads and 16 key registries of up to 16 MiB each. The open-file limit is not raised.
+- **Key registries.** An instance's 64 key slots serve every operation bound to it. A server whose clients select many distinct explicit keys can fill them, and a selected-key open then fails its reservation, as it does when one runtime fills them today (EP/ssh_key_snapshot.rs:72-78).
+- **Dependencies.** This design needs the contract's statics move (CS3.5, CS3.6) and TR2.1's retry machine. Windows needs the transport build there (TRP Phase 4).
