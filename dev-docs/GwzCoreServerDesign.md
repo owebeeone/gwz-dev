@@ -1,6 +1,6 @@
 # GWZ core server — design
 
-Date: 2026-09-26. Status: **DRAFT design; review required; no implementation or activation authority.**
+Date: 2026-09-26. Status: **DRAFT design; review required; no implementation or activation authority.** As of 2026-09-27, the [transport release plan](../gwz-core/dev-docs/GwzTransportReleasePlan.md) ships the server in the transport release. Before this design's review, its TR1.3 revises it: reuse in scope, client-side listener verification, the off switch's must-match rule, one agent source per session, and the default.
 
 This design lets gwz commands run in a long-lived core process that listens on a local socket. There is no new repository or binary. The server is a command of the two CLIs that already embed core:
 - **`gwz server --start | --stop | --status`** in gwz-cli;
@@ -415,3 +415,7 @@ Each repository tests against what it depends on.
 - **A detached worker** holds its workspace until it ends. With a server, that blocks every client, not one CLI process.
 - **A crash** affects every connected client.
 - **Job objects.** Where the caller's job object forbids breakaway, as some CI runners and terminals do, an auto-started server ends with its caller's job. A server started with `--foreground` under a service manager is unaffected.
+
+## Changelog
+
+- 2026-09-27: status notes that the transport release ships the server, pending TR1.3 of [`GwzTransportReleasePlan.md`](../gwz-core/dev-docs/GwzTransportReleasePlan.md).
