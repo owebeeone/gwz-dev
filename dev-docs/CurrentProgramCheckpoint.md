@@ -1,5 +1,41 @@
 # Current program checkpoint
 
+## Transport release — plan, amendment and session contract accepted, 2026-09-27
+
+The next minor release is the **transport release**, expected to be v1.1.0: the
+transport, the core session host, `gwz server` and connection reuse across
+commands (operator decisions of 2026-09-26 and 2026-09-27). Accepted, each by
+dual Consistency and Safety review, as text or design only:
+- [Transport release plan](../gwz-core/dev-docs/GwzTransportReleasePlan.md).
+  Round 1 NO-GO on `90fbd213…`; both axes GO on `4ec6ba33…`. The operator adopted
+  OD1–OD10. It supersedes the 1.1.0 plan and adopts that plan's still-valid steps
+  by ID, so the 1.1.0 section below is historical relative to it. gwz-core
+  `23d8ed9b`.
+- [Its amendment](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment.md):
+  ECDSA agent keys, and a native route for keys the transport cannot sign with
+  (OD11, adopted); CA bundles; strict server addresses; a sandbox check on the
+  listener; native routes through a server; a stdio server mode; and the SSH
+  remote form as a design question, with OD12 open until TR1.3's GO. Round 1
+  NO-GO on `9ef88e44…`; both axes GO on `213a164b…`. gwz-core `bd538656`.
+- [Core session contract](GwzCoreSessionDesign.md) revision 4, closing TR1.1
+  (Verdict-4, round 4 GO). gwz-core's tests fail closed without a gwz-transport
+  checkout, and its CI checks gwz-transport at the pinned `46e65a9…`. Root
+  `fa3f44c`, gwz-core `4bd92285`.
+- The 1.1.0 plan's amendment of 2026-09-26, accepted at `cb4ae166…`, is now
+  superseded in part by the transport plan. It retired the Python long-lived
+  session named in the section below. gwz-core `b5279083`.
+
+Unreviewed drafts: the [session plan](GwzCoreSessionPlan.md) (TR1.4a started),
+the [server design](GwzCoreServerDesign.md) (TR1.3, after TR1.2) and the
+[reuse design](GwzConnectionReuseDesign.md) (TR1.2 review started). No review
+found an architectural root cause, and no two-round cap was reached. Found at
+design stage, not escaped: the transport's agent signing refuses ECDSA and
+security keys and ends the login; it loads one certificate of a CA bundle, and
+macOS refuses a bundle; a Windows remote pipe name signs in over SMB before any
+check. Nothing is implemented, activated, tagged, pushed or published by these
+acceptances. The "Transport implementation checkpoint — 2026-09-23, review
+pending" section was removed as stale (root `3cd0dc6`).
+
 ## Retry/concurrency and Python lanes — authorized, 2026-09-23
 
 Operator authorized parallel work after the recommended dependency split.
