@@ -171,3 +171,36 @@ an observable claim instead of a promise.
 Adoption requires an operator decision (L1-28) and, per the process's own
 rules, the rulebook amendment gets an independent review — which is cheap
 and should be the first exercise of §4.3.
+
+## 8. Operator ruling, 2026-09-28 — review granularity
+
+Adopted by operator decision on 2026-09-28, without a review round, for the
+rest of the transport release from CS1.9's commit (root `e4f00820`,
+gwz-core `53b2b0e8`). Where `GwzCoreSessionPlan.md` differs — its dual
+re-freezes (§2.2), its recorded tiers (28 dual, 74 single-axis and 3
+Surface checkpoints) and its < 250-line step budgets — this ruling
+controls. The plan's text is not edited (its §7); the checkpoint records
+the ruling.
+
+- **One review per phase.** A phase's steps are implemented back to back.
+  Each step passes its own tests, lints and platform checks before the
+  next starts, and gets no reviewer of its own. When the phase is
+  complete, Consistency and Safety review its whole diff once; a phase
+  that freezes a user-facing surface adds Surface. Remediation and the
+  two-round cap (§4) apply to that review unchanged.
+- **Per-step dual review only where a defect is expensive:** the wire
+  format (frame tags and bodies, and anything a released client or server
+  reads), secret handling (snapshots, zeroization, credentials) and the
+  release gate. The checkpoint names these steps when a phase starts. The
+  lane owner may add a review to any other step it judges risky, and
+  records why.
+- **Step budget:** aspirational < 500 hand-written production lines, up
+  from < 250. Tests are reported separately, as before (§2.1).
+- **Commits** stay on the operator's go, per step or per phase.
+
+Why: CS1.9 (113 lines of code) took about an hour of active agent time and
+about a million tokens end to end, and its dual review found nothing.
+Per-step review of CS1.4 with CS1.5, and of CS1.7, found 5 P2s and about
+20 P3s, and no P0 or P1: real defects, at a rate one review per phase can
+still catch. §6's tripwire applies: an escaped P0–P2 attributable to this
+ruling restores per-step review for the phase it escaped from.

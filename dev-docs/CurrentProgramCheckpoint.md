@@ -1,5 +1,29 @@
 # Current program checkpoint
 
+## Transport release — CS1.9 committed; review granularity; modularization open, 2026-09-28
+
+**CS1.9 is committed** as accepted: root `e4f00820c00e3eea58c684477d30a0592d31914b`, gwz-core `53b2b0e878d0192363d81c610bf3654b04d3d740`. No tag, no push.
+- **Review granularity** (operator ruling, [process §8](GwzProcessOptimization.md)): one Consistency and Safety review per phase; per-step dual review only for the wire format, secret handling and the release gate; steps up to an aspirational 500 production lines. It overrides the session plan's recorded tiers and budgets without editing the plan.
+- **Open — modularization.** The operator observed that the session plan builds a new subsystem inside gwz-core, specified by prose contracts, rather than as small crates with narrow APIs that build and test alone, as the local-clone work did under [the library boundaries](GwzLocalCloneLibraryBoundaries.md) (LBT-001–012; 14 crates in `gwz-core/crates/`).
+  - That policy was scoped to local-clone libraries. gwz-core's `AGENTS.md` does not mention it, and neither the session plan nor its review prompts cite it.
+  - The session host is still nearly standalone: its only use of core is `crate::model`'s error types, in four files.
+- **Open — oversized files** (raised by the operator the same day). Ten product files are past L1-23's 1,000-line cohesion alarm, and no checker enforces it.
+  - Six are transport files written after the 2026-09-16 split round, each past 1,000 lines within two days of creation: gwz-py `native/src/transport_session.rs` (1,507), gwz-transport `src/protocol.rs` (1,433), and gwz-core's `git/endpoint/ssh_worker.rs` (1,279), `placement_endpoint.rs` (1,064), `https_worker.rs` (1,056) and `transport_host/session.rs` (1,009). The session plan defers splitting the gwz-core four to CS7.1.
+  - gwz-py `src/gwz/client.py` (1,380) still awaits the client-layer review that debt recovery called for on 2026-09-07.
+  - Three are kept with written reasons ([split plan](../gwz-core/dev-docs/GwzRustSplitPlan.md)): `contract.rs`, `fake_repository.rs` and `checked_artifact/entry.rs`.
+- **Done — obsolete candidate code deleted** (operator: "yes - delete obsolete code"; committed with this entry on the operator's go). This pulls CS4.8's `TransportSession` removal (1.1.0 S6.2) forward; none of it was ever released.
+  - gwz-py: `native/src/transport_session.rs`, its registration and dispatch hooks, and the bridge's candidate-session branches. `test_transport_session_api.py` and `test_transport_session_native.py` go; their three tests of surviving behaviour move to `src/tests/test_bridge_legacy_path.py`, with one new test that cancel and release report "unavailable" until Phase 4.
+  - gwz-py, dead once the session went: the operation store's identity ledger and deferred-terminal machinery, and the thread-locals `CURRENT_SESSION`, `SCOPED_STORE`, `SCOPED_BACKEND` and `SCOPED_OPERATION_ID` with their helpers. gwz-py's process-globals allowlist falls from 8 entries to 4.
+  - gwz-core: `TransportRuntime::from_environment`, whose only caller was the session. CS3.1 no longer converts it.
+  - **Bug fixed, test first:** since 2026-09-24 a native worker that panicked in an ordinary build parked its failure for a transport finish that never came, so the operation never completed. It now publishes an `InternalError` failure at once, as v1.0.17 did (`a_panicked_operation_publishes_its_failure`).
+  - Checks: the gwz-py suite passes, 918 tests (baseline 926 passed and 13 skipped: the 13 and 12 of the passes were the deleted tests, and 4 are moved or new). gwz-py's 8 Rust unit tests pass; they cannot link in the `extension-module` build and ran with libpython linked by hand. Clippy is clean apart from one earlier `needless_update`, rustfmt is no worse than HEAD, and the cfg checker reports nothing new. The candidate build fails before and after with identical errors (TR3.1), and nothing refers to the removed code.
+  - Plan text for the next revision: CS3.1's file list; the clauses that keep per-process slots and budgets for the candidate session; §2.3's transport rows; CS4.1's and CS4.8's rows for the deleted files; R11.
+- **Open — globals** (operator: thread-locals are globals, and globals are not allowed). CS1.4's `src/session_host/gate.rs` keeps a `CROSSING` thread-local, allowlisted `permanent`; gwz-core also lists 9 statics as `permanent`. gwz-py's three remaining statics are `debt` that CS4.8 removes.
+- **Next:**
+  - the operator decides whether to re-cut the rest of the session plan around crates; if so, a short crate-map design comes first;
+  - CS1.2 waits for that decision, since it would add to `src/session_host/`;
+  - the two HEAD test fixes are applied on the operator's go and pass (`scripts/test_release_bump.py` 12 OK, `tests/publish_workflow.rs` 13 passed); they are not in this commit.
+
 ## Transport release — CS1.9 accepted, 2026-09-28
 
 **CS1.9 is accepted** ([Verdict](GwzCoreSessionCS1.9-Verdict.md)). Both axes gave GO in round 1, with no findings of any severity ([Consistency](GwzCoreSessionCS1.9-ReviewConsistency.md), [Safety](GwzCoreSessionCS1.9-ReviewSafety.md)).
