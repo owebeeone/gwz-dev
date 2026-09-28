@@ -2,6 +2,8 @@
 
 Date: 2026-09-24. Status: **DRAFT proposals; not reviewed; no design, implementation or activation authority.**
 
+Revised on 2026-09-28: G1 takes the wording the operator adopted on 2026-09-27 as the transport release plan's OD9, which the accepted [server design](GwzCoreServerDesign.md) applies. Core still starts no server on its own; a driver may host one when asked.
+
 Revised on 2026-09-24 after operator direction. gwz-py keeps running core in-process through its extension (G10) and keeps its public API (G11), and the in-process session shape in §8 is the recommendation. The decisions listed in §8 remain open.
 
 The Python concurrency design train was retired to [history](history/) on 2026-09-24. It ran from the concurrency NO-GO finding through the v4 foundation draft, and its reviews, verdicts and remediation plans went with it, together with the draft transport-delivery amendments paired with it. This document starts again from the documented architecture and the facts of the current code. It reuses none of the retired designs' text.
@@ -25,7 +27,7 @@ These are taken as given. Striking or changing one is an operator decision.
 
 | ID | Requirement | Source |
 | --- | --- | --- |
-| G1 | Core runs in-process or behind a separate client boundary and carries the same typed operations either way. It starts no server or daemon itself, and no deployment may require a daemon. | [gwz-core README](../gwz-core/README.md); [GWZRequirements](../gwz-core/dev-docs/GWZRequirements.md) REQ-010, REQ-011 |
+| G1 | Core runs in-process or behind a separate client boundary and carries the same typed operations either way. Core starts no server or daemon on its own. A driver may host one on request, and no deployment may require one. | [gwz-core README](../gwz-core/README.md); [GWZRequirements](../gwz-core/dev-docs/GWZRequirements.md) REQ-010, REQ-011; OD9 of the [transport release plan](../gwz-core/dev-docs/GwzTransportReleasePlan.md), for the [server design](GwzCoreServerDesign.md) |
 | G2 | Every client reaches core through one message path: build a Taut request, submit it, render the immediate response, then render events until the `OperationResult`. The path is the same for the CLI, a daemon, a UI and a test harness. | [GWZDesign](../gwz-core/dev-docs/GWZDesign.md), "CLI Driver Design" |
 | G3 | The client–core boundary can be replaced by a wire with no code change on either side. | operator, 2026-09-24 |
 | G4 | Core reaches SSH and HTTPS only through a Taut-defined bidirectional message service. The network endpoint runs either in core's process ("local", the default) or in the client, over a message channel. An unsupported placement refuses without falling back. | [GWZRequirements](../gwz-core/dev-docs/GWZRequirements.md), "Remote transport amendment" |

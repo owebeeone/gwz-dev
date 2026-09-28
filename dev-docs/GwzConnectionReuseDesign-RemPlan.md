@@ -1,0 +1,54 @@
+# GWZ connection reuse design — first remediation plan
+
+Date: 2026-09-27. Status: **remediation plan for [the first verdict](GwzConnectionReuseDesign-Verdict.md); applied as one revision of `GwzConnectionReuseDesign.md`.**
+
+Every finding of the two reports gets exactly one disposition. The findings are [Consistency](GwzConnectionReuseDesign-ReviewConsistency.md) C-P2-1 and C-P3-1 to C-P3-7, and [Safety](GwzConnectionReuseDesign-ReviewSafety.md) S-P2-1 and S-P3-1 to S-P3-4.
+- All findings are accepted. None is disputed.
+- Every correction is to the design's text. None changes its sharing model, its trust model or its ownership split.
+- Where a reviewer left a choice open, the choice is stated: C-P3-3's refusal code, C-P3-5's gwz-py path, and C-P3-6's route for the two plan clauses.
+- The revision also takes the reviewers' residual notes where they are cheap (§3).
+
+## 1. Blocking findings
+
+| ID | Disposition | Where | Closure test |
+| --- | --- | --- | --- |
+| C-P2-1 | T3 is rewritten so ownership is unchanged. An idle entry's `Owner` is `None`, as T1 and `POOL/lifecycle.rs:84` have it. The pool records the entry's *last lessee* in a separate field that `cancel_operation`, `cancel_session`, eviction and per-owner accounting never read. A lease reports whether the last lessee's binding (`Owner.session`) differs from the new one. §4 states the lease under proof: the connection is held as the requesting binding's lease while the proof runs. It is released to idle when the proof is cancelled or times out, and closed through its release path with reason `Revoked` when the proof fails. T4's `retire_idle` covers the *other* idle entries the outcome table names. | §4, §14 T1, T3, T4 | §15 item 6 as written, plus a gwz-transport unit test. After a release, `entry.owner` is `None` and the last-lessee field is set. `cancel_session` and `cancel_operation` naming the last lessee leave the idle entry untouched. A later lease by another binding reports "differs"; one by the same binding reports "same". |
+| S-P2-1 | §8 splits the fault set. (a) Faults that leave the worker running (a sticky cleanup failure or a key-admission failure) close admission, and active exchanges drain. (b) Faults that end a physical owner's thread (the SSH worker or the HTTPS thread ending, or a panic caught at an instance entry point) stop the instance as A3 requires. Every active exchange on it fails with its typed failure, as today's stop does. Its leases are discarded, and the instance is disposed under the cleanup owner. "The instance is not shut down" is struck: a panic in binding code faults the binding, and a panic in instance code stops the instance. Decision 9, §17, C12 and the claim about A3 change to match. | §8, §14 C12, §15 item 6, §16.1 d9, §17 | §15 item 6 gains two cases: an injected panic in the SSH worker loop, and separately a forced HTTPS thread exit. Each fails B's active exchange with a typed failure, and no further frame arrives on that connection. The host context stays usable, and a later operation of B builds a fresh instance and completes. The injected sticky-cleanup fault still lets B's exchange complete. |
+
+## 2. Nonblocking findings
+
+| ID | Disposition | Where | Closure test |
+| --- | --- | --- | --- |
+| C-P3-1 | §13 adds three amendments. O5 (CS:75): transport deadlines act inside the operation's binding, and the instance's pool clocks act in the instance, which owns the connection. The transport-entry sentences (CS:221, CS:654): the three inputs stand; the gate also reaches the host context's registry for binding creation (CS:316 as amended), and the operation's limits come from the request's policy. GWZDesign's host-context list (GWZDesign.md:13) gains the registry. | §13 | A grep of the next contract revision for "runtime" finds only `OperationRuntime`, `configure_transport_runtime` and historical sentences, and GWZDesign's host-context list equals CS §5.6's. |
+| C-P3-2 | §11 gains the stdio mode's row, and the SSH remote form's row under OD12. §15's cell table gains the stdio local form. §12 states the trust claim for both. | §11, §12, §15 | §11 names every `--server` form the plan amendment's address grammar admits. |
+| C-P3-3 | Blind convergence with S-P3-3. The registry's two refusals keep one code, `transport_session_full`. §13 amends CS §4.2 and §5.1, and the ErrorCatalog comment, to add the two host-context causes: every instance bound at the bound, and the cleanup-owner budget spent. The message names which bound and its value. §15 items 6 and 11 assert the code and the message. **Choice stated:** no new code, because a new one is an API addition this step does not need; the message carries the diagnosis. | §7, §8, §13, §15 | Items 6 and 11 assert `transport_session_full` with a message naming the bound. A `SessionError` carrying it round-trips (CS §15.2). |
+| C-P3-4 | §7 states the age rule itself (decision 5), counted as the clock rule of S-P3-2 counts, and §12 cites §7. §15 gains three rows, each marked "if §16.1 dN is adopted": d5's age close, d10's key text dropped after authentication, and d12's Cold key marked Healthy by a reused connection. | §7, §12, §15 | The three rows exist and §16.1 cross-references them. |
+| C-P3-5 | §13 amends CS §5.6 (CS:308). The host context gains a bounded `shutdown` that disposes its instances and returns a cleanup report; dropping it is the fallback, and reports nothing. §7 says which driver uses which: the CLI calls `shutdown` at command end and folds the report into its notice; the server calls it in its shutdown step and logs the counts. **Choice stated:** gwz-py's process-wide host context is dropped at interpreter exit (CS:477), which disposes instances without a report, so CS §9's `HostContext` gains no method. C3 names the call. | §7, §13, §14 C3, §15 item 11 | Item 11 asserts the returned report. A CLI test shows a pending instance disposal in the command's notice. |
+| C-P3-6 | §13 gains an "On GO" list: for each amended document, the AgentProcessRules §7.2 status sentence and changelog entry. **Choice stated:** the two release-plan clauses (TR1.2 question 3, and Phase 6's swapped-agent row) are amended by this design's GO, with the operator's sign-off on its verdict, because they amend an accepted plan. The plan's status then names this design for those two clauses. The server-design edits stay TR1.3's. | §13 | After GO, each amended document's status line names this design. |
+| C-P3-7 | The per-instance thread is named the **instance pump** and defined. It steps the instance's shared engine, pools and authority, and detaches finished bindings. It is not a reaper. It ends at disposal under the retained-cleanup rule (A3:24-31). The host context's setup supervisor stays single and unchanged. | §2, §7, §15 item 11, §17 | Item 11's "its threads end" names the instance's three threads. |
+| S-P3-1 | `retire_idle` on an entry that is no longer idle is a reported no-op. The authority re-selects the oldest idle entry of the constrained group on that report, and on every transition of an entry to idle or to disposed, until the waiter is served or its deadline passes. | §5, §14 T4 | §15 item 10 gains a case: the chosen victim is leased between selection and retirement, and the waiter is served by the next idle entry within its deadline. |
+| S-P3-2 | §7 gains a clock rule. Idle expiry and the age bound count time the machine spent asleep: the host feeds the pool from a clock that includes suspend where the platform has one, and otherwise discards every idle entry when its monotonic and wall clocks disagree by more than the idle timeout. §17's silent-death risk says when silent death is expected. | §7, §17 | §15 item 11 gains a case: with the injected clock, a jump larger than the idle timeout expires every idle entry before the next lease. |
+| S-P3-3 | Blind convergence with C-P3-3. An operation that finds every instance bound waits, within its admission deadline, for one to unbind; only then is it refused, with C-P3-3's code and message. | §7, §15 item 11 | Item 11: with 16 bound, the 17th is refused only after the deadline, with a message naming the instance bound. If an instance unbinds inside the deadline, it proceeds. |
+| S-P3-4 | §4 states the shared proof job's rules. It runs under the latest waiter's deadline, and its cancellation follows the binding's operation token only. A waiter whose own deadline passes fails alone, and leaves the job running for the others. A passed proof is recorded for the binding even if the first requester has already failed. A binding's own setup of a connection counts as its proof for that key and host key. | §4 | §15 item 2b gains a case: the fixture answers after the first requester's stall but within the others'. Exactly one prompt is shown, and the remaining leases proceed. |
+
+## 3. Residual notes taken
+
+- **Registry atomicity** (Safety). Selection, attach, and the decision to dispose are made under one registry lock, so a binding never attaches to an instance that is disposing. §7 and C3 say so.
+- **One meaning of "session"** (Consistency). §2 says that "the binding's session ID" is the transport mux session each binding has (PLD:99), not a core session.
+- **Citation drift** (Consistency). The reading notes state that gwz-core dev-doc line numbers are at `b13bbadb`. The HTTPS citation becomes HTTPS:223-224, and the embedding guide's becomes TransportPlacement.md:28-29.
+- **Phase 6 row 10** (Consistency). §15's mapping notes that row 10's counts appear in §10's `--verbose` summary line, derived from the transport rows, with no row field added (decision 13).
+- **Session-plan lines for TR1.4b** (Consistency). §13's closing paragraph adds :15, :282, :293, :325, :348 and :607.
+- **C4's public constructors** (Consistency). Recommended: `TransportRuntime`'s public constructors become a wrapper over a private host context, because the placement guide documents them for embedders.
+- **The trust claim's scope** (Consistency). §12's "at that moment" becomes "as checked once per operation and key (§4)".
+- **Allocation timeouts** (Safety). §17's fairness risk adds that S5.4 measures allocation-timeout rates through a server, not only throughput.
+
+Not taken, as below the bar or covered elsewhere:
+- decision 10's alternative, which §12 already discloses;
+- same-user exhaustion, which §17 largely names and which fails closed;
+- the prompt cost of proofs, which §17's revalidation-cost risk covers.
+
+## 4. Re-review
+
+- The same two reviewers give a focused re-verdict on revision 1's SHA-256. Each gets this plan and the diff from the reviewed object.
+- The revision changes no shared interface, architecture or reviewed call graph, so no fresh round is needed.
+- If a reviewer classifies a finding in the re-verdict as a new architectural root cause, the lane stops for the operator.

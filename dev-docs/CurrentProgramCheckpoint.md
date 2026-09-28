@@ -1,5 +1,219 @@
 # Current program checkpoint
 
+## Transport release — TR1.4b closed; CS1.4, CS1.5 and CS1.7 accepted, 2026-09-28
+
+**The session plan is accepted in full** ([Verdict-2](GwzCoreSessionPlan-Verdict-2.md)).
+Revision 3 (TR1.4b) had GO from both axes at `01adc2f0…`, with 5 and 6 P3s. The
+reviewers confirmed the drafter's post-GO pass
+([Consistency-2a](GwzCoreSessionPlan-ReviewConsistency-2a.md),
+[Safety-2a](GwzCoreSessionPlan-ReviewSafety-2a.md)), and the lane owner applied
+their last notes with the status sentence. The final text is `5d1dc819…`, 1569 lines.
+- **Scope:** 8 phases and 116 steps. Phase 7 is reuse (CS7.1–CS7.27) and Phase 8
+  the server (CS8.1–CS8.32); CS1.9 and CS1.10 are the extensions.
+- **Review tiers:** 28 dual, 74 single-axis and 3 Surface.
+  - CS8.9 with CS8.10 is one dual socket-host checkpoint.
+  - CS8.17–CS8.19 are one dual Windows checkpoint that re-freezes CS8.5, CS8.8 and
+    CS8.14, re-running their counterexamples on Windows.
+- **Blind convergence, three times:**
+  - the server release gate's `env` debt, which CS7.24 now clears alongside CS6.5;
+  - reuse §15's cancellation and explicit-identity rows, now owned by CS7.9 and
+    CS7.11;
+  - the shared-file ordering. Every pair of steps that name one file is now ordered
+    by an edge or a named L1-06 handoff.
+- **New edges for the release plan's §6 sketch:**
+  - TR3.1 → CS1.1 → CS1.10;
+  - CS1.10 → the server lane SC (CS8.5, CS8.8, CS8.13), with CS1.3 → CS8.14;
+  - CS5.4 before the server steps;
+  - CS8.3 → CS8.22 and CS8.29;
+  - CS4.9 after the Phase 7 exit.
+- **When CS7.1 merges,** its split owners replace "the owners of" in the steps, and
+  the sketch is redrawn. Record both here then.
+- **Recorded, open, in the plan:**
+  - C9, the exit bound with several Clients (contract §10);
+  - C10, `git credential fill` runs in `/`;
+  - C11, the credential spawn drops `GIT_DIR`, `GIT_COMMON_DIR` and
+    `GIT_WORK_TREE`, pending the contract's next revision.
+
+  The release plan's Phase 7 exit still names only gwz-core's checker. The plan's
+  gate names both, and changing that line needs the operator's sign-off.
+- **TR1.7 is applied:** gwz-py's `GwzPyTransportDesign.md` is superseded by the
+  contract's §9, §10 and §14.
+- **Before the review,** the server design took an erratum: §12's Linux walk row now
+  refuses without `/proc`.
+
+**CS1.4 with CS1.5 is accepted** ([Verdict-1](GwzCoreSessionCS1.4-CS1.5-Verdict-1.md)):
+12 gwz-core files, whose hashes that verdict lists.
+- Round 1, both NO-GO. The blind convergence: `capture()` read the environment
+  inside core. Round 2, both GO.
+- The step's shape:
+  - core never reads the environment; drivers pass `from_os_pairs`;
+  - a panicking supervised job is quarantined;
+  - a nested gate crossing panics;
+  - `read_bytes` is at most 32 MiB and `close_wait` at most 1 hour;
+  - Windows names compare with `CompareStringOrdinal`.
+- The allowlist has 31 entries: 18 debt and 13 permanent, the new one
+  `thread_local CROSSING`.
+- CS1.4 measured 505 production lines against < 450. Windows was accepted by
+  reading; its tests first run in Windows CI.
+
+**CS1.7 is accepted and closed** ([Verdict-1](GwzCoreSessionCS1.7-Verdict-1.md)).
+- The Consistency review escalated to Safety. Both found, blind, the unscanned
+  statement class.
+- Round 2, both GO. Two post-GO patches followed, each confirmed by both reviewers
+  ([C-1a](GwzCoreSessionCS1.7-ReviewConsistency-1a.md),
+  [S-1a](GwzCoreSessionCS1.7-ReviewSafety-1a.md),
+  [C-1b](GwzCoreSessionCS1.7-ReviewConsistency-1b.md),
+  [S-1b](GwzCoreSessionCS1.7-ReviewSafety-1b.md)).
+- The inventory is 437 occurrences under 432 keys: 264 items and 173 statements.
+- `--shrink-from` runs in the boundary job. It sums per occurrence across files,
+  refuses a narrowed scope, and records the move-versus-recreate trade-off.
+- Sibling coverage stays local-only. The follow-up puts the check in gwz-cli's and
+  gwz-py's CI once CS1.7 is pushed to gwz-core's `main`.
+
+**Also found, 2026-09-28:** two failures at gwz-core HEAD have test-only fixes
+proposed, awaiting the operator's go.
+- `test_release_bump.py`: the forks' `gwz-` prefix since `26b30ca6`.
+- `publish_workflow.rs`: a text-order assertion, broken by `4bd92285`; the release
+  order itself is right.
+
+**Next.**
+- CS1.9 (the host context's bounded `shutdown`, a dual re-freeze of CS1.4) is
+  unblocked by TR1.4b's GO.
+- So are CS1.2's queues.
+- CS1.1, and with it CS1.6, CS1.10 and most of Phase 2, waits on TR3.1 in the other
+  lane.
+- CS1.9 and CS1.2 both change files of the accepted CS1.4 object. They start from
+  the commit below, so each review object stays exact.
+
+**Committed** with this entry, on 2026-09-28, as one gwz commit across the root,
+gwz-core and gwz-py. It holds:
+- contract revision 5, the reuse and server designs, and the session plan;
+- CS1.4, CS1.5 and CS1.7, at their accepted hashes;
+- every review record.
+
+The two test-only fixes are not in it. Nothing is tagged or pushed.
+
+## Transport release — TR1.3 closed: server design accepted, OD12 yes, 2026-09-28
+
+The [server design](GwzCoreServerDesign.md) is accepted as TR1.3, by dual
+Consistency and Safety review plus Surface.
+- **Round 1 NO-GO on revision 1** (`15d5410f…`):
+  - Consistency GO with 11 P3;
+  - Safety NO-GO on a P1 (links planted at the lock and log files) and three P2s
+    (the Linux relative sandbox rule, an unbounded handshake, and stale-socket
+    removal of a live foreign socket);
+  - Surface NO-GO on two P2s (two `--ssh-timeout` defaults, and actions as flags).
+- **Round 2 GO on all three axes** (`9fc80261…`), with post-GO corrections and a
+  narrowing of stale-socket removal that all three reviewers confirmed. Final
+  `61d8dfa7…`.
+- No architectural root cause, and the two-round cap was not reached.
+
+The design:
+- `gwz server start|stop|status|list|stdio` in both CLIs, opt-in (OD2).
+- Only the same user, on the same machine, from outside any sandbox. The rule is
+  absolute on every platform, so there is no server inside a seccomp-profiled
+  container.
+- The server speaks first with a secret-free `SessionHello`, within a bound.
+- A must-match set that includes the native path's and OpenSSL's process-wide
+  reads, enumerated from the vendored sources.
+- Files it creates are never followed through links, and a socket is removed only
+  when gwz's own record names it.
+- The stdio mode, and the SSH remote form.
+
+The operator's decisions:
+- **OD12, 2026-09-28:** yes. The SSH remote form ships.
+- **Sign-off:** the corrections the design carries to the release plan's Phase 10
+  spelling and to the amendment's §3.4 probe and `/net` sentences and §3.6 macOS
+  rows.
+
+The "On GO" list is applied to:
+- the contract's status, amended for §1, §3, §4.1, §4.2, §5.1, §5.6–§5.8, §9–§13,
+  §15 and §16;
+- the release plan's and the amendment's status and changelogs;
+- the reuse design's §11 note;
+- the proposals' G1 row;
+- new "Core server" paragraphs in gwz-core's GWZDesign and GWZRequirements, which
+  also now name the git2 crate as the credential helpers' spawner.
+
+Found at design stage, not escaped:
+- the amendment's named macOS probe would itself mount an automount trigger;
+- macOS has shipped `/net` disabled since autofs-281;
+- on Linux the transport's own TLS takes its default roots from the process, and
+  openssl-probe rewrites `SSL_CERT_FILE`/`SSL_CERT_DIR` at startup;
+- the macOS build links Homebrew's OpenSSL dynamically. A separate task was
+  offered to check the published artifact.
+
+Recorded for TR1.4b, with the rest in [Verdict-1](GwzCoreServerDesign-Verdict-1.md):
+- Linux CI rows that run a server need a runner outside a seccomp-profiled
+  container;
+- the session plan names gwz-py's console script `gwz`, where it is `gwz-py`.
+
+Next: TR1.4b (the session plan's second revision). On the operator's "continue
+impl" of 2026-09-28, implementation starts with the Phase 1 steps that need no
+TR3.1: CS1.7, and CS1.4 with CS1.5. Each is reviewed at the tier the session plan
+records. Nothing is committed, tagged, pushed or published.
+
+## Transport release — TR1.2 closed, session plan part 1 accepted, 2026-09-28
+
+Accepted since the entry below, each by dual Consistency and Safety review, as
+text or design only. No review found an architectural root cause, and no
+two-round cap was reached.
+- [Connection reuse design](GwzConnectionReuseDesign.md), TR1.2. Round 1 NO-GO
+  on `573d4e95…`, one P2 per axis; both axes GO on revision 1, `e8ee63f8…`.
+  The host context shares endpoint instances per endpoint configuration, and
+  each operation has its own binding. A pooled SSH connection serves another
+  operation only after the agent proves it still holds the connection's key and
+  known_hosts still trusts the host. On 2026-09-27 the operator adopted §16.1's
+  fourteen decisions, folding decision 14's Surface review into S7.5's, and kept
+  the signed possession proof. On 2026-09-28 the operator signed off the release
+  plan's two changed clauses: TR1.2 question 3 and Phase 6's swapped-agent row.
+  The design's "On GO" list is applied: the contract's and the release plan's
+  status, the paired GWZDesign and GWZRequirements paragraphs, and the status of
+  eight accepted gwz-core designs and plans. **TR1.2 is closed.**
+- [Session plan](GwzCoreSessionPlan.md) revision 2, TR1.4a, for the parts TR1.4a
+  revises. Round 1: Consistency GO; Safety NO-GO on two P2s, direct callers'
+  legacy context and the candidate's hand-kept protocol file. Both axes GO on
+  `58ab341a…`. Steps marked "TR1.4b revises this" stay draft. Steps marked
+  "TR1.4b extends this" (CS1.1, CS1.4, CS2.12, CS3.6, CS6.1 and CS6.4) may
+  merge now, and TR1.4b's extension of each is a dual re-freeze.
+- [Core session contract](GwzCoreSessionDesign.md) revision 5: both axes GO in
+  one round on `6d12f03e…`. `cancellation` is field 8 of the transport
+  capabilities response, and may be absent. Fields 3–7 stay with the placement
+  design's capability fields. This settles the session plan's C8, which the
+  operator decided on 2026-09-27.
+
+G0 is discharged. The paired GWZDesign and GWZRequirements paragraphs are no
+longer marked DRAFT, and they name revision 5. The session plan's G0 text still
+says revision 4; TR1.4b corrects it.
+
+New dependency: CS1.1 waits on TR3.1 (G2), for its rename in candidate-only code
+and its candidate build. Its other new gate, contract revision 5, is met.
+
+Review tiers (GwzProcessOptimization §4.2), as the session plan records them:
+- **Dual:** the freezes CS1.1 (schema), CS1.2 (channel contract), CS1.4 with
+  CS1.5 (gate and context) and CS1.6 (dispatch signature); CS3.4 (secret
+  handling and credential lookup); and the Phase 3 exit.
+- **Dual plus Surface:** the Phase 4 and Phase 6 exits.
+- **Single-axis,** on the first axis the step names: every other step, and the
+  Phase 2 and Phase 5 exits, both Safety first. CS3.11 is reviewed in the
+  Phase 3 exit, CS4.1 with CS4.6, CS4.7 and CS4.8 in the Phase 4 exit, CS5.3 in
+  the Phase 5 exit, and CS6.4 and CS6.5 in the Phase 6 exit. Phase 1's exit
+  needs no further review.
+
+Recorded for later:
+- The candidate build's generator pins the core schema at gwz-core `54618449`
+  (`551fe930…`) and the gwz-transport owner schema at `10179189…`. Both are
+  behind HEAD by design, and CS1.1 re-pins both.
+- Between CS4.7 and CS4.8, a gwz-py process that uses both paths holds two sets
+  of process budgets, at most twice today's. This is a development window only.
+- `EVIDENCE.md` names `D:/gwz-tests` for Windows fixtures, which is stale.
+
+Next: TR1.3, the server design revision, still an unreviewed draft. Its GO also
+settles OD12, whether the SSH remote form ships. TR1.4b follows TR1.3's GO, and
+CS1.1 can start once TR3.1 lands. Every finding so far was found at design
+review, and none escaped. Nothing is implemented, activated, tagged, pushed or
+published.
+
 ## Transport release — plan, amendment and session contract accepted, 2026-09-27
 
 The next minor release is the **transport release**, expected to be v1.1.0: the
