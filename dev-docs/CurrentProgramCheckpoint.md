@@ -1,5 +1,31 @@
 # Current program checkpoint
 
+## Transport release — crate map GO and committed, 2026-09-28
+
+- **The [crate map](GwzCoreSessionCrateMap.md)** is drafted at r0 `eac8e018…`, on the operator's "ok on crates". It re-homes the code of the session plan's remaining steps into small crates:
+  - six ordinary crates in `gwz-core/crates/`: `gwz-ids`, `gwz-session-contract`, `gwz-session-channel`, `gwz-session-host`, `gwz-server-policy` and `gwz-server-os`;
+  - five transport crates, kept out of the ordinary build until activation.
+
+  gwz-core stays the composition root, and the GWZ protocol, dispatch, secrets and git2 stay in core. The map rests on three read-only surveys: the plan's steps by area, the transport code and gwz-transport, and the channel, host and server units.
+- **Review round 1** on r0 was NO-GO, with P2 ×3 and P3 ×6 ([report](GwzCoreSessionCrateMap-ReviewCode.md)). The findings:
+  - the transport crates had forbidden dependency edges and needed a contract crate;
+  - the gh helper's environment and SSH key text would leave core;
+  - gwz-transport's pool ID had no legal source.
+
+  Revision 1 (`d0c82295…`, 207 lines) answers every finding in its §9.
+- **Round 2 on revision 1 was GO:** all nine findings closed, and the map's P3-6 departure was confirmed ([report](GwzCoreSessionCrateMap-ReviewCode-1.md)). Its four new P3s were applied after GO (`584b8431…`, 220 lines):
+  - the HTTPS bridge becomes `gwz-https-endpoint`'s `Engine`;
+  - `prepare.py` gives `gwz-ids` one path;
+  - reuse §14 joins §7;
+  - `test-support` features.
+
+  The same reviewer confirmed them ([confirmation](GwzCoreSessionCrateMap-ReviewCode-1a.md)), and GO stands. Its two notes are applied as worded. The reviewed text is `d78393ae…`, 222 lines. With the operator's two decisions recorded and the candidate crates renamed, it is `1493c5d2…`, 224 lines. The map and its three review files are committed with this entry.
+- **Revision 1's shape:** six candidate crates (`gwz-endpoint-contract`, `-policy`, `-registry`, `-instance`, `gwz-ssh-endpoint`, `gwz-https-endpoint`), and thirteen crates.io names to bootstrap in all.
+- **Decided (operator, 2026-09-28):** the candidate crates live in gwz-core, as the second workspace `gwz-core/candidate-crates/`, so the repositories stay a DAG: gwz-core depends on gwz-transport, never the reverse. They were called the transport crates, in `gwz-core/transport/`, until the operator read that folder as the gwz-transport repository.
+- **Decided (operator, 2026-09-28):** the thirteen new crates.io names are registered together, just before release preparation begins.
+- **Operator decision pending:** the map's §1 rules, including that no counter, flag or thread-local is ever `permanent`.
+- **Next:** once the operator decides §1's rules, the map's first steps (the checkers, `gwz-ids`, the channel crates and the host crate), built back to back and reviewed once. CS1.2 becomes the channel crates. The two HEAD test fixes stay applied and uncommitted until the operator's go.
+
 ## Transport release — CS1.9 committed; review granularity; modularization open, 2026-09-28
 
 **CS1.9 is committed** as accepted: root `e4f00820c00e3eea58c684477d30a0592d31914b`, gwz-core `53b2b0e878d0192363d81c610bf3654b04d3d740`. No tag, no push.
