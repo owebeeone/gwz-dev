@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## Transport release — CS1.9 accepted, 2026-09-28
+
+**CS1.9 is accepted** ([Verdict](GwzCoreSessionCS1.9-Verdict.md)). Both axes gave GO in round 1, with no findings of any severity ([Consistency](GwzCoreSessionCS1.9-ReviewConsistency.md), [Safety](GwzCoreSessionCS1.9-ReviewSafety.md)).
+- **The object:** six gwz-core files on `3f99e49c`, whose hashes the verdict lists. They are uncommitted.
+- **What it adds:**
+  - `HostContext::shutdown()` with a 5 s bound and a `ShutdownReport`;
+  - `SessionOptions::transport_off`;
+  - the proof of the snapshot's zeroization, and a Windows decoding fix that stops freeing unwiped partial values.
+- **Plan text for the next revision** (the verdict's "Recorded at acceptance"):
+  - CS1.9's file list and §4's `session_host/mod.rs` entry gain CS1.9;
+  - its measured budget, 246 or 254 production lines;
+  - quarantined jobs are dropped when the supervisor stops, which after `shutdown` precedes the host context's drop.
+- **Carried to later steps:** the verdict's table. Both axes raised, independently, how CS6.6 combines `peer_cleanup_confirmed`.
+- **Next:**
+  - commit CS1.9 on the operator's go;
+  - then CS1.2's queues, which register their modules in `session_host/mod.rs` after CS1.9 (L1-06);
+  - CS1.1 still waits on TR3.1 in the other lane.
+
 ## Transport release — TR1.4b closed; CS1.4, CS1.5 and CS1.7 accepted, 2026-09-28
 
 **The session plan is accepted in full** ([Verdict-2](GwzCoreSessionPlan-Verdict-2.md)).
