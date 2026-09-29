@@ -103,6 +103,11 @@ crate.from_cargo(
 # not read from //:Cargo.lock (see the header). Every spec is scoped to this hub: an unscoped
 # crate.spec applies to all hubs and would inject itself into gwz-core's splice.
 crate.spec(
+    package = "cfg-if",
+    version = "=1.0.4",
+    repositories = ["crates"],
+)
+crate.spec(
     package = "clap",
     version = "=4.6.6",
     features = [

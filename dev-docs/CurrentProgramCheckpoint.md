@@ -1,8 +1,81 @@
 # Current program checkpoint
 
-## Transport release — crate map steps 1 to 4 accepted, 2026-09-29
+## Transport release — cross-lane cleanup, accepted and committed, 2026-09-30
 
-- **Accepted, uncommitted,** on root `60fb142`, gwz-core `0b7fdf19` and gwz-py `a342b95`. Another session committed taut `9d46310`, gwz-transport `f8ebef7`, gwz-core `0b7fdf19` and root `60fb142` the same night; nothing overlaps.
+- **What:** the operator's "fix other lanes": the failures other lanes left at HEAD, and the operator's decisions on what that turned up. Uncommitted, on root `1ccb5c1`, gwz-core `2514dc19`, gwz-cli `ebbea90` and gwz-py `4f9b2bb` (gwz-py is unchanged).
+- **Round 1, the failing checks:**
+  - the checked-artifact gate approves 22 test-only `#[path]` edges, each noted with the commit that added it (no-fallback lane `21961474`; remote-transport lane `073395b5` of 09-21 and nine commits of 09-22);
+  - Bazel: gwz-cli's `cfg-if` is pinned (`=1.0.4`) in the root `MODULE.bazel` and declared as a dependency in `gwz-cli/BUILD.bazel`. `MODULE.bazel.lock` stays stale until git2-rs's package rename is committed (TR3.1);
+  - `runtime_timeout_refuses_changes_after_backend_creation` takes the named default (`DEFAULT_SERVER_TIMEOUT_MS`, 9000 since `1ac248ca`), and the characterization is now `native_same_tree_receiver_ref_does_not_block_the_fetch`, since the fork's libgit2 1.9.7 (`26b30ca6`) fetches natively;
+  - clippy with all features goes from 36 errors to none. 22 are `needless_update` on generated structs that the candidate build extends, allowed at the narrowest scope with that reason; the other three are fixed. rustfmt covers four files;
+  - `generated_protocol_is_current`: `src/cbor.rs` is regenerated, adding three accessors from taut `bcf98b6`. The ordinary build doesn't use them; the candidate protocol calls `try_get_opt`. It had been red since 09-22 (root `9cc9747`), not since taut `9d46310` as the entry below says.
+- **Round 2, the operator's decisions:**
+  - **`MissingRemote` again.** `validate_remote_identity` and the two identity helpers look remotes up through core's `find_remote`, so push, pull, remote tag operations and `gwz auth identity` answer `MissingRemote` for a missing remote. It had regressed to `GitCommandFailed` on 2026-09-07 (`37dbbcf4`, `6593b3b4`), and gwz-cli's 1.0.17 docs had been rewritten to quote the regression; they quote `MissingRemote` again.
+  - **The docs checks:** the three rows whose sentences gwz-cli's 1.0.17 docs reworded on purpose pin the current wording.
+  - **The git CLI fetch fallback is removed** (`fetch_anonymous_with_git`). A `git` stub that failed the fallback's call saw 2,833 calls across the local-clone, git and merge suites, and none of them was the fallback's. The prerequisites the accepted docs set were not done first, and the operator chose to leave them open (gwz-core `GwzNoFallbackPlan.md` §4): tag type consistency, missing targets, and FETCH_HEAD, cancellation and partial-outcome characterization, plus the fork's type-consistency hardening. A native `object is not a committish` now fails the import. Production code still runs `git tag`, `git tag -d`, `git commit` and `git rev-list`.
+  - **No production code in `tests/`** (standing rule). The process-globals checker refuses a production file under a crate's `tests/`, candidate cfg included. The candidate protocol moved out unchanged: `src/protocol/candidate_generated.rs`, with its schema projection, regenerator, pins and Python binding in `protocol/candidate/`. The guide example's `include!` is gone; the prepared candidate compiles the example as its own test target, against `gwz_core` as an external crate. `src/protocol/candidate_generated.rs` now ships in the gwz-core package (`include = ["/src/**"]`), inert without the cfg, as the rest of the candidate code under `src/` already does; gwz-core's `GwzCratesIoPlan.md` D4 records it.
+  - **`prepare.py` builds the candidate again,** with absolute dependency paths and no stale git2 patch.
+  - **CS1.1's pin move, pulled forward:** the candidate's core schema and retained reader move from gwz-core `54618449` to `2514dc19`, so the candidate gains `GwzErrorCode` 73 and 74 (`dfb7533b`). Its Python binding also catches up with the owner export that `0b7fdf19` pinned without regenerating it (`Envelope.message_seq`, gwz-transport `c4b632d`).
+  - **gwz-cli joins the process-globals check:** 18 items: 17 `permanent` (six environment and argument reads and nine process spawns the CLI must make, one immutable cache, and a clap `Command::new("help")` that the lexical scan can't tell from a spawn) and 1 `debt` (`GWZ_URL_SCHEME`, owner proposed as CS6.1). A new CI job runs the checker from gwz-core's `main`, unpinned as gwz-py's job does, so a checker change on `main` changes both gates (accepted, Safety S-2).
+  - gwz-cli's rustfmt failure, from another lane, is fixed.
+- **The candidate's suites run again,** for the first time since TR3.1 broke `prepare.py`. Their failures all predated this cleanup, and the operator folded their fixes into it. Round 2 fixes each at its cause, with no serialized, retried or skipped test:
+  - **The HTTPS helper slots:** the process-global `SLOTS` semaphore is gone, pulled forward from CS6.5. The helper budget now lives where the contract puts it, in the host context shared by its sessions (`GwzCoreSessionDesign.md:65`, `:350`). In the candidate, each command's driver creates one eight-slot budget and hands it to every endpoint it creates. Parallel tests no longer share one budget.
+  - **Three product defects, fixed test-first:**
+    - a stale client `Cancel` forwarded after a seal closed the whole session;
+    - the SSH pump discarded an endpoint stream's own terminal (its I/O `Timeout`) when it disconnected, so the bridged exchange never completed and the client's read hung;
+    - a client message the pump took after the mux had retired that stream's route closed the whole session, so every stream failed `CarrierLost`. The route is retired by the endpoint's `Closed` or `Failed`, or by the mux's own deadline. The pump now drops the stale message, and only that: the guard checks its own session and version, and the route the mux gave the stream belongs to the entry's request. The retiring terminal still ends the stream. A deterministic test reproduces it. Under the load that failed 6 of 6 runs, 6 of 6 now pass.
+  - **§10.1 conformance.** The SSH pump no longer charges the client's think time to the stall clock (`GwzRemoteTransportDesign.md` §10.1). `git_turns.rs` follows the pkt-line turn of v0/v1 upload-pack and receive-pack, and anything it doesn't know stays `Network`. The design has a dated note. HTTPS already didn't charge think time, but it reports that wait as `Backpressure` where §10.1 says `Idle`; that is recorded, not changed.
+  - **macOS XProtect.** The first exec of a newly written executable waits for XProtect's assessment, which pushed helper scripts past the tests' 2 s deadlines under load. The tests now warm each helper once (`helper_script.rs`); the warm-up changes no deadline or assertion.
+  - **The rest of the candidate tests:**
+    - two HTTPS budget tests have 390 ms of scheduling slack instead of 25 ms. A third, which gave a helper a 1 ms allocation, is split in two: `delayed_helper_is_charged_to_interaction_not_allocation` (a 250 ms allocation and a 5 s interaction for a 500 ms helper), and `a_stale_supervisor_tick_never_expires_a_fresh_one_millisecond_allowance`, which keeps the 1 ms case deterministically;
+    - three driver and fault tests assert gwz-core's own `SshOpenFailure` (since `1ac248ca`);
+    - `tests/protocol.rs` finds taut through `placement-candidate.json`, and its `MergeRequest` pin has a candidate branch. taut always writes a declared key, so the candidate's absent `transport_message` is `0a f6`;
+    - the consumer crate follows gwz-transport's `setup_cause` (`14f0d09`) and its 30 s connect budget.
+  - **The candidate's own corpus** (`protocol/candidate/corpus/`, 175 vectors from the candidate schema, pinned by its regenerator): corpus byte parity now holds under both cfgs, as CS1.1 asks.
+  - **Results:** the endpoint and `transport_host` set passed 10 of 10 parallel runs after the pump fix (190 tests then, 191 with the race test). The full candidate suite passed twice before the `CarrierLost` race showed up, and that race is now fixed.
+  - **Not run in CI:** nothing runs the candidate's suites, which is how they drifted.
+- **Round 2's corrections to round 1's findings:**
+  - **S-1:** gwz-core's `gwz-git2` dependency now asks for `vendored-libgit2`, and `tests/native_libgit2.rs` asserts that the linked libgit2 is the vendored one. The hazard was narrower than reported: with `unstable-sha256`, only an experimental-sha256 system libgit2 could have been picked up.
+  - **S-3:** the process-globals checker fails closed. A production `include!` it can't read is an error that no entry waives, and `cfg_attr` paths are followed.
+  - **S-4:** the candidate regenerator runs rustfmt under gwz-core's pinned toolchain. The rustfmt pin moved to 1.95.0's; the outputs are byte-identical.
+  - **Text:** the Consistency P3s and the Safety residual.
+- **Review:** one Consistency and Safety review of the whole cleanup.
+  - Round 1 (manifest `43fcf974…`): [Consistency](GwzCrossLaneCleanup-ReviewConsistency.md) GO with five P3s; [Safety](GwzCrossLaneCleanup-ReviewSafety.md) NO-GO with one P2 and three P3s. S-1: nothing forced the fork's vendored libgit2, on which the fallback's removal relies, so a build linking a system libgit2 1.9.7 would fail the import.
+  - [RemPlan](GwzCrossLaneCleanup-RemPlan.md): all nine accepted; the operator also folded the candidate suites' failures in.
+  - Round 2 (manifest `b6a5834a…`), the last under the cap:
+    - [Consistency-1](GwzCrossLaneCleanup-ReviewConsistency-1.md): NO-GO, with one P2 (the checker's own unit suite still expected 25 allowlist entries after `SLOTS` left) and four P3s;
+    - [Safety-1](GwzCrossLaneCleanup-ReviewSafety-1.md): GO, with three P3s. The same count (S-5) and probe tally (S-6), and S-7: the retired-route drop also covered a request or version mismatch.
+  - All round-2 findings are corrected:
+    - the count is 24;
+    - the drop also requires version 2;
+    - the S-1 comments name `libgit2-experimental`;
+    - the consumer README names both rustfmt pins;
+    - this entry's tally, test list and plan-text lines are fixed.
+  - **Decided (operator, 2026-09-30):** round 2 was the last, so its corrections go to the operator. The operator closed the review on them without a confirmation round, and the cleanup is committed on the operator's go.
+- **The checked-artifact gate's lost protections** (found in round 2). gwz-core `107aca7a` (2026-09-08, "streamline validation and release tests") removed the enforcement of the gate's byte pins (`PROTECTED_COMPILER_ROOT_DIGESTS`, `PROTECTED_SOURCE_DIGESTS`, `PROTECTED_SOURCE_TREE_DIGESTS`) and of entry.rs's item, import and call inventories, and left the tables and the comments that relied on them.
+  - This cleanup deletes the dead tables and `source_tree_digest`, and the comments now say what holds.
+  - `scripts/manual_tests/boundary_probes.py` holds 75 probes. Against today's gate:
+    - 41 are still rejected;
+    - 17 defeats pass it, among them writers reached through a crate function or wrapper, new helper files in the formerly pinned trees, and entry.rs edits that add no visible item;
+    - 2 expect messages or source the gate no longer has;
+    - the compiler probes can't run, because since gwz-core `26b30ca6` the crate depends on the fork by path (`../git2-rs`), which the harness's copy lacks.
+  - The gate's path-edge scan also reads only a plain `#[path]`, so it doesn't see a `cfg_attr` path. CI's clippy still catches a direct `std::fs` writer.
+  - `scripts/manual_tests/boundary_probes.py` now copies `tests/`, which the gate follows through the approved test-only edges.
+  - **Decided (operator, 2026-09-29):** structural checks close these defeats in their own reviewed step, straight after this cleanup. They should need no re-pinning on every edit. The probe file becomes its tests once its compiler probes can load the fork.
+- **Plan text for the next revision:**
+  - the session plan's §2.4 candidate bullets, CS1.1's file list and its C8 record (line 1495), and the contract's §13 sentence on the placement projection (`GwzCoreSessionDesign.md:534`), name the old `tests/` paths;
+  - the plan's line 109 still names taut `bcf98b64…` and the owner schema `10179189…`, which `0b7fdf19` had already moved to `9d46310` and `2776ae51…`;
+  - CS1.1 no longer moves the core pins, but still regenerates for §13 and wires the regenerator's check and the lexical test into `run_tests.py`;
+  - `SLOTS` went early (CS6.5, pulled forward). The plan still describes it as live in five places: line 383, CS3.6 (lines 426-427), CS6.5's file list (line 636), §5.4's `SLOTS` row (line 1251) and line 1536. So does the contract's `SLOTS` row (`GwzCoreSessionDesign.md:350`);
+  - CS6.1 is the proposed owner of `GWZ_URL_SCHEME`.
+- **For the taut lane:** `taut/dev-docs/TautOptions.md:475` names the old path of `candidate.taut.py`.
+- **Pushing:** gwz-core's commits reach GitHub before or with gwz-cli's, since gwz-cli's new job fails until gwz-core's `main` has the checker, and gwz-py's with or before gwz-core's (its CI runs gwz-core `main`'s checker, which now requires owners).
+- **Decided (operator, 2026-09-30):** a CI job for the candidate build's suites comes with the gate's structural-checks step, since both need the probe harness to find the fork (`../git2-rs`).
+- **Next:** the checked-artifact gate's structural checks and the candidate's CI job, in one reviewed step.
+
+## Transport release — crate map steps 1 to 4 committed, 2026-09-29
+
+- **Committed** on the operator's go as root `1ccb5c1`, gwz-core `2514dc19` and gwz-py `4f9b2bb`, on root `60fb142`, gwz-core `0b7fdf19` and gwz-py `a342b95`; not pushed. Another session committed taut `9d46310`, gwz-transport `f8ebef7`, gwz-core `0b7fdf19` and root `60fb142` the same night; nothing overlaps.
   - **Step 1, checkers:** the process-globals checker refuses a `permanent` entry for a counter, flag, lock, cell or thread-local unless `imposed_by` names the dependency, and every global-state `debt` entry names an `owner`. The eight counters, `CROSSING` and gwz-transport's `NEXT_POOL` became debt. It also sees `lazy_static!`. The boundary gate counts only gwz-core's own packages as first-party, so the git2 fork (`gwz-git2`) is third-party.
   - **Step 2, `gwz-ids`:** each context's `IdSource` (a random prefix from `getrandom`, plus a counter) replaces the four temp-name counters. Family-store creates its temporary exclusively and retries.
   - **Step 3, `gwz-session-contract` and `gwz-session-channel`:** CS1.2 and CS1.3 as crates that carry bytes only, with vectors from taut-shape-tool.
