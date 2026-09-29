@@ -1,5 +1,17 @@
 # Current program checkpoint
 
+## Transport release — pushed; git2-rs in CI; taut 81ba894, 2026-09-30
+
+- **Pushed on the operator's word:** every repo in the workspace, once the git2-rs fork's package rename was committed (git2-rs `d13951f` on `codex/per-remote-transport`, gwz-git `a9d7ee0`, root `867d8fa`). The rename is `git2` to `gwz-git2` and `libgit2-sys` to `gwz-libgit2-sys`; the Rust crate names stay `git2` and `libgit2_sys`. Both packages are `publish = false`, and crates.io holds only `0.0.0-bootstrap.1` placeholders, so gwz-core can't be published to crates.io until the fork is.
+- **CI checks out git2-rs:** gwz-core depends on the fork by path (`../git2-rs`), and no workflow checked it out.
+  - `gwz-core/.github/checkout-git2-rs.sh` clones git2-rs and its libgit2 submodule beside the gwz-core checkout it lives in, at the commit `.github/git2-rs.commit` pins (`d13951f`, equal to the root lock's). It refuses an existing git2-rs.
+  - Every job that builds gwz-core from its own tree calls it: gwz-core's boundary, platform, Windows, identity-probe and release jobs, gwz-cli's platform-gate build, and gwz-py's package-smoke and publish builds.
+  - gwz-cli's and gwz-py's release workflows build release branches, which take gwz-core from crates.io, so they don't need it. The manual compiler probes belong to the gate step.
+  - Rule: a gwz-core commit that moves to newer git2-rs code moves the pin in the same commit, to a pushed git2-rs commit.
+- **taut pulled to `81ba894`,** a docs-only commit whose `src/` is identical. Three generators pin taut's exact commit, so the pull broke them although their output is unchanged: gwz-core's candidate and consumer generators and gwz-transport's. All three are re-pinned and verified.
+  - Every taut commit, even a docs-only one, costs three re-pins while the pins name commits; pinning taut's `src/` tree (`git rev-parse HEAD:src`) would end that.
+  - The consumer generator's check depends on the working directory's toolchain, as the candidate's did before S-4: run it from the workspace root with Rust 1.96.0.
+
 ## Transport release — cross-lane cleanup, accepted and committed, 2026-09-30
 
 - **What:** the operator's "fix other lanes": the failures other lanes left at HEAD, and the operator's decisions on what that turned up. Uncommitted, on root `1ccb5c1`, gwz-core `2514dc19`, gwz-cli `ebbea90` and gwz-py `4f9b2bb` (gwz-py is unchanged).
