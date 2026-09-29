@@ -1,6 +1,6 @@
 # GWZ core session crate map
 
-Date: 2026-09-28. Status: **GO on revision 1** from the architecture review ([round 2](GwzCoreSessionCrateMap-ReviewCode-1.md)). That round's four P3 corrections were applied after GO and [confirmed](GwzCoreSessionCrateMap-ReviewCode-1a.md). The operator decided §8's first and third questions; the second is pending. The operator directed it ("ok on crates") after observing that the session plan builds a new subsystem inside gwz-core behind prose interfaces instead of small crates. It re-homes the code of the [session plan](GwzCoreSessionPlan.md)'s remaining steps. The plan's behaviour, limits, tests and phases carry over unchanged. One reviewer checks it on the architecture axis. Revision 1 answers that reviewer's round 1 ([report](GwzCoreSessionCrateMap-ReviewCode.md); §9). On acceptance, the map amends the text listed in §7.
+Date: 2026-09-28. Status: **accepted 2026-09-28**, on GO for revision 1 from the architecture review ([round 2](GwzCoreSessionCrateMap-ReviewCode-1.md)) and the operator's three decisions (§8). That round's four P3 corrections were applied after GO and [confirmed](GwzCoreSessionCrateMap-ReviewCode-1a.md). The operator directed it ("ok on crates") after observing that the session plan builds a new subsystem inside gwz-core behind prose interfaces instead of small crates. It re-homes the code of the [session plan](GwzCoreSessionPlan.md)'s remaining steps. The plan's behaviour, limits, tests and phases carry over unchanged. One reviewer checks it on the architecture axis. Revision 1 answers that reviewer's round 1 ([report](GwzCoreSessionCrateMap-ReviewCode.md); §9). On acceptance, the map amends the text listed in §7.
 
 ## 1. Rules
 
@@ -186,6 +186,8 @@ They are built back to back and reviewed once, as a group:
   - gwz-core's `AGENTS.md` points at the policy.
 - **The process-globals allowlist:** its definition of `permanent`, as §1's globals rule states it.
 
+How these land: the library boundaries and gwz-core's `AGENTS.md` changed on acceptance. The allowlist's definition changes in §6's first step. The contract, `GWZDesign.md`, the server design and the reuse design change in the step that moves their code, or at their next revision if that comes first. Until then, this map controls where they differ.
+
 ## 8. Operator decisions
 
 1. **Where the candidate crates live: decided 2026-09-28, gwz-core,** as the second workspace `gwz-core/candidate-crates/`. The reviews call them the transport crates, in `gwz-core/transport/`; both were renamed because that folder reads as the gwz-transport repository. The comparison that decided it:
@@ -193,7 +195,7 @@ They are built back to back and reviewed once, as a group:
    - A port and its core implementation land in one commit, instead of two repositories plus a re-pin of `reconciled_commit`.
    - The dependencies (`gwz-ids` into the candidate crates, and those crates into gwz-core) stay inside one repository and one release script.
    - gwz-transport keeps its charter: independent of GWZ core, no dependencies and no I/O.
-2. **The rules in §1,** in particular that no counter, flag or thread-local is ever `permanent`.
+2. **The rules in §1: adopted 2026-09-28,** including that no counter, flag or thread-local is ever `permanent`.
 3. **When to bootstrap the thirteen crates.io names: decided 2026-09-28,** together, just before release preparation begins.
 
 ## 9. Review round 1

@@ -5,6 +5,7 @@ Date: 2026-09-27. Status: **accepted as a design contract at revision 5, SHA-256
 - Revision 5 is revision 4, which [Verdict-4](GwzCoreSessionDesign-Verdict-4.md) accepted as sixteen files by SHA-256 (the contract then at root `4bf52e0`), with one wire number changed. `cancellation` is field 8, not 3, and it may be absent. This resolves contract ambiguity C8 in the [session plan](GwzCoreSessionPlan.md), which the operator decided on 2026-09-27.
 - Amended 2026-09-28 by [`GwzConnectionReuseDesign.md`](GwzConnectionReuseDesign.md). This document remains authoritative only as amended for O5, §1, §2, §4.2, §5.1, §5.2, §5.5, §5.6, §5.7, §7, §8, §14, §15 and §16. The design's §13 cites revision 3's line numbers. Every clause it quotes is unchanged in revision 5.
 - Amended 2026-09-28 by [`GwzCoreServerDesign.md`](GwzCoreServerDesign.md). This document remains authoritative only as amended for §1, §3, §4.1, §4.2, §5.1, §5.6, §5.7, §5.8, §9, §10, §11, §12, §13, §15 and §16. §1 is included because the operator decided OD12 yes: its "remote deployment" exclusion excepts the server's SSH remote form.
+- Amended 2026-09-29 by the [core session crate map](GwzCoreSessionCrateMap.md), accepted 2026-09-28, for the sections its §7 lists whose code its steps 3 and 4 move: §3 and §9, where `send` takes a lane and core classifies each frame; §5.1 and §5.2, where the class table and the dispatch are core's implementation of the host crate's ports; and §5.6, where the host context stays a core composite. This document remains authoritative only as amended for §3, §5.1, §5.2, §5.6 and §9. The map's other items here, O9 and §5.7's row of ID counters, change at this document's next revision, and until then the map controls where they differ (its §7). Until CS1.6 lets core classify a frame, the in-process client end, `ClientChannel::send(frame, lane)`, takes the lane its caller classifies; the extension's `send(frame)` (§9) and the host's replies are classified by core.
 - The acceptance authorizes no implementation, activation, platform proof or release.
 
 Revision 1 applied the [first remediation plan](GwzCoreSessionDesign-RemPlan.md) to the revision the [first verdict](GwzCoreSessionDesign-Verdict.md) reviewed (root `e4b8d43`). Revision 2 applied the [second remediation plan](GwzCoreSessionDesign-RemPlan-1.md) as one patch to revision 1 (root `cb5d6f2`), which the [second verdict](GwzCoreSessionDesign-Verdict-1.md) reviewed. The [third verdict](GwzCoreSessionDesign-Verdict-2.md) accepted revision 2 (root `58ea74b`) as a design contract and carried ten nonblocking findings forward. Revision 3 applied their corrections, at the operator's direction. It also moved gwz-transport's process-global check into gwz-core, which builds against gwz-transport, so that gwz-transport's CI no longer checks out its own consumer. Revision 4 applies the [third remediation plan](GwzCoreSessionDesign-RemPlan-2.md) as one patch to revision 3 (root `5a5d6cf`), which the [fourth verdict](GwzCoreSessionDesign-Verdict-3.md) reviewed, at the operator's direction of 2026-09-27, with all ten of its P3 corrections. Revision 5 changes one number in §13, at the operator's direction of 2026-09-27: `cancellation` moves from field 3 to field 8 (the session plan's C8). Its reviewers' corrections make the field absence-tolerant and cite the placement design that reserves fields 3–7, and the [fifth verdict](GwzCoreSessionDesign-Verdict-5.md) accepts it.
@@ -105,13 +106,13 @@ Nine rules follow. Every later section applies them.
   - a `SessionCall` whose `call_id` is not greater than the highest `call_id` already received in the session, which includes reusing the `call_id` of a call still outstanding.
 
   No reply is attributed to the frame that caused a protocol error.
-- **Adapters.** There are two, and both carry the same frames.
-  - **In-process:** two bounded queues of frames inside the client's process. Each holds the outstanding-call limit plus a control reserve of 64 frames.
-    - The client's `send(frame)` never blocks. On a full queue it fails with `transport_session_full`; it never drops a frame.
-    - Control calls, `operation.cancel` and `session.close`, use the control reserve. The outstanding-call limit never refuses them.
+- **Adapters.** There are two, and both carry the same frames. The frame layer and both adapters are the gwz-session-contract and gwz-session-channel crates, which carry bytes and never decode a body (the [crate map](GwzCoreSessionCrateMap.md)'s §2).
+  - **In-process:** two bounded queues of frames inside the client's process. Each holds the outstanding-call limit on its call lane plus a control reserve of 64 frames on its control lane.
+    - `send(frame, lane)` never blocks. On a full lane it fails with `transport_session_full` and gives the frame back; it never drops a frame.
+    - Core classifies each frame's lane. Control calls, `operation.cancel` and `session.close`, go on the control lane, and the outstanding-call limit never refuses them; every other call goes on the call lane. A reply goes on the lane of the call it answers.
     - `recv()` blocks until a frame arrives or the session has ended.
-    - The bridge counts a call as outstanding until its reply has been taken off the reply queue, and never exceeds either bound (§10). Calls held by the host plus replies waiting in the queue therefore never exceed the queue's capacity. The host's reply queue cannot overflow, and only a client that exceeds its own bounds meets a full call queue.
-  - **Byte stream:** stdin/stdout, a socket or SSH. Each frame is prefixed with its length as a little-endian `u32`, exactly as the taut-shape interop tool frames it.
+    - The bridge counts a call as outstanding until its reply has been taken off the reply queue, and never exceeds either bound (§10). A reply takes its call's lane, so the calls held by the host plus the replies waiting on a lane never exceed that lane's room. The host's reply queue cannot overflow, and only a client that exceeds its own bounds meets a full call lane.
+  - **Byte stream:** stdin/stdout, a socket or SSH. Each frame is prefixed with its length as a little-endian `u32`, exactly as the taut-shape interop tool frames it. A byte stream writes frames in the order they are sent and has no lanes to bound.
 - **Volume is bounded on both sides, and Git never waits on the channel.**
   - The session host only ever sends replies. What it sends is bounded by outstanding calls, and each read's reply by the read's byte limit (1 MiB by default).
   - Clients bound their own outstanding calls, and the session host refuses calls beyond its limit (§5.1).
@@ -197,7 +198,7 @@ Direct methods behave as unary calls. They run on the session's direct workers (
 - **Control frames and reads never wait for admission.** The reading thread handles `operation.cancel`, `session.close` and log reads without blocking. A read that must wait is parked as a waiter on its log, and the log's next gated append, its completion, the read timer or session end completes it. A cancel naming a call not yet admitted cancels its token, and admission then settles that call `Cancelled` before any effect. Resolution never holds the table lock that the reading thread takes to settle a cancel (§5.3).
 - A hung resolution therefore delays later admissions in its session, but never control frames or reads (§16).
 
-**Classes.** Every method belongs to exactly one class. The class table lives in core, and any method missing from it counts as W.
+**Classes.** Every method belongs to exactly one class. The class table lives in core, as part of its implementation of the host crate's ports (the crate map's `HostPorts`, §2), and any method missing from it counts as W.
 
 | Class | Methods | May run alongside |
 | --- | --- | --- |
@@ -222,7 +223,7 @@ Direct methods behave as unary calls. They run on the session's direct workers (
 
 - An operation gets its worker thread when it starts running. If the thread cannot be created, the session host settles the operation as `Failed` (`internal_error`) before it starts, with no effect.
 - Direct calls run on a pool of 8 direct workers, separate from the running limit. `status` and `transport_capabilities` therefore never wait behind eight long operations.
-- The worker runs the shared dispatch. That is gwz-cli's execution path (`execute_invocation`), moved into gwz-core as the shared dispatch that gwz-py's design already asks for. The shared dispatch also absorbs gwz-cli's diff, log and hook paths, which gwz-cli dispatches outside `execute_invocation` today.
+- The worker runs the shared dispatch. That is gwz-cli's execution path (`execute_invocation`), moved into gwz-core as the shared dispatch that gwz-py's design already asks for. The shared dispatch also absorbs gwz-cli's diff, log and hook paths, which gwz-cli dispatches outside `execute_invocation` today. The session host, in the gwz-session-host crate, reaches the dispatch only through the `HostPorts` that core implements: decoding a call's header, resolving its workspace, running an operation and encoding its replies (the crate map's §2).
 - **Transport entry.** For a transport-scope request in a build that has the transport, the worker calls a session variant of `with_local_transport` through its gate. The gate supplies three inputs: the operation's token, the endpoint environment from the session context, and the session's timeouts. It refuses the call with `Cancelled` once the token is cancelled. The entry then:
   1. builds the operation's own runtime from the session's endpoint environment and timeouts;
   2. registers the operation's single request with the token, through a new request constructor that takes the caller's token;
@@ -306,6 +307,8 @@ Every operation reaches the context only through its gate. Code on the session p
 - the HTTPS helper slots;
 - the member lock manager (§5.1);
 - the workspace registry: the workspaces on which its sessions run W operations and pushes, and the workers detached at a close bound (§5.1, §8).
+
+The host context stays a core composite (the crate map's §7). Core builds it from these members, whose machinery may live in crates, such as the gwz-session-host crate's supervisor, and its `shutdown` passes each member what remains of the one cleanup bound.
 
 The driver creates it and passes it to every session it opens:
 - gwz-cli creates one at startup.
@@ -431,7 +434,7 @@ The extension exposes a host-context constructor and one session object with fou
 | --- | --- |
 | `HostContext()` | creates a host context (§5.6). The bridge creates one per process, once, and passes it to every `open`. |
 | `open(options)` | creates the session host, its session context and its in-process channel. `options` carry the limits of §1, which `open` validates, the endpoint environment captured by the bridge, as byte-string pairs on every platform (§5.6), and the host context to use. |
-| `send(frame)` | non-blocking. Fails with `transport_session_full` on a full queue, and fails once the session has ended. |
+| `send(frame)` | non-blocking. Core classifies the frame's lane (§3) and sends it on that lane. Fails with `transport_session_full` on a full lane, and fails once the session has ended. |
 | `recv()` | blocks with the GIL released; returns a frame, or `None` once the session has ended |
 | `close()`, or dropping the object | closes the channel |
 
@@ -684,3 +687,4 @@ Assertions check typed fields and codes only.
 
 - 2026-09-28: amended by the [connection reuse design](GwzConnectionReuseDesign.md), accepted at SHA-256 `e8ee63f8…` ([its Verdict-1](GwzConnectionReuseDesign-Verdict-1.md)), for the sections its §13 lists. Each operation gets its own transport binding over endpoint instances that the host context shares, in place of its own transport runtime. The status names the amended sections, and this closes the transport release plan's TR1.2. The paired GWZDesign and GWZRequirements paragraphs are no longer marked DRAFT. Both name revision 5, and GWZDesign's also takes the design's binding and registry text.
 - 2026-09-28: amended by the [server design](GwzCoreServerDesign.md), accepted at SHA-256 `9fc80261…` ([its Verdict-1](GwzCoreServerDesign-Verdict-1.md)), for the sections its §8 lists. It adds the byte-stream handshake and control frames (tags 4 to 8) and seven error codes (77 to 83). A driver may host the session over a socket or its standard streams, with the client supplying the snapshot and the serving process the host context. The credential-helper spawn is attributed to the git2 crate. With OD12 decided yes, §1's "remote deployment" exclusion excepts the server's SSH remote form. This is TR1.3's closure.
+- 2026-09-29: amended by the [core session crate map](GwzCoreSessionCrateMap.md), accepted 2026-09-28, for the sections its §7 lists whose code its steps 3 and 4 move. §3 and §9: the frame layer and both adapters are small crates that carry bytes; `send` takes a lane, and core classifies each frame, with control calls and their replies on the control lane. §5.1 and §5.2: the class table and the dispatch are core's implementation of the host crate's ports. §5.6: the host context stays a core composite, over members whose machinery may live in crates. The status names the amended sections. The paired GWZDesign paragraphs took the same text on the same day, and GWZDesign and GWZRequirements also took the map's O9 definition of `permanent`, which this document takes at its next revision.

@@ -1,6 +1,29 @@
 # Current program checkpoint
 
-## Transport release — crate map GO and committed, 2026-09-28
+## Transport release — crate map steps 1 to 4 accepted, 2026-09-29
+
+- **Accepted, uncommitted,** on root `60fb142`, gwz-core `0b7fdf19` and gwz-py `a342b95`. Another session committed taut `9d46310`, gwz-transport `f8ebef7`, gwz-core `0b7fdf19` and root `60fb142` the same night; nothing overlaps.
+  - **Step 1, checkers:** the process-globals checker refuses a `permanent` entry for a counter, flag, lock, cell or thread-local unless `imposed_by` names the dependency, and every global-state `debt` entry names an `owner`. The eight counters, `CROSSING` and gwz-transport's `NEXT_POOL` became debt. It also sees `lazy_static!`. The boundary gate counts only gwz-core's own packages as first-party, so the git2 fork (`gwz-git2`) is third-party.
+  - **Step 2, `gwz-ids`:** each context's `IdSource` (a random prefix from `getrandom`, plus a counter) replaces the four temp-name counters. Family-store creates its temporary exclusively and retries.
+  - **Step 3, `gwz-session-contract` and `gwz-session-channel`:** CS1.2 and CS1.3 as crates that carry bytes only, with vectors from taut-shape-tool.
+  - **Step 4, `gwz-session-host`:** core's gate, limits and supervisor moved into it; `CROSSING` is gone, replaced by capabilities (the [step 4 plan](GwzCoreSessionCrateMapStep4.md)); `ClientChannel` sends and receives through `pair(Limits)`. `RustApi.md`, `GWZDesign.md` and the contract (amended 2026-09-29, §3, §5.1, §5.2, §5.6, §9) carry the text.
+  - The allowlists hold 26 gwz-core items (4 `permanent`, all imposed by libgit2 or a cleared-environment spawn), and 18 crates are versioned.
+- **Review:** one Consistency and Safety review of the whole diff, under the granularity ruling; steps 3 and 4's channel wiring, which are wire format and carry secret-bearing frames, were covered in full. No Surface reviewer: the Rust API additions reach only first-party drivers (lane owner's call).
+  - Both axes reported GO on the same object (manifest `e7f7bd90…`), with no P0 to P2: [Consistency](GwzCoreSessionCrateMapSteps-ReviewConsistency.md) five P3s, [Safety](GwzCoreSessionCrateMapSteps-ReviewSafety.md) three.
+  - The eight were applied as one change: the byte-stream adapter wipes a body it does not deliver (best-effort, safe code); `ClientChannel::close()` drops the session context and its snapshot; the process-globals checker lists macro-declared statics and follows `include!`; CI's Tier A also runs doctests; `send(frame, lane)` takes the caller's lane until CS1.6; `GWZRequirements.md` takes the O9 sentence; the crate counts are count-free.
+  - Both reviewers confirmed them on the corrected tree (manifest `631067bd…`): [Consistency-1](GwzCoreSessionCrateMapSteps-ReviewConsistency-1.md) and [Safety-1](GwzCoreSessionCrateMapSteps-ReviewSafety-1.md). Consistency-1's one new P3, three stale records, is applied as text, as it asked, without another round.
+- **Carried obligations:**
+  - CS1.6 classifies each frame on the host side and never trusts the lane it arrived on;
+  - CS2.3, CS2.12 and CS3.7: callbacks never hold controls, and the reading thread runs callbacks holding no session lock;
+  - gwz-py's commit reaches GitHub with or before gwz-core's, since gwz-py's CI runs gwz-core `main`'s checker, which now requires owners.
+- **Failing at HEAD before this work, from other lanes** (the operator decides who fixes them):
+  - the checked-artifact gate: 23 test-file `#[path]` edges and one `include!` (remote-transport lane 2026-09-21/22, no-fallback lane 2026-09-20);
+  - Bazel: gwz-cli `b2b24ed`'s `cfg-if` has no spec, and `MODULE.bazel.lock` cannot be regenerated until the fork rename (TR3.1) lets the `gwz_core_crates` hub resolve `../git2-rs`;
+  - tests `runtime_timeout_refuses_changes_after_backend_creation` (`1ac248ca`'s 9000 ms default), `native_same_tree_receiver_ref_reproduces_noncommittish_error` (the fork's libgit2 1.9.7, `26b30ca6`) and `generated_protocol_is_current` (taut `9d46310`);
+  - gwz-core clippy with all features (36 errors) and rustfmt (4 files); gwz-cli's local-clone and merge docs tests.
+- **Next:** the commit, on the operator's go: root, gwz-core and gwz-py, with the two HEAD test fixes. Then the session plan's next steps, placed by the map: CS1.6 and Phase 2 in `gwz-session-host`; CS1.1 still waits on TR3.1.
+
+## Transport release — crate map accepted, 2026-09-28
 
 - **The [crate map](GwzCoreSessionCrateMap.md)** is drafted at r0 `eac8e018…`, on the operator's "ok on crates". It re-homes the code of the session plan's remaining steps into small crates:
   - six ordinary crates in `gwz-core/crates/`: `gwz-ids`, `gwz-session-contract`, `gwz-session-channel`, `gwz-session-host`, `gwz-server-policy` and `gwz-server-os`;
@@ -19,12 +42,14 @@
   - reuse §14 joins §7;
   - `test-support` features.
 
-  The same reviewer confirmed them ([confirmation](GwzCoreSessionCrateMap-ReviewCode-1a.md)), and GO stands. Its two notes are applied as worded. The reviewed text is `d78393ae…`, 222 lines. With the operator's two decisions recorded and the candidate crates renamed, it is `1493c5d2…`, 224 lines. The map and its three review files are committed with this entry.
+  The same reviewer confirmed them ([confirmation](GwzCoreSessionCrateMap-ReviewCode-1a.md)), and GO stands. Its two notes are applied as worded. The reviewed text is `d78393ae…`, 222 lines. Root `147bf11` committed the map at `1493c5d2…` (224 lines) with its three review files. Recording the rules' adoption makes it `49442dce…`, 226 lines, uncommitted.
 - **Revision 1's shape:** six candidate crates (`gwz-endpoint-contract`, `-policy`, `-registry`, `-instance`, `gwz-ssh-endpoint`, `gwz-https-endpoint`), and thirteen crates.io names to bootstrap in all.
 - **Decided (operator, 2026-09-28):** the candidate crates live in gwz-core, as the second workspace `gwz-core/candidate-crates/`, so the repositories stay a DAG: gwz-core depends on gwz-transport, never the reverse. They were called the transport crates, in `gwz-core/transport/`, until the operator read that folder as the gwz-transport repository.
 - **Decided (operator, 2026-09-28):** the thirteen new crates.io names are registered together, just before release preparation begins.
-- **Operator decision pending:** the map's §1 rules, including that no counter, flag or thread-local is ever `permanent`.
-- **Next:** once the operator decides §1's rules, the map's first steps (the checkers, `gwz-ids`, the channel crates and the host crate), built back to back and reviewed once. CS1.2 becomes the channel crates. The two HEAD test fixes stay applied and uncommitted until the operator's go.
+- **Adopted (operator, 2026-09-28):** the map's §1 rules, including that no counter, flag or thread-local is ever `permanent`. The map is accepted.
+  - Of the text its §7 amends, the [library boundaries](GwzLocalCloneLibraryBoundaries.md) (revision 3: every new gwz-core library) and gwz-core's `AGENTS.md` changed on adoption, uncommitted.
+  - The allowlist's definition changes in step 1. The contract, `GWZDesign.md`, the server design and the reuse design change in the step that moves their code, or at their next revision; the map controls until then.
+- **Next:** the map's first steps (the checkers, `gwz-ids`, the channel crates and the host crate), built back to back and reviewed once. CS1.2 becomes the channel crates. The two HEAD test fixes stay applied and uncommitted until the operator's go.
 
 ## Transport release — CS1.9 committed; review granularity; modularization open, 2026-09-28
 

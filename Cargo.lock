@@ -434,12 +434,16 @@ dependencies = [
  "gwz-family-store-contract",
  "gwz-git2",
  "gwz-history-check",
+ "gwz-ids",
  "gwz-local-disposal",
  "gwz-local-import",
  "gwz-refcopy",
  "gwz-repo-contract",
  "gwz-repo-factory",
  "gwz-repo-inspect",
+ "gwz-session-channel",
+ "gwz-session-contract",
+ "gwz-session-host",
  "gwz-work-detector",
  "gwz-workspace-install",
  "libc",
@@ -467,6 +471,7 @@ version = "0.0.8"
 dependencies = [
  "gwz-family-model",
  "gwz-family-store-contract",
+ "gwz-ids",
  "serde",
  "serde_yaml",
 ]
@@ -497,6 +502,10 @@ version = "0.0.8"
 dependencies = [
  "gwz-repo-contract",
 ]
+
+[[package]]
+name = "gwz-ids"
+version = "0.0.8"
 
 [[package]]
 name = "gwz-libgit2-sys"
@@ -555,6 +564,24 @@ version = "0.0.8"
 dependencies = [
  "gwz-git2",
  "gwz-repo-contract",
+]
+
+[[package]]
+name = "gwz-session-channel"
+version = "0.0.8"
+dependencies = [
+ "gwz-session-contract",
+]
+
+[[package]]
+name = "gwz-session-contract"
+version = "0.0.8"
+
+[[package]]
+name = "gwz-session-host"
+version = "0.0.8"
+dependencies = [
+ "gwz-session-contract",
 ]
 
 [[package]]

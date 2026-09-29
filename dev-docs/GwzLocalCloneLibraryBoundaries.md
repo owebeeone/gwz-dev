@@ -1,6 +1,7 @@
 # GWZ local clone — library boundaries and testing
 
-Status: **PROPOSED 2026-09-05 revision 2**. Local adoption decision for
+Status: **PROPOSED 2026-09-05 revision 2**; revision 3 (2026-09-28) widens
+its scope (changelog). Local adoption decision for
 the local-clone plan, following F51 and the second GPT-6/Sol reviews.
 The packages, commands and gates below were planned at revision 1; the
 LCM1.0c checkpoint (`GwzLocalClone-LCM1.0c-Checkpoint.md`) implemented and
@@ -14,6 +15,10 @@ workspace alike, because gwz-core is now its own Cargo workspace with
 `crates/*` as members and is excluded from the root workspace; §6 the gate
 checks that layout and the CI job runs that form, and the S-P3-3
 unlocked-Tier-A guard is retired on its recorded condition. §1–§4 unchanged.
+2026-09-28 revision 3 (the [core session crate map](GwzCoreSessionCrateMap.md), accepted with the
+operator's adoption of its rules) — §1's scope covers every new gwz-core library, and the
+map's moves of existing code are authorized; §2 places the map's candidate crates and lets
+them use gwz-transport and its own generated protocol.
 
 ## 1. Scoped policy adoption
 
@@ -34,8 +39,10 @@ Do not duplicate the full policy checklist in every brief.
 
 Adopt LBT-001 through LBT-012 from the canonical
 [Library Boundary and Testing Policy](../../glade-wz/dev-docs/LibraryBoundaryAndTestingPolicy.md)
-for **new local-clone libraries and their new public boundaries**. Read
-that policy before implementing these packages. Reviewed policy snapshot:
+for **every new gwz-core library and its public boundary**: first the
+local-clone libraries, and since 2026-09-28 every other new library, under
+the [core session crate map](GwzCoreSessionCrateMap.md). Read that policy
+before implementing these packages. Reviewed policy snapshot:
 2026-09-05, SHA-256
 `dcc4fbd2b45caf928978a090208951ef14759ef0589e820b94f8475fccf07c10`.
 Keep the shared rules there; this document supplies GWZ's scope, package
@@ -47,7 +54,8 @@ outside this package-classification rollout. Their existing rules still
 apply. New adapters in core are in scope for narrow-port/API review and
 focused integration tests, but do not claim an independently compiled core
 test target. This is a named composition boundary, not permission to move
-new library logic into core. No existing-library migration is authorized.
+new library logic into core. No existing-library migration is authorized beyond the moves the core
+session crate map schedules.
 
 The goal is parallel implementation with a seconds-scale local test loop.
 Each functional library below is a separate private path crate. A filtered
@@ -57,7 +65,10 @@ unfinished implementations must not be required to compile it.
 
 ## 2. Packages, roles and permitted production dependencies
 
-All package directories are under `gwz-core/crates/`. Cargo names use the
+All package directories are under `gwz-core/crates/`, except the crate
+map's candidate crates, which stay in `gwz-core/candidate-crates/` until
+activation. The table below lists the local-clone crates; the crate map
+lists its own, with their roles and edges. Cargo names use the
 `gwz-` prefix shown below. These are internal packages in the existing
 repository, not new GWZ member repositories or a public plugin ABI.
 Use explicit package edition/version metadata so a standalone core checkout
@@ -99,6 +110,9 @@ checked-artifact code, or the full-system test harness, even as a dev
 dependency. Public contracts use owned domain values, standard paths and
 typed errors; they do not expose `git2`, OS handles, core model errors or
 protocol request types. The boundary adapter performs those translations.
+One exception: the crate map's candidate crates may use gwz-transport and
+gwz-transport's own generated protocol, never gwz-core's. gwz-transport has
+no dependencies and does no I/O, so it counts as a pure crate.
 
 `local-testrepo` uses Git library calls, fixed identities/timestamps and
 small files. Only real-I/O adapter tests use it. Pure-library fast tests
