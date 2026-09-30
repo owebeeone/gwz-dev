@@ -1,5 +1,51 @@
 # Current program checkpoint
 
+## Transport release — the transport candidate CI job, 2026-09-30
+
+- **What:** gwz-core gains `.github/workflows/transport-candidate.yml`, on the operator's word ("start the candidate CI job"). It runs on every push to `main`, on every pull request and on dispatch.
+  - It supersedes the 2026-09-30 decision to land the job with the checked-artifact gate's structural checks. That decision rested on both needing the fork at `../git2-rs`, and CI has checked the fork out since `96acd92b`.
+  - The structural checks stay their own step.
+- **The job** runs on ubuntu-24.04. It checks out gwz-core, gwz-transport, gwz-py, taut and git2-rs side by side, as a workspace has them, and runs:
+  - the candidate and consumer generators' `--check` and their pytest suites, under the taut-proto release the candidate generator pins (0.10.0), installed in site-packages. The workflow names no version of its own;
+  - three candidate Python test modules that no CI ran before: `tests/transport_backend/test_prepare.py`, `tests/transport_consumer/candidate/test_candidate.py` and `tests/transport_consumer/test_package_proof.py`;
+  - `prepare.py` into the runner's temp directory, then the copy's lock resolved;
+  - `scripts/run_tests.py` over the candidate manifest with `--cfg gwz_transport_candidate`. That covers the source checks, gwz-transport's process globals at the pin, gwz-core's and gwz-py's conditional-compilation boundaries (SKIPPED GATE for gwz-cli, which is not checked out), and the four test phases;
+  - the consumer's archive proof, over the package of the pinned gwz-transport.
+- **What the siblings are for, and their pins.** Each pinned commit must already be on its repository's `main`, and the job checks that.
+  - **gwz-transport**, pinned by the new `.github/gwz-transport.commit` (`a24e70a`). The pin moves with the candidate generators' `owner-schema-sha256`: a gwz-core commit that moves those pins moves this one too. The job's `--check` fails if they disagree. It is not the gwz-transport allowlist's `reconciled_commit` (still `46e65a9`), the commit that list was last reconciled against, which the boundary job checks.
+  - **gwz-py**, pinned by the new `.github/gwz-py.commit` (`950064d`). The candidate's embedding tests run gwz-py's Python codec from its source, and nothing is built from it. The pin moves when gwz-core's candidate tests need a newer gwz-py.
+  - **taut**, at the tag of the taut-proto release the candidate generator pins (`v0.10.0`), with no pin file of its own. The candidate's tests read taut's source from the workspace checkout: `tests/protocol.rs` does, and so does the embedding tests' bridge, `tests/transport_backend/python_embedding.py`. The adoption brief (GwzTaut010Adoption.md §3) keeps that checkout at the release tag as the checkpoint ritual's third leg, and this is the same leg in CI. The generators take the installed release instead.
+- **Why the first dry run failed:** four embedding tests, because the bridge requires `gwz-py/src` and `taut/src` beside gwz-core.
+- **`run_tests.py --skip-cfg-sibling NAME`** is new.
+  - `--skip-cfg-siblings` is only for a job with neither sibling checked out, and it prints "this run has no gwz-py checkout", which is false in a job that has one.
+  - The new flag skips one sibling, so this job checks gwz-py's boundaries at its pinned commit. CS1.7's follow-up is unchanged: each sibling's own CI checking its own changes.
+  - Two new tests in `test_check_cfg_boundaries.py`: the flag skips the named sibling alone, and it refuses a name that is not a sibling. Both failed before the change.
+  - Four statements that no gwz-core job checks gwz-py out now say what is true: `check_cfg_boundaries.py`'s docstring, the allowlist's `rule`, and the platform and Windows matrix comments. The allowlist's shrink check passes against `HEAD`.
+- **Verified locally:** `test_check_cfg_boundaries.py` (50 tests) and the other `run_tests.py` tests pass, `cargo fmt --check` passes, and the full cfg check passes over the workspace, gwz-cli included.
+- **Verified by three dry runs** of the job's steps on macOS, in a runner-shaped layout: the siblings cloned from GitHub at their pins, the gwz-core working tree, and Python 3.12 from uv in place of setup-python.
+  - The third run is the job as committed, except for three later changes checked on their own: the release pin the workflow now derives (the run installed 0.10.0 directly), the test's diagnostic messages (the candidate build compiles them, and both driver tests pass), and four text corrections.
+  - Every step of the third run passes except one intermittent test:
+    - the pins are on their repositories' `main`;
+    - the generators pass (9 and 8 tests), and the candidate Python tests pass (26);
+    - the source checks pass: process globals, conditional compilation over gwz-core and gwz-py, crate versions;
+    - the suites: 2,523 passed, 1 failed, 1 ignored. The four embedding tests that failed in the first run pass;
+    - the archive proof passes on `a24e70a`.
+- **The one failure is intermittent:** `transport_candidate_tests::drivers::candidate_service_refusal_skips_only_private_members_and_forgets_observations` got `GitCommandFailed` where it expects `RemoteRejected`.
+  - It passed in the other five full-suite runs (the first two dry runs and three reruns of the lib suite), and in 70 of 70 runs alone or eight at a time.
+  - Its assertion reported only the error code, so the failure's cause is unknown. Either the refusal was lost, or the clone failed another way, such as by the fixture's 3-second I/O timeout under the suite's load (`transport_candidate_tests.rs` passes 3000 to `ssh_local::connect`).
+  - The test's two assertions now print the whole error, so a recurrence in CI will show which.
+- **Linux** behaviour is proved only by the first run on GitHub.
+- **Open for the operator:**
+  - **Tests that read the taut checkout.** Should they take the installed release, as the generators do? That covers `tests/protocol.rs` (six tests), the embedding bridge and `test_candidate.py`, plus `docs/generate_message_catalog.py`, which reads the vendored `taut/src`. One cost surfaced in the dry run: PyO3's embedded interpreter runs from the base install it links and never activates a virtual environment. A release-only bridge therefore needs taut-proto installed in that base Python, for local runs too.
+  - **Python test modules no CI runs:** the five under `scripts/retained_readers/`, `scripts/checks/test_check_local_clone_docs.py`, `tests/transport_native/test_prove.py` and `tests/transport_native/distribution/test_fork.py`.
+  - **`src/git/endpoint/https_fixture.rs`** is included by `#[path]` in four test modules, so the candidate build warns about six fixture items that only the other copies use.
+- **Residuals:**
+  - prepare.py pins the added crates' direct versions exactly, but their transitive versions resolve when the job runs;
+  - gwz-cli's cfg check still runs only locally;
+  - macOS runs stay with the dispatch-only platform matrix;
+  - under the review granularity ruling, the phase's Consistency and Safety review covers this step.
+- **Committed** on the operator's go ("commit and push"): gwz-core `96a92b4c`, then the root lock captured and the root commit that carries this entry. Pushed in that order; the push to gwz-core's `main` starts the job's first run.
+
 ## Transport release — the uniform release rule for gwz-py's protocol generator, 2026-09-30
 
 - **What:** the open item the taut 0.10.0 adoption left: its Consistency round-2 P3-6, taken up on the operator's word ("give regen_protocol.py the uniform rule"). gwz-py's `scripts/regen_protocol.py` now applies the rule the other three generators follow. It still generates in child processes without `PYTHONPATH`. Each child:
