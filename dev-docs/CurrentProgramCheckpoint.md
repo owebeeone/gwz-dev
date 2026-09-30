@@ -1,5 +1,22 @@
 # Current program checkpoint
 
+## Transport release — the uniform release rule for gwz-py's protocol generator, 2026-09-30
+
+- **What:** the open item the taut 0.10.0 adoption left: its Consistency round-2 P3-6, taken up on the operator's word ("give regen_protocol.py the uniform rule"). gwz-py's `scripts/regen_protocol.py` now applies the rule the other three generators follow. It still generates in child processes without `PYTHONPATH`. Each child:
+  - accepts taut-proto only from this interpreter's site directories, at the pinned version, before it imports taut;
+  - checks that every loaded taut module is that release's own file, before and after generating;
+  - refuses anything else.
+
+  The parent's own version check, redundant with the children's and blind to `PYTHONPATH` shadows, is gone. The generated protocol is unchanged: `--check` and the drift check both pass.
+- **Tests:** `src/tests/test_regen_protocol.py` covers four cases:
+  - a wrong release;
+  - a shadowing `taut` package;
+  - a shadowing package with its own release metadata;
+  - a copy on `PYTHONPATH`, which generation ignores.
+
+  The metadata test fails against a copy of the script without the site-directory check. The protocol tests (`test_protocol_drift.py`, `test_log_protocol.py`) pass: 9 in all.
+- **Committed** on the operator's go ("commit and push"): gwz-py `950064d`, then the root lock captured and the root commit that carries this entry. Pushed in that order.
+
 ## Transport release — taut 0.10.0 adopted, accepted and committed, 2026-09-30
 
 - **What:** taut 0.10.0 replaces taut-proto 0.9.1 and taut-shape 0.9.2 across gwz-core, gwz-py, gwz-transport and the root. It was released on 2026-09-30 as one train: taut-proto and taut-shape on PyPI, taut-shape on crates.io, and `v0.10.0` in all four taut repos. The step lands ahead of CS1.1, whose `cancellation` field is `optional=MISSING_OK`: taut-proto 0.9.1 lacks it, and gwz-py can depend only on a published taut-proto. Operator decisions: adopt it now, as one step; drop `gwz_core::decode`. Brief: [GwzTaut010Adoption.md](GwzTaut010Adoption.md).

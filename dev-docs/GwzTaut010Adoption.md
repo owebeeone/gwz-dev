@@ -64,6 +64,8 @@ Operator decisions (2026-09-30):
    - **The candidate and consumer generators, and gwz-transport's**, accept the release only from the interpreter's site directories.
    - **gwz-py's `scripts/regen_protocol.py`** checks that the installed version equals its pin and drops `PYTHONPATH` for the generation it runs. It has neither the site-directory binding nor the module-origin check, so a copy of taut with its own metadata ahead of site-packages passes its version check. Its outputs are still guarded by `--check`, the drift check and the byte-identity of the generated API. Giving it the uniform rule is recorded as open in the checkpoint.
 
+     *Dated note, 2026-09-30, after acceptance:* `regen_protocol.py` now has the uniform rule, on the operator's word. Its generating children, still run without `PYTHONPATH`, accept taut-proto only from the interpreter's site directories at the pinned version, and check every loaded taut module's origin. See the checkpoint entry of the same date.
+
 ## 4. Not in this step
 
 - **gwz-cli's standalone `Cargo.lock`.** It is refreshed at each gwz-core release ("Refresh the standalone Cargo.lock for gwz-core 1.0.17"). It has been stale since the git2-rs rename, and the next release refresh brings taut-shape 0.10.0 with it.
