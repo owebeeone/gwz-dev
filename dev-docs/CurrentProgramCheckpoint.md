@@ -1,5 +1,46 @@
 # Current program checkpoint
 
+## Transport release — taut 0.10.0 adopted, accepted and committed, 2026-09-30
+
+- **What:** taut 0.10.0 replaces taut-proto 0.9.1 and taut-shape 0.9.2 across gwz-core, gwz-py, gwz-transport and the root. It was released on 2026-09-30 as one train: taut-proto and taut-shape on PyPI, taut-shape on crates.io, and `v0.10.0` in all four taut repos. The step lands ahead of CS1.1, whose `cancellation` field is `optional=MISSING_OK`: taut-proto 0.9.1 lacks it, and gwz-py can depend only on a published taut-proto. Operator decisions: adopt it now, as one step; drop `gwz_core::decode`. Brief: [GwzTaut010Adoption.md](GwzTaut010Adoption.md).
+- **Review:** the wire-format dual review.
+  - **Round 1:** GO on both axes, with six P3s (Consistency four, Safety two), all taken into the step ([RemPlan](GwzTaut010Adoption-RemPlan.md)). The Safety axis showed that a copy of taut carrying its own `taut-proto` metadata passed the new release check. The three generators now accept the release only from the interpreter's site directories.
+  - **Round 2:** GO on both axes. All six are closed, with the original counterexamples re-run. Consistency raised two text P3s, which the brief takes in at landing.
+  - **Reports:** `GwzTaut010Adoption-ReviewConsistency.md`, `-ReviewSafety.md`, and their `-1` re-verdicts.
+- **Release pins replace commit pins.** gwz-core's candidate and consumer generators and gwz-transport's generator took a taut checkout at a pinned commit. Now they take the released taut-proto 0.10.0, from the interpreter's site directories only. gwz-core's production generator and gwz-py's already took a PyPI release and are now pinned to 0.10.0. The previous entry's "every taut commit costs three re-pins" and its idea of pinning taut's `src/` tree lapse.
+- **The wire is unchanged:**
+  - the three corpora (155, 17 and 175 vectors) regenerate byte-identical;
+  - both pre-log fingerprints hold over IR version 1 of taut's version 2 export, and both projection checks refuse a declared taut option.
+- **Decoding changes (taut 0.10.0):**
+  - each message has a depth bound of 32 (`TooDeep`). No gwz type is recursive, and the deepest static nesting is 8;
+  - there is no length bound;
+  - Python refuses an absent optional field unless it is `MISSING_OK`, as Rust already did. Both encoders always write every field;
+  - `gwz_core::decode` and the runtime's panicking accessors are gone, `DuplicateMapKey` carries a `MapKey`, and `gwz_core::MAX_DEPTH` and `MAX_ENCODED_LEN` are new root items (`docs/RustApi.md`).
+- **Fixed on the way:**
+  - the local root build: `--locked` failed once another session moved taut-shape-rs to 0.10.0;
+  - gwz-transport's contracts CI: red since `f8ebef7`, because its taut checkout lagged the pin, plus a rustfmt failure in `tests/pool.rs` that was already there;
+  - three dead imports in candidate test code;
+  - the consumer generator's inert `codec` guard and the pin keys nothing read.
+- **The workspace:**
+  - the taut checkout is at `v0.10.0` (`a7cab03`, one behind `origin/main`, whose extra commit only sets `fallback_version`);
+  - the root lock also records another session's move of taut-shape (`5779c96`) and taut-shape-py (`f86f0e9`) to their tags, and of taut-shape-rs to `5026715`, one CI-only commit past its tag;
+  - gwz-py's `.venv` carries taut-proto 0.10.0.
+- **Plan text for the plan's next revision:** `GwzCoreSessionPlan.md` line 109 and CS1.1's regeneration inputs. They need taut-proto 0.10.0 installed in site-packages, not a taut checkout at `bcf98b64…` plus 0.9.1.
+- **Open:**
+  - gwz-py's `scripts/regen_protocol.py` checks only the installed version: no site-directory binding and no module-origin check. Giving it the uniform rule is a small follow-up (Consistency round-2 P3-6);
+  - gwz-cli's standalone `Cargo.lock`, refreshed at release time and stale since the rename;
+  - the consumer's archive proof (`package_proof.py`), which needs a committed gwz-transport and can run now;
+  - the candidate CI job, the next planned step. Until it lands, nothing in CI runs the candidate and consumer generators' `--check`;
+  - five candidate transport-host items that the non-test build never calls: `Request::open_https`, `with_https`, the fields `stream_id` and `policy`, and the `SshOpenFailure` re-export. Whether they are staged or dead is the operator's call;
+  - rustdoc's two unresolved links (`src/artifact/store.rs:10`, `src/diff/render/options.rs:38`);
+  - comparing `effective` against taut's defaults in `ir_version_1`, deferred to the step that adopts taut options.
+- **Committed** on the operator's go ("commit and push when the reviews come back"):
+  - the members: gwz-core `47ea25d6`, gwz-py `9af3cf9`, gwz-transport `a24e70a`;
+  - the root lock, captured from them;
+  - the root commit that carries this entry.
+
+  The push follows in the order gwz-transport, gwz-core, gwz-py, root. gwz-py's native code calls `gwz_core::try_decode`, which older gwz-core does not export.
+
 ## Transport release — pushed; git2-rs in CI; taut 81ba894, 2026-09-30
 
 - **Pushed on the operator's word:** every repo in the workspace, once the git2-rs fork's package rename was committed (git2-rs `d13951f` on `codex/per-remote-transport`, gwz-git `a9d7ee0`, root `867d8fa`). The rename is `git2` to `gwz-git2` and `libgit2-sys` to `gwz-libgit2-sys`; the Rust crate names stay `git2` and `libgit2_sys`. Both packages are `publish = false`, and crates.io holds only `0.0.0-bootstrap.1` placeholders, so gwz-core can't be published to crates.io until the fork is.

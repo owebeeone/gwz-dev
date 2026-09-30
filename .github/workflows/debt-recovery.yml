@@ -95,7 +95,7 @@ jobs:
         working-directory: gwz-py
         run: |
           python -m venv .venv
-          .venv/bin/python -m pip install maturin pytest pytest-asyncio setuptools-scm taut-proto==0.9.1
+          .venv/bin/python -m pip install maturin pytest pytest-asyncio setuptools-scm taut-proto==0.10.0
           .venv/bin/python -m maturin develop
           .venv/bin/python scripts/check_protocol_drift.py
           .venv/bin/python -m pytest -q 2>&1 | tee ../evidence/python-driver.log
