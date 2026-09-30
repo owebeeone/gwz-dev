@@ -1,5 +1,17 @@
 # Current program checkpoint
 
+## Transport release — the candidate job's second run: a credential helper that skips its input, 2026-10-01
+
+- **Second run** of the transport candidate job: run 36725000862, on gwz-core `1b561045`.
+  - The "Text file busy" fix held: `abort_after_helper_start_retains_permit_until_owner_reap` and the new Linux test pass.
+  - The Checked-artifact boundary job passed, its first green run since 2026-09-18, and so did the root's workspace-recovery run.
+- **The failure:** `git::endpoint::https_auth::tests::lookup_uses_bounded_direct_helper_and_returns_secret` got `Err(Io)`.
+  - **Cause:** the test's helper prints a credential and exits without reading its input. `lookup` writes the request while it reads the output, and when the helper has already exited, the write fails with a broken pipe. `lookup` returned `Io`, though the helper had answered and exited successfully. Git ignores SIGPIPE while it writes to a credential helper, so such a helper works with git.
+  - **Fix:** product code in the candidate transport, on the operator's go. The new `write_request` treats a broken pipe as the helper not reading its input, and the helper's exit status and output decide the lookup. Any other write error is still `Io`.
+  - **Tests:** a closed input does not fail the write, which failed before the fix, and any other write error is still `Io`. Both use an in-memory pipe and do not depend on timing. Locally, the candidate's endpoint and transport-host tests pass (193).
+- **The archive proof** now runs whenever the suites ran, pass or fail. It was skipped in both runs, so it has not yet been proved on Linux.
+- **Committed** on the operator's go ("yes, do both"): gwz-core `6941c1ae`, then the root lock captured and the root commit that carries this entry. Published with `gwz push`, limited to gwz-core and the root.
+
 ## Transport release — the candidate job's first run and two CI fixes, 2026-09-30
 
 - **First run** of the transport candidate job: run 36716830133, on gwz-core `96a92b4c`, on ubuntu-24.04.
