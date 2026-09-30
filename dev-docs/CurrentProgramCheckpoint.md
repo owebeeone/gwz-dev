@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## Transport release — the candidate job's first run and two CI fixes, 2026-09-30
+
+- **First run** of the transport candidate job: run 36716830133, on gwz-core `96a92b4c`, on ubuntu-24.04.
+  - Every step before the suites passed on Linux: the pins, the taut tag checkout, the generators (9 and 8 tests), the candidate Python tests (26), and the source checks, including gwz-py's conditional-compilation boundaries (SKIPPED GATE for gwz-cli).
+  - The suites: 2,318 lib tests passed and 1 failed. The four embedding tests pass, so PyO3 embeds setup-python's Python. The SSH refusal test that failed once on macOS passed.
+  - The archive proof was skipped after the failure.
+- **The failure:** `git::endpoint::https_auth::tests::abort_after_helper_start_retains_permit_until_owner_reap` stopped with "Text file busy" (ETXTBSY) in `src/git/endpoint/helper_script.rs`.
+  - **Cause:** the helper's warm-up runs a script it has just written. A child that another test thread forks during the write keeps the write descriptor until it execs, and Linux refuses to execute a file that any process holds open for writing. macOS never refuses, so no dry run saw it.
+  - **Fix:** the warm-up retries on `ExecutableFileBusy`, every 5 ms for up to 10 s. Once one exec succeeds, nothing can hold the script open for writing again, so the code under test never meets the error.
+  - **Test:** `the_warm_up_waits_out_a_process_that_holds_the_script_open_for_writing` holds the script open for 100 ms. It is Linux-only, so its failure without the fix shows only in CI. Locally, the candidate's endpoint and transport-host tests pass (191).
+- **The Checked-artifact boundary job** has failed on every push since `96acd92b`; its last green run was on 2026-09-18.
+  - Clippy's filesystem lint refuses `std::fs::read_to_string` in `tests/native_libgit2.rs`. The test now reads gwz-core's manifest with `include_str!`.
+  - Locally, clippy passes, and so do the job's last two steps, selection ownership and the M5b tripwires. No run on GitHub has reached them since that commit.
+- **Escaped defects:** both came with `22147b68`, the cross-lane cleanup.
+  - CI could not build gwz-core until `96acd92b` added the git2-rs checkout, and the boundary job's red status then went unnoticed across three pushes.
+  - From now on, every run a push starts is read, not only the job being watched.
+- **Committed** on the operator's go ("commit and push"): gwz-core `1b561045`, then the root lock captured and the root commit that carries this entry. Pushed in that order; the push reruns both jobs.
+
 ## Transport release — the transport candidate CI job, 2026-09-30
 
 - **What:** gwz-core gains `.github/workflows/transport-candidate.yml`, on the operator's word ("start the candidate CI job"). It runs on every push to `main`, on every pull request and on dispatch.
