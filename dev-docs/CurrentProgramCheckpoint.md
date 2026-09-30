@@ -1,5 +1,25 @@
 # Current program checkpoint
 
+## Transport release — the five dead transport-host items removed; the SSH refusal test's timeout, 2026-10-01
+
+- **Operator decision (2026-10-01):** the five candidate transport-host items that no production path used are dead: "remove them, they're dead". The compiler's non-test build of the candidate named them:
+  - `RequestContext::open_https`, a wrapper of `open_https_recording`. The HTTPS policy tests' 11 calls now go through `open_https_recording`, with the fresh receipt the wrapper supplied.
+  - `CliEndpoint::with_https`, the only way to build a CLI endpoint with HTTPS. The two tests that embedded messages over that configuration, `rust_https_embedded_messages_round_trip_live_git_exchange` and its Python twin, went with it, along with their driver. The three SSH embedding tests remain.
+  - `stream_id` and `policy` on `HttpsAttemptReceipt`.
+  - `stream_id` and `policy` on `HttpsOpenFailure`. The retry check that read `policy` now reads the failure's recorded auth method (`Gh`), which production reads.
+  - The transport host's `SshOpenFailure` re-export. The fault and driver tests take it from `session`, whose re-export is now test-only.
+- **Cascade:**
+  - The driver's open functions returned a stream id with every failure only to fill those fields; they now return the bare failure.
+  - `https_auth.rs` drops a `mut` that `6941c1ae` left behind. My warning check missed it: its pattern matched two-space arrows, and lines of 100 or more get three.
+- **The SSH refusal test's intermittent failure is diagnosed.** With its full error printed, it failed on macOS with `PeerFailed { code: Timeout, effect: Possible }`: under the full suite's load the clone stalled past the fixture's 3-second I/O budget. The fixture now uses production's `DEFAULT_SERVER_TIMEOUT_MS` (9 s), and the test passed in the next full run.
+- **A new intermittent failure, unrelated to these changes:** `workspace_ops::tests::g00::private_members::private_member_clone_access_refusals_are_quiet_and_preserve_public_clones` got `GitCommandFailed: "unexpectedly large parse"`. It came from libgit2's own HTTP transport, against the test's raw TCP refusing server. It passed in five of five runs alone. Recorded, not investigated.
+- **Verified:**
+  - the candidate library builds with no warnings; before, it warned about the five items and the `mut`;
+  - the candidate test build warns only about the multi-included `https_fixture.rs` items, now seven with `input`, which only the removed embedding driver used in that copy;
+  - the full candidate library suite passes 2,300 tests, and its one failure is the new intermittent one above;
+  - clippy under the boundary job's lint configuration, `cargo fmt --check`, and the conditional-compilation and process-global checks pass.
+- **Committed** on the operator's go ("yes, raise the timeout too, then commit and gwz push"): gwz-core `32b45b60` (the removal) and `0ddc513c` (the timeout), then the root lock captured and the root commit that carries this entry. Published with `gwz push`, limited to gwz-core and the root.
+
 ## Transport release — the candidate job's second run: a credential helper that skips its input, 2026-10-01
 
 - **Second run** of the transport candidate job: run 36725000862, on gwz-core `1b561045`.
