@@ -74,7 +74,15 @@
       - gwz-cli `2bdad8b46911d82e03c89272e8bd37f085abbcff9613fd87cf7e305fa619f978` (2);
       - gwz-py `2ab61cd393bacd0d77765ffaaf94ed047b12951fb77da13b86c615b6262a4a78` (2).
     - **Push order:** gwz-cli's and gwz-py's tests run the checker from gwz-core's `main`, so gwz-core reaches GitHub first, or all of them go in one push.
-  - **Lanes now:** TR2.13 (`../gwz-dev-tr2-9`), TR2.11 (`../gwz-dev-tr2-11`), 1.1.0 S6.1 (`../gwz-dev-s6-1`), and TR2.3 with the `TempDir` fix (`../gwz-dev-tr2-3`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies), and four lanes at a time.
+  - **TR2.11 merged** (gwz-core `1943e34b`, merging lane `4cf0c623`; gwz-cli `ee8b365`; root `c09f5b0`).
+    - `transport_binding::configure` installs no route without a host context, so `Git2Backend::new()` takes libgit2's native route for SSH as for HTTPS. The lazy endpoint, its `HOME`/`SSH_AUTH_SOCK` factory and its `env` debt entry are gone.
+    - Candidate tests install a host context.
+    - A new source test holds gwz-cli's `transport_meta` arms equal to gwz-core's `with_transport` call sites. It removed the stray `RepoSync` arm, as the Python design's §2.1 had said.
+    - Suites: candidate 2,519 passed; gwz-core ordinary 2,315 passed; gwz-cli 336 passed. On merged main, the inventories and the process-globals guard (23 entries) pass.
+  - **From TR2.11's agent:**
+    - **Dead code.** The blocking SSH open path now has no production caller: `ssh_endpoint.rs`'s `Route`, `ssh_local::connect`, the worker's blocking `open*` family and four `open_endpoint_*` wrappers. The module-level `#![allow(dead_code)]` hides it. Its only users are 24 call sites in `tests/transport_ssh`, a qualification crate that nothing builds. Under the remove-dead-code rule, a step after TR2.13 moves those tests onto the production attachment path or drops them, removes the code and the `allow`, and either puts the crate in CI or retires it.
+    - **Parity defect.** The transport percent-decodes an SSH URL's path, but libgit2 passes it as written, so a remote with `%XX` in its path reaches another repository. That is TR2.16.
+  - **Lanes now:** TR2.13 (`../gwz-dev-tr2-9`), 1.1.0 S6.1 (`../gwz-dev-s6-1`), TR2.3 with the `TempDir` fix (`../gwz-dev-tr2-3`), and TR2.16, SSH URL path parity with libgit2 (`../gwz-dev-tr2-16`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
   - **TR2.13, endpoint throughput (new, from TR2.9's agent):** the endpoint session hands the mux one message per pass of about 5 ms, with nothing to wake it early. That caps a session near 160 messages a second, about 2.6 MB/s at 16 KiB a message. The figure is arithmetic, not measured, and would make a large clone far slower than 1.0.17. It is measured first, then fixed, in the TR2.9 lane. Amendment 2 gains the step at its next revision; TR2.6 reviews it with Phase 2.
 - **What can start now** (the amendment's §3.13):
   - TR2.9 to TR2.12, and 1.1.0 S6.1, then S6.2 and S6.3;
