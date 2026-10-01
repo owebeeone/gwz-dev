@@ -82,8 +82,21 @@
   - **From TR2.11's agent:**
     - **Dead code.** The blocking SSH open path now has no production caller: `ssh_endpoint.rs`'s `Route`, `ssh_local::connect`, the worker's blocking `open*` family and four `open_endpoint_*` wrappers. The module-level `#![allow(dead_code)]` hides it. Its only users are 24 call sites in `tests/transport_ssh`, a qualification crate that nothing builds. Under the remove-dead-code rule, a step after TR2.13 moves those tests onto the production attachment path or drops them, removes the code and the `allow`, and either puts the crate in CI or retires it.
     - **Parity defect.** The transport percent-decodes an SSH URL's path, but libgit2 passes it as written, so a remote with `%XX` in its path reaches another repository. That is TR2.16.
-  - **Lanes now:** TR2.13 (`../gwz-dev-tr2-9`), 1.1.0 S6.1 (`../gwz-dev-s6-1`), TR2.3 with the `TempDir` fix (`../gwz-dev-tr2-3`), and TR2.16, SSH URL path parity with libgit2 (`../gwz-dev-tr2-16`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
-  - **TR2.13, endpoint throughput (new, from TR2.9's agent):** the endpoint session hands the mux one message per pass of about 5 ms, with nothing to wake it early. That caps a session near 160 messages a second, about 2.6 MB/s at 16 KiB a message. The figure is arithmetic, not measured, and would make a large clone far slower than 1.0.17. It is measured first, then fixed, in the TR2.9 lane. Amendment 2 gains the step at its next revision; TR2.6 reviews it with Phase 2.
+  - **Lanes now:** TR2.15, retiring the dead blocking SSH open path (`../gwz-dev-tr2-15`), 1.1.0 S6.1 (`../gwz-dev-s6-1`), TR2.3 with the `TempDir` fix (`../gwz-dev-tr2-3`), and TR2.16, SSH URL path parity with libgit2 (`../gwz-dev-tr2-16`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
+  - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
+    - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
+    - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
+    - **Measured, clone of a 32 MiB incompressible pack:**
+
+      | | libgit2 | Transport before | Transport after |
+      |---|---|---|---|
+      | SSH | 361–457 ms | 15.7 s (2.0 MiB/s) | 462 ms |
+      | HTTPS | 428–492 ms | 14.1 s | 455–523 ms |
+
+      The new tests hold the transport within 1.5× of libgit2 plus 1 s, on 16 MiB packs.
+    - **A defect the speed exposed, fixed in the same step.** 100 clones reached the mux's 64-stream limit, and opens and identity checks failed outright; `gwz fetch` defaults to 100 jobs. They now wait for a free stream within their allocation deadline.
+    - **Suites in the lane:** candidate 2,522 passed, 0 failed; the `tests/transport_ssh` proof crate 308 passed. A full run of merged main is under way.
+    - **From its agent:** it ran `git add -N` once to count lines, a raw git state change; the `gwz add` that followed superseded it. The shared HTTPS fixture can stall a large response on macOS, with its TLS layer holding back the last piece; libgit2's own clone hung over 10 minutes. Tests with large HTTPS responses close each connection until the fixture is fixed.
 - **What can start now** (the amendment's §3.13):
   - TR2.9 to TR2.12, and 1.1.0 S6.1, then S6.2 and S6.3;
   - TR2.1, TR2.2, TR2.3, TR2.4, TR2.7 and TR2.8;
