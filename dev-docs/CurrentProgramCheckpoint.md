@@ -1,5 +1,61 @@
 # Current program checkpoint
 
+## Transport release — split into 1.1.0 and 1.2.0; amendment 2 accepted, 2026-10-01
+
+- **Operator decision OD13 (2026-10-01).**
+  - The operator's words: "we need an intermediate release or a way we can parallelize huge chunks", then "1.1 will need windows parity too - releases - requalify 1.1.0 with windows support".
+  - **1.1.0** ships the transport, used in process by the `gwz` CLI, on macOS ARM64, Linux x86-64 and Windows x86-64, with Windows parity.
+  - **1.2.0** ships the session host, reuse across operations and commands, the server, and gwz-py on the transport.
+- **Measured before the decision:**
+  - **Code.** Since `v1.0.17` (2026-09-18), about 29,200 production lines and 42,000 test lines were added. About 23,600 of the production lines are the transport, written from 2026-09-19 to 2026-09-24. The plans budget about 44,000 production lines still to write, 38,300 of them in the session plan.
+  - **Speed.** A no-op fetch of 32 small public repositories over SSH, on macOS. The candidate reuses connections: at `--max-per-host 4`, it ran 32 fetches over 4 connections in 8.1 s, against 18.3 s for 1.0.17. At its defaults it is 2.8 times slower than 1.0.17 at `--max-per-host 32`: 7.0 s against 2.5 s. There are two causes:
+    - `MAX_OPEN_JOBS = 8` (`placement_endpoint.rs:31`);
+    - stream closes that complete one at a time, about 0.3 s apart. Their root cause is not yet found.
+  - The candidate CLI still builds from main, though no CI job builds it.
+- **[Amendment 2](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2.md)** to the transport release plan was accepted at SHA-256 `c5850e52…`, after three rounds of the dual Consistency and Safety review and two remediation rounds ([verdict](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-Verdict.md)). After the GO it carries the corrections the reviewers cleared without a further round, and hashes `4da27115…`.
+  - **New steps:**
+    - TR1.8, the Windows parity design;
+    - TR2.9, concurrent closes;
+    - TR2.10, open admission;
+    - TR2.11, no transport without a host context;
+    - TR2.12, the second switch `gwz_session_candidate`;
+    - TR3.3, the thirteen crates.io names;
+    - TR3.4, gwz-py's registry pins;
+    - TR4.6, Windows CI on push;
+    - TR4.7, the Windows review;
+    - TR4.8 to TR4.10 (revision 4): Pageant, the WinHTTP machine proxy, and the logon session's default credentials, in the transport;
+    - TR8.4, Windows parity rows.
+  - **Rule (e):** until 1.1.0's tag, a session-plan step marked **Ordinary path** merges only with a review that accepts its change for 1.1.0, and only once this checkpoint lists it under (d).
+  - **The review found three upgrade breaks before any code:**
+    - gwz-py would have moved onto the transport;
+    - the Windows SSH home came from `HOME` alone;
+    - the Windows default-credential route had no bound.
+  - **Status edits on acceptance:** the plan, amendment 1, the 1.1.0 amendment, the session plan, the crate map, the reuse design and the server design.
+- **TR3.1 is closed.** Its exit holds in the tree: the rename at git2-rs `d13951f` and gwz-git `a9d7ee0`, and the candidate build in CI.
+- **OD14 decided by the operator (2026-10-01): its alternative.** gwz-py's network operations take the per-operation transport entry in 1.1.0. The operator's words: "go with calls in with_local_transport now and don't wait for the review-loop".
+  - Revision 3 of amendment 2 (`432d7118…`) restores the 1.1.0 amendment's S6.1–S6.3 for 1.1.0 (§3.17).
+  - The new [Python design](../gwz-py/dev-docs/GwzPyPerOperationTransportDesign.md) adds four things: the environment snapshot taken under the GIL; panic safety, since `Command`'s `Drop` finishes while unwinding; one transport predicate, since the CLI's and the bridge's network sets differ on `attach_repo_member` and `repo_sync`; and the bridge's cancellation, `close()` and interpreter-exit behaviour.
+  - It skips the review loop. The [skim review](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim.md) found six P2 and three P3 text defects: among them, waits that would hold the GIL and deadlock with a failing operation, and an off switch that did not reach gwz-py. All nine are applied. On the operator's question "can we remedy the no-go issues?", the same reviewer re-checked them and reported **GO** ([re-check](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-1.md)). Its four new P3s are applied. The amendment now hashes `c5561fc5…`, and the design `3d656d1a…`.
+- **OD15 decided by the operator (2026-10-01): Windows parity is built into the transport.** The operator's words: "we can't do native only", then "I said we need to support windows parity, why is this in question?". Native routes are not the way to parity: they get no pooling or reuse, and cannot serve a server on another machine or client placement.
+  - Revision 4 of amendment 2 applies it. TR1.8 designs, in the transport, Pageant's window protocol (a visible Pageant first, as 1.0.17), the WinHTTP machine proxy, and SSPI for the logon session's default credentials. TR4.8–TR4.10 implement them, and TR4.10 gets its own dual review.
+  - OD16 keeps the zone bound, now applied by the transport: your Windows login goes only to Local Machine, Intranet and Trusted-zone hosts, and other hosts are refused, naming the Trusted zone and then the off switch. This is the one parity exception; the operator can lift it.
+  - §3.18 changes the server design's Pageant bullet and moves the Windows logon session into every session's must-match rows (1.2.0). The session plan's CS8.18 and CS8.19 follow, and both documents' status lines and changelogs record it.
+  - Revision 4 is skim-reviewed only, as revision 3 was. [Skim review 2](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-2.md) found four P2 and four P3 text defects. The most serious: the Windows-login zone check had to use the URL after a discovery redirect, or an intranet URL redirecting to an Internet host would have sent it the login's NetNTLMv2 response. All eight are applied, and the [re-check](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-3.md) reported **GO**. Its one new P3 is applied. The amendment hashes `ee130a1d…`, the server design `9fe1738b…` and the session plan `43952950…`.
+
+  OD17, ship, hold or add channels, is taken only if TR8.1 (1.1.0) misses.
+- **Still the operator's: OD10 and OD11,** adopted 2026-09-27, also send users to native routes on every platform: HTTPS through a credential helper other than `gh`, and SSH agents holding keys the transport cannot sign with. They stay as decided unless the operator moves them onto the transport too.
+- **What can start now** (the amendment's §3.13):
+  - TR2.9 to TR2.12, and 1.1.0 S6.1, then S6.2 and S6.3;
+  - TR2.1, TR2.2, TR2.3, TR2.4, TR2.7 and TR2.8;
+  - TR1.5, then TR2.5; and TR1.6;
+  - 1.1.0 S4.1, then TR1.8 and S4.2–S4.4, then TR4.8–TR4.10 once TR1.8 has GO; and TR4.6's ordinary-build job;
+  - 1.1.0 S2.1–S2.3, TR3.3's code and TR3.4. TR3.2 follows TR3.3's registry steps;
+  - 1.1.0 S3.1–S3.3;
+  - session-plan steps, under rule (e).
+
+  TR2.9 is first, because it covers the measured blocker.
+- **Not committed:** the amendment, its reviews, its remediation plans, the verdict, the Python design, the eight status edits, revision 4's server design and session plan edits, skim review 2 and its re-check, and this entry. They wait for the operator's go.
+
 ## Transport release — the five dead transport-host items removed; the SSH refusal test's timeout, 2026-10-01
 
 - **Operator decision (2026-10-01):** the five candidate transport-host items that no production path used are dead: "remove them, they're dead". The compiler's non-test build of the candidate named them:

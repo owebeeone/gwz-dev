@@ -1,6 +1,7 @@
 # GWZ core session crate map
 
 Date: 2026-09-28. Status: **accepted 2026-09-28**, on GO for revision 1 from the architecture review ([round 2](GwzCoreSessionCrateMap-ReviewCode-1.md)) and the operator's three decisions (§8). That round's four P3 corrections were applied after GO and [confirmed](GwzCoreSessionCrateMap-ReviewCode-1a.md). The operator directed it ("ok on crates") after observing that the session plan builds a new subsystem inside gwz-core behind prose interfaces instead of small crates. It re-homes the code of the [session plan](GwzCoreSessionPlan.md)'s remaining steps. The plan's behaviour, limits, tests and phases carry over unchanged. One reviewer checks it on the architecture axis. Revision 1 answers that reviewer's round 1 ([report](GwzCoreSessionCrateMap-ReviewCode.md); §9). On acceptance, the map amends the text listed in §7.
+- Amended 2026-10-01 by [`GwzTransportReleasePlanAmendment-2.md`](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2.md). This document remains authoritative only as amended for the release its candidate crates are published in.
 
 ## 1. Rules
 
@@ -224,3 +225,7 @@ Round 2, on revision 1 (`d0c82295…`), was GO: all nine findings closed, and th
 | N4: tests of crate internals | `test-support` features; CS7.1's movement commit keeps unit tests with their files (§1, §4) |
 
 The same reviewer confirmed all four ([confirmation](GwzCoreSessionCrateMap-ReviewCode-1a.md)); GO stands. Its two notes are applied as it worded them: the HTTPS engine takes its `IdSource` at construction, and the HTTPS row lists its part of CS7.20.
+
+## Changelog
+
+- 2026-10-01: amended by [`GwzTransportReleasePlanAmendment-2.md`](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2.md), accepted at SHA-256 `c5850e52…` ([its verdict](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-Verdict.md)). Candidate crates are published at 1.2.0's activation. The thirteen names are still registered together, before 1.1.0's release preparation (the amendment's TR3.3).
