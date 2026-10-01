@@ -124,7 +124,24 @@
     - 1.1.0's release notes need an unreleased section in `gwz-cli/docs/Releases.md`.
 
     Six more fixtures share the `TempDir` flaw, and gwz-cli has one `needless_update` clippy failure, which no CI job runs: the `cleanup-1` lane fixes both.
-  - **Lanes now:** the concurrency fix (`../gwz-dev-fix-concurrency`), TR2.15, retiring the dead blocking SSH open path (`../gwz-dev-tr2-15`), 1.1.0 S6.2, gwz-py on the entry (`../gwz-dev-s6-2`), and `cleanup-1` (`../gwz-dev-cleanup-1`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
+  - **The concurrency regression is fixed, with TR2.14** (gwz-core `ab5fee76`, merging lane `5796282e`; root `2106a5a`). The cause was TR2.10's 32 concurrent opens outrunning three limits each open's setup needs; TR2.13's prompt sessions exposed it:
+    - **The 64 supervised-job permits:** an open briefly held up to three. A refused identity check closed the endpoint session, so every pending open failed as `CarrierLost`.
+    - **The key registry's 16 MiB:** each key read reserves about 1 MiB, so only 15 fit, and the 16th failed `WouldBlock`.
+    - **The fixture sshd's default `MaxStartups`:** it drops unauthenticated connections beyond 10, as `Io`.
+
+    The fix:
+    - an open no longer holds a job permit while it waits for the worker's reply (TR2.14). The endpoint hands it to the worker and polls, the reply wakes the session, and the old thread-and-job open path is removed;
+    - an identity check refused by a full budget waits for a later pass;
+    - a key read waits for a registry reservation within its open's deadline;
+    - the fixture sshd accepts 64 unauthenticated connections.
+
+    Every bound is unchanged. The 100-clone test passes 10 of 10 in isolation, and the new `budget_wait_tests.rs` adds two deterministic tests, both failing on the old main. Candidate suite in the lane: 2,531 passed, 0 failed; the proof crate 311 passed. A run of the fully merged main is under way.
+  - **From the fix's agent:**
+    - **Stock OpenSSH servers drop setups beyond 10 pending** (`MaxStartups`), and the transport now opens up to 32 to one host. 1.0.17 opened up to `--jobs` (100), so the exposure is not new, but the old 8-open limit hid it. The choices: cap concurrent setups per host near 10, rely on TR2.1's retry, or document it.
+    - A setup refused by the job budget still fails its member. Finished jobs return their permits up to one reaper sweep late, and as many as 10 were seen at once. Releasing a permit as soon as its result is consumed would close that.
+    - Key reads now queue past 15. Reserving each key file's real size would admit more, but changes a security bound.
+    - **Cancel latency (S6.1) still holds after TR2.13:** finish waits out the 5 s cleanup bound after a cancel mid-exchange. It needs its own step before gwz-py's `cancel_operation` ships.
+  - **Lanes now:** TR2.15, retiring the dead blocking SSH open path (`../gwz-dev-tr2-15`), 1.1.0 S6.2, gwz-py on the entry (`../gwz-dev-s6-2`), and `cleanup-1` (`../gwz-dev-cleanup-1`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
     - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
