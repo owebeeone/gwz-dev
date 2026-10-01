@@ -96,7 +96,35 @@
     - `SshEndpointConfig::from_environment()` still reads `HOME` alone. TR1.8's Windows home order must cover it, or it is retired.
     - The snapshot code's platform `cfg_if!` has a `compile_error!` arm. It stops S4.5's Windows candidate build until S4.4, TR4.8 and TR4.9 write the Windows arm (`endpoint_environment.rs:153-185`). That is intended.
     - The copy of `gh`'s environment is not zeroized, as before.
-  - **Lanes now:** the concurrency fix (`../gwz-dev-fix-concurrency`), TR2.15, retiring the dead blocking SSH open path (`../gwz-dev-tr2-15`), TR2.3 with the `TempDir` fix (`../gwz-dev-tr2-3`), and TR2.16, SSH URL path parity with libgit2 (`../gwz-dev-tr2-16`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
+  - **TR2.16 merged** (gwz-core `ff2bf4f2`, merging lane `fba1b598`; root `3d5629f`).
+    - The transport parses SSH destinations as libgit2 1.9.7 does, the libgit2 1.0.17 shipped, with both its `ssh://` and its scp-like parser, its percent-decoding and its `/~` and leading `-` rules.
+    - Where libgit2 refuses a URL before connecting, the transport refuses it before any open.
+    - `!` in the remote command is quoted as `'\!'`, libgit2's fix for CVE-2026-5917.
+    - Fixture test: 11 URL forms on both routes. Before the fix, the transport reached a decoy `a b.git` for `a%20b.git`.
+    - A scratch differential run against libgit2's own parsers found no mismatch over about 1.6M generated URLs.
+    - Candidate suite in the lane: passed.
+  - **Open from TR2.16:**
+    - a URL password beside a user (`user:pw@host`). 1.0.17 uses it when the server offers password authentication, and keys otherwise; the transport refuses it;
+    - control characters in an SSH path. libgit2 sends them; the transport refuses them, as a safety bound;
+    - host-name case. The transport lowercases the host for pooling and the `known_hosts` lookup, where libssh2 matches case-sensitively, so a hand-written mixed-case `known_hosts` entry works on 1.0.17 and fails on 1.1.0. A case-insensitive match serves both cases;
+    - scp-form IPv6 addresses are now refused, as on 1.0.17. The development transport had accepted them;
+    - `GwzRemoteTransportSshWorker.md:17-19` still says destinations "decode URL escapes once". It is a reviewed record, so it gets an erratum.
+  - **TR2.3 merged** (gwz-core `4edfd78b`; gwz-cli `84be975`; gwz-py `f471cb6`, fast-forwarded; root `23c5d57`).
+    - On a `Partial` result, the top-level `errors` copies the full error of each `Failed` or `Rejected` member, in member order. 1.0.17 printed `[]`.
+    - Human output and exit codes are unchanged. `MachineOutput.md` gains a "Partial results" section, and gwz-py's `member_errors` is filled.
+    - The `TempDir` collision fix landed before it (gwz-core `24980055`).
+    - Suites: gwz-core ordinary 2,325 and candidate 2,533 passed; gwz-cli 246 unit and 92 integration; gwz-py 928.
+    - It changes a documented contract, so it ships only with its Surface review (S7.5).
+  - **Open from TR2.3:**
+    - whether the copy also applies to `Failed` and `Rejected` aggregates (the plan says `Partial` only);
+    - `Skipped` rows are not copied;
+    - stash's human report still shows no member error text;
+    - gwz-core's `OperationRuntime`, `ResponseBuilder::result` and `ExecutionReport` have no caller outside their own tests, but they are public API;
+    - gwz-py's CLI shows less than gwz-cli on a non-success result, as before;
+    - 1.1.0's release notes need an unreleased section in `gwz-cli/docs/Releases.md`.
+
+    Six more fixtures share the `TempDir` flaw, and gwz-cli has one `needless_update` clippy failure, which no CI job runs: the `cleanup-1` lane fixes both.
+  - **Lanes now:** the concurrency fix (`../gwz-dev-fix-concurrency`), TR2.15, retiring the dead blocking SSH open path (`../gwz-dev-tr2-15`), 1.1.0 S6.2, gwz-py on the entry (`../gwz-dev-s6-2`), and `cleanup-1` (`../gwz-dev-cleanup-1`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
     - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
