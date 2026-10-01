@@ -64,6 +64,17 @@
     - the retry plan's Cold state (§5: one setup per key until its first success) is per operation. In 1.1.0, with no reuse across commands, every command then waits one full SSH login before its other members open. That threatens TR8.1, and it conflicts with TR2.10's test once TR2.1 lands;
     - `placement_endpoint.rs` (1,095 lines) and `ssh_worker.rs` (1,279) are past the 1,000-line review mark, and 1.1.0 keeps changing them. The session plan's CS7.1 splits them only in 1.2.0;
     - the separate `tests/transport_ssh` crate compiles `placement_checks.rs` but is not in CI, and no one builds it.
+  - **Merged main, TR2.9 and TR2.10 together:** candidate suite 2,527 passed, 2 failed, 1 ignored. Both failures are `diff::tests::t_rename` tests. Their fixture's `TempDir` names directories from the process ID and a microsecond clock, so two parallel tests got the same directory. That flaw predates the transport work, and the TR2.3 lane fixes it with a regression test.
+  - **TR2.12 merged** (gwz-core `6c01af04`, merging lane `0df0bfcb`; gwz-cli `af2240d` and gwz-py `df6b59d`, fast-forwarded; root `8a8a056`).
+    - `gwz_session_candidate` is declared in all three check-cfg declarations. The process-globals definition names it.
+    - The candidate job is a two-leg matrix: the transport switch alone, and both switches. `main` has no branch protection, so the new check names need no settings change.
+    - A new checker, `check_candidate_switches.py`, compares each repository's switch sites with its inventory, and each repository's tests run it. It passes on merged main.
+    - Inventory digests (SHA-256), all 22 sites `gwz_transport_candidate`:
+      - gwz-core `scripts/candidate_switch_inventory.txt` `937330c9b3960a3d3d399078b3999e9eea6de3280e58127aa94ac5c9d67da965` (18 sites);
+      - gwz-cli `2bdad8b46911d82e03c89272e8bd37f085abbcff9613fd87cf7e305fa619f978` (2);
+      - gwz-py `2ab61cd393bacd0d77765ffaaf94ed047b12951fb77da13b86c615b6262a4a78` (2).
+    - **Push order:** gwz-cli's and gwz-py's tests run the checker from gwz-core's `main`, so gwz-core reaches GitHub first, or all of them go in one push.
+  - **Lanes now:** TR2.13 (`../gwz-dev-tr2-9`), TR2.11 (`../gwz-dev-tr2-11`), 1.1.0 S6.1 (`../gwz-dev-s6-1`), and TR2.3 with the `TempDir` fix (`../gwz-dev-tr2-3`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies), and four lanes at a time.
   - **TR2.13, endpoint throughput (new, from TR2.9's agent):** the endpoint session hands the mux one message per pass of about 5 ms, with nothing to wake it early. That caps a session near 160 messages a second, about 2.6 MB/s at 16 KiB a message. The figure is arithmetic, not measured, and would make a large clone far slower than 1.0.17. It is measured first, then fixed, in the TR2.9 lane. Amendment 2 gains the step at its next revision; TR2.6 reviews it with Phase 2.
 - **What can start now** (the amendment's §3.13):
   - TR2.9 to TR2.12, and 1.1.0 S6.1, then S6.2 and S6.3;
