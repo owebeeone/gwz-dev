@@ -43,7 +43,20 @@
   - Revision 4 is skim-reviewed only, as revision 3 was. [Skim review 2](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-2.md) found four P2 and four P3 text defects. The most serious: the Windows-login zone check had to use the URL after a discovery redirect, or an intranet URL redirecting to an Internet host would have sent it the login's NetNTLMv2 response. All eight are applied, and the [re-check](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-3.md) reported **GO**. Its one new P3 is applied. The amendment hashes `ee130a1d…`, the server design `9fe1738b…` and the session plan `43952950…`.
 
   OD17, ship, hold or add channels, is taken only if TR8.1 (1.1.0) misses.
-- **Still the operator's: OD10 and OD11,** adopted 2026-09-27, also send users to native routes on every platform: HTTPS through a credential helper other than `gh`, and SSH agents holding keys the transport cannot sign with. They stay as decided unless the operator moves them onto the transport too.
+- **Committed 2026-10-02 on the operator's go** ("go = commit"): amendment 2 through revision 4, its reviews and plans, the verdict, the Python design, and the status edits (root `1292b0c`, gwz-core `fde46265`, gwz-py `b24204e`). Not pushed.
+- **Decided by the operator on 2026-10-02:**
+  - **OD16: no zone bound** ("lift that"). The transport offers the logon session's default credentials to any host that asks, as 1.0.17 does. The migration notes state the forced-authentication hazard.
+  - **OD10 and OD11 reversed** ("yes"): the transport runs the user's configured credential helpers (TR1.6), and signs with every agent key type and signature algorithm 1.0.17 uses, security keys and certificates included (TR2.8). Under the same parity rule, TR2.8's list also covers `ssh-rsa` (SHA-1) for a server that offers no SHA-2 RSA algorithm, as libssh2 does.
+  - **The SHA-1 fallback,** confirmed by the operator ("keep sha-1 fallback"): `ssh-rsa` exactly where libssh2 1.11.1 uses it.
+  - No configuration that 1.0.17 serves takes a native route in 1.1.0. Revision 5 of amendment 2 applies all of this (its §3.19), skim-reviewed only. Its [skim review](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-4.md) found five P2 and three P3 text defects. Among them:
+    - TR1.6's helper runner is the session plan's CS3.4 `git credential fill` spawn;
+    - a helper is asked about the URL its credential goes to, after a redirect;
+    - on Windows a helper's password also answers `NTLM`, `Negotiate` and `Digest`, as 1.0.17 does;
+    - the `ssh-rsa` rule is libssh2's exact one.
+
+    All eight are applied. The [re-check](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-5.md) closed them, and found one new P2: a `Negotiate`-only challenge takes the logon session with no helper asked, as on 1.0.17. It also found three new P3s. All four are applied, and the [second re-check](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-6.md) reported **GO**. The amendment hashes `807dda1e…`.
+- **Drafts in the way of merges:** the operator's rule (2026-10-02) is to move them aside if they block. Move, never delete; restore after the merge; never touch gwz-core-evidence. The uncommitted `repository` line in `gwz-transport/Cargo.toml` is a tracked edit, not a draft, and is asked about if it blocks.
+- **Lanes started 2026-10-02 on the operator's go** ("Lanes - go"): TR2.9 (concurrent closes) in `../gwz-dev-tr2-9` and TR2.10 (open admission) in `../gwz-dev-tr2-10`, each with an Opus implementer. Disk was 97% full (about 15 GB free), so two lanes run at a time. Each uses a copy-on-write clone of a warm candidate target, and the next lanes start as these finish.
 - **What can start now** (the amendment's §3.13):
   - TR2.9 to TR2.12, and 1.1.0 S6.1, then S6.2 and S6.3;
   - TR2.1, TR2.2, TR2.3, TR2.4, TR2.7 and TR2.8;
@@ -54,7 +67,7 @@
   - session-plan steps, under rule (e).
 
   TR2.9 is first, because it covers the measured blocker.
-- **Not committed:** the amendment, its reviews, its remediation plans, the verdict, the Python design, the eight status edits, revision 4's server design and session plan edits, skim review 2 and its re-check, and this entry. They wait for the operator's go.
+- **Committed with this entry, on the operator's go:** revision 5's edits to amendment 2, the plan, amendment 1, the agent design, the server design, the session plan, the reuse design and the verdict, and its three skim review files (Skim-4, Skim-5 and Skim-6).
 
 ## Transport release — the five dead transport-host items removed; the SSH refusal test's timeout, 2026-10-01
 
