@@ -251,3 +251,37 @@ docs in 1.0.17 describe the form as it prints and say it is not a path.
 refusal and update the sample in gwz-cli `docs/LocalClones.md`; check the
 gwz-py test that asserts the refusal text. Not a docs change, so it was
 deferred out of the 1.0.17 documentation lane.
+
+## L7: a merge that exposes an ignored directory goes to `recovery-required`
+
+**Symptom.** 2026-10-02, merging the TR2.15 lane into gwz-dev with gwz 1.0.17. The merge deletes the `tests/transport_ssh` crate, including its `.gitignore`. In the receiving workspace that left the crate's 2.1 GB build cache, `tests/transport_ssh/target/`, as an untracked directory. `gwz merge --remote` made gwz-core's merge commit, then stopped in `recovery-required` before the root participant ran. Continue and abort were both blocked. The drifts it reported were `worktree-modified`, `head-advanced`, `target-ref-changed` and `pending-action-ambiguous`. The TR2.15 agent met the same defect inside its merge lane. There it also hit a rename/delete conflict whose path was deleted on both sides, so no file existed at that conflict path. `gwz add` then refused the path as "not a conflicted participant".
+
+**Reason.** gwz-core's post-merge conflict check (`merge_conflict_snapshot`) requires a worktree with no untracked files and a real file at every conflict path. A merge that turns ignored files into untracked ones, or leaves a path deleted on both sides, fails that check after the merge action has already run. The recovery planner then cannot match the live repository to a recovery point, and blocks both directions.
+
+**Remedy used.**
+- Park the receiving workspace's untracked drafts outside every workspace, with checksums.
+- Remove the exposed build cache, which is build output of a crate the merge deleted.
+- `gwz merge --status` then reports the pending true-merge as "completed exactly", with continue eligible. `gwz merge --continue` finished the root participant.
+- Restore the drafts and verify the checksums.
+- In the conflicted case, the agent restored the conflicted files from their index stages using only read-only `git show`, after which gwz accepted the conflict.
+
+**Fix needed in gwz-core:**
+- the post-merge check should ignore untracked files the merge did not create, or say which file blocks it;
+- it should accept a conflict whose path no longer exists on either side;
+- it should never block both continue and abort for a merge whose action completed exactly.
+
+## L8: `gwz merge --continue` refuses any change outside the conflict paths
+
+**Symptom.** 2026-10-02, the TR2.15 merge lane. After resolving the conflicts, two test modules had to be renamed in `src/git/endpoint/mod.rs` to match code from the other side. `merge --continue` refused the edit ("merge index contains changes outside the expected conflict paths"). The merge commit therefore left the modules out of `mod.rs`, and its test build has 18 warnings. A follow-up commit put them back.
+
+**Reason.** The continue step accepts only the conflict paths' resolutions. A resolution that needs a semantic fix elsewhere cannot go in the merge commit.
+
+**Remedy used.** A separate commit right after the merge commit. The merge commit's library still builds clean.
+
+**Fix needed:** let `--continue` accept staged changes outside the conflict paths, perhaps behind a flag, and list them.
+
+## L9: during an open merge, `gwz add` needs an explicit `--target`
+
+**Symptom.** 2026-10-02, the TR2.15 merge lane. With a coordinated merge open, `gwz add <path>` with the default target selection was refused. `gwz --target gwz-core add <path>` worked.
+
+**Fix needed:** while a merge is open, select the participant that owns the path, as `gwz add` does outside a merge.

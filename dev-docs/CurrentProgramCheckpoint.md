@@ -199,7 +199,17 @@
     - A handler that fails after the exit bound still builds its Python error during interpreter shutdown. The abi3 build has no shutdown guard, so on CPython before 3.14 that thread ends abruptly; the fix is making the extension's errors lazy.
     - A reused request ID reuses its old operation record (pre-existing).
     - gwz-py has no committed recipe for building its candidate extension; the lane used a scratch script.
-  - **Lanes now:** TR2.15's merge onto main (`../gwz-dev-tr2-15-merge`),. The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
+  - **TR2.15 merged** (gwz-core `9d4dd92f`, merging lane `661c16f8`; root `f272385`).
+    - The merge lane merged TR2.15 onto main, then main again for TR2.17 and TR3.4. The concurrency fix's design won where the two met: opens hold no job permit, and `start_endpoint_open` returns a `PendingOpen`.
+    - Follow-ons: the test harness and `budget_wait_tests` moved onto the bridged open; the Cancel case in `SshPump::deliver` was removed, shown dead by a probe that never fired; and `native_service`'s impossible `Result` was removed.
+    - Gates on the final tree: full candidate suite passed (main run 2,453, 0 failed); the 100-clone test 5 of 5; both-switches build with 0 warnings; process globals at 19 entries; the inventory at 18 sites.
+    - **gwz defects found while merging** (GwzLaneIssues L7–L9):
+      - a merge that exposes an ignored directory, or leaves a path deleted on both sides, goes to `recovery-required` with continue and abort blocked;
+      - `--continue` refuses changes outside the conflict paths;
+      - `gwz add` needs `--target` during an open merge.
+
+      The main merge hit L7 too. Removing the exposed `tests/transport_ssh/target/` cache and parking the drafts let `--continue` finish.
+  - **Lanes now:**. The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
     - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
