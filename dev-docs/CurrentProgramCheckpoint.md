@@ -209,6 +209,27 @@
       - `gwz add` needs `--target` during an open merge.
 
       The main merge hit L7 too. Removing the exposed `tests/transport_ssh/target/` cache and parking the drafts let `--continue` finish.
+  - **Merged main verified as a whole** (root `a2129d8`, gwz-core `9d4dd92f`, gwz-cli `0218cc7`, gwz-py `60596c8`), with no failure from the combination:
+
+    | Suite | Passed | Failed | Ignored or skipped |
+    |---|---|---|---|
+    | gwz-core candidate | 2,673 | 0 | 7 |
+    | gwz-core ordinary | 2,323 | 0 | 1 |
+    | gwz-cli | 342 | 0 | 1 |
+    | gwz-py ordinary | 961 | 0 | 10 |
+    | gwz-py candidate, all 10 transport rows | 971 | 0 | 0 |
+
+    Through gwz-py: mid-exchange cancel 0.02 s and `close()` 0.01 s (5.00 s before TR2.17); exit with a running operation 0.69 s; a stalled setup fails at 9.04 s on the stall clock; 8 overlapping operations open 8 connections.
+  - **gwz-py follow-ups merged** (gwz-py `766de53`, fast-forward; root `888059e`):
+    - **Lazy errors (`a671054`).** `error::model` holds Rust values and builds the Python error only when raised or read. Before, a failure after the exit bound either panicked in PyO3 ("interpreter not initialized") or had CPython end the thread with nothing recorded.
+    - **Request IDs (`6bb5729`).** Per the contract's §4.3, an ID matching a live operation is refused with `InvalidRequest` before any effect, and one matching an ended operation gets a fresh record. Merge duplicates now fail the same way.
+    - **Candidate recipe (`766de53`).** `scripts/build_candidate_extension.py` builds the candidate extension, and `run_tests.py --candidate DIR` runs the suite against it: 986 passed.
+  - **From the verify lane:**
+    - **One interpreter touch remains:** `dispatch::record` formats a failed submit's error through the interpreter. Keeping errors as Rust values through dispatch would change about 130 signatures.
+    - **Request IDs:** `STORE` is process-wide, so the rule spans Clients where the contract scopes it per session. Merge's duplicate behaviour changed, which is for S7.5's Surface review.
+    - **CI gaps:** no CI job builds gwz-py's candidate extension, so its 10 transport rows never run in CI, and gwz-py's Rust unit tests never run in CI either.
+    - **Stale text:** S6.2's cancel docstring and 7 s limits in `test_client_host_transport.py`, and the Python design's §2.6 rationale for the GIL.
+    - The both-switches leg was not run on the merged tree.
   - **Lanes now:**. The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
