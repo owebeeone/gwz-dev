@@ -175,7 +175,31 @@
     - gwz-cli's release branch must take `gwz-git2` from crates.io before `publish.yml`'s git2-rs checkout can go;
     - whether to retire D7's mixed-pair rule;
     - `GwzCratesIoPlan.md`'s D7 and O1 need a status line.
-  - **Lanes now:** TR2.15's merge onto main (`../gwz-dev-tr2-15-merge`), 1.1.0 S6.2, gwz-py on the entry (`../gwz-dev-s6-2`),. The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
+  - **1.1.0 S6.2 merged** (gwz-core `89b828cd`, merging `ac654d49`; gwz-cli `0218cc7`; gwz-py `60596c8`, merging `eecb485`; root `fb242ca`).
+    - **The shared predicate.** `gwz-core/src/transport_scope.rs` lists the 9 transport-scope operations and is called by gwz-cli's `transport_meta` and gwz-py's native entry. A source test pins it to the handlers that call `with_transport`, and gwz-py's network set loses `attach_repo_member`.
+    - **`ClientHost`** (`gwz-py/native/src/client_host.rs`) is one `#[pyclass]` per `Client`, with no static:
+      - a limit of 8 across `call` and `submit`;
+      - a snapshot taken, and the operation registered, while the GIL is held;
+      - cancellation through tokens, and a bounded record of the last 64 completed cancels;
+      - a running cleanup aggregate;
+      - `close()`, which cancels and joins within `session_host::CLEANUP_BOUND`;
+      - a per-host atexit callback holding a weakref.
+
+      The bridge's per-loop lock, its `TransportCleanup(0, False)` stub, its `_needs_transport` set and the unused module-level native `call` and `submit` are gone.
+    - **The off-switch seam** (`route/transport.rs::transport_off`) answers "off" until TR1.5 and TR2.5.
+    - `~/` identities resolve against the snapshot's `HOME`.
+    - **gwz-core:** a model `Cancelled` now maps to the protocol's `cancelled` code instead of `io_error`, and the cleanup bound is exported.
+    - Suites in the lane: gwz-py 946 passed on the candidate build and 936 on the ordinary. In the candidate gwz-core run, the two failures were the concurrency bug main had already fixed, and an HTTPS throughput test that missed its bound under heavy load and passes alone.
+    - gwz-py's inventory has 3 sites; its SHA-256 is `e943e10d68ca7e31772559698209d41e3174913571a090c793e7a7d306ed2472`.
+  - **From S6.2, for the operator and TR2.6:**
+    - `ClientHost` exists in every build, so gwz-py's ordinary build changes now: no per-loop serialization, a limit of 8, waiting operations cancellable, and `close` joining. That is an ordinary-path change for TR2.6's review and S7.5's Surface.
+    - The `Cancelled` → `cancelled` code is visible to clients.
+    - The production diff is about 1,270 lines in gwz-py.
+    - Mid-exchange cancel and `close` took 5.00 s in the lane, which predates TR2.17. They should now follow TR2.17's 14 ms, and the combined verification checks that.
+    - A handler that fails after the exit bound still builds its Python error during interpreter shutdown. The abi3 build has no shutdown guard, so on CPython before 3.14 that thread ends abruptly; the fix is making the extension's errors lazy.
+    - A reused request ID reuses its old operation record (pre-existing).
+    - gwz-py has no committed recipe for building its candidate extension; the lane used a scratch script.
+  - **Lanes now:** TR2.15's merge onto main (`../gwz-dev-tr2-15-merge`),. The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
     - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
