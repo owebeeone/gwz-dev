@@ -141,7 +141,15 @@
     - A setup refused by the job budget still fails its member. Finished jobs return their permits up to one reaper sweep late, and as many as 10 were seen at once. Releasing a permit as soon as its result is consumed would close that.
     - Key reads now queue past 15. Reserving each key file's real size would admit more, but changes a security bound.
     - **Cancel latency (S6.1) still holds after TR2.13:** finish waits out the 5 s cleanup bound after a cancel mid-exchange. It needs its own step before gwz-py's `cancel_operation` ships.
-  - **Lanes now:** TR2.15, retiring the dead blocking SSH open path (`../gwz-dev-tr2-15`), 1.1.0 S6.2, gwz-py on the entry (`../gwz-dev-s6-2`), and `cleanup-1` (`../gwz-dev-cleanup-1`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
+  - **Fully merged main is green.** Through the concurrency fix (gwz-core `ab5fee76`), the candidate suite gives 2,549 passed, 0 failed, 3 ignored.
+  - **cleanup-1 merged** (gwz-core `bd13b665`, merging `f9546477`; gwz-cli `602a79f`, fast-forwarded; root `5ae60e6`).
+    - One atomic `unique_dir`/`TempDir` helper in `gwz-core/src/test_support/` replaces the pid-and-clock and pid-and-counter temp names across gwz-core's tests: the six reported fixtures and about 30 more. The global `TEMP_SEQUENCE` and its two allowlist entries are gone.
+    - gwz-cli gets its own copy of the helper.
+    - gwz-cli's hook reflink probe creates its seed file with `create_new`, a small production change.
+    - The `needless_update` clippy failure is fixed.
+    - gwz-core's gate and gwz-cli's tests pass, and the process-globals and cfg-boundary guards report nothing new. `src/filesystem/native/facts/linux.rs` is reviewed by eye, since only the Linux CI leg compiles it.
+    - **Open:** the helper exists three times (gwz-core, gwz-cli, copy-contract); gwz-cli's CI runs no clippy.
+  - **Lanes now:** TR2.15, retiring the dead blocking SSH open path (`../gwz-dev-tr2-15`), 1.1.0 S6.2, gwz-py on the entry (`../gwz-dev-s6-2`), TR2.17, prompt cancel and permit release (`../gwz-dev-tr2-17`), and TR3.4, gwz-py's release pins (`../gwz-dev-tr3-4`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
     - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
