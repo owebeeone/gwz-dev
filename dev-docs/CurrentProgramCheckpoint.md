@@ -149,7 +149,17 @@
     - The `needless_update` clippy failure is fixed.
     - gwz-core's gate and gwz-cli's tests pass, and the process-globals and cfg-boundary guards report nothing new. `src/filesystem/native/facts/linux.rs` is reviewed by eye, since only the Linux CI leg compiles it.
     - **Open:** the helper exists three times (gwz-core, gwz-cli, copy-contract); gwz-cli's CI runs no clippy.
-  - **Lanes now:** TR2.15, retiring the dead blocking SSH open path (`../gwz-dev-tr2-15`), 1.1.0 S6.2, gwz-py on the entry (`../gwz-dev-s6-2`), TR2.17, prompt cancel and permit release (`../gwz-dev-tr2-17`), and TR3.4, gwz-py's release pins (`../gwz-dev-tr3-4`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
+  - **TR2.15 done in its lane** (gwz-core `d9239566`, root `46a4264`). It is being merged by hand onto current main in `../gwz-dev-tr2-15-merge`, because main's concurrency fix rewrote the same open path.
+    - **Dead code.** With the module's `#![allow(dead_code, unused_imports)]` removed, the candidate library showed 59 warnings, all now fixed:
+      - `ssh_endpoint.rs`, `ssh_local::connect` and the blocking `open*` family;
+      - the `open_endpoint_*` wrappers, the unwired interaction pause, refusal receipts and unread fields;
+      - always-set flags and options, now gone;
+      - test-only items, moved under `cfg(test)`.
+    - **HTTPS.** The orphaned-helper registry (`ORPHANS`), whose reaper had no caller, is removed. An owner dropped with retained helpers now releases their slots, where before they stayed held for the process's life; a test pins this. The process-globals allowlist goes from 23 to 19 entries.
+    - **The `tests/transport_ssh` crate is folded into gwz-core** (`src/git/endpoint/ssh_tests/`) and removed. It compiled 23 production files a second time, which forced the hidden allows, and needed its own libgit2 build and lock. Its suites now run in both candidate CI legs, and on Linux CI for the first time: they need `ssh-agent`, `ssh-add`, `ps -axo` and `kill -STOP`.
+    - **Size.** `ssh_worker.rs` is 908 lines, down from 1,310, so only `placement_endpoint.rs` (1,086) is still past the review mark.
+    - **For the operator:** about 100 HTTPS test call sites still use worker wrappers that run a mode production never uses (`allow_transition = false`), now under `cfg(test)`. Moving them onto `prepare_budget_for_transition` would be a step of its own.
+  - **Lanes now:** TR2.15's merge onto main (`../gwz-dev-tr2-15-merge`), 1.1.0 S6.2, gwz-py on the entry (`../gwz-dev-s6-2`), TR2.17, prompt cancel and permit release (`../gwz-dev-tr2-17`), and TR3.4, gwz-py's release pins (`../gwz-dev-tr3-4`). The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
     - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
