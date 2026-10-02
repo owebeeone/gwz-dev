@@ -1,5 +1,21 @@
 # Current program checkpoint
 
+## TR1.8 partial baseline preserved, 2026-10-03
+
+- Core `497149940f2ea570e8be0943af31e7de7127fde7` commits four draft/
+  baseline/checkpoint/guide documents only. Private evidence
+  `70f481147830707d375f4da7f5c70e2aff3f7460` retains the new dated
+  native run and its exact manifest. Tracked archive verification and the
+  exact core per-commit gate pass. No product code or Windows guard changed.
+- This is preservation, not Windows design or implementation acceptance.
+  Baseline rows explicitly distinguish executed, partial and unexecuted
+  outcomes, and available isolated work from provider/account/trust prerequisites.
+  Required physical rows still precede canonical design reviews and GO.
+  Mac trust approval is unanswered; Windows trust remains held. The scratch
+  SSH-loss guard proof applies only to the exact tested launch shape.
+- The implementer finished this bounded baseline package. Resume remaining
+  isolated prerequisites through the root owner; no push, tag or release.
+
 ## Five-file split, 2026-10-03
 
 - Completed sequentially in main at the operator's request, using the
