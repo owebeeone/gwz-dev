@@ -1,5 +1,25 @@
 # Current program checkpoint
 
+## TR2.22 helper context amendment — settled draft, 2026-10-03
+
+- The accepted wire checkpoint lacks helper-specific timeout provenance and
+  an HTTPS URL username carrier; its fixed causes also lack the accepted
+  duplicate/malformed recognized-field refusal. One bounded draft addresses
+  all three representation gaps, without changing the public GWZ request/
+  response API, authentication policy, clocks or retry outcomes.
+- Draft object: core `0adb093a99f4eb8e9b8818b767514a842533a193`, containing
+  [amendment](../gwz-core/dev-docs/GwzTransportCredentialHelperTimingAmendment.md)
+  and [caller messages](../gwz-core/dev-docs/GwzTransportCredentialHelpersSurface.md).
+  Transport remains `9f9f0dc4dd82e6329d6ce53e102a231e214ff673`.
+  Core's exact per-commit boundary check passes. Status: **DRAFT, not GO**.
+- Independent Consistency/Safety review and docs-only Surface check precede
+  implementation of either new wire field or the new fixed parser cause.
+  Existing-contract helper runner work may proceed; all such working-tree
+  edits are explicitly outside this committed document review. No dirty-tree
+  implementation acceptance, merge, publication or platform qualification.
+- Code review's terminal-detail allocation P3 is being folded into the next
+  helper package. No standalone P3 package or serial second context amendment.
+
 ## TR2.22 wire checkpoint — implementation accepted, 2026-10-03
 
 - Accepted at reviewed tuple root `e489c4f9a1d152dc66dd50a9e3d3af583e31cd62`,
