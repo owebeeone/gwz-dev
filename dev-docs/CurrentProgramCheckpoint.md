@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## Credential implementation — NO-GO, remediation round 1, 2026-10-03
+
+Final source review at core f97ff21f / transport41a16b27 returned Code NO-GO
+(two P2), State NO-GO (five P2), Surface GO (two P3). Six distinct blocking
+causes are all reviewer-classified non-architectural; both source axes
+independently found the first-failure publication race. One combined
+GwzTransportCredentialHelpers-RemPlan.md maps every finding to correction and
+closure regression. No accepted source merge yet. Root will settle the single
+patch, obtain original reviewer closure, then GWZ merge on all GO and validate
+MAIN composition. Operator authorizes merge, not push/tag/publication/activation.
+Unrelated drafts and Windows proof are preserved outside this object.
+
+
 ## Credential implementation — settled for independent acceptance review
 
 2026-10-03. Intended source is committed at core
