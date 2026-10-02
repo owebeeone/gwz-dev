@@ -1,0 +1,15 @@
+# TR2.5 step 2 — canonical review inputs
+
+Status: **inputs prepared; no acceptance review dispatched**. The root owner fills the exact settled tuple only after committing the package. Generate all reviewer prompts from `/Users/owebeeone/.claude/skills/review-loop/references/review-prompt-template.md`; splice the relevant axis unchanged. Root owns dispatch and report filing.
+
+Object: CLI diff from `0164e66376dac204910552148c62cb6c5c55ed03` through the settled CLI commit, plus `dev-docs/GwzTransportSettingCli-Implementation.md` at the settled root commit. Record core `2e64e88a28c332ed422cc390adc76738dc701bb1` unless root changes the baseline before dispatch. Each reviewer verifies the supplied tuple at start and end. No working-tree package is the review object.
+
+Authority: AgentProcessRules.md as amended by GwzProcessOptimization.md §8; gwz-core/dev-docs/GwzTransportOffSwitchDesign.md revision 3, GwzTransportReleasePlanAmendment-2.md and GwzTransportHandoff.md §6.1. Preserve the adopted gwz/native names, D2/D3/E3, three-form precedence and recommended OQs. Deferrals fence off release/platform/performance outcomes only; interface shape remains in scope.
+
+Code attack areas: candidate and ordinary build boundaries; global flag and precedence through core; transport-scope arms and local tag exclusion; native bypass before runtime construction; policy/timeout fill without clobbering explicit values; human-only notices; optional metadata including null-meta errors, JSONL and retained auth rows; accepted help strings and ordinary help preservation; inventory updates and the test path edge.
+
+State attack areas: resolution/refusal before backend creation and first operation effect; snapshot timing and absence of core process-environment reads; native selected before runtime admission; request policy owner, preserved explicit limits and no fallback; ignored scan delegation and exact target scope; source/path/value escaping via core; default output compatibility and refusal paths. No new durable format or mutation owner is introduced.
+
+Surface attack areas: read no implementation/design/plan. Inspect `gwz fetch -h`, `gwz fetch --help`, `gwz push --help`, `gwz pull --help`, root/help command context, docs/commands/auth.md and docs/MachineOutput.md. Use candidate binary at the settled source only. Walk through flag/environment/global setting, override each, and undo each from help/docs; verify every default and machine-output promise.
+
+Permitted inspection: `git rev-parse HEAD`, `git status --short`, `git show <settled SHA>:<path>`, `git diff <baseline>..<settled SHA>`, `rg`, `cat`, `sed`, file hashes and captured gate logs. Builds/tests are not permitted during read-only review; root supplies settled build/help receipts and the allowed binary help invocations. If reviewers need a test beyond those receipts, request owner execution. Reports: `GwzTransportSettingCli-ReviewCode.md`, `-ReviewState.md`, `-ReviewSurface.md`, filed verbatim by root. Any P0/P1/P2 blocks; remediation is one patch and verification by the original finding owner, with the two-round cap unchanged.

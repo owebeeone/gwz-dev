@@ -1,5 +1,31 @@
 # Current program checkpoint
 
+## TR2.5 step 2 CLI — implementation draft, 2026-10-03
+
+- Resumed the isolated `tr2-5-cli` draft on the operator's GPT-6.1 direction.
+  Core's accepted resolver is unchanged. The CLI adds candidate-only
+  `--transport gwz|native`, driver snapshot resolution, ignored-value notices,
+  verbose selection text and optional `meta.transport_setting`. Native skips
+  local transport runtime creation and fills omitted limits with 50 jobs,
+  8 per host and a 3 second timeout; explicit values are preserved.
+- Help and user docs follow accepted TR1.5 §10. Ordinary help/JSON are retained.
+  Local unit and real-binary workflows cover the settings, defaults, notices,
+  machine output and non-network immunity. Switch/process-global inventories
+  and conditional boundaries pass. Both full CLI suites and ordinary/candidate strict CLI Clippy
+  pass on explicit Rust 1.95.0. Earlier 1.96 runs also passed; they are
+  supplemental receipts, not substituted for the pinned runs.
+  Inherited formatting debt in `src/tests/g02/partial_errors.rs` is unchanged.
+  Full-core candidate Clippy debt is not waived.
+- [Package and limitations](GwzTransportSettingCli-Implementation.md),
+  [canonical review inputs](GwzTransportSettingCli-ReviewInputs.md). Root owns
+  settlement and independent Code/State plus Surface dispatch. The root owner
+  committed CLI `c4a588f8be4e91926deff2156dce00c7062f4184` via GWZ;
+  review is pending. The candidate/test-confined `transport_tests.rs` path
+  edge is acknowledged in this settlement record. No dirty-tree acceptance
+  review, merge, push, tag or installation occurred.
+  Platform, route/fixture timing and performance qualification remain deferred.
+
+
 ## Five-file split, 2026-10-03
 
 - Completed sequentially in main at the operator's request, using the
