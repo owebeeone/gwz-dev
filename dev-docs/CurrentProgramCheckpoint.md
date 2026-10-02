@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## Combined integration — two stale Python tests, 2026-10-03
+
+Production credential source accepted and GWZ merged; CLI full ordinary/candidate
+suites, both strictClippy and shared guards GREEN. Python fullordinary991/1/18
+and both1008/2 reveal two stale tests: historical projection lacks exact approved75;
+fake-gh row expects unconfigured automatic invocation, superseded by accepted
+configured-helper policy. Native builds/strictClippy/protocol drift/provenance
+checks GREEN. No production defect is established by these failures. Root
+corrects only two existing Py tests under GwzTransportCredentialIntegration-RemPlan.md,
+then focusedGREEN, settle, interior Code review and fullPython revalidation.
+Core ordinary and standalone transport suites pass; core candidate full phases
+continue with their own compiled inputs unchanged. Validator records explicit
+independent Py/root tuple transition instead of claiming all six unchanged.
+Integration/release stays pending; no failure is waived.
+
 ## Credential implementation integrated — combined validation, 2026-10-03
 
 Source accepted after Code2/State2 GO at lane rootb35887e/coreec43f585;
