@@ -1,5 +1,37 @@
 # Current program checkpoint
 
+## Credential implementation — settled for independent acceptance review
+
+2026-10-03. Intended source is committed at core
+`f97ff21fa56c2fe4abec6a73e90871dbe2d9d185`, transport
+`41a16b2713b302c3675f081584d392afeae26ad5`, generated/drift Python
+`947ed579abec292a23db3db7394923e70ee4363e` and CLI guide
+`1543a3bec00cda913a02c266e89d841eeeafb55b`; evidence remains
+`662d89828b478a2acce8c0308834db7d17c872f7`. The corrected exact core
+commit gate passes. All intended member work is clean; inherited private
+BugReport/proposal and old evidence drafts remain excluded, as do five root
+drafts. The first unpublished core checkpoint was rebuilt after a stale four-edge
+source-loading inventory failed its gate; the record names the correction and
+no gate floor/history waiver. New split leaves' EOF whitespace was corrected.
+
+Final affected suite passes 442/0/4 existing ignores after actual SSH typed
+M1/M4/M10 projection and local configured-budget producer tests. Source guards
+and candidate core Clippy pass with 50 retained warnings. Prior full ordinary
+2103/0/1 ignored and both candidate2652/0/7 ignored runs precede this final
+consumer patch, explicitly so labeled; unchanged generators/provenance and
+transport full/strict-Clippy checks remain recorded. Root-owned helper recovery
+guides and first-day help inputs join the package. Full source acceptance is
+NO-GO pending fresh peer-blind Code/State and combined Surface review; final
+Surface also covers MAIN Python help P3 closure at `a0773afa`. Windows is not
+part of this acceptance and its design remains provisional.
+
+Operator now explicitly authorizes merge after all required GO. Next: review
+this settled tuple, remediate any findings within the bounded loop, then GWZ
+merge accepted members and validate actual integrated CLI/core/Python source.
+No push, tag, publication, activation or alpha installation is authorized here.
+External exact source/gate and help inputs are filed under
+`/Volumes/projects/limbo/gwz-lanes-prewarm-20261003/credential-implementation-review/`.
+
 ## SSH helper clock — accepted mechanism, implementation next
 
 2026-10-03. Original round-2 Consistency and Safety reviewers both returned
