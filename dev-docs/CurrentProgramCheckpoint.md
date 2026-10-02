@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## SSH helper clock round 1 — corrected draft settled for closure
+
+2026-10-03. Core `d4c1f90f7b8c66c2dbbdf08451edc3db420273ea` settles
+the one corrected DRAFT: atomic transition/expiry arbitration for all consumers,
+explicit aggregate/stall pause/resume and a core timing witness with neutral
+pool terminal identity. Earlier NO-GO reports remain controlling until original
+reviewers verify their counterexamples and full changed mechanism. Source clock
+implementation stays gated. HTTPS candidate suite now passes 161/0, transport
+full suite/doctests and retained-failure regression pass; error-projection and
+final normal source gates remain open. No source implementation acceptance.
+
 ## SSH helper clock — NO-GO, combined remediation round 1
 
 2026-10-03. Both fresh GPT-6.1 reviewers returned NO-GO on draft core
