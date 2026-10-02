@@ -1,5 +1,27 @@
 # Current program checkpoint
 
+## TR2.8 lane — implementation accepted, 2026-10-02
+
+- The stopped `../gwz-dev-tr2-8` work is completed and reviewed: core
+  `c51b1b5ff75a772f42847ce22fa4f35a61cf4497`, root review baseline
+  `2f65e3c898fdd9c9eb78b7557339613aab1c8ba7`. Both
+  [Code](../gwz-core/dev-docs/GwzTransportSshKeyTypes-ReviewCode-1.md) and
+  [State](../gwz-core/dev-docs/GwzTransportSshKeyTypes-ReviewState-1.md) report GO.
+- Agent keys/signatures, certificates, security-key software fixtures, RSA's
+  three SHA-1 cases and selected-key container parity are implemented. Two P2
+  defects and one P3 found during review were closed in one remediation round.
+- Original ordinary/full candidate suites passed; corrected SSH suite 153/0;
+  corrected full suite with both candidate switches passed. Source guards,
+  format and per-commit gates pass. Strict Clippy remains red on inherited
+  diagnostics outside this lane's changed files; it is not waived or called green.
+- [Implementation and exact validation matrix](../gwz-core/dev-docs/GwzTransportSshKeyTypes-Implementation.md).
+  This accepts implementation only. Hardware-key manual execution needs the
+  operator's go; Windows bridge work and release-platform qualification remain
+  in the release plan. No merge, push or tag has been performed for this lane.
+- Next: integrate the ready lanes, preserving this acceptance record; run the
+  outstanding platform/hardware/strict-lint checks in the release batch.
+
+
 ## Transport release — split into 1.1.0 and 1.2.0; amendment 2 accepted, 2026-10-01
 
 - **Operator decision OD13 (2026-10-01).**
