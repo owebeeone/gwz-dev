@@ -10,13 +10,18 @@
   core `aedfa862d7ce6c121ecbe4d65ac4900e2017fdde`; reports filed verbatim
   in that lane. Its internal fields/parser cause may now be implemented.
   Real Git hasconfig conditional-include regression is honestly RED;
-  a separate minimal configuration-view mechanism is being prototyped before
-  contract review. Accepted policy and child environment are not silently changed.
+  a separate configuration-view mechanism has passed an external physical
+  prototype: supervised Git parsing, captured-home unconditional include walk,
+  ordered private view and real credential fill. The simpler mechanism needs
+  no new libgit2 binding; its single amendment still needs settlement/review
+  before product adoption. Accepted policy/environment are not silently changed.
 - `tr1-8-win`: native primitive/baseline experiments continue before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
   membership prevents claiming guardian independence for trust edits. A
-  scratch-only session-loss test is authorized; Windows trust execution is
-  held. Mac fixture inputs and cleanup guards are prepared; explicit operator
+  scratch-only session-loss test passed for the exact tested launch shape:
+  owned processes retired, mock state restored and no late write. It does not
+  establish universal job independence; Windows trust execution remains held.
+  Mac fixture inputs and cleanup guards are prepared; explicit operator
   approval for temporary account trust is pending. No trust was changed.
 - Both remaining agents run GPT-6.1 Sol. Implementation and Windows release
   acceptance remain open. Next: finish these two packages, review/integrate,
