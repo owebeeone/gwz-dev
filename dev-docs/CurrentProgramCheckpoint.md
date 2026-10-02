@@ -267,12 +267,30 @@
     13. CI jobs for gwz-py's candidate build (its transport rows) and its Rust unit tests.
     14. The remaining interpreter-exit edge in gwz-py (`dispatch::record`) is a known 1.1.0 limitation, which 1.2.0's session host replaces.
   - **Lanes now:**
-    - `split-pe`: the split, movement only;
-    - `tr2-18`: decisions 5 and 7, plus an erratum for the SSH worker design's URL-decoding line;
-    - `tr2-19`: decisions 8 and 9;
-    - `ci-py`: decision 13, plus tightening S6.2's stale cancel bounds and the Python design's §2.6 erratum.
+    - `split-pe` and `ci-py` are merged (below), and their lanes are kept until the operator says to dispose of them;
+    - `tr2-18`: decisions 5 and 7, an erratum for the SSH worker design's URL-decoding line, and the three Linux SSH test fixes;
+    - `tr2-19`: decisions 8 and 9, and the characterization test's `.git` change;
+    - `tr2-1`: TR2.1, the retry plan's Phase 3 with OD18;
+    - TR2.20 waits for disk (23 GB free while two lanes build);
+    - TR1.5's revision 1 is being written to its remediation plan, after three NO-GO reviews;
+    - TR1.6's revision 1 is under its three reviews.
 
     Drafters (scratch, no lane): TR1.5 and TR1.6. After the split merges, TR2.1 (retry, with decision 1) and the HTTPS test migration (12). Amendment 2 revision 6 records decisions 1, 3, 6, 8, 9, 13 and 14, and steps TR2.13–TR2.19.
+  - **The split merged** (gwz-core `ff5f35eb`, merging lane `e459cb25`; root `4ca53a6`, then `37398f3`).
+    - `placement_endpoint.rs`, `https_worker.rs` and `transport_host/session.rs` are split into module directories, movement only.
+    - **The proof.** rust-split's own `split` could not handle the 878-line impl block, so the agent used its lossless `explode` and copied every moved item from those chunks. An item-level checker, which the agent mutation-tested, found each item exactly once and byte-identical: 43/43, 41/41 and 66/66. The other differences are wiring: `mod` and `use` lines, impl headers and visibility.
+    - The lane's first commit is the boundary approval, byte-identical to `a3bef7cc`.
+    - **Gates.** The candidate suite passed (2,679 passed, 0 failed), and the both-switches check was clean. The per-commit gate is green over `9d4dd92f..ff5f35eb`, and the switch inventory still lists 18 sites. The merged tree's `src` equals the lane's.
+    - **Still over 1,000 lines:** `checked_artifact/entry.rs` (1,080), `gitbackend/fake_repository.rs` (1,079, a test fake) and `gitbackend/contract.rs` (1,067). `transport_host/session/driver.rs` is 773, over the 500-line ceiling.
+  - **ci-py merged: TR2.21** (gwz-py `35e2fda`, a fast-forward; root `94e7b7a`).
+    - **New jobs:**
+      - `transport-candidate.yml` runs gwz-py's suite, with its 10 transport rows, and its candidate Rust unit tests on both candidate legs;
+      - `package-smoke.yml` gains a `rust-tests` job.
+    - **The lock fix.** `validate` and `candidate` resolve gwz-cli's lock in CI (`cargo metadata`) before building gwz-cli main, the cause of the red runs since 2026-09-29. `publish.yml` does not, on purpose.
+    - **The manifest.** gwz-py's `Cargo.toml` drops pyo3's deprecated `extension-module` feature, so `cargo test` links libpython. maturin still enables it from `pyproject.toml`, and the release graph and the built extension are byte-identical.
+    - **S6.2's bounds** are tightened: cancel and close from 7 s to 1 s, exit from 9 s to 5 s. The cancel docstring is corrected, and the Python design gains an erratum line.
+    - **Results.** Locally, 996 passed on each leg, and 25 and 29 Rust unit tests passed. None of it is confirmed on GitHub until a push.
+    - gwz-cli's standalone lock should be refreshed in gwz-cli itself; the CI step works around it.
   - **Amendment 2 revision 6, committed with this entry.**
     - §3.20 records TR2.13–TR2.22, the split, S6.2's follow-ups and the fourteen decisions.
     - It also records OD18, the cold start: in each operation a key's first wave of setups starts in parallel, up to the per-host limit. OD18 amends the retry plan's §5 Cold state, §4's sentence on what Closed stops, and two S3.1 sentences. It reverses the single Cold probe that closed the retry plan's Safety `[P2-4]`, for 1.0.17 parity.
