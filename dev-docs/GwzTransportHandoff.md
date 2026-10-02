@@ -1,5 +1,14 @@
 # GWZ transport release — handoff, 2026-10-02
 
+## Current update, 2026-10-03
+
+The five-file split in §6.1 is completed sequentially in main, as requested.
+See [CurrentProgramCheckpoint.md](CurrentProgramCheckpoint.md) for the layout,
+preservation proof and validation. TR2.4/TR2.7 are merged and tr2-4-7 has
+been disposed without --keep. Earlier lane/status paragraphs below are the
+historical handoff snapshot.
+
+
 ## Integration update — ready lanes merged
 
 TR2.1, TR2.5 step 1, TR2.8 and TR2.4/TR2.7 are now merged into main through GWZ. The latest

@@ -1,5 +1,61 @@
 # Current program checkpoint
 
+## Five-file split, 2026-10-03
+
+- Completed sequentially in main at the operator's request, using the
+  `split-files` skill and rust-split 0.2.1. No parallel lane or agent was
+  started. Responsibilities now sit in private cohesive modules:
+
+  | Original file | Before | Facade | Largest child | Responsibilities |
+  | --- | ---: | ---: | ---: | --- |
+  | checked_artifact/entry.rs | 1,080 | 330 | 238 | observation, artifact facts, recovery, catalog |
+  | git/gitbackend/contract.rs | 1,067 | 131 | 210 | eight Git method groups |
+  | git/gitbackend/fake_repository.rs | 1,079 | 42 | 226 | eight fake-backend method groups |
+  | transport_host/session/driver.rs | 873 | 220 | 356 | opening/admission and message pump |
+  | git/endpoint/https_worker_tests.rs | 959 | 62 | 365 | discovery, exchange, failures, pooling, proxy |
+
+- The oversized trait and fake trait implementation cannot be divided into
+  multiple implementations of the same trait. Private method-group macros
+  preserve one trait and one implementation, with the original methods,
+  signatures and order. Inherent Session methods use separate impl blocks.
+  The method macros and three widened private helper signatures have
+  `rustfmt::skip` to preserve moved text; no formatter rewrote the payloads.
+- rust-split's explode chunks reconstruct all five originals byte for byte.
+  A syntax-span helper accounts for all 120 trait methods, 75 fake methods
+  and six Session methods. The relocation checker finds all 294 recorded
+  payloads exactly once: 275 exact and 19 with necessary visibility, import
+  depth or test-module path adjustments. Reversing those adjustments restores
+  each original exactly; deletion, duplication and alteration probes fail
+  the payload checker. Work files and proofs are outside
+  repositories at `/Volumes/projects/limbo/gwz-core-split-five-20261002/`.
+- The entry facade preserves its 24 visible names and nine classified
+  consumers. Its raw record writer stays in entry.rs. The four exact private
+  parts retain the writer lint boundary and filesystem/context checks;
+  facade re-exports and the five HTTPS test path edges are inventoried in
+  the same source commit. Mutation checks cover extra children, added public
+  APIs, wildcard/extra exports, removed writer protection and raw-write leaks.
+  The pre-existing owner-side lease/import scan hole remains explicitly
+  recorded in the checker; this split does not claim to repair it.
+- Validation: the ordinary full runner passes (2,103 real tests, the
+  filesystem/fake-backend groups and 69 integration tests). The candidate
+  full run passed all functional tests and 69 integration tests, with one
+  source-location pin failure: the record-root positive control gained the
+  moved catalog file. Its exact file inventory was updated and its targeted
+  rerun passes. The forced-merge and catalog-activation pins pass too.
+  All seven entry-boundary mutation tests and six filesystem checker tests
+  pass. Formatting, checked-artifact, filesystem, conditional-boundary and
+  process-global checks pass. Ordinary strict Clippy passes with the expanded
+  filesystem lint configuration. The previously recorded candidate Clippy
+  debt is not waived or claimed fixed.
+- Source commit: core `2e64e88a28c332ed422cc390adc76738dc701bb1`.
+  Its per-commit boundary gate passes over the exact committed tree.
+- Release/platform qualification remains a later batch. Nothing here
+  activates Windows or changes protocol, authentication, pool or retry
+  behavior. The previously merged tr2-4-7 lane has since been disposed
+  without --keep, with explicit authorization for unpreserved history;
+  its directory is gone and the workspace family contains only root.
+  No push, tag or alpha installation was performed in this step.
+
 ## TR2.4/TR2.7 merged after bounded review, 2026-10-02
 
 - The operator requested a quick plan/code review and merge if suitable.
