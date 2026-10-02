@@ -1,5 +1,40 @@
 # Current program checkpoint
 
+## TR2.5 Python configuration lane — ready for settled review, 2026-10-03
+
+- `tr2-5-py` implements the accepted off-switch design's Python driver seam:
+  per-operation environment/global configuration resolution; ignored values
+  logged once per file per Client; native selection's standard UserWarning;
+  native 50/8 defaults; constructor host-limit default None with explicit 32
+  honoured; the existing one 9-second clock; and Python CLI note/help text.
+- No shared-core, Rust CLI, credential, wire or platform changes. The existing
+  candidate route boundary encloses the setting implementation; ordinary
+  builds keep an empty notice context. No new candidate switch site is added,
+  and the inventory guard passes. Independent transport message forwarding
+  and the per-operation runtime remain unchanged.
+- Pinned Rust 1.95.0 gates: ordinary normal runner 992 passed / 18
+  candidate-only skips; both-switch whole suite 1,010 passed; Rust unit
+  suites 25 ordinary / 29 candidate; strict Clippy passes on both Python
+  target shapes. Final rebuilt focused suites pass 56 and 8; the
+  transport-only network/settings integration passes 18. Regeneration,
+  process-global, switch inventory, conditional boundaries and changed-file
+  formatting pass. Two equivalent lint corrections followed the broad runs;
+  rebuilt extensions and final focused gates verified those source forms.
+- The lane virtualenv's copied main editable was replaced with this lane's
+  editable build. Fresh candidate manifests and module paths name this lane;
+  candidate extension builds target Python 3.13. The ordinary runner uses
+  the lane virtualenv's Python 3.12. An initial default-stable Rust 1.96 run
+  is superseded by the explicitly pinned final gates.
+- [Exact implementation, commands, provenance and scope](../gwz-py/dev-docs/GwzPyTransportSetting-Implementation.md).
+  Status is **settled, not accepted**. Root committed Python
+  `5bf260d040964a3dd9ec606b58a625bc74ac4afc` through GWZ. The lane owner
+  records the tuple and runs independent Code, State and Surface reviews from the
+  canonical review-loop prompts. No dirty-tree acceptance or self-GO is
+  claimed; bounded combined remediation and the original reviewers'
+  counterexample verification apply. No commit, merge, push, tag or alpha
+  installation was performed by the drafter.
+
+
 ## Five-file split, 2026-10-03
 
 - Completed sequentially in main at the operator's request, using the
