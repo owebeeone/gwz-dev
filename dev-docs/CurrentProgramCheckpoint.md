@@ -230,7 +230,31 @@
     - **CI gaps:** no CI job builds gwz-py's candidate extension, so its 10 transport rows never run in CI, and gwz-py's Rust unit tests never run in CI either.
     - **Stale text:** S6.2's cancel docstring and 7 s limits in `test_client_host_transport.py`, and the Python design's §2.6 rationale for the GIL.
     - The both-switches leg was not run on the merged tree.
-  - **Lanes now:**. The operator approved deleting `gwz-py/target` and the root `target` (31 GB with the lanes' copies) and running four lanes at a time. Each merged lane's build directory is deleted.
+  - **Pushed on the operator's go** ("Push, and all as recommended"): root `a9479d8`, gwz-core `9d4dd92f`, gwz-cli `0218cc7`, gwz-py `766de53`, gwz-transport `6910ba6`. That includes gwz-transport's `repository` line, committed first (decision 10). Each `main` was verified equal to its `origin/main`.
+    - CI runs started: gwz-core 36946316178 (Transport candidate), 36946316190 (Checked-artifact boundary), 36946316180 (Retained merge readers), 36946316181 (Linux identity probe); gwz-py 36946314367; gwz-transport 36946310967; gwz-dev 36946323296.
+    - gwz-cli 36946312818 passed at once, including its new switch-inventory job against gwz-core main's checker.
+  - **Operator decisions, 2026-10-02, "all as recommended":**
+    1. **Cold start:** the first wave of setups starts in parallel up to the per-host limit, as 1.0.17's does, instead of the retry plan's one Cold setup per key. Setups that a server's `MaxStartups` drops are left to TR2.1's retry.
+    2. TR2.14 was done by the concurrency fix.
+    3. Split `placement_endpoint.rs`, movement only.
+    4. Start the design steps: TR1.5 (off switch) and TR1.6 (credential helpers) now. TR1.8 waits for dabeest's 1.0.17 evidence.
+    5. A password in an SSH URL is used as 1.0.17 uses it.
+    6. Control characters in an SSH path stay refused, a deliberate difference from 1.0.17.
+    7. `known_hosts` host names match case-insensitively.
+    8. A `Failed` or `Rejected` result also lists member errors in `errors`.
+    9. gwz-core's dead `OperationRuntime`, `ResponseBuilder::result` and `ExecutionReport` are removed: a public API removal for the release notes.
+    10. Done (above).
+    11. The 15 merged lanes were disposed, after each one's heads were proven in main and its one "unique" file was proven identical to main's committed gwz-transport `Cargo.toml`. That freed 21 GB.
+    12. The HTTPS tests that run a mode production never uses (`allow_transition = false`) move onto `prepare_budget_for_transition`, after the split.
+    13. CI jobs for gwz-py's candidate build (its transport rows) and its Rust unit tests.
+    14. The remaining interpreter-exit edge in gwz-py (`dispatch::record`) is a known 1.1.0 limitation, which 1.2.0's session host replaces.
+  - **Lanes now:**
+    - `split-pe`: the split, movement only;
+    - `tr2-18`: decisions 5 and 7, plus an erratum for the SSH worker design's URL-decoding line;
+    - `tr2-19`: decisions 8 and 9;
+    - `ci-py`: decision 13, plus tightening S6.2's stale cancel bounds and the Python design's §2.6 erratum.
+
+    Drafters (scratch, no lane): TR1.5 and TR1.6. After the split merges, TR2.1 (retry, with decision 1) and the HTTPS test migration (12). Amendment 2 revision 6 records decisions 1, 3, 6, 8, 9, 13 and 14, and steps TR2.13–TR2.19.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
     - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
