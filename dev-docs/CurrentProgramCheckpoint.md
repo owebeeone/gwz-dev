@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## SSH helper setup clock — settled draft, dual design review next
+
+2026-10-03. Core `eb06fac24a3e1eb8f4db32de261a26627e1fd01b` freezes
+GwzTransportSshHelperClockAmendment.md; exact core gate passes. The private
+password-only route needs one connection-scoped authority for pool expiry,
+Control and post-result classification, so helper work receives its accepted
+independent allowance. This is a concrete ownership mechanism, not a new
+authentication policy or wire change. Review tier: dual Consistency/Safety;
+do not implement shared clock semantics before root-relayed GO.
+Unfinished HTTPS/helper/context/code75/password source is excluded from this
+draft review. Its independent HTTPS work continues. Final secret Code/State
+and combined Surface implementation acceptance remain owed.
+
 ## Native parser early-read correction — preserved, implementation review pending
 
 2026-10-03. Bounded mechanism-doc correction is committed at core
