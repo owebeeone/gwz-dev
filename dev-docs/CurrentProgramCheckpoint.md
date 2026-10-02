@@ -269,13 +269,81 @@
   - **Lanes now:**
     - `split-pe` and `ci-py` are merged (below), and their lanes are kept until the operator says to dispose of them;
     - `tr2-18`: decisions 5 and 7, an erratum for the SSH worker design's URL-decoding line, and the three Linux SSH test fixes;
-    - `tr2-19`: decisions 8 and 9, and the characterization test's `.git` change;
+    - The five merged lanes (`split-pe`, `ci-py`, `tr2-19`, `tr2-20` and `tr2-18`) were disposed on the operator's go, after each lane's heads were proven in main;
     - `tr2-1`: TR2.1, the retry plan's Phase 3 with OD18;
-    - TR2.20 waits for disk (23 GB free while two lanes build);
-    - TR1.5's revision 1 is being written to its remediation plan, after three NO-GO reviews;
-    - TR1.6's revision 1 is under its three reviews.
+    - TR1.5 is accepted (above);
+    - TR1.6: revision 2's round-2 reviews are in (Safety GO, Surface GO on condition that OQ5 (a) is taken, Consistency NO-GO on one P2, the 1.0.17 codes for M6 and M8). Revision 3 is being written to remediation plan 2, the last round.
 
     Drafters (scratch, no lane): TR1.5 and TR1.6. After the split merges, TR2.1 (retry, with decision 1) and the HTTPS test migration (12). Amendment 2 revision 6 records decisions 1, 3, 6, 8, 9, 13 and 14, and steps TR2.13–TR2.19.
+  - **More operator decisions, 2026-10-02:**
+    - **Split all five large files,** movement only, in one lane after TR2.1 merges: `checked_artifact/entry.rs` (1,080 lines), `gitbackend/fake_repository.rs` (1,079), `gitbackend/contract.rs` (1,067), `transport_host/session/driver.rs` (813 in TR2.1's lane) and `https_worker_tests.rs` (959).
+    - **Keep TR2.19's two items.** `gwz status` stays on the shared builder. The session plan's next amendment fixes the stale text: CS2.5, D10 and the session design's §5.4.
+    - **Connection statistics in machine output** (the operator's request: "consider adding some connections stats on the jsonl responses (maybe with --verbose or --json_verbose) so that we can diagnose connection issues more easily"). A design is being drafted. The starting recommendation is the existing `--verbose`, combined with `--json` or `--jsonl`, and no new flag. It gets a Surface review.
+  - **TR1.5 accepted: the transport setting (the off switch).** The [design](../gwz-core/dev-docs/GwzTransportOffSwitchDesign.md) is accepted at SHA-256 `145af486…` (revision 2), and filed as revision 3 (`208be7f1…`). The [verdict](../gwz-core/dev-docs/GwzTransportOffSwitchDesign-Verdict.md) has the details.
+    - **Its review.** Three rounds of Consistency, Safety and Surface, with two remediation rounds, the cap. Round 1 was three NO-GOs with 8 P2s. Round 2 was GO, NO-GO and GO; Safety's one P2 was unquoted workspace paths in the suggested removal commands, a copy-paste injection. Round 3 was GO on all three axes. Revision 3 applies round 3's P3s, and the reviewers confirmed the forms that differ from their text.
+    - **The design.**
+      - `--transport <gwz|native>`, `GWZ_TRANSPORT` and `gwz.transport`, read from the user's global git configuration only, with no `includeIf` and no `GIT_CONFIG_GLOBAL`.
+      - A workspace or repository value is ignored. In gwz-py the note about it is a `logging` record, so no warnings filter can turn it into a refusal.
+      - An unreadable file is skipped, as git and libgit2 skip it.
+      - The scan is bounded to the operation's targets, to regular files and to 1 MiB.
+      - Printed commands are shell-quoted.
+      - JSON carries `meta.transport_setting`.
+    - **Applied recommendations, which the operator may reverse:**
+      - **D2,** the names;
+      - **D3,** 1.0.17's defaults when native is selected: 50, 8 and 3 s in gwz-cli;
+      - **E3,** the defaults filled in by the drivers in 1.1.0. gwz-py's `Client(max_connections_per_host=None)`; that keyword postdates 1.0.17. TR2.11's callers stay at 100 and 32. In 1.2.0 the session host fills the defaults.
+    - **The operator's answers, 2026-10-02 ("All as recommended").** D2, D3 and E3 are kept. OQ1: there is no way to silence the note. OQ2: a gwz-core module. OQ3: all four 1.2.0 items go to the server design's next revision. OQ4: a consumer-build row in S7.3 (1.1.0), which amendment 2's next revision adds. TR2.5 may start.
+    - **Follow-ons:**
+      - **TR2.5** runs in three steps after OQ1–OQ4, with its retry row after TR2.1.
+      - **The session plan's re-check:** CS3.10, CS8.3, C1, CS8.28 and CS4.5, the 1.2.0 fill under CS3.10, CS4.7 and CS6.4, and the edge CS6.6 ── CS6.4, which also goes into the Phase 6 sketch.
+      - **The status lines** of the retry plan and the Python design, and the plan's changelog, are updated with this entry.
+  - **TR2.20 and TR2.18 merged** (gwz-core `72c6f49d`, a fast-forward to TR2.20, then `77c0ed9c`, merging TR2.18's `b212d044`; root `cc3e5c2`, then `a15c48c`).
+    - **TR2.20.**
+      - 44 call sites in 30 tests, plus the `OpeningSession` fixture route (37 tests in all), now run the production entry `prepare_budget_for_transition`.
+      - The test-only `Client` wrappers and `allow_transition` are gone. Under the dead-code rule, so is a second test-only mode: `https_policy::classify`'s `allow_auth_transition`, which production has passed as `false` since the HTTPS endpoint landed.
+      - The change is movement and deletion only. One weak test is fixed: its budget had made its four other domains untestable.
+      - **Suites:** 2,320 ordinary and 2,670 candidate.
+      - **Reported, not changed:** `budget_for_open` turns a zero interaction deadline into a zero helper allowance, which TR2.22's helper budget (TR1.6 E6) should settle. `https_worker_tests.rs` is now 959 lines.
+    - **TR2.18.**
+      - **Decision 5:** a password in an `ssh://` URL is used exactly as 1.0.17's libgit2 uses it, from `ssh_libssh2.c:830-863`.
+        - The password is used only beside a user, and only if the server lists `password`. After it come the callback's key or agent, or a helper on a password-only server.
+        - It stays inside the process, is never logged, is zeroized, and has a pool identity of its own.
+        - A cross-process placement refuses password URLs.
+      - **Decision 7:** `known_hosts` names match without regard to case. Hashed names match as written or lowercased.
+      - **The tests.** A stdlib-only loopback SSH server (`tests/transport_backend/password_sshd.py`) proves the identical authentication sequence on both routes, across six URLs.
+      - **The design erratum** is in `GwzRemoteTransportSshWorker.md`.
+      - **The three Linux test fixes:** reset or EOF in the two close assertions, and normal budgets for `selected_pool`'s first open. They are unconfirmed until CI runs on Linux.
+      - **Suites:** 2,471 per leg.
+    - **Deviation, accepted by the operator ("Merge as is").** TR2.18's first commit, `341a669d`, a four-line erratum, predates the lane's approval commit, so the per-commit gate is RED there. Its root cause is S6.2's unapproved `#[path]` edge, the same as the pushed `ac654d49`, `89b828cd` and `9d4dd92f`. The next push's boundary job will report it.
+    - **Merged main.** `cargo check --tests` is clean on both candidate legs and the ordinary build, and the gate is green over `ab48966f..77c0ed9c` apart from `341a669d`. The switch inventory lists 18 sites.
+    - **From TR2.18, for the operator:**
+      - **Parity gap.** 1.0.17 runs configured credential helpers for an SSH server that offers only `password`; the transport does not. Under the parity rule this is to be built: a new step, TR2.23, will reuse TR1.6's lookup after TR1.6's GO, in amendment 2's next revision.
+      - **Not parity.** A server that accepts `none` authenticates on the transport, where 1.0.17 fails. This is for the notes.
+      - **1.2.0.** A URL password cannot reach an endpoint in another process, because the protocol has no slot for it. That is for the server design's next revision.
+      - **Observation rows** have no `password` method. That is S7.5's Surface item.
+      - **Process slips.** The agent used one raw `git checkout`, reverting its own uncommitted probe, and deleted a `__pycache__`.
+  - **TR2.19 merged** (gwz-core `ab48966f`, merging lane `ec95c0b9`; gwz-cli `236f753`, a fast-forward; gwz-py `2e0509fd`; root `46b69f8`).
+    - **Decision 8.** A `Failed` or `Rejected` result lists each failed or rejected member's error in `errors`, as `Partial` does, in member order. `gwz status` now builds its envelope with the shared builder, so its own failed and rejected results copy errors too. MachineOutput.md, gwz-py's README, OperationModel.md, Reference.md and ErrorCatalog.md say so.
+    - **Decision 9.** The removed public paths, for the 1.1.0 notes, all under `gwz_core::operation`, with their methods:
+      - `OperationRuntime`;
+      - `ResponseBuilder` (both `result` and `accepted`);
+      - `ExecutionReport`, `MemberExecution`, `MemberExecutionStatus` and `OperationError`;
+      - `RuntimeEventSink` and `EventSubscription`;
+      - `OperationPlan`, `MemberPlan` and `PlannedAction`;
+      - the impls `From<MemberExecutionStatus> for MemberStatus` and `From<operation::PlannedAction> for PlannedAction`.
+
+      `ResponseBuilder::accepted`'s only caller was `OperationRuntime`, so the plan types went with it. A search of the whole workspace found no other reference. The protocol types `gwz_core::PlannedAction` and `ActionKind` stay.
+    - **The CI flake.** git 2.55, CI's version, leaves `objects/maintenance.lock` behind after a commit, from its detached auto-maintenance, and that lock broke the characterization test. Its child now sets `maintenance.auto=false` and `gc.auto=0`. A stand-in wrapper reproduced the failure 20 times in 20, and with the fix it passed 20 times in 20. CI is the real confirmation.
+    - **Suites:**
+      - gwz-core gate: 2,320 passed;
+      - candidate: 2,669 passed;
+      - gwz-cli: 252 unit and 92 integration tests passed;
+      - gwz-py: 980 ordinary and 990 candidate passed.
+    - **Merged main.** The per-commit gate is green over `ff5f35eb..ab48966f`, and `cargo check --tests` is clean for gwz-core and gwz-cli.
+    - **For the operator:**
+      - the status scope above;
+      - session plan text this removal makes stale: CS2.5, D10's "deprecate, do not remove", and the session design's §5.4, which describes `OperationRuntime`. Those need an amendment;
+      - a release-note item: `gwz-py --json` now prints the member error copies for a failed or rejected result.
   - **The split merged** (gwz-core `ff5f35eb`, merging lane `e459cb25`; root `4ca53a6`, then `37398f3`).
     - `placement_endpoint.rs`, `https_worker.rs` and `transport_host/session.rs` are split into module directories, movement only.
     - **The proof.** rust-split's own `split` could not handle the 878-line impl block, so the agent used its lossless `explode` and copied every moved item from those chunks. An item-level checker, which the agent mutation-tested, found each item exactly once and byte-identical: 43/43, 41/41 and 66/66. The other differences are wiring: `mod` and `use` lines, impl headers and visibility.
