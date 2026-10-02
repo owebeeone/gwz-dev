@@ -12,7 +12,9 @@ CLI/Python configuration and credential-helper implementation are integrated.
 Credential Code/State round2 and unchanged Surface round1 report GO; exact tuple,
 closure evidence and GWZ merge are in CurrentProgramCheckpoint.md and core's
 GwzTransportCredentialHelpersAcceptance.md. Fresh combined MAIN CLI/core/Python
-ordinary/candidate checks are pending. Windows has three preserved native batches
+ordinary/candidate checks pass on macOS. Two stale Python tests were corrected
+without production/protocol changes, independently reviewed and fully rerun;
+[the integration record](GwzTransportCredentialIntegration.md) records evidence. Windows has three preserved native batches
 but no design GO; missing provider/identity, lifetime, compatibility and trust/
 routing proof remain mandatory. No trust fixture has been approved or applied.
 Aggregate review, deferred platform/performance and selected-source/package

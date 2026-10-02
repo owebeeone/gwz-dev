@@ -1,5 +1,43 @@
 # Current program checkpoint
 
+## Credential transport — integrated and macOS validated, 2026-10-03
+
+The credential lane is merged and combined macOS integration is accepted.
+The validated tuple is:
+
+| Repository | Commit |
+| --- | --- |
+| root | `5be088f50808e930cc78be8db0671486256dac4a` |
+| gwz-core | `a92a7990081475e349b182a332c7553731f4fb5b` |
+| gwz-transport | `1aab733783e06b25cb5d2321d71ec0b34417a29c` |
+| gwz-cli | `f925e1165c2b2d368a00277594450b010a95867a` |
+| gwz-py | `5aeff4bfb11da048f1174db2b1045ed0c9b6c80a` |
+| gwz-core-evidence | `662d89828b478a2acce8c0308834db7d17c872f7` |
+
+This checkpoint commit changes only documentation after validation.
+[The integration record](GwzTransportCredentialIntegration.md) records exact
+receipts and limitations. Production Code and State round 2 reviews and the
+unchanged Surface round 1 review are GO. Two source remediation rounds closed
+seven findings; reviewers identified no architectural cause in this source object.
+
+GWZ fast-forwarded five members in `merge_op_93443_1790979898498_0001`.
+All 27 unrelated draft files were restored and their hashes verified.
+Full integration exposed two stale Python tests. Their correction changes only
+tests, has independent Code GO, and passes all final full Python suites:
+992 ordinary passes with 18 candidate-only skips; 1,010 passes in each candidate
+configuration. Full CLI ordinary/candidate suites, strict Clippy and guards pass.
+All 15 core/transport gates pass, including full ordinary and both candidate
+phase runners. Core's 49 warnings, inherited ignores and formatting debt remain
+unwaived. Original failed attempts are preserved.
+
+Next: Windows TR1.8 still needs bounded native proof and design GO, then
+implementation/parity. Deferred platform, performance and selected-source/package
+checks remain a later batch, followed by aggregate release/activation review.
+This accepts macOS integration only. No push, tag, publication, activation or
+alpha installation occurred. Lane root history and its older Python stash remain
+retained; no lane was disposed. The sections below are historical snapshots;
+this section controls current status.
+
 ## Combined integration — two stale Python tests, 2026-10-03
 
 Production credential source accepted and GWZ merged; CLI full ordinary/candidate
