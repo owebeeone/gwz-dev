@@ -1,5 +1,17 @@
 # Current program checkpoint
 
+## Windows bounded residual observations — preserved, no design GO
+
+2026-10-03. Core `44afdf1b14cff393c5b38e50a622b603b1d5a8ec` and
+evidence `cf553a5f9f1f1b23ed35e448dd7561fced2fb06b` preserve the third
+bounded batch. Exact core and tracked archive gates pass. Pageant concurrency,
+process-pinned ECDSA/RSA-PSS peer hashes and actual fixture URL-zone classes
+have executed proof. Numeric HWND reuse was not observed within the fixed cap;
+MD5 handshakes refused. Neither is reported as a passing required assertion.
+Earlier two runs match byte-for-byte; owned processes retired. Windows design
+remains NO-GO with native trust/provider/identity and compatibility prerequisites
+open. No product, trust, proxy, zone, service or account change was performed.
+
 ## TR1.8 native primitive batch preserved, 2026-10-03
 
 - Core `e616dc8a96cab434578297a04e9fbb567b63dcd8` records HOME,
