@@ -51,10 +51,24 @@
   on a new non-architectural prepared-token refusal branch. Reports and one
   round-2 plan are preserved at lane core
   `fae9c93e79477923d2c32afd3cc0cc22dc971364`; exact gate passes.
-  The second bounded correction is underway; architectural count remains two.
-  HTTPS candidate suite now passes 161/0 and full transport/doctests pass.
-  Final projection/normal source checks remain open. Shared-clock code waits for GO;
-  HTTPS and narrow fetch/push error-code preservation continue independently.
+  Both original round-2 reviewers now return GO with no open findings at lane
+  core `fde5878ac11b9e02892127f438cb50954551b9a3`, root
+  `0bb560c5f34ba5bde5ece053dc58e33ef10fd8e0`. Reports and narrow design/
+  requirements authority are adopted at core
+  `a53e1f1004a157d0bdc3adb2a038fcf52cb25ddc`, lane root
+  `647127ffdcd2bc99bfb006da49686dffaa7b6f6f`; exact core gate passes.
+  Root explicitly relayed implementation GO for this mechanism only.
+  Two remediation rounds close all findings; architectural count remains two.
+  HTTPS candidate suite passes 162/0; full transport/doctests and strict
+  transport Clippy pass. Real fetch/push/private-clone error projections pass,
+  including M1/code75, controlled E2BIG M2 and repaired same-operation routing.
+  Normal core passes 2103/0 with one ignored; generators, provenance and source
+  guards pass. Candidate core Clippy passes with 51 existing warnings retained
+  as debt. Logs: `/Volumes/projects/limbo/gwz-tr222-route-https-final-v7.log`
+  and `gwz-tr222-helper-projection-v4.log` alongside it. These are working-source
+  results, not accepted source. Next: implement accepted shared clock/password
+  route and required TDD rows, final gates, exact settlement and fresh Code/State
+  plus combined Surface review. No credential merge or release GO yet.
 - `tr1-8-win`: two native primitive/baseline batches are preserved before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
   membership prevents claiming guardian independence for trust edits. A
@@ -83,7 +97,7 @@
   No provider/account provisioning or shared-host state change was performed;
   original evidence is frozen. Mac fixture inputs and cleanup guards are prepared; explicit operator
   approval for temporary account trust is pending. No trust was changed.
-- Credential implementation and both SSH clock reviewers run GPT-6.1 Sol;
+- Credential implementation runs GPT-6.1 Sol; both SSH clock reviewers completed GO;
   Windows' bounded residual agent is complete.
   Implementation and Windows release acceptance remain open. Next: finish and
   review the credential package, close Windows prerequisites, review/integrate,
