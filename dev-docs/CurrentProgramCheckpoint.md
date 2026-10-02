@@ -233,6 +233,24 @@
   - **Pushed on the operator's go** ("Push, and all as recommended"): root `a9479d8`, gwz-core `9d4dd92f`, gwz-cli `0218cc7`, gwz-py `766de53`, gwz-transport `6910ba6`. That includes gwz-transport's `repository` line, committed first (decision 10). Each `main` was verified equal to its `origin/main`.
     - CI runs started: gwz-core 36946316178 (Transport candidate), 36946316190 (Checked-artifact boundary), 36946316180 (Retained merge readers), 36946316181 (Linux identity probe); gwz-py 36946314367; gwz-transport 36946310967; gwz-dev 36946323296.
     - gwz-cli 36946312818 passed at once, including its new switch-inventory job against gwz-core main's checker.
+  - **The push's CI, read 2026-10-02.** Five of the eight runs passed: gwz-core's retained merge readers (36946316180) and Linux identity probe (36946316181), gwz-transport's contracts (36946310967), gwz-dev's workspace recovery (36946323296) and gwz-cli (36946312818). Three failed:
+    - **gwz-core's checked-artifact boundary (36946316190).**
+      - The per-commit lane gate was RED at gwz-core `ac654d49` (S6.2), `89b828cd` and `9d4dd92f`. S6.2 included `transport_scope_tests.rs` from `transport_scope.rs` by `#[path]` without approving the edge in `check_checked_artifact_boundaries.py`.
+      - Neither `run_tests.py` nor the lane merges run that checker, so nothing local caught it.
+      - **Deviation:** the three pushed commits stay RED in the gate's history, as `95d292f` and `b923109` do.
+      - Fixed at gwz-core `a3bef7cc`, and the gate is green over `9d4dd92f..a3bef7cc`. The three gwz-core lanes were told to make the identical change as their first commit, before any commit of their own; none had committed. So no new red commit reaches main.
+      - From now on, the lane gate runs locally over a push's range before the push.
+    - **gwz-core's transport candidate (36946316178).**
+      - In both legs, two tests that TR2.15 folded into the candidate tests, now running on Linux for the first time, expect EOF from a closed peer and get `ConnectionReset`. Linux resets the peer of a socket closed with unread data, for TCP and `AF_UNIX` alike. The two tests are `agent_auth::native_network_wait_retries_with_stable_state_and_is_cancellable` and `agent_client::native::cancellation_interrupts_every_partial_reply_and_closes_agent_socket`.
+      - In the both-switches leg only, two more failed:
+        - `selected_pool::stalled_admission_does_not_stop_an_existing_stream`: its first open overran a 1 s aggregate deadline under load;
+        - `path_characterization::h_member_direct_attributes_match_native_and_current`: its member's `.git` changed during the test. The suspected cause is recent git's detached auto-maintenance lock.
+      - The three SSH tests went to `tr2-18`, and the characterization test to `tr2-19`.
+    - **gwz-py's CI (36946314367), all 12 jobs.** It has been red on every push since 2026-09-29, so this push did not cause it.
+      - `run_tests.py` builds the sibling gwz-cli `--locked`. `gwz-cli/Cargo.lock` is refreshed only at release, so it lacks gwz-core main's new crates (`gwz-git2`, `gwz-ids`, `gwz-session-*`). Locally the root workspace's lock hides this.
+      - It went to `ci-py`, whose new jobs need the same fix.
+
+    The fixes can be confirmed on Linux only by the next push, which waits for the operator's go.
   - **Operator decisions, 2026-10-02, "all as recommended":**
     1. **Cold start:** the first wave of setups starts in parallel up to the per-host limit, as 1.0.17's does, instead of the retry plan's one Cold setup per key. Setups that a server's `MaxStartups` drops are left to TR2.1's retry.
     2. TR2.14 was done by the concurrency fix.
@@ -255,6 +273,11 @@
     - `ci-py`: decision 13, plus tightening S6.2's stale cancel bounds and the Python design's §2.6 erratum.
 
     Drafters (scratch, no lane): TR1.5 and TR1.6. After the split merges, TR2.1 (retry, with decision 1) and the HTTPS test migration (12). Amendment 2 revision 6 records decisions 1, 3, 6, 8, 9, 13 and 14, and steps TR2.13–TR2.19.
+  - **Amendment 2 revision 6, committed with this entry.**
+    - §3.20 records TR2.13–TR2.22, the split, S6.2's follow-ups and the fourteen decisions.
+    - It also records OD18, the cold start: in each operation a key's first wave of setups starts in parallel, up to the per-host limit. OD18 amends the retry plan's §5 Cold state, §4's sentence on what Closed stops, and two S3.1 sentences. It reverses the single Cold probe that closed the retry plan's Safety `[P2-4]`, for 1.0.17 parity.
+    - [Skim review 7](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-7.md) reported GO with eight P3s. They were applied, P3-7 in part, with its dispute upheld. The [re-check](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2-ReviewSkim-8.md) reported GO with two new P3s, also applied.
+    - The amendment hashes `8a532c4a…`. TR2.1 now waits for the split, and TR8.1 (1.1.0) and TR8.4 wait for TR2.1.
   - **TR2.13 merged** (gwz-core `67c680a7`, merging lane `083ac49b`; root `d3d2c60`). The cap was real.
     - **Cause.** Every hop polled on a fixed timer and moved one message a pass: the endpoint session every 5 ms, the local link every 2 ms, the driver session every 5 ms, and the SSH worker's bridges every 1 ms.
     - **Change.** A pass now moves every ready message, within bounds, and the session sleeps only when nothing moved. Work arriving at the link, a bridge or a stream wakes it, and the local link waits on both sessions. Every existing bound stays.
@@ -271,7 +294,7 @@
     - **From its agent:** it ran `git add -N` once to count lines, a raw git state change; the `gwz add` that followed superseded it. The shared HTTPS fixture can stall a large response on macOS, with its TLS layer holding back the last piece; libgit2's own clone hung over 10 minutes. Tests with large HTTPS responses close each connection until the fixture is fixed.
 - **What can start now** (the amendment's §3.13):
   - TR2.9 to TR2.12, and 1.1.0 S6.1, then S6.2 and S6.3;
-  - TR2.1, TR2.2, TR2.3, TR2.4, TR2.7 and TR2.8;
+  - TR2.2, TR2.3, TR2.4, TR2.7 and TR2.8; from revision 6, the split, then TR2.1 and TR2.20; TR2.18, TR2.19 and TR2.21; TR2.2 and TR1.6's GO, then TR2.22;
   - TR1.5, then TR2.5; and TR1.6;
   - 1.1.0 S4.1, then TR1.8 and S4.2–S4.4, then TR4.8–TR4.10 once TR1.8 has GO; and TR4.6's ordinary-build job;
   - 1.1.0 S2.1–S2.3, TR3.3's code and TR3.4. TR3.2 follows TR3.3's registry steps;
@@ -279,7 +302,15 @@
   - session-plan steps, under rule (e).
 
   TR2.9 is first, because it covers the measured blocker.
-- **Committed with this entry, on the operator's go:** revision 5's edits to amendment 2, the plan, amendment 1, the agent design, the server design, the session plan, the reuse design and the verdict, and its three skim review files (Skim-4, Skim-5 and Skim-6).
+- **Committed with this entry, under the operator's go of 2026-10-02:**
+  - amendment 2's revision 6;
+  - the retry plan's status line and changelog;
+  - the plan's changelog;
+  - the verdict;
+  - skim reviews 7 and 8.
+
+  gwz-core `a3bef7cc`, the boundary fix, was committed just before them.
+- **Committed earlier, on the operator's go:** revision 5's edits to amendment 2, the plan, amendment 1, the agent design, the server design, the session plan, the reuse design and the verdict, and its three skim review files (Skim-4, Skim-5 and Skim-6).
 
 ## Transport release — the five dead transport-host items removed; the SSH refusal test's timeout, 2026-10-01
 
