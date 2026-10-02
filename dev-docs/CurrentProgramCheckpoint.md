@@ -47,7 +47,13 @@
   and stall-resume gaps; Consistency additionally found the pool-first helper
   timing-provenance gap. Reports and one combined remediation plan are filed
   at lane core `a81d1433621d5634e19b125f1ca217c147c840f0`; exact gate
-  passes. Round 1 correction is underway. Shared-clock code waits for GO;
+  passes. Round 1 closes all original findings; Consistency GO, Safety NO-GO
+  on a new non-architectural prepared-token refusal branch. Reports and one
+  round-2 plan are preserved at lane core
+  `fae9c93e79477923d2c32afd3cc0cc22dc971364`; exact gate passes.
+  The second bounded correction is underway; architectural count remains two.
+  HTTPS candidate suite now passes 161/0 and full transport/doctests pass.
+  Final projection/normal source checks remain open. Shared-clock code waits for GO;
   HTTPS and narrow fetch/push error-code preservation continue independently.
 - `tr1-8-win`: two native primitive/baseline batches are preserved before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
