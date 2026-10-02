@@ -29,8 +29,12 @@
   implementation-contact counterexample shows native Git can preread an
   unconditional FIFO include even for stdin parsing. The child deadline bounds
   the failure, but the accepted source-only parse-I/O claim needs correction.
-  A minimal parser-environment suppression is being checked against that exact
-  counterexample. Full implementation gates and review remain open; none of
+  A minimal empty controlled parser environment passes that exact native
+  counterexample and preserves null/empty/escaping/non-UTF-8 values. Initial
+  discovery remains native-read/deadline bounded. The bounded correction,
+  design clarification and cleanup regressions join the final full Code/State
+  package; earlier mechanism GO does not cover these corrected bytes.
+  Full implementation gates and review remain open; none of
   these intermediate results is implementation acceptance or release GO.
 - `tr1-8-win`: two native primitive/baseline batches are preserved before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
@@ -49,10 +53,13 @@
   archive gates pass. It adds HOME characterization, owned Pageant/pipe/job
   lifetime tests, SSPI first legs and process-pinned TLS peer/hash proof.
   HOME compatibility dispositions, native provider/identity proof and released
-  HTTPS trust rows remain open. The agent has completed this bounded batch;
+  HTTPS trust rows remain open. The agent completed this bounded batch;
+  a new bounded residual batch covers only owned HWND concurrency/reuse,
+  process-scoped additional certificate hashes and read-only URL zones.
+  It permits no provider/account provisioning or shared-host state changes;
   original evidence is frozen. Mac fixture inputs and cleanup guards are prepared; explicit operator
   approval for temporary account trust is pending. No trust was changed.
-- The credential agent continues on GPT-6.1 Sol; the Windows agent is complete.
+- Both credential and bounded Windows residual agents run GPT-6.1 Sol.
   Implementation and Windows release acceptance remain open. Next: finish and
   review the credential package, close Windows prerequisites, review/integrate,
   aggregate gate, then deferred platform/performance/selected-source/package
