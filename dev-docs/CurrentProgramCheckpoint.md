@@ -271,10 +271,32 @@
     - `tr2-18`: decisions 5 and 7, an erratum for the SSH worker design's URL-decoding line, and the three Linux SSH test fixes;
     - `tr2-19`, `tr2-20` and `tr2-18` are merged (above). Disposing of the merged lanes waits for the operator;
     - `tr2-1`: TR2.1, the retry plan's Phase 3 with OD18;
-    - TR1.5: revision 1 (`a72f9216…`) is with its three reviewers for re-checks;
-    - TR1.6: its reviews of revision 1 are in (Consistency GO, Safety and Surface NO-GO), and revision 2 is being written to its remediation plan.
+    - TR1.5 is accepted (above);
+    - TR1.6: revision 2's round-2 reviews are in (Safety GO, Surface GO on condition that OQ5 (a) is taken, Consistency NO-GO on one P2, the 1.0.17 codes for M6 and M8). Revision 3 is being written to remediation plan 2, the last round.
 
     Drafters (scratch, no lane): TR1.5 and TR1.6. After the split merges, TR2.1 (retry, with decision 1) and the HTTPS test migration (12). Amendment 2 revision 6 records decisions 1, 3, 6, 8, 9, 13 and 14, and steps TR2.13–TR2.19.
+  - **TR1.5 accepted: the transport setting (the off switch).** The [design](../gwz-core/dev-docs/GwzTransportOffSwitchDesign.md) is accepted at SHA-256 `145af486…` (revision 2), and filed as revision 3 (`208be7f1…`). The [verdict](../gwz-core/dev-docs/GwzTransportOffSwitchDesign-Verdict.md) has the details.
+    - **Its review.** Three rounds of Consistency, Safety and Surface, with two remediation rounds, the cap. Round 1 was three NO-GOs with 8 P2s. Round 2 was GO, NO-GO and GO; Safety's one P2 was unquoted workspace paths in the suggested removal commands, a copy-paste injection. Round 3 was GO on all three axes. Revision 3 applies round 3's P3s, and the reviewers confirmed the forms that differ from their text.
+    - **The design.**
+      - `--transport <gwz|native>`, `GWZ_TRANSPORT` and `gwz.transport`, read from the user's global git configuration only, with no `includeIf` and no `GIT_CONFIG_GLOBAL`.
+      - A workspace or repository value is ignored. In gwz-py the note about it is a `logging` record, so no warnings filter can turn it into a refusal.
+      - An unreadable file is skipped, as git and libgit2 skip it.
+      - The scan is bounded to the operation's targets, to regular files and to 1 MiB.
+      - Printed commands are shell-quoted.
+      - JSON carries `meta.transport_setting`.
+    - **Applied recommendations, which the operator may reverse:**
+      - **D2,** the names;
+      - **D3,** 1.0.17's defaults when native is selected: 50, 8 and 3 s in gwz-cli;
+      - **E3,** the defaults filled in by the drivers in 1.1.0. gwz-py's `Client(max_connections_per_host=None)`; that keyword postdates 1.0.17. TR2.11's callers stay at 100 and 32. In 1.2.0 the session host fills the defaults.
+    - **Open for the operator:**
+      - OQ1, silencing the note. Recommended: no.
+      - OQ2, a module or a crate. Recommended: a gwz-core module.
+      - OQ3, four 1.2.0 items for the server design. Recommended: all four.
+      - OQ4, a consumer-build row. Recommended: yes.
+    - **Follow-ons:**
+      - **TR2.5** runs in three steps after OQ1–OQ4, with its retry row after TR2.1.
+      - **The session plan's re-check:** CS3.10, CS8.3, C1, CS8.28 and CS4.5, the 1.2.0 fill under CS3.10, CS4.7 and CS6.4, and the edge CS6.6 ── CS6.4, which also goes into the Phase 6 sketch.
+      - **The status lines** of the retry plan and the Python design, and the plan's changelog, are updated with this entry.
   - **TR2.20 and TR2.18 merged** (gwz-core `72c6f49d`, a fast-forward to TR2.20, then `77c0ed9c`, merging TR2.18's `b212d044`; root `cc3e5c2`, then `a15c48c`).
     - **TR2.20.**
       - 44 call sites in 30 tests, plus the `OpeningSession` fixture route (37 tests in all), now run the production entry `prepare_budget_for_transition`.
