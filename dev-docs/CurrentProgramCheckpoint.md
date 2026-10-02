@@ -1,5 +1,15 @@
 # Current program checkpoint
 
+## SSH clock round 2 — corrected draft settled for closure
+
+2026-10-03. Core `fde5878ac11b9e02892127f438cb50954551b9a3` settles
+the bounded expired-preparation outcome and inactive-stall wording correction;
+exact core gate passes. Original reviewers will verify the new counterexample
+and full changed range; prior NO-GO remains controlling until closure.
+Shared-clock source remains gated. Normal core suite/source guards pass;
+real fetch/push/private-clone projections are being completed, including
+typed E2BIG push preflight. This is not final implementation acceptance.
+
 ## SSH clock round 2 — bounded prepared-refusal correction
 
 2026-10-03. Round-1 Consistency GO; Safety closes its original findings but
