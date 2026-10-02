@@ -1,6 +1,20 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a0fa4e-2712-77c0-a354-8d88bfb27e64
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+origin_url_hash: sha256:e35341f4b797aa8e57a066bf78413f40c277b3985e757118ca9aea8d390fbb9c
+created_at: unix-ms:1790905828378
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 29410a524793c41752fb5955fda187df6a6e4d84
+  branch: main
+selected_targets:
+- '@root'
+- mem_gwz_py
+committed_targets:
+- mem_gwz_py
+- '@root'
 members:
   mem_git2_rs:
     path: git2-rs
@@ -24,10 +38,10 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: ff5f35eb36a2916115342bfa5fc0f3f5f26a919a
+    commit: 9d4dd92f15c6c8af075e3327018ae62de097d7b7
     branch: main
     detached: false
-    dirty: false
+    dirty: true
     materialized: true
   mem_gwz_core_evidence:
     path: gwz-core-evidence
