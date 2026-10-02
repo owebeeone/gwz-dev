@@ -1,5 +1,64 @@
 # Current program checkpoint
 
+## TR2.5 CLI configuration — implementation accepted, 2026-10-03
+
+- Accepted at reviewed tuple root `52adfa0b8dba8752623d0ef5ada142105c48ac03`,
+  CLI `90fdb108f2a91ead456e07053da108b721300cd3`, core
+  `2e64e88a28c332ed422cc390adc76738dc701bb1` after original
+  [Code](GwzTransportSettingCli-ReviewCode-1.md),
+  [State](GwzTransportSettingCli-ReviewState-1.md) and
+  [Surface](GwzTransportSettingCli-ReviewSurface-1.md) reviewers returned GO.
+  Complete reports are filed verbatim. This accepts CLI configuration and
+  reporting only, not combined integration or release/platform qualification.
+- One remediation round closes all three reporting root causes and the
+  lifecycle-documentation P3; no new architectural cause and no open finding.
+  Rust 1.95 ordinary/candidate checks and source guards remain green; inherited
+  formatting and full-core candidate lint debt remain separately identified.
+- Next: integrate this accepted lane and the accepted Python configuration
+  lane through GWZ, with merged validation. Credentials and Windows continue
+  independently. No push, tag, publication or alpha installation.
+
+## TR2.5 CLI remediation round 1 — settled for re-review, 2026-10-03
+
+- Initial independent Code and State reviews found three blocking reporting
+  root causes; Surface reported GO with one lifecycle-documentation P3.
+  Complete raw reports and the combined remediation plan are filed verbatim.
+- Root committed the single correction at CLI
+  `90fdb108f2a91ead456e07053da108b721300cd3`. It fixes error and tag-list
+  reporting, exact machine path identity and the paired global-file recipe.
+  Full ordinary/candidate CLI suites, both strict CLI Clippy runs, focused
+  red/green regressions and source guards pass on explicit Rust 1.95.0.
+- Status: **NO-GO pending original-reviewer closure**, not implementation
+  self-approval. Re-review uses the same Code/State/Surface reviewers and
+  unchanged core `2e64e88a28c332ed422cc390adc76738dc701bb1`. Accepted design,
+  platform/performance deferrals and inherited lint/fmt debt are unchanged.
+
+## TR2.5 step 2 CLI — implementation draft, 2026-10-03
+
+- Resumed the isolated `tr2-5-cli` draft on the operator's GPT-6.1 direction.
+  Core's accepted resolver is unchanged. The CLI adds candidate-only
+  `--transport gwz|native`, driver snapshot resolution, ignored-value notices,
+  verbose selection text and optional `meta.transport_setting`. Native skips
+  local transport runtime creation and fills omitted limits with 50 jobs,
+  8 per host and a 3 second timeout; explicit values are preserved.
+- Help and user docs follow accepted TR1.5 §10. Ordinary help/JSON are retained.
+  Local unit and real-binary workflows cover the settings, defaults, notices,
+  machine output and non-network immunity. Switch/process-global inventories
+  and conditional boundaries pass. Both full CLI suites and ordinary/candidate strict CLI Clippy
+  pass on explicit Rust 1.95.0. Earlier 1.96 runs also passed; they are
+  supplemental receipts, not substituted for the pinned runs.
+  Inherited formatting debt in `src/tests/g02/partial_errors.rs` is unchanged.
+  Full-core candidate Clippy debt is not waived.
+- [Package and limitations](GwzTransportSettingCli-Implementation.md),
+  [canonical review inputs](GwzTransportSettingCli-ReviewInputs.md). Root owns
+  settlement and independent Code/State plus Surface dispatch. The root owner
+  committed CLI `c4a588f8be4e91926deff2156dce00c7062f4184` via GWZ;
+  review is pending. The candidate/test-confined `transport_tests.rs` path
+  edge is acknowledged in this settlement record. No dirty-tree acceptance
+  review, merge, push, tag or installation occurred.
+  Platform, route/fixture timing and performance qualification remain deferred.
+
+
 ## TR2.5 Python configuration — implementation accepted, 2026-10-03
 
 - Accepted at reviewed tuple root `b256a791f1dd05c04caedd8391ef146ff4d3d8fa`,
