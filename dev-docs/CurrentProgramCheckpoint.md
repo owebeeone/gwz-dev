@@ -272,9 +272,30 @@
     - The five merged lanes (`split-pe`, `ci-py`, `tr2-19`, `tr2-20` and `tr2-18`) were disposed on the operator's go, after each lane's heads were proven in main;
     - `tr2-1`: TR2.1, the retry plan's Phase 3 with OD18;
     - TR1.5 is accepted (above);
-    - TR1.6: revision 2's round-2 reviews are in (Safety GO, Surface GO on condition that OQ5 (a) is taken, Consistency NO-GO on one P2, the 1.0.17 codes for M6 and M8). Revision 3 is being written to remediation plan 2, the last round.
+    - TR1.6 is accepted (above). Its OQ1–OQ7 are with the operator;
 
     Drafters (scratch, no lane): TR1.5 and TR1.6. After the split merges, TR2.1 (retry, with decision 1) and the HTTPS test migration (12). Amendment 2 revision 6 records decisions 1, 3, 6, 8, 9, 13 and 14, and steps TR2.13–TR2.19.
+  - **TR1.6 accepted: HTTPS credential helpers on the transport.** The [design](../gwz-core/dev-docs/GwzTransportCredentialHelpersDesign.md) is accepted at SHA-256 `760f7ad4…` (revision 3), and filed as revision 4 (`9aef40ff…`). The [verdict](../gwz-core/dev-docs/GwzTransportCredentialHelpersDesign-Verdict.md) has the details.
+    - **Its review.** Three rounds, with two remediation rounds, the cap.
+      - Before review, the lane owner sent the draft back once under the parity rule. That made prompting helpers (OQ3) and a redirect after the challenge (OQ4) operator questions.
+      - **Round 1:** Consistency GO; Safety NO-GO; Surface NO-GO with four P2s about messages. Safety's P2: OQ1 (b) as worded let a crafted URL username make git look up another host's credential and send it to the attacker's host. The fix keeps URL text only inside the encoded `url=` line.
+      - **Round 2:** Consistency's P2 was codes that departed from 1.0.17. Remediation plan 2's F1 makes every outcome's codes and clone behaviour 1.0.17's.
+      - **Round 3:** GO on all three axes.
+    - **The design.**
+      - The transport runs `git credential fill`, with prompts off and a filtered environment, in `/`, in its own process group, under a bound.
+      - It asks only on a discovery 401, for the URL that challenged.
+      - It asks once per route, holds the credential with the route, and pools the connection under the credential's scope.
+      - It never sends a credential after a rejection, and never runs `approve` or `reject`.
+      - Messages M1–M11 each carry a next action, and their codes and clone behaviour are 1.0.17's.
+    - **Open for the operator, OQ1–OQ7:**
+      - **OQ1:** HTTPS URLs that carry a username;
+      - **OQ2:** Ctrl-C and the helper's process group;
+      - **OQ3:** helpers that prompt;
+      - **OQ4:** a redirect after the challenge;
+      - **OQ5:** the `credential_helper_timeout` error code, on which Surface's GO depends;
+      - **OQ6:** where the slot wait is charged;
+      - **OQ7:** a failure detail field on the wire, which could also carry TR2.1's attempt number.
+    - **After the answers:** the status lines of the documents §9 amends, and TR2.22, with TR2.2 first.
   - **More operator decisions, 2026-10-02:**
     - **Split all five large files,** movement only, in one lane after TR2.1 merges: `checked_artifact/entry.rs` (1,080 lines), `gitbackend/fake_repository.rs` (1,079), `gitbackend/contract.rs` (1,067), `transport_host/session/driver.rs` (813 in TR2.1's lane) and `https_worker_tests.rs` (959).
     - **Keep TR2.19's two items.** `gwz status` stays on the shared builder. The session plan's next amendment fixes the stale text: CS2.5, D10 and the session design's §5.4.
