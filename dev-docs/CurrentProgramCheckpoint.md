@@ -269,13 +269,37 @@
   - **Lanes now:**
     - `split-pe` and `ci-py` are merged (below), and their lanes are kept until the operator says to dispose of them;
     - `tr2-18`: decisions 5 and 7, an erratum for the SSH worker design's URL-decoding line, and the three Linux SSH test fixes;
-    - `tr2-19` is merged (above);
+    - `tr2-19`, `tr2-20` and `tr2-18` are merged (above). Disposing of the merged lanes waits for the operator;
     - `tr2-1`: TR2.1, the retry plan's Phase 3 with OD18;
-    - `tr2-20`: TR2.20, the HTTPS tests onto the production mode;
     - TR1.5: revision 1 (`a72f9216…`) is with its three reviewers for re-checks;
     - TR1.6: its reviews of revision 1 are in (Consistency GO, Safety and Surface NO-GO), and revision 2 is being written to its remediation plan.
 
     Drafters (scratch, no lane): TR1.5 and TR1.6. After the split merges, TR2.1 (retry, with decision 1) and the HTTPS test migration (12). Amendment 2 revision 6 records decisions 1, 3, 6, 8, 9, 13 and 14, and steps TR2.13–TR2.19.
+  - **TR2.20 and TR2.18 merged** (gwz-core `72c6f49d`, a fast-forward to TR2.20, then `77c0ed9c`, merging TR2.18's `b212d044`; root `cc3e5c2`, then `a15c48c`).
+    - **TR2.20.**
+      - 44 call sites in 30 tests, plus the `OpeningSession` fixture route (37 tests in all), now run the production entry `prepare_budget_for_transition`.
+      - The test-only `Client` wrappers and `allow_transition` are gone. Under the dead-code rule, so is a second test-only mode: `https_policy::classify`'s `allow_auth_transition`, which production has passed as `false` since the HTTPS endpoint landed.
+      - The change is movement and deletion only. One weak test is fixed: its budget had made its four other domains untestable.
+      - **Suites:** 2,320 ordinary and 2,670 candidate.
+      - **Reported, not changed:** `budget_for_open` turns a zero interaction deadline into a zero helper allowance, which TR2.22's helper budget (TR1.6 E6) should settle. `https_worker_tests.rs` is now 959 lines.
+    - **TR2.18.**
+      - **Decision 5:** a password in an `ssh://` URL is used exactly as 1.0.17's libgit2 uses it, from `ssh_libssh2.c:830-863`.
+        - The password is used only beside a user, and only if the server lists `password`. After it come the callback's key or agent, or a helper on a password-only server.
+        - It stays inside the process, is never logged, is zeroized, and has a pool identity of its own.
+        - A cross-process placement refuses password URLs.
+      - **Decision 7:** `known_hosts` names match without regard to case. Hashed names match as written or lowercased.
+      - **The tests.** A stdlib-only loopback SSH server (`tests/transport_backend/password_sshd.py`) proves the identical authentication sequence on both routes, across six URLs.
+      - **The design erratum** is in `GwzRemoteTransportSshWorker.md`.
+      - **The three Linux test fixes:** reset or EOF in the two close assertions, and normal budgets for `selected_pool`'s first open. They are unconfirmed until CI runs on Linux.
+      - **Suites:** 2,471 per leg.
+    - **Deviation, accepted by the operator ("Merge as is").** TR2.18's first commit, `341a669d`, a four-line erratum, predates the lane's approval commit, so the per-commit gate is RED there. Its root cause is S6.2's unapproved `#[path]` edge, the same as the pushed `ac654d49`, `89b828cd` and `9d4dd92f`. The next push's boundary job will report it.
+    - **Merged main.** `cargo check --tests` is clean on both candidate legs and the ordinary build, and the gate is green over `ab48966f..77c0ed9c` apart from `341a669d`. The switch inventory lists 18 sites.
+    - **From TR2.18, for the operator:**
+      - **Parity gap.** 1.0.17 runs configured credential helpers for an SSH server that offers only `password`; the transport does not. Under the parity rule this is to be built: a new step, TR2.23, will reuse TR1.6's lookup after TR1.6's GO, in amendment 2's next revision.
+      - **Not parity.** A server that accepts `none` authenticates on the transport, where 1.0.17 fails. This is for the notes.
+      - **1.2.0.** A URL password cannot reach an endpoint in another process, because the protocol has no slot for it. That is for the server design's next revision.
+      - **Observation rows** have no `password` method. That is S7.5's Surface item.
+      - **Process slips.** The agent used one raw `git checkout`, reverting its own uncommitted probe, and deleted a `__pycache__`.
   - **TR2.19 merged** (gwz-core `ab48966f`, merging lane `ec95c0b9`; gwz-cli `236f753`, a fast-forward; gwz-py `2e0509fd`; root `46b69f8`).
     - **Decision 8.** A `Failed` or `Rejected` result lists each failed or rejected member's error in `errors`, as `Partial` does, in member order. `gwz status` now builds its envelope with the shared builder, so its own failed and rejected results copy errors too. MachineOutput.md, gwz-py's README, OperationModel.md, Reference.md and ErrorCatalog.md say so.
     - **Decision 9.** The removed public paths, for the 1.1.0 notes, all under `gwz_core::operation`, with their methods:
