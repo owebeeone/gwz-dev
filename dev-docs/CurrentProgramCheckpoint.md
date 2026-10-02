@@ -4,6 +4,11 @@
 
 - CLI/Python configuration is integrated and validated in main; exact sources,
   successful ordinary/candidate gates and limitations are recorded below.
+  Python's two accepted Surface P3 help corrections are folded into the next
+  combined Surface package: root and network help now expose effective
+  concurrency defaults, transport precedence and selection/removal recipes.
+  All seven help surfaces were inspected and the existing parser suite passes;
+  runtime selection and defaults are unchanged. Reviewer closure is pending.
 - `tr2-22`: bounded helper context contract is accepted after all three
   original reviewers' GO (reviewed core `ec1b95831582651953bb0bd3be3c4f88985aba6b`).
   Acceptance record/root `684ffca933bea7b0d2028048d64a97d1be389699`,
