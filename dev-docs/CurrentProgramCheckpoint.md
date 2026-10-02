@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## TR2.5 Python configuration — implementation accepted, 2026-10-03
+
+- Accepted at reviewed tuple root `b256a791f1dd05c04caedd8391ef146ff4d3d8fa`,
+  Python `5bf260d040964a3dd9ec606b58a625bc74ac4afc`, core
+  `2e64e88a28c332ed422cc390adc76738dc701bb1` after independent
+  [Code](GwzPyTransportSetting-ReviewCode.md),
+  [State](GwzPyTransportSetting-ReviewState.md) and
+  [Surface](GwzPyTransportSetting-ReviewSurface.md) reported GO. Reports are
+  filed verbatim. This accepts the Python configuration/driver implementation
+  only; it is neither integration nor release/platform qualification.
+- No blocking findings and no remediation round. Surface P3-1/P3-2 record
+  missing transport-dependent concurrency defaults and selection/undo text
+  in Python CLI help; include these bounded documentation corrections in the
+  next combined surface update, not a new standalone work package.
+- Pinned local checks and unchanged shared contracts are recorded below.
+  No merge, push, tag or alpha installation. Next: integrate the accepted
+  Python lane alongside accepted CLI work, then combined validation.
+
 ## TR2.5 Python configuration lane — ready for settled review, 2026-10-03
 
 - `tr2-5-py` implements the accepted off-switch design's Python driver seam:
