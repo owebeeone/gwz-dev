@@ -30,13 +30,61 @@ All 15 core/transport gates pass, including full ordinary and both candidate
 phase runners. Core's 49 warnings, inherited ignores and formatting debt remain
 unwaived. Original failed attempts are preserved.
 
-Next: Windows TR1.8 still needs bounded native proof and design GO, then
-implementation/parity. Deferred platform, performance and selected-source/package
+Next: Windows TR1.8 still needs the remaining native assertions/dispositions and
+design GO, then implementation/parity. Its five-batch checkpoint follows below.
+Deferred platform, performance and selected-source/package
 checks remain a later batch, followed by aggregate release/activation review.
 This accepts macOS integration only. No push, tag, publication, activation or
 alpha installation occurred. Lane root history and its older Python stash remain
 retained; no lane was disposed. The sections below are historical snapshots;
 this section controls current status.
+
+## Windows TR1.8 — five native batches retained, design remains DRAFT
+
+The Windows lane is checkpointed separately; it has not been merged into MAIN.
+
+| Repository | Commit |
+| --- | --- |
+| lane root | `e2ca3c849e7d829096557b99a660799f59aba3fd` |
+| lane gwz-core | `d4baa0186671181d00ad8ec920a8960b1058fa18` |
+| lane gwz-core-evidence | `0f18b57724f3a1bc5b9ee8f1b586b23ba71da071` |
+
+Lane: `/Volumes/projects/limbo/gwz-dev-tr1-8-win`. Its core documents are
+`dev-docs/GwzTransportWindowsBaseline.md`, `GwzTransportWindowsCheckpoint.md`,
+`GwzTransportWindowsParityDesign.md` and the new
+`GwzTransportWindowsProofDispositions-DRAFT.md`. The working note proposes
+HOME compatibility dispositions and distinguishes GWZ sender cleanup from an
+external Pageant receiver's lifetime; neither is accepted policy yet.
+
+The fourth batch's four WDigest credential variants all returned
+`SEC_E_UNKNOWN_CREDENTIALS`; method/URI exchange remains unexecuted. A controlled
+native wait proved retention of two live SSPI contexts through cancellation,
+capacity refusal and release only after worker exit. It did not exercise a
+blocked provider call or establish native cancellation guarantees.
+
+The fifth batch passed five native Windows Rust TLS primitive rows: two origin
+bindings matched independent certificate digests, untrusted/wrong-name peers
+refused before application data, and nested TLS proxy/CONNECT/origin selected
+distinct correct bindings. The DRAFT now uses the existing native-tls
+`tls_server_end_point()` API through tokio-native-tls rather than requiring a
+new certificate parser. This proves the extraction seam, not integrated
+Hyper/pool lifetime, HTTP authentication, EPA or the complete TLS matrix.
+
+Private raw evidence is retained in the lane evidence member under
+`campaigns/transport-qualification/runs/2026-10-03-tr1-8-digest-workers/`
+and `2026-10-03-tr1-8-tls-adapter/` (40 and 38 files). Failed collector/fixture
+attempts remain preserved. All 74 manifest-listed artifacts match their hashes;
+archive and fast document checks pass. The fourth batch's public-document hashes
+describe its handoff snapshot; subsequent coordinator additions are explicit.
+No product source, OS trust, service, account or policy changed.
+
+Windows remains NO-GO. Before design freeze, refresh the lane from MAIN's
+accepted helper timing/context and SSH clock seams, resolve Pageant receiver/
+window-identity promises and Digest/blocked-SSPI ownership, and finish the
+required identity, trust/routing and EPA assertions or accepted dispositions.
+The Mac-only temporary trust test is prepared but awaits explicit approval;
+Windows trust changes remain held. Only then settle the design for independent
+review and implementation. No new review verdict, push, tag or release occurred.
 
 ## Combined integration — two stale Python tests, 2026-10-03
 

@@ -14,9 +14,15 @@ closure evidence and GWZ merge are in CurrentProgramCheckpoint.md and core's
 GwzTransportCredentialHelpersAcceptance.md. Fresh combined MAIN CLI/core/Python
 ordinary/candidate checks pass on macOS. Two stale Python tests were corrected
 without production/protocol changes, independently reviewed and fully rerun;
-[the integration record](GwzTransportCredentialIntegration.md) records evidence. Windows has three preserved native batches
-but no design GO; missing provider/identity, lifetime, compatibility and trust/
-routing proof remain mandatory. No trust fixture has been approved or applied.
+[the integration record](GwzTransportCredentialIntegration.md) records evidence.
+Windows now has five preserved native batches, checkpointed separately from MAIN.
+The existing Rust TLS binding API passed five primitive rows and is selected in
+the Windows DRAFT. Digest acquisition still refuses; controlled worker-retention
+proof does not establish cancellation of a blocked SSPI provider. Windows has
+no design GO: provider/identity, lifetime, compatibility, trust/routing and EPA
+proof remain mandatory, along with incorporation of MAIN's accepted helper
+timing/context and SSH clock seams before design freeze. The proposed Mac-only
+temporary trust test awaits explicit approval; no OS trust change was applied.
 Aggregate review, deferred platform/performance and selected-source/package
 qualification still precede release.
 
