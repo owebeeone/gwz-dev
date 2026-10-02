@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## TR2.22 wire checkpoint — implementation accepted, 2026-10-03
+
+- Accepted at reviewed tuple root `e489c4f9a1d152dc66dd50a9e3d3af583e31cd62`,
+  core `26922a1cfd823a4894e09be9aeb05f7f73d21414`, transport
+  `9f9f0dc4dd82e6329d6ce53e102a231e214ff673` after independent
+  [Code](../gwz-core/dev-docs/GwzTransportCredentialHelpersWire-ReviewCode.md)
+  and [State](../gwz-core/dev-docs/GwzTransportCredentialHelpersWire-ReviewState.md)
+  reported GO. Reports are filed verbatim. This accepts the bounded diagnostic
+  wire/retry-count checkpoint only, not credential producers or release.
+- No blocking findings and no remediation round. Code P3-1 identifies an
+  invalid local terminal detail cloned before admission; fold the bounded
+  validation-before-copy fix into the next credential package, not a new
+  standalone work package. Encoded ingress remains bounded.
+- The credential drafter resumes supervised helpers/route ownership and SSH
+  password parity behind accepted contracts. Timing-message provenance needs
+  explicit bounded reconciliation before any additional wire semantics.
+  Required secret-handling review and aggregate/platform gates remain owed.
+
 ## TR2.22 wire diagnostics checkpoint — settled for review, 2026-10-03
 
 - Root committed the bounded optional Failure detail and endpoint-produced
