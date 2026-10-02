@@ -1,5 +1,45 @@
 # Current program checkpoint
 
+## Credential correction — frozen for remediation round1 review, 2026-10-03
+
+Candidate fixes remain NO-GO pending reviewer closure. Exact source:
+core `64ec039089b6e217625d7784b106d917452963cb`, transport
+`1aab733783e06b25cb5d2321d71ec0b34417a29c`, Python
+`a0d4350f31069362b3cfbeae668666ab47567264`, CLI
+`f925e1165c2b2d368a00277594450b010a95867a`, evidence
+`662d89828b478a2acce8c0308834db7d17c872f7`; root is this settlement commit.
+One correction across39 owned paths addresses six distinct original blockers
+and both Surface P3s. Sixteen new regressions (13 core) are recorded in
+GwzTransportCredentialHelpersRemediationRecord.md, not self-closed.
+
+Frozen affected core455/0/4 existing ignores; transport185/0/2 ignores including
+doctest; strict transport libClippy pass; core Clippy exits0 with49 warnings,
+including explicitly unwaived existing opening arity expanded to9/7. CLI actual
+candidate build and3 help/retry tests, composed Py28 parser tests/drift, shared
+source guards and refreshed help pass. Earlier whole suites remain pre-correction.
+The default-concurrency affected454/1/4 physical SSH timing failure is preserved;
+its exact isolated row passed1/0, and bounded-concurrency union passed455/0 before
+and after final cleanup. No timeouts or test assertions were relaxed. Working
+boundary and exact core commit gate both pass; checker unit tests7/0 passed.
+
+Shared atomic terminate_if_alive addition preserves old terminate, phase,
+expiry, cancellation and lock policy, but changes a shared interface. Review-loop
+material-interface rule requires fresh Code/State on revised tuple and full
+original finding closure tables; original reporters can verify their exact
+counterexamples cheaply. Surface continues original reviewer. Remediation round1
+of2, zero reviewer-classified architectural causes so far. No source mutations
+while review runs. GO on all required axes precedes already-authorized GWZ member
+merge, then fresh MAIN CLI/core/Py composition validation. Root owns acceptance,
+Git/GWZ and filing. No push/tag/publication/activation/alpha installation here.
+
+Python accepted MAINa077 configuration and generated75 are already composed in
+this lane through GWZ; its P3 is now only README/shared-help recipe. Original WIP
+is retained in coordinated stash_unix_ms_1790977722088 plus hashed external
+backup until representation/acceptance verification. Unrelated drafts remain
+untouched. Windows design/provider/trust/parity and deferred qualification remain
+outside this source acceptance; no Windows or release GO is implied.
+
+
 ## Credential implementation — NO-GO, remediation round 1, 2026-10-03
 
 Final source review at core f97ff21f / transport41a16b27 returned Code NO-GO
