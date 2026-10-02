@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## SSH clock round 2 — bounded prepared-refusal correction
+
+2026-10-03. Round-1 Consistency GO; Safety closes its original findings but
+reports one new non-architectural P2: an expired prepared reservation can refuse
+while the active authority is Alive, with no Terminal record to project.
+Complete reports and RemPlan-2 are preserved at core
+`fae9c93e79477923d2c32afd3cc0cc22dc971364`; exact core gate passes.
+The author corrects that outcome branch and folds Consistency's P3 live-deadline
+wording into one patch. Architectural count remains two; third-cause stop
+unchanged. Clock code remains gated, and HTTPS source/gates continue separately.
+
 ## SSH helper clock round 1 — corrected draft settled for closure
 
 2026-10-03. Core `d4c1f90f7b8c66c2dbbdf08451edc3db420273ea` settles
