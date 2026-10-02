@@ -1,5 +1,43 @@
 # Current program checkpoint
 
+## TR2.4/TR2.7 merged after bounded review, 2026-10-02
+
+- The operator requested a quick plan/code review and merge if suitable.
+  Both steps remain in the release plan: TR2.4 in the base plan and TR2.7
+  in accepted amendment 1 §3.5, retained by amendment 2. Neither was abandoned.
+  The skim found no blocker to integration; TR2.6's combined implementation
+  review remains outstanding.
+- Accepted the lane's two interpretations: enclosing modules satisfy the
+  explicit conditional boundary rule without adding a dependency; a mixed
+  `[1,2,3]` offer selects profile 2 when the unstable feature is disabled.
+  A profile-3-only offer still refuses with `UnsupportedVersion`, no effects,
+  and a profile-3 Bound cannot be accepted in that build.
+- Merged `tr2-4-7` through GWZ, operation
+  `merge_op_15344_1790946495458_0001`. Transport fast-forwarded to
+  `35475977530171ab77ee2fbb1e8128f938acb5ae`; core merged at
+  `c252e65332a24f45b7afb2efc0768799c5fd5c71`. The only conflict was test
+  module registration: both `retry_tests` and `ca_bundle_tests` were retained.
+  Core `28e72cacb99472fe6cbc16aaf2023eaaf1e3dd92` corrects that registration's
+  formatting and adds the historical alpha document's CA-bundle erratum.
+  All lane repository heads are now ancestors of main; other member heads
+  are unchanged. Stable zero-context patch IDs match for the core changes
+  outside the resolved module registration.
+- Validation: transport's full default and `unstable-sequenced` suites pass,
+  including seeded ordering tests. On merged main with both candidate
+  switches, all three macOS CA-bundle tests pass. Core/transport formatting,
+  checked-artifact boundary, conditional boundaries, candidate inventory and
+  process-global checks pass; per-commit boundary checks cover the lane and
+  merge commits. Linux additive-root execution and Windows qualification
+  remain in the deferred platform batch. Existing strict-Clippy debt is not
+  waived. The extra CA step size is predominantly regression fixtures/tests:
+  368 changed lines, about 75 production, as the handoff already recorded.
+- All 15 temporarily parked paths were restored; file hashes match the
+  manifest in `/Volumes/projects/limbo/gwz-tr247-merge-parking-20261002/`.
+  No evidence contents changed. TR2.8 was previously detached with `--keep`;
+  `tr2-4-7` remains registered, now fully merged, with its files retained.
+  The preceding integrated tuple was pushed; this merge has not been pushed,
+  tagged or installed in `gwz-alpha`.
+
 ## Ready transport lanes integrated into main, 2026-10-02
 
 - Integrated through GWZ 1.0.17, in order: TR2.1 (`tr2-1`), TR2.5 step 1

@@ -2,12 +2,16 @@
 
 ## Integration update — ready lanes merged
 
-TR2.1, TR2.5 step 1 and TR2.8 are now merged into main through GWZ. The latest
+TR2.1, TR2.5 step 1, TR2.8 and TR2.4/TR2.7 are now merged into main through GWZ. The latest
 entry in [CurrentProgramCheckpoint.md](CurrentProgramCheckpoint.md) records
 the source tuple, fixture conflict resolution, validation and remaining work.
 TR2.1 and TR2.5a were detached with `--keep`, preserving their entire trees.
-TR2.8 is still registered; TR2.4/TR2.7 is still unmerged. Nothing was pushed
-or tagged. The handoff itself was committed before these merges.
+TR2.8 has also been detached with `--keep`. TR2.4/TR2.7 remains registered,
+but its committed work is fully merged. The two decisions in §3.3 were
+resolved in favour of enclosing modules and profile-2 negotiation for mixed
+offers. The preceding integrated tuple was pushed; TR2.4/TR2.7's merge and
+this closing record have not been pushed or tagged. The handoff itself was
+committed before these merges.
 
 The moved workspace's old catalog blocked the first merge. On the operator's
 explicit approval it was preserved outside the workspace, with checksums;
