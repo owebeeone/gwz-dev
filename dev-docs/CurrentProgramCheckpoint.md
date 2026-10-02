@@ -1,5 +1,21 @@
 # Current program checkpoint
 
+## Credential correction — round2 frozen for closure, 2026-10-03
+
+Source acceptance pending at coreec43f585f7c768afa0fe71e23a7e503cfda9150c;
+transport1aab733, CLI f925e116, Pythona0d4350, evidence662d898 unchanged.
+One bounded runner correction plus existing tests and remediation record
+keeps final admission before Job cleanup retirement. Original-behavior RED
+0/3 reproduces ongoing descendant writes after refusal. Corrected focused17/0
+and affected458/0/4 pass; coreClippy0 with49 disclosed warnings and source
+guards pass. Three new regressions cover exact deadline, cancellation and
+normal accepted completion; no shared API/protocol/policy or new module edge.
+Root exact commit gate must pass before continuation. Same fresh State reviewer
+checks its P2-1, Code checks only changed-range proof. Earlier six blockers
+and Surface P3s closed on preceding tuple; no merge until closure GO.
+Round2 of this implementation object; zero architectural causes. Then authorized
+GWZ merge and actual MAIN CLI/core/Python checks; no release/platform claims.
+
 ## Credential correction — round2 cleanup defect, 2026-10-03
 
 Remediation round1 at root1de9e7f/core64ec039 closes all six original
