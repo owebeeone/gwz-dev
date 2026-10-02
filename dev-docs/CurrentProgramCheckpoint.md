@@ -11,12 +11,16 @@
   in that lane. Its internal fields/parser cause may now be implemented.
   Real Git hasconfig conditional-include regression is honestly RED;
   a separate configuration-view mechanism passed physical feasibility but its
-  initial review is NO-GO: Consistency GO, Safety P2-1 HOME anchoring and
-  P2-2 sensitive scratch after process death. Full reports and one combined
-  RemPlan are committed in the lane at core
-  `232f2b21c0db48f8414cc8494c6e4593a754ceb6`; exact core gate passes.
-  A disk-free correction is being proved before re-review. No new libgit2
-  binding is needed; no unaccepted view semantics enter product code.
+  initial review found Safety P2-1 HOME anchoring and P2-2 sensitive scratch
+  after process death. One disk-free correction closes both: original
+  Consistency/Safety reviewers returned GO at lane core
+  `daeb4e17dd414ccdb670f9ab74333dd84ef0ba19`. Adoption at core
+  `edcab346745b896c14112bc8efdace87d91c50f1` files raw reports, folds the
+  nonblocking P3 outcome-supersession clarification and adds implementation
+  authority; exact core gate passes. No new libgit2 binding is needed.
+  The implementer now finishes one helper/context/code75 package. Broader
+  HTTPS source checks still have 14 failures (hasconfig, old helper fixtures,
+  slot timing); this is not implementation acceptance or release GO.
 - `tr1-8-win`: native primitive/baseline experiments continue before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
   membership prevents claiming guardian independence for trust edits. A
