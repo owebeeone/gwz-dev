@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## Credential implementation accepted — integration next, 2026-10-03
+
+Both round2 original reviewer continuations report GO on rootb35887e/core
+ec43f585; unchanged transport1aab733, Pythona0d4350, CLIf925e116,
+evidence662d898. Original six blockers and round1 new cleanup-order P2 are
+closed. Surface1 GO remains authoritative for unchanged CLI/Py/help source.
+Complete Code2/State2 reports and exact source acceptance are filed at core
+a92a7990081475e349b182a332c7553731f4fb5b. Two implementation remediation
+rounds, seven distinct settled-review defects, zero architectural causes and
+no established escaped accepted-source defect. Root exact docs-commit gate
+required before merge. Then GWZ member-scoped fast-forward into MAIN and
+fresh combined CLI/core/Python checks. Source acceptance is not release GO;
+Windows and deferred qualification stay held. No push/tag/publication/activation
+or alpha installation. Excluded drafts and old Python stash are preserved.
+
 ## Credential correction — round2 frozen for closure, 2026-10-03
 
 Source acceptance pending at coreec43f585f7c768afa0fe71e23a7e503cfda9150c;
