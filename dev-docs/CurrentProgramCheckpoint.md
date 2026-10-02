@@ -269,13 +269,35 @@
   - **Lanes now:**
     - `split-pe` and `ci-py` are merged (below), and their lanes are kept until the operator says to dispose of them;
     - `tr2-18`: decisions 5 and 7, an erratum for the SSH worker design's URL-decoding line, and the three Linux SSH test fixes;
-    - `tr2-19`: decisions 8 and 9, and the characterization test's `.git` change;
+    - `tr2-19` is merged (above);
     - `tr2-1`: TR2.1, the retry plan's Phase 3 with OD18;
-    - TR2.20 waits for disk (23 GB free while two lanes build);
-    - TR1.5's revision 1 is being written to its remediation plan, after three NO-GO reviews;
-    - TR1.6's revision 1 is under its three reviews.
+    - `tr2-20`: TR2.20, the HTTPS tests onto the production mode;
+    - TR1.5: revision 1 (`a72f9216…`) is with its three reviewers for re-checks;
+    - TR1.6: its reviews of revision 1 are in (Consistency GO, Safety and Surface NO-GO), and revision 2 is being written to its remediation plan.
 
     Drafters (scratch, no lane): TR1.5 and TR1.6. After the split merges, TR2.1 (retry, with decision 1) and the HTTPS test migration (12). Amendment 2 revision 6 records decisions 1, 3, 6, 8, 9, 13 and 14, and steps TR2.13–TR2.19.
+  - **TR2.19 merged** (gwz-core `ab48966f`, merging lane `ec95c0b9`; gwz-cli `236f753`, a fast-forward; gwz-py `2e0509fd`; root `46b69f8`).
+    - **Decision 8.** A `Failed` or `Rejected` result lists each failed or rejected member's error in `errors`, as `Partial` does, in member order. `gwz status` now builds its envelope with the shared builder, so its own failed and rejected results copy errors too. MachineOutput.md, gwz-py's README, OperationModel.md, Reference.md and ErrorCatalog.md say so.
+    - **Decision 9.** The removed public paths, for the 1.1.0 notes, all under `gwz_core::operation`, with their methods:
+      - `OperationRuntime`;
+      - `ResponseBuilder` (both `result` and `accepted`);
+      - `ExecutionReport`, `MemberExecution`, `MemberExecutionStatus` and `OperationError`;
+      - `RuntimeEventSink` and `EventSubscription`;
+      - `OperationPlan`, `MemberPlan` and `PlannedAction`;
+      - the impls `From<MemberExecutionStatus> for MemberStatus` and `From<operation::PlannedAction> for PlannedAction`.
+
+      `ResponseBuilder::accepted`'s only caller was `OperationRuntime`, so the plan types went with it. A search of the whole workspace found no other reference. The protocol types `gwz_core::PlannedAction` and `ActionKind` stay.
+    - **The CI flake.** git 2.55, CI's version, leaves `objects/maintenance.lock` behind after a commit, from its detached auto-maintenance, and that lock broke the characterization test. Its child now sets `maintenance.auto=false` and `gc.auto=0`. A stand-in wrapper reproduced the failure 20 times in 20, and with the fix it passed 20 times in 20. CI is the real confirmation.
+    - **Suites:**
+      - gwz-core gate: 2,320 passed;
+      - candidate: 2,669 passed;
+      - gwz-cli: 252 unit and 92 integration tests passed;
+      - gwz-py: 980 ordinary and 990 candidate passed.
+    - **Merged main.** The per-commit gate is green over `ff5f35eb..ab48966f`, and `cargo check --tests` is clean for gwz-core and gwz-cli.
+    - **For the operator:**
+      - the status scope above;
+      - session plan text this removal makes stale: CS2.5, D10's "deprecate, do not remove", and the session design's §5.4, which describes `OperationRuntime`. Those need an amendment;
+      - a release-note item: `gwz-py --json` now prints the member error copies for a failed or rejected result.
   - **The split merged** (gwz-core `ff5f35eb`, merging lane `e459cb25`; root `4ca53a6`, then `37398f3`).
     - `placement_endpoint.rs`, `https_worker.rs` and `transport_host/session.rs` are split into module directories, movement only.
     - **The proof.** rust-split's own `split` could not handle the 878-line impl block, so the agent used its lossless `explode` and copied every moved item from those chunks. An item-level checker, which the agent mutation-tested, found each item exactly once and byte-identical: 43/43, 41/41 and 66/66. The other differences are wiring: `mod` and `use` lines, impl headers and visibility.
