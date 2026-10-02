@@ -295,8 +295,13 @@
       - **OQ5:** the `credential_helper_timeout` error code, on which Surface's GO depends;
       - **OQ6:** where the slot wait is charged;
       - **OQ7:** a failure detail field on the wire, which could also carry TR2.1's attempt number.
-    - **After the answers:** the status lines of the documents §9 amends, and TR2.22, with TR2.2 first.
+    - **The operator's answers, 2026-10-02 ("All as recommended").** OQ1 (b), OQ2 (a), OQ3 (b), OQ4 (a), OQ5 (a), OQ6 (a), OQ7 (1).
+      - The `Failure` detail field also carries TR2.1's attempt number, at the operator's addition, so `attempt N of M` comes from the endpoint. That answers TR2.1's question about an attempt field on the wire.
+      - The field is a gwz-transport wire change. TR2.22 makes it, with the per-step dual review a wire change takes, and S7.1 (1.1.0) names it.
+    - **Next:** TR2.2, then TR2.22. Amendment 2's next revision carries the texts §9 and C3 amend, with status lines on those documents, and C2, C7 and TR2.23.
   - **More operator decisions, 2026-10-02:**
+    - **The `--ssh-timeout` help: fix the text** (TR2.1's question). The help says the stall clock is SSH's, and that HTTPS setup has the 30-second aggregate budget. TR2.1 makes the change, and amendment 2's next revision records it as an erratum to the retry plan's §8.
+    - **Lanes: dispose of tr2-1 and tr2-5a once each merge is verified.**
     - **Split all five large files,** movement only, in one lane after TR2.1 merges: `checked_artifact/entry.rs` (1,080 lines), `gitbackend/fake_repository.rs` (1,079), `gitbackend/contract.rs` (1,067), `transport_host/session/driver.rs` (813 in TR2.1's lane) and `https_worker_tests.rs` (959).
     - **Keep TR2.19's two items.** `gwz status` stays on the shared builder. The session plan's next amendment fixes the stale text: CS2.5, D10 and the session design's §5.4.
     - **Connection statistics in machine output** (the operator's request: "consider adding some connections stats on the jsonl responses (maybe with --verbose or --json_verbose) so that we can diagnose connection issues more easily"). A design is being drafted. The starting recommendation is the existing `--verbose`, combined with `--json` or `--jsonl`, and no new flag. It gets a Surface review.
