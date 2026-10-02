@@ -9,7 +9,7 @@
   Acceptance record/root `684ffca933bea7b0d2028048d64a97d1be389699`,
   core `aedfa862d7ce6c121ecbe4d65ac4900e2017fdde`; reports filed verbatim
   in that lane. Its internal fields/parser cause may now be implemented.
-  Real Git hasconfig conditional-include regression is honestly RED;
+  Real Git hasconfig conditional-include regression was initially RED;
   a separate configuration-view mechanism passed physical feasibility but its
   initial review found Safety P2-1 HOME anchoring and P2-2 sensitive scratch
   after process death. One disk-free correction closes both: original
@@ -18,10 +18,16 @@
   `edcab346745b896c14112bc8efdace87d91c50f1` files raw reports, folds the
   nonblocking P3 outcome-supersession clarification and adds implementation
   authority; exact core gate passes. No new libgit2 binding is needed.
-  The implementer now finishes one helper/context/code75 package. Broader
-  HTTPS source checks still have 14 failures (hasconfig, old helper fixtures,
-  slot timing); this is not implementation acceptance or release GO.
-- `tr1-8-win`: native primitive/baseline experiments continue before Windows
+  The implementer now finishes one helper/context/code75/SSH-password package.
+  Before the view implementation, broader HTTPS checks reached 148 passes
+  and two failures; the real hasconfig product regression now passes. A new
+  implementation-contact counterexample shows native Git can preread an
+  unconditional FIFO include even for stdin parsing. The child deadline bounds
+  the failure, but the accepted source-only parse-I/O claim needs correction.
+  A minimal parser-environment suppression is being checked against that exact
+  counterexample. Full implementation gates and review remain open; none of
+  these intermediate results is implementation acceptance or release GO.
+- `tr1-8-win`: two native primitive/baseline batches are preserved before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
   membership prevents claiming guardian independence for trust edits. A
   partial baseline is preserved at lane core
@@ -31,11 +37,19 @@
   scratch-only session-loss test passed for the exact tested launch shape:
   owned processes retired, mock state restored and no late write. It does not
   establish universal job independence; Windows trust execution remains held.
-  A larger isolated native-primitive batch continues; original evidence is
-  frozen. Mac fixture inputs and cleanup guards are prepared; explicit operator
+  The second isolated native-primitive batch is complete at lane core
+  `e616dc8a96cab434578297a04e9fbb567b63dcd8`, private evidence
+  `9025f0bc18ea55bcd39fc145057269920750dce6`, root
+  `affd9eb1ffbfe669d90f137b1fa4c30d60ba3d85`; exact core and tracked
+  archive gates pass. It adds HOME characterization, owned Pageant/pipe/job
+  lifetime tests, SSPI first legs and process-pinned TLS peer/hash proof.
+  HOME compatibility dispositions, native provider/identity proof and released
+  HTTPS trust rows remain open. The agent has completed this bounded batch;
+  original evidence is frozen. Mac fixture inputs and cleanup guards are prepared; explicit operator
   approval for temporary account trust is pending. No trust was changed.
-- Both remaining agents run GPT-6.1 Sol. Implementation and Windows release
-  acceptance remain open. Next: finish these two packages, review/integrate,
+- The credential agent continues on GPT-6.1 Sol; the Windows agent is complete.
+  Implementation and Windows release acceptance remain open. Next: finish and
+  review the credential package, close Windows prerequisites, review/integrate,
   aggregate gate, then deferred platform/performance/selected-source/package
   batch. No push, tag, publication or alpha installation in this round.
 
