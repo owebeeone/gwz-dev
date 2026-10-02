@@ -8,15 +8,15 @@ credential helpers are part of 1.1.0; the earlier gh-only scope below is
 historical. [CurrentProgramCheckpoint.md](CurrentProgramCheckpoint.md) records
 exact tuples, reviews, gate results and outstanding work.
 
-CLI/Python transport configuration is integrated and host-validated. The
-credential lane has passing HTTPS and actual-operation projection checks; its
-shared SSH helper clock mechanism has dual design GO and is being implemented.
-The completed credential package still needs exact settlement, Code/State and
-combined Surface acceptance before integration. Windows has three preserved
-native evidence batches but no design GO; missing provider/identity, lifetime,
-compatibility and trust/routing proof remain mandatory. No trust fixture has
-been approved or applied. Aggregate review, deferred platform/performance and
-selected-source/package qualification still precede release.
+CLI/Python configuration and credential-helper implementation are integrated.
+Credential Code/State round2 and unchanged Surface round1 report GO; exact tuple,
+closure evidence and GWZ merge are in CurrentProgramCheckpoint.md and core's
+GwzTransportCredentialHelpersAcceptance.md. Fresh combined MAIN CLI/core/Python
+ordinary/candidate checks are pending. Windows has three preserved native batches
+but no design GO; missing provider/identity, lifetime, compatibility and trust/
+routing proof remain mandatory. No trust fixture has been approved or applied.
+Aggregate review, deferred platform/performance and selected-source/package
+qualification still precede release.
 
 The remainder is the preserved 2026-09-22 pause record, not a current instruction
 to stop work or a new scope ruling. Read its outstanding obligations through the

@@ -1,5 +1,37 @@
 # Current program checkpoint
 
+## Credential implementation integrated — combined validation, 2026-10-03
+
+Source accepted after Code2/State2 GO at lane rootb35887e/coreec43f585;
+Surface1 GO holds for unchanged CLI/Python/help. Complete reports and source
+acceptance are now in MAIN core dev-docs/GwzTransportCredentialHelpersAcceptance.md.
+GWZ family merge merge_op_93443_1790979898498_0001 fast-forwarded5 members:
+corea92a7990081475e349b182a332c7553731f4fb5b,
+transport1aab733783e06b25cb5d2321d71ec0b34417a29c,
+Python a0d4350f31069362b3cfbeae668666ab47567264,
+CLI f925e1165c2b2d368a00277594450b010a95867a,
+evidence662d89828b478a2acce8c0308834db7d17c872f7.
+Two source remediation rounds close six original blockers plus one new
+cleanup-order P2; zero architectural causes. Source acceptance and merge do
+not constitute combined integration, platform or release acceptance.
+
+MAIN refused first merge for unrelated untracked drafts. A targeted GWZ stash
+preserved them, then all27 preflight files were restored and hash-verified;
+temporary stash retired. No data was deleted. Lane root history was not part
+of member-scoped merge and remains retained at tr2-22 rootf8212e7. The older
+Python WIP stash remains in that lane with hashed external backup; do not pop.
+Current coordinator logs/review prompts are external under
+/Volumes/projects/limbo/gwz-lanes-prewarm-20261003/credential-implementation-review/.
+
+Next: fresh MAIN ordinary/candidate CLI, core and Python suites with separate
+build-cache ownership. CLI ordinary stages precede Python hardcoded CLI fixture.
+Earlier full suites are historical; round2 focused17/0 and affected458/0/4,
+coreClippy0/49 warnings, source guards and exact core gates pass. Retained
+warnings/ignores are unwaived. Windows design/provider/trust remains NO-GO;
+platform/performance/selected-source/package and aggregate release review remain
+open. No push/tag/publication/activation/alpha installation this round.
+
+
 ## Four transport lanes — coordinator state, 2026-10-03
 
 - CLI/Python configuration is integrated and validated in main; exact sources,
