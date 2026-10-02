@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## Configuration mechanism — corrected tuple for re-review
+
+2026-10-03. Core `daeb4e17dd414ccdb670f9ab74333dd84ef0ba19`, evidence
+`84fef16e6b225cf6668d4bbd4fb8c4678b649723`. One round-1 patch makes HOME
+anchors explicit and removes named sensitive copies: native source parsing
+uses stdin and the flattened view uses bounded process-lifetime parameters.
+The real Git v7 prototype passes value/order, scope, inheritance, size-refusal
+and kill/reap checks. Earlier frozen attempts remain intact. Exact core and
+tracked archive gates pass. Original-reviewer closure is pending; no GO or
+product adoption yet. Accepted-context working sources stay excluded.
+
 ## TR2.22 configuration mechanism — NO-GO, remediation round 1
 
 2026-10-03. Consistency GO; Safety NO-GO on P2-1 (HOME anchoring) and
