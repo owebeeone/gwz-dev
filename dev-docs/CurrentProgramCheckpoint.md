@@ -1,5 +1,28 @@
 # Current program checkpoint
 
+## TR2.22 helper context amendment — accepted contract, 2026-10-03
+
+- Original Consistency/Safety/Surface reviewers all return GO at corrected
+  root `745c37398ebe3da9037dffff4020cebd49bc7c89`, core
+  `ec1b95831582651953bb0bd3be3c4f88985aba6b`, transport
+  `9f9f0dc4dd82e6329d6ce53e102a231e214ff673`. Full reports are filed
+  verbatim; one combined remediation closes both blocking root causes and
+  the rounding supersession P3. No new finding remains on this contract.
+- Amendment and baseline design/requirements now authorize its two bounded
+  internal fields and one fixed parser cause. Public application request/
+  response schema and accepted credential policy stay unchanged. Implement
+  its producer/validator/rendering/redaction/account-isolation regressions
+  together with the helper runner, then settled Code/State and Surface gates.
+- Separate executed runner RED: Git's globally matching includeIf hasconfig
+  activates even with cwd '/', contrary to TR1.6's all-conditional exclusion.
+  Keep policy and exact child environment unchanged while a minimal ordered
+  unconditional configuration-view mechanism is investigated. Any mechanism
+  changing §3.2's frozen environment needs an explicit bounded amendment;
+  neither disabling legitimate includes nor silently widening policy is GO.
+- Existing lifecycle/secret tests are green locally; runner remains unaccepted
+  working code. Windows baseline/design work continues independently. No
+  merge, push, publication, alpha rebuild or release/platform qualification.
+
 ## TR2.22 helper context remediation round 1 — settled draft, 2026-10-03
 
 - The first draft is NO-GO: Consistency and Safety independently identified
