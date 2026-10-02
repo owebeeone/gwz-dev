@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## TR2.22 configuration-view mechanism — settled for review, 2026-10-03
+
+- Core `63abcb8afa89750eb19b93bf1614fd36fc2d292e` settles only the
+  configuration-view amendment and concise feasibility receipt. Private
+  evidence `9ef2a6adbc19cfb8a038e7b841d954c0c9d3b248` preserves the
+  native-Git-only prototype's failed/green attempts; archive checks pass.
+  The exact core per-commit gate passes. Transport remains
+  `9f9f0dc4dd82e6329d6ce53e102a231e214ff673`.
+- Independent Consistency/Safety mechanism review is next. This is a
+  settled proposal, not design or implementation acceptance. No new library
+  binding, public API, wire field or Windows mechanism belongs to this object.
+  The unfinished accepted-context/helper implementation is working-tree
+  noise excluded from review; the real product hasconfig test remains RED.
+  Native trust approval and Windows prefreeze prerequisites remain separate.
+
 ## TR2.22 helper context amendment — accepted contract, 2026-10-03
 
 - Original Consistency/Safety/Surface reviewers all return GO at corrected
