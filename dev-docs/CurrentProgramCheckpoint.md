@@ -1,5 +1,41 @@
 # Current program checkpoint
 
+## TR2.5 CLI/Python configuration — integrated and host-validated, 2026-10-03
+
+- Reviewed CLI `90fdb108f2a91ead456e07053da108b721300cd3` and Python
+  `5bf260d040964a3dd9ec606b58a625bc74ac4afc` are now in main with unchanged
+  core `2e64e88a28c332ed422cc390adc76738dc701bb1`. Combined validation
+  held root `0bd86ebe0eeb581df9b4933f3139bc292343a5bc` throughout.
+- GWZ completed the Python root/member merge and the scoped CLI member merge
+  `merge_op_65108_1790957378002_0001`. The earlier combined CLI root merge
+  was aborted through GWZ because its managed integrity marker conflicted.
+  Accepted CLI root reports/checkpoint were copied verbatim separately; no
+  managed metadata was hand-edited. Its root history remains in tr2-5-cli,
+  which must be retained until root history is integrated or preserved.
+- Pinned Rust 1.95 combined checks pass: full ordinary/candidate CLI suites,
+  strict CLI all-target Clippy in both modes and shared source guards;
+  Python normal ordinary suite and both candidate-mode full suites, with
+  strict Python-library Clippy in all three modes. Fresh candidate manifests
+  and native extension paths name main, not copied lane editables. Neither
+  validator changed tracked sources or history. Reports/commands/provenance:
+  `/Volumes/projects/limbo/gwz-lanes-prewarm-20261003/main-cli-integration/`
+  and `main-py-integration/` beside it.
+- Python validation runs on the main venv's Python 3.12.12; candidate abi3
+  builds use Python 3.13. Its existing cross-driver fixture explicitly
+  rebuilds the root CLI target despite runner binary/target overrides. The
+  final ordinary binary hash changes but source hashes/build provenance
+  match the accepted tuple; this cache-ownership limitation is recorded.
+- This is macOS host integration, not aggregate activation or release GO.
+  Candidate external provenance, local Homebrew wheel dependencies, inherited
+  CLI formatting/full-core candidate lint debt and platform/performance/
+  selected-source/package qualification remain explicit limitations.
+  Python help P3s join the next combined Surface package. All five parked
+  root drafts were restored with their original hashes; private core/evidence
+  drafts stayed untouched. No push, tag or alpha installation.
+- Next: complete accepted credential/helper implementation and Windows
+  baseline/design/implementation, integrate those lanes, then aggregate
+  review and the deferred qualification/release batch.
+
 ## TR2.5 CLI configuration — implementation accepted, 2026-10-03
 
 - Accepted at reviewed tuple root `52adfa0b8dba8752623d0ef5ada142105c48ac03`,
