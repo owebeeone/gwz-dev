@@ -1,5 +1,28 @@
 # Current program checkpoint
 
+## Four transport lanes — coordinator state, 2026-10-03
+
+- CLI/Python configuration is integrated and validated in main; exact sources,
+  successful ordinary/candidate gates and limitations are recorded below.
+- `tr2-22`: bounded helper context contract is accepted after all three
+  original reviewers' GO (reviewed core `ec1b95831582651953bb0bd3be3c4f88985aba6b`).
+  Acceptance record/root `684ffca933bea7b0d2028048d64a97d1be389699`,
+  core `aedfa862d7ce6c121ecbe4d65ac4900e2017fdde`; reports filed verbatim
+  in that lane. Its internal fields/parser cause may now be implemented.
+  Real Git hasconfig conditional-include regression is honestly RED;
+  a separate minimal configuration-view mechanism is being prototyped before
+  contract review. Accepted policy and child environment are not silently changed.
+- `tr1-8-win`: native primitive/baseline experiments continue before Windows
+  design freeze. ReFS and native APIs have executed proof; SSH-inherited job
+  membership prevents claiming guardian independence for trust edits. A
+  scratch-only session-loss test is authorized; Windows trust execution is
+  held. Mac fixture inputs and cleanup guards are prepared; explicit operator
+  approval for temporary account trust is pending. No trust was changed.
+- Both remaining agents run GPT-6.1 Sol. Implementation and Windows release
+  acceptance remain open. Next: finish these two packages, review/integrate,
+  aggregate gate, then deferred platform/performance/selected-source/package
+  batch. No push, tag, publication or alpha installation in this round.
+
 ## TR2.5 CLI/Python configuration — integrated and host-validated, 2026-10-03
 
 - Reviewed CLI `90fdb108f2a91ead456e07053da108b721300cd3` and Python
