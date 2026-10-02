@@ -1,5 +1,25 @@
 # Current program checkpoint
 
+## Native parser early-read correction — preserved, implementation review pending
+
+2026-10-03. Bounded mechanism-doc correction is committed at core
+`646e3e1cda04634df22369238bee286bc1b7ef82`; the append-only v8 native
+FIFO counterexample and controlled-empty parser proof are preserved at evidence
+`662d89828b478a2acce8c0308834db7d17c872f7`. Exact core and tracked
+archive checks pass. Captured-env stdin parsing prereads original config;
+empty controlled config prevents that read and preserves exact entry bytes.
+Initial discovery remains native-file/deadline bounded. Earlier mechanism
+reviews do not certify the changed bytes; full implementation Code/State
+review must assess this correction together with helper/context/code75 and
+SSH-password parity. No separate micro-review or implementation self-GO.
+
+The focused product configuration suite passes, including initial FIFO timeout,
+child reap and release of both permits, isolated stdin parsing, regular-file
+refusal, duplicate roots, value/order, HOME repair and E2BIG without a latch.
+Source remains unfinished and excluded from this preservation checkpoint.
+Route-owned credential reuse and SSH password-only integration continue;
+the real hasconfig product regression is now green. No merge, push or tag.
+
 ## Configuration mechanism — adopted after round-1 closure
 
 2026-10-03. Both original reviewers reported GO at core
