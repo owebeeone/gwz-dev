@@ -66,9 +66,19 @@
   guards pass. Candidate core Clippy passes with 51 existing warnings retained
   as debt. Logs: `/Volumes/projects/limbo/gwz-tr222-route-https-final-v7.log`
   and `gwz-tr222-helper-projection-v4.log` alongside it. These are working-source
-  results, not accepted source. Next: implement accepted shared clock/password
-  route and required TDD rows, final gates, exact settlement and fresh Code/State
-  plus combined Surface review. No credential merge or release GO yet.
+  results, not accepted source. Shared clock/password endpoint implementation is
+  now complete: both full candidate phase runners pass 2652/0/7 ignored;
+  ordinary core passes 2103/0/1 ignored; native SSH passes 194/0/3 ignored;
+  transport/tests/strict Clippy, generators and source guards pass. Candidate
+  core Clippy retains 50 warnings. The final consumer trace found an open seam:
+  SshOpenFailure/HostRoute must retain typed helper outcomes through the existing
+  owned TransportAttempt bridge, as HTTPS already does. Root authorized this
+  bounded projection under the accepted clock's typed retry/error scope, using
+  existing common M4/M10 wording and exact budgets without HTTP-specific mapping,
+  string inference, public schema or policy change. This final correction and
+  actual-operation regressions are running; previous whole gates predate it.
+  Next: final patch/gates, exact settlement, fresh Code/State and combined Surface
+  review (including the common SSH helper wording). No merge or release GO yet.
 - `tr1-8-win`: two native primitive/baseline batches are preserved before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
   membership prevents claiming guardian independence for trust edits. A
