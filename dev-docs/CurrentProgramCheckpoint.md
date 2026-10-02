@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## TR2.22 helper context remediation round 1 — settled draft, 2026-10-03
+
+- The first draft is NO-GO: Consistency and Safety independently identified
+  the same false busy-helper diagnosis at zero allocation. Surface found
+  native Git recovery can use an ignored repository/conditional helper.
+  Consistency's exact T15(b) rounding supersession P3 joins this one patch.
+  Raw reports and [combined remediation](../gwz-core/dev-docs/GwzTransportCredentialHelperContext-RemPlan.md)
+  are filed verbatim; there are two blocking root causes, not new wire needs.
+- Corrected draft: core `ec1b95831582651953bb0bd3be3c4f88985aba6b`;
+  transport remains `9f9f0dc4dd82e6329d6ce53e102a231e214ff673`.
+  Complete M10 is causal-neutral at zero/free slots, recovery names the
+  actual unconditional helper chain and caveats native Git success, and
+  T15(b) now uses captured integer milliseconds rendered exactly in seconds.
+- Status: **NO-GO pending same-original-reviewer closure**. Exact core
+  boundary gate passes. No amendment field/cause implemented before GO.
+  Existing-contract runner work is uncommitted and excluded from this
+  document review; no release/platform or implementation acceptance claimed.
+
 ## TR2.22 helper context amendment — settled draft, 2026-10-03
 
 - The accepted wire checkpoint lacks helper-specific timeout provenance and
