@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## TR2.5 CLI configuration — implementation accepted, 2026-10-03
+
+- Accepted at reviewed tuple root `52adfa0b8dba8752623d0ef5ada142105c48ac03`,
+  CLI `90fdb108f2a91ead456e07053da108b721300cd3`, core
+  `2e64e88a28c332ed422cc390adc76738dc701bb1` after original
+  [Code](GwzTransportSettingCli-ReviewCode-1.md),
+  [State](GwzTransportSettingCli-ReviewState-1.md) and
+  [Surface](GwzTransportSettingCli-ReviewSurface-1.md) reviewers returned GO.
+  Complete reports are filed verbatim. This accepts CLI configuration and
+  reporting only, not combined integration or release/platform qualification.
+- One remediation round closes all three reporting root causes and the
+  lifecycle-documentation P3; no new architectural cause and no open finding.
+  Rust 1.95 ordinary/candidate checks and source guards remain green; inherited
+  formatting and full-core candidate lint debt remain separately identified.
+- Next: integrate this accepted lane and the accepted Python configuration
+  lane through GWZ, with merged validation. Credentials and Windows continue
+  independently. No push, tag, publication or alpha installation.
+
 ## TR2.5 CLI remediation round 1 — settled for re-review, 2026-10-03
 
 - Initial independent Code and State reviews found three blocking reporting
