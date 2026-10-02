@@ -42,8 +42,12 @@
   SSH password-only integration found a shared-clock seam: Control, generic
   pool expiry and post-result classification otherwise clip helper time.
   A bounded DRAFT at core `eb06fac24a3e1eb8f4db32de261a26627e1fd01b`,
-  lane root `5d89a096dd0688e5b82b501a6ce997dcfae060f1`, is under fresh
-  GPT-6.1 Consistency/Safety review. Shared-clock implementation waits for GO;
+  lane root `5d89a096dd0688e5b82b501a6ce997dcfae060f1`, received NO-GO
+  from both fresh GPT-6.1 reviewers. Blind convergence confirms arbitration
+  and stall-resume gaps; Consistency additionally found the pool-first helper
+  timing-provenance gap. Reports and one combined remediation plan are filed
+  at lane core `a81d1433621d5634e19b125f1ca217c147c840f0`; exact gate
+  passes. Round 1 correction is underway. Shared-clock code waits for GO;
   HTTPS and narrow fetch/push error-code preservation continue independently.
 - `tr1-8-win`: two native primitive/baseline batches are preserved before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
