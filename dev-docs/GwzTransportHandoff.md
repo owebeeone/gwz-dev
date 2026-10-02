@@ -1,5 +1,20 @@
 # GWZ transport release — handoff, 2026-10-02
 
+## Integration update — ready lanes merged
+
+TR2.1, TR2.5 step 1 and TR2.8 are now merged into main through GWZ. The latest
+entry in [CurrentProgramCheckpoint.md](CurrentProgramCheckpoint.md) records
+the source tuple, fixture conflict resolution, validation and remaining work.
+TR2.1 and TR2.5a were detached with `--keep`, preserving their entire trees.
+TR2.8 is still registered; TR2.4/TR2.7 is still unmerged. Nothing was pushed
+or tagged. The handoff itself was committed before these merges.
+
+The moved workspace's old catalog blocked the first merge. On the operator's
+explicit approval it was preserved outside the workspace, with checksums;
+GWZ initialized a fresh catalog and the merge succeeded. All unrelated drafts
+were restored and verified. The source snapshot below is historical wherever
+it says these lanes are unmerged, TR2.8 is stopped, or this file is untracked.
+
 ## Takeover update — TR2.8 implementation completed
 
 The operator asked to finish the stopped TR2.8 lane. Its implementation is now

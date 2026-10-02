@@ -1,5 +1,58 @@
 # Current program checkpoint
 
+## Ready transport lanes integrated into main, 2026-10-02
+
+- Integrated through GWZ 1.0.17, in order: TR2.1 (`tr2-1`), TR2.5 step 1
+  (`tr2-5a`), and TR2.8 (`tr2-8`). Accepted lane heads are ancestors of main.
+  The settled source tuple is root `21c7becab6bd`, core `ea60286415f9`, CLI
+  `0164e66376da`, Python `b2369f1d0bf7`; core `63801e84` then files the two
+  retry wire reviews without changing source. This record's closing commit
+  advances root only, with GWZ's generated member lock update.
+- TR2.1 brings the retry machines and all five reviewed follow-ups, including
+  the per-attempt cleanup allowance and the SSH/HTTPS help correction. Merge
+  refuses `max_retries` with its established `MergeValidationFailed` code.
+  The [Code](../gwz-core/dev-docs/GwzTransportRetryWireField-ReviewCode.md) and
+  [State](../gwz-core/dev-docs/GwzTransportRetryWireField-ReviewState.md) wire
+  reviews are filed verbatim. TR2.5 is the configuration resolver foundation
+  only; its CLI/Python activation remains to be implemented.
+- TR2.8 conflicted only in `ssh_fixture.rs` and `ssh_tests/mod.rs`. The
+  resolution keeps both the retry lane's server startup controls and the key
+  lane's configuration/logging controls, and registers both test modules.
+  Production changes merged automatically. Zero-context stable patch IDs
+  verify both sides outside these two resolved fixture files and the
+  GWZ-generated metadata. The earlier TR2.8 acceptance below remains valid.
+- Validation on the combined tree: full core suite with both candidate
+  switches and full ordinary suite pass; the transport-only core test build
+  passes; CLI ordinary 253 + 92 and candidate 254 + 92 pass. Consumer Python
+  tests pass (18 tooling/package and 9 candidate), candidate regeneration
+  matches, and the isolated archive consumer passes 32 including 11 request
+  compatibility tests. Python with both candidate switches passes all 1,000
+  tests. Source guards, core formatting, ordinary strict Clippy and the
+  per-commit boundary gate through core `63801e84` pass.
+- Candidate strict Clippy remains red (129 diagnostics on the pinned
+  compiler; none in the two resolved fixture files). CLI formatting remains
+  red only in `src/tests/g02/partial_errors.rs`, byte-identical to pre-merge
+  main. Neither is waived or presented as passing.
+- The first merge refused before registration because the retained catalog
+  target differed from this moved checkout. On explicit operator approval,
+  its complete old catalog was moved outside the workspace with hashes
+  verified; GWZ initialized a fresh catalog and merged successfully.
+  [L10](GwzLaneIssues.md#l10-a-moved-workspace-retains-a-catalog-bound-to-its-previous-target)
+  records the limitation. All 24 parked drafts were restored with matching
+  SHA-256s. The old catalog and three TR2.1 build caches remain preserved in
+  `/Volumes/projects/limbo/gwz-merge-parking-20261002-ready/`.
+- TR2.1 and TR2.5a have no unique commit, reflog or stash history in any
+  repository compared with main. They were detached using `gwz local dispose
+  --keep`: their directories, drafts and evidence copies remain intact.
+  TR2.8 stays registered; TR2.4/TR2.7 stays unmerged pending its two decisions.
+  No evidence-member contents were changed. Nothing was pushed or tagged.
+- Gate logs, patch comparisons, catalog hashes and the preservation audit
+  are in `/Volumes/projects/limbo/gwz-handoff-2026-10-02/logs/merged-ready-20261002/`.
+  This is integration acceptance, not release qualification. Remaining work
+  includes the planned five-file split, CLI/Python configuration integration,
+  credential-helper work, Windows parity and the release/platform/performance
+  batch; hardware-key execution still needs the operator's go.
+
 ## TR2.8 lane — implementation accepted, 2026-10-02
 
 - The stopped `../gwz-dev-tr2-8` work is completed and reviewed: core

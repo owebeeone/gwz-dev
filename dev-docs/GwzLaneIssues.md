@@ -285,3 +285,13 @@ deferred out of the 1.0.17 documentation lane.
 **Symptom.** 2026-10-02, the TR2.15 merge lane. With a coordinated merge open, `gwz add <path>` with the default target selection was refused. `gwz --target gwz-core add <path>` worked.
 
 **Fix needed:** while a merge is open, select the participant that owns the path, as `gwz add` does outside a merge.
+
+## L10: a moved workspace retains a catalog bound to its previous target
+
+**Symptom.** 2026-10-02, the first TR2.1 family merge after moving the workspace to another volume. GWZ 1.0.17 refused twice before coordinated merge registration: "checked merge start parents rejected catalog recovery target: durable recovery evidence belongs to another catalog target". `merge --status` reported idle and every selected HEAD was unchanged. Import refs were retained.
+
+**Reason.** The catalog target digest includes the canonical path and durable identities of the workspace, repository, common Git directory and private parent. The retired bootstrap record in `.gwz/catalog-final` held a target digest different from the current checkout's. The move is the likely cause; the old digest was not independently reconstructed.
+
+**Remedy used, on explicit operator approval.** Preserve the complete old catalog outside the workspace, verify every file's SHA-256, then retry through `gwz merge --remote`. GWZ created a fresh catalog and the merge completed. No catalog record was edited, no Git merge was substituted, and the old catalog remains available. This is a recovery-state workaround, not a general instruction to remove catalogs when a merge fails.
+
+**Fix needed:** a supported relocation/reinitialization operation that checks for pending actions and preserves the previous catalog, or a refusal that explains the relocation case and a supported recovery route.
