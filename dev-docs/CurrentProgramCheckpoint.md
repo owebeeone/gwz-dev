@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## Credential correction — round2 cleanup defect, 2026-10-03
+
+Remediation round1 at root1de9e7f/core64ec039 closes all six original
+blocking counterexamples. Original Code/State closure, fresh Code and Surface
+are GO. Fresh State is NO-GO for one new non-architectural P2: final helper
+refusal after group/child cleanup capability retirement. Complete reports and
+GwzTransportCredentialHelpers-RemPlan-2.md are filed at core6f365909.
+One bounded correction keeps final admission inside existing HelperJob
+ownership, with deterministic deadline/cancellation descendant cleanup proof.
+Same State reviewer verifies the correction; no protocol/design expansion.
+This is implementation remediation round2; zero new architectural causes.
+Required GO precedes authorized GWZ member merge and fresh combined MAIN
+CLI/core/Python validation. No push/tag/publication/activation/alpha install.
+Excluded drafts, Python stash and Windows proof remain preserved.
+
 ## Credential correction — frozen for remediation round1 review, 2026-10-03
 
 Candidate fixes remain NO-GO pending reviewer closure. Exact source:
