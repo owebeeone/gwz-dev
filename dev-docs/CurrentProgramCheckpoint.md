@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## SSH helper clock — NO-GO, combined remediation round 1
+
+2026-10-03. Both fresh GPT-6.1 reviewers returned NO-GO on draft core
+`eb06fac24a3e1eb8f4db32de261a26627e1fd01b`. Blind convergence confirms
+transition/expiry arbitration across independent consumers and undefined stall
+resumption; Consistency additionally identifies lost helper timing provenance
+when pool expiry wins. These are three causes, two classified architectural.
+Complete verbatim reports and one combined remediation plan are committed at
+core `a81d1433621d5634e19b125f1ca217c147c840f0`; exact core gate passes.
+The author is correcting the draft; shared-clock code remains gated. Original
+reviewers will verify their own counterexamples and the complete changed
+mechanism at a settled tuple. A third new architectural cause invokes the cap.
+HTTPS source/projection work continues independently; no final secret or
+Surface acceptance, merge, push or tag is implied.
+
 ## SSH helper setup clock — settled draft, dual design review next
 
 2026-10-03. Core `eb06fac24a3e1eb8f4db32de261a26627e1fd01b` freezes
