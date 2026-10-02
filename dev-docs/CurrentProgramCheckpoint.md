@@ -1,5 +1,34 @@
 # Current program checkpoint
 
+## SSH helper clock — accepted mechanism, implementation next
+
+2026-10-03. Original round-2 Consistency and Safety reviewers both returned
+GO with no open findings on root `0bb560c5f34ba5bde5ece053dc58e33ef10fd8e0`,
+core `fde5878ac11b9e02892127f438cb50954551b9a3`, transport
+`9f9f0dc4dd82e6329d6ce53e102a231e214ff673` and evidence
+`662d89828b478a2acce8c0308834db7d17c872f7`. Complete reports are filed
+verbatim. Adoption at core `a53e1f1004a157d0bdc3adb2a038fcf52cb25ddc`
+adds narrow authority to GWZDesign/GWZRequirements and accepts the mechanism
+only. Two remediation rounds closed the original arbitration, provenance and
+stall defects plus the non-architectural prepared-refusal branch; the total
+architectural root-cause count remains two. No third-cause stop is triggered.
+The exact committed core gate passes. Root may now relay implementation GO;
+clock regressions remain unexecuted obligations at this checkpoint.
+
+Independent working-source results: final HTTPS candidate suite 162/0 after
+advertised-ref error projection; full transport/doctests and strict transport
+Clippy pass. Real fetch/push/private-clone error projection passes, including
+M1/code75 and E2BIG M2 without a latch and repaired same-operation routing.
+Normal core suite passes 2103/0 with one ignored; generators, owner IR checks,
+provenance tests and source guards pass. Candidate core Clippy passes with
+51 existing warnings, which remain debt rather than strict acceptance.
+External logs are `/Volumes/projects/limbo/gwz-tr222-route-https-final-v7.log`
+and `gwz-tr222-helper-projection-v4.log` alongside it. These are current
+working-source results, not final secret implementation or release acceptance.
+Next: TDD implementation of the accepted shared clock/password-only route,
+final source gates, settle one credential package, then fresh Code/State and
+combined Surface review. No merge, push, tag or release is authorized here.
+
 ## SSH clock round 2 — corrected draft settled for closure
 
 2026-10-03. Core `fde5878ac11b9e02892127f438cb50954551b9a3` settles
