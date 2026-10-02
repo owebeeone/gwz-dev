@@ -10,18 +10,25 @@
   core `aedfa862d7ce6c121ecbe4d65ac4900e2017fdde`; reports filed verbatim
   in that lane. Its internal fields/parser cause may now be implemented.
   Real Git hasconfig conditional-include regression is honestly RED;
-  a separate configuration-view mechanism has passed an external physical
-  prototype: supervised Git parsing, captured-home unconditional include walk,
-  ordered private view and real credential fill. The simpler mechanism needs
-  no new libgit2 binding; its single amendment still needs settlement/review
-  before product adoption. Accepted policy/environment are not silently changed.
+  a separate configuration-view mechanism passed physical feasibility but its
+  initial review is NO-GO: Consistency GO, Safety P2-1 HOME anchoring and
+  P2-2 sensitive scratch after process death. Full reports and one combined
+  RemPlan are committed in the lane at core
+  `232f2b21c0db48f8414cc8494c6e4593a754ceb6`; exact core gate passes.
+  A disk-free correction is being proved before re-review. No new libgit2
+  binding is needed; no unaccepted view semantics enter product code.
 - `tr1-8-win`: native primitive/baseline experiments continue before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
   membership prevents claiming guardian independence for trust edits. A
+  partial baseline is preserved at lane core
+  `497149940f2ea570e8be0943af31e7de7127fde7`, private evidence
+  `70f481147830707d375f4da7f5c70e2aff3f7460`; exact core/tracked archive
+  gates pass. This is preservation, not design GO. The
   scratch-only session-loss test passed for the exact tested launch shape:
   owned processes retired, mock state restored and no late write. It does not
   establish universal job independence; Windows trust execution remains held.
-  Mac fixture inputs and cleanup guards are prepared; explicit operator
+  A larger isolated native-primitive batch continues; original evidence is
+  frozen. Mac fixture inputs and cleanup guards are prepared; explicit operator
   approval for temporary account trust is pending. No trust was changed.
 - Both remaining agents run GPT-6.1 Sol. Implementation and Windows release
   acceptance remain open. Next: finish these two packages, review/integrate,
