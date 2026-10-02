@@ -1,5 +1,22 @@
 # Current program checkpoint
 
+## Configuration mechanism — adopted after round-1 closure
+
+2026-10-03. Both original reviewers reported GO at core
+`daeb4e17dd414ccdb670f9ab74333dd84ef0ba19` / root
+`054d1dddc345452a2285e74c31f5ea4c0b0d5360`; both P2 findings closed,
+no new architectural root cause. Their complete changed-mechanism reviews
+follow the operator's direction to use old reviewers. Adoption at core
+`edcab346745b896c14112bc8efdace87d91c50f1` files raw reports, folds the
+nonblocking P3 outcome-supersession clarification and adds design/requirements
+authority. Exact core gate passes. This is mechanism acceptance only.
+
+Root cleared implementation of the disk-free view with the existing helper,
+context and code75 work as one final package. Broader HTTPS source checks remain
+RED until the real hasconfig regression, old helper fixtures and slot timing
+are resolved. Required implementation Code/State and Surface gates, aggregate
+integration and deferred release qualification remain open. No push or tag.
+
 ## Configuration mechanism — corrected tuple for re-review
 
 2026-10-03. Core `daeb4e17dd414ccdb670f9ab74333dd84ef0ba19`, evidence
