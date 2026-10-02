@@ -1,6 +1,6 @@
 # TR2.5 step 2 — CLI transport setting
 
-Date: 2026-10-03. Status: **CLI settled at `c4a588f8be4e91926deff2156dce00c7062f4184`, pending independent review**. No acceptance, merge, release or platform qualification is claimed.
+Date: 2026-10-03. Status: **CLI remediation settled at `90fdb108f2a91ead456e07053da108b721300cd3`, pending original-reviewer closure**. Initial review at `c4a588f8be4e91926deff2156dce00c7062f4184` is NO-GO. No acceptance, merge, release or platform qualification is claimed.
 
 Authority: gwz-core/dev-docs/GwzTransportOffSwitchDesign.md revision 3 (§§2–7, 9–10), GwzTransportReleasePlanAmendment-2.md and GwzTransportHandoff.md §6.1. D2/D3/E3 and the recommended OQ dispositions remain unchanged. Process: AgentProcessRules.md as amended by GwzProcessOptimization.md §8 and the review-loop skill. The lane owner owns all Git/GWZ operations and reviewer dispatch.
 
@@ -30,3 +30,32 @@ Linux/Windows execution, disposable SSH/HTTPS route and no-fallback receipt qual
 ## Settlement and review
 
 The root owner committed the CLI via GWZ at the revision above and acknowledges the candidate/test-confined `transport_tests.rs` path edge. The root record commit completes settlement; reviewer prompts name its exact root/CLI/core tuple. Independent Code and State plus Surface reviewers use the canonical review-prompt template. Review this implementation and its authority; Surface reads only help and user docs. One merged remediation patch, original-reviewer closure verification and the two-round cap apply. TR2.6's aggregate Phase 2 review remains owed.
+
+## Round-1 bounded remediation, 2026-10-03
+
+The combined patch follows [RemPlan](GwzTransportSettingCli-RemPlan.md).
+Code P2-1 / State P2-3 share the candidate execution-error rendering seam:
+`run()` now invokes `render_execution_error` in its Err branch, decorating
+object-valued metadata and human verbose output while retaining null-meta
+omission, channels and exit 1. Code P2-2 / State P2-2 serialize the underlying
+path string in deciding/ignored/skipped JSON fields, keeping human escaping
+in human output. State P2-1 enriches remote `kind: tags` listings only when
+required, retaining entries and default/local-only absence. Surface P3-1's
+paired setter/remover use explicit `$HOME/.gitconfig` with `--file`, bypassing
+`GIT_CONFIG_GLOBAL`, and help/docs explain that distinction.
+
+Before the correction, focused tests reproduced missing error settings,
+corrupted decoded path identity, missing remote-tag settings and the help
+recipe gap. The corrected 10 focused unit tests and 6 process workflows pass;
+they exercise actual error rendering with ResponseMeta/authentication rows,
+real binary null-meta/human errors, JSON/JSONL controls, exact control-character
+path decoding, file-origin remote tag listings, ignored/skipped values,
+unchanged entries, no Diagnostic events, local/default absence and the isolated
+setter/remover lifecycle under an alternate GIT_CONFIG_GLOBAL.
+
+Full ordinary/candidate suites, both strict CLI Clippy runs, inventory/process
+guards and conditional boundaries pass on Rust 1.95.0. Formatting remains red
+only in unchanged inherited partial_errors.rs. Private raw red/green receipts:
+`campaigns/transport-qualification/runs/2026-10-03-tr25-cli-remediation-1/`.
+No core/interface, route or policy changes; no Git/GWZ operations or self-closure.
+Root must settle the corrected tuple and return to the original reviewers.

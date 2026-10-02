@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## TR2.5 CLI remediation round 1 — settled for re-review, 2026-10-03
+
+- Initial independent Code and State reviews found three blocking reporting
+  root causes; Surface reported GO with one lifecycle-documentation P3.
+  Complete raw reports and the combined remediation plan are filed verbatim.
+- Root committed the single correction at CLI
+  `90fdb108f2a91ead456e07053da108b721300cd3`. It fixes error and tag-list
+  reporting, exact machine path identity and the paired global-file recipe.
+  Full ordinary/candidate CLI suites, both strict CLI Clippy runs, focused
+  red/green regressions and source guards pass on explicit Rust 1.95.0.
+- Status: **NO-GO pending original-reviewer closure**, not implementation
+  self-approval. Re-review uses the same Code/State/Surface reviewers and
+  unchanged core `2e64e88a28c332ed422cc390adc76738dc701bb1`. Accepted design,
+  platform/performance deferrals and inherited lint/fmt debt are unchanged.
+
 ## TR2.5 step 2 CLI — implementation draft, 2026-10-03
 
 - Resumed the isolated `tr2-5-cli` draft on the operator's GPT-6.1 direction.

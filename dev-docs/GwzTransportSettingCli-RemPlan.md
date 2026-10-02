@@ -31,3 +31,19 @@ candidate Clippy debt remain identified, not waived.
 
 The root owner files all complete reviewer reports verbatim, commits the revised
 tuple, supplies exact changed ranges and evidence, and merges re-verdicts.
+
+## Implementer evidence — pending original-reviewer verification
+
+One combined CLI patch implements the dispositions above. Local validation on
+Rust 1.95.0 is green: full ordinary/candidate CLI suites, ordinary/candidate
+strict CLI Clippy, 10 focused unit regressions, 6 process workflows, candidate
+inventory/process-global tests and the conditional boundary guard. Formatting
+continues to report only inherited partial_errors.rs. The initial focused reds
+and green receipts, source hashes and commands are preserved privately at
+`campaigns/transport-qualification/runs/2026-10-03-tr25-cli-remediation-1/`.
+
+No finding is closed by this paragraph. The Err arm's shared candidate helper,
+exact JSON path serialization, required tag-list metadata and paired --file
+recipes are the changed seams. Root owns the revised commit tuple and re-verdict
+requests to the original Code, State and Surface reviewers. All prior deferrals
+and the two-round cap remain in force.
