@@ -1,5 +1,17 @@
 # Current program checkpoint
 
+## TR2.22 configuration mechanism — NO-GO, remediation round 1
+
+2026-10-03. Consistency GO; Safety NO-GO on P2-1 (HOME anchoring) and
+P2-2 (sensitive scratch ownership after process death). Full reports and the
+single combined RemPlan are committed at core
+`232f2b21c0db48f8414cc8494c6e4593a754ceb6`; exact per-commit gate passes.
+Root accepted both findings. The drafter is proving a disk-free correction
+before amending the mechanism, with an explicit absolute-HOME/refusal rule.
+No view implementation may consume this unaccepted contract. Accepted context
+fields, fixed causes, code75 generation and helper source work continue
+independently; moving source is still excluded from design acceptance.
+
 ## TR2.22 configuration-view mechanism — settled for review, 2026-10-03
 
 - Core `63abcb8afa89750eb19b93bf1614fd36fc2d292e` settles only the
