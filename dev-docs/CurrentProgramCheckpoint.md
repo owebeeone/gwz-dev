@@ -1,5 +1,19 @@
 # Current program checkpoint
 
+## TR1.8 native primitive batch preserved, 2026-10-03
+
+- Core `e616dc8a96cab434578297a04e9fbb567b63dcd8` records HOME,
+  Pageant, overlapped pipe, helper Job Object, SSPI and native TLS/hash
+  execution plus explicit limitations. New private evidence
+  `9025f0bc18ea55bcd39fc145057269920750dce6` preserves the second
+  batch; prior frozen run bytes are unchanged. Exact core and tracked archive
+  gates pass. No product or design/guide source was changed.
+- The batch is complete, but Windows design remains NO-GO pending required
+  physical rows and compatibility dispositions, especially observed HOME/
+  Digest behavior, provider/account prerequisites and native HTTPS trust.
+  Mac approval is unanswered; Windows trust/supervisor hold remains. This
+  preservation commit waives no row and enables no Windows candidate.
+
 ## TR1.8 partial baseline preserved, 2026-10-03
 
 - Core `497149940f2ea570e8be0943af31e7de7127fde7` commits four draft/
