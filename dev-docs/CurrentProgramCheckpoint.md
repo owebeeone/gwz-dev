@@ -1,5 +1,30 @@
 # Current program checkpoint
 
+## TR2.22 wire diagnostics checkpoint — settled for review, 2026-10-03
+
+- Root committed the bounded optional Failure detail and endpoint-produced
+  retry attempt counts through GWZ: core
+  `26922a1cfd823a4894e09be9aeb05f7f73d21414`, transport
+  `9f9f0dc4dd82e6329d6ce53e102a231e214ff673`. The accepted helper policy,
+  retry transitions and secret runner are unchanged. Configured-gh regressions
+  are intentionally red characterization of the next checkpoint, not a GO
+  claim for helper implementation.
+- The package manifest and precise executed gates are in
+  [the core package](../gwz-core/dev-docs/reviews/GwzTransportCredentialHelpersWire-Package.md)
+  and [implementation record](../gwz-core/dev-docs/GwzTransportCredentialHelpersImplementation.md).
+  Explicit Rust 1.95 transport suites, focused candidate endpoint/host tests,
+  ordinary full core runner, generation and source checks pass. Two inherited
+  all-target transport Clippy test diagnostics remain identified and unwaived.
+- Root's exact per-commit core boundary gate passes. A clean Cargo archive
+  produced from the settled transport commit has SHA-256
+  `6477e9d2a17de2e1a88cf62cb78077f120f061cbe0a867b1a063f0a05d2d7248`;
+  its isolated archive-consumer proof passes on Rust 1.95. Commands and
+  normal product-gate output are retained outside repositories at
+  `/Volumes/projects/limbo/gwz-lanes-prewarm-20261003/wire-archive-consumer.log`.
+- Status: **settled, not accepted**. Independent peer-blind Code/State review
+  is the next gate. The original protected core BugReport and root drafts stay
+  outside the package. No merge, push, tag, publication or alpha install.
+
 ## Five-file split, 2026-10-03
 
 - Completed sequentially in main at the operator's request, using the
