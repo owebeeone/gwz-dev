@@ -1,12 +1,30 @@
-# Remote transport release readiness — operator pause
+# Remote transport release readiness
 
-Current status (2026-09-23): the operator has resumed work under the accepted
-[v1.1.0 plan](../gwz-core/dev-docs/GwzV110Plan.md). The accepted
-[retry plan](../gwz-core/dev-docs/GwzRemoteTransportRetryPlan.md) and
-[Python session design](../gwz-py/dev-docs/GwzPyTransportDesign.md) are being
-implemented in parallel. See [the current checkpoint](CurrentProgramCheckpoint.md)
-for exact acceptance boundaries. The pause and source tuple below are historical;
-no new release or alpha acceptance is implied.
+Current status (2026-10-03): work continues under the accepted
+[transport release plan](../gwz-core/dev-docs/GwzTransportReleasePlan.md), as
+[amendment 2](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2.md)
+splits it into **1.1.0 transport** and **1.2.0 sessions/server**. Configured
+credential helpers are part of 1.1.0; the earlier gh-only scope below is
+historical. [CurrentProgramCheckpoint.md](CurrentProgramCheckpoint.md) records
+exact tuples, reviews, gate results and outstanding work.
+
+CLI/Python transport configuration is integrated and host-validated. The
+credential lane has passing HTTPS and actual-operation projection checks; its
+shared SSH helper clock mechanism has dual design GO and is being implemented.
+The completed credential package still needs exact settlement, Code/State and
+combined Surface acceptance before integration. Windows has three preserved
+native evidence batches but no design GO; missing provider/identity, lifetime,
+compatibility and trust/routing proof remain mandatory. No trust fixture has
+been approved or applied. Aggregate review, deferred platform/performance and
+selected-source/package qualification still precede release.
+
+The remainder is the preserved 2026-09-22 pause record, not a current instruction
+to stop work or a new scope ruling. Read its outstanding obligations through the
+accepted plan and amendments; a historical result or tuple is not present-day
+release acceptance. No push, tag, publication or alpha installation occurred in
+this coordination round.
+
+## Historical pause record
 
 Date: 2026-09-22. Status: **paused to conserve weekly GPT quota**.
 Do not resume agents, tests or implementation until requested. No reviews were
