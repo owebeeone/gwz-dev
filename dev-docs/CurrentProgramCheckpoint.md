@@ -36,6 +36,15 @@
   package; earlier mechanism GO does not cover these corrected bytes.
   Full implementation gates and review remain open; none of
   these intermediate results is implementation acceptance or release GO.
+  The counterexample/docs checkpoint is preserved at lane core
+  `646e3e1cda04634df22369238bee286bc1b7ef82`, evidence
+  `662d89828b478a2acce8c0308834db7d17c872f7`; exact checks pass.
+  SSH password-only integration found a shared-clock seam: Control, generic
+  pool expiry and post-result classification otherwise clip helper time.
+  A bounded DRAFT at core `eb06fac24a3e1eb8f4db32de261a26627e1fd01b`,
+  lane root `5d89a096dd0688e5b82b501a6ce997dcfae060f1`, is under fresh
+  GPT-6.1 Consistency/Safety review. Shared-clock implementation waits for GO;
+  HTTPS and narrow fetch/push error-code preservation continue independently.
 - `tr1-8-win`: two native primitive/baseline batches are preserved before Windows
   design freeze. ReFS and native APIs have executed proof; SSH-inherited job
   membership prevents claiming guardian independence for trust edits. A
@@ -54,12 +63,18 @@
   lifetime tests, SSPI first legs and process-pinned TLS peer/hash proof.
   HOME compatibility dispositions, native provider/identity proof and released
   HTTPS trust rows remain open. The agent completed this bounded batch;
-  a new bounded residual batch covers only owned HWND concurrency/reuse,
-  process-scoped additional certificate hashes and read-only URL zones.
-  It permits no provider/account provisioning or shared-host state changes;
+  the third bounded batch is now preserved at core
+  `44afdf1b14cff393c5b38e50a622b603b1d5a8ec`, evidence
+  `cf553a5f9f1f1b23ed35e448dd7561fced2fb06b`, lane root
+  `0fa94b20a4526780ca6c834e015fc0ae4ccf7931`; exact checks pass.
+  Owned Pageant concurrency, process-pinned ECDSA/RSA-PSS hashes and actual
+  URL-zone classes executed. Numeric HWND reuse was not observed within its
+  cap and MD5 handshakes refused; no required assertion is silently waived.
+  No provider/account provisioning or shared-host state change was performed;
   original evidence is frozen. Mac fixture inputs and cleanup guards are prepared; explicit operator
   approval for temporary account trust is pending. No trust was changed.
-- Both credential and bounded Windows residual agents run GPT-6.1 Sol.
+- Credential implementation and both SSH clock reviewers run GPT-6.1 Sol;
+  Windows' bounded residual agent is complete.
   Implementation and Windows release acceptance remain open. Next: finish and
   review the credential package, close Windows prerequisites, review/integrate,
   aggregate gate, then deferred platform/performance/selected-source/package
