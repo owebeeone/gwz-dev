@@ -15,7 +15,8 @@ GwzTransportCredentialHelpersAcceptance.md. Fresh combined MAIN CLI/core/Python
 ordinary/candidate checks pass on macOS. Two stale Python tests were corrected
 without production/protocol changes, independently reviewed and fully rerun;
 [the integration record](GwzTransportCredentialIntegration.md) records evidence.
-Windows now has five preserved native batches, checkpointed separately from MAIN.
+Windows has five preserved baseline/primitive batches, checkpointed separately
+from MAIN, plus two targeted authentication feasibility investigations.
 The existing Rust TLS binding API passed five primitive rows and is selected in
 the Windows DRAFT. Digest acquisition still refuses; controlled worker-retention
 proof does not establish cancellation of a blocked SSPI provider. Windows has
@@ -23,6 +24,13 @@ no design GO: provider/identity, lifetime, compatibility, trust/routing and EPA
 proof remain mandatory, along with incorporation of MAIN's accepted helper
 timing/context and SSH clock seams before design freeze. The proposed Mac-only
 temporary trust test awaits explicit approval; no OS trust change was applied.
+The independent Rust authentication candidate demonstrated cancellable I/O but
+does not replace current-logon native authentication or Digest. The subsequent
+[native process-worker probe](../gwz-core/dev-docs/GwzTransportWindowsSspiWorkerFeasibility.md)
+passed bounded context, IPC, termination and parent-loss lifecycle tests. It
+supports a bounded Windows design revision and review, not product/platform GO;
+blocked-provider, forced-exit erasure and external-provider cancellation were
+not demonstrated. Digest/provider and the remaining parity obligations persist.
 Aggregate review, deferred platform/performance and selected-source/package
 qualification still precede release.
 

@@ -64,8 +64,8 @@ Python full-run start/end snapshots exactly match corrected six-head tuple,
 tracked/untracked hashes and module hashes. Root verified the final gate exits and
 recorded suite log hashes and all 27 preserved draft hashes before this documentation commit.
 
-External coordinator records require local access; public builds do not depend
-on private evidence:
+Coordinator records now reside in the private evidence member; public builds do
+not depend on private evidence:
 
 - main-credential-cli-integration/IntegrationReport.md and exact gate/hash receipts.
 - main-credential-core-integration/IntegrationValidation.md and integration-receipt.json,
@@ -73,7 +73,11 @@ on private evidence:
 - main-credential-py-integration/final-gates/report.json,
   SHA-256: `42b3494ceabe68cf268f309ab8bf964ff202a5e3beb6ab03ff2306ffccc7dcd3`.
 
-These directories live under /Volumes/projects/limbo/gwz-lanes-prewarm-20261003/.
+These directories are retained under
+`gwz-core-evidence/campaigns/transport-qualification/runs/2026-10-03-coordinator-artifact-relocation/imported/prewarm/`.
+Their original bytes and hashes are unchanged. The former external paths are
+historical; [the artifact-location record](GwzTransportArtifactLocations.md)
+maps them to the archive and consolidated retained build/runtime copies.
 Production review records and acceptance live in gwz-core/dev-docs; full test-
 correction Code report lives beside this document. Retained ignores/warnings,
 external-candidate revision-unavailable provenance and ordinary core dirty=true

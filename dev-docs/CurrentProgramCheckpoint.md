@@ -1,5 +1,43 @@
 # Current program checkpoint
 
+## Windows process investigation and artifact relocation, 2026-10-03
+
+The authentication-alternative investigation is complete. Independent Rust
+`sspi` 0.23.0 cancelled real suspended Kerberos network waits in a bounded native
+Windows fixture and rejected mismatched synthetic NTLM bindings. It is not a
+full native SSPI replacement: current-logon SSO and Digest are absent from the
+tested independent path; synchronous discovery, temporary password copies and
+full EPA/interoperability remain concerns. The operator selected investigation
+of native SSPI in a separate worker process instead. That investigation now
+passes bounded native process/Job tests: the worker retained its NTLM context
+across token exchanges, IPC EOF cleaned up, job termination reaped a controlled
+stalled worker and descendant, and parent loss triggered kill-on-close cleanup.
+Held handles confirmed exits before capacity release; final fixture census was
+empty. The arrangement worked inside the actual SSH parent's existing Job.
+It did not reproduce a blocked provider, finish server authentication, establish
+interactive SSO, prove secret erasure after forced exit, or cancel external
+LSASS/Pageant work. No process mechanism is accepted or implemented in the product.
+Next: revise and review the bounded Windows worker design, incorporating MAIN's
+accepted helper/clock seams and explicit identity, IPC and unconfirmed-exit
+quarantine rules. Digest and the other outstanding Windows proof rows remain.
+
+The operator also requested correction of loose parent artifacts. All 210
+selected entries are now relocated, with exact logs/receipts/runners in private
+evidence, reports in dev-docs and 35 runtime/build/parking directories consolidated
+outside the repositories. No bytes were deleted and the registered GWZ lanes
+remain ready at their original locations. See
+[artifact locations](GwzTransportArtifactLocations.md) and
+[the alternative report](../gwz-core/dev-docs/GwzTransportWindowsAuthAlternativeFeasibility.md).
+The [native worker report](../gwz-core/dev-docs/GwzTransportWindowsSspiWorkerFeasibility.md)
+and its exact private run are now retained in MAIN as well as the Windows lane.
+Earlier external paths below are historical snapshots. Mac trust preparation
+requires renewed exact preflight after relocation; no OS trust change occurred.
+MAIN documentary/evidence member heads are core
+`ba2df3b213a88f9290177b4ab931efe3cafa4886` and evidence
+`a539aeaa9340f659c8b7d995d1c0be3e59d76b80`. Product source remains the validated
+tuple below; these later commits add reports/evidence only. File/hash, archive,
+document-link and fast document guards pass. No push, tag or product activation.
+
 ## Credential transport — integrated and macOS validated, 2026-10-03
 
 The credential lane is merged and combined macOS integration is accepted.
