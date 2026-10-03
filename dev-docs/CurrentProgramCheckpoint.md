@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## SSPI taut schema/design awaiting review, 2026-10-03
+
+[Message checkpoint](GwzSspiMessagesDesign.md) records the private seven-message
+schema, exported IR, semantic fingerprint, pinned tooling and ten passing
+synthetic tests. Existing Rust tests/lint/format/package checks pass. This is a
+mandatory dual Consistency/Safety wire-format review; no public caller API change.
+Actual codecs/API/supervision/native authentication remain unimplemented, and the
+step-1 dual secret-boundary stop is still open. Worker refuses and publishing is
+disabled. No activation/remote/push/tag/release. Next: independent schema reviews,
+then merged blocker remediation if needed. Previous sections are earlier snapshots.
+
 ## SSPI Rust repository scaffold accepted, 2026-10-03
 
 The operator authorized `gwz repo create gwz-sspi` and Rust/test/release layout.
