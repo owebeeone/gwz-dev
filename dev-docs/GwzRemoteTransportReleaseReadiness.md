@@ -1,5 +1,25 @@
 # Remote transport release readiness
 
+## SSPI HTTPS implementation accepted; Windows qualification outstanding, 2026-10-04
+
+[Implementation acceptance](GwzSspiHttpsCompositionImplementationAcceptance.md)
+records Code/State/Surface GO on the exact corrected tuple after one bounded
+remediation. HTTPS composition, original CLI/Python caller capture, fixed D,
+CBT admission, truthful facts and retained cleanup are implemented and reviewed.
+All initial findings are closed; the existing Windows activation guard remains.
+Affected HTTPS199/199, private materialize8/8, SSPI recipes27/27 and final
+supported loaded Python artifact checks pass. Full strict-core Clippy remains
+RED45 with attribution limits; no release gate is waived.
+
+Next is actual Windows provider/identity/EPA/CBT/physical-cleanup and installed
+host qualification, with fixtures on the operator-selected E: volume. Remaining
+Windows parity decisions/proofs, deferred platform and selected-source batches,
+performance/distribution builds and aggregate activation/release review remain.
+Full Windows release remains **NO-GO** until those gates pass. Portable validator
+and synthetic-session tests are not native provider qualification. No push,
+tag, publication or activation. Earlier entries below are historical snapshots.
+
+
 ## SSPI HTTPS contract accepted; implementation pending, 2026-10-04
 
 [Composition acceptance](GwzSspiHttpsCompositionAcceptance.md) records independent

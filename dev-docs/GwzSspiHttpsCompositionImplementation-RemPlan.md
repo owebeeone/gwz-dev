@@ -68,3 +68,12 @@ One completed initial implementation review; zero completed remediation reviews.
 The original reviewers classify any new architectural cause. The review-loop cap
 remains two remediation rounds. Windows qualification, activation and release
 remain NO-GO independently of this implementation correction. No push/tag/publish.
+
+## Independently verified closure
+
+Accepted at root7066ff222abf7995e7e0103e9ad38543173d6079 and product tuple in
+[implementation acceptance](GwzSspiHttpsCompositionImplementationAcceptance.md).
+Original Code/State/Surface re-verdicts all GO; every mapped finding independently
+closed. One completed remediation round, no new architectural root cause. The
+initial NO-GO/report statements above remain historical testimony. Windows
+qualification, full strict-core and release gates remain outstanding.

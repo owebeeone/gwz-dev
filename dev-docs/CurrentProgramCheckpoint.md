@@ -1,54 +1,39 @@
 # Current program checkpoint
 
-## SSPI HTTPS round1 corrected; settled closure review pending, 2026-10-04
+## SSPI HTTPS composition accepted; Windows qualification next, 2026-10-04
 
-The accepted step4b architecture is unchanged. Initial implementation Code and
-State were NO-GO; Surface GO/P3. The
-[merged correction](GwzSspiHttpsCompositionImplementation-RemPlan.md) has landed
-through GWZ at the tuple below, but findings remain open until their original
-reviewers verify closure. The root SHA is in the generated re-review briefs.
+[Implementation acceptance](GwzSspiHttpsCompositionImplementationAcceptance.md)
+records original Code/State/Surface GO at root
+`7066ff222abf7995e7e0103e9ad38543173d6079` and the exact unchanged product
+member tuple. All four P2 and two P3 initial findings are independently closed
+in one bounded correction/review round. No new architectural root cause was
+found. This accepts cohesive step4b implementation/caller surface only.
 
-- gwz-core `28f564a674574eaefa43266d3137be9a4ddc38b8`
-- gwz-sspi `c88fa0e174b185a43e0d0d0c91660cb0957e380a`
-- gwz-transport `8a2ec7fc2e6d6a0da4c5519d72eac90c9ca4c578`
-- gwz-cli `6a9c0dac8aebe7b9d20ecfa20a8c402ec4bf4311`
-- gwz-py `e0c5af10b33289a455f662680af8ac12fd24f9d3`
-- gwz-core-evidence `ba70034feaeb384619d48dbfaa06c02df6f508b3`
+Implemented original-caller capture, fixed positive Open D/zero native refusal,
+final-origin prefixed CBT, exclusive generation, truthful completion/remote
+facts, retained Start/session/Finish and actual core charges, conservative
+concurrent reaper counts, visible native local failure and teardown docs.
+Affected HTTPS199/199, focused native26/26, private_members8/8, SSPI docs27/27,
+final supported Python packaging/loaded host checks and source guards pass.
+Exact commands/artifacts/limitations are in the immutable reviewed
+[receipt](GwzSspiHttpsCompositionCheckpoint.md). Private raw proof is committed;
+public gates do not require private archive access. No reviewed source bytes
+changed during closure. Full strict-core Clippy remains RED45 with explicitly
+limited attribution; this is no full strict PASS or release waiver.
 
-Corrected raw digest→prefixed CBT, owned Start retention before await,
-conservative reaper visibility, visible local native error projection, introduced
-serve lint and caller teardown documentation. Code/State independently converged
-on ownership/counting and lint attribution. Real TLS→real private SSPI validator,
-pre-/post-registration Start abort, concurrent reaping and actual private-member
-producer→consumer regression tests now execute the original counterexamples.
+Next: real Windows provider/caller identity/EPA/CBT/disposal and installed-host
+qualification, using E: fixtures; remaining parity dispositions and deferred
+platform/selected-source/performance/package/aggregate release gates follow.
+Windows activation and full release remain NO-GO. No push, tag or publication.
+Unrelated untracked SSH N2b prompts/route draft, core bug report and old alpha
+evidence remain untouched. All review reports are filed verbatim.
 
-Gates: full affected HTTPS199/199; native26/26; private_members8/8;
-SSPI doctests27/27; final supported wheel packaging6PASS/1existingmacOSskip,
-actual loaded ClientHost2PASS including overlapping operations. Source guards,
-formatting, inventories and whitespace pass. Strict core Clippy remains RED45:
-introduced guard/new bridge diagnostics absent; the earlier RED47 all-baseline
-claim is withdrawn, with the exact primary-span comparison limits recorded in
-[the receipt](GwzSspiHttpsCompositionCheckpoint.md). This is no full strict-core
-PASS or platform/release qualification.
-37 handwritten source/test files,3,201addedlines; six member/API docs; two
-administrative inventory ledgers; three generated projections. Final receipt
-links to a committed private raw run and50filefingerprint; public tests do not
-depend on private archive access. Existing old alpha evidence is untouched.
-
-Next: original Code/State verify their finding closures; original cold Surface
-checks exact teardown signatures/recipe. No edit or HEAD movement during that
-review. No finding self-closed. Unrelated untracked root SSH N2b prompts/route
-draft, core bug report and old alpha evidence stay out of scope. Generated
-re-review briefs/reports are authorized review outputs. No Windows activation,
-push, tag, publication or release. Accepted design/zero disposition and revised
-budget remain controlling; full Windows release remains NO-GO.
-
-Metrics: one initial review completed, first remediation patch committed,
-zero completed remediation reviews. Four unique P2 defects and two P3 issues
-were discovered at settled review (three independently convergent across main
-axes); genuine counterexamples and correction gates are in the receipt. No
-post-acceptance escape claim applies before acceptance. Wall time spans restart
-and is not measured as one session. Earlier entries are historical snapshots.
+Metrics: one initial settled review plus one remediation/closure round;
+four unique P2 and two P3 issues found at settled review; two ownership/counting
+issues and lint attribution independently convergent. No post-acceptance escape
+observed at landing. Implementation-contact discoveries are in the receipt;
+wall time spans the parked/restarted session and is not measured as one run.
+Earlier entries below preserve historical snapshots.
 
 ## SSPI HTTPS implementation paused for Codex restart, 2026-10-04
 
