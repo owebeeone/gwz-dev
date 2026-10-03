@@ -168,3 +168,20 @@ Unknown is not confirmation. Explicit `shutdown(deadline)` closes admission and
 observes outstanding records until its separate shutdown bound. Dropping its
 future does not abandon retained cleanup. Dropping a capture cannot reopen a
 closed Supervisor or release another conversation's permit.
+
+The exact disposal recipe is compiled in `gwz-sspi/docs/Supervision.md`.
+`Conversation::cancel(self) -> CancellationReceipt` is synchronous and consumes
+its Conversation. The receipt's public fields are `record_id: RecordId` and
+`cleanup: CleanupStatus`. `Supervisor::cleanup_status(&self, RecordId) ->
+CleanupStatus` takes an owned ID (clone the receipt ID to preserve it).
+`Supervisor::shutdown(&self, Deadline)` returns an owned `Send + 'static` future
+whose output is `ShutdownReport { confirmed: usize, outstanding: Vec<RecordId> }`.
+The confirmed field counts lifetime confirmations, not just this shutdown call.
+Use a separate shutdown deadline, retain the cancellation receipt and report,
+and keep Pending/Unknown owners charged; an expired shutdown may return outstanding
+records. Dropping that future retains supervision and cannot establish confirmation.
+
+Local native identity/capture/launch refusal remains visible through the request
+and Git clone/materialize consumers. It is not classified as quiet private-member
+remote access refusal; actual repository refusal and accepted helper absence keep
+their existing behavior. This round1 correction still requires independent review.

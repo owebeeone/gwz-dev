@@ -22,6 +22,15 @@ No finding is disputed or self-closed. Original Code/State reviewers verify thei
 counterexamples on the corrected settled tuple; Surface verifies the bounded doc
 correction. This is one merged patch, not independent per-finding packages.
 
+Owner approves a private cross-crate fixture for the missing real CBT admission
+seam: the synthetic public TLS certificate's produced binding crosses an SSPI
+unit-test entry invoking the existing private request validator. No new public
+validation API, protocol or production dependency. The probe must be bounded,
+use external build targets, fail rather than silently skip when unavailable,
+and be reproducible from public fixture/prepared inputs. Standalone SSPI tests
+retain no neighbor/private-evidence dependency. This is product composition
+qualification, not a compiler diagnostic or source-mutation probe.
+
 ## Scope and budget before remediation
 
 No new wire field, public protocol, Supervisor/runtime owner, capacity domain,
@@ -34,6 +43,13 @@ source/test files total, plus the authorized Python ledger), only if necessary.
 No test/qualification obligation is descoped; broader platform work remains
 deferred as before. The 3,500 added-line and eight API-document ceilings remain.
 Stop before exceeding them and report the concrete required correction size.
+
+Before ledger edits, owner permits one additional administrative reconciliation
+in core `scripts/candidate_switch_inventory.txt`: the new private materialize
+test site, plus correcting the existing Runtime site's syntactic owner after
+the owning declaration moved. This is separate from the 37 source/test files
+and the already authorized Python ledger; no semantic candidate-switch or
+activation expansion. The actual guard must pass after reconciliation.
 
 The first prompts mistakenly named a nonexistent member-local SSPI design path;
 the root `dev-docs/GwzSspiDesign.md` §6 is the actual authority. Correct prompt

@@ -46,10 +46,10 @@ Existing application observations retain their lossy Unknown native method
 projection: Unknown proves neither native selection nor Complete; the success
 flag comes from independently validated remote facts.
 
-Guard retains session/Finish receipt, operation dependency and endpoint request
-slot. Finish ownership is installed before await; abort, cancellation or expiry
+Guard retains owned Start/session/Finish work, operation dependency and endpoint request
+slot. Start and Finish ownership are installed before await; abort, cancellation or expiry
 transfers its owned future and both charges into existing endpoint retained
-cleanup. Reaping takes pending entries out of the shared lock, polls work and
+cleanup. Reaping counts entries while they are claimed outside the shared lock, polls work and
 checks proof outside locks, and drops confirmed entries outside locks. Completed
 futures are never repolled. Pending/Unknown keep both charges; only Confirmed
 releases them. Retained entries are bounded by the existing 64 charged request
@@ -63,7 +63,7 @@ wipe owner before secret copying/encoding; fallible decode/parse/encode and Drop
 are observed before deallocation. Existing SSPI identity/token/CBT storage is
 retained. `http::HeaderValue`, Hyper/native-TLS and provider/dependency copies are
 outside this owner's wipe guarantee; marking a header sensitive is not a wipe.
-CBT's returned dependency Vec is wiped immediately after copying into SecretBytes.
+CBT is constructed as `tls-server-end-point:` plus a supported 32/48/64-byte digest inside initialized fixed wiping storage. Its returned dependency Vec is wiped immediately after copying; unsupported digest lengths refuse native admission.
 
 Absolute-D checkout expiry deliberately reports Timeout with Phase::Other, no
 setup cause and FirstConnect::None. The pool API does not expose whether the
@@ -74,26 +74,30 @@ is a conservative classifier limitation, not a new pool API or borrowed cause.
 
 ## Modified file inventory and budget
 
-Handwritten production/test files (34):
+Handwritten production/test files (37):
 
 - SSPI (6): src/lib.rs; src/supervisor/{api,futures,mod,ports,remediation_tests}.rs.
 - Transport (7): protocol/transport.taut.py; src/binding.rs; src/codec/validate.rs;
   src/mux/{mod,routing}.rs; src/policy.rs; tests/https_reuse.rs.
-- Core (18): src/git/endpoint/https_auth/secret.rs; https_connection.rs;
+- Core (21): src/git/endpoint/https_auth/secret.rs; https_connection.rs;
   https_policy.rs; https_worker.rs; https_worker/{budget,credentials,native,
   prepare,serve}.rs; setup_retry.rs; src/git/gitbackend/transport_binding.rs;
   src/transport_host/{cancellable,https_endpoint,local_command,mod,session}.rs;
-  src/transport_host/session/driver/opening.rs; tests/transport_backend/prepare.py.
+  src/transport_host/session/driver/opening.rs; tests/transport_backend/prepare.py;
+  src/git/endpoint/https_remote.rs; src/transport_host/request/https_failure.rs;
+  src/workspace_ops/tests/g00/private_members.rs.
 - CLI (1): src/globalargs/dispatch.rs.
 - Python (2): native/src/client_host.rs; native/src/route/transport.rs.
 
 Python scripts/candidate_switch_inventory.txt is the separately authorized
-administrative ledger (two exact network capture/attach rows), making 35 files
-including ledger. Six member/API documents: SSPI docs/{CallerValues,Supervision}.md;
+administrative ledger (two exact network capture/attach rows). Core
+scripts/candidate_switch_inventory.txt is the separately authorized round1 ledger
+(one new private test site and the existing Runtime owner replacement). There are
+39 source/test/administrative files including both ledgers. Six member/API documents: SSPI docs/{CallerValues,Supervision}.md;
 core docs/TransportPlacement.md; transport README.md; CLI README.md; Python README.md.
 Generated outputs separately: transport protocol/transport.ir.json,
 src/protocol.rs and src/admission.rs. External prepared manifests/derived locks
-are not product source changes. Final added-line recount: 2,757 handwritten source/test added lines (1,927 production/source documentation; 830 test lines), plus two administrative ledger lines, 369 generated lines and 113 member/API documentation lines. Test classification uses the existing globals guard lexical test ranges, plus standalone test files; Rust doctest text stays with its API source. Whole changed-file format reflow is included, not discounted.
+are not product source changes. Round1 final source recount: 3,201 handwritten source/test added lines (2,115 production/source documentation; 1,086 test lines), within37/3500. Core2623, SSPI237, transport309, CLI5, Python27. Generated projections remain369 added lines; both ledgers total4 added/1 removed lines, and six member/API documents total140 added/1 removed lines. Root docs are separate. Test classification uses the existing globals guard lexical test ranges, plus standalone test files; Rust doctest text stays with its API source. Whole changed-file format reflow is included, not discounted.
 
 ## Executed RED then GREEN evidence
 
@@ -155,7 +159,7 @@ execution. Portable fake native ports are private production orchestration seams
 
 - SSPI `CARGO_TARGET_DIR=$C/sspi cargo +1.95.0 test --manifest-path gwz-sspi/Cargo.toml --locked --offline`: PASS79unit+5integration+26doctests, including compiled caller recipe and20 compile-fail probes. Strict `cargo +1.95.0 clippy --lib --locked --offline -- -D warnings`: PASS. Owner Windows source-only `cargo +1.95.0 check --locked --offline --lib --target x86_64-pc-windows-msvc`: PASS.
 - Transport external target `cargo +1.95.0 test --manifest-path gwz-transport/Cargo.toml --locked --offline`: owner PASS, existing long seeded campaign ignored. Strict `clippy --lib --locked --offline -- -D warnings`: PASS. `$C/../schema-tools/bin/python gwz-transport/scripts/regen.py --check`: PASS4artifacts verified; generator rustfmt pin unchanged.
-- Core strict candidate `RUSTFLAGS='--cfg gwz_transport_candidate' CARGO_TARGET_DIR=$C/core-clippy-target cargo +1.95.0 clippy --manifest-path $C/core-prepared/Cargo.toml --lib --locked --offline --message-format=json -- -D warnings`: full gate RED47 pre-existing candidate diagnostics. New native/prepare/secret/host bridge diagnostics zero after correcting new warnings. No full strict-core GO and no lint allowances are claimed. Legacy warnings in changed files belong to untouched existing connection/endpoint if bodies.
+- Core strict candidate `RUSTFLAGS='--cfg gwz_transport_candidate' CARGO_TARGET_DIR=$C/core-clippy-target cargo +1.95.0 clippy --manifest-path $C/core-prepared/Cargo.toml --lib --locked --offline --message-format=json -- -D warnings`: initial full gate RED47. The initial assertion that all47 were pre-existing/zero-new was inaccurate: the introduced serve generation guard was omitted from attribution. That assertion is withdrawn; the historical raw47 result stays recorded rather than being relabeled as the current45 result. Original initial raw bytes are not reconstructed into the new evidence run. Round1 full strict gate remains RED45. No diagnostic is reported for the corrected generation guard, Start holder, CBT constructor, or changed failure consumers. Forty-four primary snippets exactly match the range baseline and the remaining serve line5 differs only by whitespace; this source comparison is limited and is not a full compiled baseline attribution or full strict-core GO. No lint allowances were added.
 - CLI external cli-prepared `test --lib --locked --offline worker_host::tests` with candidate RUSTFLAGS: PASS1. Python external py-prepared `test --lib --locked --offline route::transport` with candidate RUSTFLAGS and PYO3_PYTHON=gwz-py/.venv/bin/python: PASS4.
 - Supported local Python wheel producer: import scripts/build_candidate_extension.py, construct Prepared($C/py-provisioned-wipe-final,$C/core-prepared,$C/py-prepared/Cargo.toml), call build with absolute unresolved venv interpreter and external py-packaging-target, then unpack. RUSTUP_TOOLCHAIN=1.95.0, CARGO_NET_OFFLINE=true. Worker and extension share producer fingerprint. Final artifact/source refresh: PASS supported producer rebuild after final source, format and secondary wipe receipt settled, yielding gwz-0.0.0-cp310-abi3-macosx_11_0_arm64.whl and extracted _gwz_core.abi3.so.
 - `GWZ_PY_NATIVE_MODULE=$C/py-provisioned-wipe-final/extension/gwz/_gwz_core.abi3.so gwz-py/.venv/bin/python -B -m pytest -q gwz-py/src/tests/test_worker_packaging.py -k 'actual_loaded_extension_selection or candidate_and_backend_preserve_owned_scratch_root or real_handoff_and_bundler_isolate_same_name_builds'`: PASS6,1existing macOS nonUTF8 fixture skip,18deselected.
@@ -166,3 +170,74 @@ execution. Portable fake native ports are private production orchestration seams
 
 No private raw evidence or campaign runner was added to the parent repository.
 This checkpoint is a bounded review handoff; owner settlement/reviews remain.
+
+## Round1 correction handoff (implementation evidence; review still required)
+
+The initial Code and State NO-GO findings in Implementation-RemPlan remain open
+for the original reviewers. This patch does not self-close either axis.
+
+| Genuine failing production regression | Correction and current result |
+|---|---|
+| Actual TLS request reached the standalone private SSPI validator with raw certificate digest and was refused InvalidRequest | Final-origin producer constructs typed CBT prefix plus digest in fixed wiping storage; `production_tls_binding_crosses_real_sspi_request_validator` GREEN. `production_binding_shapes_are_admitted_or_refused_by_real_validator` also executes32/48/64, raw and malformed-prefix refusal, and producer unsupported-length refusal. |
+| Abort during pending Start released endpoint slot (64 rather than63) | Start holder installed before await, retained by existing endpoint cleanup; late Conversation canceled. `production_abort_pending_start_retains_registration_and_pre_registration_owners` GREEN for pre-registration and registered Start, no token publication, sealed operation/slot retention and Pending/Unknown/Confirmed cleanup. |
+| Concurrent reaper removed entries from count and observer reported0 instead of1 | Claimed entries stay in authoritative checking count. `production_cleanup_count_covers_claimed_records_and_concurrent_insertion` GREEN for Pending/Unknown/Confirmed, second insertion, dual charges and final legal zero. Provider/proof callbacks and final disposal remain outside shared locks. |
+| Actual candidate private materialize quietly succeeded after local IdentityMismatch | Existing model/Git consumers keep Sspi Authentication visible as GitCommandFailed/GenericError. `private_materialize_keeps_production_native_identity_refusal_visible` GREEN; accepted helper absence and RepositoryRefused suppression unchanged. |
+
+The first broad FILTER=production_ RED ran55PASS/4FAIL: the three native regressions
+above plus an unrelated existing merge reverse-entry fixture bootstrap failure.
+The private materialize RED ran separately1FAIL. Test fixture compilation errors
+were corrected before these meaningful RED receipts. The first focused native
+GREEN attempt ran25PASS/1FAIL because an assertion counted physical cleanup and
+native cleanup together (2 instead of1); the final assertion identifies the
+native owner and separately observes bounded physical settlement. No product
+relaxation was made for that test correction.
+
+Private validator execution is fail-closed and bounded to30s per subprocess. Core
+uses public prepared inputs, takes the synthetic CBT from the production TLS
+AuthRequest, invokes `cargo +1.95.0 test --manifest-path gwz-sspi/Cargo.toml --lib
+--locked --offline composition_request_validator_fixture -- --nocapture
+--test-threads=1` with an external target and test-only hex fixture input, and
+requires exactly one admission/refusal receipt. The standalone unit-test entry
+calls the existing private `protocol::supervision::validate_request`; no public
+API, codec, production dependency, live credential, source mutation or compiler-
+diagnostic probe was added. Ordinary standalone SSPI tests construct their own
+synthetic inputs and have no neighbor/private-evidence dependency. This proves
+the previously bypassed structural CBT admission boundary; private synthetic
+provider responses do not qualify native Windows authentication or EPA behavior.
+
+Round1 exact focused core command is the Core command above with
+FILTER=`https_worker::native::tests::`: GREEN26/26. With FILTER=`private_members::`:
+GREEN8/8, including existing quiet private access refusal/public failure rows and
+the new actual producer-to-consumer regression. SSPI
+`CARGO_TARGET_DIR=$C/sspi cargo +1.95.0 test --manifest-path gwz-sspi/Cargo.toml
+--doc --locked --offline`: GREEN27/27 (7 compiled recipes,20 compile-fail probes),
+including the exact cancel → retained receipt → cleanup_status → bounded shutdown
+accounting recipe. The standalone validator fixture also passed1/1 without its
+optional composition input. Existing unaffected transport/CLI/Python source gates
+above are historical inherited receipts, not rerun round1 claims.
+
+Final common-prepare affected command with FILTER=`https_`: GREEN199/199 (23.76s).
+Final supported producer refresh used Prepared($C/py-provisioned-rem1,
+$C/core-prepared,$C/py-prepared/Cargo.toml), the absolute unresolved venv interpreter,
+RUSTUP_TOOLCHAIN=1.95.0, CARGO_NET_OFFLINE=true and external py-packaging-target.
+Wheel: `$C/py-provisioned-rem1/wheels/gwz-0.0.0-cp310-abi3-macosx_11_0_arm64.whl`;
+extracted final source artifact: `$C/py-provisioned-rem1/extension/gwz/_gwz_core.abi3.so`.
+With GWZ_PY_NATIVE_MODULE pointing at that exact artifact, the same packaging
+pytest filter above passed6,1existing macOS nonUTF8 skip,18deselected; the same
+ClientHost transport filter passed2,8deselected. This executes supported matched
+worker/extension metadata and actual loaded constructor/network/descriptor
+handoff; it does not activate or qualify Windows native HTTP.
+
+Round1 final rustfmt check passed on10 changed Rust files; no new ordinary
+Rust test compilation warning was emitted (dependency ranlib warnings retained).
+Cfg1388/433, core globals1183/19, core inventory23 and Python inventory5 pass;
+all5member diff whitespace checks pass. Administrative inventory correction is
+recorded separately from37 handwritten source/test files. Six member/API docs
+remain within8; the root CallerGuide and this checkpoint are also updated.
+
+Raw final runs and the failed25/26 focused attempt are retained in the private
+[round1 evidence run](../gwz-core-evidence/campaigns/https-integration/runs/2026-10-03-https-sspi-composition-rem1/README.md)
+(access required). Earlier RED observations captured only in tool output are
+listed as derived receipts, not invented raw files. The original raw47 historical
+result is not overwritten or reconstructed. Build trees and compiled artifacts
+remain external; public composition tests need no private evidence access.

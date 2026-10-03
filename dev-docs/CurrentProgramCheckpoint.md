@@ -1,53 +1,54 @@
 # Current program checkpoint
 
-## SSPI HTTPS composition implemented; review NO-GO, bounded correction next, 2026-10-04
+## SSPI HTTPS round1 corrected; settled closure review pending, 2026-10-04
 
-The operator resumed the accepted cohesive step4b implementation. Product changes
-are committed through GWZ at the member tuple below. The root review object is
-this checkpoint, the caller guide and the
-[implementation receipt](GwzSspiHttpsCompositionCheckpoint.md); its exact root
-SHA is recorded in the generated review prompts after this settlement.
+The accepted step4b architecture is unchanged. Initial implementation Code and
+State were NO-GO; Surface GO/P3. The
+[merged correction](GwzSspiHttpsCompositionImplementation-RemPlan.md) has landed
+through GWZ at the tuple below, but findings remain open until their original
+reviewers verify closure. The root SHA is in the generated re-review briefs.
 
-- gwz-core `efdd0a2cf66be889364466c7d69c97cc2736c278`
-- gwz-sspi `58cc87c99bca21874a63d0ba11209b75a3e0c50a`
+- gwz-core `28f564a674574eaefa43266d3137be9a4ddc38b8`
+- gwz-sspi `c88fa0e174b185a43e0d0d0c91660cb0957e380a`
 - gwz-transport `8a2ec7fc2e6d6a0da4c5519d72eac90c9ca4c578`
 - gwz-cli `6a9c0dac8aebe7b9d20ecfa20a8c402ec4bf4311`
 - gwz-py `e0c5af10b33289a455f662680af8ac12fd24f9d3`
+- gwz-core-evidence `ba70034feaeb384619d48dbfaa06c02df6f508b3`
 
-Accepted [design](GwzSspiHttpsCompositionDesign-DRAFT.md),
-[acceptance](GwzSspiHttpsCompositionAcceptance.md) and
-[budget disposition](GwzSspiHttpsCompositionBudgetDisposition.md) control.
-The implementation connects original-caller capture, immutable HTTPS Open D,
-final-origin CBT, native rounds/facts, exclusive generation and retained cleanup
-through CLI and Python entries. Zero refuses native selection before Begin;
-anonymous, Basic and SSH remain available without native availability.
-Windows activation boundaries remain unchanged.
+Corrected raw digest→prefixed CBT, owned Start retention before await,
+conservative reaper visibility, visible local native error projection, introduced
+serve lint and caller teardown documentation. Code/State independently converged
+on ownership/counting and lint attribution. Real TLS→real private SSPI validator,
+pre-/post-registration Start abort, concurrent reaping and actual private-member
+producer→consumer regression tests now execute the original counterexamples.
 
-Gates: core HTTPS 195/195; subsequent secondary-owner live wipe 1/1; standalone
-SSPI and transport tests/strict Clippy; regenerated projections; loaded supported
-Python wheel packaging and overlapping operation checks; cfg boundaries, globals,
-inventories and formatting. Full strict core Clippy remains RED47. Review refutes its original all-baseline
-attribution: one new serve guard diagnostic was missed. Correct and refresh
-the receipt rather than claim zero new diagnostics. See the receipt for exact commands,
-artifact paths, setup failures and the order of final source/artifact checks.
-34 handwritten source/test files and 2,757 added lines; six member/API documents,
-one separately authorized Python ledger and three generated projections.
+Gates: full affected HTTPS199/199; native26/26; private_members8/8;
+SSPI doctests27/27; final supported wheel packaging6PASS/1existingmacOSskip,
+actual loaded ClientHost2PASS including overlapping operations. Source guards,
+formatting, inventories and whitespace pass. Strict core Clippy remains RED45:
+introduced guard/new bridge diagnostics absent; the earlier RED47 all-baseline
+claim is withdrawn, with the exact primary-span comparison limits recorded in
+[the receipt](GwzSspiHttpsCompositionCheckpoint.md). This is no full strict-core
+PASS or platform/release qualification.
+37 handwritten source/test files,3,201addedlines; six member/API docs; two
+administrative inventory ledgers; three generated projections. Final receipt
+links to a committed private raw run and50filefingerprint; public tests do not
+depend on private archive access. Existing old alpha evidence is untouched.
 
-Code and State implementation reviews are NO-GO; Surface is GO/P3. The
-[merged remediation](GwzSspiHttpsCompositionImplementation-RemPlan.md) corrects
-CBT representation, Start retention, reaper visibility, native error projection,
-lint attribution and teardown documentation in one patch. Both main axes
-independently found the ownership/counting defects. Next: one drafter correction,
-settlement and original-reviewer closure. No finding is self-closed. Unrelated untracked SSH
-N2b prompts/route draft, core bug report and old private alpha evidence are out of
-scope. Owner-generated review prompts/reports are the only permitted new review
-outputs. No Windows activation, push, tag, publication or release.
+Next: original Code/State verify their finding closures; original cold Surface
+checks exact teardown signatures/recipe. No edit or HEAD movement during that
+review. No finding self-closed. Unrelated untracked root SSH N2b prompts/route
+draft, core bug report and old alpha evidence stay out of scope. Generated
+re-review briefs/reports are authorized review outputs. No Windows activation,
+push, tag, publication or release. Accepted design/zero disposition and revised
+budget remain controlling; full Windows release remains NO-GO.
 
-Metrics: this implementation object has one completed initial implementation review and
-zero completed remediation rounds. Regression discoveries during implementation contact are
-listed in the receipt; no post-acceptance escape claim applies before acceptance.
-Wall time spans the parked session/restart and is not measured as a single run.
-Earlier entries below are historical snapshots; the user continue revoked pause.
+Metrics: one initial review completed, first remediation patch committed,
+zero completed remediation reviews. Four unique P2 defects and two P3 issues
+were discovered at settled review (three independently convergent across main
+axes); genuine counterexamples and correction gates are in the receipt. No
+post-acceptance escape claim applies before acceptance. Wall time spans restart
+and is not measured as one session. Earlier entries are historical snapshots.
 
 ## SSPI HTTPS implementation paused for Codex restart, 2026-10-04
 
