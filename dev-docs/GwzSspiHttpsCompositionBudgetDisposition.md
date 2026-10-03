@@ -38,3 +38,21 @@ API, policy, owner, dependency or activation scope is added. Preserve the existi
 bootstrap default and test the actual host mux path. This is a budget-only
 correction to the estimate, before either extra call site is edited; it does not
 waive implementation review or authorize omitted graph/test obligations.
+
+## Required source-ratchet ledger
+
+The Python candidate-switch guard reports two new sites in the already counted
+`native/src/client_host.rs::network`: original-caller capture and attaching that
+capture to the selected route. The owner authorizes the corresponding two rows
+in `gwz-py/scripts/candidate_switch_inventory.txt` before editing it. This is one
+administrative ratchet ledger in addition to the 34 handwritten production/test
+files (35 files when that ledger is included); the source-line and member/API-doc
+ceilings remain unchanged. It records the two accepted existing-entry seams,
+not a new switch, consumer or activation rule. The actual guard must pass after
+reconciliation; adding rows is not evidence that the seams work.
+
+The final call-path implementation replaces the initially drafted mapping hunk
+in `request.rs` with the actual coarse-policy selector in
+`git/gitbackend/transport_binding.rs`. This substitution stays within the same
+34 source/test files and preserves explicit Anonymous policy rather than
+reinterpreting it as WindowsDefault.
