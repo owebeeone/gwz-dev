@@ -1,5 +1,17 @@
 # Remote transport release readiness
 
+## SSPI HTTPS contract accepted; implementation pending, 2026-10-04
+
+[Composition acceptance](GwzSspiHttpsCompositionAcceptance.md) records independent
+Consistency/Safety GO and retained caller Surface GO on the exact reviewed tuple.
+Timeout zero is settled: native selection refuses before publication without a
+finite deadline; positive setup remains one fixed logical Open deadline.
+Implementation of step 4b is authorized and next, followed by its secret-adapter
+and installed-caller reviews. The accepted worker/host foundation remains valid.
+Full Windows release remains NO-GO until implementation, native qualification and
+the remaining release gates pass. No push, tag, publication or activation.
+Earlier entries below are historical snapshots.
+
 ## SSPI foundation and installed hosts accepted, 2026-10-04
 
 The [native worker](GwzSspiNativeAcceptance.md) and

@@ -221,6 +221,28 @@ cancelled or every shutdown empties its resources.
 
 ## 6. Core composition and clocks
 
+The accepted [HTTPS composition amendment](GwzSspiHttpsCompositionDesign-DRAFT.md),
+with exact review tuple in [acceptance](GwzSspiHttpsCompositionAcceptance.md),
+clarifies this section's clock source and caller handoff. For native-capable
+HTTPS, capture one positive effective setup aggregate as an absolute logical Open
+deadline before first checkout/adoption. Preserve it across discovery, redirects,
+helper work, carried/reused leases and all native rounds. Zero refuses native
+selection before Begin or credential publication; an expired positive deadline
+is Timeout. Allocation and cumulative active HTTP I/O allowances cannot replace
+that deadline. This extends the positive setup clock's scope only, without
+extending retry eligibility. An enclosing expiry during helper work cancels with
+setup/authentication provenance and cannot cause default-logon fallback; M4/M10's
+own captured allowances and helper failure provenance remain distinct.
+
+The same amendment specifies Supervisor-bound owned CallerCapture and
+start_captured, captured synchronously on the original host entry before fanout
+or Python submission. Start owns a private origin reference without executor
+recapture; launch rechecks identity and thread liveness. Native Facts preserve
+actual mechanism authority independently of native Complete; authenticated
+success additionally requires credential publication and valid remote acceptance.
+These clarifications supersede ambiguous clock/capture wording below, without
+changing the library's immutable deadline or retained ownership guarantees.
+
 The core adapter passes an **absolute existing operation/setup deadline** and
 cancellation observation. Launch, Hello, native rounds and IPC all consume that
 same deadline; no fresh allowance per challenge, helper-local budget or 120-second

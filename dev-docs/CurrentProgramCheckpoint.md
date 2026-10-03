@@ -1,5 +1,21 @@
 # Current program checkpoint
 
+## SSPI HTTPS contract accepted; implementation authorized, 2026-10-04
+
+[Acceptance](GwzSspiHttpsCompositionAcceptance.md) records the exact reviewed root
+`721e07d65aa78a8bd79d41dae86ad99629a7aefc` and unchanged product-member tuple.
+Consistency re-verdict and the first completed Safety review are GO, with zero
+open findings. P2-1 is independently closed for the contract. Original Surface GO
+is retained for unchanged caller shape; only disposition-status text changed.
+One bounded documents-only remediation round; prior quota failure was incomplete.
+The delegated zero decision is finite native setup or pre-publication refusal.
+The operator authorizes implementation of the bounded cohesive step 4b, under §9
+budget and production-bridge test obligations. Dual Code/State secret-adapter
+review and installed-caller Surface check follow the committed implementation.
+HTTPS composition is not yet implemented or accepted. Windows activation and full
+release remain NO-GO; no push, tag, publication or release is authorized.
+Entries below are historical snapshots.
+
 ## SSPI HTTPS reviews resumed; timeout zero settled by owner, 2026-10-04
 
 The operator directed the owner to finish reviews, settle timeout-zero behavior

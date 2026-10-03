@@ -1,7 +1,9 @@
 # HTTPS SSPI composition — bounded remediation
 
-2026-10-04. Status: correction applied, independent closure pending; acceptance and implementation remain
-NO-GO. The reviewed root is `fe40ba9b23e31da95358441ae5214a7cadb31b31`;
+2026-10-04. Status: **closed for the accepted design contract**. Original
+Consistency independently closed P2-1 at root `721e07d65aa78a8bd79d41dae86ad99629a7aefc`;
+Safety completed with GO. See [acceptance](GwzSspiHttpsCompositionAcceptance.md).
+The disposition and resume entries below are historical. The originally reviewed root is `fe40ba9b23e31da95358441ae5214a7cadb31b31`;
 member HEADs are unchanged from the exact tuple in the filed reports.
 
 ## Review disposition

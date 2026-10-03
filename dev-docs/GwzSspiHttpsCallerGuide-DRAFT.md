@@ -1,8 +1,9 @@
 # HTTPS caller capture — proposed API guide
 
-DRAFT, 2026-10-04. The additions below are proposals, not APIs available in the
-current package. The owner selected timeout-zero native refusal under the
-operator's directive to settle the behavior; contract review remains required.
+Accepted caller contract, 2026-10-04, with exact tuple and review scope in
+[acceptance](GwzSspiHttpsCompositionAcceptance.md). The additions below are not
+yet APIs available in the current package. The owner selected timeout-zero native
+refusal under the operator's directive; independent contract review is complete.
 This guide supplies no authority to activate Windows HTTPS transport. Digest
 remains refused before native credential/context work.
 

@@ -1,13 +1,14 @@
 # HTTPS SSPI composition amendment — DRAFT
 
-Status: characterization and proposed contract, 2026-10-04. This document is not
-authority to implement, activate Windows transport, change a public API, or
-change either wire protocol. It proposes the cohesive remainder of plan step
-4b after the accepted host packaging/bootstrap checkpoint 4a. Independent
-consistency, safety and caller-surface review precedes implementation. The
-operator directed the owner to finish the reviews, settle timeout zero and then
-implement; the owner's finite-deadline disposition is recorded below. The
-remaining review gates are not waived by that directive.
+Status: **accepted design contract**, 2026-10-04, at root
+`721e07d65aa78a8bd79d41dae86ad99629a7aefc` and the member tuple in
+[acceptance](GwzSspiHttpsCompositionAcceptance.md), after Consistency/Safety GO
+and retained caller Surface GO. The historical DRAFT filename is retained for
+review references. This authorizes the bounded implementation of step 4b after
+accepted host packaging/bootstrap step 4a, including the API and taut changes
+specified below. It does not accept an implementation or authorize Windows
+activation or release. Proposed-language sections below describe the accepted
+implementation contract; characterization of the baseline remains historical.
 
 Baseline: root `ac950cc7c88fb897938a5c300fb228fd17d3ea41`, core
 `8cb3a3f01d79699a5ad07b6ec7cfc78321224d31`, SSPI
@@ -46,7 +47,7 @@ and proceed through review to implementation. Under that delegation, the owner
 selects finite native setup or refusal at zero, preserving the SSPI deadline
 contract without an invented allowance. This is a recorded owner disposition,
 not an inference from elapsed time. Independent acceptance of this corrected
-proposal remains required before dependent implementation.
+proposal is recorded in the linked acceptance before dependent implementation.
 
 This also makes the positive aggregate run through challenge-dependent helper
 work on a route that can select SSPI. There are **no pauses or extensions**.
