@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## SSPI Rust repository scaffold accepted, 2026-10-03
+
+The operator authorized `gwz repo create gwz-sspi` and Rust/test/release layout.
+The member is registered locally; independent Code/State review is GO on the
+[scaffold record](GwzSspiScaffold.md). Standalone Cargo, exact toolchain, separate
+contract/replay/native-test directories, optional refusing worker, Gearu managed
+instructions/config, CI and guarded publication workflow are committed. The one
+nonblocking archive documentation issue was corrected and package-verified.
+Local build/test/lint/format/package and Gearu validation pass. Public workflow
+files are authored, not remotely executed. Authentication/API/codec/native-worker
+implementation is still next; full Windows remains NO-GO. No remote configured,
+no registry release/push/tag. No additional operator input needed for local work;
+remote and registry setup are later release prerequisites.
+
+
 ## SSPI boundary design accepted, 2026-10-03
 
 [Design](GwzSspiDesign.md), [plan](GwzSspiPlan.md) and

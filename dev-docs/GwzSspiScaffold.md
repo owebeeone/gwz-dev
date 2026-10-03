@@ -1,6 +1,12 @@
 # GWZ SSPI repository scaffold
 
-2026-10-03. DRAFT implementation checkpoint, pending Code/State review.
+2026-10-03. **ACCEPTED scaffold checkpoint** after
+[Code GO](GwzSspiScaffold-ReviewCode.md) and
+[State GO](GwzSspiScaffold-ReviewState.md) at root
+`e6772cbeda821deb7f2f42d63f73d9a3581e60ec`, gwz-sspi
+`bd807b0403d502fd6f25ef2f93389ce432f0c0c0`, core
+`8cb3a3f01d79699a5ad07b6ec7cfc78321224d31`.
+Scaffold-only GO, not authentication implementation or release acceptance.
 The operator authorized GWZ local repository creation, Rust library/test layout
 and release management using Gearu. No release, tag, push or registry mutation.
 
@@ -59,3 +65,15 @@ accepted. Later code/secret boundary reviews retain the accepted plan's stops.
 Next implementation: owned caller values and private taut schema/secret codecs,
 fake tests, then dual secret-boundary GO before supervision work. Do not start
 native/authentication implementation inside this scaffold review chunk.
+
+## Acceptance addendum
+
+Original raw reports and canonical prompts are filed alongside this record.
+Code P3-1 (packaged README linked excluded implementation checkpoint) was fixed
+by explicitly including dev-docs/Implementation.md in the Cargo whitelist. A
+fresh package verification and direct archive-member inspection confirm every
+local README link now resolves; runtime/authentication code unchanged. This
+nonblocking correction did not open another remediation package. Workflow YAML
+parsing also passes using isolated PyYAML 6.0.2; no production dependency added.
+Earlier default interpreters lacked that optional validation tool; no edits to
+product environments were made. No remote CI, tag, publish or native SSPI claim.
