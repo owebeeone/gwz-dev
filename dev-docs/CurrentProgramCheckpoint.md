@@ -12,6 +12,10 @@ The delegated zero decision is finite native setup or pre-publication refusal.
 The operator authorizes implementation of the bounded cohesive step 4b, under §9
 budget and production-bridge test obligations. Dual Code/State secret-adapter
 review and installed-caller Surface check follow the committed implementation.
+The actual call-path inventory prompted an owner budget-only
+[disposition](GwzSspiHttpsCompositionBudgetDisposition.md): 32 source/test files
+instead of the estimated 26, retaining 3,500 handwritten added lines, eight
+member/API docs and the same reviewed architecture and test obligations.
 HTTPS composition is not yet implemented or accepted. Windows activation and full
 release remain NO-GO; no push, tag, publication or release is authorized.
 Entries below are historical snapshots.
