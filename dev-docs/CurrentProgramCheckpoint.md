@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## SSPI HTTPS implementation paused for Codex restart, 2026-10-04
+
+The operator explicitly requested parking. The single drafter was interrupted;
+no active compiler/build process was observed. The exact committed tuple,
+18 partial working-file fingerprints, focused RED/GREEN receipts, incomplete core
+tests and next actions are in the
+[parked checkpoint](GwzSspiHttpsCompositionParkedCheckpoint.md).
+Design reviews/timeout-zero disposition are accepted; partial implementation
+remains uncommitted and unreviewed. CLI/Python source is unchanged. Core's new
+native module contains tests only and is not a buildable completion. Do not
+resume until the operator resumes. Windows activation/full release remain NO-GO;
+no push, tag or publication. Earlier entries below are historical snapshots.
+
 ## SSPI HTTPS contract accepted; implementation authorized, 2026-10-04
 
 [Acceptance](GwzSspiHttpsCompositionAcceptance.md) records the exact reviewed root
