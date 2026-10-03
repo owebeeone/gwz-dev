@@ -77,3 +77,14 @@ the same object, not a new feature or architecture package:
 Artifact coherence, runtime authority, wire/core/auth ownership remain unchanged.
 The original round-1 testimony is preserved. Reviewers verify the narrow correction;
 no additional authentication/native campaign or expensive unchanged Rust gate is needed.
+
+Nonblocking cleanup is committed at Python ded47130af23720099e7b6a92ccb9a161bb5db9a;
+SSPI/CLI/core are unchanged. Four existing Python files change. Explicit/default
+candidate scratch-root regressions reproduced two failures and one control pass,
+then all three pass. Owned target capsules now live under the selected root;
+private wheel transaction staging and no-replace publication remain under output.
+Delegated option choices/absence policy link verified primary Maturin 1.15 contracts.
+Owner independently passed the final focused suites with the previous unchanged
+native image: 53 passed, one EILSEQ skip. The unprovisioned suite has 52 passes
+and two opt-in fixture skips. No fresh packaged artifact/native qualification or
+unchanged Rust build is claimed; diff checks pass. Final focused closure is pending.

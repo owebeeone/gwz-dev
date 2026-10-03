@@ -201,6 +201,13 @@ platform/filesystem limitations. Cumulative implementation remains 25 files and
 1,168 additions, six member plus three root implementation docs, with review
 audit records separate. Same-reviewer closure is pending, not accepted.
 
+All three remediation-1 verdicts are GO; four original P2 findings are closed.
+The two nonblocking caller details are corrected at Python ded4713 in four
+existing files, with production handoff/root tests and owner 53-pass focused
+suite (one EILSEQ skip using previous unchanged native image). Same reviewers
+perform final focused closure and changed-range inspection; this does not add
+another authentication/native proof or change core/runtime/wire scope.
+
 | Repository | Committed implementation |
 |---|---|
 | gwz-sspi | `e31b17e95defd3468140e9b5f73fef8591766599` |

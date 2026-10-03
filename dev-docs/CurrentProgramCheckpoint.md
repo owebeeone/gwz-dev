@@ -4,8 +4,10 @@
 
 Code/State/Surface re-verdicts are all GO at root 6b67028 and the corrected
 member tuple below. Four original P2s are closed; zero new architectural causes.
-Two nonblocking P3s are being corrected in the same object: candidate scratch-root
-placement and delegated auditwheel/compatibility defaults. Runtime/core/wire
+Two nonblocking P3s are corrected at Python ded4713 in the same object: candidate
+scratch-root placement and delegated auditwheel/compatibility defaults. Owner
+focused suites pass with 53 passes/one EILSEQ skip; native image is the previous
+unchanged Rust artifact, not a new packaged-build proof. Runtime/core/wire
 boundaries stay unchanged. Final acceptance/ledger follows focused closure.
 
 Code and State returned NO-GO on the installed-host tuple rooted at
