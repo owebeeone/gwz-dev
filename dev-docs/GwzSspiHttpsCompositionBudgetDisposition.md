@@ -22,3 +22,19 @@ or changing the accepted architecture; report exact modified-file/line counts.
 The implementation remains one cohesive draft and one settled dual Code/State
 secret-adapter review plus installed-caller Surface gate. Windows activation and
 release remain separately gated.
+
+## Resume call-path adjustment
+
+After restart, the draft reached exactly 32 handwritten files. Two existing
+live call sites are indispensable to the already accepted protocol: transport
+`src/mux/mod.rs::begin` must include native policies in its profile-2 offer while
+retaining the bootstrap offer's profile-1 default; core
+`src/transport_host/session/driver/opening.rs::open_https` must emit Ambient
+identity for native policies as §7 requires. Neither was in the earlier estimate.
+
+The owner permits **34 handwritten production/test files** for this exact
+completion, with 3,500 added lines and eight member/API docs unchanged. No new
+API, policy, owner, dependency or activation scope is added. Preserve the existing
+bootstrap default and test the actual host mux path. This is a budget-only
+correction to the estimate, before either extra call site is edited; it does not
+waive implementation review or authorize omitted graph/test obligations.

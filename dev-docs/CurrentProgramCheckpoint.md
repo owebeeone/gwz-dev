@@ -13,6 +13,10 @@ lease/CBT/cleanup and actual CLI/Python handoff are next, followed by the settle
 implementation review. No Windows activation, push, tag, publication or release.
 The parked entry below is historical; the user's continue revokes the pause.
 
+Live host mux traversal exposed two required existing call sites omitted from
+the 32-file estimate. The owner records a budget-only allowance of 34 files in
+the linked budget disposition; lines/docs and accepted semantics remain unchanged.
+
 ## SSPI HTTPS implementation paused for Codex restart, 2026-10-04
 
 The operator explicitly requested parking. The single drafter was interrupted;
