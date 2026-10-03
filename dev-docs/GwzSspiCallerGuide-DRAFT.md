@@ -3,8 +3,13 @@
 2026-10-03. **Accepted revision 2 baseline plus reviewed token-limit amendment.**
 GwzSspiMessagesAcceptance.md records Consistency/Safety/Surface GO after remediation 1.
 Package and worker are not released yet. Owned caller values and private codecs
-passed their separate [Code/State/Surface gate](GwzSspiSecretCodecAcceptance.md); native authentication remains unimplemented. Parent supervision is implemented in
-the accepted [supervisor checkpoint](GwzSspiSupervisorAcceptance.md).
+passed their separate [Code/State/Surface gate](GwzSspiSecretCodecAcceptance.md).
+Parent supervision is implemented in the accepted
+[supervisor checkpoint](GwzSspiSupervisorAcceptance.md). Native Negotiate/NTLM
+and shared worker entry passed the bounded
+[native ownership gate](GwzSspiNativeAcceptance.md); completed remote HTTP
+authentication and installed Windows qualification remain open. Digest refuses
+before credential/context work because the current request lacks native H(Entity).
 [Acceptance](GwzSspiAcceptance.md) records the exact reviewed tuple and Surface GO.
 The historical DRAFT filename is retained until the implementation documentation lands.
 Windows-specific native SSPI authentication, one contained process per conversation.
@@ -12,22 +17,28 @@ It produces authentication tokens; it does not make HTTP requests or decide whet
 a server authenticated you. Core/CLI/Python application protocols do not change.
 
 Install the matching `gwz-sspi` library and worker with your application. A CLI can
-call `worker_entry(bootstrap)` from an internal self-exec mode before its normal
+call `worker_entry(bootstrap, build_fingerprint)` from an internal self-exec mode before its normal
 startup. A Python wheel bundles the dedicated worker executable alongside its
 extension and uses its absolute installed path. No PATH lookup, shell or child
 Python interpreter. Removing/upgrading the application removes/replaces its worker
 together. The host supplies the trusted packaging metadata field
 `build_fingerprint`: exactly the 32 bytes embedded in that matching worker
 artifact and reported by Hello. The library neither derives these bytes from a
-file hash nor exports production packaging metadata. That producer belongs to
-the future installed-host packaging step; do not guess a digest or use Cargo
-version alone. A synthetic construction recipe is in the member supervision
-guide. Missing workers and protocol/build mismatches are errors, not fallbacks.
+file hash nor supplies default production packaging metadata. The build-only
+producer and host entry points are implemented pending the installed-host review;
+see the [library packaging guide](../gwz-sspi/docs/HostPackaging.md),
+[CLI packaging guide](../gwz-cli/docs/HostPackaging.md) and
+[Python packaging guide](../gwz-py/docs/HostPackaging.md). They supply matching
+compiled metadata for a declared artifact set. Do not guess a digest or use Cargo
+version alone. Missing workers and protocol/build mismatches are errors, not
+fallbacks; runtime environment and diagnostic receipts cannot provision a worker.
 
-The following signatures specify the full public API. Owned caller values, TokenLimit and the parent lifecycle are implemented; see [implemented caller values](../gwz-sspi/docs/CallerValues.md)
-for their constructors, source ownership and validation boundaries. Supervisor/Conversation and deadline/cancellation/cleanup support now have a
-standalone parent implementation; native authentication and worker_entry remain
-future functionality.
+The following signatures specify the public conversation API. Owned caller
+values, TokenLimit, the parent lifecycle and native worker entry are implemented;
+see [implemented caller values](../gwz-sspi/docs/CallerValues.md) for constructors,
+source ownership and validation boundaries. Installed CLI/Python packaging is
+implemented pending the [hosts checkpoint](GwzSspiHostsCheckpoint.md) review; core HTTP composition
+and endpoint activation are later gates.
 All async methods return owned results; step borrows Conversation mutably until
 its future completes or is dropped. SecretBytes/SecretText have zeroizing
 storage and no Debug/Clone. Conversation and Supervisor own resources; there are
@@ -43,7 +54,7 @@ no raw native handles or pointers in this caller API.
 | `Conversation::cancel(self) -> CancellationReceipt` | Immediately revoke result publication and initiate termination. Receipt names opaque record ID with cleanup Pending or Confirmed; not a claim termination is already complete. |
 | `Supervisor::cleanup_status(RecordId) -> CleanupStatus` | Pending or Confirmed. Terminal tombstones last for the supervisor lifetime and are bounded by a 256-entry FIFO; evicted IDs return Unknown, never inferred Confirmed. IDs are context-owned monotonic values with checked overflow refusal. |
 | `Supervisor::shutdown(Deadline) -> Future<ShutdownReport>` | Close admission, cancel records and await cleanup up to supplied deadline. Report gives confirmed count and outstanding record IDs. Idempotent; repeated calls may observe further cleanup. No default timeout. |
-| `worker_entry(WorkerBootstrap) -> WorkerExit` | Host's internal child-only dispatch using supplied private bootstrap pipe handles. No ordinary commands or network connection. Runtime bootstrap parsing is an internal integration API, not user CLI flags. |
+| `worker_entry(WorkerBootstrap, [u8; 32]) -> Result<(), Error>` | Host's internal child-only dispatch using supplied private bootstrap pipe handles and trusted compiled fingerprint. No ordinary commands or network connection. Runtime bootstrap parsing is an internal integration API, not user CLI flags. |
 
 `AuthRequest` owns Package (Negotiate, Ntlm or Digest), canonical host target,
 Identity, channel-binding bytes and a required `token_limit: TokenLimit`.
@@ -68,7 +79,8 @@ TokenLimit already applies the 65,536-byte ceiling and the host's HTTP allowance
 after scheme/base64 overhead,
 with the entire private frame capped at 100,000 bytes. Missing/oversized or
 wrong-package fields return InvalidRequest before native work; owned inputs wipe.
-Digest use remains gated on native provider qualification. Channel binding must come from
+Digest is unavailable: the current native request lacks H(Entity), so a reviewed
+contract amendment and native provider qualification are required. Channel binding must come from
 the actual verified final origin TLS connection, not a configured trust root.
 The library rejects missing/invalid binding for an SSPI offer. Basic uses another path.
 

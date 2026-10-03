@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## SSPI installed host packaging implemented; review pending, 2026-10-04
+
+The operator authorized the next chunk after native acceptance. The bounded
+[hosts checkpoint](GwzSspiHostsCheckpoint.md) covers step 4a: trusted artifact-set
+fingerprints, CLI early self-execution, Python bundled worker and installed
+descriptor selection. No core adapter or Windows gate removal is in this chunk.
+Local/extracted wheel, provisioned CLI, library, source-boundary and packaging
+gates pass. Implementation is committed at SSPI e31b17e, CLI 061385f and
+Python e9e228c; core stays 8cb3a3f. Dual Code/State plus caller Surface review
+is next. Registry publication prerequisites and Windows installed/native
+qualification are explicitly unproved; existing unrelated lint/format debt is
+untouched. No core HTTP adapter is claimed implemented.
+Step 4b remains open: existing finite deadline translation, honest native auth
+facts and actual HTTPS lease/route/identity/CBT composition. No fresh SSPI timeout
+allowance or helper provenance is authorized. Full Windows remains NO-GO;
+Digest, remote provider parity and qualification retain their separate gates.
+No push, tag, publishing, release or activation. Earlier entries are snapshots.
+
 ## SSPI native Negotiate/NTLM worker accepted, 2026-10-03
 
 [Acceptance](GwzSspiNativeAcceptance.md) records Code/State/Surface GO at root
