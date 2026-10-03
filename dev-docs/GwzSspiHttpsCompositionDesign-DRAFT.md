@@ -425,8 +425,11 @@ Closed native facts validity, checked in every Opened/Closed/Failure facts path:
   represents an actual unresolved Continue observation; direct NTLM cannot use
   it. Source may be Configured or CurrentLogon.
 - Selected requires nonnull mechanism. Negotiate permits Kerberos or Ntlm;
-  Ntlm scheme permits only Ntlm. authoritative=true follows only native Complete;
-  Continue may report a provisional selected mechanism with authoritative=false.
+  Ntlm scheme permits only Ntlm. Preserve the actual MechanismObservation
+  authoritative value independently of TokenStatus. Continue may be provisional
+  or authoritative; direct NTLM can already be authoritative on Continue.
+  Core tracks native Complete separately in the owned conversation state;
+  authoritative mechanism selection alone does not mean negotiation completed.
 - Selected source/scheme cannot change through a logical Open; a resolved
   mechanism cannot later switch. Producer/state checks enforce these temporal
   rules; structural codec checks alone do not prove a conversation history.
@@ -435,7 +438,12 @@ Closed native facts validity, checked in every Opened/Closed/Failure facts path:
   for Some(false), true for Some(true). No new tri-state enum or field is added.
   Native/provider failure or Complete alone leaves None. Actual remote rejection
   after publication sets Some(false); accepted remote authentication sets
-  Some(true), requiring credential_offered=true and Selected/authoritative=true.
+  Some(true), requiring credential_offered=true, Selected/authoritative=true,
+  independently observed native Complete and valid remote acceptance under the
+  existing terminal/publication checks. An authoritative Continue cannot satisfy
+  that completion prerequisite. Cancellation/expiry before Complete preserves
+  the actual mechanism authority and leaves authenticated=None unless an actual
+  remote rejection was observed.
   `http_status` remains the actual response status, not a synthetic native status.
 - `credential_offered` becomes true only when Authorization is actually
   published. It remains monotonic for the logical Open. Local failure before
@@ -554,6 +562,10 @@ Meaningful RED first, then GREEN on the same production bridge:
   mixed offers, no usable identity, helper timeout/cancel, explicit rejection,
   Digest refusal and no silent downgrade. Authoritative mechanism facts and
   incapable-peer admission tests against independently generated wire vectors.
+- Native facts preserve authoritative NTLM Continue, including cancellation or
+  expiry before Complete; an early remote response cannot bypass native Complete.
+  Only native Complete plus valid remote acceptance may publish authenticated
+  success. Cover unresolved/provisional Negotiate and remote rejection separately.
 - Lease exclusivity, final-origin CBT vs proxy TLS, replacement generation,
   authenticated redirect refusal; seeded late output/cancel/cleanup schedules
   and both terminal-publication orders through actual orchestration ports.

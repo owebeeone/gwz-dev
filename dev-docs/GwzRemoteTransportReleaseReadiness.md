@@ -10,6 +10,11 @@ scopes. They do not yet authenticate core HTTPS requests. The operator authorize
 the next HTTPS composition chunk; its finite deadline translation and honest
 native authentication facts need a bounded contract clarification before
 implementation. Current work is recorded in [the program checkpoint](CurrentProgramCheckpoint.md).
+Composition draft review returned Surface GO and Consistency NO-GO on one
+mechanism-authority/completion mismatch. Its bounded text correction is recorded
+but unverified; Safety could not produce a verdict because of the usage limit.
+The timeout-zero/native-refusal choice remains pending. None of these records
+accepts HTTP composition or authorizes dependent implementation.
 
 Windows release remains NO-GO. After HTTPS composition, the outstanding Windows
 provider, identity, EPA, Digest, trust, proxy and agent compatibility rows still

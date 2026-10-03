@@ -1,5 +1,28 @@
 # Current program checkpoint
 
+## SSPI HTTPS composition review incomplete; correction recorded, 2026-10-04
+
+The documents-only proposal was reviewed at root
+`fe40ba9b23e31da95358441ae5214a7cadb31b31`, with all product member HEADs
+unchanged from the installed-host baseline. Filed
+[Consistency](GwzSspiHttpsComposition-ReviewConsistency.md) is NO-GO on one P2:
+mechanism authority and native token completion are independent facts. Filed
+[Surface](GwzSspiHttpsComposition-ReviewSurface.md) is GO with no findings.
+Safety hit the account usage limit without producing a report/verdict; this is
+an incomplete attempt and is not counted as a completed review/remediation.
+
+The [bounded remediation](GwzSspiHttpsComposition-RemPlan.md) records one text
+correction preserving authoritative NTLM Continue while requiring native Complete
+separately before authenticated success. The owner applied it to the proposal;
+the original reviewer has not verified closure. Future bridge tests/wire vectors
+must cover its publication/cancel/expiry counterexamples. The caller guide is
+unchanged. No new schema/API/source/runtime dependency or Windows activation.
+Next: revised exact-tuple Consistency re-verdict plus the missing Safety review
+when quota permits; also obtain the pending timeout-zero/native-refusal choice.
+Draft acceptance and dependent implementation remain NO-GO. The accepted native
+worker/installed-host scopes remain valid; full Windows release is still NO-GO.
+No push, tag, publication or activation occurred. The earlier entry is historical.
+
 ## SSPI HTTPS composition draft ready for review, 2026-10-04
 
 The operator authorized step 4b after installed-host acceptance. One retained
