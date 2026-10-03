@@ -1,5 +1,43 @@
 # GWZ SSPI native worker checkpoint
 
+## Current object: remediation 1 pending re-verdict
+
+2026-10-03. Initial Code/Surface GO and State NO-GO are preserved verbatim.
+[One merged remediation](GwzSspiNative-RemPlan.md) corrected all six finding
+records in member `425e13dc011c42e94fdea31779a8e5967aedc82b`.
+[Drafter report](GwzSspiNative-DrafterReport-1.md) records portable/cross/package
+results and the two guard RED/GREEN regressions. Public API, dependencies, wire
+and authentication policy are unchanged; Digest remains unavailable.
+
+Owner disabled-branch scope check passed. Corrected committed source passed
+actual Windows11/MSVC production Supervisor/native/default suites. Suspended
+children distinguish Job termination from EOF; the no-kill control remained
+alive until explicitly terminated, with held-handle cleanup. Actual parent death
+and forced after-spawn/PID/observer failures confirmed helper/worker exit and
+scratch disposal. Real Negotiate query returned status0, NTLM selection and a
+returned allocation with checked successful release. These are local initial
+tokens, not completed remote authentication. The direct helper no-op supplies no
+separate containment proof.
+
+The documented recipe's unchanged ownership/restoration logic passed all four
+absent/prior-value × success/injected-failure cases with actual owned-root removal
+after synthetic receipt retention. Its first long encoded collector invocation
+failed at PowerShell parsing; exact failed evidence is preserved. File invocation
+of the same harness passed. Final owned-path inventory: 0, E: ReFS, build26200.
+
+Private [corrected campaign](../gwz-core-evidence/campaigns/transport-qualification/runs/2026-10-03-sspi-native-remediation-1/README.md)
+(private access required) is committed at evidence
+`9adf06beab7a15d1e5c22ec1cecf8e35966e1d7c`; archive/tracked checks and exact manifest
+hashes pass. Original raw receipts remain immutable. Earlier Job-drop/parent-loss
+receipts observed exit with EOF as a competing cause; the stronger claim belongs
+only to the corrected suspended-child run.
+
+Next: same Code/State/Surface reviewers verify their original counterexamples and
+classify the changed range at the corrected settled tuple. The owner does not
+self-close findings. No activation/push/tag/release; open Digest, installed host
+composition and full Windows qualification gates remain. Sections below describe
+the original implementation checkpoint.
+
 2026-10-03. **Implementation in progress; not accepted.** Operator authorized
 plan step 3 after parent supervision acceptance. Parent baseline is root
 e220886f0641e4d3e5e67443171808666e191ff7 and gwz-sspi

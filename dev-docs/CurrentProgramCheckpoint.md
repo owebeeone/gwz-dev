@@ -1,5 +1,26 @@
 # Current program checkpoint
 
+## SSPI native worker review: bounded remediation 1, 2026-10-03
+
+Initial Code/Surface GO and State NO-GO at root
+40fd121fbc2d9e6e727ed1a1b2501275200a1797, member
+610964282663c3b7844c9620d063e40d9ee76258, reference core
+8cb3a3f01d79699a5ad07b6ec7cfc78321224d31 and evidence
+57d132b823d405bf91b698c74aaaf75b9bee5980. Reports are filed verbatim.
+[The merged remediation](GwzSspiNative-RemPlan.md) addresses one P2 and five P3
+records: failed fixture helper cleanup, containment evidence with EOF as a
+competing exit cause, real initial Negotiate query coverage and caller-guide
+status/restoration. Production API/wire/auth policy remain unchanged. Original
+native exit receipts are preserved; they do not independently prove Job kill.
+Corrected member
+425e13dc011c42e94fdea31779a8e5967aedc82b and evidence
+9adf06beab7a15d1e5c22ec1cecf8e35966e1d7c are committed. Portable/cross/package,
+source-scope and actual Windows native/default/recipe gates pass; final owned
+inventory is empty. Same reviewers now verify closure and changed-range scope. No production exposure or false
+publication defect was established. Digest H(Entity), host integration and full
+Windows qualification remain open; no activation/push/tag/release.
+Earlier entries below are historical snapshots.
+
 ## SSPI native worker gates passed; review pending, 2026-10-03
 
 Operator authorized plan step 3 after parent supervision acceptance.
