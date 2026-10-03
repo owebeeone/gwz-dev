@@ -1,5 +1,21 @@
 # Current program checkpoint
 
+## SSPI native worker gates passed; review pending, 2026-10-03
+
+Operator authorized plan step 3 after parent supervision acceptance.
+[Native checkpoint](GwzSspiNativeCheckpoint.md) records baseline, scope and the
+reviewed Windows binding feature addition. Native candidate member
+610964282663c3b7844c9620d063e40d9ee76258 is committed. Darwin/package/schema,
+Windows MSVC/GNU strict inspection, disabled-branch scope and actual Windows
+production Supervisor/native/EOF/Job/parent-death/default suites pass. Native
+logs are archived privately; final owned-process inventory is empty. Next is
+mandatory peer-blind Code/State secret-disposal review and cold WorkerEntry
+Surface review of the settled tuple. Digest is refused before acquisition:
+Microsoft requires H(Entity), absent from the current contract. It needs a
+bounded reviewed amendment, so this does not close all plan step 3. No wire
+amendment or host activation; full Windows release remains NO-GO.
+
+
 ## SSPI parent supervision accepted, 2026-10-03
 
 [Acceptance](GwzSspiSupervisorAcceptance.md) records independent Code/State/Surface
