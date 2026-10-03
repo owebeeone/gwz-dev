@@ -4,8 +4,7 @@
 GwzSspiMessagesAcceptance.md records Consistency/Safety/Surface GO after remediation 1.
 Package and worker are not released yet. Owned caller values and private codecs
 passed their separate [Code/State/Surface gate](GwzSspiSecretCodecAcceptance.md); native authentication remains unimplemented. Parent supervision is implemented in
-the pending [supervisor checkpoint](GwzSspiSupervisorCheckpoint.md); that gate is
-not yet accepted.
+the accepted [supervisor checkpoint](GwzSspiSupervisorAcceptance.md).
 [Acceptance](GwzSspiAcceptance.md) records the exact reviewed tuple and Surface GO.
 The historical DRAFT filename is retained until the implementation documentation lands.
 Windows-specific native SSPI authentication, one contained process per conversation.

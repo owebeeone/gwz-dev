@@ -1,21 +1,24 @@
 # Current program checkpoint
 
-## SSPI supervisor remediation 1 ready for re-review, 2026-10-03
+## SSPI parent supervision accepted, 2026-10-03
 
-Initial settled tuple: root d2821a2db90aa641b1af6f80cadaf1aba9b35a0c, member
-fb6a5fc6d1d013b3e7e9f6955d7b6dabafd51d7a, reference core unchanged
-8cb3a3f01d79699a5ad07b6ec7cfc78321224d31. Code NO-GO (one P2), State NO-GO
-(two P2s), Surface GO (one P3). [Merged remediation](GwzSspiSupervisor-RemPlan.md)
-fixes accidental receiver lifetime capture, terminal projection after reaping and
-completed-step challenge lifetime. Both axes converged on missing production fake
-ownership-bridge coverage (P3); polling disposal/fingerprint documentation also
-corrected in this one patch. Recorded tier remains dual Code/State plus Surface;
-corrected member a75485cbdd03607909d11637c07f97548dd7902c passes full local
-and cross-target/standalone gates; original reviewers verify the corrected tuple
-before acceptance. Accepted-through
-remains the prior secret gate. Native provider/worker entry, Windows runtime and
-installed-host qualification remain deferred; worker refuses, publishing/activation
-and full Windows release remain NO-GO. No push/tag. Earlier entries are historical.
+[Acceptance](GwzSspiSupervisorAcceptance.md) records independent Code/State/Surface
+GO at root 255d05e09c0433e27dd7afeaa9f9fe04699cad05, member
+a75485cbdd03607909d11637c07f97548dd7902c and unchanged reference core
+8cb3a3f01d79699a5ad07b6ec7cfc78321224d31. Final member
+aec1b9c65b75ad53dd3ae780fc1e04af18de795c updates packaged status only.
+Parent async lifecycle, charged launch/I/O/reaping, Windows containment adapter
+and strict phase bridge are accepted; native authentication is not implemented.
+One merged remediation closed three P2s and all P3s. Code/State converged on
+missing ownership-bridge coverage; actual production fake-port iterations now
+cover it. Zero open findings, new architectural causes 0, escaped defects observed
+0. Recorded tier: dual Code/State plus Surface. Full local Rust/schema/lint/fmt,
+disabled-branch scope and standalone archive tests pass; Windows MSVC/GNU strict
+cross-compilation passes. Native runtime and remote CI remain unexecuted.
+Next: step 3 native SSPI/bootstrap and credential/context/buffer disposal, Windows
+fixtures, then mandatory dual secret-disposal gate. Worker still refuses;
+publishing/activation and full Windows release remain NO-GO. No push/tag/release.
+Earlier sections are historical snapshots.
 
 ## SSPI caller values / secret codec accepted, 2026-10-03
 

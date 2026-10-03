@@ -1,6 +1,8 @@
 # SSPI supervisor remediation 1
 
-2026-10-03. **NO-GO pending correction and reviewer verification.** Review tuple:
+2026-10-03. **Complete: original reviewers verified all findings closed and returned GO.**
+GwzSspiSupervisorAcceptance.md records the exact corrected tuple.
+The initial NO-GO and dispositions below are retained as the audit trail. Review tuple:
 root d2821a2db90aa641b1af6f80cadaf1aba9b35a0c, member
 fb6a5fc6d1d013b3e7e9f6955d7b6dabafd51d7a, unchanged reference core
 8cb3a3f01d79699a5ad07b6ec7cfc78321224d31. One merged patch; native provider,

@@ -1,9 +1,10 @@
 # SSPI supervision kernel implementation checkpoint
 
-2026-10-03. **DRAFT implementation checkpoint** under accepted GwzSspiDesign.md
+2026-10-03. **Accepted implementation checkpoint** under accepted GwzSspiDesign.md
 revision 2 plus §8 and GwzSspiPlan.md step 2. Operator authorized implementation
 after the accepted secret-codec gate. This applies the approved mechanism, not a
-new process/protocol design. Mandatory dual Code/State gate; additional Surface
+new process/protocol design. [Acceptance](GwzSspiSupervisorAcceptance.md) records
+Code/State/Surface GO on the exact corrected tuple. Mandatory dual Code/State gate; additional Surface
 check for the newly implemented caller lifecycle. No native SSPI or product
 activation is implied.
 
@@ -153,3 +154,7 @@ sixteen compile-fail doctests), strict Darwin/MSVC/GNU Clippy, both format check
 13 Python tests. Three original blocking counterexamples were RED before correction
 and GREEN afterward. New production iteration/fake-owner coverage supplements
 the retained pure kernel schedules. Await original reviewers; no native claim.
+
+All original reviewers independently verified closure and returned GO on the
+corrected tuple; see GwzSspiSupervisorAcceptance.md. No native qualification or
+activation is accepted. Earlier implementation/review paragraphs are historical.
