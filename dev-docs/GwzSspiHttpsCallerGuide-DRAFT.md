@@ -1,7 +1,8 @@
 # HTTPS caller capture — proposed API guide
 
 DRAFT, 2026-10-04. The additions below are proposals, not APIs available in the
-current package. Timeout-zero native refusal is pending operator disposition.
+current package. The owner selected timeout-zero native refusal under the
+operator's directive to settle the behavior; contract review remains required.
 This guide supplies no authority to activate Windows HTTPS transport. Digest
 remains refused before native credential/context work.
 
@@ -84,7 +85,8 @@ paused, reset or extended; an earlier enclosing cancellation signals the supplie
 Cancellation. Existing active-HTTP-IO accounting remains separate.
 
 Proposed timeout-zero behavior is refusal of native selection before tokens when
-no finite setup deadline exists. It is pending, not an implemented default.
+no finite setup deadline exists. This is the selected contract proposal, not an
+implemented default or a claim of completed review.
 Expired positive deadlines produce Timeout. Anonymous, existing Basic and SSH
 do not require a native worker or caller capture; missing native availability
 is retained and reported only if native authentication is selected.

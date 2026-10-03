@@ -3,9 +3,11 @@
 Status: characterization and proposed contract, 2026-10-04. This document is not
 authority to implement, activate Windows transport, change a public API, or
 change either wire protocol. It proposes the cohesive remainder of plan step
-4b after the accepted host packaging/bootstrap checkpoint 4a. Owner consistency,
-safety and caller-surface review, followed by operator disposition of the clock
-proposal, precede implementation. No review has been dispatched by the drafter.
+4b after the accepted host packaging/bootstrap checkpoint 4a. Independent
+consistency, safety and caller-surface review precedes implementation. The
+operator directed the owner to finish the reviews, settle timeout zero and then
+implement; the owner's finite-deadline disposition is recorded below. The
+remaining review gates are not waived by that directive.
 
 Baseline: root `ac950cc7c88fb897938a5c300fb228fd17d3ea41`, core
 `8cb3a3f01d79699a5ad07b6ec7cfc78321224d31`, SSPI
@@ -13,7 +15,7 @@ Baseline: root `ac950cc7c88fb897938a5c300fb228fd17d3ea41`, core
 `0c7dfaf0199731648d2360358284010b2b4575c1`, Python
 `ded47130af23720099e7b6a92ccb9a161bb5db9a`.
 
-## 1. Decision needed and recommendation
+## 1. Clock proposal and timeout-zero disposition
 
 Retain SSPI's one finite immutable absolute deadline. There is no existing
 finite operation-wide deadline to copy at the actual HTTPS challenge callsite.
@@ -31,7 +33,7 @@ lease. It is never captured afresh at a 401, a native round, or a new physical
 connection inside that logical Open. The normal positive aggregate is 30 seconds;
 this is a proposed extension of that existing domain, not a new SSPI allowance.
 
-The exact compatibility disposition needing approval is: when the effective
+The exact compatibility disposition selected by the lane owner is: when the effective
 connect aggregate is disabled, refuse selection of SSPI before credential
 publication with a fixed unsupported finite-deadline-policy failure. Do not
 quietly restore 30 seconds, borrow allocation/network/helper time, or launch a
@@ -39,9 +41,12 @@ cancellation-only worker. Anonymous and existing Basic behavior remain governed
 by their existing zero-timeout contract. An already-expired positive deadline
 produces Timeout, not this unsupported-policy refusal.
 
-The operator's answer on this zero/refusal compatibility choice is pending.
-Elapsed time is not approval. Other contracts may be reviewed independently;
-no dependent implementation or final GO follows before that disposition.
+On 2026-10-04 the operator instructed the owner to settle timeout-zero behavior
+and proceed through review to implementation. Under that delegation, the owner
+selects finite native setup or refusal at zero, preserving the SSPI deadline
+contract without an invented allowance. This is a recorded owner disposition,
+not an inference from elapsed time. Independent acceptance of this corrected
+proposal remains required before dependent implementation.
 
 This also makes the positive aggregate run through challenge-dependent helper
 work on a route that can select SSPI. There are **no pauses or extensions**.

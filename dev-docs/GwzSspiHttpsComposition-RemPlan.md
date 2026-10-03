@@ -1,6 +1,6 @@
 # HTTPS SSPI composition — bounded remediation
 
-2026-10-04. Status: correction proposed; acceptance and implementation remain
+2026-10-04. Status: correction applied, independent closure pending; acceptance and implementation remain
 NO-GO. The reviewed root is `fe40ba9b23e31da95358441ae5214a7cadb31b31`;
 member HEADs are unchanged from the exact tuple in the filed reports.
 
@@ -28,10 +28,12 @@ is introduced by this correction; Surface's reviewed caller guide is unchanged.
 
 ## Resume boundary
 
-File and commit the correction/audit checkpoint through GWZ. After quota permits,
-reuse Consistency for its focused re-verdict and complete the missing independent
+The correction/audit checkpoint is committed at root `1468517adcfcaa88c8185d674ed7c6d09db877c6`.
+The operator has now directed the owner to finish the reviews, settle timeout
+zero and implement after acceptance. The owner chooses native refusal at zero;
+this matches the previously reviewed proposed behavior without a new allowance.
+Reuse Consistency for its focused re-verdict and complete the missing independent
 Safety review on the corrected exact tuple. Generate revised canonical prompts;
 do not reuse a prompt naming the original root against corrected HEAD.
-The operator's timeout-zero/native-refusal choice is still pending, and neither
-elapsed time nor a draft GO settles it. No dependent implementation or Windows
-activation starts before the required verdicts and that disposition.
+No dependent implementation starts before the required verdicts. Full Windows
+activation and release remain separately gated; the directive does not waive them.

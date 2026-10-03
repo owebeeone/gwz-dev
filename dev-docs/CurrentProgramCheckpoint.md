@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## SSPI HTTPS reviews resumed; timeout zero settled by owner, 2026-10-04
+
+The operator directed the owner to finish reviews, settle timeout-zero behavior
+and then implement HTTPS composition. The owner selects native refusal before
+credential publication when the effective setup aggregate is disabled, preserving
+one finite fixed deadline and leaving anonymous/Basic/SSH zero behavior intact.
+This is a delegated owner disposition, not a presumed answer to the earlier
+question. The proposed behavior and caller API shape were already in the Surface
+GO object; only their pending-disposition status changes.
+Consistency P2-1's text correction awaits its original reviewer's closure. The
+missing Safety review is resumed on the revised exact tuple; failed quota attempts
+remain incomplete. No implementation starts before independent design acceptance.
+No Windows activation, push, tag or publication is authorized. Entries below are
+historical snapshots; the selected proposal remains unaccepted until review GO.
+
 ## SSPI HTTPS composition review incomplete; correction recorded, 2026-10-04
 
 The documents-only proposal was reviewed at root
