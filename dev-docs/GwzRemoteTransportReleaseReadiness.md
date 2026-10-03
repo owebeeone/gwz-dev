@@ -1,5 +1,19 @@
 # Remote transport release readiness
 
+## SSPI boundary design checkpoint, 2026-10-03
+
+The operator selected Windows-specific `gwz-sspi`, with CLI self-exec and a
+Python bundled executable. The [design](GwzSspiDesign.md),
+[plan](GwzSspiPlan.md) and [caller guide](GwzSspiCallerGuide-DRAFT.md) are pending
+independent Consistency/Safety and docs-only API Surface review. Native creation-
+time Job attachment passed on Win11 inside OpenSSH's existing Job, including
+parent loss while suspended, descendant cleanup and invalid-Job creation refusal.
+The Windows draft and its five frozen evidence batches are now imported into
+MAIN against the current accepted helper graph; no Windows product code merged.
+This scoped gate cannot accept full Windows parity or activate endpoints. No
+implementation, new repository, push, tag or release in this checkpoint.
+
+
 Current status (2026-10-03): work continues under the accepted
 [transport release plan](../gwz-core/dev-docs/GwzTransportReleasePlan.md), as
 [amendment 2](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2.md)

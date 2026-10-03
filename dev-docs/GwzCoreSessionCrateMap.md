@@ -3,6 +3,13 @@
 Date: 2026-09-28. Status: **accepted 2026-09-28**, on GO for revision 1 from the architecture review ([round 2](GwzCoreSessionCrateMap-ReviewCode-1.md)) and the operator's three decisions (§8). That round's four P3 corrections were applied after GO and [confirmed](GwzCoreSessionCrateMap-ReviewCode-1a.md). The operator directed it ("ok on crates") after observing that the session plan builds a new subsystem inside gwz-core behind prose interfaces instead of small crates. It re-homes the code of the [session plan](GwzCoreSessionPlan.md)'s remaining steps. The plan's behaviour, limits, tests and phases carry over unchanged. One reviewer checks it on the architecture axis. Revision 1 answers that reviewer's round 1 ([report](GwzCoreSessionCrateMap-ReviewCode.md); §9). On acceptance, the map amends the text listed in §7.
 - Amended 2026-10-01 by [`GwzTransportReleasePlanAmendment-2.md`](../gwz-core/dev-docs/GwzTransportReleasePlanAmendment-2.md). This document remains authoritative only as amended for the release its candidate crates are published in.
 
+Pending bounded SSPI review (2026-10-03):
+[GwzSspiDesign.md](GwzSspiDesign.md) proposes a standalone `gwz-sspi` repository
+and owned credential/token/CBT handling by its nature. This is a scoped placement
+and secret-handling exception, effective only after its mechanism GO. Its own
+private IPC is taut-authored; GWZ application encoding stays in core. No full
+environment snapshot or dependency on core enters the library.
+
 ## 1. Rules
 
 - **Small crates, narrow APIs.** Every new gwz-core library follows the [library boundaries](GwzLocalCloneLibraryBoundaries.md) policy (LBT-001 to LBT-012), not only the local-clone libraries.
