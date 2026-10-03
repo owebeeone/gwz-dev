@@ -1,5 +1,21 @@
 # Current program checkpoint
 
+## SSPI HTTPS composition draft ready for review, 2026-10-04
+
+The operator authorized step 4b after installed-host acceptance. One retained
+drafter completed the [bounded composition proposal](GwzSspiHttpsCompositionDesign-DRAFT.md)
+and [cold caller guide](GwzSspiHttpsCallerGuide-DRAFT.md). Existing physical-connect deadlines end before later HTTP
+authentication; reused leases have no live setup deadline. The SSPI deadline
+remains one fixed finite absolute instant, without per-challenge reset or
+extension. The draft must settle its core clock source and native authentication
+facts, plus originating-caller capture before the endpoint thread handoff. The
+proposal names exact capture APIs and native facts, with one logical Open deadline
+carried through authentication. Independent Consistency/Safety and cold Surface
+review are next. Timeout-zero/native-refusal compatibility is a pending operator
+choice; draft review cannot settle that outcome or authorize dependent implementation.
+No composition source, schema change or Windows activation has landed. The
+accepted hosts tuple below remains the production baseline.
+
 ## SSPI installed hosts accepted, 2026-10-04
 
 [Acceptance and ledger](GwzSspiHostsCheckpoint.md) records final Code/State/Surface

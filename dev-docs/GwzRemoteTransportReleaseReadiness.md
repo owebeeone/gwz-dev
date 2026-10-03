@@ -1,5 +1,26 @@
 # Remote transport release readiness
 
+## SSPI foundation and installed hosts accepted, 2026-10-04
+
+The [native worker](GwzSspiNativeAcceptance.md) and
+[installed CLI/Python hosts](GwzSspiHostsCheckpoint.md) have passed their bounded
+Code/State/Surface reviews. The library, containment supervisor, native
+Negotiate/NTLM worker and matching host packaging are accepted within those
+scopes. They do not yet authenticate core HTTPS requests. The operator authorized
+the next HTTPS composition chunk; its finite deadline translation and honest
+native authentication facts need a bounded contract clarification before
+implementation. Current work is recorded in [the program checkpoint](CurrentProgramCheckpoint.md).
+
+Windows release remains NO-GO. After HTTPS composition, the outstanding Windows
+provider, identity, EPA, Digest, trust, proxy and agent compatibility rows still
+need their own proof/dispositions and aggregate review. Performance, selected
+source/distribution builds, production activation and the combined release gate
+remain release obligations. The accepted release scope is 1.1.0 transport on
+macOS ARM64, Linux x86-64 and Windows x86-64; sessions/server remain 1.2.0 under
+release-plan amendment 2. No release date or percentage-complete estimate is
+established. No push, tag, publication or activation is authorized here.
+Earlier entries below preserve historical checkpoints.
+
 ## SSPI boundary design accepted, 2026-10-03
 
 [Design](GwzSspiDesign.md), [plan](GwzSspiPlan.md) and

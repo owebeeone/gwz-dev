@@ -38,7 +38,7 @@ The following signatures specify the public conversation API. Owned caller
 values, TokenLimit, the parent lifecycle and native worker entry are implemented;
 see [implemented caller values](../gwz-sspi/docs/CallerValues.md) for constructors,
 source ownership and validation boundaries. Installed CLI/Python packaging is
-implemented pending the [hosts checkpoint](GwzSspiHostsCheckpoint.md) review; core HTTP composition
+accepted at the [hosts checkpoint](GwzSspiHostsCheckpoint.md); core HTTP composition
 and endpoint activation are later gates.
 All async methods return owned results; step borrows Conversation mutably until
 its future completes or is dropped. SecretBytes/SecretText have zeroizing
