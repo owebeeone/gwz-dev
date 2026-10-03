@@ -1,6 +1,8 @@
 # gwz-sspi caller guide
 
-2026-10-03. DRAFT revision 2 API contract; the package and worker are not released yet.
+2026-10-03. **Accepted revision 2 API contract**; package and worker are not released yet.
+[Acceptance](GwzSspiAcceptance.md) records the exact reviewed tuple and Surface GO.
+The historical DRAFT filename is retained until the implementation documentation lands.
 Windows-specific native SSPI authentication, one contained process per conversation.
 It produces authentication tokens; it does not make HTTP requests or decide whether
 a server authenticated you. Core/CLI/Python application protocols do not change.

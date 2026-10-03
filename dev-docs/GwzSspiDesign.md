@@ -1,6 +1,14 @@
 # GWZ SSPI process boundary
 
-Date: 2026-10-03. Revision 2 (merged remediation 1). **DRAFT — pending Consistency, Safety and API Surface review.**
+Date: 2026-10-03. Revision 2 (merged remediation 1). **ACCEPTED — bounded design/API only**, at root
+`f2029e4b1739c0214138675dfb16abdb44f6a0d7`, core
+`d78a664e3c5a325c6f12be409eb7645c1c1b51d0`, evidence
+`1beb1d204c824701ddbd033c7f89df9a3561f5e5`, after
+[Consistency](GwzSspiDesign-ReviewConsistency-1.md),
+[Safety](GwzSspiDesign-ReviewSafety-1.md) and
+[Surface](GwzSspiDesign-ReviewSurface-1.md) GO.
+[Acceptance](GwzSspiAcceptance.md) records scope and next work. Product remains
+unimplemented and full Windows separately NO-GO.
 
 ## 1. Decision and authority
 

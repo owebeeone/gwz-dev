@@ -31,3 +31,16 @@ in one document patch. Publication/containment/clock architecture remains as
 reviewed; the changed Digest/Token contract gets explicit focused retracing.
 Original reviewers continue under the operator's preference to use old reviewers.
 No design acceptance yet; full Windows parity remains NO-GO.
+
+## Remediation 1 accepted
+
+All three original reviewers rechecked root
+`f2029e4b1739c0214138675dfb16abdb44f6a0d7` with unchanged core/evidence and
+reported GO. Complete re-verdicts are filed with `-1` suffixes. No open findings;
+no new architectural root cause. [Acceptance](GwzSspiAcceptance.md) merges the
+same-tuple verdicts. Subsequent commits change status/authority records only.
+
+Raw evidence import manifests preserve bytes/modes. Their public-document hashes
+record the copy-time original drafts, before the explicit bounded amendments;
+reviewed amended documents are identified by their Git tuple, not those old hashes.
+Full Windows NO-GO and implementation/package/release gates are unchanged.

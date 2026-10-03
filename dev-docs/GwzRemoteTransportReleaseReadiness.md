@@ -1,17 +1,24 @@
 # Remote transport release readiness
 
-## SSPI boundary design checkpoint, 2026-10-03
+## SSPI boundary design accepted, 2026-10-03
 
-The operator selected Windows-specific `gwz-sspi`, with CLI self-exec and a
-Python bundled executable. The [design](GwzSspiDesign.md),
-[plan](GwzSspiPlan.md) and [caller guide](GwzSspiCallerGuide-DRAFT.md) are pending
-independent Consistency/Safety and docs-only API Surface review. Native creation-
-time Job attachment passed on Win11 inside OpenSSH's existing Job, including
-parent loss while suspended, descendant cleanup and invalid-Job creation refusal.
-The Windows draft and its five frozen evidence batches are now imported into
-MAIN against the current accepted helper graph; no Windows product code merged.
-This scoped gate cannot accept full Windows parity or activate endpoints. No
-implementation, new repository, push, tag or release in this checkpoint.
+[Design](GwzSspiDesign.md), [plan](GwzSspiPlan.md) and
+[caller API](GwzSspiCallerGuide-DRAFT.md) revision 2 are **GO** on all three axes
+at root `f2029e4b1739c0214138675dfb16abdb44f6a0d7`, core
+`d78a664e3c5a325c6f12be409eb7645c1c1b51d0`, evidence
+`1beb1d204c824701ddbd033c7f89df9a3561f5e5`. One merged remediation; raw reports,
+scope correction, withdrawals and closure are in [acceptance](GwzSspiAcceptance.md)
+and [ledger](GwzSspiDesign-ReviewLedger.md). The Windows DRAFT and exact raw batches
+are imported into MAIN, without product code. Native creation-time Job attachment
+passed; it is primitive containment evidence, not authentication/release GO.
+
+Accepted scope is standalone Windows-specific `gwz-sspi`, CLI self-exec/Python
+bundled worker and explicit IPC/identity/secret/cancellation/cleanup contracts.
+Full Windows remains NO-GO. Next: supplied member remote, standalone contract
+implementation/tests and mandatory secret-boundary review stops. No new repository,
+implementation, push, tag or product activation in this design checkpoint.
+Acceptance commits only status/evidence records; no reviewed behavior changed.
+Earlier investigation snapshots below predate this design GO.
 
 
 Current status (2026-10-03): work continues under the accepted
@@ -34,7 +41,7 @@ from MAIN, plus two targeted authentication feasibility investigations.
 The existing Rust TLS binding API passed five primitive rows and is selected in
 the Windows DRAFT. Digest acquisition still refuses; controlled worker-retention
 proof does not establish cancellation of a blocked SSPI provider. Windows has
-no design GO: provider/identity, lifetime, compatibility, trust/routing and EPA
+no full-parity design GO: provider/identity, lifetime, compatibility, trust/routing and EPA
 proof remain mandatory, along with incorporation of MAIN's accepted helper
 timing/context and SSH clock seams before design freeze. The proposed Mac-only
 temporary trust test awaits explicit approval; no OS trust change was applied.

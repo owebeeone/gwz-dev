@@ -1,6 +1,7 @@
 # GWZ SSPI implementation plan
 
-2026-10-03. DRAFT, pending the bounded [design](GwzSspiDesign.md) review.
+2026-10-03. **ACCEPTED bounded plan**, with [design](GwzSspiDesign.md) revision 2
+and exact GO tuple in [acceptance](GwzSspiAcceptance.md).
 Scope: Windows native authentication process boundary. Full Windows activation
 and provider parity retain their separate gates. No implementation starts before
 Consistency/Safety and caller-guide Surface GO on the exact settled tuple.
