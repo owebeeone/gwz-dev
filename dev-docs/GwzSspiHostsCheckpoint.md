@@ -185,6 +185,16 @@ and remote CI remain open. No publish, push, tag, release or activation occurred
 The review tuple is recorded in generated prompts; acceptance requires independent
 Code/State and cold caller Surface verdicts on that exact tuple.
 
+## Initial review: remediation required
+
+Code and State NO-GO; Surface GO with one P3. Four P2 and two P3 records
+are mapped to one correction and one closure test each in
+[remediation 1](GwzSspiHosts-RemPlan.md). Original reports are retained verbatim.
+No exact-defect blind convergence occurred. All were found before acceptance;
+no escaped release defect is established. The existing budgets and scope apply.
+The same reviewers verify their counterexamples after a corrected tuple settles;
+the drafter cannot self-close findings. No HTTP/native qualification starts here.
+
 | Repository | Committed implementation |
 |---|---|
 | gwz-sspi | `e31b17e95defd3468140e9b5f73fef8591766599` |

@@ -1,5 +1,17 @@
 # Current program checkpoint
 
+## SSPI installed hosts: remediation 1, 2026-10-04
+
+Code and State returned NO-GO on the installed-host tuple rooted at
+8cb284391dc5864c9ba6f41324cdd3c5807cf765; Surface returned GO with a P3.
+[The merged plan](GwzSspiHosts-RemPlan.md) covers four P2 and two P3 records:
+atomic coherent wheel publication/shared-cache capture, conventional Cargo
+rustflags, frontend interpreter/target preservation, lossless Python paths,
+matrix receipts and wrapper option defaults. Reports are filed verbatim.
+One drafter is applying a bounded patch, then the same reviewers verify closure.
+No HTTP/core composition, wire change, native campaign or activation is included.
+Full Windows and release remain NO-GO. Earlier entries are snapshots.
+
 ## SSPI installed host packaging implemented; review pending, 2026-10-04
 
 The operator authorized the next chunk after native acceptance. The bounded
