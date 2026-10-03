@@ -3,9 +3,11 @@
 ## SSPI taut schema/design awaiting review, 2026-10-03
 
 [Message checkpoint](GwzSspiMessagesDesign.md) records the private seven-message
-schema, exported IR, semantic fingerprint, pinned tooling and ten passing
-synthetic tests. Existing Rust tests/lint/format/package checks pass. This is a
-mandatory dual Consistency/Safety wire-format review; no public caller API change.
+schema, exported IR, semantic fingerprint, pinned tooling and twelve passing
+synthetic/model tests. Existing Rust tests/lint/format/package checks pass. This is a
+mandatory dual Consistency/Safety wire-format review. Initial Safety GO,
+Consistency NO-GO P2-1: HTTP cap missing from caller input. Remediation 1 adds
+required typed TokenLimit and a revised Surface review; one architectural cause.
 Actual codecs/API/supervision/native authentication remain unimplemented, and the
 step-1 dual secret-boundary stop is still open. Worker refuses and publishing is
 disabled. No activation/remote/push/tag/release. Next: independent schema reviews,

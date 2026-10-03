@@ -280,3 +280,18 @@ requires Windows parity §11's complete native and compatibility gates. Any
 mechanism deviation affecting identity, containment, secret handling or lifetime
 returns to design review. No product code, repository creation, push or tag is
 part of this draft package.
+
+## 8. DRAFT bounded token-limit amendment (message remediation 1)
+
+Pending Consistency/Safety and revised caller-guide Surface GO in
+[the message checkpoint](GwzSspiMessagesDesign.md). On acceptance, this explicitly
+supplements §4's HTTP token bound and §6's adapter inputs: AuthRequest owns a
+required token_limit: TokenLimit, constructed from raw bytes 1–65,536 with no
+default. Core derives it from its existing HTTP header allowance after
+scheme/base64 overhead and the parent copies it exactly into Begin.token_limit.
+Parent and worker enforce it for initial/subsequent input and output, with native
+provider maximum narrowing it before credential/context initialization. No HTTP
+policy dependency, new setting, deadline change or retry is added. The updated
+caller guide defines the checked constructor, units and error boundaries.
+The revision-2 API's omission of a cap carrier is superseded only by this scoped
+amendment; previous Surface GO does not cover the added field/constructor.

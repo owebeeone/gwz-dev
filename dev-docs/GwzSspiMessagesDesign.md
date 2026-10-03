@@ -1,9 +1,11 @@
 # SSPI taut messages — schema/design checkpoint
 
-2026-10-03. **DRAFT, pending dual Consistency/Safety GO.** Operator directive:
+2026-10-03. **DRAFT remediation 1, pending Consistency/Safety and Surface GO.** Operator directive:
 create taut messages, write their design and perform review-loop review.
-This is a private wire-format freeze, so dual review is mandatory. No caller API
-surface changes: the accepted caller guide/Surface verdict remain in force.
+This is a private wire-format freeze, so dual review is mandatory. Initial review
+found the missing HTTP-cap input bridge. Remediation 1 adds a required typed caller
+TokenLimit; the revised caller guide needs Surface review on this amendment.
+The earlier Surface verdict covers the unchanged baseline only.
 
 ## Object and authority
 
@@ -77,12 +79,18 @@ Pending exact root/member tuple after settlement. Review prompts are generated
 from the canonical review-loop template. Axes: Consistency (schema/design/graph
 agreement, reproducibility, scope) and Safety (secret handling permitted by text,
 closed framing, phase/round legality, terminal and cleanup invariants).
-No new public caller interface is frozen; private IPC shapes are reviewed on
+The required TokenLimit caller field/constructor is a bounded API amendment;
+Surface now reviews its guide independently. Private IPC shapes are reviewed on
 both axes. Full report outputs and prompt files will be explicitly permitted
 review-time noise. Unrelated root SSH prompts/route draft, core bug report and
 old evidence timeout run remain out of scope and untouched.
 
-Metrics: initial schema review round pending; implementation-contact tooling
+Metrics: initial review completed; remediation 1 pending; implementation-contact tooling
 failures above do not constitute discovered protocol defects; escaped defects 0.
-Next: merge both independent verdicts, remediate any blocker in one patch, up to
+Initial: Safety GO, Consistency P2-1 NO-GO; one architectural root cause, no
+blind convergence. The [merged remediation](GwzSspiMessagesDesign-RemPlan-1.md)
+adds the missing caller cap and executable synthetic input-to-wire/bound models.
+The corrected suite passes 12 tests; schema tags/IR remain unchanged, while the
+semantic fingerprint is regenerated. These models are not production proof.
+Next: obtain Consistency/Safety re-verdicts and added Surface GO, up to
 two rounds; accept only the same exact tuple with both GO. Preserve reports verbatim.

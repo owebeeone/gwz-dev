@@ -1,6 +1,8 @@
 # gwz-sspi caller guide
 
-2026-10-03. **Accepted revision 2 API contract**; package and worker are not released yet.
+2026-10-03. **Accepted revision 2 baseline plus DRAFT token-limit amendment**
+under GwzSspiMessagesDesign.md remediation 1; package and worker are not released yet.
+The amendment requires its own Surface GO before acceptance.
 [Acceptance](GwzSspiAcceptance.md) records the exact reviewed tuple and Surface GO.
 The historical DRAFT filename is retained until the implementation documentation lands.
 Windows-specific native SSPI authentication, one contained process per conversation.
@@ -22,6 +24,7 @@ no raw native handles or pointers in this caller API.
 | API | Contract |
 |---|---|
 | `Supervisor::new(WorkerExecutable, Options) -> Result<Supervisor, Error>` | Absolute installed worker path; capture current primary Windows identity. Refuse impersonation or unsupported OS. Options defaults: `max_workers = 8`; accepted range 1–64. |
+| `TokenLimit::new(raw_bytes: u32) -> Result<TokenLimit, Error>` | Required raw authentication-token byte cap, 1–65,536 inclusive. Invalid values return InvalidRequest before start/registration. No default; the host derives this from its existing HTTP limit after scheme/base64 overhead. Immutable nonsecret numeric value, no new CLI setting. |
 | `Supervisor::start(AuthRequest, Deadline, Cancellation) -> Future<Result<Conversation, Failure>>` | Wait for capacity, launch and verify matching worker; no native authentication until `step(None)`. Deadline is the caller's absolute monotonic deadline. No default timeout. |
 | `Conversation::step(Option<SecretBytes>) -> Future<Result<TokenStep, Failure>>` | First step is None and sends Begin; later steps supply challenge bytes. At most eight total steps. One step at a time through mutable ownership. Output status Continue or Complete, checked attributes, MechanismObservation and owned SecretBytes. Complete forbids further steps. |
 | `Conversation::finish(self) -> Future<Result<(), Failure>>` | Legal immediately after start, during negotiation or after Complete. Normal native cleanup and confirmed process/Job/thread exit; pre-first-step finish initializes no native handles. Uses original deadline; drop of this future cancels and retains supervision. May return Pending cleanup in Failure if deadline expires. |
@@ -31,7 +34,18 @@ no raw native handles or pointers in this caller API.
 | `worker_entry(WorkerBootstrap) -> WorkerExit` | Host's internal child-only dispatch using supplied private bootstrap pipe handles. No ordinary commands or network connection. Runtime bootstrap parsing is an internal integration API, not user CLI flags. |
 
 `AuthRequest` owns Package (Negotiate, Ntlm or Digest), canonical host target,
-Identity and channel-binding bytes. Identity is CurrentLogon or Explicit with
+Identity, channel-binding bytes and a required `token_limit: TokenLimit`.
+The request owns this checked cap; there is no implicit fallback to 65,536. Parent
+copies its raw-byte value exactly into Begin.token_limit. Parent checks initial
+Digest and subsequent challenges before sending, and worker checks them before
+native context work. Both refuse output exceeding this cap before publication.
+The worker further intersects it with its provider maximum before credential/context
+initialization; that can narrow but never enlarge the supplied cap. Oversized
+caller input is InvalidRequest, oversized worker output is Protocol (provider
+overproduction inside worker is ProviderRejected); failures cancel the conversation
+and retain the existing cleanup rules. Caps do not change during a conversation.
+
+Identity is CurrentLogon or Explicit with
 owned Unicode user/domain/password. DOMAIN\user splits once; UPN uses empty domain.
 Negotiate/Ntlm target is `HTTP/<canonical host>` without port/path. Digest additionally
 requires Explicit identity, actual method, percent-encoded URI and nonempty initial
@@ -70,7 +84,11 @@ Malformed IPC/provider failure is terminal, without an automatic fallback or ret
 A minimal host sequence:
 
 1. Create Supervisor once per host context with a trusted installed worker path.
-2. Capture the verified connection's binding and construct AuthRequest. Pass your
+2. Capture the verified connection's binding. Derive the raw token allowance from
+   your HTTP header limit after scheme/base64 overhead; construct
+   `TokenLimit::new(raw_bytes)?`, then include it as `AuthRequest.token_limit`.
+   Values 0 and 65,537 refuse; there is no default. Construct the rest of
+   AuthRequest and pass your
    existing operation deadline and cancellation signal to `start`.
 3. Await `step(None)`, send the token on that exclusively leased HTTP connection,
    after checking MechanismObservation against the permissive package choice,

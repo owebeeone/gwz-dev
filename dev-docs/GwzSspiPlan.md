@@ -8,7 +8,10 @@ Consistency/Safety and caller-guide Surface GO on the exact settled tuple.
 
 1. **Repository and contract.** Once a remote is supplied, use GWZ to add the
    `gwz-sspi` member. Author the private IPC schema with taut, export its schema and
-   generated Rust, and implement the narrow caller API. No dependency on core,
+   generated Rust, and implement the narrow caller API. The message checkpoint
+   now drafts the missing required raw TokenLimit caller input; revised Surface
+   GO is required for that amendment. Schema/IR-only acceptance cannot close
+   the later codec/API secret-boundary review. No dependency on core,
    Git, transport implementation, CLI or Python. Standalone fake OS/IPC/deadline
    tests first, including secrets in codecs and malformed bounded framing. Stop
    for dual Code/State review of the codec/API secret boundary before step 2.
