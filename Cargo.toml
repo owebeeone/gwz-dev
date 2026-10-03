@@ -25,6 +25,7 @@ exclude = [
     "gwz-core",
     "gwz-transport",
     "gwz-git",
+    "gwz-sspi",
     "git2-rs",
 ]
 

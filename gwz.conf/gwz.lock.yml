@@ -56,6 +56,15 @@ members:
     detached: false
     dirty: false
     materialized: true
+  mem_gwz_sspi:
+    path: gwz-sspi
+    source_id: src_gwz_sspi
+    source_kind: git
+    commit: bd807b0403d502fd6f25ef2f93389ce432f0c0c0
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
   mem_gwz_transport:
     path: gwz-transport
     source_id: src_gwz_transport

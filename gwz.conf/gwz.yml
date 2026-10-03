@@ -150,3 +150,11 @@ members:
     url: git@github.com:owebeeone/gwz-git.git
     fetch: true
     push: true
+- id: mem_gwz_sspi
+  path: gwz-sspi
+  type: git
+  source_id: src_gwz_sspi
+  active: true
+  desired:
+    local_only: true
+  remotes: []
