@@ -60,7 +60,7 @@ members:
     path: gwz-sspi
     source_id: src_gwz_sspi
     source_kind: git
-    commit: fb6a5fc6d1d013b3e7e9f6955d7b6dabafd51d7a
+    commit: a75485cbdd03607909d11637c07f97548dd7902c
     branch: main
     detached: false
     dirty: false

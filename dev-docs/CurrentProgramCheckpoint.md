@@ -1,20 +1,21 @@
 # Current program checkpoint
 
-## SSPI parent supervision ready for settled review, 2026-10-03
+## SSPI supervisor remediation 1 ready for re-review, 2026-10-03
 
-Member `fb6a5fc6d1d013b3e7e9f6955d7b6dabafd51d7a` implements the authorized
-[supervisor checkpoint](GwzSspiSupervisorCheckpoint.md); accepted secret baseline
-and reference core `8cb3a3f01d79699a5ad07b6ec7cfc78321224d31` are unchanged.
-Parent lifecycle, charged dispatch/launch/I/O/reaping, Windows containment adapter,
-private phase bridge and caller docs are implemented. Local Darwin tests, strict
-lint/fmt, schema, disabled-branch scope and standalone archive checks pass;
-Windows MSVC/GNU strict cross-target lint passes. Native execution is unproved.
-Recorded tier: mandatory peer-blind Code/State plus cold caller Surface on the
-settled root/member tuple. Review pending, accepted-through remains prior secret
-gate. Native SSPI/worker entry is step 3; worker still refuses; publication,
-activation and full Windows release remain NO-GO. No push/tag. Implementation
-contact corrected five ownership/scheduling issues before settlement; no escaped
-defect or architectural review cause claimed. Preceding entries are historical.
+Initial settled tuple: root d2821a2db90aa641b1af6f80cadaf1aba9b35a0c, member
+fb6a5fc6d1d013b3e7e9f6955d7b6dabafd51d7a, reference core unchanged
+8cb3a3f01d79699a5ad07b6ec7cfc78321224d31. Code NO-GO (one P2), State NO-GO
+(two P2s), Surface GO (one P3). [Merged remediation](GwzSspiSupervisor-RemPlan.md)
+fixes accidental receiver lifetime capture, terminal projection after reaping and
+completed-step challenge lifetime. Both axes converged on missing production fake
+ownership-bridge coverage (P3); polling disposal/fingerprint documentation also
+corrected in this one patch. Recorded tier remains dual Code/State plus Surface;
+corrected member a75485cbdd03607909d11637c07f97548dd7902c passes full local
+and cross-target/standalone gates; original reviewers verify the corrected tuple
+before acceptance. Accepted-through
+remains the prior secret gate. Native provider/worker entry, Windows runtime and
+installed-host qualification remain deferred; worker refuses, publishing/activation
+and full Windows release remain NO-GO. No push/tag. Earlier entries are historical.
 
 ## SSPI caller values / secret codec accepted, 2026-10-03
 

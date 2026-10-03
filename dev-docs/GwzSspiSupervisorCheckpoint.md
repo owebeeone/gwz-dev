@@ -30,7 +30,11 @@ and after Complete. Tokens and native completion are not HTTP/Git success.
 
 No native/blocking call, thread join, wake or host callback under the short state
 lock. Payload locks guard only bytes; transitions use the state lock with an
-explicit lock order. Futures do not synchronously wait on OS calls or IPC.
+explicit lock order. Polling does not perform native authentication/metadata, worker/thread creation,
+pipe I/O, process/Job waits or joins. Pre-registration originating-thread snapshot
+handle destruction is synchronous on refusal or Start Drop, outside state locks;
+that narrow resource-disposal operation has no hard OS-time bound. Long-running
+worker/IPC ownership remains charged and offloaded.
 Launch/I/O worker storage remains owned until completion even after cancellation.
 Bounded dedicated supervision outlives dropped futures/runtime/Supervisor.
 Quarantined records retain permits; never admit replacement capacity against them.
@@ -44,7 +48,8 @@ executor thread that later polls a moved future. Windows start uses a synchronou
 originating-thread metadata snapshot/refusal and held-thread-handle capture;
 document those probes as synchronous, without a nonblocking/OS-time guarantee.
 The charged launch owner rechecks that held originating thread and primary
-identity before process creation. Future::poll performs no native metadata query.
+identity before process creation. Future::poll performs no native metadata query. Captured-handle destruction on
+pre-registration refusal is the explicit synchronous disposal exception above.
 Ordinary metadata capture is distinct from worker launch side effects; launch
 still requires the installed charged record first. This is an implementation
 choice for the accepted caller-identity rule and must be inspected by reviewers.
@@ -130,3 +135,21 @@ Implemented caller documentation is `gwz-sspi/docs/Supervision.md`, included in
 Rustdoc with a compiled async walkthrough. The shared caller guide now labels the
 parent implementation and its pending acceptance separately from future native
 provider/worker entry. Existing pure secret ownership guarantees remain in force.
+
+## Settled-review remediation
+
+Initial Code review found one P2; State found two distinct P2s. Surface was GO
+with one P3. Code/State independently converged on missing production ownership
+bridge coverage (P3), while Code also found a too-broad polling description (P3).
+[One merged remediation plan](GwzSspiSupervisor-RemPlan.md) maps every finding to
+its correction and closure. Remediation round 1 is in progress; acceptance remains
+pending. No protocol redesign or native provider activation is proposed.
+
+Remediation candidate member `a75485cbdd03607909d11637c07f97548dd7902c`
+passed owner full Rust tests (60 unit, three integrations, three compiled examples,
+sixteen compile-fail doctests), strict Darwin/MSVC/GNU Clippy, both format checks,
+61-file disabled-branch scan, unchanged 16-artifact schema check, standalone
+96-file archive verification and extracted-archive full tests. Drafter also ran
+13 Python tests. Three original blocking counterexamples were RED before correction
+and GREEN afterward. New production iteration/fake-owner coverage supplements
+the retained pure kernel schedules. Await original reviewers; no native claim.

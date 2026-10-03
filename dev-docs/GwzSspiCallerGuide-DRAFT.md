@@ -17,7 +17,13 @@ call `worker_entry(bootstrap)` from an internal self-exec mode before its normal
 startup. A Python wheel bundles the dedicated worker executable alongside its
 extension and uses its absolute installed path. No PATH lookup, shell or child
 Python interpreter. Removing/upgrading the application removes/replaces its worker
-together. Missing workers and protocol/build mismatches are errors, not fallbacks.
+together. The host supplies the trusted packaging metadata field
+`build_fingerprint`: exactly the 32 bytes embedded in that matching worker
+artifact and reported by Hello. The library neither derives these bytes from a
+file hash nor exports production packaging metadata. That producer belongs to
+the future installed-host packaging step; do not guess a digest or use Cargo
+version alone. A synthetic construction recipe is in the member supervision
+guide. Missing workers and protocol/build mismatches are errors, not fallbacks.
 
 The following signatures specify the full public API. Owned caller values, TokenLimit and the parent lifecycle are implemented; see [implemented caller values](../gwz-sspi/docs/CallerValues.md)
 for their constructors, source ownership and validation boundaries. Supervisor/Conversation and deadline/cancellation/cleanup support now have a
@@ -83,6 +89,10 @@ infer identity. Direct Ntlm/Digest have their selected provider identity.
 Choose a shorter deadline before start if needed; it is immutable after start.
 For an earlier enclosing deadline D2 during a pending step, signal Cancellation
 at D2. There is no extension operation: a later D3 cannot replace the original.
+Captured originating-thread handle destruction is synchronous on pre-registration
+refusal or start-future Drop, outside state locks, without a hard OS-time bound.
+Polling performs no provider/metadata call, worker/thread creation, pipe I/O or
+process/Job wait/join; charged worker cleanup remains offloaded.
 Launch, native calls and token delivery consume it. There is no per-round timer reset. `Failure` carries
 a fixed ErrorKind, optional numeric native status and CleanupStatus/RecordId;
 no secret, identity or native error text. Kinds: UnsupportedPlatform, InvalidRequest,
