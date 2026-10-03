@@ -281,10 +281,10 @@ mechanism deviation affecting identity, containment, secret handling or lifetime
 returns to design review. No product code, repository creation, push or tag is
 part of this draft package.
 
-## 8. DRAFT bounded token-limit amendment (message remediation 1)
+## 8. Accepted bounded token-limit amendment (message remediation 1)
 
-Pending Consistency/Safety and revised caller-guide Surface GO in
-[the message checkpoint](GwzSspiMessagesDesign.md). On acceptance, this explicitly
+Accepted after Consistency/Safety and revised caller-guide Surface GO at
+[the exact message tuple](GwzSspiMessagesAcceptance.md). This explicitly
 supplements §4's HTTP token bound and §6's adapter inputs: AuthRequest owns a
 required token_limit: TokenLimit, constructed from raw bytes 1–65,536 with no
 default. Core derives it from its existing HTTP header allowance after

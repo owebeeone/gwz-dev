@@ -1,17 +1,22 @@
 # Current program checkpoint
 
-## SSPI taut schema/design awaiting review, 2026-10-03
+## SSPI taut messages/design accepted, 2026-10-03
 
-[Message checkpoint](GwzSspiMessagesDesign.md) records the private seven-message
-schema, exported IR, semantic fingerprint, pinned tooling and twelve passing
-synthetic/model tests. Existing Rust tests/lint/format/package checks pass. This is a
-mandatory dual Consistency/Safety wire-format review. Initial Safety GO,
-Consistency NO-GO P2-1: HTTP cap missing from caller input. Remediation 1 adds
-required typed TokenLimit and a revised Surface review; one architectural cause.
-Actual codecs/API/supervision/native authentication remain unimplemented, and the
-step-1 dual secret-boundary stop is still open. Worker refuses and publishing is
-disabled. No activation/remote/push/tag/release. Next: independent schema reviews,
-then merged blocker remediation if needed. Previous sections are earlier snapshots.
+[Acceptance](GwzSspiMessagesAcceptance.md) records Consistency/Safety/Surface GO at
+root 05403cea8018cf14a793977ddec2c0c7136ccc54, member
+7ea900e77f272dd6e0d64f566c59fb29322f5738 and unchanged core
+8cb3a3f01d79699a5ad07b6ec7cfc78321224d31. Seven private taut messages, exported
+IR, fingerprint of schema plus semantics, pinned generator tooling and twelve
+synthetic/model tests are accepted. One merged remediation closed Consistency
+P2-1 (required raw TokenLimit caller input), one architectural cause, no blind
+convergence, escaped defects 0. Surface P3 stale formula corrected at acceptance.
+Final extracted crate schema/tests and package verification pass; remote CI is
+unexecuted. No production API/codec/SSPI authentication is implemented, worker
+refuses, publishing disabled and Windows remains NO-GO. Next cohesive chunk:
+caller secret values and IR-driven zeroizing codec + deterministic conformance,
+then mandatory dual Code/State secret-boundary gate before supervision. No input
+needed for this local work; no push, tag, release, remote or endpoint activation.
+Earlier sections are historical snapshots.
 
 ## SSPI Rust repository scaffold accepted, 2026-10-03
 

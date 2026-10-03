@@ -1,6 +1,7 @@
 # SSPI taut messages — schema/design checkpoint
 
-2026-10-03. **DRAFT remediation 1, pending Consistency/Safety and Surface GO.** Operator directive:
+2026-10-03. **ACCEPTED schema/design and bounded API amendment**, after
+Consistency/Safety/Surface GO at the [exact tuple](GwzSspiMessagesAcceptance.md). Operator directive:
 create taut messages, write their design and perform review-loop review.
 This is a private wire-format freeze, so dual review is mandatory. Initial review
 found the missing HTTP-cap input bridge. Remediation 1 adds a required typed caller
@@ -75,7 +76,9 @@ Public CI and tests depend on no private evidence or sibling checkout.
 
 ## Review ledger
 
-Pending exact root/member tuple after settlement. Review prompts are generated
+Reviewed root 05403cea8018cf14a793977ddec2c0c7136ccc54, member
+7ea900e77f272dd6e0d64f566c59fb29322f5738, core
+8cb3a3f01d79699a5ad07b6ec7cfc78321224d31; all three axes GO. Review prompts are generated
 from the canonical review-loop template. Axes: Consistency (schema/design/graph
 agreement, reproducibility, scope) and Safety (secret handling permitted by text,
 closed framing, phase/round legality, terminal and cleanup invariants).
@@ -85,12 +88,15 @@ both axes. Full report outputs and prompt files will be explicitly permitted
 review-time noise. Unrelated root SSH prompts/route draft, core bug report and
 old evidence timeout run remain out of scope and untouched.
 
-Metrics: initial review completed; remediation 1 pending; implementation-contact tooling
+Metrics: initial dual review plus one merged remediation and added Surface; implementation-contact tooling
 failures above do not constitute discovered protocol defects; escaped defects 0.
 Initial: Safety GO, Consistency P2-1 NO-GO; one architectural root cause, no
 blind convergence. The [merged remediation](GwzSspiMessagesDesign-RemPlan-1.md)
 adds the missing caller cap and executable synthetic input-to-wire/bound models.
 The corrected suite passes 12 tests; schema tags/IR remain unchanged, while the
 semantic fingerprint is regenerated. These models are not production proof.
-Next: obtain Consistency/Safety re-verdicts and added Surface GO, up to
-two rounds; accept only the same exact tuple with both GO. Preserve reports verbatim.
+Consistency verified P2-1 closed; Safety GO and Surface GO on the same corrected
+tuple. Surface P3-1 stale cap formula corrected during acceptance (no wire/schema
+or semantic-profile change). No blocking findings remain. See acceptance for
+verbatim reports, exact provenance and deferred gates. Next: caller values and
+IR-driven zeroizing codec, then dual Code/State secret-boundary review.

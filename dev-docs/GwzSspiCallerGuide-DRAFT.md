@@ -1,8 +1,8 @@
 # gwz-sspi caller guide
 
-2026-10-03. **Accepted revision 2 baseline plus DRAFT token-limit amendment**
-under GwzSspiMessagesDesign.md remediation 1; package and worker are not released yet.
-The amendment requires its own Surface GO before acceptance.
+2026-10-03. **Accepted revision 2 baseline plus reviewed token-limit amendment.**
+GwzSspiMessagesAcceptance.md records Consistency/Safety/Surface GO after remediation 1.
+Package and worker are not released yet; no production API implementation is claimed.
 [Acceptance](GwzSspiAcceptance.md) records the exact reviewed tuple and Surface GO.
 The historical DRAFT filename is retained until the implementation documentation lands.
 Windows-specific native SSPI authentication, one contained process per conversation.
@@ -51,7 +51,9 @@ Negotiate/Ntlm target is `HTTP/<canonical host>` without port/path. Digest addit
 requires Explicit identity, actual method, percent-encoded URI and nonempty initial
 challenge. These three Digest fields are prohibited on other packages. Begin carries
 them to the first native call on step(None), in owned zeroizing storage. Initial
-challenge/token cap is min(provider maximum, 65,536 bytes, HTTP header limit),
+challenge/token cap is min(provider maximum, supplied raw-byte TokenLimit).
+TokenLimit already applies the 65,536-byte ceiling and the host's HTTP allowance
+after scheme/base64 overhead,
 with the entire private frame capped at 100,000 bytes. Missing/oversized or
 wrong-package fields return InvalidRequest before native work; owned inputs wipe.
 Digest use remains gated on native provider qualification. Channel binding must come from
