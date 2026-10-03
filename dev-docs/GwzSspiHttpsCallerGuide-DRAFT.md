@@ -1,17 +1,18 @@
-# HTTPS caller capture — proposed API guide
+# HTTPS caller capture — implementation caller guide
 
-Accepted caller contract, 2026-10-04, with exact tuple and review scope in
-[acceptance](GwzSspiHttpsCompositionAcceptance.md). The additions below are not
-yet APIs available in the current package. The owner selected timeout-zero native
-refusal under the operator's directive; independent contract review is complete.
-This guide supplies no authority to activate Windows HTTPS transport. Digest
-remains refused before native credential/context work.
+Accepted caller contract, 2026-10-04, with design tuple and scope in
+[acceptance](GwzSspiHttpsCompositionAcceptance.md). The implementation now adds
+the APIs below; its separate implementation review is pending. The owner selected
+timeout-zero native refusal under the operator's directive. This guide supplies
+no authority to activate Windows HTTPS transport. Native Windows integration is
+not yet qualified, and Digest remains refused before native credential/context
+work.
 
-## Proposed additions
+## Caller capture API
 
 `gwz_sspi::CallerCapture` is an opaque owned type with private fields. It is
 Send + Sync and implements neither Clone nor Debug. It provides no getters,
-raw native handles or credential data. These are the exact proposed signatures:
+raw native handles or credential data. These are the public signatures:
 
 ```rust
 pub struct CallerCapture { /* private fields */ }
@@ -77,7 +78,7 @@ overhead. Native token completion is not authenticated HTTP success.
 
 Deadline remains the immutable finite absolute monotonic timestamp made with
 `Deadline::new(existing_instant)`. No timeout is chosen by the library. The
-proposed core source is one logical HTTPS Open setup deadline captured before
+core source is one logical HTTPS Open setup deadline captured before
 first checkout/adoption from the effective positive existing connect aggregate,
 normally 30 seconds. Reused leases, discovery redirects, challenges, helper work,
 capacity, launch, Hello, native rounds and IPC retain that same timestamp. Do not
@@ -85,17 +86,15 @@ construct `now + 30 seconds` at each native start or challenge. It cannot be
 paused, reset or extended; an earlier enclosing cancellation signals the supplied
 Cancellation. Existing active-HTTP-IO accounting remains separate.
 
-Proposed timeout-zero behavior is refusal of native selection before tokens when
-no finite setup deadline exists. This is the selected contract proposal, not an
-implemented default or a claim of completed review.
+Timeout zero refuses native selection before tokens when no finite setup
+deadline exists. It does not silently restore a finite timeout.
 Expired positive deadlines produce Timeout. Anonymous, existing Basic and SSH
 do not require a native worker or caller capture; missing native availability
 is retained and reported only if native authentication is selected.
 
 ## Caller recipe
 
-The following recipe uses the proposed API and becomes a compile-checkable
-example when it is implemented. Obtain the trusted descriptor and Supervisor in
+The following recipe uses the caller capture API. Obtain the trusted descriptor and Supervisor in
 the explicit host owner. On each original CLI/Python operation caller, before
 any detach or thread handoff:
 

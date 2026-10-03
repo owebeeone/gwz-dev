@@ -1,21 +1,50 @@
 # Current program checkpoint
 
-## SSPI HTTPS implementation resumed after restart, 2026-10-04
+## SSPI HTTPS composition implemented; settled implementation review pending, 2026-10-04
 
-The operator said continue. All 18 working-file fingerprints in the parked
-checkpoint match, so no newer source needs reconciliation. The previous agent
-contexts are unavailable after restart; one replacement GPT-6.1 drafter
-`/root/sspi_https_drafter` continues the same authorized implementation object.
-Design acceptance, finite-deadline/zero disposition and the 32-file budget-only
-disposition remain controlling. Partial capture/protocol gates are green; the
-core native module still begins with tests only. Core prepare/serve, deadline,
-lease/CBT/cleanup and actual CLI/Python handoff are next, followed by the settled
-implementation review. No Windows activation, push, tag, publication or release.
-The parked entry below is historical; the user's continue revokes the pause.
+The operator resumed the accepted cohesive step4b implementation. Product changes
+are committed through GWZ at the member tuple below. The root review object is
+this checkpoint, the caller guide and the
+[implementation receipt](GwzSspiHttpsCompositionCheckpoint.md); its exact root
+SHA is recorded in the generated review prompts after this settlement.
 
-Live host mux traversal exposed two required existing call sites omitted from
-the 32-file estimate. The owner records a budget-only allowance of 34 files in
-the linked budget disposition; lines/docs and accepted semantics remain unchanged.
+- gwz-core `efdd0a2cf66be889364466c7d69c97cc2736c278`
+- gwz-sspi `58cc87c99bca21874a63d0ba11209b75a3e0c50a`
+- gwz-transport `8a2ec7fc2e6d6a0da4c5519d72eac90c9ca4c578`
+- gwz-cli `6a9c0dac8aebe7b9d20ecfa20a8c402ec4bf4311`
+- gwz-py `e0c5af10b33289a455f662680af8ac12fd24f9d3`
+
+Accepted [design](GwzSspiHttpsCompositionDesign-DRAFT.md),
+[acceptance](GwzSspiHttpsCompositionAcceptance.md) and
+[budget disposition](GwzSspiHttpsCompositionBudgetDisposition.md) control.
+The implementation connects original-caller capture, immutable HTTPS Open D,
+final-origin CBT, native rounds/facts, exclusive generation and retained cleanup
+through CLI and Python entries. Zero refuses native selection before Begin;
+anonymous, Basic and SSH remain available without native availability.
+Windows activation boundaries remain unchanged.
+
+Gates: core HTTPS 195/195; subsequent secondary-owner live wipe 1/1; standalone
+SSPI and transport tests/strict Clippy; regenerated projections; loaded supported
+Python wheel packaging and overlapping operation checks; cfg boundaries, globals,
+inventories and formatting. Full strict core Clippy remains RED47 reported
+pre-existing candidate diagnostics, with no new bridge diagnostics; independent
+review must assess the baseline attribution. See the receipt for exact commands,
+artifact paths, setup failures and the order of final source/artifact checks.
+34 handwritten source/test files and 2,757 added lines; six member/API documents,
+one separately authorized Python ledger and three generated projections.
+
+Next: independent peer-blind Code/State secret-adapter implementation review plus
+cold caller Surface at this exact settled object. Acceptance is pending those
+verdicts. No source edit or HEAD movement during review. Unrelated untracked SSH
+N2b prompts/route draft, core bug report and old private alpha evidence are out of
+scope. Owner-generated review prompts/reports are the only permitted new review
+outputs. No Windows activation, push, tag, publication or release.
+
+Metrics: this implementation object has zero completed implementation review or
+remediation rounds. Regression discoveries during implementation contact are
+listed in the receipt; no post-acceptance escape claim applies before acceptance.
+Wall time spans the parked session/restart and is not measured as a single run.
+Earlier entries below are historical snapshots; the user continue revoked pause.
 
 ## SSPI HTTPS implementation paused for Codex restart, 2026-10-04
 
