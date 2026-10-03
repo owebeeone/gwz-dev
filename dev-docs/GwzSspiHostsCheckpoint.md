@@ -195,6 +195,12 @@ no escaped release defect is established. The existing budgets and scope apply.
 The same reviewers verify their counterexamples after a corrected tuple settles;
 the drafter cannot self-close findings. No HTTP/native qualification starts here.
 
+Remediation 1 is implemented at SSPI 14d834b, CLI 0c7dfaf, Python c3f5f7d;
+reference core remains unchanged. The merged plan records corrected gates and
+platform/filesystem limitations. Cumulative implementation remains 25 files and
+1,168 additions, six member plus three root implementation docs, with review
+audit records separate. Same-reviewer closure is pending, not accepted.
+
 | Repository | Committed implementation |
 |---|---|
 | gwz-sspi | `e31b17e95defd3468140e9b5f73fef8591766599` |

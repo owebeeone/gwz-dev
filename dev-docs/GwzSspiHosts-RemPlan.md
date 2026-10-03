@@ -27,3 +27,36 @@ is build-time artifact ownership, not a new authentication process owner.
 Any material architecture/interface change must be classified by reviewers;
 the lane's two-remediation cap applies. Existing 25 source/test/workflow-file
 ceiling and 1,800 addition budget remain; use existing files for regressions.
+
+## Corrected tuple and gates, pending reviewer closure
+
+SSPI 14d834b311200b0984e7041e4a34419c59501119, CLI
+0c7dfaf0199731648d2360358284010b2b4575c1, Python
+c3f5f7d6b614155e413db0036242849010ef1149; reference core unchanged.
+Eleven existing files changed, no dependency/lock/wire/core delta. Wheel and source
+archive adaptations stage privately; wheel publication uses atomic no-replace
+hard links and explicitly refuses collisions/unsupported filesystems. Mutable
+extension-cache reuse is removed from provisioned wheel builds and documented.
+Metadata and build hooks normalize one effective interpreter/target. OS paths
+cross PyO3 losslessly. Rustflags channels are conservative identity inputs and
+matrix receipts have target-set names.
+
+Original frontend/default and real handoff tests: seven failures to seven passes;
+rustflags sensitivity, Unix path byte-round-trip and actual flattened matrix
+aggregation each reproduced failure before correction. Owner independently passed
+the corrected installed wheel suites (50 passed, one filesystem skip), producer
+suite, CLI release tests and conditional-boundary guard; member diff checks clean.
+Drafter additionally passed 27 Rust library tests, strict library Clippy, pinned
+changed-file formatting, 16-artifact regeneration, real Darwin wheel/sdist and
+extracted-sdist rebuild, extracted installed descriptor and RECORD validations.
+Ordinary artifacts remain external in evidence-build-cache/gwz-sspi/hosts-remediation-1.
+
+Limits: Darwin refuses the non-UTF8 fixture directory with EILSEQ. The Rust PyO3
+conversion test passes, but no actual non-UTF8 loader proof is claimed. Windows
+surrogate/runtime publication and installed Hello mismatch remain unexecuted.
+Existing all-target Clippy needless_update at operations.rs:714 is unchanged.
+Cumulative implementation: 25 source/test/workflow files, 1,168 additions and
+six member plus three root implementation docs. Mandatory review/remediation
+audit records are separate process artifacts. No further expansion or activation.
+Same reviewers must classify changed-range materiality and verify closure;
+these checks are implementation evidence, not self-closure.

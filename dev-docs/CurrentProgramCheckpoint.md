@@ -8,7 +8,11 @@ Code and State returned NO-GO on the installed-host tuple rooted at
 atomic coherent wheel publication/shared-cache capture, conventional Cargo
 rustflags, frontend interpreter/target preservation, lossless Python paths,
 matrix receipts and wrapper option defaults. Reports are filed verbatim.
-One drafter is applying a bounded patch, then the same reviewers verify closure.
+The bounded patch is committed at SSPI 14d834b, CLI 0c7dfaf, Python c3f5f7d;
+the same reviewers next verify closure. Owner installed-wheel focused suites,
+producer/release and source-boundary checks pass; real Darwin source/extracted
+builds and Rust library gates pass. Darwin non-UTF8 fixture creation is skipped
+with EILSEQ; Windows surrogate/runtime publication remain unexecuted.
 No HTTP/core composition, wire change, native campaign or activation is included.
 Full Windows and release remain NO-GO. Earlier entries are snapshots.
 
