@@ -88,3 +88,13 @@ Owner independently passed the final focused suites with the previous unchanged
 native image: 53 passed, one EILSEQ skip. The unprovisioned suite has 52 passes
 and two opt-in fixture skips. No fresh packaged artifact/native qualification or
 unchanged Rust build is claimed; diff checks pass. Final focused closure is pending.
+
+## Final reviewer closure
+
+Final Code/State/Surface reports all return GO at root a17a7b0, SSPI 14d834b,
+CLI 0c7dfaf, Python ded4713 and unchanged reference core 8cb3a3f. Code closes
+candidate scratch placement, Surface closes its option-default remainder, and
+State independently verifies preservation of coherent capture/publication.
+All four P2 and three P3 records are closed; no new architectural root cause.
+GwzSspiHostsCheckpoint.md records acceptance of packaging only and the separate
+HTTP/native/qualification work remaining. Earlier pending prose is historical.

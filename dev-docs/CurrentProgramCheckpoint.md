@@ -1,5 +1,24 @@
 # Current program checkpoint
 
+## SSPI installed hosts accepted, 2026-10-04
+
+[Acceptance and ledger](GwzSspiHostsCheckpoint.md) records final Code/State/Surface
+GO at root a17a7b07becb1e92da5519b64add39c41d6ee09e, SSPI
+14d834b311200b0984e7041e4a34419c59501119, CLI
+0c7dfaf0199731648d2360358284010b2b4575c1 and Python
+ded47130af23720099e7b6a92ccb9a161bb5db9a; reference core unchanged.
+Final SSPI 616e32c updates README status only. Step 4a packaging/installed
+descriptors are accepted. Four P2 and three P3 records closed through one blocking
+remediation and one nonblocking cleanup; no new architectural cause or escaped
+release defect established. Owner final focused suites pass 53 cases with one
+disclosed Darwin EILSEQ skip using the previous unchanged native image. Library,
+producer/release/source-boundary and prior actual Darwin source/extracted wheel
+checks pass; Windows/native/cross-volume/final packaged qualification is not claimed.
+Next is 4b: finite clock/native-auth facts, then identity/CBT/HTTPS lease/route
+cancellation/retry composition and secret-adapter review. Core remains unchanged;
+full Windows/release NO-GO, Digest and provider parity separate. No push, tag,
+publishing or activation. Earlier sections are historical snapshots.
+
 ## SSPI installed hosts: remediation 1, 2026-10-04
 
 Code/State/Surface re-verdicts are all GO at root 6b67028 and the corrected

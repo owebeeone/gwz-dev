@@ -1,11 +1,61 @@
 # GWZ SSPI installed hosts checkpoint
 
-2026-10-03. **DRAFT implementation checkpoint; not accepted.** The operator
+2026-10-04. **ACCEPTED installed-host packaging after Code/State/Surface GO.** The operator
 authorized the next chunk after native worker acceptance. This is plan step 4a:
 trusted artifact production, CLI early self-execution and Python bundled worker.
 Step 4 as a whole remains open until the HTTP composition in 4b is accepted.
 Windows endpoint activation, publishing and full release qualification remain
 NO-GO. No push, tag or release is authorized by this checkpoint.
+
+## Acceptance and review ledger
+
+Independent final [Code](GwzSspiHosts-ReviewCode-2.md),
+[State](GwzSspiHosts-ReviewState-2.md) and
+[Surface](GwzSspiHosts-ReviewSurface-2.md) reviews report GO on this exact tuple:
+
+| Repository | Reviewed commit |
+|---|---|
+| gwz-dev | `a17a7b07becb1e92da5519b64add39c41d6ee09e` |
+| gwz-sspi | `14d834b311200b0984e7041e4a34419c59501119` |
+| gwz-cli | `0c7dfaf0199731648d2360358284010b2b4575c1` |
+| gwz-py | `ded47130af23720099e7b6a92ccb9a161bb5db9a` |
+| gwz-core, unchanged reference | `8cb3a3f01d79699a5ad07b6ec7cfc78321224d31` |
+
+Final SSPI `616e32cceeea1b7df1d7bbe1c1695a409a733f6d` updates README status only.
+Production, dependency, schema and selected fingerprint-input bytes are unchanged
+after review. Root landing changes status/ledger and files verbatim reports only.
+This accepts plan step 4a only: trusted producer, CLI self-execution, bundled Python
+worker, installed descriptors and coherent packaging/publication. It does not
+accept core HTTP composition, Windows authentication activation or release.
+
+Initial Code/State NO-GO and Surface GO, all later reports, and the
+[merged correction](GwzSspiHosts-RemPlan.md) are retained. Seven finding records
+were discovered before acceptance: four P2 and three P3. All are independently
+closed: interpreter target defaults, lossless paths, coherent wheel publication,
+Cargo rustflags, matrix receipts, option defaults and candidate scratch placement.
+One blocking remediation plus one bounded nonblocking caller cleanup; no new
+architectural root cause, exact-defect blind convergence or escaped release defect
+was established. Zero findings remain open in this packaging object.
+Recorded tier: dual Code/State and cold caller Surface. Cumulative implementation
+is 25 source/test/workflow files and 1,208 additions, within the recorded ceiling.
+Six member and three root implementation documents; mandatory process audit
+records are separate. No new runtime owner, wire, dependency or core behavior.
+
+Final focused suites: owner 53 passes/one EILSEQ skip using the previous unchanged
+native image. Producer/release/source-boundary checks and Rust library gates pass;
+real Darwin wheel/sdist and extracted rebuild/installed/RECORD checks passed before
+the Python-only scratch-root cleanup. No fresh final packaged build, Windows
+surrogate/hard-link/runtime/Hello or cross-volume execution proof is attributed
+to the last source-only tests. Existing unrelated formatting/Clippy debt stays
+disclosed. Filesystem scratch-root tests inspect production handoffs with synthetic
+subprocess outputs. Publication requires supported hard links and refuses collisions.
+
+Next: settle finite deadline translation and honest native authentication facts,
+then implement core identity/CBT/HTTPS lease/route/cancel/retry composition (4b)
+with the accepted secret-adapter gates. Full Windows qualification remains NO-GO;
+Digest and provider/EPA/trust/proxy/Pageant proof rows retain their own gates.
+No push, tag, publication, release or activation occurred. Later sections preserve
+the historical implementation/review snapshots; this acceptance controls status.
 
 ## Authority and baseline
 

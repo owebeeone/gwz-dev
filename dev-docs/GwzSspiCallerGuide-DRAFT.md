@@ -25,7 +25,8 @@ together. The host supplies the trusted packaging metadata field
 `build_fingerprint`: exactly the 32 bytes embedded in that matching worker
 artifact and reported by Hello. The library neither derives these bytes from a
 file hash nor supplies default production packaging metadata. The build-only
-producer and host entry points are implemented pending the installed-host review;
+producer and host entry points passed the bounded
+[installed-host review](GwzSspiHostsCheckpoint.md);
 see the [library packaging guide](../gwz-sspi/docs/HostPackaging.md),
 [CLI packaging guide](../gwz-cli/docs/HostPackaging.md) and
 [Python packaging guide](../gwz-py/docs/HostPackaging.md). They supply matching
