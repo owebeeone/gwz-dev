@@ -3,8 +3,9 @@
 2026-10-03. **Accepted revision 2 baseline plus reviewed token-limit amendment.**
 GwzSspiMessagesAcceptance.md records Consistency/Safety/Surface GO after remediation 1.
 Package and worker are not released yet. Owned caller values and private codecs
-passed their separate [Code/State/Surface gate](GwzSspiSecretCodecAcceptance.md); authentication
-and process supervision remain unimplemented.
+passed their separate [Code/State/Surface gate](GwzSspiSecretCodecAcceptance.md); native authentication remains unimplemented. Parent supervision is implemented in
+the pending [supervisor checkpoint](GwzSspiSupervisorCheckpoint.md); that gate is
+not yet accepted.
 [Acceptance](GwzSspiAcceptance.md) records the exact reviewed tuple and Surface GO.
 The historical DRAFT filename is retained until the implementation documentation lands.
 Windows-specific native SSPI authentication, one contained process per conversation.
@@ -18,19 +19,20 @@ extension and uses its absolute installed path. No PATH lookup, shell or child
 Python interpreter. Removing/upgrading the application removes/replaces its worker
 together. Missing workers and protocol/build mismatches are errors, not fallbacks.
 
-The following signatures specify the full public API. Only owned caller values
-and TokenLimit are implemented; see [implemented caller values](../gwz-sspi/docs/CallerValues.md)
-for their constructors, source ownership and validation boundaries. Supervisor,
-Conversation, deadlines, cancellation and worker_entry remain future APIs.
-All async methods return owned results. SecretBytes/SecretText have zeroizing
+The following signatures specify the full public API. Owned caller values, TokenLimit and the parent lifecycle are implemented; see [implemented caller values](../gwz-sspi/docs/CallerValues.md)
+for their constructors, source ownership and validation boundaries. Supervisor/Conversation and deadline/cancellation/cleanup support now have a
+standalone parent implementation; native authentication and worker_entry remain
+future functionality.
+All async methods return owned results; step borrows Conversation mutably until
+its future completes or is dropped. SecretBytes/SecretText have zeroizing
 storage and no Debug/Clone. Conversation and Supervisor own resources; there are
 no raw native handles or pointers in this caller API.
 
 | API | Contract |
 |---|---|
-| `Supervisor::new(WorkerExecutable, Options) -> Result<Supervisor, Error>` | Absolute installed worker path; capture current primary Windows identity. Refuse impersonation or unsupported OS. Options defaults: `max_workers = 8`; accepted range 1–64. |
+| `Supervisor::new(WorkerExecutable, Options) -> Result<Supervisor, Error>` | Absolute installed worker path; capture current primary Windows identity through synchronous OS metadata calls with no realtime bound. Refuse impersonation or unsupported OS. Options defaults: `max_workers = 8`; accepted range 1–64. |
 | `TokenLimit::new(raw_bytes: u32) -> Result<TokenLimit, Error>` | Required raw authentication-token byte cap, 1–65,536 inclusive. Invalid values return InvalidRequest before start/registration. No default; the host derives this from its existing HTTP limit after scheme/base64 overhead. Immutable nonsecret numeric value, no new CLI setting. |
-| `Supervisor::start(AuthRequest, Deadline, Cancellation) -> Future<Result<Conversation, Failure>>` | Wait for capacity, launch and verify matching worker; no native authentication until `step(None)`. Deadline is the caller's absolute monotonic deadline. No default timeout. |
+| `Supervisor::start(AuthRequest, Deadline, Cancellation) -> Future<Result<Conversation, Failure>>` | Wait for capacity, launch and verify matching worker; no native authentication until `step(None)`. Deadline is the caller's absolute monotonic deadline. No default timeout. start synchronously captures/refuses the originating thread and retains its handle; charged launch rechecks that same thread even if the future moves between executor threads. Future polling does no native metadata, launch or blocking I/O calls. |
 | `Conversation::step(Option<SecretBytes>) -> Future<Result<TokenStep, Failure>>` | First step is None and sends Begin; later steps supply challenge bytes. At most eight total steps. One step at a time through mutable ownership. Output status Continue or Complete, checked attributes, MechanismObservation and owned SecretBytes. Complete forbids further steps. |
 | `Conversation::finish(self) -> Future<Result<(), Failure>>` | Legal immediately after start, during negotiation or after Complete. Normal native cleanup and confirmed process/Job/thread exit; pre-first-step finish initializes no native handles. Uses original deadline; drop of this future cancels and retains supervision. May return Pending cleanup in Failure if deadline expires. |
 | `Conversation::cancel(self) -> CancellationReceipt` | Immediately revoke result publication and initiate termination. Receipt names opaque record ID with cleanup Pending or Confirmed; not a claim termination is already complete. |
@@ -117,6 +119,6 @@ Quarantined workers keep their capacity slot until exit plus Job emptiness plus
 IPC/launch-thread completion are confirmed. Saturation waits/refuses by each
 caller's deadline; max_workers does not bound time to cleanup. Forced exit does not
 promise physical secret erasure or cancellation in LSASS/Pageant. No token/secret
-logging is supported. Future native Supervisor construction on non-Windows returns
+logging is supported. Supervisor construction on non-Windows returns
 UnsupportedPlatform. Pure owned-value constructors work on every platform and
 do not perform authentication.

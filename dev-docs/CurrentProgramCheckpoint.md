@@ -1,5 +1,21 @@
 # Current program checkpoint
 
+## SSPI parent supervision ready for settled review, 2026-10-03
+
+Member `fb6a5fc6d1d013b3e7e9f6955d7b6dabafd51d7a` implements the authorized
+[supervisor checkpoint](GwzSspiSupervisorCheckpoint.md); accepted secret baseline
+and reference core `8cb3a3f01d79699a5ad07b6ec7cfc78321224d31` are unchanged.
+Parent lifecycle, charged dispatch/launch/I/O/reaping, Windows containment adapter,
+private phase bridge and caller docs are implemented. Local Darwin tests, strict
+lint/fmt, schema, disabled-branch scope and standalone archive checks pass;
+Windows MSVC/GNU strict cross-target lint passes. Native execution is unproved.
+Recorded tier: mandatory peer-blind Code/State plus cold caller Surface on the
+settled root/member tuple. Review pending, accepted-through remains prior secret
+gate. Native SSPI/worker entry is step 3; worker still refuses; publication,
+activation and full Windows release remain NO-GO. No push/tag. Implementation
+contact corrected five ownership/scheduling issues before settlement; no escaped
+defect or architectural review cause claimed. Preceding entries are historical.
+
 ## SSPI caller values / secret codec accepted, 2026-10-03
 
 [Acceptance](GwzSspiSecretCodecAcceptance.md) records Code/State/Surface GO at root
