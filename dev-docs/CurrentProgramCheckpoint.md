@@ -1,5 +1,25 @@
 # Current program checkpoint
 
+## SSPI native Negotiate/NTLM worker accepted, 2026-10-03
+
+[Acceptance](GwzSspiNativeAcceptance.md) records Code/State/Surface GO at root
+bb2387d7fdb4b5bb7c16554fabdbf59b245b8b6e, member
+425e13dc011c42e94fdea31779a8e5967aedc82b, reference core
+8cb3a3f01d79699a5ad07b6ec7cfc78321224d31 and evidence
+9adf06beab7a15d1e5c22ec1cecf8e35966e1d7c. Final member
+84266f412b12a31b9b643a51158079a5412470e5 changes packaged status only.
+Native/shared bootstrap and secret disposal are accepted within that scope.
+One merged remediation closed one P2 and five P3 records; zero open findings,
+new architectural causes 0, no production exposure/escaped defect established.
+Portable/cross/package/schema/source-scope and actual Windows native/default
+checks pass, including suspended Job/no-kill/parent-death, forced helper cleanup,
+actual Negotiate query/free and recipe restoration/teardown. Final owned census
+is empty. Original EOF-confounded receipts retain their precise limitation.
+Digest H(Entity) amendment remains open, so all step 3 is not closed. Next:
+step 4 installed fingerprint and CLI/core/Python composition with secret-adapter
+reviews; full Windows parity/qualification and release remain NO-GO. No push,
+tag, release, publishing or activation. Earlier sections are historical snapshots.
+
 ## SSPI native worker review: bounded remediation 1, 2026-10-03
 
 Initial Code/Surface GO and State NO-GO at root

@@ -1,5 +1,11 @@
 # GWZ SSPI native worker checkpoint
 
+Status: **accepted at the exact tuple in
+[Native acceptance](GwzSspiNativeAcceptance.md)** after all three remediation
+re-verdicts returned GO. This accepts native Negotiate/NTLM/shared worker only;
+Digest, installed hosts and full Windows qualification remain open. The sections
+below preserve the review checkpoint snapshots.
+
 ## Current object: remediation 1 pending re-verdict
 
 2026-10-03. Initial Code/Surface GO and State NO-GO are preserved verbatim.

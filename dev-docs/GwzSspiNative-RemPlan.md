@@ -36,3 +36,10 @@ real Negotiate query/allocation release and recipe restoration/disposal pass.
 Final owned-path process inventory is empty. New campaign preserves the failed
 encoded recipe invocation and corrected file invocation separately. Same reviewers
 must verify closure; no implementer closure or new policy/wire is claimed.
+
+## Reviewer closure
+
+Code/State/Surface remediation-1 re-verdicts all returned GO on the exact corrected
+settled tuple. Every finding is independently closed; no new architectural cause
+was identified. See GwzSspiNativeAcceptance.md for bounded scope and remaining
+qualification. Original reports/receipts remain unchanged.
