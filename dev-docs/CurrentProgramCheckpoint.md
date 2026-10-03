@@ -1,19 +1,25 @@
 # Current program checkpoint
 
-## SSPI caller values / secret codec ready for review, 2026-10-03
+## SSPI caller values / secret codec accepted, 2026-10-03
 
-[Implementation checkpoint](GwzSspiSecretCodecDesign.md) controls owned caller
-values and generated private codecs in member e3851768da8d58140d92590bf61575f6edbe333c.
-29 unit tests, caller integration, worker refusal, twelve negative doctests,
-13 Python tests, pinned generation, strict Clippy/fmt, cfg-scope source check and
-61-file standalone archive verification pass. Schema/semantics fingerprints remain
-unchanged. Sole approved dependency: zeroize =1.9.0 alloc-only.
-Review tier: mandatory dual Code/State secret/wire gate plus cold value Surface.
-Remediation rounds 0; no formal findings yet. One drafter stopped editing; owner
-settles root tuple and dispatches independent reviewers. No Supervisor/native/
-process implementation, push, release or activation. Secret-boundary stop stays
-open until same-tuple GO; full Windows remains NO-GO. Next after GO: supervision
-kernel under the existing plan. Preceding entries are historical snapshots.
+[Acceptance](GwzSspiSecretCodecAcceptance.md) records Code/State/Surface GO at root
+e9f80c697acc5860ad90dbf5acd5888ccf2bd586, member
+e3851768da8d58140d92590bf61575f6edbe333c and unchanged reference core
+8cb3a3f01d79699a5ad07b6ec7cfc78321224d31. Final member
+44879481fbd54dab84b99fecdadc89a34a84dcbd adds a compiled caller walkthrough and
+status/testing notes; Surface re-verdict independently closes its nonblocking P3.
+No runtime/API/wire change in that follow-up. Zero findings remain, blocking
+remediation rounds 0, architectural causes 0, blind convergence none, escaped
+defects 0. Recorded tier: dual Code/State secret/wire gate plus cold value Surface.
+29 unit tests, caller integration, unchanged worker refusal, twelve negative
+trait doctests and compiled example pass (44 Rust checks); 13 Python tests,
+16-artifact regeneration, Clippy/fmt, disabled-branch scope check and 61-file
+standalone package verification pass. Remote CI is unexecuted.
+Step 1 secret-boundary stop is closed. Next: supervision kernel with deterministic
+race schedules, retained launch/I/O capacity and Code/State review, then native
+secret disposal review and host integration. Worker still refuses; publishing
+disabled; full Windows remains NO-GO. No push, tag, release or activation.
+Preceding entries are historical snapshots.
 
 ## SSPI taut messages/design accepted, 2026-10-03
 

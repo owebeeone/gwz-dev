@@ -3,7 +3,7 @@
 2026-10-03. **Accepted revision 2 baseline plus reviewed token-limit amendment.**
 GwzSspiMessagesAcceptance.md records Consistency/Safety/Surface GO after remediation 1.
 Package and worker are not released yet. Owned caller values and private codecs
-are implemented pending their separate Code/State/Surface gate; authentication
+passed their separate [Code/State/Surface gate](GwzSspiSecretCodecAcceptance.md); authentication
 and process supervision remain unimplemented.
 [Acceptance](GwzSspiAcceptance.md) records the exact reviewed tuple and Surface GO.
 The historical DRAFT filename is retained until the implementation documentation lands.

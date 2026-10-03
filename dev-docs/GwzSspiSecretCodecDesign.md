@@ -1,6 +1,8 @@
 # SSPI caller values and secret codec implementation checkpoint
 
-2026-10-03. **DRAFT implementation checkpoint**, not a new process design.
+2026-10-03. **Accepted bounded implementation checkpoint**, not a new process design.
+[Acceptance](GwzSspiSecretCodecAcceptance.md) records exact Code/State/Surface GO
+and the subsequent nonblocking caller-example correction and Surface closure.
 Accepted authority: GwzSspiMessagesAcceptance.md (schema/design and TokenLimit),
 GwzSspiDesign.md revision 2 plus §8, GwzSspiPlan.md step 1, caller guide, and
 member docs/WireProtocol.md exact fingerprinted bytes. Secret handling and wire
