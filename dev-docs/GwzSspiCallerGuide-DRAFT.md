@@ -2,7 +2,9 @@
 
 2026-10-03. **Accepted revision 2 baseline plus reviewed token-limit amendment.**
 GwzSspiMessagesAcceptance.md records Consistency/Safety/Surface GO after remediation 1.
-Package and worker are not released yet; no production API implementation is claimed.
+Package and worker are not released yet. Owned caller values and private codecs
+are implemented pending their separate Code/State/Surface gate; authentication
+and process supervision remain unimplemented.
 [Acceptance](GwzSspiAcceptance.md) records the exact reviewed tuple and Surface GO.
 The historical DRAFT filename is retained until the implementation documentation lands.
 Windows-specific native SSPI authentication, one contained process per conversation.
@@ -16,7 +18,10 @@ extension and uses its absolute installed path. No PATH lookup, shell or child
 Python interpreter. Removing/upgrading the application removes/replaces its worker
 together. Missing workers and protocol/build mismatches are errors, not fallbacks.
 
-The following signatures specify the public API; implementation has not landed.
+The following signatures specify the full public API. Only owned caller values
+and TokenLimit are implemented; see [implemented caller values](../gwz-sspi/docs/CallerValues.md)
+for their constructors, source ownership and validation boundaries. Supervisor,
+Conversation, deadlines, cancellation and worker_entry remain future APIs.
 All async methods return owned results. SecretBytes/SecretText have zeroizing
 storage and no Debug/Clone. Conversation and Supervisor own resources; there are
 no raw native handles or pointers in this caller API.
@@ -112,4 +117,6 @@ Quarantined workers keep their capacity slot until exit plus Job emptiness plus
 IPC/launch-thread completion are confirmed. Saturation waits/refuses by each
 caller's deadline; max_workers does not bound time to cleanup. Forced exit does not
 promise physical secret erasure or cancellation in LSASS/Pageant. No token/secret
-logging is supported. Non-Windows constructors return UnsupportedPlatform.
+logging is supported. Future native Supervisor construction on non-Windows returns
+UnsupportedPlatform. Pure owned-value constructors work on every platform and
+do not perform authentication.

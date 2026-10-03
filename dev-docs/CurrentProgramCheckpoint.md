@@ -1,5 +1,20 @@
 # Current program checkpoint
 
+## SSPI caller values / secret codec ready for review, 2026-10-03
+
+[Implementation checkpoint](GwzSspiSecretCodecDesign.md) controls owned caller
+values and generated private codecs in member e3851768da8d58140d92590bf61575f6edbe333c.
+29 unit tests, caller integration, worker refusal, twelve negative doctests,
+13 Python tests, pinned generation, strict Clippy/fmt, cfg-scope source check and
+61-file standalone archive verification pass. Schema/semantics fingerprints remain
+unchanged. Sole approved dependency: zeroize =1.9.0 alloc-only.
+Review tier: mandatory dual Code/State secret/wire gate plus cold value Surface.
+Remediation rounds 0; no formal findings yet. One drafter stopped editing; owner
+settles root tuple and dispatches independent reviewers. No Supervisor/native/
+process implementation, push, release or activation. Secret-boundary stop stays
+open until same-tuple GO; full Windows remains NO-GO. Next after GO: supervision
+kernel under the existing plan. Preceding entries are historical snapshots.
+
 ## SSPI taut messages/design accepted, 2026-10-03
 
 [Acceptance](GwzSspiMessagesAcceptance.md) records Consistency/Safety/Surface GO at
