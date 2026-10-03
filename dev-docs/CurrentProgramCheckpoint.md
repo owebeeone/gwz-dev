@@ -1,5 +1,18 @@
 # Current program checkpoint
 
+## SSPI HTTPS implementation resumed after restart, 2026-10-04
+
+The operator said continue. All 18 working-file fingerprints in the parked
+checkpoint match, so no newer source needs reconciliation. The previous agent
+contexts are unavailable after restart; one replacement GPT-6.1 drafter
+`/root/sspi_https_drafter` continues the same authorized implementation object.
+Design acceptance, finite-deadline/zero disposition and the 32-file budget-only
+disposition remain controlling. Partial capture/protocol gates are green; the
+core native module still begins with tests only. Core prepare/serve, deadline,
+lease/CBT/cleanup and actual CLI/Python handoff are next, followed by the settled
+implementation review. No Windows activation, push, tag, publication or release.
+The parked entry below is historical; the user's continue revokes the pause.
+
 ## SSPI HTTPS implementation paused for Codex restart, 2026-10-04
 
 The operator explicitly requested parking. The single drafter was interrupted;
