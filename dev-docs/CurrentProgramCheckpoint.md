@@ -2,6 +2,12 @@
 
 ## SSPI installed hosts: remediation 1, 2026-10-04
 
+Code/State/Surface re-verdicts are all GO at root 6b67028 and the corrected
+member tuple below. Four original P2s are closed; zero new architectural causes.
+Two nonblocking P3s are being corrected in the same object: candidate scratch-root
+placement and delegated auditwheel/compatibility defaults. Runtime/core/wire
+boundaries stay unchanged. Final acceptance/ledger follows focused closure.
+
 Code and State returned NO-GO on the installed-host tuple rooted at
 8cb284391dc5864c9ba6f41324cdd3c5807cf765; Surface returned GO with a P3.
 [The merged plan](GwzSspiHosts-RemPlan.md) covers four P2 and two P3 records:

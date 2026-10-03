@@ -60,3 +60,20 @@ six member plus three root implementation docs. Mandatory review/remediation
 audit records are separate process artifacts. No further expansion or activation.
 Same reviewers must classify changed-range materiality and verify closure;
 these checks are implementation evidence, not self-closure.
+
+## Remediation-1 verdicts and nonblocking cleanup
+
+Code, State and Surface all returned GO on root 6b670283179f45f0dbbe38b1f6c300b326e50100
+and the corrected member tuple above. Four original P2 findings are independently
+closed. Code also closes its matrix-receipt P3. No new architectural root cause
+was identified. Two bounded P3 records remain; they are routine corrections in
+the same object, not a new feature or architecture package:
+
+| Finding | Disposition | Closure |
+|---|---|---|
+| Code P3-2: candidate target-dir ignored | Preserve scratch-root selection with unique owned Rust target trees beneath the supplied root. Keep raw/provisioned wheel staging beneath output for same-filesystem publication. Update candidate defaults/help and tests. | Trace explicit/default candidate roots through production backend with mocked subprocesses; retain coherent concurrent/fault tests. |
+| Surface P3-1 remainder | State delegated auditwheel/compatibility choices, absence/config policy and precise upstream contracts; no behavior change. | Cold comparison with installed Maturin 1.15 help and primary contract; same Surface reviewer predicts default/explicit selections. |
+
+Artifact coherence, runtime authority, wire/core/auth ownership remain unchanged.
+The original round-1 testimony is preserved. Reviewers verify the narrow correction;
+no additional authentication/native campaign or expensive unchanged Rust gate is needed.
