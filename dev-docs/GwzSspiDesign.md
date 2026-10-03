@@ -1,6 +1,6 @@
 # GWZ SSPI process boundary
 
-Date: 2026-10-03. Revision 1. **DRAFT — pending Consistency, Safety and API Surface review.**
+Date: 2026-10-03. Revision 2 (merged remediation 1). **DRAFT — pending Consistency, Safety and API Surface review.**
 
 ## 1. Decision and authority
 
@@ -59,6 +59,19 @@ are serial on the worker's native thread. Negotiate/NTLM keep Windows §8's targ
 flags and opaque token handling; WDigest retains its method/URI contract, but
 support is gated on its unresolved native parity row. Basic is outside this API.
 No independent Rust NTLM/Kerberos/Digest implementation is substituted.
+Negotiate explicitly permits either Windows Kerberos or NTLM; callers requiring
+Kerberos-only must not start it. This version adds no per-mechanism policy knob.
+Each Token reports MechanismObservation: Unresolved or Selected { mechanism:
+Kerberos/Ntlm/Digest, authoritative: bool }. For Negotiate the worker queries
+SECPKG_ATTR_NEGOTIATION_INFO after native processing; IN_PROGRESS/OPTIMISTIC or
+unavailable intermediate queries are not authoritative. COMPLETE with a known
+package is authoritative. Unknown/unavailable selection at Token Complete refuses
+before publication. Direct Ntlm/Digest select their known requested provider.
+Intermediate unresolved tokens are permitted only under the caller's explicit
+acceptance of either Negotiate mechanism, never as evidence of Kerberos-only use.
+Query output ownership is freed normally; no provider strings escape the worker.
+See [Microsoft's negotiation-info contract](https://learn.microsoft.com/en-us/windows/win32/api/sspi/ns-sspi-secpkgcontext_negotiationinfoa).
+Production native tests must verify this observation for each supported provider.
 
 `Identity::CurrentLogon` supplies NULL authentication data. The supervisor captures
 its actual primary token SID, authentication LUID and session ID; the child returns
@@ -70,7 +83,7 @@ alternate-token, service-to-desktop or interactive-user discovery. Those require
 separate evidence/design. Child token equality does not authorize route reuse.
 
 `Identity::Explicit` owns Unicode user/domain/password in non-Clone zeroizing
-storage; DOMAIN\\user splits once, UPN keeps empty domain. It lives through all
+storage; DOMAIN\user splits once, UPN keeps empty domain. It lives through all
 possible native use. Target host is core's canonical U, never reverse DNS.
 Core captures binding from the actual verified final origin TLS connection using
 the existing native-tls API. The owned binding travels with this conversation;
@@ -130,13 +143,19 @@ frames; they cannot publish a token or revive a conversation.
 
 Protocol v1 is closed: worker Hello (protocol version, build/schema fingerprint,
 actual identity); parent Begin (selected package, target, identity, CBT and optional
-Digest method/URI); serialized Challenge; worker Token (Continue or Complete,
-attributes and opaque output); parent Finish; worker Finished; worker Error
+Digest initial_challenge/method/URI); serialized Challenge; worker Token (Continue or Complete,
+attributes, MechanismObservation and opaque output); parent Finish; worker Finished; worker Error
 (fixed enum/status). Supervisor::start stops after verified Hello; the first step(None) sends Begin
-and performs the first Initialize, with empty input when appropriate; subsequent Initialize runs only from Challenge. Round 8 continuing
+and performs the first Initialize, with empty input when appropriate; for Digest Begin's initial_challenge supplies the entire validated
+challenge at the first Initialize. All three Digest fields are required for
+Digest and prohibited for Negotiate/Ntlm; Digest requires Explicit identity.
+Initial challenge is nonempty owned zeroizing bytes bounded by the same token,
+HTTP and frame limits. Missing/oversized/wrong-package fields refuse before native
+work, with all owned inputs wiped. Subsequent Initialize runs only from Challenge. Round 8 continuing
 refuses rather than issuing round 9. Hello mismatch refuses before Begin. Finish
-is legal from any successfully begun nonterminal state and performs normal cleanup;
-cancel does not depend on receiving Finish or acknowledgement. Generated secret
+is legal after verified Hello, before Begin, during negotiation or after Complete;
+pre-Begin cleanup has no native credentials/context to dispose. It performs normal
+cleanup and confirmed exit; cancel does not depend on receiving Finish or acknowledgement. Generated secret
 messages must not derive Debug/Clone or retain ordinary String/Vec copies: codec
 adapters and generated types must offer owned zeroizing decoding/encoding, or
 implementation must stop for a reviewed schema/codec correction before secrets
@@ -200,8 +219,11 @@ same deadline; no fresh allowance per challenge, helper-local budget or 120-seco
 SSPI allowance. SSPI does not borrow SSH's LocalAdmission/LocalInteraction phase
 or pause network clocks. Core owns its accepted setup/Control progression and
 network idle semantics; the library receives a translated monotonic deadline
-once per conversation and may only shorten it. Worker receives remaining budget
-for cooperative checks, but the parent remains the deadline authority.
+once per conversation. It is immutable after start; a caller chooses any shorter
+value before start. If its enclosing deadline moves earlier while work is pending,
+the caller signals the supplied Cancellation at that boundary. No worker budget
+or parent-clock timestamp is sent over IPC: parent supervision alone enforces the
+deadline, including during native calls. There is no way to extend it.
 
 Accepted helper interaction/allocation M4/M10 and failure provenance remain
 unchanged. Do not invent helper_budget_ms or a helper timeout cause for SSPI
@@ -235,7 +257,8 @@ Implementation follows [the plan](GwzSspiPlan.md). Fast standalone tests use fak
 OS/clock/IPC ports: deterministic schedule exploration and seeded random sequences
 around every state/effect boundary, malformed/partial/max frames, cancellation
 before/after registration, late completion, saturation/quarantine and shutdown.
-Native tests reproduce creation/Job/IPC rows with owned handles, then real SSPI
+Fake protocol tests cover exact first Digest input, wrong-package fields, pre-Begin
+finish and typed mechanism publication; native tests reproduce creation/Job/IPC rows with owned handles, then real SSPI
 context cleanup and secret-owner cleanup. Public CI fixtures are self-contained;
 private raw evidence is optional. Identity/CBT fidelity, per-route rejection and
 CLI/Python installed worker matching are required composition tests. Normal-path

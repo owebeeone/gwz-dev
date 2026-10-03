@@ -9,7 +9,8 @@ Consistency/Safety and caller-guide Surface GO on the exact settled tuple.
    `gwz-sspi` member. Author the private IPC schema with taut, export its schema and
    generated Rust, and implement the narrow caller API. No dependency on core,
    Git, transport implementation, CLI or Python. Standalone fake OS/IPC/deadline
-   tests first, including secrets in codecs and malformed bounded framing.
+   tests first, including secrets in codecs and malformed bounded framing. Stop
+   for dual Code/State review of the codec/API secret boundary before step 2.
 2. **Supervision kernel.** Implement bounded admission, creation-time Job/HANDLE
    attachment, private pipes and dedicated charged I/O/launch ownership. Test every
    state/effect race with deterministic schedules and seeded random sequences;
@@ -20,6 +21,7 @@ Consistency/Safety and caller-guide Surface GO on the exact settled tuple.
    Windows fixtures reproduce the proved Job, parent loss and pipe cases, secret
    storage normal cleanup and owned-handle reaping. Rejection means no degraded
    fallback. Digest remains unavailable for product use until parity is proved.
+   Stop for dual Code/State review of native secret ownership/disposal before step 4.
 4. **Hosts and core composition.** CLI self-exec and Python bundled executable
    use the same worker entry. Core supplies identity/CBT/deadline/route lifecycle;
    no new CLI/core protocol or network carrier. Installation/mismatch/no-worker,
@@ -32,7 +34,8 @@ Consistency/Safety and caller-guide Surface GO on the exact settled tuple.
    decisions before any Windows endpoint activation. Design mechanism GO does not
    qualify Kerberos/Digest/EPA/trust/proxy/Pageant or authorize guard removal.
 
-Steps 1–3 form one reviewable library chunk; step 4 a composition chunk. Do not
+Steps 1–3 form a cohesive library sequence with the two explicit secret-boundary
+stops and kernel review above; step 4 is a composition chunk. Do not
 split implementation into per-function reviews. Independent remaining Windows
 investigations may run alongside after scoped authorization, without changing the
 frozen library contract. Builds/runtime caches stay outside repositories; prompts,
