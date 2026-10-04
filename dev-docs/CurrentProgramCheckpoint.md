@@ -1,5 +1,24 @@
 # Current program checkpoint
 
+## LLM handoff after WH1 round-1 closure verdict, 2026-10-04
+
+The operator requested handoff before further work. Both original reviewers
+finished at root0d2db2c23afd83d496ca9eb55d8264bf8366314e/core261eaca.
+Code GO; State NO-GO on residual P2-3: final native D check is before acquiring
+the asynchronous Owner mux lock. Constructor and HTTPS-only capacity findings
+are independently closed; actual one-connection CLI/Python normal paths pass.
+The direct-Mux deadline regressions miss this contention/suspension schedule.
+State classifies it as incomplete existing publication correction, not a new
+architectural root. One remediation round used, no next patch begun. Limited
+WH1 acceptance and full Windows release remain NO-GO.
+
+Read [merged verdict](GwzWindowsHttpsIntegrationImplementation-Verdict-1.md)
+and [handoff](GwzWindowsHttpsIntegrationHandoff-2026-10-04.md) for exact member
+revisions, raw evidence, external runtimes, constraints and next steps. Product
+tracked sources are clean; all reviewers/drafter and native runs finished.
+Handoff landing adds documentation only; no push/tag/publication/activation.
+Earlier snapshots below retain their historical status.
+
 ## Windows HTTPS WH1 remediation verified; original closure next, 2026-10-04
 
 Original settled Code/State reports are NO-GO on three concrete defects.

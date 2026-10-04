@@ -1,6 +1,11 @@
 # Windows HTTPS WH1 — remediation checkpoint 1
 
-2026-10-04. **Implemented and tested; original reviewer closure pending.**
+2026-10-04. **Implemented and tested; closure Code GO / State NO-GO.**
+[Final merged verdict](GwzWindowsHttpsIntegrationImplementation-Verdict-1.md)
+retains State P2-3 on the asynchronous publication-lock interval. Constructor
+and capacity findings are closed. This checkpoint's test results remain valid
+for their named schedules; they do not prove that remaining interval. The
+handoff starts before another patch.
 This corrects all blocking findings in the [merged plan](GwzWindowsHttpsIntegrationImplementation-RemPlan-1.md).
 It accepts no release, ordinary Windows activation or broader WH3 matrix outcome.
 

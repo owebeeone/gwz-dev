@@ -1,5 +1,17 @@
 # Remote transport release readiness
 
+## Windows WH1 handoff: publication lock gap remains, 2026-10-04
+
+Round-1 closure completed: Code GO, State NO-GO on P2-3. Constructor and
+HTTPS-only capacity are closed, with actual corrected CLI/Python one-connection
+clone/fetch/push and stream checks passing. Native publication can still cross D
+between the outer guard and asynchronous mux-lock acquisition. Existing direct
+Mux tests do not cover that interval. Limited WH1 acceptance remains NO-GO;
+full Windows activation/release remains NO-GO. No next patch has started.
+The [handoff](GwzWindowsHttpsIntegrationHandoff-2026-10-04.md) and
+[merged verdict](GwzWindowsHttpsIntegrationImplementation-Verdict-1.md) control
+current sequencing. Earlier entries below are historical snapshots.
+
 ## Windows HTTPS WH1 review remediation, 2026-10-04
 
 Qualification-only WH1 is implemented; provisioned CLI and installed Python
