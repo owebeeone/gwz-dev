@@ -1,5 +1,40 @@
 # Current program checkpoint
 
+## CI repaired after the push; HTTPS close race fixed, 2026-10-04
+
+Pushing everything ran CI over code that had not been green for days, so each fix uncovered the next failure. Fifteen are fixed and pushed. Two were product defects.
+
+- **Product defects:**
+  - **HTTPS close race** (gwz-core `3861265d`). When the initiator's Close overtook the response, the HTTPS worker failed the stream with `Io` instead of finishing the close. Git's Close can overtake it once Git reaches an advertisement's flush packet.
+    - **Cause:** from a received Close the stream refuses I/O-state reports with `WrongState`. The SSH pump skips those reports; `serve.rs` mapped the refusal to `Io`.
+    - **Origin:** it escaped from the candidate HTTPS endpoint (`280f970a`, 2026-09-22). WH1's stale-action test exposed it: CI run 37199948980, and locally once in 40 to 1,200 runs.
+    - **Test-first:** a 4 MiB advertisement closed after one byte failed with `PeerFailed(Io)` on every run before the fix.
+    - **After the fix:** WH1's test passed 1,500 of 1,500 runs. Both candidate legs passed 2,945, the ordinary gate passed 2,331, strict Clippy passed, and the lane gate is ok.
+  - **gwz-py's build backend under pip's build isolation** (gwz-py `c541a60`). `sspi_backend` ran `python -m maturin`, whose launcher looks for maturin beside the interpreter, but pip installs it into an overlay on PATH. Every editable install failed while preparing metadata, and the launcher's message went to the stdout the backend captured. Introduced by `e9e228c` (2026-10-04).
+- **CI and test fixes:**
+  - **gwz-sspi:**
+    - `c5afd08`: the workflow was invalid, because the `runner` context is not available in job `env`.
+    - `7679171`: text checks out with LF on every platform.
+    - `e45f467`: `CARGO_HOME` is read without needing a home directory.
+    - `d80bf63`: the package job runs under bash, because PowerShell reports only a step's last command and so hid a failed schema check.
+  - **gwz-transport:** `d0be15a`, formatting with rustfmt 1.96.0.
+  - **gwz-core:**
+    - `1f6b1e3e`: generator drift. Regenerated artifacts, pins moved to IR `c5667a0d…` and transport `d0be15a`, and the consumer test's `https_username`.
+    - `e33bebbc`: the process-globals test's `NEXT_WORKER` path.
+    - `7079edc7`: a gwz-sspi checkout and pin in the candidate job.
+    - `0fbd20aa`: an external `CARGO_TARGET_DIR` for the nested SSPI validator tests.
+  - **gwz-cli:** `9d25cfab`, `worker_host::early()` takes argv from `run()`.
+  - **gwz-py:**
+    - `aa4600af`: gwz-sspi checkouts.
+    - `409db0bf`: the candidate extension is built without auditwheel repair, which had broken every candidate run since `766de53`; and the executable-bit check runs only on POSIX.
+- **Open: gwz-py's Windows suite.** It fails five tests that predate today, from `eecb485` (2026-10-02). Four `test_client_host` tests call `os.killpg`, and `test_caller_directory` hits WinError 32 during cleanup. They need Windows work, not skips.
+- **Lanes:** `regen-protocol` merged (members fast-forwarded, root merge verified) and is disposed, as is every earlier lane. The family is root only. This supersedes the "lane disposal waits" lines below.
+- **Follow-ups:**
+  - gwz-cli's manual platform gate and release workflows, and gwz-py's `publish.yml`, have no gwz-sspi checkout yet.
+  - Multi-line PowerShell steps elsewhere hide failed commands the same way: gwz-py's Windows install steps and gwz-core's manual Windows matrix.
+  - After an early Close, the HTTPS worker still forwards the rest of the response within Close's cleanup deadline. Stopping and discarding the connection instead is a separate design question.
+  - gwz-sspi's `Cargo.toml` still says no GitHub remote is configured.
+
 ## native.rs split merged, 2026-10-04
 
 The operator's size rule splits `gwz-core/src/git/endpoint/https_worker/native.rs`, which was 1,847 lines, by responsibility. It is now `native.rs` plus seven files under `native/`, all at most 500 lines: the root (412), `sspi.rs`, `owners.rs`, `exchange.rs` and four test files.
