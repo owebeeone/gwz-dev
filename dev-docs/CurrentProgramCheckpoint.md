@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## Windows native-provider qualification preparation, 2026-10-04
+
+Operator authorized focused Windows qualification. The existing production
+composition is unchanged. Six new public native fixtures plus two existing ones
+passed 8/8 on Windows11/MSVC/E: ReFS: completed NTLM/Negotiate→NTLM, actual wrong
+binding refusal, live/retired/impersonated originating-thread handoff, and idle
+worker cancellation/fixed-deadline confirmed cleanup. Final owned processes zero.
+Independent Code/State review of the test/evidence checkpoint is next;
+[qualification checkpoint](GwzWindowsHttpsQualificationCheckpoint.md) records
+exact scope, original fixture failures, limits and source/command receipts.
+
+Sequencing correction: full HTTPS qualification first needs a bounded Windows
+private test-entry/portability package. The actual endpoint/caller routes remain
+Unix-gated and helper runner/file-reader contain unconditional Unix APIs.
+These native provider results do not prove TLS/EPA, installed callers or Git.
+Full Windows activation/release remain NO-GO. No push/tag/publication; unrelated
+dirt unchanged. Earlier entries below preserve historical snapshots.
+
 ## SSPI HTTPS composition accepted; Windows qualification next, 2026-10-04
 
 [Implementation acceptance](GwzSspiHttpsCompositionImplementationAcceptance.md)
