@@ -54,7 +54,14 @@ existing first-leg/pre-Begin tests:
   its initial token. Actual Supervisor cleanup is Confirmed, shutdown has no
   outstanding records. This covers idle native IPC, not a blocked provider call.
 
-Final owned-path process inventory: **zero**, ReFS verified. Local ordinary SSPI
+Corrected owned-path process inventory: **zero**, ReFS verified, after an actual
+live-process negative control. The original inventory-final-v3 zero attribution
+is withdrawn: Code P3-1 found an unnormalized slash comparison could miss live
+owned Windows paths. Corrected inventory normalizes both paths and includes a
+directory boundary. The live control proves original miss, corrected detection,
+actual gate refusal (exit1), sibling exclusion, held control exit and subsequent
+zero gate (exit0). Original raw receipts are retained; reviewer closure is pending.
+Local ordinary SSPI
 all-feature tests/doctests, Windows-target strict Clippy, explicit fixture rustfmt
 and diff checks pass. Windows target Clippy is source evidence only. The shared
 cfg guard passes its existing core/CLI/Python scope; it does not scan SSPI.
