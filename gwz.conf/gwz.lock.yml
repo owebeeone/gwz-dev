@@ -60,7 +60,7 @@ members:
     path: gwz-sspi
     source_id: src_gwz_sspi
     source_kind: git
-    commit: 582ec001bd2972076ea65a7db87d81d988c6f2e7
+    commit: c5afd08cc6965b2bd24aa0c22b9f829ded087e8f
     branch: main
     detached: false
     dirty: false
@@ -69,7 +69,7 @@ members:
     path: gwz-transport
     source_id: src_gwz_transport
     source_kind: git
-    commit: cd007b6868905543caa212155ad8ec99b3a4052c
+    commit: d0be15a8f76071a0a7e23ef39fd39678bada05fe
     branch: main
     detached: false
     dirty: false
