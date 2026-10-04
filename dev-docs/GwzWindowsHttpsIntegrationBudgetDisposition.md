@@ -24,3 +24,13 @@ Implement the single cohesive WH1 package and obtain dual Code/State review.
 Stop for any new architecture/owner/interface or >120% growth; do not use the
 40-file allowance to absorb WH2 or skip actual Windows checks. No publication,
 push, tag, production activation or release approval.
+
+
+Implementation-contact allowance, 2026-10-04: the TDD closure identifies up to
+44 source/test/build files, with three mechanical switch inventories counted
+separately. The lane owner permits that bounded growth (110% of the 40-file
+estimate) while retaining 2,600 added lines and identical scope. The extra sites
+are actual helper exclusion, neutral settings/capture and meaningful admission/
+backend tests; no runtime owner, public API, dependency, WH2 or generic refactor
+is added. Stop above 44 actual source files, the line ceiling, or any structural
+trigger. Record final exact count before review; this is not release acceptance.

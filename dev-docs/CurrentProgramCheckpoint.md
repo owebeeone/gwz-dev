@@ -12,7 +12,8 @@ is superseded solely for this qualification boundary. Both reviewers found the
 same nonblocking P3 method-name error; both independently closed the corrected
 text at root `2dd4ebf1c24d36c728d2ad60c257fd479de22cbf`. Zero design findings
 remain open; WH1 implementation is now in progress. [Acceptance](GwzWindowsHttpsIntegrationAcceptance.md) records scope.
- Production member sources are unchanged; Windows release remains NO-GO.
+The single implementation drafter is editing WH1; its changes are uncommitted
+and unreviewed. Windows release remains NO-GO.
 
 The external Windows11/MSVC/E: ReFS prototype now compiles the actual HTTP pool,
 SSPI and per-remote composition with SSH absent and helper lookup refused.
@@ -23,6 +24,16 @@ files. Actual native WinHTTP capture is DIRECT. The prototype's empty unused SSH
 home is not a product design and must be replaced by private neutral budgets.
 Private raw evidence is in the HTTPS-integration run
 `2026-10-04-windows-https-portability`; public tests do not depend on it.
+
+The disposable native HTTPS verifier now accepts matched leaf binding, rejects
+mismatched binding, and reports Negotiate selecting authoritative NTLM. An
+independent Curl client retrieved a real authenticated smart-Git advertisement.
+These are fixture checks, not GWZ client qualification. Curl needed a fixture-only
+revocation override for the ephemeral certificate; this does not qualify GWZ TLS
+or revocation policy. Original unsupported direct-NTLM and certificate failures
+are preserved. A fresh external Windows Python venv is prewarmed; GWZ is not yet
+installed. Updated private evidence is committed; no build output or secrets are
+archived. The implementation-contact file allowance is recorded separately.
 
 Next: implement accepted WH1 qualification-only boundary with absent SSH/
 helper ownership and actual original-entry CLI/Python selection, then execute
