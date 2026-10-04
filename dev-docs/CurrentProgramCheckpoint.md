@@ -4,13 +4,14 @@
 
 This fork owns the authorized Windows integration and real HTTPS/Git/CLI/Python
 qualification work. [Integration proposal](GwzWindowsHttpsIntegrationDesign-DRAFT.md)
-is DRAFT: initial Safety GO, Consistency NO-GO for one P2 (the claimed caller
-helper-disable option does not exist). Remediation 1 specifies a fixed
-qualification-only Disabled backend at the existing shared request constructor,
-with unchanged context; no caller option/API/schema is added. Original reviewer
-closure is pending. Accepted composition §9
-remains unchanged until that review accepts the explicit qualification-only
-amendment. Production member sources are unchanged; Windows release remains NO-GO.
+is accepted for WH1 after original Consistency closure and Safety GO at root
+`1ddbfca026347c37deb135934d3b1af610aee781`. P2-1 is closed for design; a fixed
+qualification-only Disabled backend at `TransportRuntime::open_request` retains
+its context without a caller option/API/schema. Composition §9's first paragraph
+is superseded solely for this qualification boundary. Both reviewers found the
+same nonblocking P3 method-name error; corrected text awaits independent
+confirmation. [Acceptance](GwzWindowsHttpsIntegrationAcceptance.md) records scope.
+ Production member sources are unchanged; Windows release remains NO-GO.
 
 The external Windows11/MSVC/E: ReFS prototype now compiles the actual HTTP pool,
 SSPI and per-remote composition with SSH absent and helper lookup refused.
@@ -22,7 +23,7 @@ home is not a product design and must be replaced by private neutral budgets.
 Private raw evidence is in the HTTPS-integration run
 `2026-10-04-windows-https-portability`; public tests do not depend on it.
 
-Next: settle and review WH1 qualification-only boundary, implement absent SSH/
+Next: implement accepted WH1 qualification-only boundary with absent SSH/
 helper ownership and actual original-entry CLI/Python selection, then execute
 real TLS/auth/Git and installed caller cases. WH2 helper/Job/path qualification
 is separate; no actual HTTPS/Git/CLI/Python success is claimed by compilation.

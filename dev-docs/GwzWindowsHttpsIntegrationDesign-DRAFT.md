@@ -1,7 +1,8 @@
 # Windows HTTPS integration and qualification — DRAFT
 
-2026-10-04. **Proposal, not frozen or accepted. Full Windows release remains
-NO-GO.** The operator authorized Windows integration and real HTTPS/Git/CLI/
+2026-10-04. **WH1 qualification boundary accepted after dual review; WH2 is
+future scope, WH3 is required qualification. Full Windows release remains
+NO-GO.** See [acceptance](GwzWindowsHttpsIntegrationAcceptance.md). The operator authorized Windows integration and real HTTPS/Git/CLI/
 Python qualification. This proposes a bounded qualification build, not activation,
 publication, pushing, tagging or acceptance of general Windows parity.
 
@@ -36,12 +37,13 @@ unsupported Windows mechanisms or removing the ordinary product guard.
 This document proposes to supersede only the first paragraph of accepted
 composition §9, beginning “Production activation remains” and ending “No
 generated files change during this draft”, for WH1 qualification builds.
-Its replacement permits the existing callable endpoint/host module under
+Its accepted replacement permits the existing callable endpoint/host module under
 `all(windows, gwz_transport_candidate, gwz_windows_https_qualification)` solely
 in disposable qualification artifacts. Ordinary Windows and candidate-only
 Windows selection remain unchanged; all remaining composition §9 obligations
 and other sections remain controlling. No wire/generated payload changes are
-proposed. This permission is **pending independent GO**, not effective now.
+proposed. This qualification-only permission is effective at the acceptance below;
+ordinary Windows activation remains prohibited.
 
 ## 2. Characterized dependencies
 
@@ -100,7 +102,7 @@ WindowsConfigured or Gh offer is emitted. A forged unsupported Open refuses
 before effects, including before current-logon capture consumption/worker launch.
 There is no CLI/Python helper-disable selector today. WH1 qualification
 artifacts apply an explicit fixed construction rule at
-`TransportRuntime::request_kind` (`src/transport_host/mod.rs`, currently the
+`TransportRuntime::open_request` (`src/transport_host/mod.rs`, currently the
 host-bound `Git2Backend::new()` assignment): inside the exact Windows
 qualification predicate, construct `Git2Backend::without_credential_helpers()`
 and attach the same `RequestContext` using `with_host_context`. The existing

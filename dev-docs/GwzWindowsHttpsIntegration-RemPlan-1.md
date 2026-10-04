@@ -7,7 +7,7 @@ Consistency identified one P2. Reports are filed verbatim alongside this plan.
 
 | Finding | Disposition | Closure |
 | --- | --- | --- |
-| Consistency P2-1: nonexistent CLI/Python helper-disable option | Accept. Replace the false option claim with a fixed qualification-only backend construction at core `TransportRuntime::request_kind`: existing `without_credential_helpers()` plus unchanged host context. Outside the exact qualification cfg retain `new()`. No flag, API or schema added. Explicit configured/Gh Opens remain refused. | Original Consistency reviewer retraces actual caller reachability on corrected draft §§3/6/9. WH1 regression tests later observe actual policy and context through shared construction and normal CLI/Python call/submit; WH3 runs installed real HTTPS/Git cases. Ordinary routes preserve original policy. |
+| Consistency P2-1: nonexistent CLI/Python helper-disable option | Accept. Replace the false option claim with a fixed qualification-only backend construction at core `TransportRuntime::open_request`: existing `without_credential_helpers()` plus unchanged host context. Outside the exact qualification cfg retain `new()`. No flag, API or schema added. Explicit configured/Gh Opens remain refused. | Original Consistency reviewer retraces actual caller reachability on corrected draft §§3/6/9. WH1 regression tests later observe actual policy and context through shared construction and normal CLI/Python call/submit; WH3 runs installed real HTTPS/Git cases. Ordinary routes preserve original policy. |
 
 No other blocking finding exists. The correction implements the original
 reviewer's bounded remedy, preserves the reviewed architecture and supersession,
