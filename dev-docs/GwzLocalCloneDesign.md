@@ -502,7 +502,8 @@ An absent family name may take the pull/push fallback below.
    member’s path; for each **selected dest member**, pair by dest lock
    **member id / `source_id`**. Path is not the key. Set mismatch
    (missing / extra / path moved for the same id) refuses aggregating;
-   no fetch. Pair a selected `@root` separately with the other
+   no fetch (for the family merge, narrowed by the 2026-10-04 amendment
+   below). Pair a selected `@root` separately with the other
    workspace's root repository: it has no member-lock entry. Preserve
    each verb's existing selection defaults.
 2. If no family row has the name, resolve as today's Git remote
@@ -517,6 +518,24 @@ pull still defaults to `origin` as today.
 index or not `ready` → `UnknownLocal`. `--remote origin` is a family
 miss (reserved / not a member). A bare `gwz merge feature/x` is a git
 ref and is **not** `UnknownLocal`.
+
+Receiver-only member amendment (2026-10-04, operator ruling: "this is a
+bug, it should allow merging"; `GwzLaneIssues.md` L11). gwz-sspi was
+registered at root after lane `tr1-8-win` was cloned, and every `gwz merge
+--remote tr1-8-win` refused `pairing_mismatch`, even with `--target`
+leaving gwz-sspi out. For the family merge, item 1's set mismatch is now
+one-sided. A member only the **source** lock records still refuses
+aggregating, before any fetch. A member only the **dest** lock records has
+nothing to import and is not a mismatch. If only a set selector reached it
+(the verb's default, `@all`), it is left out of the import and of the
+delegated merge: no import ref, its HEAD, worktree and lock row unchanged,
+never a participant of the merge record or its recovery, and the response
+reports it `not in source lane; unchanged`. A selection that names it, by
+id or path, cannot be served: `pairing_mismatch` naming the member and
+saying the source lane has no such member, before any fetch, nothing
+written. The same id at different recorded paths or with a different
+`source_id` still refuses as before. Family pull and push remain unserved;
+this amendment covers the merge.
 
 Family bindings are **not** persisted as git remotes. Resolve at
 operation time from the index. `repo sync` / capture must not write
@@ -676,13 +695,14 @@ GwzErrorCode.destination_incomplete = 66      # a completion rule failed before 
                                               # recapture, the marker -- or the install was
                                               # cancelled; the row and directory are retained
                                               # (`local list`: creating/incomplete)
-GwzErrorCode.pairing_mismatch = 67            # the two workspaces are no longer the same
-                                              # shape: a lock member id on one side only,
-                                              # the same id at different recorded paths or
+GwzErrorCode.pairing_mismatch = 67            # the two workspaces cannot be paired: a
+                                              # lock member id only the source records, a
+                                              # dest-only member the selection names, the
+                                              # same id at different recorded paths or
                                               # with a different source_id, a selected
-                                              # @root with no root to pair (§6); refused
-                                              # before any fetch, nothing written (LCM1.2,
-                                              # §11 item 26)
+                                              # @root with no root to pair (§6, amended
+                                              # 2026-10-04); refused before any fetch,
+                                              # nothing written (LCM1.2, §11 item 26)
 GwzErrorCode.import_incomplete = 68           # the family merge's import stopped before
                                               # the engine was entered: a fetch or receiver
                                               # read failed, or the import was cancelled;
@@ -1152,6 +1172,10 @@ Verbatim reflinks `target/` (disk, not a shared `CARGO_TARGET_DIR`).
     after it. The lock scope is §3.2's: the family lock from before the
     source lock is read until the engine returns, no receiver workspace
     lock preheld (measured: the engine's own acquisition succeeds).
+    Amended 2026-10-04 (§6's receiver-only member amendment): "a lock
+    member id on one side only" now refuses only for a member the source
+    records, or a dest-only member the selection names; an unnamed
+    dest-only member is left out and reported, and the code is unchanged.
 27. Ordinary-disposal codes and what the evidence covers — **allocated**
     (lane C, LCM2.1/LCM2.2, 2026-09-06; checkpoint §17): `unwaived_hazard`
     (69) for §5.2 step 3's known hazards not named by `--force`, every
@@ -1242,6 +1266,7 @@ exhaustive platform durability/identity matrix is not a prerequisite.
 | Dirty/open/incomplete lane with keep | detach matching metadata and retain all remaining files |
 | Two local-family mutation commands | family lock makes one busy; unrelated ordinary writers require operator quiescence |
 | Family merge delegates to existing engine | no preheld receiver workspace lock; existing lifecycle unchanged |
+| Dest registered a member after the lane was cloned | default/`@all`/explicit set without it merges the paired members, reports it not in source lane, leaves HEAD, worktree, lock row and refs unchanged through continue/abort; naming it refuses `pairing_mismatch` before any fetch; a member only the lane has still refuses |
 | Import crashes before engine entry | retained Git refs may remain; no record repair or automatic pruning |
 | Open merge after source detach/disposal or ordinary Git GC | retained import ref keeps source objects local |
 | Hub receives lane/from-A, receiver uses lane/agent-17 | same-branch pull refuses missing branch; explicit merge selects intended import; hub HEAD unchanged |

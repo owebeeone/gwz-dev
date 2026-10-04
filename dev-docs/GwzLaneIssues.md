@@ -295,3 +295,22 @@ deferred out of the 1.0.17 documentation lane.
 **Remedy used, on explicit operator approval.** Preserve the complete old catalog outside the workspace, verify every file's SHA-256, then retry through `gwz merge --remote`. GWZ created a fresh catalog and the merge completed. No catalog record was edited, no Git merge was substituted, and the old catalog remains available. This is a recovery-state workaround, not a general instruction to remove catalogs when a merge fails.
 
 **Fix needed:** a supported relocation/reinitialization operation that checks for pending actions and preserves the previous catalog, or a refusal that explains the relocation case and a supported recovery route.
+
+## L11: a member registered after a lane was cloned blocks every merge from it
+
+**Symptom.** 2026-10-04, gwz-dev with gwz 1.0.17. gwz-sspi (`mem_gwz_sspi`) was registered in gwz-dev after the lane `tr1-8-win` was cloned, so gwz-dev's lock records it and the lane's does not. `gwz --target @root --target gwz-core --target gwz-core-evidence merge --remote tr1-8-win` refused before any fetch: `PairingMismatch: … import pairing is incomplete; unpaired: mem_gwz_sspi; no import ref was created; nothing was written`. The `--target` set leaves gwz-sspi out, and the refusal came anyway; a default merge refuses the same way.
+
+**Reason.** gwz-core's import library (`gwz_local_import::pair_participants`) required the two workspaces' member sets to match "whatever this verb selected", so a member only the receiving lock records was reported unpaired even when the selection left it out. Under the default selection the family wrapper also selected it for the import, and the delegated merge would have planned it and looked in it for an import ref the lane cannot supply.
+
+**Ruling.** The operator: "this is a bug, it should allow merging".
+
+**Reproduction.** gwz-core `src/local_clone/tests/family_merge/receiver_only.rs`: the root registers `extra` (`mem_extra`) after its lane `A` was cloned, and merges from `A` with the default selection, with `--target @root --target mem_app`, with targets naming `extra`, and through a `README` conflict with `--abort` and `--continue`. All four tests failed on gwz-core `21f9e15e` with `PairingMismatch` (`unpaired: mem_extra`).
+
+**Fix.** gwz-core `dca4a162`, with docs in gwz-cli `220c89a` (lane `fix-family-pairing`):
+- a member only the receiving lock records is left out of the import and of the merge when only the default or `@all` reached it. It gets no import ref; its HEAD, worktree and lock row are unchanged; it is never a participant of the merge record, so status, continue, abort and gc never visit it. The merge's summary message reports it as `<path> (<id>): not in source lane; unchanged`;
+- a selection that names it, by id or path, refuses `PairingMismatch` before any fetch, saying the source lane has no such member;
+- a member only the lane has, and a member recorded at different paths or with a different `source_id`, still refuse as before.
+
+The rule is the 2026-10-04 amendment in `GwzLocalCloneDesign.md` §6 and in gwz-core `GWZDesign.md` and `GWZRequirements.md`.
+
+**Limits.** gwz's human output prints the engine's participant table and not the summary message, so the "not in source lane; unchanged" line is visible in `--json` output (`meta.message`) and through the Python API, and the member is simply absent from the human table. Not yet released: an installed 1.0.17 still refuses; use a build with the fix.
