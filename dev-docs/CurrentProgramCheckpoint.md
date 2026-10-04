@@ -4,7 +4,11 @@
 
 This fork owns the authorized Windows integration and real HTTPS/Git/CLI/Python
 qualification work. [Integration proposal](GwzWindowsHttpsIntegrationDesign-DRAFT.md)
-is DRAFT and pending dual Consistency/Safety review. Accepted composition §9
+is DRAFT: initial Safety GO, Consistency NO-GO for one P2 (the claimed caller
+helper-disable option does not exist). Remediation 1 specifies a fixed
+qualification-only Disabled backend at the existing shared request constructor,
+with unchanged context; no caller option/API/schema is added. Original reviewer
+closure is pending. Accepted composition §9
 remains unchanged until that review accepts the explicit qualification-only
 amendment. Production member sources are unchanged; Windows release remains NO-GO.
 

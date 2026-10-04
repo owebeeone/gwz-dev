@@ -98,10 +98,19 @@ WindowsDefault, with profile 2 and existing limits. Bound, public capability
 projection and Open validation must agree. No SshAmbient/SshExplicit,
 WindowsConfigured or Gh offer is emitted. A forged unsupported Open refuses
 before effects, including before current-logon capture consumption/worker launch.
-The actual CLI/Python helper-disabled request policy already maps to
-WindowsDefault; use that documented option in WH1 scenarios. A configured-policy
-request is explicitly unsupported in WH1 even when a Negotiate-only challenge
-could avoid a helper. Do not reinterpret it as WindowsDefault, anonymous or
+There is no CLI/Python helper-disable selector today. WH1 qualification
+artifacts apply an explicit fixed construction rule at
+`TransportRuntime::request_kind` (`src/transport_host/mod.rs`, currently the
+host-bound `Git2Backend::new()` assignment): inside the exact Windows
+qualification predicate, construct `Git2Backend::without_credential_helpers()`
+and attach the same `RequestContext` using `with_host_context`. The existing
+Disabled policy then maps to WindowsDefault. Outside that predicate keep the
+existing AllowConfigured construction. Do not change the constructor defaults,
+request schema, CLI options, Python API, ordinary Windows, Unix, or explicitly
+selected native-route backend. This is a limited artifact disposition, not an
+ambient setting or automatic authentication downgrade. Explicit/forged
+WindowsConfigured Opens still refuse before effects, even when a Negotiate-only
+challenge could avoid a helper. Do not reinterpret it as WindowsDefault, anonymous or
 Basic. This deliberately limited qualification build is not full Windows parity.
 
 Keep a private scheme-neutral budget value for pool/connect/I/O/helper
@@ -231,8 +240,8 @@ is authoritative; no expected pass-count census gate or concealed timing reruns.
 | Pool/effects | Actual reuse within allowed opaque scope, no cross-operation credential reuse, idle reap/caps, replacement generation, concurrent Opens/jobs/per-host; receive-pack POST failure never retried; fetch post-byte failure terminal. |
 | Deadline/cleanup | Original D across reuse/401/native rounds, timeout zero native refusal, exact expiry/late token, cancellation during HTTP/native IPC, cleanup retained before replacement admission, shutdown pending/confirmed. Idle native cancellation is distinct from truly stalled provider work. |
 | Git | Real advertisement and pack traffic: clone expected tree, fetch changed refs/objects, push ref accepted/rejected; independently verify bare remote refs and content. Native Complete alone is not Git success. |
-| CLI | Installed qualification binary executes normal dispatch with helper-disabled policy, original caller capture, real HTTPS route, worker provenance refusal and truthful JSON/human errors/cleanup. |
-| Python | Installed wheel call and concurrent submit, transport delivery while application consumer stalls, cancellation/close and origin capture before detach; actual loaded extension/worker Hello and rejected mismatch. |
+| CLI | Installed qualification binary executes normal dispatch with the fixed qualification-only Disabled backend policy, original caller capture, real HTTPS route, worker provenance refusal and truthful JSON/human errors/cleanup. |
+| Python | Installed wheel call and concurrent submit, transport delivery while application consumer stalls, cancellation/close and origin capture before detach; actual loaded extension/worker Hello and rejected mismatch; assert the same host-bound Disabled → WindowsDefault construction for call/submit. |
 | WH2 | Configured explicit identity accepted/rejected with no default retry, Basic existing semantics, helper timeout/cancel/overflow/descendant hangs and missing executable classifications; lossless config includes/path/environment and wiping owners. |
 
 The local fixture server owns native inbound verifier and optional smart-HTTP
@@ -327,3 +336,30 @@ Illegal guard cases, compiled public tests, CLI/Python builds, live TLS/auth/Git
 installed hosts, configured helpers, and runtime refusal/effect tests have not
 executed in this run. The newly written inbound verifier is unexecuted fixture
 source and supplies no qualification evidence. No production source changed.
+
+
+## 9. Installed caller recipe and construction regression (P2-1)
+
+After WH1 lands, build/provision disposable artifacts with both
+`--cfg gwz_transport_candidate --cfg gwz_windows_https_qualification`, using the
+accepted SSPI fingerprint producer. The fixture supplies its ordinary workspace,
+HTTPS remote and connector-local CA file via existing `GIT_SSL_CAINFO`. It uses
+existing `GWZ_TRANSPORT=gwz` to prevent a global native selection; this setting
+selects transport, not authentication policy. It changes no user config or trust.
+
+Run the installed CLI through `gwz --transport gwz --json fetch` against that
+fixture workspace. Run the installed wheel through normal `Client.fetch()`
+and `Client.submit(FetchRequest(...))`/existing operation handle consumption,
+using the fixture workspace. No helper-disable argument exists or is needed:
+the qualification runtime itself uses the specified Disabled backend.
+
+Public WH1 regression tests must observe the actual host-bound backend policy
+at the shared request construction point and its Disabled → WindowsDefault
+mapping, verify the context remains attached, and execute the normal CLI and
+Python call/submit route paths. Forged configured/Gh Opens still refuse before
+effects. Guard tests prove other builds use the original AllowConfigured backend
+and the explicit native route remains unchanged. WH3 then executes the installed
+recipes with real TLS/SSPI/Git, independently verifies resulting refs/content,
+and reports them separately from these construction tests. The existing helper
+failure diagnostic stating CLI/Python always enable helpers must be qualified
+for this build; no new user-facing selector is introduced.
