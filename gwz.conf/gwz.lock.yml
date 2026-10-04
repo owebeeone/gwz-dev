@@ -69,7 +69,7 @@ members:
     path: gwz-transport
     source_id: src_gwz_transport
     source_kind: git
-    commit: 966763e429c6c894da52e498b6f95ffd3d5ab5b5
+    commit: cd007b6868905543caa212155ad8ec99b3a4052c
     branch: main
     detached: false
     dirty: false
