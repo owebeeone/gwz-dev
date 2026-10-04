@@ -10,13 +10,12 @@
     - Its candidate stage runs the contracts job's gates.
     - Its exact stage packages the release commit, because `cargo package` refuses gearu's uncommitted candidate.
     - It has six unit tests.
-  - **`.github/workflows/release.yml`:** on a published GitHub Release, it reruns both stages on the tag, then publishes by Trusted Publishing only.
+  - **`.github/workflows/release.yml`:** on a published GitHub Release, it reruns both stages on the tag, then publishes by Trusted Publishing only, in no GitHub environment (`ff6083b`).
 - **Verified:**
   - Both stages passed end to end on a copy with the guard lifted: 12 script tests, 4 generated artifacts, formatting, both suites, and 81 files packaged.
   - `gearu plan 0.1.0` accepts the configuration.
-- **Operator steps before the release:**
-  - configure gwz-transport's trusted publisher on crates.io: owner owebeeone, repository gwz-transport, workflow `release.yml`, environment `crates-io` (TR3.3's exit);
-  - create the release venv once, as in `RELEASE.md`.
+- **Trusted publisher:** configured by the operator on 2026-10-05: owner owebeeone (GitHub ID 366621, verified), repository gwz-transport, workflow `release.yml`. It names no environment, by the operator's choice ("no crates-io environment"). That covers TR3.3's exit for gwz-transport.
+- **Operator step before the release:** create the release venv once, as in `RELEASE.md`.
 - **Plan:** amendment 2's revision 7 records this as Phase 10 step 2's mechanism.
 
 ## gwz-sspi registered on crates.io, trusted publishing only, 2026-10-05
