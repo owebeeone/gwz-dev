@@ -1,5 +1,23 @@
 # Current program checkpoint
 
+## Windows HTTPS WH1 accepted (limited), 2026-10-04
+
+The limited WH1 implementation is [accepted](GwzWindowsHttpsIntegrationImplementationAcceptance.md) after three remediation rounds. The third round was confined to non-architectural corrections under the cap.
+
+- **Round 2** (fresh reviewers): `gwz-transport` `Owner::send_if` closes State-1 P2-3. State-2 then found P2-4, a pre-existing routing omission: a stale action on an HTTPS-only endpoint closed the session.
+- **Round 3** routes that stale input as no-work and adds Code-2 P3-1's atomicity test. [Code-3](GwzWindowsHttpsIntegrationImplementation-ReviewCode-3.md) and [State-3](GwzWindowsHttpsIntegrationImplementation-ReviewState-3.md) report GO with no findings ([verdict](GwzWindowsHttpsIntegrationImplementation-Verdict-3.md)).
+- **Native refresh:** on the operator's Windows host, at the exact round-3 sources, it passes:
+  - MSVC qualification 5/5;
+  - CLI clone, fetch and push, with its refusals;
+  - installed-wheel clone, fetch and push, with stream and close.
+
+  It is archived at evidence `566db869`.
+- **Accepted tuple:** core `21f9e15e`, transport `cd007b68`, evidence `566db869`. CLI, Python and sspi are unchanged.
+- **Budget:** 55/55 files and 2,438/2,600 lines.
+- **Merge:** lane `wh1-rem2` merges into main with untracked files parked and restored by hash, on the operator's go of 2026-10-04.
+- **Still NO-GO:** ordinary Windows activation, WH2, WH3, provider parity, TR1.8 and release. The REDs stay disclosed: Clippy 45, the owner-IR pin, and six pre-existing candidate failures.
+- **Push obligations** are in the acceptance record. Nothing is pushed.
+
 ## WH1 remediation round 2 authorized, 2026-10-04
 
 The operator approved round 2's fix for State P2-3 ("Approve send_if"): one neutral `gwz-transport` method, `Owner::send_if`, whose admit check runs under the mux lock. The pump uses it for an Opened that carries native D, with fresh time and cancellation read inside the lock. A test clock seam drives a production-path regression through the real Owner/Session boundary. [Remediation plan 2](GwzWindowsHttpsIntegrationImplementation-RemPlan-2.md) and the [budget disposition](GwzWindowsHttpsIntegrationBudgetDisposition.md) record the scope: 55 files and 2,600 lines stay. The shared interface changes, so fresh Code and State reviewers review round 2. Implementation runs in lane `wh1-rem2`. Limited WH1 and full Windows remain NO-GO. Codex's lanes `tr1-8-win`, `tr2-22`, `tr2-5-cli` and `tr2-5-py` are untouched.
