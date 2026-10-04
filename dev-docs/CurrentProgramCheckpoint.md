@@ -1,5 +1,24 @@
 # Current program checkpoint
 
+## gwz-transport releases with Gearu, 2026-10-05
+
+- **Operator decision:** "use gearu for gwz-transport too - core, cli and py need a dependency check that gearu lacks". gwz-core, gwz-cli and gwz-py keep `scripts/release.py`.
+- **gwz-transport `2c12922e`:**
+  - **Guidance:** `gearu init` added its managed sections to `AGENTS.md` and `RELEASE.md`.
+  - **`gearu.toml`:** the version is `Cargo.toml`'s. The lock is regenerated offline, which is safe because there are no dependencies. The checks run `scripts/release_checks.py` under `{repo}/.release-venv`, which holds the pinned taut-proto release that `regen.py` requires.
+  - **`scripts/release_checks.py`:** it refuses while `publish = false` stands, because 0.1.0 is Phase 10's step 2.
+    - Its candidate stage runs the contracts job's gates.
+    - Its exact stage packages the release commit, because `cargo package` refuses gearu's uncommitted candidate.
+    - It has six unit tests.
+  - **`.github/workflows/release.yml`:** on a published GitHub Release, it reruns both stages on the tag, then publishes by Trusted Publishing only.
+- **Verified:**
+  - Both stages passed end to end on a copy with the guard lifted: 12 script tests, 4 generated artifacts, formatting, both suites, and 81 files packaged.
+  - `gearu plan 0.1.0` accepts the configuration.
+- **Operator steps before the release:**
+  - configure gwz-transport's trusted publisher on crates.io: owner owebeeone, repository gwz-transport, workflow `release.yml`, environment `crates-io` (TR3.3's exit);
+  - create the release venv once, as in `RELEASE.md`.
+- **Plan:** amendment 2's revision 7 records this as Phase 10 step 2's mechanism.
+
 ## gwz-sspi registered on crates.io, trusted publishing only, 2026-10-05
 
 - **Why:** gwz-cli's release publishes to crates.io (cargo-dist's `publish-crate` job), and gwz-cli now requires gwz-sspi `=0.1.0`, which was on no registry.
