@@ -1,5 +1,24 @@
 # Current program checkpoint
 
+## TR8.1 measured on macOS: about 0.2 s short of parity at defaults, 2026-10-05
+
+- **Method:** a no-op `gwz fetch` of the 32-member workspace from 2026-10-01, plus a 16-member copy.
+  - The candidate was built from gwz-core `3861265d`, gwz-cli `9d25cfab` and gwz-transport `ff6083b5`; the baseline is the installed 1.0.17 (tag `a4f6fa38`).
+  - Medians of 3 interleaved rounds, with connections counted by `connlog.dylib`.
+  - Zero failed members in every run.
+- **Results (32 members):**
+  - At defaults, the candidate takes 2.71 s against 1.0.17's 8.56 s.
+  - With both at `--max-per-host 32`, the candidate takes 3.40 s against 2.62 s.
+  - At `--max-per-host 4`, the candidate takes 7.70 s over 4 connections, against 17.91 s over 32.
+  - Off switch (`--transport native`): 8.76 s, the same as 1.0.17.
+- **The criterion** (candidate defaults no slower than 1.0.17 at `--max-per-host 32`):
+  - Over 13 rounds, the candidate took 2.73 s against 2.51 s, and was slower in 9 of 10 paired rounds.
+  - A single-member fetch is 0.14 s slower too, which suggests a fixed per-command cost.
+  - The plan gives no tolerance. **Operator decision:** accept the gap, or find and remove the per-command cost first.
+  - On 2026-10-01 it was 7.0 s against 2.5 s; TR2.9 and TR2.10 removed the serialized closes and the open cap.
+- **Not done:** Linux has no host set up. One Mac, one network path.
+- **Evidence:** gwz-core-evidence, `campaigns/transport-qualification/runs/2026-10-04-tr8-1-macos-parity` (a Sonnet agent ran it).
+
 ## gwz-py's last Windows test failures fixed; S6.3's Windows rows pass natively, 2026-10-05
 
 - **The failures:** both cases of `test_an_operation_that_fails_after_the_exit_bound_records_its_outcome_without_the_interpreter`, on Windows with Python 3.11 to 3.13 (CI run 37207645569). The child printed "exiting" and nothing more, and the row blamed the operation's thread.
