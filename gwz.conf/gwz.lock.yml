@@ -33,7 +33,7 @@ members:
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
-    commit: 1add0746a1ffc50cd4f6cbe479c630b9cc2babeb
+    commit: 566db869313cb072beeefe12670f1cab77d07d99
     branch: main
     detached: false
     dirty: true
