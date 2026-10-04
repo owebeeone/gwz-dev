@@ -1,5 +1,9 @@
 # Current program checkpoint
 
+## WH1 remediation round 2 authorized, 2026-10-04
+
+The operator approved round 2's fix for State P2-3 ("Approve send_if"): one neutral `gwz-transport` method, `Owner::send_if`, whose admit check runs under the mux lock. The pump uses it for an Opened that carries native D, with fresh time and cancellation read inside the lock. A test clock seam drives a production-path regression through the real Owner/Session boundary. [Remediation plan 2](GwzWindowsHttpsIntegrationImplementation-RemPlan-2.md) and the [budget disposition](GwzWindowsHttpsIntegrationBudgetDisposition.md) record the scope: 55 files and 2,600 lines stay. The shared interface changes, so fresh Code and State reviewers review round 2. Implementation runs in lane `wh1-rem2`. Limited WH1 and full Windows remain NO-GO. Codex's lanes `tr1-8-win`, `tr2-22`, `tr2-5-cli` and `tr2-5-py` are untouched.
+
 ## LLM handoff after WH1 round-1 closure verdict, 2026-10-04
 
 The operator requested handoff before further work. Both original reviewers

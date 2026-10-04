@@ -60,3 +60,5 @@ no new architecture, owner, API, schema, helper support or ordinary activation.
 The drafter must list actual owning files/count and stop before exceeding either
 ceiling or changing a structural invariant. All findings form one patch and
 remain open until their original reviewers verify correction and regressions.
+
+Round-2 disposition, 2026-10-04. The operator approved one shared-interface addition for State P2-3: `gwz-transport` `mux::asynchronous::Owner::send_if`, a neutral guarded send whose admit check runs under the mux lock. gwz-transport therefore joins WH1's changed members. The allowance stays at **55 source/test/build files**, plus the three switch inventories, and 2,600 gross added lines, counted across all members. Adding this method allows no other API, owner, dependency, schema, wire, helper support or ordinary activation. Exceeding either ceiling, or any further structural change, stops the patch for a new disposition. Fresh Code and State reviewers review round 2 ([remediation plan 2](GwzWindowsHttpsIntegrationImplementation-RemPlan-2.md)).
