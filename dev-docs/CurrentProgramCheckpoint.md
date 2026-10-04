@@ -1,5 +1,9 @@
 # Current program checkpoint
 
+## File-count budgets dropped, 2026-10-04
+
+The operator dropped the file budget: "drop the file budget, keep the 500 LOC after splitting an rs file that is >1000LOC". No file-count ceiling applies. The lane owner had set WH1's (24, then 40, 44, 49 and 55), not the operator. The size rule stays: a Rust file over 1,000 lines is split by responsibility into files of at most 500 lines (`docs/SplitPolicy.md`). Of WH1's files, `gwz-core/src/git/endpoint/https_worker/native.rs` (1,847 lines) needs that split. The [budget disposition](GwzWindowsHttpsIntegrationBudgetDisposition.md) records the decision.
+
 ## Windows HTTPS WH1 accepted (limited), 2026-10-04
 
 The limited WH1 implementation is [accepted](GwzWindowsHttpsIntegrationImplementationAcceptance.md) after three remediation rounds. The third round was confined to non-architectural corrections under the cap.
