@@ -51,7 +51,7 @@ members:
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
-    commit: aa4600af301980e5e69820e86c02b520f75735b1
+    commit: c541a6084c0fb523288f506959d5d98c1dcd3f23
     branch: main
     detached: false
     dirty: false
