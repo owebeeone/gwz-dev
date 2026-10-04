@@ -1,5 +1,29 @@
 # Current program checkpoint
 
+## Windows HTTPS WH1 remediation verified; original closure next, 2026-10-04
+
+Original settled Code/State reports are NO-GO on three concrete defects.
+[Round1 checkpoint](GwzWindowsHttpsIntegrationImplementationCheckpoint-1.md)
+records one cohesive correction at core261eaca55dca4067548027e8976ff0249a34d2f3
+and evidence053121cc97664e46539c07d77cdad4effb481955. CLI6ab16d4/Python5df1576
+sources are unchanged; their provisioned artifacts are rebuilt against that core.
+Native original constructor/capacity counterexamples fail; corrected native5
+pass. Actual corrected CLI and installed Python clone/fetch/push at existing
+one-connection limits pass exact refs/content; Python stream, unconsumed consumer
+independence and close pending0 also pass. Wrong CBT/untrusted/hostname refuse.
+Actual endpoint/mux fixed-D delayed collection/backpressure REDs are corrected,
+with route revocation and retained physical charges. Portable HTTPS208, paired16,
+cleanup2 and guards/format pass; complete commands/fingerprints in private evidence.
+
+Cumulative52 source/test/build +3inventories,1350added within55/2600 allowance.
+No interface/owner/dependency/schema expansion. Same original reviewers must
+verify closure before limited WH1 acceptance; no finding self-closed. Full
+Windows activation/release remains NO-GO: broader integrated adversity/identity/
+installed-path proofs, WH2 helpers/provider parity, strictClippy45, owner-IR pin
+mismatch and remaining release/platform/source/performance/package gates open.
+No push/tag/publication/OS policy changes. Unrelated dirt unchanged.
+Earlier entries below are historical snapshots.
+
 ## Windows HTTPS WH1 implemented; dual review next, 2026-10-04
 
 The authorized fork implemented and committed the qualification-only boundary

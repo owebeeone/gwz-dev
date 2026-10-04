@@ -1,6 +1,12 @@
 # Windows HTTPS WH1 implementation checkpoint
 
-2026-10-04. **Status: committed implementation; dual Code/State review pending.**
+2026-10-04. **Status: original implementation reviewed NO-GO; round 1 correction
+and native verification in progress.** See the verbatim [Code](GwzWindowsHttpsIntegrationImplementation-ReviewCode.md)
+and [State](GwzWindowsHttpsIntegrationImplementation-ReviewState.md) reports and
+[merged plan](GwzWindowsHttpsIntegrationImplementation-RemPlan-1.md). Original
+member revisions and results below are retained as the initial checkpoint;
+the correction's final tuple and closure evidence will be recorded separately.
+No blocking finding is self-closed.
 This is the accepted qualification-only WH1 boundary and limited basic WH3
 proof. It does not accept ordinary Windows activation or the transport release.
 

@@ -48,3 +48,15 @@ caller/API/wire, WH2 helper support or ordinary activation is added; the 2,600
 added-line ceiling remains. This replaces the earlier file-count stop trigger
 before those edits begin. Stop above 49 or on any functional/architectural scope
 growth. Native failure and corrected regression evidence must accompany review.
+
+
+Review remediation disposition, 2026-10-04: original Code/State NO-GO identifies
+three concrete implementation omissions within accepted WH1. The owner allows
+**55 source/test/build files**, plus the existing three switch inventories,
+for round 1 before edits: the existing 49 plus capacity installation, native
+Open publication/retained deadline scopes and their meaningful production-path
+tests. Retain the 2,600 gross added-line ceiling. This bounded allowance permits
+no new architecture, owner, API, schema, helper support or ordinary activation.
+The drafter must list actual owning files/count and stop before exceeding either
+ceiling or changing a structural invariant. All findings form one patch and
+remain open until their original reviewers verify correction and regressions.

@@ -1,5 +1,29 @@
 # Remote transport release readiness
 
+## Windows HTTPS WH1 review remediation, 2026-10-04
+
+Qualification-only WH1 is implemented; provisioned CLI and installed Python
+perform actual strict-TLS/native-SSPI clone/fetch/push, with exact ref/content
+verification and independent Python transport delivery while application events
+remain unconsumed. Wrong CBT, untrusted chain and hostname refuse. These limited
+receipts do not complete Windows qualification or activate the ordinary route.
+
+Settled Code/State implementation reviews are **NO-GO** on three defects:
+nondefault HTTPS pool limits require absent SSH, public SSH-only construction
+advertises an empty runtime, and native Open publication can escape fixed D.
+The [merged remediation plan](GwzWindowsHttpsIntegrationImplementation-RemPlan-1.md)
+assigns one correction and production-path regressions. Both actual native CLI
+and installed Python reproduce the nondefault-limit failure; failed receipts
+are retained. Next: complete the correction, rerun native existing-policy cases
+and deadline/constructor regressions, and obtain original reviewer closure.
+
+Remaining: integrated adverse scheduling/cancellation/identity and installed-path
+proof, WH2 configured helper/platform work, provider/parity dispositions, full
+strict-Clippy and generator-pin debt, and platform/source/performance/package/
+aggregate release gates. No release gate is waived. Windows activation/release
+remain NO-GO; no push/tag/publication or OS-policy changes. Earlier entries below
+are historical snapshots; their stated next action may already be completed.
+
 ## SSPI HTTPS implementation accepted; Windows qualification outstanding, 2026-10-04
 
 [Implementation acceptance](GwzSspiHttpsCompositionImplementationAcceptance.md)
