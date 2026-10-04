@@ -9,8 +9,9 @@ is accepted for WH1 after original Consistency closure and Safety GO at root
 qualification-only Disabled backend at `TransportRuntime::open_request` retains
 its context without a caller option/API/schema. Composition §9's first paragraph
 is superseded solely for this qualification boundary. Both reviewers found the
-same nonblocking P3 method-name error; corrected text awaits independent
-confirmation. [Acceptance](GwzWindowsHttpsIntegrationAcceptance.md) records scope.
+same nonblocking P3 method-name error; both independently closed the corrected
+text at root `2dd4ebf1c24d36c728d2ad60c257fd479de22cbf`. Zero design findings
+remain open; WH1 implementation is now in progress. [Acceptance](GwzWindowsHttpsIntegrationAcceptance.md) records scope.
  Production member sources are unchanged; Windows release remains NO-GO.
 
 The external Windows11/MSVC/E: ReFS prototype now compiles the actual HTTP pool,

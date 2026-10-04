@@ -18,8 +18,10 @@ helper-disable option exists or is added. Normal callers use fetch/fetch_stream.
 
 Both axes identified the same nonblocking P3 method-name error. The landing
 corrects `request_kind` to the actual `TransportRuntime::open_request`; both
-request and request_with_token converge there. Independent P3 text confirmation
-is pending; this is not owner self-closure or a blocking design defect.
+request and request_with_token converge there. Independent [Consistency](GwzWindowsHttpsIntegration-ReviewConsistency-P3Closure.md)
+and [Safety](GwzWindowsHttpsIntegration-ReviewSafety-P3Closure.md) text closure
+confirmed the correction at root `2dd4ebf1c24d36c728d2ad60c257fd479de22cbf`.
+Zero design findings remain open; implementation remains unaccepted.
 
 Only composition §9's first paragraph is superseded as specified in design §1:
 actual Windows endpoint/caller selection is permitted solely under candidate
