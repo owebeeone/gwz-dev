@@ -1,5 +1,31 @@
 # Current program checkpoint
 
+## gwz family-merge pairing fixed; all lanes merged, 2026-10-04
+
+- **The bug (L11).** `gwz merge --remote <lane>` refused with `PairingMismatch` when the receiving workspace had a member the lane never had: `gwz-sspi` was added after the Codex lanes were cloned. It refused even with that member excluded by `--target`. The operator ruled it a bug ("it should allow merging").
+- **The fix.** gwz-core `dca4a162` and gwz-cli `220c89a` (docs), merged into main by fast-forward.
+  - **The rule:**
+    - A member only the receiver has is left out of the import and the merge, and is reported "not in source lane; unchanged" (in JSON `meta.message`).
+    - Explicitly targeting such a member refuses before any fetch.
+    - A member only the lane has still refuses.
+  - **Tests.** Test-first: four new family-merge tests failed on the old rule, and all 16 family-merge tests now pass. The ordinary gate passed 2,331.
+  - **Candidate passes.** Both ran and passed before the operator's instruction to skip them arrived.
+  - **Documents changed:** ErrorCatalog, Protocol, RustApi, GWZDesign and GWZRequirements, the local-clone design, LocalClones and Releases.
+- **The lanes, merged with the fixed build.** The build is not installed. A read-only metadata comparison with the installed 1.0.17 found it identical.
+  - **tr1-8-win:** root, gwz-core and gwz-core-evidence.
+    - Main already held its content: the five Windows documents, which main has as supersets, and the 525 evidence files, byte-identical.
+    - Conflicts kept main's versions. The merge adds history and three commit markers.
+  - **tr2-22 and tr2-5-cli:** root histories, 24 and 4 commits.
+    - Their documents were already in main, identical.
+    - Conflicts kept main's checkpoint and gwz metadata. The lanes' checkpoint sections stay reachable in history.
+  - **tr2-5-py:** already merged.
+  - **Result:** every lane repository's head is now an ancestor of main. The untracked drafts and alpha runs were parked and restored by hash, with zero mismatches.
+- **Follow-ups:**
+  - print the "not in source lane" line in normal output too (today it is JSON only);
+  - fix the stale selection text in gwz-cli `docs/commands/merge.md`;
+  - the installed gwz 1.0.17 still refuses until a release carries the fix.
+- **Lanes:** none is disposed yet. tr2-22 still holds an older Python WIP stash, with its external backup recorded.
+
 ## File-count and package line budgets dropped, 2026-10-04
 
 The operator dropped the file budget: "drop the file budget, keep the 500 LOC after splitting an rs file that is >1000LOC". No file-count ceiling applies. The lane owner had set WH1's (24, then 40, 44, 49 and 55), not the operator. The size rule stays: a Rust file over 1,000 lines is split by responsibility into files of at most 500 lines (`docs/SplitPolicy.md`). Of WH1's files, `gwz-core/src/git/endpoint/https_worker/native.rs` (1,847 lines) needs that split. The [budget disposition](GwzWindowsHttpsIntegrationBudgetDisposition.md) records the decision. In a second decision, the operator also dropped the package line ceilings: WH1's 2,600 and WH2's and WH3's 2,000. The design's §7 asserted them without deriving them. The structural stop triggers remain: API, wire, dependency or runtime owner, ownership crossings, and mechanism changes. WH2 and WH3 are planned as steps of about 500 lines, per the operator's step rule.
