@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## native.rs split merged, 2026-10-04
+
+The operator's size rule splits `gwz-core/src/git/endpoint/https_worker/native.rs`, which was 1,847 lines, by responsibility. It is now `native.rs` plus seven files under `native/`, all at most 500 lines: the root (412), `sspi.rs`, `owners.rs`, `exchange.rs` and four test files.
+- **Movement only.** A mutation-tested, syn-based item checker finds every original item exactly once.
+  - Of 99 units, 92 are byte-identical and 7 carry listed edits: `pub(super)` widenings, one deeper `super::` path, and an `in`-path visibility of the same reach.
+  - Every cfg arm's units are unchanged, and no `#[path]` edge or switch site was added.
+- **macOS gates.** Ordinary passes 2,326. The candidate leg fails only the six pre-existing tests.
+- **Native MSVC check** on the operator's Windows host, at the exact sources (gwz-core `18da0e8d`): qualification 5/5, and both library checks with 0 warnings. The warnings are identical to round 3's.
+- **Merged into main** without conflicts. The split's patch-id equals what main gained, main's own patch-id is unchanged, and the lane heads are ancestors of main.
+- **Lane disposal** waits for the operator.
+
 ## gwz family-merge pairing fixed; all lanes merged, 2026-10-04
 
 - **The bug (L11).** `gwz merge --remote <lane>` refused with `PairingMismatch` when the receiving workspace had a member the lane never had: `gwz-sspi` was added after the Codex lanes were cloned. It refused even with that member excluded by `--target`. The operator ruled it a bug ("it should allow merging").
