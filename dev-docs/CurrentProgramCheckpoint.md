@@ -7,9 +7,12 @@ composition is unchanged. Six new public native fixtures plus two existing ones
 passed 8/8 on Windows11/MSVC/E: ReFS: completed NTLM/Negotiate→NTLM, actual wrong
 binding refusal, live/retired/impersonated originating-thread handoff, and idle
 worker cancellation/fixed-deadline confirmed cleanup. Final owned processes zero.
-Independent Code/State review of the test/evidence checkpoint is next;
+Independent Code/State reviews are GO; the original Code reviewer independently
+closed its P3 inventory defect after normalized-path/live-control characterization.
+Zero findings open; one dual review plus one evidence-only correction. Accepted
+scope is provider preparation only. The
 [qualification checkpoint](GwzWindowsHttpsQualificationCheckpoint.md) records
-exact scope, original fixture failures, limits and source/command receipts.
+the exact tuples, scope, original fixture failures, limits and source/command receipts.
 
 Sequencing correction: full HTTPS qualification first needs a bounded Windows
 private test-entry/portability package. The actual endpoint/caller routes remain

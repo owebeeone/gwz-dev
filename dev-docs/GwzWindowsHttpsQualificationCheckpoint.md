@@ -1,9 +1,23 @@
 # Windows HTTPS qualification checkpoint
 
-2026-10-04. **Worker/provider preparation passed; review pending. Full Windows
+2026-10-04. **Worker/provider preparation accepted. Full Windows
 HTTPS qualification and release remain NO-GO.** The operator authorized focused
 qualification after accepting HTTPS composition. This checkpoint accepts no
 activation, push, tag, registry publication or broader Windows parity disposition.
+
+[Code](GwzWindowsHttpsQualification-ReviewCode.md) and
+[State](GwzWindowsHttpsQualification-ReviewState.md) returned GO at root
+`c1db8d490bbce380c726ac4793493aec87053a00`, SSPI
+`582ec001bd2972076ea65a7db87d81d988c6f2e7`, evidence
+`1930542b7264bcbc5d9b10c67887c0f350798cb1`, and unchanged core. Code's one P3
+inventory finding is independently closed by the original
+[reviewer](GwzWindowsHttpsQualification-ReviewCode-1.md) at root
+`71d7621c42b498a761e8be6a806899e72d964ba4`, evidence
+`d505cddaca791ed6cadb11f9fb5ab4fd88e0fa51`, with SSPI/core unchanged. State GO is
+retained on the unchanged public fixtures. Zero open findings; no new architecture.
+One initial dual review and one bounded evidence-only nonblocking correction.
+This accepts worker/provider preparation and its corrected owned-path inventory
+only. Eight native tests are executed; integrated HTTPS remains unexecuted.
 
 ## Exact scope
 
@@ -60,7 +74,7 @@ is withdrawn: Code P3-1 found an unnormalized slash comparison could miss live
 owned Windows paths. Corrected inventory normalizes both paths and includes a
 directory boundary. The live control proves original miss, corrected detection,
 actual gate refusal (exit1), sibling exclusion, held control exit and subsequent
-zero gate (exit0). Original raw receipts are retained; reviewer closure is pending.
+zero gate (exit0). Original raw receipts are retained; reviewer closure is filed.
 Local ordinary SSPI
 all-feature tests/doctests, Windows-target strict Clippy, explicit fixture rustfmt
 and diff checks pass. Windows target Clippy is source evidence only. The shared

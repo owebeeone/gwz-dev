@@ -24,3 +24,8 @@ against their original receipt/transfer hashes, not silently relabeled.
 Both original verdicts remain GO on the public fixture object. This record does
 not self-close P3-1; the original Code reviewer must verify the corrected tuple.
 Full Windows HTTPS/activation/release remain NO-GO.
+
+Closure: original Code reviewer returned GO and verified P3-1 CLOSED at root
+`71d7621c42b498a761e8be6a806899e72d964ba4` / evidence
+`d505cddaca791ed6cadb11f9fb5ab4fd88e0fa51`. Public SSPI/core source unchanged;
+no new finding/architectural cause. See filed ReviewCode-1.

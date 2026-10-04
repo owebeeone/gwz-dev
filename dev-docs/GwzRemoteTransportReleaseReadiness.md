@@ -11,8 +11,18 @@ Affected HTTPS199/199, private materialize8/8, SSPI recipes27/27 and final
 supported loaded Python artifact checks pass. Full strict-core Clippy remains
 RED45 with attribution limits; no release gate is waived.
 
-Next is actual Windows provider/identity/EPA/CBT/physical-cleanup and installed
-host qualification, with fixtures on the operator-selected E: volume. Remaining
+The [native preparation checkpoint](GwzWindowsHttpsQualificationCheckpoint.md)
+is now accepted after Code/State GO and one independently closed evidence-only
+P3: eight live Windows tests prove local completed NTLM/Negotiate→NTLM, synthetic
+binding rejection, originating-thread lifetime/impersonation refusal and idle
+worker cancellation/deadline cleanup. Corrected live-control inventory is zero.
+This does not qualify integrated HTTPS, TLS/EPA, installed callers or Git.
+
+Next first needs a bounded private Windows qualification-entry/portability
+package: actual endpoint/caller routes remain Unix-gated, with Unix-specific
+helper APIs and a missing Windows endpoint-environment arm. Then run integrated
+provider/identity/EPA/CBT/physical-cleanup and installed-host qualification on E:.
+Remaining
 Windows parity decisions/proofs, deferred platform and selected-source batches,
 performance/distribution builds and aggregate activation/release review remain.
 Full Windows release remains **NO-GO** until those gates pass. Portable validator
