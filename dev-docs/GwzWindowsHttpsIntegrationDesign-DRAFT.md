@@ -263,6 +263,8 @@ debt remain explicit separate rows, not silently PASS or waived.
 
 ## 7. Budget, gates and owner dispositions
 
+> **Operator decision, 2026-10-04, after acceptance:** this section's line and file ceilings are withdrawn. That covers WH1's 2,600 lines and 24 files, WH2's 2,000 and 14, and WH3's 2,000 and 16, and with them the ">120% growth" trigger. The structural stop triggers below remain. WH2 and WH3 are planned as steps of about 500 lines. See the [budget disposition](GwzWindowsHttpsIntegrationBudgetDisposition.md).
+
 WH1 proposal ceiling: 2,600 handwritten added production/test lines, 24 source
 files across core/CLI/Python plus affected build-script declarations; movement
 counted separately and reviewed for preservation. WH2 separate proposal ceiling:

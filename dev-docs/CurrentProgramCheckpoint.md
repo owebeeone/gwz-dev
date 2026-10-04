@@ -1,8 +1,8 @@
 # Current program checkpoint
 
-## File-count budgets dropped, 2026-10-04
+## File-count and package line budgets dropped, 2026-10-04
 
-The operator dropped the file budget: "drop the file budget, keep the 500 LOC after splitting an rs file that is >1000LOC". No file-count ceiling applies. The lane owner had set WH1's (24, then 40, 44, 49 and 55), not the operator. The size rule stays: a Rust file over 1,000 lines is split by responsibility into files of at most 500 lines (`docs/SplitPolicy.md`). Of WH1's files, `gwz-core/src/git/endpoint/https_worker/native.rs` (1,847 lines) needs that split. The [budget disposition](GwzWindowsHttpsIntegrationBudgetDisposition.md) records the decision.
+The operator dropped the file budget: "drop the file budget, keep the 500 LOC after splitting an rs file that is >1000LOC". No file-count ceiling applies. The lane owner had set WH1's (24, then 40, 44, 49 and 55), not the operator. The size rule stays: a Rust file over 1,000 lines is split by responsibility into files of at most 500 lines (`docs/SplitPolicy.md`). Of WH1's files, `gwz-core/src/git/endpoint/https_worker/native.rs` (1,847 lines) needs that split. The [budget disposition](GwzWindowsHttpsIntegrationBudgetDisposition.md) records the decision. In a second decision, the operator also dropped the package line ceilings: WH1's 2,600 and WH2's and WH3's 2,000. The design's §7 asserted them without deriving them. The structural stop triggers remain: API, wire, dependency or runtime owner, ownership crossings, and mechanism changes. WH2 and WH3 are planned as steps of about 500 lines, per the operator's step rule.
 
 ## Windows HTTPS WH1 accepted (limited), 2026-10-04
 
