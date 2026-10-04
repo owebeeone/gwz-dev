@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## gwz-sspi registered on crates.io, trusted publishing only, 2026-10-05
+
+- **Why:** gwz-cli's release publishes to crates.io (cargo-dist's `publish-crate` job), and gwz-cli now requires gwz-sspi `=0.1.0`, which was on no registry.
+- **Done:**
+  - gwz-sspi `8078278` added `.github/workflows/bootstrap-crate.yml` and the placeholder `.github/bootstrap-crate`. The placeholder is a prerelease with no implementation and no dependencies, which no ordinary version requirement selects.
+  - The publishing workflow is renamed `release.yml`, as in gwz-core and gwz-cli.
+  - The operator ran the bootstrap once with a token: run 37207954643. `gwz-sspi 0.0.0-bootstrap.1` has been on crates.io since 2026-10-04 14:05 UTC.
+  - The operator then deleted the secret and set the crate to trusted publishing only: owner owebeeone, repository gwz-sspi, workflow `release.yml`, environment `crates-io`.
+- **Unchanged:** the real crate keeps `publish = false`. `release_checks.py` refuses to publish until its reviewed activation, after implementation acceptance and Windows qualification (gwz-sspi `RELEASE.md`). gwz-cli's crates.io publication of 1.1.0 waits on gwz-sspi 0.1.0.
+- **Plan:** TR3.3's thirteen crates.io names become fourteen with gwz-sspi. This is owed in amendment 2's revision 7.
+
 ## CI repaired after the push; HTTPS close race fixed, 2026-10-04
 
 Pushing everything ran CI over code that had not been green for days, so each fix uncovered the next failure. Fifteen are fixed and pushed. Two were product defects.
