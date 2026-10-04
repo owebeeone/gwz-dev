@@ -1,6 +1,23 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a105b8-9588-73a3-8b6b-756a3c554892
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+created_at: '1791097342617'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: c06eb1c8b7539baab6abab7821547036f3e09f07
+  branch: main
+selected_targets:
+- mem_gwz_core
+- mem_gwz_core_evidence
+- mem_gwz_transport
+- '@root'
+committed_targets:
+- mem_gwz_core
+- mem_gwz_core_evidence
+- mem_gwz_transport
+- '@root'
 members:
   mem_git2_rs:
     path: git2-rs
@@ -119,3 +136,38 @@ members:
     detached: false
     dirty: false
     materialized: true
+merge:
+  merge_id: merge_op_21729_1791097341645_0001
+  operation_id: op_21729_1791097341645
+  source_ref: refs/gwz/local-imports/xfer_81ccfe7b67727a0b2a6aefe152f5e6b2
+  selected_targets:
+  - mem_gwz_core
+  - mem_gwz_core_evidence
+  - mem_gwz_transport
+  - '@root'
+  participants:
+    '@root':
+      target_kind: root
+      target_branch: main
+      before_commit: 22c1bbd70188af8d2cf8fcf51400f79fa81bbbc0
+      source_commit: c06eb1c8b7539baab6abab7821547036f3e09f07
+      resulting_commit: c06eb1c8b7539baab6abab7821547036f3e09f07
+    mem_gwz_core:
+      target_kind: member
+      target_branch: main
+      before_commit: 261eaca55dca4067548027e8976ff0249a34d2f3
+      source_commit: 21f9e15ed4360c031f6d2c803224b173f82b3111
+      resulting_commit: 21f9e15ed4360c031f6d2c803224b173f82b3111
+    mem_gwz_core_evidence:
+      target_kind: member
+      target_branch: main
+      before_commit: 053121cc97664e46539c07d77cdad4effb481955
+      source_commit: 566db869313cb072beeefe12670f1cab77d07d99
+      resulting_commit: 566db869313cb072beeefe12670f1cab77d07d99
+    mem_gwz_transport:
+      target_kind: member
+      target_branch: main
+      before_commit: 8a2ec7fc2e6d6a0da4c5519d72eac90c9ca4c578
+      source_commit: cd007b6868905543caa212155ad8ec99b3a4052c
+      resulting_commit: cd007b6868905543caa212155ad8ec99b3a4052c
+  root_merge_commit: c06eb1c8b7539baab6abab7821547036f3e09f07
