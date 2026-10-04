@@ -1,5 +1,29 @@
 # Current program checkpoint
 
+## Windows HTTPS WH1 implemented; dual review next, 2026-10-04
+
+The authorized fork implemented and committed the qualification-only boundary
+at core398158b, CLI6ab16d4 and Python5df1576. The [implementation checkpoint](GwzWindowsHttpsIntegrationImplementationCheckpoint.md)
+records exact tuples, design/budget authority, private raw evidence and limits.
+Final MSVC qualification tests2/2, ordinary/candidate-only library checks and
+illegal predicate refusal pass. Final provisioned CLI and installed Python
+wheel both perform real strict-TLS/native-SSPI clone/fetch/push with independent
+exact refs and no client Git PATH. Python additionally streams events, completes
+a call while events remain unconsumed, and closes with pending_local_work=0.
+Actual wrong CBT, untrusted chain and hostname refuse; server contexts disposed.
+Python final packaging passes with incremental compilation explicitly disabled;
+original dev incremental cleanup failure remains recorded. Native test fixture
+closures preserve portable coverage. Portable HTTPS201 and focused guards pass.
+
+Implementation/evidence acceptance is pending peer-blind settled Code/State review.
+Full strict core Clippy remains RED45 and the existing generator owner-IR mismatch
+remains RED, without waivers. Full integrated adversity/identity transitions,
+WH2/helper/provider parity and package/performance/platform/source/aggregate gates
+are still open. Ordinary Windows activation and full release remain NO-GO.
+No push/tag/publication or OS configuration changes. Unrelated dirt unchanged.
+Earlier entries are historical snapshots.
+
+
 ## Windows HTTPS integration prerequisite spike, 2026-10-04
 
 This fork owns the authorized Windows integration and real HTTPS/Git/CLI/Python
