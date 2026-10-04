@@ -349,7 +349,8 @@ selects transport, not authentication policy. It changes no user config or trust
 
 Run the installed CLI through `gwz --transport gwz --json fetch` against that
 fixture workspace. Run the installed wheel through normal `Client.fetch()`
-and `Client.submit(FetchRequest(...))`/existing operation handle consumption,
+and `Client.fetch_stream()` (which calls the existing bridge `submit`) with
+normal event/result consumption,
 using the fixture workspace. No helper-disable argument exists or is needed:
 the qualification runtime itself uses the specified Disabled backend.
 
