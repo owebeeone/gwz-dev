@@ -1,5 +1,32 @@
 # Current program checkpoint
 
+## gwz-py's last Windows test failures fixed; S6.3's Windows rows pass natively, 2026-10-05
+
+- **The failures:** both cases of `test_an_operation_that_fails_after_the_exit_bound_records_its_outcome_without_the_interpreter`, on Windows with Python 3.11 to 3.13 (CI run 37207645569). The child printed "exiting" and nothing more, and the row blamed the operation's thread.
+- **Cause: the test's probe, not the product.**
+  - From 3.11 on Windows, `time.sleep` on the main thread also waits on the Ctrl+C event. Finalization closes that event before it clears modules.
+  - So the child's finalizer raised `OSError` (WinError 6) on its first pause. Python reported the exception as ignored, and nothing was written.
+  - 3.10's `time.sleep` returns there instead of raising, so its job passed.
+- **Fix** (gwz-py `5913484`): the finalizer pauses on a timed acquire of a lock it holds itself. The row now shows the child's stderr when the finalizer writes neither line.
+- **Verified on dabeest:** an ordinary build with Python 3.13.5.
+  - As committed, the row failed as in CI.
+  - With the diagnostic, it showed the `OSError`.
+  - Repaired, it passed.
+  - An outcome that never comes still reads `unrecorded`.
+  - All of `test_client_host.py` and `test_process_tree.py` passed there: 12 passed, plus the macOS-only skip.
+  - Python 3.10 to 3.12 rely on CI.
+- **So:** the lazy-error fix (`a671054`) records the outcome without the interpreter on Windows too.
+- **Earlier repairs of the same suite:**
+  - `3dd0fef`: process trees in a Job Object, in place of `os.killpg`;
+  - `2424f9b`: the working-directory row;
+  - `1960aa2`: the non-UTF-8 extension case is skipped where the interpreter cannot load from such a path;
+  - `a6e9993`: macOS zombie groups.
+
+  This supersedes the "Open: gwz-py's Windows suite" line below.
+- **Evidence:** gwz-core-evidence `d3603aa`, under `campaigns/transport-qualification/runs/`:
+  - `2026-10-04-windows-exit-bound-probe`;
+  - `2026-10-04-windows-py-test-helpers`, the helper round behind `3dd0fef` and `2424f9b`. Those commits had cited only its host path, so it is archived retroactively.
+
 ## gwz-transport releases with Gearu, 2026-10-05
 
 - **Operator decision:** "use gearu for gwz-transport too - core, cli and py need a dependency check that gearu lacks". gwz-core, gwz-cli and gwz-py keep `scripts/release.py`.
@@ -25,7 +52,8 @@
   - gwz-sspi `8078278` added `.github/workflows/bootstrap-crate.yml` and the placeholder `.github/bootstrap-crate`. The placeholder is a prerelease with no implementation and no dependencies, which no ordinary version requirement selects.
   - The publishing workflow is renamed `release.yml`, as in gwz-core and gwz-cli.
   - The operator ran the bootstrap once with a token: run 37207954643. `gwz-sspi 0.0.0-bootstrap.1` has been on crates.io since 2026-10-04 14:05 UTC.
-  - The operator then deleted the secret and set the crate to trusted publishing only: owner owebeeone, repository gwz-sspi, workflow `release.yml`, environment `crates-io`.
+  - The operator then deleted the secret and set the crate to trusted publishing only: owner owebeeone, repository gwz-sspi, workflow `release.yml`.
+  - **Environment unconfirmed** (corrected 2026-10-05): the setup steps asked for environment `crates-io`, and `release.yml` runs in it. The operator has not confirmed that the publisher names it. If the publisher names none, publishing still works, but `RELEASE.md` overstates the restriction.
 - **Unchanged:** the real crate keeps `publish = false`. `release_checks.py` refuses to publish until its reviewed activation, after implementation acceptance and Windows qualification (gwz-sspi `RELEASE.md`). gwz-cli's crates.io publication of 1.1.0 waits on gwz-sspi 0.1.0.
 - **Plan:** TR3.3's thirteen crates.io names become fourteen with gwz-sspi. This is owed in amendment 2's revision 7.
 
