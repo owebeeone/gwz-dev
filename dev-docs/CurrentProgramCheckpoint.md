@@ -1,5 +1,30 @@
 # Current program checkpoint
 
+## Windows HTTPS integration prerequisite spike, 2026-10-04
+
+This fork owns the authorized Windows integration and real HTTPS/Git/CLI/Python
+qualification work. [Integration proposal](GwzWindowsHttpsIntegrationDesign-DRAFT.md)
+is DRAFT and pending dual Consistency/Safety review. Accepted composition §9
+remains unchanged until that review accepts the explicit qualification-only
+amendment. Production member sources are unchanged; Windows release remains NO-GO.
+
+The external Windows11/MSVC/E: ReFS prototype now compiles the actual HTTP pool,
+SSPI and per-remote composition with SSH absent and helper lookup refused.
+Original forced-visibility failure (23 errors), v1 syntax failure and v2 SSH
+setup dependency failure are retained; v3 library check passes with 139 warnings,
+not a strict lint pass. Native readback matched 14,435 source files and 18 patched
+files. Actual native WinHTTP capture is DIRECT. The prototype's empty unused SSH
+home is not a product design and must be replaced by private neutral budgets.
+Private raw evidence is in the HTTPS-integration run
+`2026-10-04-windows-https-portability`; public tests do not depend on it.
+
+Next: settle and review WH1 qualification-only boundary, implement absent SSH/
+helper ownership and actual original-entry CLI/Python selection, then execute
+real TLS/auth/Git and installed caller cases. WH2 helper/Job/path qualification
+is separate; no actual HTTPS/Git/CLI/Python success is claimed by compilation.
+No push/tag/publication/production activation. Unrelated dirt is untouched.
+Earlier entries below retain historical state.
+
 ## Windows native-provider qualification preparation, 2026-10-04
 
 Operator authorized focused Windows qualification. The existing production
