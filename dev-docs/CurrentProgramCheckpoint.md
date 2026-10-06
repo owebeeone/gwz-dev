@@ -1,5 +1,25 @@
 # Current program checkpoint
 
+## TR8.1 is not met: HTTPS refuses past 8 per host, Linux SSH is slower, and the macOS gap has a cause, 2026-10-06
+
+All runs used the same candidate commits as 2026-10-04 (gwz-core `3861265d`, gwz-cli `9d25cfab`, gwz-transport `ff6083b5`), compared against 1.0.17 on the 32- and 16-member public sets. Sonnet agents ran them.
+
+- **HTTPS, macOS and Linux (weftpi, a Raspberry Pi 5): not met. Release blocker.**
+  - At the default of 32 per host, the candidate's HTTPS endpoint rejects every member past 8 in flight with `Capacity`, instead of queueing it. All 13 rounds returned partial results: 24 of 32 members failed.
+  - At `--max-per-host 8` or lower it works, and matches or beats 1.0.17 at the same setting. Capped at 8 connections, it is 0.6–0.7 s slower than 1.0.17 at 32.
+- **SSH on Linux: not met on speed.**
+  - 4.38 s against 1.0.17's 3.21 s, slower in 12 of 13 pairs. Zero partial results, against 1.0.17's 9 timed-out runs out of 54.
+  - The single-member gap is 0.15 s, the same as on macOS, so on the Pi the gap grows with the number of members. Not yet diagnosed.
+  - The operator authorized forwarding the owebeeone agent to weftpi for these SSH runs (2026-10-06).
+- **The macOS SSH gap is diagnosed: about 150 ms per command, all in the candidate's SSH path.** With `--transport native` it is at parity.
+  - **About 100 ms:** the in-process stream between Git and the SSH worker holds the server's ref advertisement for its 100 ms coalesce window. `ssh_worker.rs` uses gwz-transport's default `coalesce_delay_ms: 100`.
+  - **10–25 ms:** agent authentication sleeps 20 ms at a time instead of polling the socket (`agent_auth.rs`).
+  - **13–16 ms:** teardown waits twice on 5 ms placement timers that nothing unparks (`Session::seal` and `close`, and the endpoint session's thread).
+  - **Proposed fix, not applied:** a scratch patch of four files, at `build-scratch/tr8-1-profile/report/proposed-fix.patch`. In scratch builds it brought the candidate within 50 ms of 1.0.17. The coalesce change needs push coverage, and the endpoint wake needs a real implementation, not a shorter timer.
+  - **Incident:** the profiling agent's scratch tree linked into the real gwz-core and gwz-cli, through the candidate prepare script's links. Its edits sat in 12 source files for about 15 minutes and were reverted. Nothing was committed, and the Linux run's sources came from `git archive` before that window and are verified identical.
+- **Baseline note:** weftpi's 1.0.17 is the CI release artifact; the Mac's is a local `cargo install` build.
+- **Evidence:** gwz-core-evidence, under `campaigns/transport-qualification/runs/`, `2026-10-06-tr8-1-linux` (HTTPS and SSH) and `2026-10-06-tr8-1-macos-https`.
+
 ## TR8.1 measured on macOS: about 0.2 s short of parity at defaults, 2026-10-05
 
 - **Method:** a no-op `gwz fetch` of the 32-member workspace from 2026-10-01, plus a 16-member copy.
