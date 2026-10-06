@@ -1,5 +1,22 @@
 # Current program checkpoint
 
+## SSH's fixed waits removed: one member at parity, 32 about 0.1 s behind, 2026-10-07
+
+- **gwz-core `db0f8447`** removes the waits that profiling found:
+  - the Endpoint stream's 100 ms coalesce window;
+  - logins sleeping in 20 ms steps instead of waiting for the socket (agent and selected-key);
+  - placement and endpoint threads waiting for 5 ms ticks at seal, close and shutdown, now woken through `shutdown_watch`.
+- **Tests:** each part has a test that failed before. A 4 MiB push through the worker now takes 285 ms instead of 390.
+- **Gates:** the ordinary suite (2,331) and both candidate legs (2,959) pass, and the lane gate is ok.
+- **Remeasured over SSH** against 1.0.17 (paired medians):
+  - one member: macOS +0.005 s, Pi −0.003 s;
+  - 32 members at `--max-per-host 32`, 30 rounds: macOS +0.097 s (was +0.235), Pi +0.120 s (was +0.695);
+  - TR8.1's criterion pair (candidate defaults against 1.0.17 at 32), 13 rounds: macOS +0.033 s, Pi +0.200 s.
+- **TR8.1 over SSH is still not strictly met.** The plan states no tolerance, so the operator decides.
+  - What remains grows with member count, together with more whole-second login excursions on the Pi: 12 of 30 runs against 1.0.17's 3 of 30.
+  - Strace didn't catch an excursion, so the cause is open.
+- **Evidence:** gwz-core-evidence `campaigns/transport-qualification/runs/2026-10-06-tr8-1-ssh-gap-fix`.
+
 ## TR8.1 is not met: HTTPS refuses past 8 per host, Linux SSH is slower, and the macOS gap has a cause, 2026-10-06
 
 All runs used the same candidate commits as 2026-10-04 (gwz-core `3861265d`, gwz-cli `9d25cfab`, gwz-transport `ff6083b5`), compared against 1.0.17 on the 32- and 16-member public sets. Sonnet agents ran them.
