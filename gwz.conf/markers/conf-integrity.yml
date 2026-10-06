@@ -2,5 +2,5 @@
 # Commit this together with gwz.yml and gwz.lock.yml — git must move all three.
 schema: gwz.conf-integrity/v0
 files:
-  gwz.conf/gwz.lock.yml: sha256:4f0bf6f3863fc47e56bd6fd3990569789ef4d6e413aa98a98c4c127de0a369a0
+  gwz.conf/gwz.lock.yml: sha256:2f2d48a71c6445b4994fb8bc9494c948647afd690f73a6b27b2d0f230ef66a03
   gwz.conf/gwz.yml: sha256:e3ea9fcb9f733622f8a3ed0c99823b643d8c9ee9a6523c4c2885b43baf39efd1
