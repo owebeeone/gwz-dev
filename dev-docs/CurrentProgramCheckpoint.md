@@ -1,5 +1,39 @@
 # Current program checkpoint
 
+## Adaptive concurrency design reviewed GO on four axes; the operator decided all 17 open questions, 2026-10-07
+
+- **gwz-core `f48cf5a6`:** `dev-docs/GwzTransportAdaptiveConcurrencyDesign.md` revision 11. It replaces revision 1's hypothesis model with the operator's limit-discovery machine (SATURATED, STABLE, PROBING, DISCOVERING, plus RESTORING after an outage), and adds a race model for the gap between the client's and the server's connection counts.
+  - **Setting N:** the believed limit N is set from the connections the server is visibly holding, never incremented. A refusal lowers it only when it is judged against its attempt's own admission target and the client's own connections cannot explain it.
+  - **Probing:** a timer runs from 0.5 s, doubling to 30 s.
+  - **Settle time:** below the ceiling, a closed connection stays counted for a settle time, so the client never creates the overlap between a close and an open.
+- **Retry machine:** it closes a key only on a permanent failure. Exhaustion puts the key in **Down**: arrivals wait up to 30 s for a retest, and fail at once only after two failed retests (operator: "Park, give up after 2").
+- **Capacity:** reported only for the member's own 429, 503 with `Retry-After`, long `Retry-After`, or local setup-slot expiry. A `capacity` detail names the cause.
+- **Reviews, all GO, filed beside the design:**
+  - Consistency and Safety (Opus) and State (Fable, at the operator's request) reviewed revisions 2 to 5 over four rounds. No finding was architectural.
+  - Surface (Sonnet) reviewed revisions 8 to 10.
+  - Six Surface P3s are left for the implementing step's wording and docs (§9).
+- **Operator decisions (§13):**
+  - OQ1–OQ17 are decided, with a second reviewer's rulings as input.
+  - Two differ from the recommendations: OQ3 (a throttled POST is reported once, and no member is re-run) and OQ5 (the 1.2.0 session keeps N for at most 10 s).
+- **Next:**
+  - amendment 2's next revision records §14's 19 accepted-text changes (OQ12), with a dual review;
+  - then the plan. The release blocker (the 64-caps, §7) is in it.
+- **Companion task (OQ17):** detecting idle-socket EOF, and replacing dead leased connections instead of failing the member. It is running in its own session.
+
+## SSH gap at 32 members traced: graceful close, lost SYNs and a 1 ms poll, 2026-10-07
+
+- **Behind gwz-core `db0f8447`,** the candidate is still about 0.1 s behind 1.0.17 at 32 members. Traces on the Mac and the Pi attribute the gap to three things:
+  - **the graceful channel close:** the candidate waits for the server's EOF, exit status and close before it reuses a connection. The trailing receive span at the 90th percentile is 4–52 ms, against 0 for 1.0.17, and under load some connections pay 40–75 ms;
+  - **more lost TCP SYNs:** 6.2–8.7% of the candidate's connections on the Pi, against 1.7–4.9% for 1.0.17. Spacing connects 1 ms apart reduced it to 3.3%, and the mechanism is unknown;
+  - **the SSH worker's 1 ms poll** (`runner.rs`): about 3.5 times the baseline's CPU.
+- **The early-close prototypes** closed most of the gap but gave up reuse. They were reverted, and their patches are kept.
+- **Operator decision pending:**
+  - **A:** finish the close off the member's path (recommended; a short design first);
+  - **B:** drop connections the way 1.0.17 does;
+  - **C:** accept the gap.
+- **Also offered:** replacing the 1 ms poll with a readiness wait, and a SYN-loss experiment on the Pi.
+- **Evidence:** gwz-core-evidence `4674d47`, `campaigns/transport-qualification/runs/2026-10-07-tr8-1-ssh-gap-32`.
+
 ## SSH's fixed waits removed: one member at parity, 32 about 0.1 s behind, 2026-10-07
 
 - **gwz-core `db0f8447`** removes the waits that profiling found:
