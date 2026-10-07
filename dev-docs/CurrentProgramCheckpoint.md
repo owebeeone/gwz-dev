@@ -1,5 +1,28 @@
 # Current program checkpoint
 
+## HTTPS fixed cost found: the CA bundle parsed per connection and 2 ms polls; 64-caps patch ready, 2026-10-07
+
+- **HTTPS profiling on weftpi** (Sonnet, gwz-core `959171c6` = `f48cf5a6` source):
+  - The gap reproduced: +47 ms for one member (187 of 204 rounds slower), +135 ms at 16.
+  - **CA bundle, all of the 16-member growth.**
+    - git2-rs sets `SSL_CERT_FILE`, and gwz decodes the bundle itself (`endpoint_environment.rs:95-108`, `ca_bundle.rs:23`): 8.5 ms.
+    - Each HTTPS connection builds its own `TlsConnector`, parsing the bundle twice (`https_connection.rs:259-273`): 23 ms each.
+    - At 16 members that is 17 builds on 4 cores, 562 ms of CPU against 1.0.17's 89 ms, and 19 ms more to free them at exit.
+  - **Two 2 ms polls** add about 9.5 ms before exit: `serve.rs:253` (`complete_close` retry) and `https_pool.rs:70` (the supervisor).
+  - **Scratch patches:** one shared connector takes the 16-member gap from +135 to +76 ms. All fixes together: +22 ms at one member, about +32 ms at 16.
+  - **Unexplained:** about 20 ms before the GET, about 4 ms in the placement park, about 30 ms in the single HTTPS runtime.
+  - **Fix in progress** (Sonnet, scratch copy, test-first): one connector per endpoint, built once; no second parse; wakes instead of polls.
+- **Phase 1, the 64-caps:** a patch in `build-scratch/caps64-20261007/out/` (27 files, +1,488/−214, candidate legs 2,975 and ordinary 2,331 passing).
+  - 200 HTTPS repositories with `--jobs 100` all succeed (136 of 200 failed before).
+  - **F7:** per-route release is impossible, because a route must outlive the discovery that pinned it until the member's exchange runs. The OQ10 fallback is taken: routes are released with the operation.
+  - **7.3** is reachable through varying redirects, so it is kept as `UnsupportedOperation`.
+  - **Operator decisions (2026-10-07):**
+    - the pool's connect clock pauses while a resource reports a local wait (a gwz-transport change), so a local wait never reaches the retry machine as a server stall;
+    - the job budget and its waiters move into an endpoint-owned context instead of the global `Hub` (OQ9 pulled into Phase 1).
+  - Both are being added in the scratch copy.
+- **Landing:** both patches conflict with the idle-loss (OQ17) session's uncommitted gwz-core edits. They land in a lane after it commits.
+- **Evidence:** gwz-core-evidence `campaigns/transport-qualification/runs/2026-10-07-https-fixed-cost-profile`.
+
 ## TR8.1 HTTPS on Linux, build-matched: the 32-member gap is within noise; a fixed cost remains at 1 and 16 members, 2026-10-07
 
 - **The 1.0.17 artifact's build:** cargo-dist's `dist` profile (`release` plus `lto = "thin"`, Rust 1.95.0). The candidate was rebuilt the same way from gwz-core `f48cf5a6`.
