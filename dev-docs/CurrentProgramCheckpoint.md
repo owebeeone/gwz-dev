@@ -1,5 +1,25 @@
 # Current program checkpoint
 
+## TR8.1 HTTPS on Linux rerun: no more Capacity failures, still about 0.24 s slower, 2026-10-07
+
+- **Build:** the candidate at gwz-core `f48cf5a6` (with `279860c`'s setup-slot queueing), built on weftpi from committed sources. A Sonnet agent ran it.
+- **Capacity is fixed:**
+  - 150 candidate runs: zero failed members, no `Capacity`, all exits 0;
+  - one connection per member at the defaults;
+  - 1.0.17 had 2 partial results in 23 runs at `--max-per-host 8` (an SSL `EAGAIN`).
+- **Speed is not met:**
+  - TR8.1's criterion pair (candidate defaults against 1.0.17 at `--max-per-host 32`): +0.24 s paired median, slower in 19 of 23 rounds;
+  - both at 32: +0.27 s;
+  - 16 members: +0.15 s;
+  - one member: +0.04 s, slower in 21 of 23.
+  - At the defaults the candidate takes 0.70 s against 1.0.17's 1.21 s, because 1.0.17's default is 8 per host.
+- **Not diagnosed.** The builds differ: 1.0.17 is the CI release artifact (thin LTO), the candidate a plain `--release` build. A build-matched rerun is running.
+- **Evidence:** gwz-core-evidence `campaigns/transport-qualification/runs/2026-10-07-tr8-1-linux-https-rerun`.
+- **Option A for the SSH gap:**
+  - The operator chose A (finish the close off the member's path). Its design, `gwz-core/dev-docs/GwzTransportSshBackgroundCloseDesign.md`, is drafted.
+  - An Opus State review returned NO-GO on 3 P2 and 3 P3, none architectural. The core rule holds: closing a fetch early cannot lose or misreport a result.
+  - For the reuse gap the review found, the operator chose "wait briefly": a new exchange waits up to 250 ms for a connection that is mid-close. A revision is in progress.
+
 ## Adaptive concurrency design reviewed GO on four axes; the operator decided all 17 open questions, 2026-10-07
 
 - **gwz-core `f48cf5a6`:** `dev-docs/GwzTransportAdaptiveConcurrencyDesign.md` revision 11. It replaces revision 1's hypothesis model with the operator's limit-discovery machine (SATURATED, STABLE, PROBING, DISCOVERING, plus RESTORING after an outage), and adds a race model for the gap between the client's and the server's connection counts.
