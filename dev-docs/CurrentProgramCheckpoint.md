@@ -1,5 +1,32 @@
 # Current program checkpoint
 
+## TR8.1 HTTPS on Linux, build-matched: the 32-member gap is within noise; a fixed cost remains at 1 and 16 members, 2026-10-07
+
+- **The 1.0.17 artifact's build:** cargo-dist's `dist` profile (`release` plus `lto = "thin"`, Rust 1.95.0). The candidate was rebuilt the same way from gwz-core `f48cf5a6`.
+- **480 runs in balanced order:** all clean, with no failed member and no `Capacity`.
+- **Results, paired against 1.0.17 at `--max-per-host 32`:**
+
+  | Pair | Thin LTO | Plain `--release` | Slower in (thin LTO) |
+  |---|---|---|---|
+  | TR8.1 criterion pair, 60 rounds | +0.026 s | +0.061 s | 34 of 60 |
+  | 16 members | +0.146 s | +0.153 s | 28 of 30 |
+  | 1 member | +0.047 s | +0.040 s | 28 of 30 |
+
+- **The build profile explains none of the gap.** The earlier run's +0.24 s was mostly 1.0.17's own run-to-run level: 0.50 s then, 0.66 s now. At 32 members TR8.1 HTTPS on Linux is within noise (paired p90 about 0.3 s): close to met, not proven.
+- **A steady fixed cost remains at 1 and 16 members.** A Sonnet profiling run on weftpi is under way.
+- **Evidence:** gwz-core-evidence `campaigns/transport-qualification/runs/2026-10-07-tr8-1-linux-https-lto`.
+- **Option A, the SSH background close:**
+  - The design, `gwz-core/dev-docs/GwzTransportSshBackgroundCloseDesign.md`, is at revision 2. Its Opus State review was GO on round 2.
+  - The operator accepted all seven open questions as recommended:
+    - a fetch completes at libgit2's close;
+    - a push keeps its EOF wait;
+    - exit status is not a reuse gate after an early close;
+    - stuck closes are bounded by `cleanup_ms`;
+    - late failures are debug-only;
+    - `Reusable` is kept, with a contract text change;
+    - the 250 ms wait is a constant.
+  - **Implementation is next,** test-first, in a gwz lane. It waits for the idle-EOF (OQ17) session to land, since both touch the SSH worker and pool.
+
 ## TR8.1 HTTPS on Linux rerun: no more Capacity failures, still about 0.24 s slower, 2026-10-07
 
 - **Build:** the candidate at gwz-core `f48cf5a6` (with `279860c`'s setup-slot queueing), built on weftpi from committed sources. A Sonnet agent ran it.
