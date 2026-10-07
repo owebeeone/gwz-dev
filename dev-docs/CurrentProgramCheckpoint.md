@@ -1,5 +1,29 @@
 # Current program checkpoint
 
+## Idle loss and the 64-caps landed and pushed; option A closes the SSH gap in its lane; a known flake in the ordinary suite, 2026-10-08
+
+- **Landed and pushed:**
+  - **The idle-loss work (OQ17):** gwz-transport `2d41e93` (`Request::fresh`) and gwz-core `b5e286b3`. Hosts notice idle connections the server closed. A reused connection found dead before any request byte is retried once on a fresh connection. Its design note, `gwz-core/dev-docs/GwzTransportIdleLossDesign.md`, is DRAFT and not reviewed; its §10 records the operator's answers.
+  - **Phase 1, the 64-caps, ported onto it:** gwz-transport `9eef731` (the connect clock pauses during a local wait) and gwz-core `2a12006f`.
+    - The 64-caps are removed; operations wait instead of being refused.
+    - A local wait that expires reports `Capacity`.
+    - The job budget moved from four statics into an `agent_job::Supervisor` owned by the host's `Authority` (OQ9). The budget is now per transport host, not per process, which amendment 2's next revision records. The process-globals allowlist went from 19 entries to 15.
+    - gwz-core's CI pin moved to gwz-transport `9eef731`.
+  - **Gates:** the ordinary suite (2,331) and both candidate legs (2,997) pass. gwz-core's and gwz-transport's CI are green.
+- **HTTPS fixed-cost fix:** evidence pushed in gwz-core-evidence `2b649f5`. One member went from +42.0 ms to +27.5 ms and 16 members from +138.5 to +65.1 ms. CPU at 32 members fell from 1,125 ms to 247 ms, against 1.0.17's 161 ms. The patch is being ported onto `2a12006f` in lane `gwz-dev-httpsfix`, with one operator-approved change: skip gwz's own CA decode when the snapshot's `SSL_CERT_FILE` equals the process's.
+- **Option A (lane `gwz-dev-bgclose`, on `959171c6`, not landed):** implemented test-first. Its gates pass, and it closes the 32-member SSH gap. Paired medians against 1.0.17 went from +0.075 s to −0.152 s on the Mac and from +0.106 s to −0.161 s on the Pi. One member is about 0.2 s faster, which the integrated remeasure must confirm. Reuse is intact: `--max-per-host 4` takes about 7 s, against 17–19 s for 1.0.17. The operator decided its four design points as recommended:
+  - "never defer a test carrier" moves to the adaptive plan;
+  - a push also waits for the client's EOF to reach the server;
+  - a discarded connection is gone within one pass, through `PoolHost::step`'s progress wake rather than the worker's `released` flag;
+  - the deferral counter goes with TR2.24.
+  
+  Revision 3 of the design records these, and the evidence is archived when A lands, after the HTTPS port.
+- **Known flake, ordinary suite, Linux:** `git::tests::g08::named_push_reports_server_hook_rejection` (`gwz-core/src/git/tests/g08.rs:237`) expected `RemoteRejected` and got `GitCommandFailed`.
+  - **Where it hit:** gwz-dev workspace recovery run 37647400999 at `faaac4b3`, ubuntu-24.04 only; macOS passed. Run 37647957801 at `1e4315e9`, with the same gwz-core and gwz-transport, passed on both.
+  - **Not caused by the transport work:** the pushed commits change only `endpoint/` and `transport_host/`, and `endpoint` is compiled only under `gwz_transport_candidate` (`src/git/mod.rs:5`).
+  - **Likely cause:** the test pushes over `git://` to a local `git daemon` whose pre-receive hook refuses. If the daemon closes the connection before libgit2 reads the report-status, the refusal surfaces as a generic failure.
+  - **Status:** not fixed; to fix separately, operator 2026-10-08.
+
 ## HTTPS fixed cost found: the CA bundle parsed per connection and 2 ms polls; 64-caps patch ready, 2026-10-07
 
 - **HTTPS profiling on weftpi** (Sonnet, gwz-core `959171c6` = `f48cf5a6` source):
