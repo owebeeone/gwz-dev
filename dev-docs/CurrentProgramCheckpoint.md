@@ -1,5 +1,51 @@
 # Current program checkpoint
 
+## Option A, the HTTPS fixed cost and Linux CA trust landed; Windows CI on every push and Phase 0 done; the SSH SYN loss was a measurement artifact; the limit machine built, unwired, 2026-10-09
+
+- **Landed and pushed (CI green on Linux and Windows):**
+  - **HTTPS fixed cost** (gwz-core `a8941cab`): one TLS connector per endpoint, wake-ups instead of the 2 ms polls, and `PoolHost` waking its caller on `release`, so a discard is disposed of within a pass.
+  - **Linux CA trust** (same commit): native-tls's openssl-probe added every standard certificate directory beside any `SSL_CERT_FILE`, so narrowing trust did not narrow it. Linux trust is now exactly OpenSSL's default verify paths, and all 14 `SSL_CERT_FILE` cells equal 1.0.17's. TR2.7 stays accepted for `GIT_SSL_CAINFO` everywhere and for `SSL_CERT_FILE` on macOS and Windows (operator, 2026-10-08). TR2.7's text owes an erratum for Linux in amendment 2's next revision.
+  - **Option A, the SSH background close, with the idle-loss State review's fixes** (gwz-core `3e0b5690`, gwz-transport `40965a6`):
+    - the pin gate in `run_tests.py`;
+    - `Disposing{idle_lost}` treated as lost;
+    - `fresh` proved by tests;
+    - one retry per open;
+    - the duplicate certificate parse trimmed.
+  - **Windows CI on every push and pull request (TR4.6):**
+    - gwz-core `candidate-windows` (`0e21bdde`);
+    - the ordinary suite (`73bd5605`, whose old `|| true` had hidden build and check failures);
+    - gwz-cli's first Rust job (`21d6231`).
+    
+    All passed their first real runs: 32, 38 and 4 minutes.
+  - **The Windows parity plan:** `gwz-core/dev-docs/GwzTransportWindowsParityPlan.md`, revision 3. Consistency was GO in round 3; the operator decided all of its open questions as recommended.
+- **Committed, not yet pushed (this entry's batch):**
+  - **Windows Phase 0, steps 0.3 to 0.5** (gwz-core `b9a6595f`):
+    - `check_windows_parity.py` with a shrink-only inventory of every Unix-only gate, run in the lane gate;
+    - `windows_lane_check.py`;
+    - the HTTPS tests that need no TLS test server now run on Windows (dabeest: 2,316 passed, 0 failed).
+    
+    **0.5b is open:** under dabeest's key-based SSH logon, Windows denies the per-user key store, so the fixture's TLS identity cannot load. The likely route is a non-schannel TLS server for the tests' server side.
+  - **The limit-discovery machine** (gwz-core `43807e9c` and `febdb717`), pure and not wired: the state table, windows, evidence filter, machine, probe timer, holds and notes; 87 tests. Readings taken where the design's text is loose:
+    - an ordinary refusal is judged against the `N` in force at its result (R3, case 15);
+    - an overload sets `N` to `min(Connected, hi)` as written;
+    - no ordinary start while a test runs (§4.9).
+    
+    Next: wire it into the pool (`set_limit`, `set_settle`, `discard_idle`) and both endpoints, then Down/RESTORING and `Ns`.
+- **The SSH SYN loss was a measurement artifact** (gwz-core-evidence `d7ca6a3`).
+  - **The cause:** 1.0.17's close (a FIN before the server has finished replying) makes the next 2–3 runs from the host lose about 18 SYNs each, over about 40 s. The cyclic rotation always put the candidate right after 1.0.17.
+  - **The correction:** "the candidate loses more SYNs" (run `2026-10-07-tr8-1-ssh-gap-32` and the 2026-10-09 attribution) is withdrawn.
+  - **Unpoisoned:** the candidate takes 2.37 s against 1.0.17's 2.54 s at 32 members over SSH on the Pi.
+  - **From now on:** use `runner/tail_runner_blocked.py`.
+- **Operator decisions, 2026-10-09:**
+  - TR8.1 is moot, since the candidate beats 1.0.17 on SSH and HTTPS is within noise.
+  - O1 (gwz-sspi's trusted-publisher environment) is settled at publish time: a mismatch fails before upload and is fixed then.
+  - No PRs: validate locally and push, in batches. Lanes and branches are created freely.
+- **Deferred:**
+  - amendment 2's revision 7: O1–O5, the 19 adaptive clauses, option A's Connected meaning, the per-host job budget, the TR2.7 Linux erratum;
+  - the adaptive plan's remaining phases;
+  - the g08 git-daemon flake;
+  - making the Windows legs required checks.
+
 ## Idle loss and the 64-caps landed and pushed; option A closes the SSH gap in its lane; a known flake in the ordinary suite, 2026-10-08
 
 - **Landed and pushed:**
