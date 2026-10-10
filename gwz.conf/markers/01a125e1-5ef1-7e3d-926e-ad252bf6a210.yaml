@@ -1,6 +1,19 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a125e1-5ef1-7e3d-926e-ad252bf6a210
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+created_at: '1791636882692'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: f8c3f503422bb398f2b0896751b48c06dea7392a
+  branch: main
+selected_targets:
+- mem_gwz_core_evidence
+- '@root'
+committed_targets:
+- mem_gwz_core_evidence
+- '@root'
 members:
   mem_git2_rs:
     path: git2-rs
@@ -119,3 +132,24 @@ members:
     detached: false
     dirty: false
     materialized: true
+merge:
+  merge_id: merge_op_87804_1791636881944_0001
+  operation_id: op_87804_1791636881944
+  source_ref: refs/gwz/local-imports/xfer_eb3d870df54ba2caa8b1acba846e2d47
+  selected_targets:
+  - mem_gwz_core_evidence
+  - '@root'
+  participants:
+    '@root':
+      target_kind: root
+      target_branch: main
+      before_commit: 59c48205de3403535a7385c2e33207793f5dd93c
+      source_commit: 80622303461ce3d1b9476c28453f80c862e36488
+      resulting_commit: f8c3f503422bb398f2b0896751b48c06dea7392a
+    mem_gwz_core_evidence:
+      target_kind: member
+      target_branch: main
+      before_commit: 93371b4daf7a14950ce965c9459ff679c9db80d6
+      source_commit: 17849cbd4635dca41bb99c5ce90a6264f0824747
+      resulting_commit: 17849cbd4635dca41bb99c5ce90a6264f0824747
+  root_merge_commit: f8c3f503422bb398f2b0896751b48c06dea7392a
