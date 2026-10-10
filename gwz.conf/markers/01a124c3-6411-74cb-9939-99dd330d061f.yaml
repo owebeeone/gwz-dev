@@ -1,0 +1,133 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a124c3-6411-74cb-9939-99dd330d061f
+workspace_id: ws_default
+origin_url_hash: sha256:8ff5c72f9873aa26e3fb19d7084a5aac3065e84955e9e38e7d0f871fbb9f9dee
+created_at: unix-ms:1791618147785
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: af3459f4ed68a8964e7eb3768911774d3719ad91
+  branch: codex/large-object-connectivity
+selected_targets:
+- '@root'
+committed_targets:
+- '@root'
+members:
+  mem_git2_rs:
+    path: git2-rs
+    source_id: src_git2_rs
+    source_kind: git
+    commit: d13951f7e0bfb6e0efcee1207ac5b140adefa455
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: a4f6fa38d709e79dd88b744e84f57f04edb929cd
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: 197d41919dec810931a7677953f5a54effa9f3a3
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core_evidence:
+    path: gwz-core-evidence
+    source_id: src_gwz_core_evidence
+    source_kind: git
+    commit: d7ca6a3834a46c22fa14ca90487117362ca755bb
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_git:
+    path: gwz-git
+    source_id: src_gwz_git
+    source_kind: git
+    commit: a9d7ee09cce6dd1407be99d8ec3676a1d288b4bf
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 5950ba3883755807e6a32694aa966431a5cf0784
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_sspi:
+    path: gwz-sspi
+    source_id: src_gwz_sspi
+    source_kind: git
+    commit: 364ccc770023792afe3cdd6c03ec82b6cf649a63
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_transport:
+    path: gwz-transport
+    source_id: src_gwz_transport
+    source_kind: git
+    commit: 40965a6c186a3f430084fde9124b8995ef569dbc
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_libgit2:
+    path: libgit2
+    source_id: src_libgit2
+    source_kind: git
+    commit: b172e3d187a4b6866fd9f696f40a1b8e7f56d348
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 3c6d07ecb4cdb2496dd1a7524e270f8cc11a7640
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 5779c9676d29750528e256714adb4dd24373e09a
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: f86f0e9fa793e4ce5576706f25868ece84337687
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: 502671593f453f4b2e5915fe90e4c34b863e9b50
+    branch: codex/large-object-connectivity
+    detached: false
+    dirty: false
+    materialized: true
