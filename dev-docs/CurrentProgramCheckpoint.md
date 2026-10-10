@@ -1,5 +1,32 @@
 # Current program checkpoint
 
+## The limit machine wired (non-adaptive), Windows 0.5b and Phase 1 steps 1.1 to 1.3 landed, Phase 0 skimmed, 2026-10-10
+
+- **Limit wiring** (gwz-transport `77f89cd`; gwz-core `fb5ad0b5`, `4c7f9f7d` and its orphan-file cleanup):
+  - The pool gains per-site `set_limit`, `set_settle` and `discard_idle` through a non-owning `PoolControl`. gwz-core's CI pin moves to `77f89cd`.
+  - Both endpoints and the pool host drive a per-pool `Governor`.
+  - Adaptive mode stays off. The only behaviour change is that a `Retry-After` (429, or 503/403 with the header) holds the site, and the end of a hold longer than 1 s discards the site's idle connections in one pool step.
+  - **Review:** one Code+State review (Opus), three rounds, GO at round 3 (`gwz-core/dev-docs/GwzTransportLimitWiring-Review*`, `-RemPlan*`). Closed: P2-1 (SSH sites clamped to `open_ceiling`, 32), P2-2 (a concurrent request's start erased a live hold), P2-3 (a kept hold carried the previous request's ceiling), and P3-1 to P3-4.
+  - **History:** `fb5ad0b5` alone fails the lane gate's parity ratchet (212 against 210). The operator chose to merge the fix on top rather than soft-reset (2026-10-10), so `fb5ad0b5` stays in history with the review's defects. Do not bisect onto it.
+  - **Next:** probe carriers and classification (adaptive on), Requeue and the `Capacity` detail, POST-level holds (case 55), Down/RESTORING and `Ns`, and per-operation scoping of the machines (the shared-operation constraint in the design's changelog).
+- **Windows parity:**
+  - **0.5b** (gwz-core `a3ba9ea0`, `8a16053a`, `4e4d1750`): the HTTPS test fixture serves with rustls, as test-only dev-dependencies of the candidate. Product TLS stays native-tls. The loopback fixture binds 127.0.0.1 and ::1 on one port, because Windows' `localhost` tries ::1 first and stalls 2 s on a refusal. dabeest: 2,294 → 2,356 passed.
+  - **Phase 0 skim review** (OQ16): `GwzTransportWindowsParityPhase0-ReviewSkim.md`. Its P2-1 (silent IPv4-only fallback) and P3-1, P3-4 and P3-5 are fixed. **Open:** P3-2 (the ratchet can be relabelled from unported to platform, and runtime `cfg!` splits are not scanned) and P3-3 (`windows_lane_check.py`'s trigger paths are narrower than the inventory, and the lane gate never asks for a receipt). Plan revision 4 must record step 0.5b.
+  - **Phase 1, steps 1.1 to 1.3** (gwz-core `caf1e4c8`):
+    - System32's `sshd.exe` (OpenSSH_for_Windows 9.5p2) serves as the Windows SSH test server, a foreground child under a Job Object. Its keys are RSA because libssh2 on CNG has no ed25519, though the files keep their `_ed25519` names.
+    - `socket_wait` (select on Windows) found and fixed a refused connect reported as success on Windows.
+    - `git::regular_file` lives in `git/`, not the plan's `endpoint/`, because an ordinary-build caller needs it.
+    - **Owed before the steps are done:** the windows-2022 rows (select, the device and pipe rows, sshd under a `cmd.exe` default shell), a non-admin run, and a full Windows lib run.
+  - **Parity count:** unported 210 → 151.
+- **Also landed:**
+  - gwz-core `eada401a` (the test git-daemon leak and the two g08 tests).
+  - The operator's large-blob header verification (origin `269ecbc6`), merged as `c6c8d907`.
+- **Gates on the merged tree** (gwz-core `eb924c0e`, gwz-transport `77f89cd`):
+  - macOS: ordinary suite 2,346, transport leg 3,247 and transport-and-session leg 3,247, all with 0 failed.
+  - dabeest: the three shapes plus test mode compile. The full qualification-shape lib run, unskipped, passed 2,565, with 0 failed and 2 ignored. Every focused group passes (HTTPS, loopback, socket_wait, regular_file, ssh_fixture, limit, governor, throttle).
+  - The lane gate is red only at `fb5ad0b5`, as recorded above.
+- **Incident, 2026-10-10:** an agent killed its test sshd with `taskkill /IM sshd.exe`, which also matched dabeest's OpenSSH service. dabeest went offline until it rebooted (18:03; the operator thinks a Windows update did it). Agents now stop processes only by exact PID or an owned Job Object.
+
 ## Option A, the HTTPS fixed cost and Linux CA trust landed; Windows CI on every push and Phase 0 done; the SSH SYN loss was a measurement artifact; the limit machine built, unwired, 2026-10-09
 
 - **Landed and pushed (CI green on Linux and Windows):**
