@@ -1,0 +1,155 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a12637-d097-7963-bd0e-72447d468d81
+workspace_id: ws_default
+created_at: '1791642551374'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: e9b9936900a79fa1e71842a1c004c2d9c8d74e12
+  branch: main
+selected_targets:
+- mem_gwz_core_evidence
+- '@root'
+committed_targets:
+- mem_gwz_core_evidence
+- '@root'
+members:
+  mem_git2_rs:
+    path: git2-rs
+    source_id: src_git2_rs
+    source_kind: git
+    commit: d13951f7e0bfb6e0efcee1207ac5b140adefa455
+    branch: codex/per-remote-transport
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: 21d6231053097a979057b85412485d0880c41e19
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: 838521d2f897b3fd162211547f17f599d98e19ac
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core_evidence:
+    path: gwz-core-evidence
+    source_id: src_gwz_core_evidence
+    source_kind: git
+    commit: 12b46d9025571dbd61175fde3d4e3d5eea7ca308
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_git:
+    path: gwz-git
+    source_id: src_gwz_git
+    source_kind: git
+    commit: a9d7ee09cce6dd1407be99d8ec3676a1d288b4bf
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 5950ba3883755807e6a32694aa966431a5cf0784
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_sspi:
+    path: gwz-sspi
+    source_id: src_gwz_sspi
+    source_kind: git
+    commit: 364ccc770023792afe3cdd6c03ec82b6cf649a63
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_transport:
+    path: gwz-transport
+    source_id: src_gwz_transport
+    source_kind: git
+    commit: 6146bd581fe3dbb8ba6a4716611c1dc8bf4246ad
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_libgit2:
+    path: libgit2
+    source_id: src_libgit2
+    source_kind: git
+    commit: b172e3d187a4b6866fd9f696f40a1b8e7f56d348
+    branch: codex/local-fetch-noncommit-1.9.7
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 3c6d07ecb4cdb2496dd1a7524e270f8cc11a7640
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 5779c9676d29750528e256714adb4dd24373e09a
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: f86f0e9fa793e4ce5576706f25868ece84337687
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: 502671593f453f4b2e5915fe90e4c34b863e9b50
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+merge:
+  merge_id: merge_op_30656_1791642550742_0001
+  operation_id: op_30656_1791642550742
+  source_ref: refs/gwz/local-imports/xfer_6164e430f1157d1b960b72ceeaa8e359
+  selected_targets:
+  - mem_gwz_core_evidence
+  - '@root'
+  participants:
+    '@root':
+      target_kind: root
+      target_branch: main
+      before_commit: 29afdfaf66ea32a7106c062aa78ae20740ace3bc
+      source_commit: 92ab898322f967c6507dc6281dfe3f49844fcd51
+      resulting_commit: e9b9936900a79fa1e71842a1c004c2d9c8d74e12
+    mem_gwz_core_evidence:
+      target_kind: member
+      target_branch: main
+      before_commit: 17849cbd4635dca41bb99c5ce90a6264f0824747
+      source_commit: 12b46d9025571dbd61175fde3d4e3d5eea7ca308
+      resulting_commit: 12b46d9025571dbd61175fde3d4e3d5eea7ca308
+  root_merge_commit: e9b9936900a79fa1e71842a1c004c2d9c8d74e12
