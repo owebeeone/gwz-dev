@@ -1,6 +1,20 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a124c3-3a68-70ce-805d-be35260655d6
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+origin_url_hash: sha256:8ff5c72f9873aa26e3fb19d7084a5aac3065e84955e9e38e7d0f871fbb9f9dee
+created_at: unix-ms:1791618137531
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 3d14889241343e56d1e70611b7f1477571c2f42e
+  branch: codex/large-object-connectivity
+selected_targets:
+- '@root'
+- mem_gwz_core
+committed_targets:
+- mem_gwz_core
+- '@root'
 members:
   mem_git2_rs:
     path: git2-rs
