@@ -1,6 +1,23 @@
-schema: gwz.lock/v0
+schema: gwz.marker/v0
+gwz_commit_id: 01a1265d-626a-7a19-add4-cc27e3ec2437
 workspace_id: ws_default
-manifest_schema: gwz.workspace/v0
+created_at: '1791645007401'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: 2ec2ebff21a3b164480b93ce1a78c46023bfa65a
+  branch: main
+selected_targets:
+- mem_gwz_core
+- mem_gwz_core_evidence
+- mem_gwz_transport
+- '@root'
+committed_targets:
+- mem_gwz_core
+- mem_gwz_core_evidence
+- mem_gwz_transport
+- '@root'
 members:
   mem_git2_rs:
     path: git2-rs
@@ -119,3 +136,38 @@ members:
     detached: false
     dirty: false
     materialized: true
+merge:
+  merge_id: merge_op_16846_1791645005972_0001
+  operation_id: op_16846_1791645005972
+  source_ref: refs/gwz/local-imports/xfer_dd00be04e47df726a16f5f7ea5d8c7e0
+  selected_targets:
+  - mem_gwz_core
+  - mem_gwz_core_evidence
+  - mem_gwz_transport
+  - '@root'
+  participants:
+    '@root':
+      target_kind: root
+      target_branch: main
+      before_commit: d49c868726860b1fc57d61d3989a5ec472aba19d
+      source_commit: a17c089150da0981b045e70c35ba0ea79bf8a91c
+      resulting_commit: 2ec2ebff21a3b164480b93ce1a78c46023bfa65a
+    mem_gwz_core:
+      target_kind: member
+      target_branch: main
+      before_commit: ba722da0f8c64a133e89db7226bd4b58dfc4d150
+      source_commit: cf92f9dab3e192656f4c151accf00caf49e78fee
+      resulting_commit: b5a5afb224865fd8f7563bb8eab65cae9860f3df
+    mem_gwz_core_evidence:
+      target_kind: member
+      target_branch: main
+      before_commit: 4d399a7c03a3a527dfd88d9b2e05cc8624ca218b
+      source_commit: e07f51673519f811bd1e9aa6cc80d687dd35b0a7
+      resulting_commit: bd9f173214580384a799cae493e4fd234d8206db
+    mem_gwz_transport:
+      target_kind: member
+      target_branch: main
+      before_commit: 77f89cdf20da6e69ab5bc91fd609918dbdcb6f04
+      source_commit: 6146bd581fe3dbb8ba6a4716611c1dc8bf4246ad
+      resulting_commit: 6146bd581fe3dbb8ba6a4716611c1dc8bf4246ad
+  root_merge_commit: 2ec2ebff21a3b164480b93ce1a78c46023bfa65a
