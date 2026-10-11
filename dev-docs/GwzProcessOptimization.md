@@ -185,9 +185,16 @@ the ruling.
 - **One review per phase.** A phase's steps are implemented back to back.
   Each step passes its own tests, lints and platform checks before the
   next starts, and gets no reviewer of its own. When the phase is
-  complete, Consistency and Safety review its whole diff once; a phase
-  that freezes a user-facing surface adds Surface. Remediation and the
-  two-round cap (§4) apply to that review unchanged.
+  complete, Consistency and Safety review its whole diff once. Remediation
+  and the two-round cap (§4) apply to that review unchanged.
+- **At most two independent reviewers on any object** (operator,
+  2026-10-11). Two exist to give two different perspectives, not to get
+  more work done: one reviewer can do plenty. When an object needs more
+  coverage — a user-facing surface (help text read cold, lifecycle pairs,
+  defaults, a first-day walkthrough), closure of earlier findings, a
+  regression check — write it into one of the two reviewers' mandates as
+  a required report section. Never add a third reviewer, concurrent or as
+  a separate step. Earlier "adds Surface" wording here is superseded.
 - **Per-step dual review only where a defect is expensive:** the wire
   format (frame tags and bodies, and anything a released client or server
   reads), secret handling (snapshots, zeroization, credentials) and the
