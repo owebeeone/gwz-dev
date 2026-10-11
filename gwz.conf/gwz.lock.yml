@@ -24,16 +24,16 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 3c8f23fff433a20e13b7aff15790fbb42a1eb720
+    commit: 49d3afb10cefb0e7f626cf269bb6a2f782302941
     branch: main
     detached: false
-    dirty: true
+    dirty: false
     materialized: true
   mem_gwz_core_evidence:
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
-    commit: 928f6d425847cc82395deb6d0b6a52c1d8ef794f
+    commit: 5526e6a3ca1cbad022ebb208aeb9b1484eaf6bb6
     branch: main
     detached: false
     dirty: false
