@@ -1,5 +1,19 @@
 # Current program checkpoint
 
+## TR1.8 step 2.4 accepted; Ns, POST holds and the notes drain; Windows steps 3.8 (partial), 4.3 and 4.5; the stuck-close server; T7, 2026-10-11 (later)
+
+Everything since the entry below, which stopped at gwz-core `e5e8e804`. Sources: the logs at gwz-core `fb439146`, gwz-cli (notes commit), gwz-py `075a48b`, gwz-core-evidence `4f210db`.
+
+- **Step 2.4 accepted** at root `48b61b3f`, gwz-core `6fae490c` after `GwzTransportWindowsParityDesign-2.4-ReviewConsistency-3.md` and `-ReviewSafety-4.md` reported GO; the package (`GwzTransportWindowsParityDesign-ReviewPackage-2.4.md`) carries the status line. Three rounds: round 1 (three reviewers, all NO-GO; R13 and the plain-HTTP boundary found blind by all three), round 2 (Consistency and Safety converged blind on the Pageant wait entering the SSH clock's LocalInteraction phase), round 3 text-only (one Safety P2, F3-1: the https-to-http refusal coached the downgrade). Operator decisions D1 to D5 are in `GwzTransportTR18-OperatorDecisions.md`; D5 (b): the Pageant wait stays on the network clock in 1.1.0. R13 measured on 1.0.17 (gwz-core-evidence `2026-10-11-tr18-r13-https-proxy`). Phase 3 policy steps (3.1, 3.2a, 3.2b, 3.3, 3.4, 3.6) and step 4.4 are unblocked.
+- **Process ruling (operator, 2026-10-11):** at most two independent reviewers on any object; Surface's mandate folds into one of the two (`dev-docs/GwzProcessOptimization.md` §8, root `cea80726`).
+- **Limit machine:** `Ns` (section 4.10), POST-level holds (case 55) and the `control.rs` split (receipt `adaptive3-20261011-a`); the notes drain, gwz-core plus gwz-cli printing `note:` lines above the progress line in human output only (receipt `notes-20261011-a`). Still to come: the section 9 docs and the `capacity` detail. **Unreviewed**, as Down and RESTORING (reviews deferred for budget).
+- **Windows parity:** steps 4.3 and 4.5 (receipt `phase4-20261011-g`); 3.8's key-type and RSA rows on the pipe agent and the stuck-close rows on a test-controlled russh server (receipt `p38srv-20261011-r`; russh is a candidate dev-dependency only, Apache-2.0, operator OK). 3.8 stays open for `known_hosts_case.rs` and `url_parity.rs`. Unported 108 to 82.
+- **T7:** the stall errors name `--ssh-timeout` and its value (operator: done now, outside the Windows plan); "1 second" singular; a pre-existing race in the password-helper rows' marker read fixed.
+- **Operator decisions:** no minimum Git version is enforced (helper owner contract §7); russh OK as a test-only dependency.
+- **Verification of the combined tree:** Mac ordinary 2,346, candidate legs 3,429 and 3,429, gwz-cli 351, all 0 failed; Windows receipts `landing4-20261011-a`, `landing5-20261011-a`, `landing6-20261011-a` PASS.
+- **Deviation, accepted by the operator ("Record and push").** The notes drain's gwz-core commit `dc17d80c` and its merge `d1dc4683` are RED in the per-commit gate: a `#[path = "local_command_notes_tests.rs"]` include outside the boundary checker's inventory. `fb439146` moves the module to `local_command/notes_tests.rs` (no `#[path]`) and is green. Both stay RED in the gate's history, as `95d292f` and `b923109` do.
+- **Open for the operator:** with no `HOME`, should `~/` includes fall back to `USERPROFILE`; skip UNC `PATH` entries; the missing-git hint's `cmd` versus PowerShell syntax; a `platform` row for the Linux-only ETXTBSY test; dead code behind the limit module's `#![allow(dead_code)]` (`Limit::admit`, `Start`) used only by tests — remove, or kept for 1.2.0.
+
 ## Adaptive mode on with Down and RESTORING, Windows Phase 1 and WH2 landed, the TR1.8 decisions run on dabeest, gwz-sspi 0.1.0 published, 2026-10-11
 
 Everything since the 2026-10-10 entry, which stopped at gwz-core `eb924c0e`. Sources: the gwz-core, gwz-transport, gwz-sspi and gwz-core-evidence logs at gwz-core `e5e8e804`, gwz-transport `6146bd5`, gwz-sspi `73de8c8` and gwz-core-evidence `46b770f`.
