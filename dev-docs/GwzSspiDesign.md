@@ -10,6 +10,8 @@ Date: 2026-10-03. Revision 2 (merged remediation 1). **ACCEPTED — bounded desi
 [Acceptance](GwzSspiAcceptance.md) records scope and next work. Product remains
 unimplemented and full Windows separately NO-GO.
 
+**Annotation, 2026-10-11 (not an amendment; the accepted text above and below is unchanged).** Operator decision D3 of the TR1.8 step 2.4 review remediation (`gwz-core/dev-docs/GwzTransportWindowsParityDesign-RemPlan-2.4.md`): `Identity::Explicit` (section 3) and the Digest request fields and path (sections 3 and 4) **stay in this library on purpose, for use after 1.1.0.** TR1.8 (TD1, TD2) scopes the 1.1.0 transport to the logon session's default identity for `Negotiate` and `NTLM` and never answers Digest, so these have **no 1.1.0 caller**, and the 1.1.0 plan builds, tests and offers neither. Nothing in the library is to be removed on that account, and no 1.1.0 release gate rests on them.
+
 ## 1. Decision and authority
 
 The operator selected a Windows-specific SSPI library named `gwz-sspi`. A fresh
