@@ -15,7 +15,7 @@ members:
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
-    commit: 969b1c104b6f7f86a5ece0622c4273ff07034819
+    commit: 220501a5f00abd76d23f5b3ef75499d5f7a09d19
     branch: main
     detached: false
     dirty: false
@@ -33,10 +33,10 @@ members:
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
-    commit: cf6b3470ff82c0242d9022cc0878b9a142807c7f
+    commit: a4fd96c8ab289449de75a96cc6b69e777d7a3e8d
     branch: main
     detached: false
-    dirty: false
+    dirty: true
     materialized: true
   mem_gwz_git:
     path: gwz-git
