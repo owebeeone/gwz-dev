@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## Phases 3 and 4 code-complete except Pageant's console rows; native commit and tag; parity unported 82 to 17, 2026-10-12
+
+Everything since the entry below. Sources: the logs at gwz-core `aadcd3d9`, gwz-cli `3d0e5f6`, gwz-py `41f0052`, gwz-sspi `d303888`, gwz-core-evidence `f0e10e8`. Every landing ran the Mac ordinary suite and both candidate legs and a Windows receipt on its merged tree; flakes that pass alone are named in the commits.
+
+- **Windows parity, landed:** 3.1 (one SSH home contract, `USERPROFILE` fallback), 3.2a/3.2b (the `AgentSource` seam and selection: Pageant, then `SSH_AUTH_SOCK`'s pipe, then the default pipe), 3.3 (the OpenSSH agent pipe), 3.4 (`agent_auth` on Windows, CRT allocator proved), 3.6 (Pageant as the agent source, synthetic receiver only), 3.8 (done), 4.4 (helper policies on Windows, logon session first, D3), 4.6/4.7 (the machine proxy, D1, under TD10), 4.8 (default-identity SSPI, real SSPI rows), 4.9 (T5, redirects in `--verbose`, WH3 adversity), 4.10 (installed paths and worker provenance), 4.11 (helper test modules on Windows). Receipts: `sshsmall-20261012-a`, `proxy-20261012-b`, `httpshelp-20261012-d`, `sshagent-20261012-j`, `pageant-20261012-c`, `wh3-20261012-c`, and the merge receipts `landing8-20261012-a`.
+- **Native commit and tag** (operator 2026-10-12, `GwzNoFallbackPlan.md` §6): libgit2 unless a hook would fire, signing is configured, or anything native cannot match byte for byte; differential tests against the CLI. Lane 3's full removal stays future work.
+- **gwz-sspi pin** moved to `d303888` (activation `73de8c8` plus the 4.10 packaging rows).
+- **Parity unported 17:** 3.1's 10 `transport_setting` rows (operator decisions 4 and 5), 4.11's 2 refusal rows (decision 8), 3.4's proven allocator row (checker change owed), one 1.4/1.7 fixture row, 5.1's 2, 6.1's 1.
+- **Owed:** the real Pageant 0.83 rows (operator console session, runbook in `gwz-core-evidence/.../2026-10-12-pageant/README.md`); reviews of Phase 3, Phase 4, 4.4 and 4.8 (two reviewers each), and the deferred Phase 1 and adaptive reviews; Phases 5 and 6.
+- **Open for the operator:** machine-proxy refusal scope; the U2 "no proxy" hint carrier; port 80 for a portless entry; `platform` rows for FIFO, newline names, search permission, the process-home walk; Windows forms of `transport_setting`'s POSIX-quoted commands; one host-key message for "not listed" and "changed"; T4's single cause; 4.11's two refusal rows; worker-refusal wording; the 3.6 pin contents and its own texts; `winp3a`'s three questions; the CNG -8 retry; OD17; UNC `PATH` entries; native commit as a gwz-core module or its own crate.
+
 ## TR1.8 step 2.4 accepted; Ns, POST holds and the notes drain; Windows steps 3.8 (partial), 4.3 and 4.5; the stuck-close server; T7, 2026-10-11 (later)
 
 Everything since the entry below, which stopped at gwz-core `e5e8e804`. Sources: the logs at gwz-core `fb439146`, gwz-cli (notes commit), gwz-py `075a48b`, gwz-core-evidence `4f210db`.
