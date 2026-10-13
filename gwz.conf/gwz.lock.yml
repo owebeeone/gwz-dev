@@ -36,7 +36,7 @@ members:
     commit: d5aed2facebf7902dc2676055da0f2e129e97896
     branch: main
     detached: false
-    dirty: true
+    dirty: false
     materialized: true
   mem_gwz_git:
     path: gwz-git
