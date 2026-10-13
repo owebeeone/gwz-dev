@@ -33,10 +33,10 @@ members:
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
-    commit: a3ab68d4bc24c9813bd7906e59098fa36a63b31f
+    commit: d5aed2facebf7902dc2676055da0f2e129e97896
     branch: main
     detached: false
-    dirty: false
+    dirty: true
     materialized: true
   mem_gwz_git:
     path: gwz-git
