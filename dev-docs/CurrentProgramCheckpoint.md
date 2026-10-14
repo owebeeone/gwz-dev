@@ -1,5 +1,14 @@
 # Current program checkpoint
 
+## The remaining work recounted; D16 to D18; D17 built; the idle_loss flake fixed, 2026-10-15
+
+Everything since the entry below. Sources: the logs at gwz-core `65706ce3`, gwz-cli `bebcc198`, gwz-core-evidence `ea67397e`.
+
+- **Correction.** The "remaining for 1.1.0, counted" lists of the two entries below used the Windows parity plan's numbering only and folded most of the 1.1.0 plan's Phases 5, 7 and 8 into "the release train". An audit against the commits and evidence runs (2026-10-15) found these open as well: S5.1 (partly: push and reads, large packs, a Linux x86-64 row), S5.2, S5.3, S5.4, S5.6 (the whole cell table), S7.1 to S7.5 (S7.2 partly), Phase 8; S3.x and TR2.6 unconfirmed. **`gwz-core/dev-docs/GwzV110RemainingPlan.md` is now the list of open steps**, with the two numberings side by side, Phases A to D, and OQ-A to OQ-D for the operator.
+- **Operator decisions D16 to D18** (winp3a's three questions, `GwzTransportTR18-OperatorDecisions.md`): the Windows SSH limit keeps its interim `UnsupportedOperation` carrier (a closed cause in 1.2.0); D17 built: a passphrase-protected key file gets its own refusal and words on every platform (gwz-core `2481f201`, gwz-cli `bebcc198`, receipt `keywords-20261014-a`); an OS connect `TimedOut` and `AddrNotAvailable` stay final.
+- **CI flakes:** `fixture_port`'s range row raced other fixtures (`cacf71c2`); the Windows `idle_loss*` rows had four test-support faults, none in the product (`65706ce3`, run `2026-10-14-idleloss`: dabeest 0 of 600 after, 9 of 120 before). Hosted Windows then failed `https_compat_tests::local_http_and_git_remain_native_compatibility_transports` once (a reset in a git:// clone, first seen after `880bc388` changed the git-daemon fixture); lane `gitdaemon` is on it.
+- **Finding for the operator (OQ-C):** `sshd.exe` sometimes refuses a signature it accepted the key for (`PUBLICKEY_UNVERIFIED`, about 1 in 6,000 dials); D14 retries only a failed key exchange.
+
 ## The Linux HTTPS fixed-cost fix accepted; the CI flakes fixed, 2026-10-14 (later)
 
 Everything since the entry below. Sources: the logs at root `ecbf73db`, gwz-core `b6eca0bb`, gwz-py `37e4c151`, gwz-core-evidence `61947e19`. CI green on gwz-core `3f42c994` and `b6eca0bb` and gwz-py `37e4c151`.
