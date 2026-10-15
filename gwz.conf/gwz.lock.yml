@@ -15,7 +15,7 @@ members:
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
-    commit: 8d909ec4886118789c06295ccd13a87bb496432a
+    commit: 0e361576e40750d8f303f4b51e1670ac582235e8
     branch: main
     detached: false
     dirty: false
@@ -24,7 +24,7 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: af7e40412b16175d7d6a13d3c66776a688ad7955
+    commit: bb34619d396e6dc8b9b4acae836b036aed058ee9
     branch: main
     detached: false
     dirty: true
@@ -33,10 +33,10 @@ members:
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
-    commit: ce3b5d931833636bac12d6681e6bead5498d6481
+    commit: 5c5bd5eb2d6165ab8d6cb6d32a62c856bd8021d4
     branch: main
     detached: false
-    dirty: false
+    dirty: true
     materialized: true
   mem_gwz_git:
     path: gwz-git
@@ -51,7 +51,7 @@ members:
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
-    commit: da098f5c52e822a3f7ed0920b016e9b0c5c5a10a
+    commit: 47b8587c18357bff77b38ba1cba2e6137762eaf8
     branch: main
     detached: false
     dirty: false
@@ -60,7 +60,7 @@ members:
     path: gwz-sspi
     source_id: src_gwz_sspi
     source_kind: git
-    commit: d3038882f7937be023d1835fe1b03e0309260acb
+    commit: 75c1b032e6ea43fb1e39f56fca9513a58cc89ef1
     branch: main
     detached: false
     dirty: false
