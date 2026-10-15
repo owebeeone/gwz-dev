@@ -158,7 +158,12 @@ unrelated transport streams. Do not replace capture with worker-thread identity.
 Every logical Open owns its one positive immutable deadline D immediately before
 first checkout/adoption. Allocation, helper and active-I/O clocks remain separate.
 401, new physical generation, pool reuse, redirects and native rounds never
-reset/extend D. Native selection at timeout zero refuses before credential
+reset/extend D.
+**Amendment (2026-10-16, D19 review State P2-2 and P3-6):** D does not run
+while a configured helper's Basic lookup works (that lookup is on the helper's
+own allocation and interaction allowance, so D is moved on by the lookup's
+duration); and a throttle requeue (429, or 503 with `Retry-After`) of an Open
+is a new attempt with its own D, its native rounds carried. Native selection at timeout zero refuses before credential
 publication under the accepted finite-deadline policy. Existing anonymous/Basic
 zero semantics are unchanged on supported routes. No hidden 30-second fallback.
 
