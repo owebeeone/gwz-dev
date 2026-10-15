@@ -162,8 +162,10 @@ reset/extend D.
 **Amendment (2026-10-16, D19 review State P2-2 and P3-6):** D does not run
 while a configured helper's Basic lookup works (that lookup is on the helper's
 own allocation and interaction allowance, so D is moved on by the lookup's
-duration); and a throttle requeue (429, or 503 with `Retry-After`) of an Open
-is a new attempt with its own D, its native rounds carried. Native selection at timeout zero refuses before credential
+duration); and a requeue of an Open under the adaptive design (§5.1: a throttle, a 429
+or a 503 or 403 with `Retry-After`; or a refusal the limit machine takes as
+evidence, such as a bare 503) is a new attempt with its own D, its native
+rounds carried. Native selection at timeout zero refuses before credential
 publication under the accepted finite-deadline policy. Existing anonymous/Basic
 zero semantics are unchanged on supported routes. No hidden 30-second fallback.
 

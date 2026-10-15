@@ -1,5 +1,16 @@
 # Current program checkpoint
 
+## D19 pre-activation review accepted; C1, S5.1 to S5.3, and step 6.2 done, 2026-10-16
+
+Everything since the entry below. Sources: the logs at gwz-core `aee4c257`, gwz-cli `8d909ec4`, gwz-py `da098f5c`, gwz-core-evidence `ce3b5d93`.
+
+- **D19 accepted** (`GwzV110PreActivationReview-Package.md`): one combined Code and State review of TR2.6 (the Phase 2 transport tree), S3.1 (timeout clocks), S3.2 (Q6 retirement), WPP 4.8/TR4.10 (SSPI, gwz-sspi) and the WPP 4.2/4.3 dual (WH2); step 5.6 counted as the Phase 1, 3, 4, 4.4 and 3.5 reviews (D19's ruling). Round 1: both NO-GO (Code: Windows non-401 answers classified as credential rejections; a Cargo-built Windows CLI unable to sign in — ARCHITECTURAL, answered by D23 self-provision. State: the per-open backstop sealing the whole request; the Basic helper on the 30 s network deadline). Round 1 remediation (gwz-core `4518f665`, `93a08dbc`, `6778cbfa`; gwz-cli `b7c9edc`; gwz-py `da098f5`): Code GO, State NO-GO on a new P2-3 (a Basic credential sent on a connection that could not carry it). Round 2 (gwz-core `ecf1cdf7`, gwz-cli `8d909ec`, design amendments): **both GO** at round 2 of the cap. Deferred with records: the SSPI status needs a wire field (1.2.0); the backstop's Cli-placement holds (1.2.0). Open with the operator before S7.1: State P3-1, P3-2, P3-5.
+- **C1** (gwz-core `8e54e500`, gwz-cli and gwz-py lock and CI commits): the transport's dependencies in `Cargo.toml` behind `gwz_transport_candidate`; CI checks out gwz-transport and gwz-sspi beside gwz-core. Bazel's `@gwz_core_crates` was already unbuildable (operator decision pending).
+- **Evidence:** S5.1 completion, S5.2, S5.3 on macOS ARM64 and Linux x86-64 (WSL 2 on dabeest, D20): runs `2026-10-15-s51`, `-s52`, `-s53`. Step 6.2's Windows parity rows (run `2026-10-15-parityrows`), Pageant owed to the operator; F1 decided as D22.
+- **CI flakes fixed:** the git-daemon reset (`665f42ae`), host-dependent test rows (`7ff37f3f`, `6560a132`).
+- **Decisions D19 to D23** recorded in `GwzTransportTR18-OperatorDecisions.md`.
+- **Remaining:** `GwzV110RemainingPlan.md` (Phase B: S3.3 live fetches, 6.1, Pageant, S5.4, 6.3, S5.6; Phase C: C2 to C5; Phase D).
+
 ## The remaining work recounted; D16 to D18; D17 built; the idle_loss flake fixed, 2026-10-15
 
 Everything since the entry below. Sources: the logs at gwz-core `65706ce3`, gwz-cli `bebcc198`, gwz-core-evidence `ea67397e`.
