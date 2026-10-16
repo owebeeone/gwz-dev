@@ -1,5 +1,19 @@
 # Current program checkpoint
 
+## C2, C2.3, C3a, the SSH stall fix, the spawn gate and gwz-sspi 0.1.1 landed; step 6.1 measured, 2026-10-16
+
+Everything since the entry below. Sources: the logs at gwz-core `c1dc78d7`, gwz-cli `279bf85f`, gwz-py `8e8446ba`, gwz-sspi `75c1b03` (tag `v0.1.1`), gwz-core-evidence `bcb06357`. CI green on each.
+
+- **C2.1/C2.2** (gwz-core `158c628c`, `6f0699c9`; gwz-py `0c8bcc70`, `c5bb918`): `OperationPolicy.max_retries` and the four `TransportObservation` receipts in the ordinary protocol as MISSING_OK. Dual review GO (`GwzV110S71Protocol-Review{Code,State}.md`), P3s closed. **C2.3** (`e6a7371f`): the S7.5 Surface list in `GwzV110RemainingPlan.md`; the catalog renders MISSING_OK as "yes (absent ok)".
+- **C3a** (gwz-core `a5702b38`, `9bf1512a`; gwz-py `cc2903d`; gwz-cli `3d57acd`): the Cli placement and the 1.2.0 protocol projection under `gwz_session_candidate`; the transport switch alone is now the 1.1.0 product. Dual review GO (`GwzV110S71C3a-Review{Code,State}.md`); both axes found, blind, that 1.1.0 pins had moved session-only: seven Local ports added, each red against a mutation; the Cli identity-check bookkeeping gated (`CheckSlot`). Receipt `c3x-20261016-b`. No Windows job builds the session shape (1.2.0).
+- **SSH pump stall fix** (gwz-core `d9d6ad47`, `d94d3816`): consumer backpressure and post-pack local work no longer run the stall clock. State review GO (`GwzTransportSshPumpStall-ReviewState.md`), three P3s closed. Follow-up 1 (a push producer pausing mid-pack is charged as Network) is an operator decision, with a 1 GiB-blob push row as its trigger test.
+- **D24 done:** gwz-sspi 0.1.1 (worker pipes non-inheritable outside the creation window) tagged at `75c1b03` and published to crates.io; State review GO (`GwzSspi011PipeFix-ReviewState.md`); pins moved in gwz-core `bb34619d`, gwz-cli `0e36157`, gwz-py `47b8587`.
+- **D25 built, partly:** the spawn gate (gwz-core `7933e9e7`, `b8516fa6`) serializes gwz-core's std spawns and the credential helper call with the WH2 helper window. State review GO (`GwzTransportSpawnGate-ReviewState.md`), five P3s closed, receipt `spawngate-20261016-d`. **Open, S7.1 waits:** gwz-sspi's own launch window is not gated (operator ruling: coarse gating or a gwz-sspi 0.1.2 launch guard). Stated limits: the gate is per host (gwz-py operations in one process do not serialize), `gwz log`'s `git rev-list` is not gated.
+- **Step 6.1 measured** (run `2026-10-16-tr84speed`): every speed cell misses by the TR8.1 rule. SSH a fixed 20-30 ms per command (+0.008 s at 32 members); HTTPS +4.7 ms per member (+0.165 s at 32). No partial result on the transport route at 16 and 32 members on either protocol; 1.0.17 lost members in up to half its SSH runs (D22). Operator decision pending.
+- **Open for the operator:** step 6.1's speed miss; the 1.1.0 Windows capability answer (`transport_capabilities::handle` answers `file_identity`/`exact_agent_identity` true on Windows; S7.2 requires false until a named fixture GO; the 6.2 key-file rows are candidate evidence for `file_identity`); the gwz-sspi coverage of D25; the Pageant session.
+- **Incidents:** `/Volumes/projects` filled (30 MiB free); stale build outputs deleted; an interrupted `gwz local clone` could not be disposed without `--keep` (nested libgit2 submodule layout). A `git add` under fsmonitor hung in a test during two concurrent gate runs (follow-up offered).
+- **Remaining:** Phase B: S3.3 live fetches, Pageant, S5.4, 6.3, S5.6, and 6.1's decision; Phase C: C3b, C4a, C4b, C5; Phase D.
+
 ## D19 pre-activation review accepted; C1, S5.1 to S5.3, and step 6.2 done, 2026-10-16
 
 Everything since the entry below. Sources: the logs at gwz-core `aee4c257`, gwz-cli `8d909ec4`, gwz-py `da098f5c`, gwz-core-evidence `ce3b5d93`.
