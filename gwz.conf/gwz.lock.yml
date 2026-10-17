@@ -27,7 +27,7 @@ members:
     commit: 96178df3df9479a8d130c51b8b6e9ecf3d309a7a
     branch: main
     detached: false
-    dirty: true
+    dirty: false
     materialized: true
   mem_gwz_core_evidence:
     path: gwz-core-evidence
