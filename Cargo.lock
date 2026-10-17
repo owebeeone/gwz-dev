@@ -673,7 +673,7 @@ dependencies = [
 
 [[package]]
 name = "gwz-sspi"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "windows-sys 0.61.2",
  "zeroize",
