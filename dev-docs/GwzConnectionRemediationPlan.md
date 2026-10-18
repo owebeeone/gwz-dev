@@ -1,7 +1,11 @@
 # GWZ Connection: communication and reuse remediation
 
-Date: 2026-10-19. Status: **DRAFT — requirements and implementation sequence for
-review; no replacement API, repository or source changes approved by this text.**
+Date: 2026-10-19. Status: **accepted as a remediation plan only at root
+`468975076f94cd761aa07ba4b47c2c4af797a892` after
+[Consistency](GwzConnectionRemediationPlan-ReviewConsistency.md) and
+[Safety](GwzConnectionRemediationPlan-ReviewSafety.md) reported GO.**
+No replacement API, repository, source implementation or release is approved by
+this plan acceptance. See the [verdict](GwzConnectionRemediationPlan-Verdict.md).
 
 This is one of four plans under the
 [remediation process](GwzTransportReleaseRemediationPlan.md). Its companions are
