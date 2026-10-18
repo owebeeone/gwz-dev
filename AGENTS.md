@@ -1,5 +1,13 @@
 Read and follow `AGENTS_GWZ.md` before doing any work in this workspace.
 
+## Development documentation
+
+Before adding or expanding development documents, follow
+[`dev-docs/AgentProcessRules.md`, L1-33](dev-docs/AgentProcessRules.md#l1-33--archive-superseded-documents).
+Its per-repository file-count and document-size caps apply to every member.
+Schedule cleanup at stable checkpoints; preserve archived contents and leave
+historical references unchanged.
+
 ## Explicit scope for control flow and conditional compilation
 
 Standing rule across all projects and languages, effective immediately:

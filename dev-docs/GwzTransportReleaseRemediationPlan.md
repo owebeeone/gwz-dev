@@ -1,7 +1,8 @@
 # GWZ transport release: architecture and delivery remediation
 
 Date: 2026-10-19. Status: **DRAFT — operator-requested remediation process;
-implementation and formal review have not started under this document.**
+read-only anti-pattern audit delegated first. Implementation and formal review
+have not started under this document.**
 
 ## 1. Purpose and authorization
 
@@ -21,7 +22,12 @@ The operator requested four components:
 4. Audit the affected code for anti-patterns, including globals, oversized
    contexts, ownership problems, concurrency hazards and oversized files.
 
-**Current authorized deliverable:** this process/plan document. This does not
+Repair and prevention are equally required outcomes. Closing the current findings
+without constraining how the supported APIs are subsequently used is incomplete.
+
+**Current authorized work:** this process/plan document and the read-only
+anti-pattern audit, which the operator directed to precede boundary redesign.
+This does not
 authorize source edits, a new repository, dependency upgrades, lane merges,
 publication or wholesale adoption of an older session programme. The later
 implementation boundary must be recorded and approved before implementation.
@@ -150,6 +156,14 @@ graph is a design deliverable. Do not equate it with the whole application sessi
 host, and do not require server dispatch, a new wire format or a new repository
 merely to obtain in-process reuse.
 
+The operator further specified a Git-independent communication library, consumed
+by the Git interface, with SSH and HTTP/HTTPS coverage and independent testing.
+Its requirements must explicitly allocate authentication, key/certificate
+management and credential-source selection. Evaluate whether those need a separate
+authentication boundary; do not assume all policy or secrets belong inside the
+communication library. The design must recommend repository placement, with
+dependency, test and release consequences, before any repository is created.
+
 Use explicit ports for platform and credential policy. Preserve applicable secret
 ownership and taut protocol boundaries, or document precisely the amendment a
 proposed move needs. The smaller library must be independently testable, not a
@@ -188,6 +202,52 @@ coordinated with affected lanes. Do not add a new hard limit or duplicate checke
 For each material split candidate, select a checkpoint and cohesive boundaries;
 keep mechanical moves separate from behavior changes and preserve attributes.
 
+### 4.4 Prevent recurrence, not only repair current callers
+
+For each accepted audit finding, specify both its repair and the structural
+constraint or regression evidence that prevents the same mistake returning.
+Distinguish properties the API makes impossible from those tests detect and
+those that remain caller obligations. Do not claim a test proves an invariant
+outside its scope or that a written rule alone enforces ownership.
+
+- **Required ownership at construction.** A supported pooled Git/communication
+  entry takes its intended owner explicitly. Avoid successful construction with
+  unrelated default state that a later builder call must repair. Any native or
+  alternate route is explicit, rather than a silent consequence of missing context.
+- **Separate resource scopes.** Express process, host/client, operation, connection
+  and stream lifetimes independently. Operation finish/cancel must not own shared
+  host shutdown. Process-wide native hazards need a process-valid mechanism;
+  merely passing one gate consistently within each client does not prove safety.
+- **Finite lifecycle policies.** Declare admission, waiting work, completed-result
+  retention, identifier/generation turnover and shutdown bounds. Test sustained
+  use beyond a single generation and beyond normal concurrency, not just a happy
+  pair of operations. Do not remove stale-message protection to obtain reuse.
+- **One operation input contract.** Specify the immutable configuration and
+  authentication inputs used by subordinate routes. No adapter should quietly
+  recapture ambient state at a later boundary without an explicit contract.
+- **Independent contract tests.** Exercise the supported library API with fake
+  connectors, clocks and credential sources, including cancellation, fault scope,
+  reuse eligibility and cleanup. Native adapters get their own focused platform
+  tests. Turn confirmed audit counterexamples into lasting regression cases.
+- **Real-consumer proofs.** CLI/Python acceptance must traverse the same supported
+  API that production uses. An internal test retaining an owner cannot prove
+  caller-level reuse if the actual caller constructs and destroys another owner.
+- **Dependency boundaries that remain enforced.** Use existing architecture and
+  source guards where applicable, and public API visibility/dependency direction
+  to keep Git internals and communication ownership out of workspace coordination.
+  Amend existing guards only where a demonstrated gap warrants it; do not create
+  a parallel rulebook or checker suite as a substitute for API design.
+- **Review recurrence and convergence.** Reviews assess actual consumers and
+  ownership across calls, not just local implementations. When the same class of
+  defect recurs, explain which prior invariant was unenforced and repair that
+  boundary rather than only adding another caller-specific patch. Report release
+  acceptance progress and outstanding cost at the existing milestone checkpoints.
+
+The boundary design must include an invariant table: requirement, resource owner,
+API enforcement, independent regression test, real-consumer evidence, and any
+remaining caller obligation. This is a concrete review object, not a promise that
+all future defects can be eliminated.
+
 ## 5. Milestones and decision gates
 
 Steps are single goals; aim for less than 500 lines of implementation per step
@@ -195,12 +255,17 @@ where practical. This is a budgeting aid, not a reason to fragment a coherent
 review or impose another hard size rule. Record estimated moved code separately
 from new behavior. Group completed steps into meaningful review packages.
 
-### M1 — Settled baseline and release acceptance
+### M1 — Anti-pattern audit first, then release reconciliation
 
-1. Reconcile the exact main/member tuple and active lanes: merged, ready,
-   unfinished, superseded or parked. Associate each with an acceptance requirement.
-2. Produce the finite release acceptance table and original-promise reconciliation.
-3. Trace the critical caller paths and complete the scoped audit/ownership map.
+1. Capture the source tuple and conduct the read-only anti-pattern audit of
+   critical caller paths, using the operator's four components and existing
+   requirements as scope. Produce the evidence-backed findings and ownership map
+   before choosing the replacement library boundaries or beginning migration.
+2. Reconcile active lanes: merged, ready, unfinished, superseded or parked.
+   Associate each with a release requirement and the relevant audit findings.
+3. Produce the finite release acceptance table and original-promise reconciliation,
+   informed by the audit. Neither this table nor a new design is a prerequisite
+   for starting the already-authorized audit.
 
 **Exit:** evidence-backed inventory, explicit release outcomes and a finite set of
 boundary defects. No new implementation or dependency work is hidden in the audit.
@@ -211,8 +276,9 @@ boundary defects. No new implementation or dependency work is hidden in the audi
 2. Specify the communication/reuse API, resource owners, dependency graph,
    configuration/identity rules and failure semantics; compare existing designs.
 3. Define the early proof, acceptance criteria, migration sequence, affected
-   requirements and rollback approach. Run a bounded design review for technical
-   consistency, lifecycle safety, requirement provenance and authorized scope.
+   requirements, recurrence-prevention invariants and rollback approach. Run a
+   bounded design review for technical consistency, lifecycle safety, requirement
+   provenance, prevention at actual consumer boundaries and authorized scope.
 
 **Exit:** a reviewed, concrete repair, not an uncosted new session programme.
 Repository creation and source changes remain subject to implementation approval.
@@ -291,6 +357,8 @@ dependencies unless a demonstrated blocker and separate authorization expands
 scope. A design preference, audit finding or review suggestion is not permission
 for an upgrade, a new framework or unrelated cleanup.
 
-No additional implementation agents, merges, commits, pushes, tags or releases
-were launched by creating this plan. Next: M1's settled acceptance/ownership
-assessment, followed by the bounded boundary design and its review.
+Creating this plan launched no implementation, merges, pushes, tags or releases.
+The operator subsequently requested a separate read-only anti-pattern audit;
+that audit is delegated and comes first. Next: use its findings to reconcile
+release acceptance and ownership, followed by the bounded boundary design and
+its review. Implementation remains separately authorized work.

@@ -62,14 +62,14 @@ Phase 0 work; the section-anchor checker extension itself is Phase 2 tooling.
 tuple, generated per review (rulebook §14.4 proposal 6). Kills prompt drift
 and a manual step per round.
 
-**2.5 History archiving (operator-added at adoption).** Superseded documents
-that no longer carry weight move to `dev-docs/history/` under rulebook rule
-L1-33: only fully superseded documents nothing current cites as controlling;
-never controlling documents, latest review rounds, checker-manifest entries,
-or rulebook-cited files; moves via `git mv`; `history/README.md` states that
-nothing in the directory is normative. Applies to each repository's dev-docs
-directory; sweeps recur at checkpoint boundaries. Guardrail: the citation
-check before each move, and documentation gates green after.
+**2.5 History archiving (operator-added at adoption; amended 2026-10-19).**
+The current `AgentProcessRules.md` L1-33 controls archival eligibility,
+per-repository document capacity and bounded exceptions, including the operator's
+2026-10-19 limits. Apply it at stable checkpoints. Archive approved files unchanged;
+historical references remain untouched, without redirects or link-repair work.
+Protect currently controlling texts and actual checker inputs unless their
+disposition is explicitly changed. The operator's unchanged-content direction
+supersedes this section's former requirement for no dangling historical citations.
 
 ## 3. Reorder where freeze-first fights physics
 

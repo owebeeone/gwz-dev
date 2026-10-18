@@ -15,7 +15,7 @@ members:
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
-    commit: fc6756dab729da8c0ffdb31d200774ff6568516a
+    commit: 5193db962e672c54cd20ab2ef8448d904129a559
     branch: main
     detached: false
     dirty: false
@@ -24,10 +24,10 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 5ec4c65f7ef34d2b6323d718a6de5a9b9229e3e6
+    commit: 9e8edb80e730e86e44894d79d18cef551f70e6e5
     branch: main
     detached: false
-    dirty: true
+    dirty: false
     materialized: true
   mem_gwz_core_evidence:
     path: gwz-core-evidence
@@ -51,7 +51,7 @@ members:
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
-    commit: 271d73c3dc1888388b0e1f3ad3c4e29ceb9521ec
+    commit: 5b6b66579867d96d21d5d5d003aaa69f50960b4e
     branch: main
     detached: false
     dirty: false
@@ -87,7 +87,7 @@ members:
     path: taut
     source_id: src_taut
     source_kind: git
-    commit: 3c6d07ecb4cdb2496dd1a7524e270f8cc11a7640
+    commit: 913e0dc35c85504aa83a33ccdf39a9a6e68100ce
     branch: main
     detached: false
     dirty: false
@@ -96,7 +96,7 @@ members:
     path: taut-shape
     source_id: src_taut_shape
     source_kind: git
-    commit: 5779c9676d29750528e256714adb4dd24373e09a
+    commit: 89916c4d017123d7c16f094eb2fba6ece98facc0
     branch: main
     detached: false
     dirty: false
@@ -105,7 +105,7 @@ members:
     path: taut-shape-py
     source_id: src_taut_shape_py
     source_kind: git
-    commit: f86f0e9fa793e4ce5576706f25868ece84337687
+    commit: da79bfb74376802edcd25049ed4ce29de814db44
     branch: main
     detached: false
     dirty: false
@@ -114,7 +114,7 @@ members:
     path: taut-shape-rs
     source_id: src_taut_shape_rs
     source_kind: git
-    commit: 502671593f453f4b2e5915fe90e4c34b863e9b50
+    commit: 959f0f048a671347c0940962c5299ae117d92f8a
     branch: main
     detached: false
     dirty: false

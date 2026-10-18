@@ -1,22 +1,29 @@
 # dev-docs/history
 
-Nothing in this directory is normative. Files here are fully superseded
-development artifacts retained for provenance: typically old review rounds,
-or completed-work documents superseded by the landed product and its current
-product documentation. They are moved under rulebook rule L1-33
-(`dev-docs/AgentProcessRules.md`).
+Operator-approved disposition, 2026-10-19, under `../AgentProcessRules.md`, L1-33.
+Archive location describes the working set; it does not itself change a file's
+approval, authority or outstanding obligations. An old status or next-action
+sentence describes its recorded source tuple, not today's execution state.
 
 Rules for this directory:
 
-- A file moves here only when nothing current cites it as controlling:
-  never a controlling document, the latest review round of an object, a
-  checker-manifest entry, or a rulebook-cited file. A citation check (an
-  ad-hoc scripted grep today; standing tooling arrives with the Phase 2
-  work in `GwzProcessOptimization.md`) runs before every move.
-- Moves use `git mv`; full lineage remains in git history.
-- If a document in here turns out to be cited by something current, moving
-  it back is the correction — do not duplicate it.
-- Sweeps recur at checkpoint boundaries. Many currently-superseded rounds
-  remain in `dev-docs/` only because live documents still cite them in
-  embedded status histories; they become movable when the status-smearing
-  cleanup (`GwzProcessOptimization.md` §2.2) lands.
+- Completed checkpoint review packets, including final reviews and acceptance
+  provenance, may be retained here. A historical citation alone does not prevent
+  archival. Current working authorities, genuinely unresolved gate records and
+  actual path-consumed checker inputs remain in the active set.
+- `parked/` holds inactive unfinished programmes. Parking does not complete,
+  abandon, supersede or further defer their approved obligations.
+- `reference/` holds historical or incorporated reference snapshots. Explicitly
+  adopted constraints retain their authority subject to controlling amendments.
+- Preserve file contents in archival moves and use the workspace-approved
+  staging/commit workflow; lineage remains available in Git history.
+- Sweeps recur at stable checkpoint boundaries. Do not duplicate archived files
+  or reactivate them merely because a historical reference names the old path.
+
+Operator amendment, 2026-10-19: historical references are left unchanged when
+files move. Do not add redirects or repair links as part of an archival pass.
+The active-document capacity limits and exception procedure live in
+`../AgentProcessRules.md`, L1-33. Archive contents are exempt from those active
+limits and retain their original bytes. The operator approved the audited
+keep-list disposition, including final review records and parked programmes.
+This approval does not authorize changing product requirements or unfinished scope.

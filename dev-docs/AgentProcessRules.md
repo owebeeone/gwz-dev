@@ -30,6 +30,13 @@ That document controls where it differs from this one.
 
 ## Changelog
 
+- 2026-10-19: operator set development-document caps at 75 active files per
+  repository and 2,500 lines per document. Extended L1-33 with counting, stable
+  checkpoint and bounded-exception rules, and the operator's instruction to move
+  archival files unchanged without reference repairs or redirects.
+- 2026-10-19: operator approved the audited keep-list disposition, including
+  final review provenance, parked unfinished programmes and reference snapshots.
+  Archive location does not cancel authority, approvals or outstanding obligations.
 - 2026-09-18: amended L1-18 with the Surface axis (operator decision D7 in
   `GwzOpenDecisions.md`) after the Claude Code hook surface review found two
   interface-shape defects that two dual-review rounds had not.
@@ -618,18 +625,51 @@ every state it writes. Grounding: A1 rules in
 ### L1-33 — Archive superseded documents
 
 > `[given]` Keep the live documentation directory limited to documents that
-> currently carry weight. Move a document to `dev-docs/history/` only when it
-> is fully superseded and nothing current cites it as controlling: never a
-> controlling document, the latest review round of any object, a document
-> named by a checker manifest, or one cited by the standing rulebook. Move
-> with `git mv` so lineage is preserved, and keep a README in the history
-> directory stating that nothing in it is normative.
+> are needed for the current development cycle. Archive location describes the
+> working set; it does not itself change approval, authority or outstanding
+> obligations. Final reviews and acceptance provenance of completed checkpoints
+> may be archived unchanged. Inactive unfinished programmes belong in explicitly
+> parked snapshots, without declaring them completed, abandoned or superseded.
+> Retain current working authorities, genuinely unresolved gate records and actual
+> path-consumed checker inputs. Historical citations and a completed object's
+> latest review are not by themselves reasons to prevent archival. Preserve file
+> contents during moves and use the workspace-approved staging/commit workflow.
+> Historical references are left unchanged: do not rewrite links, add redirects
+> or start a citation-repair campaign as part of archiving. Keep a README stating
+> the archive's disposition and authority rules.
+
+**Capacity limits — operator direction, 2026-10-19.**
+
+- Each repository MUST have at most **75 active files** under `dev-docs/`.
+  Count recursively, excluding `dev-docs/history/` and filesystem aliases of
+  another checkout. Non-history subdirectories and reference files still count;
+  moving files to another active subdirectory does not evade the cap.
+- Each active text document MUST have at most **2,500 physical lines**, including
+  blank lines. Historical files retain their original contents and are not split
+  merely to meet an active-document limit.
+- Check capacity before adding or expanding documents and at settled milestone
+  boundaries. Schedule archival cleanup and cohesive splits between stable steps,
+  coordinated with other lanes; do not disrupt overlapping work with an automatic
+  mid-step split. Separate movement from substantive requirement/design changes.
+- A necessary exception requires explicit operator approval naming the file or
+  bounded set, reason, owner and resolution checkpoint. Do not silently increase
+  a cap, relabel an active obligation as historical, or obtain compliance by
+  hiding controlling documents from the working set.
+- Existing violations are cleanup work, not evidence that these caps are met.
+  Inventory and resolve them at the current cleanup checkpoint before expanding
+  the active document set, unless a bounded exception is approved. Do not rewrite
+  frozen accepted specifications solely to make a count pass.
 
 Trigger: a checkpoint closes, or superseded rounds accumulate. Action: build
-the candidate list, exclude anything cited by current documents or manifests,
-move the remainder. Verification: documentation gates still pass and no
-current document's citation dangles. Origin: operator instruction,
-2026-08-15, at the process-adoption handoff.
+the candidate list, distinguish current working documents from incorporated
+reference authority and parked work, protect actually checker-consumed inputs,
+and move approved records unchanged. Use `history/parked/` for inactive unfinished
+programmes and `history/reference/` for incorporated reference snapshots.
+Verification: capacity, byte-preserving moves and necessary checker
+inputs; historical dangling citations are permitted by the operator's explicit
+no-reference-rewriting direction. Origins: process-adoption handoff, 2026-08-15;
+unchanged-content archiving and capacity directions, 2026-10-19. This does not
+assert that new automated cap enforcement has been implemented.
 
 ## 4. L2: toolchain and platform bindings
 
