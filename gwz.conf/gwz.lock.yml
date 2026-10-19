@@ -38,6 +38,14 @@ members:
     detached: false
     dirty: false
     materialized: true
+  mem_gwz_credential:
+    path: gwz-credential
+    source_id: src_gwz_credential
+    source_kind: git
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
   mem_gwz_git:
     path: gwz-git
     source_id: src_gwz_git
@@ -51,7 +59,7 @@ members:
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
-    commit: 02d79cad937f2d7752362861022cd07e4d1c09a5
+    commit: f7cacfb3b4b68046728b20d112070c2a28b1a7b2
     branch: main
     detached: false
     dirty: false
