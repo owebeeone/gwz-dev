@@ -263,6 +263,9 @@ from new behavior. Group completed steps into meaningful review packages.
    before choosing the replacement library boundaries or beginning migration.
 2. Reconcile active lanes: merged, ready, unfinished, superseded or parked.
    Associate each with a release requirement and the relevant audit findings.
+   The 2026-10-19 closeout disposed every lane and records each one's disposition,
+   preserved location and remaining obligation in
+   [GwzLaneCloseout-2026-10-19.md](GwzLaneCloseout-2026-10-19.md).
 3. Produce the finite release acceptance table and original-promise reconciliation,
    informed by the audit. Neither this table nor a new design is a prerequisite
    for starting the already-authorized audit.
