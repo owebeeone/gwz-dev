@@ -42,7 +42,7 @@ members:
     path: gwz-credential
     source_id: src_gwz_credential
     source_kind: git
-    commit: 648aae24e6ba00e27b65a56314739a67ee1ccc33
+    commit: 3e995edd53d315f639cbfe167fd4562778ee42b9
     branch: main
     detached: false
     dirty: false
