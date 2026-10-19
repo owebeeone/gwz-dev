@@ -1,6 +1,6 @@
 # Credential acquisition boundary amendment
 
-Date: 2026-10-19. Status: **DRAFT for joint Code/State review; not accepted and
+Date: 2026-10-19. Revision 1, direct-Future Surface correction. Status: **DRAFT for joint Code/State review; not accepted and
 no production implementation is authorized before that review passes.**
 
 ## 1. Requirements reconciliation and authorized scope
@@ -61,8 +61,8 @@ and authentication observations and publication stages remain distinct.
 Capture, acquisition, immutable selection, peer authentication and reusable scope
 are separate stages. Capture performs no credential-source I/O. Acquisition
 creates one bounded immutable source snapshot/capability for one prospective
-selection. Selection consumes that acquired result; it never reads a path,
-consults an agent/helper or starts native work. Authentication begins only with
+lookup/authentication. Internal selection after acquisition is pure; it never
+reads a path, consults an agent/helper or starts native work. Authentication begins only with
 real verified peer facts. An accepted connection-bound ScopeLease remains the
 existing separate stage and never substitutes for fresh explicit-key acquisition.
 
@@ -70,14 +70,22 @@ existing separate stage and never substitutes for fresh explicit-key acquisition
 impl CredentialContext {
     pub fn acquire(&self, selection: ExchangeSelection,
                    purpose: AcquisitionPurpose, control: AuthControl)
-        -> Result<CredentialAcquiring, AuthError>;
-    pub fn select(&self, acquired: AcquiredCredential)
-        -> Result<PreparedCredential, SelectError>;
+        -> CredentialAcquiring;
+}
+impl Future for CredentialAcquiring {
+    type Output = Result<PreparedCredential, AuthError>;
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>;
 }
 impl CredentialAcquiring {
-    pub fn observation(&self) -> AcquisitionObservation;
-    pub async fn wait(self) -> Result<AcquiredCredential, AuthError>;
-    pub fn cancel(self) -> AcquisitionClosing;
+    pub fn observation(&self) -> Option<AcquisitionObservation>;
+    pub fn cancel(self) -> AcquisitionEnd;
+}
+pub struct AcquisitionEnd {
+    pub reason: AuthError,
+    pub cleanup: Option<AcquisitionCleanupReceipt>,
+}
+impl AcquisitionEnd {
+    pub fn cleanup_status(&self) -> CleanupStatus;
 }
 impl PreparedCredential {
     pub fn source_identity(&self) -> SourceIdentity;
@@ -87,6 +95,25 @@ impl SourceIdentity {
     pub fn same_material(&self, other: &SourceIdentity) -> bool;
 }
 ```
+
+There is ONE awaited acquisition result: `context.acquire(...).await?` yields
+PreparedCredential. CredentialAcquiring is the custom Future itself, unique,
+Send and non-Clone. There is no separate public wait, AcquiredCredential or
+context.select step. Captured policy/source choice is already supplied to acquire;
+immutable material selection and guarded publication are internal phases, not
+additional caller chores. Constructor validation/admission failure is a ready
+failed Future with no source effect or retained record; observation() is None.
+A registered acquisition returns Some(source observation), even if it completes
+before the caller's first poll. Work progresses independently of polling.
+
+cancel consumes the Future, synchronously seals the source decision and returns
+an IMMEDIATE AcquisitionEnd, not a closing Future. reason is the first terminal
+failure (Cancelled unless an earlier error won); no material has been published
+from that owning future. cleanup is None only when admission never registered
+work; cleanup_status is then Confirmed. For registered work it contains the
+matching receipt and reports Pending until actual disposal. Dropping this report
+or its receipt does not own or stop cleanup. This directly answers the former
+undefined AcquisitionClosing surface without adding another stage.
 
 `AcquisitionPurpose` is source-specific: `BeforeLookup` has no peer; a
 `VerifiedRequest` carries actual verified PeerContext and bounded offer/challenge
@@ -101,7 +128,7 @@ other providers require their own conformance qualification.
 `acquire` validates captured policy, endpoint/caller, purpose and live controls,
 reserves both provider-declared snapshot/work maxima and one retained record,
 and registers source observation BEFORE any source effect. Admission failure
-returns synchronously with no effect. It returns promptly after registration;
+is stored in the returned ready failed Future with no effect. It returns promptly after registration;
 only the independently owned retainer may start/progress source work. No physical
 connection is reserved and no authentication is started by acquisition.
 
@@ -112,14 +139,18 @@ explicit endpoint base carried in captured input; absolute native paths are
 preserved. This is necessary operation input missing from the portable form,
 not permission to import the application's environment snapshot.
 
-AcquiredCredential is unique/non-Clone and contains immutable selection and
-provider material plus its charged ownership. `select` checks that it belongs
-to this exact live provider/operation, consumes it and produces one independent
-PreparedCredential. It performs no I/O and no native authentication. A denied
-selection drops/zeroizes its material once all legitimate pins disappear.
-The acquisition control's deadline governs acquisition through result transfer;
-begin receives the original exchange's still-current absolute deadline, never a
-restarted duration. A snapshot does not extend an expired request.
+On successful Future polling, internal pure selection checks this exact live
+provider/operation and source/request control, then atomically transfers one
+PreparedCredential containing immutable selection/material and its charged
+ownership. It performs no source I/O or native authentication. A rejected transfer
+discards/zeroizes material once its legitimate native pins disappear. The
+acquisition deadline/cancellation govern through transfer; the resulting prepared
+credential preserves those source-authority facts and cannot authorize a lookup
+or begin after the original request expires/revokes. Begin also validates its
+still-current absolute exchange control; neither stage restarts a duration.
+For VerifiedRequest, the immutable result binds the actual supplied origin,
+peer/generation, challenge purpose and caller facts; later begin must match the
+required provider binding. No material is rebound to another verified request.
 
 SourceIdentity is an opaque endpoint-local equality capability, not a secret
 getter, authorization receipt or reusable auth scope. It retains the same charged
@@ -131,6 +162,81 @@ bytes do not. Full original-caller/policy, possession and fresh host trust check
 remain separate existing reuse prerequisites. No standalone equality result
 permits checkout or credential publication. A revoked owner cannot supply a fresh
 selection even when an older identity capability is still retained for equality.
+
+### 3.1 First use, errors, cancel, Drop and close
+
+The composition supplies selected providers/ports, captured input (including native
+base and original caller), source choice and the original absolute request control.
+The following library calls are exact. `network` lines denote the external trusted
+adapter, not new Credential/Connection methods or an implemented integration.
+
+```rust,ignore
+let (owner, handle) = build(config, providers, ports)?;
+let operation = handle.prepare(captured_input)?; // capture/admission only, no source I/O
+let context = operation.context();
+let source_control = AuthControl {
+    deadline_ms: request_control.deadline_ms,
+    cancellation: request_control.cancellation.clone(),
+};
+let prepared = context.acquire(selection, AcquisitionPurpose::BeforeLookup,
+                               source_control).await?;
+let identity = prepared.source_identity(); // exact bounded bytes now exist
+// EXTERNAL: only now may network perform this request's pool lookup/trust/proof.
+// The following lines show its new-connection branch; eligible reuse keeps
+// the existing separate proof/authorization rules and need not redo login.
+let (peer, mut native_adapter) = network.lookup_or_connect(&identity).await?;
+let mut session = prepared.begin(peer, request_control).await?;
+// EXTERNAL: native_adapter drives session.use_ssh_key with its own readiness,
+// records actual peer result and preserves connection-before-key-pin disposal.
+let peer_result = native_adapter.authenticate(&mut session).await?;
+let end = session.finish(peer_result).await;
+drop(end); // report/receipt observation; retainer owns unfinished cleanup
+let operation_end = operation.close().await;
+drop(operation_end);
+let provider_end = owner.close().await;
+drop(provider_end);
+```
+
+AuthOpening already represents an authentication Future; no wait wrapper is
+required in this example. finish/cancel and operation/provider close remain their
+existing owned report Futures, with the existing declared outputs. They are
+listed to make the whole lifecycle usable; this amendment adds no network API.
+
+All acquisition errors use the same awaited Result. Invalid source/policy, expired
+control or refused reservation yields Err without source effects when refused at
+admission. A registered worker error/control failure also yields Err, with its
+separately retained source observation/cleanup available if needed:
+
+```rust,ignore
+let acquiring = context.acquire(selection, purpose, control);
+let observation = acquiring.observation(); // None means no registered source work
+match acquiring.await {
+    Ok(prepared) => { drop(prepared); } // releases this completed material pin
+    Err(reason) => { report_nonsecret(reason); } // optional app diagnostic
+}
+// If Some, observation still records the first terminal decision and cleanup.
+drop(observation); // never cancels/replaces retained cleanup
+```
+
+Explicit cancellation does not require awaiting another stage:
+
+```rust,ignore
+let acquiring = context.acquire(selection, purpose, control);
+let observation = acquiring.observation();
+let end = acquiring.cancel();
+assert_eq!(end.reason, AuthError::Cancelled); // if no earlier failure won
+let disposal = end.cleanup_status(); // Pending for an unfinished registered read
+drop(end);
+// Registered observation remains usable: terminal Cancelled, later matching
+// cleanup Confirmed after native release/join; no late PreparedCredential.
+```
+
+Dropping acquiring before its first poll or while Pending performs the same
+synchronous cancellation transition. Dropping a ready-but-unconsumed future
+cancels unpublished success. Poll::Ready(Ok(prepared)) is the atomic transfer;
+subsequently dropping prepared releases its pin without rewriting source success.
+Calling cancel on a ready failed admission Future reports its original error and
+Confirmed with no receipt; it invents neither an acquisition record nor peer facts.
 
 ## 4. Source observation, public-stage Drop and retained ownership
 
@@ -148,17 +254,20 @@ last owner disappears, as with current AuthObservation.
 | Registered, not started | reserve and expose source observation; cancellation can prevent effects | Registered acquisition record and shared reservation |
 | Acquiring | nonblocking polls; absolute deadline/cancel checked by retainer and worker control | Existing bounded source/native work owner, joined/probed through record |
 | Result ready but untransferred | no terminal success/publication yet; transfer races atomically with close/deadline | Record owns charged immutable result |
-| Result transferred | terminal success with material_published=true; select may consume only under live owning operation | Acquired/selected/identity/auth pins own SAME snapshot reservation |
-| CredentialAcquiring/wait Drop, including unconsumed success | synchronously seal acquisition with Cancelled; late result cannot transfer | Retainer drives unfinished work and discards/zeroizes late material |
+| Result transferred | terminal success with material_published=true; select may consume only under live owning operation | Prepared/identity/auth pins own SAME snapshot reservation |
+| CredentialAcquiring Future Drop, including ready-but-unconsumed success | synchronously seal acquisition with Cancelled; late result cannot transfer | Retainer drives unfinished work and discards/zeroizes late material |
 | cancel(self) / operation/provider close | synchronously seal matching acquisitions; report immediately with Pending where needed | Same record, slot, work and budget survive caller loss |
-| AcquisitionClosing Drop | abandon observation only | Retainer continues cleanup |
+| AcquisitionEnd/receipt Drop | abandon report observation only | Retainer continues cleanup |
 | Native work finishes after cancellation/deadline | immutable terminal reason stays; no snapshot/output publication | Join/probe, zeroize discarded result, then confirm actual cleanup |
-| AcquiredCredential/PreparedCredential/SourceIdentity Drop | release only its own pin; no sibling/global shutdown | Snapshot remains charged until LAST legitimate material/native pin disappears |
+| PreparedCredential/SourceIdentity Drop | release only its own pin; no sibling/global shutdown | Snapshot remains charged until LAST legitimate material/native pin disappears |
 
-No selection grant is transferred until source publication wins under the same
+No prepared selection grant is transferred until source publication wins under the same
 provider/operation revocation guard. A worker may produce a private result after
-cancellation but cannot publish it or start authentication. Terminal source
-failure is observable immediately even if an OS read cannot be interrupted.
+cancellation but cannot publish it or start authentication. Explicit cancel and owner/operation close publish the terminal source
+failure synchronously even if an OS read cannot be interrupted. External cancel
+flags and absolute deadlines are observed by the required bounded periodic
+retainer progress independently of worker wakeups; every publication also checks
+them under the guard before transfer.
 Confirming disposal requires the actual native owner to finish/join or its
 qualified probe, not cancellation, timeout, dropped JoinHandle or a closed channel.
 The original terminal reason is never overwritten by cleanup completion.
@@ -226,8 +335,8 @@ Native provider qualification remains required on every supported platform.
 2. Read once using the qualified source owner; preserve exact bytes, check live
    control around bounded chunks and validate existing supported container forms.
    Cancellation during a stalled read reports terminal Pending and keeps capacity.
-3. Join admission and atomically transfer X only if original request is live.
-   Pure select consumes the result; its source identity supplies exact-byte pool
+3. Join admission and internally select/atomically transfer X as PreparedCredential
+   only if the original request is live; its source identity supplies exact-byte pool
    compatibility, with existing fresh trust/possession obligations unchanged.
 4. For a new physical connection, verify endpoint-local host trust, then begin
    auth against actual peer/generation. LocalSshKeyPort borrows X; NeedNetwork
@@ -241,11 +350,11 @@ Required permanent provider traces/faults: barrier-stalled source followed by
 cancel/owner close and lost futures; immediate terminal source observation with
 pending cleanup; no late source publication; reserved-slot refusal BEFORE open;
 replacement-owner refusal against shared pending work; transfer-versus-close and
-absolute-deadline races; result ready but unconsumed Drop; cleanup failure/panic
+absolute-deadline races; result ready but unconsumed Future Drop; cleanup failure/panic
 retains accounting; exact bytes/path replacement before each lookup; different
 callers/endpoint/base/source cannot widen captured policy; native non-UTF-8 Unix
 and native Windows filenames; unsupported/encrypted/oversize/special files;
-no source access during pure select; exact source equality without key export;
+no source access during internal pure selection or result transfer; exact source equality without key export;
 NeedNetwork/native disposal pin tests; success material and observation retention
 charged through last pin. Fake sources exercise both eager and genuinely pending
 admission, not just already-loaded fixtures. Native source/provider qualification
@@ -255,8 +364,8 @@ and generic kernel review are separate acceptance evidence.
 
 On acceptance only, this amendment controls these acquisition clauses:
 
-- Credential §4 context.select(selection) becomes acquire(...).wait followed by
-  select(acquired); its operation paragraphs, value table and §5 lifetime table
+- Credential §4 context.select(selection) becomes acquire(...).await yielding
+  PreparedCredential directly; its operation paragraphs, value table and §5 lifetime table
   gain the distinct acquisition stage defined here. §4.1 key memory-auth/pinning
   remains unchanged. §5.1 retention covers source records/observations as here;
   §5.2 record default remains 64 TOTAL. §7.2 steps 1/2/5 become this amendment's
