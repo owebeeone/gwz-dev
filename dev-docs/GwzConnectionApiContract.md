@@ -1,6 +1,6 @@
 # GWZ Connection API contract
 
-Date: 2026-10-19. Revision 0. **DRAFT — interface review; no source implementation,
+Date: 2026-10-19. Revision 1. **DRAFT — remediated interface review; no source implementation,
 repository creation, dependency change or release activation authorized.**
 
 Authority: the operator requested a concrete API contract and review addressing
@@ -84,6 +84,12 @@ All constructors validate finite limits; opaque values have private fields.
 pub fn build(config: HostConfig, ports: HostPorts)
     -> Result<(HostOwner, HostHandle), BuildError>;
 
+pub fn cleanup_domain(config: DomainConfig, retention: RetentionPort)
+    -> Result<(CleanupDomainOwner, CleanupDomain), BuildError>;
+impl CleanupDomainOwner {
+    pub fn close(self) -> DomainClose;
+}
+
 impl HostHandle {
     pub fn admit(&self, input: PreparedOperation)
         -> Result<Admission, AdmissionError>;
@@ -120,6 +126,8 @@ impl HostOwner {
 `Admission`, `Opening`, `OperationFinish`, `ExchangeFinish` and `HostClose` are
 owned futures/awaitable values. `OperationFinish` yields `OperationEnd`,
 `ExchangeFinish` yields `ExchangeEnd`, and `HostClose` yields `CleanupStatus`.
+`DomainClose` also yields `CleanupStatus`. CleanupDomain is a cloneable submission
+capability with no close/reset method; its owner is Send, not Clone.
 Construction of finish/close objects performs the sealing transition immediately,
 before polling; an unpolled future cannot leave admission open.
 
@@ -159,6 +167,24 @@ It outlives all hosts made on it, cannot be reset by making a replacement host,
 and retains a failed host's cleanup until confirmed. The composition root owns
 its final shutdown; Connection does not acquire unrelated workspace services.
 
+Domain construction allocates accounting only, with no I/O. Its required
+RetentionPort is the composition's existing supervised cleanup service (a stepped
+fake in fast tests), which accepts a finite retained-work record before any
+native effect is allowed. It keeps ownership/progress after host or domain-owner
+drop until disposal is confirmed or the process exits. This is not an optional
+detached task, a static ledger or permission to implement a general process library.
+If retention cannot be reserved, work is refused before effects.
+
+DomainOwner close/drop synchronously seals the domain and revokes every host on
+it, including Reserved claims, before returning its awaitable. Existing host
+close/drop and domain close are idempotent and use one overall five-second close
+bound, not five seconds serially per host. At the bound, return Pending(ticket);
+the RetentionPort still owns the generation. Dropping that ticket or the last
+domain handle does not release physical resources/permits or stop the retainer.
+The retainer never admits new work; it retires itself only after confirmed cleanup.
+Closing another host on the same domain cannot clear the first host's pending
+record. Native implementations must prove the retention lifetime separately.
+
 The EndpointFactory returns an opaque `EndpointAdapter`. Its operations are
 `connect`, `authorize_reuse`, `start_exchange`, `cancel_work`, `dispose` and
 `poll_completion`, over owned typed commands/tokens. All completions include
@@ -191,6 +217,31 @@ Reserved -> Registered and publishes the binding under one state lock. The
 claim is updated at that same linearization point. Its unwind/drop guard knows
 which side of insertion occurred and cancels a registered binding; it must never
 infer NotRegistered merely because a Rust call failed to return.
+
+**Revocation of acquired permits.** Host close/drop, host-progress failure and
+domain close/drop set the corresponding revoked state under the same authority
+lock used by register. That transition covers both Reserved and Registered claims,
+not just the live-operation table. It revokes Reserved claims and releases their
+active/admission reservations exactly once; physical-effect-capable work cannot
+be published from them. Settling captured inputs runs outside the lock, retaining
+its charge/cleanup ownership until settlement is complete.
+
+The infallible register signature is retained. Consuming a revoked permit returns
+an already sealed **terminal Operation**, with `registration = NeverRegistered`
+and a specific terminal reason (`HostClosing`, `HostFault` or `DomainClosing`).
+It publishes no live binding, invokes no adapter and allocates nothing. `open`
+on it synchronously returns that reason with `Effect::None`; finish returns the
+same provenance and input-cleanup status. Drop is an exactly-once no-op for already
+released reservations. OperationEnd for an actual insertion instead states
+`Registered(binding_id)` even if shutdown immediately cancels it.
+
+The two legal race outcomes are: registration wins and is included in revocation's
+registered cleanup accounting; or revocation wins and register returns the terminal
+NeverRegistered operation. Close need not be polled, and dropping its future does
+not reopen this decision. No late insertion after a shutdown cancellation sweep.
+The domain authority mutex guards domain/host phases and claim phases. Payload
+locks, if needed, follow that mutex; never acquire them in reverse order. No
+await, port call, provider destructor or blocking native call runs under either.
 
 OOM/abort is not a recoverable registration result. Internal unwinds are caught
 at the host driver/caller adapter boundary; no Rust unwind crosses Python/C.
@@ -257,8 +308,8 @@ creating records. Current-binding invalid messages fault that binding only.
 Per-binding tombstones remain until its queues settle, then the whole binding
 can retire; a host-wide forever-growing tombstone set is forbidden.
 
-Discrete-message ordering is enforced by gwz-transport's sequenced profile, not
-by the scheduler. Bound adapters must feed the sequence kernel before applying
+Discrete-message ordering is enforced by the neutral core of gwz-transport's
+sequenced profile (§6.1), not by the scheduler. Bound adapters feed that core before applying
 messages to a stream. Opens for independent streams may pass a stalled Open;
 data/control ordering for each stream obeys that protocol's terminal rules.
 Abortive terminal messages fence later work; orderly close cannot silently skip
@@ -278,6 +329,92 @@ uses the same binding ports as the current messages embedded in core/CLI/Python.
 No Python callback is needed merely to advance the local Rust transport pump.
 If a Python delivery adapter is used, its lifecycle service must keep forwarding
 all stream traffic until that binding's terminal cleanup, independent of app calls.
+
+### 6.1 Neutral start and ordered-stream seam
+
+**Selected change:** factor the current profile-3 ordering algorithm from its
+Git-envelope wrapper; add a typed, in-memory start entry and an ordered-event
+stream entry in gwz-transport. Do not reuse a dummy GitService or rewrite a
+version-3 envelope as version 2. This changes pure-kernel interfaces, not a wire
+schema, and is an explicit small-proof implementation item, not existing code.
+
+The neutral `StreamOrder` API has these operations:
+
+| Entry/output | Required state and authority |
+| --- | --- |
+| `reserve(lane, limits) -> PendingLane` | Lane includes binding-generation and stream ID; reserve finite reorder/control storage; no network or start authority |
+| `start(pending_lane, direction, start_ticket) -> OrderReport` | Initial sequence 0 in that direction; ticket names one prevalidated, bounded opening record owned by Connection or the profile adapter |
+| `submit(lane, direction, seq, event) -> OrderReport` | Existing data/window/half-close/terminal body values; no Git Open or serializer; data may be buffered awaiting that direction's start |
+| `take_applied() -> AppliedEvent` | A moved, non-Clone event/receipt minted only by StreamOrder after admission, ordering and terminal-fence checks |
+| `resume(lane)` / `tick(now)` | Retry a blocked apply callback / enforce the existing gap and retirement bounds; no sequence reset |
+
+`OrderReport` uses the existing Buffered/Applied/Superseded/AlreadyResolved
+distinctions; it is not an effect or cleanup acknowledgment. Start metadata stays
+in a bounded owner table, charged before the ticket is made; the order kernel
+keeps its constant-size ticket only. A stale/foreign ticket is rejected by the
+binding authority before an apply can cause effects. Raw message/request IDs
+cannot mint tickets, and arbitrary generic callers cannot open physical resources
+by constructing a kernel alone.
+
+Each direction has its own sequence: RequestStart is initiator 0, ReplyStart
+(opened or rejected) is endpoint 0, subsequent events begin at 1. Outbound assigns
+the sequence exactly once when enqueue succeeds; retrying WouldBlock does not
+consume a number. The callback for an applied RequestStart may enqueue a connector
+job, only while its operation claim is still live. It returns WouldBlock while
+its bounded work queue is full; that lane retains its position, while another
+lane can apply its own Start. Applying Start does not mean connection setup has
+completed. ReplyStart success is applied only after physical open/authorization;
+until then Opening yields no Exchange. Failed/abortive starts fence buffered
+later traffic and retain actual cleanup accounting.
+
+`stream::OrderedStreamMachine::new(lane, limits)` is the selected byte-state
+entry. It has **no wire profile/version field** and accepts only moved
+`AppliedEvent` tokens from that lane's StreamOrder. The transition implementation
+reuses the current byte-offset, receive-window, EOF and buffer logic after
+sequencing. It does not call today's profile-1/2 `incoming(Envelope)` path.
+ReplyStart creates/activates that byte machine before buffered Data is drained;
+data is not applied while physical open is pending. Invalid offsets/credit still
+fail even if sequence admission succeeded. Stream close/error produces its normal
+progress/terminal receipt; only the physical adapter can confirm lease cleanup.
+In particular, the data apply callback returns WouldBlock while its ordered byte
+machine is not ready; it does not mint an AppliedEvent and then reject/drop it.
+ReplyStart or cancellation resumes/resolves that lane using the reserved control
+capacity. An applied token transfers once into the byte transition; failed byte
+validation faults the lane, never retries an already-consumed event as new data.
+
+The existing profile-3 `Inbound`/`Outbound` remain taut-envelope adapters over
+the same StreamOrder. They validate the existing authored Open/CheckIdentity and
+its Git metadata first, retain it in their bounded profile table, and map that
+control to a start ticket at sequence 0. Existing envelope `message_seq`, binding,
+direction and generation map one-to-one; other bodies become neutral events.
+Profile version 3 is checked at this wrapper only. The private typed event has
+no re-encoded version. Identity-check-only lanes retain their existing terminal
+grammar and never instantiate a byte stream. Existing profile-1/2 interfaces
+remain unchanged compatibility paths; they cannot masquerade as this ordered API.
+
+Generic in-process SshExec and HTTP callers use Connection's bounded typed opening
+table and tickets directly, with no GitService, Open envelope or new serialized
+control format. Start, typed body delivery and reply enter the same order core;
+the supplied local message adapter may interleave delivery but cannot bypass it.
+For GWZ Git traffic, gwz-git/core's profile adapter performs the service mapping
+and retains the existing envelope encoding. Any legacy raw HTTP prelude/body
+conversion belongs in that profile adapter, not in generic MessageStream or
+its callers. An arbitrary generic remote-open format is still not being added.
+
+**Non-Git proof traces:** (a) register an Operation, reserve a lane, enqueue
+RequestStart for SshExec `printf probe`, apply it to a fake connector, apply its
+ReplyStart, then receive Data sequence 2 before 1. Only application of 1 permits
+1/2 to reach OrderedStreamMachine; orderly terminal 3 follows both, adapter
+cleanup returns the lease. (b) perform a generic HTTP GET with status/head from
+the fake HTTP adapter and body events through the same lane; stall RequestStart
+on another lane and verify the HTTP lane completes. A body-before-ReplyStart is
+buffered; failed ReplyStart/cancel supersedes it under the existing terminal rules.
+Neither trace names GitService, changes a wire version or trusts scheduler order.
+
+This seam does not claim the current kernel already exposes these methods.
+Implementation must factor one ordering/terminal algorithm, not copy it into
+Connection. Run both existing profile-3 vectors and the generic traces against
+that core; mismatched terminal behavior is a failed conformance gate.
 
 ## 7. Configuration, identity and authentication inputs
 
@@ -537,12 +674,19 @@ central policy owns it, rather than arbitrary callers editing deadline numbers.
 
 Admission errors are `InvalidInput`, `QueueFull`, `AdmissionTimeout`,
 `CleanupCapacity`, `HostClosing`, `IdentifierExhausted`, `ForkedHost` and
-`UnavailableAdapter`. Opening/stream errors add `BindingLimit`, `Unsupported`,
+`UnavailableAdapter`, plus `InputBudget` for the retained-charge checks performed
+by admit. `BuildError` is `InvalidConfig(reason)`, `MissingPort`,
+`UnavailableProgress` or `DomainClosing`; invalid charge/limit configuration is
+`InvalidConfig(InputBudget)`, not a registered/opening failure.
+Opening/stream errors add `BindingLimit`, `Unsupported`,
 `AllocationTimeout`, `SetupStall`, `SetupAggregate`, `InteractionTimeout`,
 `Authentication`, `Trust`, `Cancelled`, `Protocol`, `CarrierLost`, `Io` and
 `EndpointFault`, with `InputBudget`, `WrongState` and `WrongScheme` for the
 bounded-input/lifecycle violations specified above. Each retains origin/scope,
 effect and cleanup as applicable.
+Terminal permits additionally expose `HostFault`/`DomainClosing` on open as
+specified in §5. An over-budget AuthContext must return
+`AdmissionError::InputBudget` with no registration, endpoint construction or effect.
 Dependency error code and class remain distinct diagnostic domains, not compared
 as interchangeable integers. No unbounded native message or credential text is
 automatically included in Display/Debug.
@@ -575,6 +719,8 @@ No static or thread-local hides that owner; no Client/backend constructor silent
 manufactures a substitute. Direct Rust callers choose their owner lifetime.
 
 ```rust,ignore
+let (domain_owner, domain) = cleanup_domain(domain_config, retained_supervisor)?;
+let config = config.with_cleanup_domain(domain.clone()); // config data, not host patch-up
 let (owner, host) = build(config, supplied_ports)?;
 let a = host.admit(capture_on_original_entry(input_a)?)?.acquire().await?;
 let op_a = a.register();
@@ -585,6 +731,7 @@ let op_b = b.register();
 run_git_via_gwz_git(&op_b).await?;
 let end_b = op_b.finish().await;
 let cleanup = owner.close().await; // explicit composition shutdown
+let domain_cleanup = domain_owner.close().await; // pending ownership remains supervised
 ```
 
 `run_git_via_gwz_git` accepts the operation communication capability; it cannot
@@ -597,6 +744,16 @@ The example omits application error projection; production uses RAII on every
 early return, so abandoned operations/owner still follow §5. Client close cancels
 its own operation scopes; it has no HostOwner capability and does not close a
 module-shared pool used by another Client. Module close owns shared shutdown.
+
+For two hosts, clone the same CleanupDomain into both build configurations.
+Close host A and keep its Pending(ticket_A), then close host B. DomainOwner close
+now seals the composition and returns Complete or Pending(ticket_domain) within
+one bound. If A remains pending, both tickets still name that same retained
+generation; the RetentionPort owns it even if both tickets and every domain handle
+are dropped. B's successful close does not release A's reservation. A late verified
+disposal completes the corresponding ticket states and releases that generation
+once. Test both explicit final close and final DomainOwner drop using a stepped
+retainer; never rely on an application caller to continue polling a lost future.
 
 ## 13. Independent proof and migration gates
 
@@ -626,16 +783,19 @@ apply to changed source paths; this contract does not waive them.
 | --- | --- | --- |
 | A1/A7 owner cannot be optional or operation-owned | Private constructors and separate capabilities | Real Python A/B uses one host; dropping A leaves B and idle pool usable; unsupported private-constructor route does not compile |
 | Registration provenance never inferred from a missing return | Preallocated claim + one state transition; unwind test | Panic at every pre/post insertion boundary, cancel before/after admission, verify no orphan/double settle |
+| Reserved permits cannot revive a closed host | One authority transition and terminal NeverRegistered operation | Acquire P, construct unpolled close, register/open P; zero effects and exactly-once release. Repeat owner drop, driver failure, domain close/drop and both register-vs-close race orders |
 | Operation fault differs from instance failure | Runtime state ownership + typed errors | A bad message closes only A; kill physical owner fails affected exchanges and subsequent operation rebuilds |
 | A4 no waiter/thread growth before admission | Finite synchronous reservation; native adapter conformance | More than 8 active + 64 queued rejects before worker creation; drop queued futures; bound retained resources |
 | A3/A5 terminal records and binding IDs are sustainable | Runtime accounting + caller policy | 10,000 operations with repeated external request IDs, delayed stale events and abandoned receipts; table size returns to bound |
 | Lower capacity never mutates another operation's pool | Per-owner counters / shared authority | A at max-per-host 4 and B at 32 overlap; neither clamps/evicts the other's active work; cross-scheme idle eviction frees only after disposal |
 | Cleanup is not cancellation acknowledgment | Domain-owned permits + qualified receipts | Late success/duplicate completion after cancellation, pending helper and host recreation; no double release or replacement beyond domain budget |
+| Domain teardown cannot orphan retained work | Owner/handle split and mandatory RetentionPort | Two hosts share domain; A pending, B complete, domain closes/drops, all tickets drop, retainer still owns A until verified disposal |
 | A8 one immutable input per operation | Required PreparedOperation and no ambient constructors | Change env/cwd/agent behind path after capture; only explicit permitted revalidation reads current trust/key |
 | Authentication cannot leak across reused HTTPS connections | Typed security scope + native conformance | Two callers/accounts/origins, anonymous->Basic reuse, native connection-bound auth, redirects and CBT generation changes |
 | Signed SSH proof is per operation/key and host trust is fresh | Provider contract + native tests | Agent withdrawal/replacement/confirmation refusal, changed key file and known_hosts; no eligible reused row on failure |
 | A2 process safety cannot be per-host theater | Capability gate + native race fixture | Two hosts plus unrelated inheriting spawn during launch window; refuse unqualified path before credentials |
 | Stream ordering is protocol-owned | Kernel sequencing + bounded reservations | Interleave streams, reorder data/close/fail, stall one Open; no byte corruption, ghost lease or cross-binding event |
+| Generic opens do not invent Git metadata or a version cast | Neutral Start/AppliedEvent and ordered byte entry | Both §6.1 non-Git traces use actual factored kernel and no GitService; existing profile-3 vectors still pass; no direct v3-to-v2 input path |
 | Stream effect never claims Git success/replay safety | Typed effect boundary + Git integration | Disconnect after exec/HTTP submission and before ack; never replay mutating exchange |
 | Budgets are centralized | Typed clock transitions + fake clock | 401/redirect/native rounds/reuse do not renew D; only named pause/new-attempt transitions; zero refuses native auth and still cleans up |
 | Git boundary remains used | Production constructor/dependency guard | Real core entry calls gwz-git, no duplicate direct binding in migrated area; dependency update changes only implementation behind boundary |
@@ -664,6 +824,7 @@ that introduces the boundary; this contract controls these points on acceptance.
 | gwz-git design/API: G0 is read-only and future network adaptation remains a later phase | Add Connection operation as the required communication capability for migrated remote behavior; preserve owned Git API values, not exposure of core/git2/OS types. G0 behavior remains compatible. |
 | Current core/Python interim per-operation transport route | Replaced only when production consumer proof passes: module/command owner survives operation binding teardown; private per-operation host construction is removed from the supported pooled path. |
 | Current unreviewed sequenced kernel feature status | Unchanged by document GO. A small-proof conformance result and implementation review are required before any production claim or feature activation. |
+| Sequenced-stream design §§2–4: first Open/CheckIdentity, per-direction numbering, terminal application and port context; current profile-1/2 byte-machine entry | Factor a neutral StreamOrder start/ticket and AppliedEvent seam per §6.1. Git profile's authored first messages/sequence numbers stay unchanged in its wrapper; generic in-process starts are typed only. Add OrderedStreamMachine without a wire-version field, consuming admitted tokens; never cast a v3 envelope to v2. Existing terminal fences, reorder/queue bounds, delivery generations and profile-1/2 compatibility remain. |
 
 No existing taut field tag, method surface or user flag is changed by this design.
 If adapting the chosen generic Rust surface actually requires a wire-schema
