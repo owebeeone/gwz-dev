@@ -1,6 +1,11 @@
 # GWZ Credential: API boundary and independent-test design
 
-Date: 2026-10-19. Revision: **1 — DRAFT, joint-review remediation**.
+Date: 2026-10-19. Revision: **1 — accepted as a joint Credential/Connection
+interface design** at root `c0fe3cf8185087a61780b8a61e347c95efc83c4f`, after
+[Consistency-1](GwzCredentialApiDesign-ReviewConsistency-1.md) and
+[Safety-1](GwzCredentialApiDesign-ReviewSafety-1.md) both reported GO. See the
+[merged verdict](GwzCredentialApiDesign-Verdict.md). Acceptance covers design only;
+repository creation, implementation and release require separate authorization.
 
 The operator requested this API definition after identifying responsibility and
 test coupling between connection management and authentication. This document
