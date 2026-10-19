@@ -1,7 +1,11 @@
 # GWZ Connection API contract
 
-Date: 2026-10-19. Revision 2. **DRAFT — remediated interface review; no source implementation,
-repository creation, dependency change or release activation authorized.**
+Date: 2026-10-19. Revision 2. **Accepted as an interface/design contract at root
+`f4aff9b0b6524711b5065eb0d088e41ef43ecabe` after
+[Consistency-2](GwzConnectionApiContract-ReviewConsistency-2.md) and
+[Safety-2](GwzConnectionApiContract-ReviewSafety-2.md) reported GO.**
+Acceptance does not authorize source implementation, repository creation,
+dependency change or release activation. See [verdict](GwzConnectionApiContract-Verdict.md).
 
 Authority: the operator requested a concrete API contract and review addressing
 the current churn, after the accepted

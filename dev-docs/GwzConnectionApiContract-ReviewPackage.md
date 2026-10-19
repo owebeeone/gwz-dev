@@ -1,6 +1,9 @@
 # GWZ Connection API contract — review package
 
-Date: 2026-10-19. Revision 0. Status: **dual review in progress; no implementation GO.**
+Date: 2026-10-19. Status: **CLOSED — revision 2 Consistency GO and Safety GO;
+two remediation rounds, zero open findings. Interface/design only.**
+See the [merged verdict](GwzConnectionApiContract-Verdict.md). The original
+revision-0 prompts and each subsequent checkpoint remain below for provenance.
 
 ## Original authority and authorized scope
 
@@ -378,3 +381,24 @@ the new neutral start/token/byte-readiness seam and domain retention changes.
 Neither reads its peer's current-round report. No closure is assumed in advance.
 
 Remediation rounds used: 1 of 2. Architectural roots recorded before re-review: 1.
+
+## Remediation round 2 checkpoint
+
+Revision 1 Consistency GO closed its original P2/P3s. Safety closed its original
+P2-1 but found P2-2 in the new seam: Applied/sequence advancement was separated
+from byte mutation by an owned event. Safety classified this as the second
+architectural root on this object. Both prior-round reports are filed verbatim.
+
+Revision 2 is committed at root
+`f4aff9b0b6524711b5065eb0d088e41ef43ecabe`; all reference heads unchanged.
+The [round-2 plan](GwzConnectionApiContract-RemPlan-2.md) selects the existing
+atomic synchronous callback model, with a borrowed CandidateEvent and no owned
+post-Applied event queue. WouldBlock retains the same charged event; successors,
+orderly terminal and cancellation obey the per-lane application guard.
+
+The same two reviewers received the revised tuple, full delta and merged plan.
+Both must recheck prior closures and scope, classify new roots, and verify heads.
+Safety re-runs the predecessor/successor/terminal/late-cancel counterexample;
+Consistency retains Surface and generic-start/version/lifecycle/error checks.
+Remediation rounds used: 2 of 2. A third architectural root stops this lane;
+no further architecture patch is authorized by the review loop.
