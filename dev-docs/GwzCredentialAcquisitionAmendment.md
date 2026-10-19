@@ -1,6 +1,6 @@
 # Credential acquisition boundary amendment
 
-Date: 2026-10-19. Revision 1, direct-Future Surface correction. Status: **DRAFT for joint Code/State review; not accepted and
+Date: 2026-10-19. Revision 2, completed-Future Surface closure. Status: **DRAFT for joint Code/State review; not accepted and
 no production implementation is authorized before that review passes.**
 
 ## 1. Requirements reconciliation and authorized scope
@@ -81,7 +81,8 @@ impl CredentialAcquiring {
     pub fn cancel(self) -> AcquisitionEnd;
 }
 pub struct AcquisitionEnd {
-    pub reason: AuthError,
+    pub reason: Option<AuthError>,
+    pub material_published: bool,
     pub cleanup: Option<AcquisitionCleanupReceipt>,
 }
 impl AcquisitionEnd {
@@ -98,7 +99,7 @@ impl SourceIdentity {
 
 There is ONE awaited acquisition result: `context.acquire(...).await?` yields
 PreparedCredential. CredentialAcquiring is the custom Future itself, unique,
-Send and non-Clone. There is no separate public wait, AcquiredCredential or
+Send, Unpin and non-Clone. There is no separate public wait, AcquiredCredential or
 context.select step. Captured policy/source choice is already supplied to acquire;
 immutable material selection and guarded publication are internal phases, not
 additional caller chores. Constructor validation/admission failure is a ready
@@ -106,14 +107,29 @@ failed Future with no source effect or retained record; observation() is None.
 A registered acquisition returns Some(source observation), even if it completes
 before the caller's first poll. Work progresses independently of polling.
 
-cancel consumes the Future, synchronously seals the source decision and returns
-an IMMEDIATE AcquisitionEnd, not a closing Future. reason is the first terminal
-failure (Cancelled unless an earlier error won); no material has been published
-from that owning future. cleanup is None only when admission never registered
-work; cleanup_status is then Confirmed. For registered work it contains the
-matching receipt and reports Pending until actual disposal. Dropping this report
-or its receipt does not own or stop cleanup. This directly answers the former
-undefined AcquisitionClosing surface without adding another stage.
+cancel consumes the Future and returns an IMMEDIATE AcquisitionEnd, not another
+Future. Before transfer it synchronously seals the source decision: reason is
+Some(first failure), normally Cancelled unless an earlier error won, and
+material_published is false. cleanup is None only when no work was registered;
+cleanup_status is then Confirmed. Registered work supplies its matching receipt
+and Pending until actual disposal. Report/receipt Drop never owns/stops cleanup.
+
+A Future value can still exist after manual/borrowed polling returns Ready.
+Completed-state methods are therefore explicitly defined:
+
+| Retained Future state | cancel(self) | Drop / observation / re-poll |
+| --- | --- | --- |
+| Ready(Ok(prepared)) was transferred | Return observational AcquisitionEnd { reason: None, material_published: true, matching source cleanup receipt }; no cancellation/revocation of transferred prepared authority | Drop releases only this completed view/observation pin. observation remains the same registered observation. Re-poll returns Ready(Err(WrongState)), never a second PreparedCredential or a rewritten source terminal record. |
+| Ready(Err(error)) was returned | Return original reason: Some(error), material_published: false and matching receipt (None for pre-admission refusal); never replace error with Cancelled | Drop has no new transition. Registered observation stays unchanged; absent observation remains absent. Re-poll returns Ready(Err(WrongState)), without rewriting the original error. |
+
+Thus cancel means cancel-if-unpublished plus truthful terminal observation; after
+successful transfer it cannot undo that transfer. The completed Future retains
+only its fixed terminal/view state and optional charged source observation, not
+a second material owner. Moving its receipt into AcquisitionEnd preserves the
+same observation ownership; it cannot free native/secret capacity early. Each
+actual source cleanup or material pin is released only by its own matching proof.
+This closes the former undefined AcquisitionClosing and completed-Future cases
+without adding caller stages, a panic precondition or a second public Result.
 
 `AcquisitionPurpose` is source-specific: `BeforeLookup` has no peer; a
 `VerifiedRequest` carries actual verified PeerContext and bounded offer/challenge
@@ -224,7 +240,8 @@ Explicit cancellation does not require awaiting another stage:
 let acquiring = context.acquire(selection, purpose, control);
 let observation = acquiring.observation();
 let end = acquiring.cancel();
-assert_eq!(end.reason, AuthError::Cancelled); // if no earlier failure won
+assert_eq!(end.reason, Some(AuthError::Cancelled)); // if no earlier failure won
+assert!(!end.material_published);
 let disposal = end.cleanup_status(); // Pending for an unfinished registered read
 drop(end);
 // Registered observation remains usable: terminal Cancelled, later matching
@@ -235,8 +252,29 @@ Dropping acquiring before its first poll or while Pending performs the same
 synchronous cancellation transition. Dropping a ready-but-unconsumed future
 cancels unpublished success. Poll::Ready(Ok(prepared)) is the atomic transfer;
 subsequently dropping prepared releases its pin without rewriting source success.
-Calling cancel on a ready failed admission Future reports its original error and
-Confirmed with no receipt; it invents neither an acquisition record nor peer facts.
+Calling cancel on a ready failed admission Future reports Some(original error),
+material_published=false and Confirmed with no receipt; it invents neither an
+acquisition record nor peer facts.
+
+Manual/borrowed completion is also usable without a hidden invalid-method state:
+
+```rust,ignore
+let mut acquiring = context.acquire(selection, purpose, control);
+let observation = acquiring.observation();
+let prepared = (&mut acquiring).await?;
+let end = acquiring.cancel(); // observation only after successful transfer
+assert_eq!(end.reason, None);
+assert!(end.material_published);
+// Source observation still says success/published; prepared remains the one
+// unique material authority. No native/material charge is freed by this call.
+drop(end);
+drop(prepared); // releases this material pin normally; other pins remain charged
+```
+
+Closure traces must repeat Ready(Err(error)) followed by cancel, verify the same
+original error/receipt, and repeat both completed states followed by Drop. They
+must also re-poll each completed future and observe only WrongState, unchanged
+original source terminal facts, no second transfer and no early pin release.
 
 ## 4. Source observation, public-stage Drop and retained ownership
 
@@ -256,7 +294,7 @@ last owner disappears, as with current AuthObservation.
 | Result ready but untransferred | no terminal success/publication yet; transfer races atomically with close/deadline | Record owns charged immutable result |
 | Result transferred | terminal success with material_published=true; select may consume only under live owning operation | Prepared/identity/auth pins own SAME snapshot reservation |
 | CredentialAcquiring Future Drop, including ready-but-unconsumed success | synchronously seal acquisition with Cancelled; late result cannot transfer | Retainer drives unfinished work and discards/zeroizes late material |
-| cancel(self) / operation/provider close | synchronously seal matching acquisitions; report immediately with Pending where needed | Same record, slot, work and budget survive caller loss |
+| pre-transfer cancel(self) / operation/provider close | synchronously seal matching acquisitions; report immediately with Pending where needed | Same record, slot, work and budget survive caller loss |
 | AcquisitionEnd/receipt Drop | abandon report observation only | Retainer continues cleanup |
 | Native work finishes after cancellation/deadline | immutable terminal reason stays; no snapshot/output publication | Join/probe, zeroize discarded result, then confirm actual cleanup |
 | PreparedCredential/SourceIdentity Drop | release only its own pin; no sibling/global shutdown | Snapshot remains charged until LAST legitimate material/native pin disappears |
@@ -350,7 +388,7 @@ Required permanent provider traces/faults: barrier-stalled source followed by
 cancel/owner close and lost futures; immediate terminal source observation with
 pending cleanup; no late source publication; reserved-slot refusal BEFORE open;
 replacement-owner refusal against shared pending work; transfer-versus-close and
-absolute-deadline races; result ready but unconsumed Future Drop; cleanup failure/panic
+absolute-deadline races; result ready but unconsumed Future Drop; completed success/error cancel, Drop and re-poll; cleanup failure/panic
 retains accounting; exact bytes/path replacement before each lookup; different
 callers/endpoint/base/source cannot widen captured policy; native non-UTF-8 Unix
 and native Windows filenames; unsupported/encrypted/oversize/special files;
