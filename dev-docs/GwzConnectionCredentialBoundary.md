@@ -1,6 +1,11 @@
 # Connection–Credential boundary contract
 
-Date: 2026-10-19. Revision: **0 — DRAFT, pending joint review**.
+Date: 2026-10-19. Revision: **0 — accepted boundary/interface design** at root
+`0570a27ececdc62b83b2bd31065aaf20559914aa`, after independent
+[Consistency](GwzConnectionCredentialBoundary-ReviewConsistency.md) and
+[Safety](GwzConnectionCredentialBoundary-ReviewSafety.md) reviews both returned GO.
+See the [merged verdict](GwzConnectionCredentialBoundary-Verdict.md).
+Acceptance covers documentation only, not repository creation or implementation.
 
 The operator requested this boundary as a document and review before Credential
 implementation. This contract makes the seam between the accepted
