@@ -168,5 +168,9 @@ members:
   source_id: src_gwz_credential
   active: true
   desired:
-    local_only: true
-  remotes: []
+    branch: main
+  remotes:
+  - name: origin
+    url: https://github.com/owebeeone/gwz-credential.git
+    fetch: true
+    push: true

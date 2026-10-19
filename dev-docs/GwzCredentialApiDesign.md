@@ -1,5 +1,9 @@
 # GWZ Credential: API boundary and independent-test design
 
+Draft acquisition amendment: [GwzCredentialAcquisitionAmendment.md](GwzCredentialAcquisitionAmendment.md)
+reconciles source-before-lookup timing and retained source ownership. It is not
+accepted; existing acceptance below still applies only to its recorded tuple.
+
 Date: 2026-10-19. Revision: **1 — accepted as a joint Credential/Connection
 interface design** at root `c0fe3cf8185087a61780b8a61e347c95efc83c4f`, after
 [Consistency-1](GwzCredentialApiDesign-ReviewConsistency-1.md) and
