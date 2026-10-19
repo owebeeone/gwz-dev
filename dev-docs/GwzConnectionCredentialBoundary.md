@@ -1,8 +1,9 @@
 # Connection–Credential boundary contract
 
-Draft acquisition amendment: [GwzCredentialAcquisitionAmendment.md](GwzCredentialAcquisitionAmendment.md)
-reconciles source-before-lookup timing and retained source ownership. It is not
-accepted; existing acceptance below still applies only to its recorded tuple.
+Accepted acquisition amendment: [GwzCredentialAcquisitionAmendment.md](GwzCredentialAcquisitionAmendment.md)
+at root 5dd59da1 controls the exact acquisition clauses listed in its §7.
+Its one directly awaited acquisition replaces the old public selection chain;
+prior acceptance below remains historical for its recorded tuple.
 
 Date: 2026-10-19. Revision: **0 — accepted boundary/interface design** at root
 `0570a27ececdc62b83b2bd31065aaf20559914aa`, after independent

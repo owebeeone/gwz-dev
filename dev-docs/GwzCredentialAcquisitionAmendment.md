@@ -1,7 +1,13 @@
 # Credential acquisition boundary amendment
 
-Date: 2026-10-19. Revision 2, completed-Future Surface closure. Status: **DRAFT for joint Code/State review; not accepted and
-no production implementation is authorized before that review passes.**
+Date: 2026-10-19. Revision 2, completed-Future Surface closure. Status: **accepted design at root
+5dd59da1ea5123e0de850ba4b2409a4ef1b7e1d9 after Code + Surface and State both
+reported GO.** Verbatim final reports and merged verdict are in gwz-credential
+`648aae24e6ba00e27b65a56314739a67ee1ccc33`, dev-docs/CredentialAcquisition-ReviewCode-2.md,
+CredentialAcquisition-ReviewState-2.md and CredentialAcquisition-Verdict.md.
+Acceptance covers the affected design only; source/native/integration acceptance
+requires the separate implementation gates. The remaining body is the reviewed
+revision2; this status records its later evidence without changing semantics.
 
 ## 1. Requirements reconciliation and authorized scope
 
@@ -400,7 +406,7 @@ and generic kernel review are separate acceptance evidence.
 
 ## 7. Exact supersession and bridge handoff
 
-On acceptance only, this amendment controls these acquisition clauses:
+At the accepted design tuple above, this amendment controls these acquisition clauses:
 
 - Credential §4 context.select(selection) becomes acquire(...).await yielding
   PreparedCredential directly; its operation paragraphs, value table and §5 lifetime table
