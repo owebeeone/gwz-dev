@@ -1,6 +1,6 @@
 # GWZ Connection API contract
 
-Date: 2026-10-19. Revision 1. **DRAFT — remediated interface review; no source implementation,
+Date: 2026-10-19. Revision 2. **DRAFT — remediated interface review; no source implementation,
 repository creation, dependency change or release activation authorized.**
 
 Authority: the operator requested a concrete API contract and review addressing
@@ -345,7 +345,7 @@ The neutral `StreamOrder` API has these operations:
 | `reserve(lane, limits) -> PendingLane` | Lane includes binding-generation and stream ID; reserve finite reorder/control storage; no network or start authority |
 | `start(pending_lane, direction, start_ticket) -> OrderReport` | Initial sequence 0 in that direction; ticket names one prevalidated, bounded opening record owned by Connection or the profile adapter |
 | `submit(lane, direction, seq, event) -> OrderReport` | Existing data/window/half-close/terminal body values; no Git Open or serializer; data may be buffered awaiting that direction's start |
-| `take_applied() -> AppliedEvent` | A moved, non-Clone event/receipt minted only by StreamOrder after admission, ordering and terminal-fence checks |
+| `apply_ready(lane, callback) -> OrderReport` | Callback borrows a lane-bound CandidateEvent synchronously; actual state mutation succeeds before sequence advancement or Applied receipt |
 | `resume(lane)` / `tick(now)` | Retry a blocked apply callback / enforce the existing gap and retirement bounds; no sequence reset |
 
 `OrderReport` uses the existing Buffered/Applied/Superseded/AlreadyResolved
@@ -355,6 +355,31 @@ keeps its constant-size ticket only. A stale/foreign ticket is rejected by the
 binding authority before an apply can cause effects. Raw message/request IDs
 cannot mint tickets, and arbitrary generic callers cannot open physical resources
 by constructing a kernel alone.
+
+**Application commit boundary, preserved from the existing kernel.** StreamOrder
+retains the event and its charge while it is eligible. It invokes
+`callback(&CandidateEvent) -> Result<(), ApplyError>` synchronously under that
+lane's exclusive application guard. CandidateEvent is a borrowed, non-Clone
+capability scoped to that call; it cannot be taken, queued, spawned, awaited or
+applied later. The callback performs the actual bounded byte/control transition,
+not merely a readiness test or a handoff to another worker.
+
+Only callback success advances the expected sequence and produces an Applied
+receipt. That receipt contains identifiers/progress only, never an event that
+still needs application. A successor or orderly terminal cannot enter its apply
+callback or become Applied ahead of an uncommitted predecessor. `WouldBlock`
+must mutate nothing: the event/charge remain kernel-owned at the same sequence,
+and later resume retries it once. No callback blocks, awaits, does I/O or invokes
+foreign code; bounded queue insertion for Start and in-memory byte transitions
+are the only applications. Other lanes progress after a WouldBlock; no host
+scheduler ordering requirement substitutes for this per-lane guard.
+
+Cancellation/abortive fencing is serialized by that same lane guard. Either the
+current byte transition commits before the fence, or the fence supersedes the
+uncommitted event; no borrowed candidate survives to apply afterward. A rejected
+byte transition or callback unwind faults/fences the lane without publishing
+Applied or retrying potentially mutated state. Partial mutation cannot be hidden
+by returning WouldBlock. Physical/native cleanup still belongs to its owner.
 
 Each direction has its own sequence: RequestStart is initiator 0, ReplyStart
 (opened or rejected) is endpoint 0, subsequent events begin at 1. Outbound assigns
@@ -368,8 +393,9 @@ until then Opening yields no Exchange. Failed/abortive starts fence buffered
 later traffic and retain actual cleanup accounting.
 
 `stream::OrderedStreamMachine::new(lane, limits)` is the selected byte-state
-entry. It has **no wire profile/version field** and accepts only moved
-`AppliedEvent` tokens from that lane's StreamOrder. The transition implementation
+entry. It has **no wire profile/version field**. Its `apply(&CandidateEvent)`
+runs only within that lane's StreamOrder callback and returns success only after
+the byte-state mutation. The transition implementation
 reuses the current byte-offset, receive-window, EOF and buffer logic after
 sequencing. It does not call today's profile-1/2 `incoming(Envelope)` path.
 ReplyStart creates/activates that byte machine before buffered Data is drained;
@@ -377,10 +403,11 @@ data is not applied while physical open is pending. Invalid offsets/credit still
 fail even if sequence admission succeeded. Stream close/error produces its normal
 progress/terminal receipt; only the physical adapter can confirm lease cleanup.
 In particular, the data apply callback returns WouldBlock while its ordered byte
-machine is not ready; it does not mint an AppliedEvent and then reject/drop it.
+machine is not ready, with no byte or ordering mutation.
 ReplyStart or cancellation resumes/resolves that lane using the reserved control
-capacity. An applied token transfers once into the byte transition; failed byte
-validation faults the lane, never retries an already-consumed event as new data.
+capacity. There is no take_applied queue or owned event handoff after an Applied
+receipt. Failed byte validation faults the lane; it never retries an already
+mutated event as new data.
 
 The existing profile-3 `Inbound`/`Outbound` remain taut-envelope adapters over
 the same StreamOrder. They validate the existing authored Open/CheckIdentity and
@@ -410,6 +437,12 @@ the fake HTTP adapter and body events through the same lane; stall RequestStart
 on another lane and verify the HTTP lane completes. A body-before-ReplyStart is
 buffered; failed ReplyStart/cancel supersedes it under the existing terminal rules.
 Neither trace names GitService, changes a wire version or trusts scheduler order.
+Also pause sequence 1 at eligibility by a no-effect WouldBlock, then submit
+sequence 2 and orderly terminal 3: neither becomes Applied until 1's callback
+commits. An unrelated lane completes during the pause. Repeat with cancellation
+before eligibility and immediately after byte commit: only the committed prefix
+survives, with no post-fence application. These tests use the real callback seam,
+not a test runner that happens to consume queued tokens in sequence.
 
 This seam does not claim the current kernel already exposes these methods.
 Implementation must factor one ordering/terminal algorithm, not copy it into
@@ -795,7 +828,8 @@ apply to changed source paths; this contract does not waive them.
 | Signed SSH proof is per operation/key and host trust is fresh | Provider contract + native tests | Agent withdrawal/replacement/confirmation refusal, changed key file and known_hosts; no eligible reused row on failure |
 | A2 process safety cannot be per-host theater | Capability gate + native race fixture | Two hosts plus unrelated inheriting spawn during launch window; refuse unqualified path before credentials |
 | Stream ordering is protocol-owned | Kernel sequencing + bounded reservations | Interleave streams, reorder data/close/fail, stall one Open; no byte corruption, ghost lease or cross-binding event |
-| Generic opens do not invent Git metadata or a version cast | Neutral Start/AppliedEvent and ordered byte entry | Both §6.1 non-Git traces use actual factored kernel and no GitService; existing profile-3 vectors still pass; no direct v3-to-v2 input path |
+| Generic opens do not invent Git metadata or a version cast | Neutral Start and synchronous CandidateEvent apply callback | Both §6.1 non-Git traces use actual factored kernel and no GitService; existing profile-3 vectors still pass; no direct v3-to-v2 input path |
+| Applied means actual byte/control mutation, not event handoff | Exclusive lane callback and commit-after-success | Hold predecessor at WouldBlock; successor/terminal cannot commit; another lane progresses. Cancel before/after callback commit; no delayed post-fence application |
 | Stream effect never claims Git success/replay safety | Typed effect boundary + Git integration | Disconnect after exec/HTTP submission and before ack; never replay mutating exchange |
 | Budgets are centralized | Typed clock transitions + fake clock | 401/redirect/native rounds/reuse do not renew D; only named pause/new-attempt transitions; zero refuses native auth and still cleans up |
 | Git boundary remains used | Production constructor/dependency guard | Real core entry calls gwz-git, no duplicate direct binding in migrated area; dependency update changes only implementation behind boundary |
@@ -824,7 +858,7 @@ that introduces the boundary; this contract controls these points on acceptance.
 | gwz-git design/API: G0 is read-only and future network adaptation remains a later phase | Add Connection operation as the required communication capability for migrated remote behavior; preserve owned Git API values, not exposure of core/git2/OS types. G0 behavior remains compatible. |
 | Current core/Python interim per-operation transport route | Replaced only when production consumer proof passes: module/command owner survives operation binding teardown; private per-operation host construction is removed from the supported pooled path. |
 | Current unreviewed sequenced kernel feature status | Unchanged by document GO. A small-proof conformance result and implementation review are required before any production claim or feature activation. |
-| Sequenced-stream design §§2–4: first Open/CheckIdentity, per-direction numbering, terminal application and port context; current profile-1/2 byte-machine entry | Factor a neutral StreamOrder start/ticket and AppliedEvent seam per §6.1. Git profile's authored first messages/sequence numbers stay unchanged in its wrapper; generic in-process starts are typed only. Add OrderedStreamMachine without a wire-version field, consuming admitted tokens; never cast a v3 envelope to v2. Existing terminal fences, reorder/queue bounds, delivery generations and profile-1/2 compatibility remain. |
+| Sequenced-stream design §§2–4: first Open/CheckIdentity, per-direction numbering, terminal application and port context; current profile-1/2 byte-machine entry | Factor a neutral StreamOrder start/ticket and synchronous CandidateEvent callback per §6.1. Git profile's authored first messages/sequence numbers stay unchanged in its wrapper; generic in-process starts are typed only. Add version-free OrderedStreamMachine applying inside that callback; never cast a v3 envelope to v2. Retain the existing atomic apply-before-Applied/sequence-advance rule, no-effect WouldBlock, terminal fences, reorder/queue bounds, delivery generations and profile-1/2 compatibility. |
 
 No existing taut field tag, method surface or user flag is changed by this design.
 If adapting the chosen generic Rust surface actually requires a wire-schema

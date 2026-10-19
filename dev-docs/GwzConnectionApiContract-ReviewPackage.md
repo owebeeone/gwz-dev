@@ -354,3 +354,27 @@ part of the result; they are what a GO rests on.}
 {Residual risks below the finding bar; the single next action this verdict
 implies.}
 ```
+
+## Remediation round 1 checkpoint
+
+Initial Consistency: NO-GO, one P2 (generic sequencing seam, one architectural
+root), two P3s (domain lifecycle, InputBudget). Initial Safety: NO-GO, one P2
+(permit revocation, non-architectural). Reports are filed verbatim. The merged
+[remediation](GwzConnectionApiContract-RemPlan-1.md) maps all four findings.
+
+Revised object: revision 1 at root
+`011d3eb0a487dbf62e10432034a0105be2518a22`; all eight reference heads unchanged.
+The object changed by one merged text patch (+165/-4 lines). No source edits.
+The same two reviewers continue under the operator's earlier explicit instruction
+“use the old reviewers,” recorded in RemPlan, overriding the skill's usual fresh
+replacement for material interface changes. This is not an extra review axis.
+
+Both received the revised tuple, whole changed range from the initial object,
+merged remediation and original canonical mandate. They must verify start/end
+heads, retain necessity/authority checks, add prior-finding closure tables and
+changed-range analysis, re-run original counterexamples, and classify any new
+architectural root. Consistency retains API Surface; Safety additionally attacks
+the new neutral start/token/byte-readiness seam and domain retention changes.
+Neither reads its peer's current-round report. No closure is assumed in advance.
+
+Remediation rounds used: 1 of 2. Architectural roots recorded before re-review: 1.
