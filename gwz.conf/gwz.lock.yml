@@ -24,7 +24,7 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 794199db341e33e4ebf1aa464083da27090945ef
+    commit: 64fa3263d68575d629f2daec6c015b7ee131611b
     branch: main
     detached: false
     dirty: false
@@ -60,7 +60,7 @@ members:
     path: gwz-py
     source_id: src_gwz_py
     source_kind: git
-    commit: 22e4f133a4b4a0d8b99816a61bb402767a01898c
+    commit: a948e2c4fc03778b722f508c17dc8289eb0fe986
     branch: main
     detached: false
     dirty: false
