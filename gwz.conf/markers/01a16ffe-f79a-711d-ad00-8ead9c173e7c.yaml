@@ -1,0 +1,155 @@
+schema: gwz.marker/v0
+gwz_commit_id: 01a16ffe-f79a-711d-ad00-8ead9c173e7c
+workspace_id: ws_default
+created_at: '1792880342400'
+created_by:
+  actor_id: unknown
+root:
+  path: .
+  before_commit: e50869f4749bbd4be90e2945ffac35edcf853cce
+  branch: main
+selected_targets:
+- mem_gwz_transport
+committed_targets:
+- mem_gwz_transport
+- '@root'
+members:
+  mem_git2_rs:
+    path: git2-rs
+    source_id: src_git2_rs
+    source_kind: git
+    commit: d13951f7e0bfb6e0efcee1207ac5b140adefa455
+    branch: codex/per-remote-transport
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_cli:
+    path: gwz-cli
+    source_id: src_gwz_cli
+    source_kind: git
+    commit: 9ecc2b7c1bd69386e1f19b1789fa504e1adbecba
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core:
+    path: gwz-core
+    source_id: src_gwz_core
+    source_kind: git
+    commit: 9a9a659eb28be6dbce0ea38d57e0f0293a59d506
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_core_evidence:
+    path: gwz-core-evidence
+    source_id: src_gwz_core_evidence
+    source_kind: git
+    commit: 93c0e38b2a6e80ee4a0386a67df8838ab409a7ee
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_credential:
+    path: gwz-credential
+    source_id: src_gwz_credential
+    source_kind: git
+    commit: 6d78c593a4c57f7fece73d38ebe836e15219af15
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_git:
+    path: gwz-git
+    source_id: src_gwz_git
+    source_kind: git
+    commit: e3bc2a41f6bf19c87b1cd2ab555ff97dfe6b732a
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_py:
+    path: gwz-py
+    source_id: src_gwz_py
+    source_kind: git
+    commit: 22e4f133a4b4a0d8b99816a61bb402767a01898c
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_sspi:
+    path: gwz-sspi
+    source_id: src_gwz_sspi
+    source_kind: git
+    commit: a2978a8f3f6ce7a4b387a2f9ebcad555a7c8888e
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_gwz_transport:
+    path: gwz-transport
+    source_id: src_gwz_transport
+    source_kind: git
+    commit: 9f8f091b1c1f62215be3440eba8f5df420050312
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_libgit2:
+    path: libgit2
+    source_id: src_libgit2
+    source_kind: git
+    commit: b172e3d187a4b6866fd9f696f40a1b8e7f56d348
+    branch: codex/local-fetch-noncommit-1.9.7
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut:
+    path: taut
+    source_id: src_taut
+    source_kind: git
+    commit: 913e0dc35c85504aa83a33ccdf39a9a6e68100ce
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape:
+    path: taut-shape
+    source_id: src_taut_shape
+    source_kind: git
+    commit: 89916c4d017123d7c16f094eb2fba6ece98facc0
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_py:
+    path: taut-shape-py
+    source_id: src_taut_shape_py
+    source_kind: git
+    commit: da79bfb74376802edcd25049ed4ce29de814db44
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+  mem_taut_shape_rs:
+    path: taut-shape-rs
+    source_id: src_taut_shape_rs
+    source_kind: git
+    commit: 959f0f048a671347c0940962c5299ae117d92f8a
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
+merge:
+  merge_id: merge_op_35057_1792880342395_0001
+  operation_id: op_35057_1792880342395
+  source_ref: 9f8f091b1c1f62215be3440eba8f5df420050312
+  selected_targets:
+  - mem_gwz_transport
+  participants:
+    mem_gwz_transport:
+      target_kind: member
+      target_branch: main
+      before_commit: a21e972eca6c4508ddd944c589ce657fb0d3d157
+      source_commit: 9f8f091b1c1f62215be3440eba8f5df420050312
+      resulting_commit: 9f8f091b1c1f62215be3440eba8f5df420050312
