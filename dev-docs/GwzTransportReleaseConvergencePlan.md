@@ -15,6 +15,13 @@ unchanged as [history/GwzTransportReleaseConvergencePlan-r0.md](history/GwzTrans
 Each phase starts on the operator's instruction (D-G covers Phase 0, Phase 1's trunk, Phase 2 from
 1.1, and Git rows 5.1–5.3).
 
+Clerical record after acceptance (2026-10-25, no re-review; the decisions are the operator's, the
+split changes no accepted clause): §10 gains **D-N** (control priority on byte streams) and **D-O**
+(gwz-py's `server` family replaced), both stops raised by step 2.0's draft; §1.1 gains the three
+rows those record and the placement design §4 row 2.0's §8 found implied by 2.0(a); step 1.3 is
+split into 1.3a, 1.3b and 1.3c because the step as written would have had an endpoint instance own
+its pool, against contract §4.1 and §8. Nothing else changed.
+
 Companions: the [remediation process](GwzTransportReleaseRemediationPlan.md) (M1–M5, which this
 plan sequences), the governing [Connection API contract](GwzConnectionApiContract.md), the accepted
 [placement design](../gwz-core/dev-docs/history/reference/GwzRemoteTransportPlacementDesign.md)
@@ -98,6 +105,9 @@ not edited, this list is the record):
 | gwz-core `GwzNoFallbackPlan.md` §6 (operator decision of 2026-10-14, `8cefbe40`) | native commit and tag "stay a module of gwz-core" | superseded by D-G: step 5.2 moves them to gwz-git with their characterization tests (the capability map, step 5.1, records the size: about 2,200 production lines) |
 | Contract §7.3 | "A parent mutex that only known GWZ callers voluntarily take is not proof"; fail closed | D-E scopes the Windows claim to gwz callers and records the residual (third-party spawns) in the release notes; recorded in §15 at step 1.1 |
 | Reuse design §2–§5, §11 | registry/instances/bindings, configuration, revalidation, capacity; "Client placement is not in this release" | superseded by contract §4–§8, §7.1; `cli` placement ships (step 0.1, landed in lane p0-design) |
+| Placement design §4 :181–183 | hooks are "not new RPC methods or an independently serialized wrapper"; `RequestMeta`/`ResponseMeta` are the canonical attachment slots | the served form carries core-to-client envelopes in `TransportLaneFrame` on tags 16–17 and leaves the meta slots absent (2.0 §3.1, §3.3); recorded 2026-10-25 from 2.0's §8, implied by 2.0(a) |
+| Session design §3 :115 (a byte stream "writes frames in the order they are sent and has no lanes to bound"); `session-channel` `byte_stream.rs`, README ("writes every frame in call order"); `session-contract` `channel.rs:18–19` (one order "whatever their lanes") | one FIFO order on every byte stream; the lane argument is ignored there | **amended (D-N)**: a per-end priority writer on byte streams; the session design §3 and the byte-stream adapter are amended in place by 2.0 (text) and 2.1 (code) |
+| Server design :13–14, §6: `gwz-py server start\|stop\|status\|list\|stdio` | gwz-py hosts a server with the same family as gwz-cli | **replaced (D-O)**: gwz-py is a client only in this release; it owns its in-process host (3.2) and reaches a served core through its bridge (`SocketCoreBridge`); no gwz-py `server` family is built or scheduled; a Python-hosted server is Phase 7 at the earliest |
 
 ## 2. What exists, so nothing is designed twice
 
@@ -297,7 +307,7 @@ the merged commit whenever both sides of a merge touched a trigger path.
 
 ```text
 Phase 0  ─ 0.1 ∥ 0.2 ∥ 0.3 ──► 0.4 ──► review of this plan (rounds 1–3, D-L, two closure checks: GO)
-Phase 1  ─ trunk: 1.1 → 1.2 → 1.3 ──► { 1.5 ∥ 1.6 } → 1.4 → 1.7 → 1.8 (review)
+Phase 1  ─ trunk: 1.1 → 1.2 → 1.3a → 1.3b → 1.3c ──► { 1.5 ∥ 1.6 } → 1.4 → 1.7 → 1.8 (review)
 Phase 2  ─ 2.0 (doc, dual) may start now ──► 2.1 (dual) after 1.1 ──► 2.2 (dual) after 1.2
            ──► 2.2b (dual) after 2.0 ──► 2.2c (dual) after 1.2 and 2.1 ──► 2.3 (dual) after 1.7
            ──► 2.4 (dual) ──► 2.5 → 2.6 (review)
@@ -394,6 +404,15 @@ construction half carry over.
   binding; a physical fault retires the connection, not the host; contract §8). Files:
   `git/endpoint/https_pool.rs`, `https_endpoint.rs`, the SSH worker's fault arm, the factory file.
   Red rows against the fixture servers. ~300 + 300.
+  Split 2026-10-25 (clerical; no accepted clause changes): the step as written would have had an
+  endpoint instance own its pool, which contract §4.1 and §8 forbid (adapters are at the
+  Connector/Resource level; the host owns pooling). **1.3a** gate routing, the `ProcessSafety`
+  implementations including Windows (D-E), and the source check with its planted
+  `SpawnGate::new()` red row; independent of the adapter question; Windows receipt; ~400.
+  **1.3b** the executor-run pump in the crate, the SSH adapter at the Connector/Resource level, the
+  `ExchangeSpec` Git service and path (a crate addition under contract §9), fixture sshd rows.
+  **1.3c** the HTTPS adapter and fixture HTTPS rows. Sizes beyond the original ~300 + 300 are
+  recorded in the Phase 1 report.
 - **1.4 Capacity per binding.** Limits travel with the binding; `TransportCapacityConflict` for
   differing limits goes; the host keeps physical ceilings (contract §8). Red row: two bindings with
   different `--max-per-host` overlap. Trunk, after 1.3 (shares `session/capacity.rs`). ~200 + 200.
@@ -825,6 +844,23 @@ Decided 2026-10-25 (all as recommended):
   alternatives, a gwz-git-defined stream port with two core implementations (map F6) and a proxy
   host in the core, were not taken.
 - **D-M Per-host default**: 32, a chosen default; the 2026-10-24 sweep found no GitHub limit up to 32.
+
+Decided 2026-10-25 (the two stops step 2.0's draft raised; operator: "A and replace"):
+- **D-N Control priority on byte streams (S1, alternative A).** The session design §3 and the
+  byte-stream adapter are amended with a per-end writer that, at each frame boundary, writes the
+  oldest control frame (tag 17, and tags 1–3 on the control lane) ahead of ordinary frames, except
+  ordinary frames of its own target (same `call_id`, or same `(request_id, session_id, stream_id)`)
+  and any `SessionCall` (tag 1), which are never overtaken, so per-target order and the increasing
+  call-ID rule survive. Each end's reader never blocks on a consumer: it routes every frame to a
+  per-class queue whose bound the peer must respect (the call limit, the control reserve, the
+  binding's transport `Limits`), and an overrun is a protocol error of that class. The tag split
+  (16 data, 17 control) stands. Alternative B (one FIFO order with a stated bound of N MiB of
+  in-band spool ahead of control) was not taken. The text lands in 2.0 (amending
+  `GwzCoreSessionDesign.md` §3 in place, dual review) and the code in 2.1 (dual review).
+- **D-O gwz-py's `server` family (S2, replace).** The server design's `gwz-py server
+  start|stop|status|list|stdio` is replaced: gwz-py is a client only in this release (its
+  in-process host, 3.2; its bridge to a served core). No step builds a Python-hosted server; it is
+  Phase 7 at the earliest. 2.0 freezes gwz-cli's family and `SocketCoreBridge` only.
 
 Open: none.
 
