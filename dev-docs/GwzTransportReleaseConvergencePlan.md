@@ -595,6 +595,13 @@ new framing or a new peer check.
   destination named; a receive-pack open under a fetch-class command is refused; a core-named
   identity path is refused; a `SessionOpen` with an environment is refused; stdio with an inherited
   agent socket is refused. After 1.7, 2.2, 2.2b and 2.2c. ~400 + 450.
+  Carried from step 2.1's review (2026-10-25, lane owner): 2.3 also owns the sandbox rule's platform
+  checks (Linux seccomp and user/mount namespaces, macOS `sandbox_check`, Windows AppContainer; the
+  below-Medium integrity refusal and process-identity pinning landed in 2.1's remediation), the address
+  walk, `SessionHello` and a bounded `connect`, the 30 s link check, drain-before-exit, the lock file,
+  the stale-socket rule and `ws-<key>` naming (replacing 2.1's random `s-` names), the CLI client rows
+  the plan's 2.1 text named, and setting the carrier's stall bounds from policy (2.1 provides the
+  mechanism with 60 s defaults). `SocketCoreBridge` rows move to 3.2.
 - **2.4 HTTPS at the `cli` placement (dual).** A design amendment to the placement design's SSH-only
   rule (§2, :96–98) and `docs/TransportPlacement.md:83–84`, carried in 2.0's
   `GwzSplitCommandChannel.md` (historical files are not edited) and reviewed with it, then: the `cli` endpoint is
