@@ -713,6 +713,14 @@ Authority: D-G and the Git boundary plan (a draft the operator adopted by D-G); 
 
 Exit: each chosen row has a production caller and its old path is gone (R9).
 
+Record (2026-10-25): 5.2, 5.3 and 5.5 landed in lane p5-gitmap and passed the Phase 5 review of rows A,
+B and the guard (Code and State, two rounds; one remediation patch; accepted at gwz-git `6dcb6b84`,
+gwz-core `a6ae99ae`; merged to root). 5.5 also moved `repository_paths`/`repository_index` behind
+`reads.rs` (lane owner). Open from the review: the adoption check's same-name receiver credit (Code
+P3-2, carried), five unconsumed gwz-git capabilities on the dated ratchet (R9 debt), the CLI route's
+environment inheritance (`env_clear()` + `GitEnvironment` snapshot before release). 5.4 waits on 4.1;
+5.6 then reviews 5.4 only.
+
 ### Phase 6: qualify and release (12–15 lane-days)
 
 - **6.1 Activation.** The archived C3b recipe re-run on main and C4a/C4b; the 62 + 116 clippy
