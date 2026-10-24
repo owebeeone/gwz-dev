@@ -97,6 +97,8 @@ Both are the operator's decisions of 2026-10-25 ("A and replace"), recorded as D
 | §5.6 session context | adopted without the endpoint environment; host context = member lock manager and detached-worker record only (no SSH supervisor, helper slots or endpoint registry: those are the client's) |
 | §5 session host as a client-facing service (persistent client holding owners), §11 in-process CLI sessions | Phase 7; the in-process CLI keeps today's dispatch |
 
+**Accepted deviations recorded at step 2.2b (2026-10-25, lane owner, from its reviews):** `diff.output` reads are probes (the existing log service's v0 rule), not held reads; cancelling a spent read, result or control call answers `operation_expired` rather than `invalid_request` (a conforming bridge treats it as "already finished"). The §5.1 member lock manager lands in 2.3 (plan). Both stand until the Phase 2 review revisits them.
+
 ### 3.3 The transport lane
 
 - **Body:** a GWZ taut message appended to the schema, `TransportLaneFrame { request_id: str (1), envelope: Envelope (2) }`, where `Envelope` is gwz-transport's, imported through the existing `transport_consumer` route (placement design §3; no second definition, no change to gwz-transport's schema).

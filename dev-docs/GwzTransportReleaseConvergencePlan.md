@@ -602,6 +602,12 @@ new framing or a new peer check.
   the stale-socket rule and `ws-<key>` naming (replacing 2.1's random `s-` names), the CLI client rows
   the plan's 2.1 text named, and setting the carrier's stall bounds from policy (2.1 provides the
   mechanism with 60 s defaults). `SocketCoreBridge` rows move to 3.2.
+  Carried from step 2.2b's review (2026-10-25, lane owner): 2.3 also owns the §5.1 member lock
+  manager in the host context (2.0 §3.2 adopts it; 2.2b built only the detached-worker record, so
+  fetch beside fetch on one member relies on Git's own lock refusal, and within one session the
+  design's "blocks rather than refusing" does not yet hold); and 2.3 calls `Service::open()` before
+  it writes `SessionOpened`. The transport lane's routing is 2.1's carrier (one owner; 2.2b's
+  duplicate was removed in its remediation).
 - **2.4 HTTPS at the `cli` placement (dual).** A design amendment to the placement design's SSH-only
   rule (§2, :96–98) and `docs/TransportPlacement.md:83–84`, carried in 2.0's
   `GwzSplitCommandChannel.md` (historical files are not edited) and reviewed with it, then: the `cli` endpoint is
