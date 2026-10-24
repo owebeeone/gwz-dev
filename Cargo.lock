@@ -487,6 +487,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "gwz-connection"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "gwz-transport",
+]
+
+[[package]]
 name = "gwz-copy-contract"
 version = "0.0.8"
 
@@ -501,10 +509,12 @@ dependencies = [
  "cfg-if",
  "chrono",
  "getrandom 0.3.4",
+ "gwz-connection",
  "gwz-copy-contract",
  "gwz-family-model",
  "gwz-family-store",
  "gwz-family-store-contract",
+ "gwz-git",
  "gwz-git2",
  "gwz-history-check",
  "gwz-ids",
@@ -568,6 +578,14 @@ name = "gwz-family-store-contract"
 version = "0.0.8"
 dependencies = [
  "gwz-family-model",
+]
+
+[[package]]
+name = "gwz-git"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "gwz-git2",
 ]
 
 [[package]]
