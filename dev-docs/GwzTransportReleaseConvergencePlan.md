@@ -66,8 +66,9 @@ the *driver*); the **client** side owns connections and credentials (the code ca
 **Placement** names which side the endpoint runs on: `local` (same process as the core) or `cli`
 (the client's process). The **owner** is the contract's `HostOwner`: the long-lived holder of
 pools and endpoints on the client side. **In a served core the core holds a carrier-backed
-`HostHandle` to the client's owner (D-L):** its `admit → acquire → register → open` travel over
-the carrier, so gwz-git receives the same `Operation` under `local` and `cli`, and pool, reuse and
+`HostHandle` to the client's owner (D-L):** its `register` (as `bind`) and `open` travel over the
+carrier while `admit` and `acquire` stay core-local (step 2.2c's wording governs; corrected 2026-10-25
+after 2.0's Consistency review, O3), so gwz-git receives the same `Operation` under `local` and `cli`, and pool, reuse and
 admission policy stay with the owner on the client. The carrier-backed `admit` carries only an
 operation reference: the client's owner builds the `PreparedOperation` (profile, authentication
 context, policy) from its own invocation and capture, and refuses any such field from the core.
@@ -106,7 +107,7 @@ not edited, this list is the record):
 | Contract §7.3 | "A parent mutex that only known GWZ callers voluntarily take is not proof"; fail closed | D-E scopes the Windows claim to gwz callers and records the residual (third-party spawns) in the release notes; recorded in §15 at step 1.1 |
 | Reuse design §2–§5, §11 | registry/instances/bindings, configuration, revalidation, capacity; "Client placement is not in this release" | superseded by contract §4–§8, §7.1; `cli` placement ships (step 0.1, landed in lane p0-design) |
 | Placement design §4 :181–183 | hooks are "not new RPC methods or an independently serialized wrapper"; `RequestMeta`/`ResponseMeta` are the canonical attachment slots | the served form carries core-to-client envelopes in `TransportLaneFrame` on tags 16–17 and leaves the meta slots absent (2.0 §3.1, §3.3); recorded 2026-10-25 from 2.0's §8, implied by 2.0(a) |
-| Session design §3 :115 (a byte stream "writes frames in the order they are sent and has no lanes to bound"); `session-channel` `byte_stream.rs`, README ("writes every frame in call order"); `session-contract` `channel.rs:18–19` (one order "whatever their lanes") | one FIFO order on every byte stream; the lane argument is ignored there | **amended (D-N)**: a per-end priority writer on byte streams; the session design §3 and the byte-stream adapter are amended in place by 2.0 (text) and 2.1 (code) |
+| Session design §3 :115 (a byte stream "writes frames in the order they are sent and has no lanes to bound"); `session-channel` `byte_stream.rs:65, :130` ("writes every frame in call order") and its README ("does not use the lane"); `session-contract` `channel.rs:18–19` (one order "whatever their lanes") | one FIFO order on every byte stream; the lane argument is ignored there | **amended (D-N)**: a per-end priority writer on byte streams; the session design §3 and the byte-stream adapter are amended in place by 2.0 (text) and 2.1 (code) |
 | Server design :13–14, §6: `gwz-py server start\|stop\|status\|list\|stdio` | gwz-py hosts a server with the same family as gwz-cli | **replaced (D-O)**: gwz-py is a client only in this release; it owns its in-process host (3.2) and reaches a served core through its bridge (`SocketCoreBridge`); no gwz-py `server` family is built or scheduled; a Python-hosted server is Phase 7 at the earliest |
 
 ## 2. What exists, so nothing is designed twice
@@ -521,7 +522,7 @@ new framing or a new peer check.
   cannot reach every allowed repository; the identity **and the username** are the client's choice
   (its invocation or its configuration), never a core-named key path or `ssh_username`/
   `https_username`; it is a `GitService`-typed open
-  (never generic HTTP); the port is not refused; and, under either Windows native policy
+  (never generic HTTP); the port must match the allowance's tuple (D-H (b); "the port is not refused" was corrected 2026-10-25 after 2.0's Safety review); and, under either Windows native policy
   (`WindowsConfigured` or `WindowsDefault`), the logon session answers NTLM or Negotiate toward a
   core-named host only with an explicit flag. Admission is applied again at every redirect hop
   before any credential, helper or native exchange. The allowed set is supplied non-interactively:
