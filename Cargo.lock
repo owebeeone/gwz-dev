@@ -451,6 +451,17 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
+version = "0.2.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ff2abc00be7fca6ebc474524697ae276ad847ad0a6b3faa4bcb027e9a4614ad0"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "wasi",
+]
+
+[[package]]
+name = "getrandom"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd"
@@ -496,11 +507,11 @@ dependencies = [
 
 [[package]]
 name = "gwz-copy-contract"
-version = "0.0.8"
+version = "0.0.9"
 
 [[package]]
 name = "gwz-core"
-version = "1.0.17"
+version = "1.0.18"
 dependencies = [
  "base64",
  "bytes",
@@ -540,6 +551,7 @@ dependencies = [
  "openssl",
  "openssl-probe 0.1.6",
  "regex",
+ "ring",
  "rustix",
  "serde",
  "serde_yaml",
@@ -560,11 +572,11 @@ dependencies = [
 
 [[package]]
 name = "gwz-family-model"
-version = "0.0.8"
+version = "0.0.9"
 
 [[package]]
 name = "gwz-family-store"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-family-model",
  "gwz-family-store-contract",
@@ -575,7 +587,7 @@ dependencies = [
 
 [[package]]
 name = "gwz-family-store-contract"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-family-model",
 ]
@@ -603,14 +615,14 @@ dependencies = [
 
 [[package]]
 name = "gwz-history-check"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-repo-contract",
 ]
 
 [[package]]
 name = "gwz-ids"
-version = "0.0.8"
+version = "0.0.9"
 
 [[package]]
 name = "gwz-libgit2-sys"
@@ -626,7 +638,7 @@ dependencies = [
 
 [[package]]
 name = "gwz-local-disposal"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-family-model",
  "gwz-family-store-contract",
@@ -636,7 +648,7 @@ dependencies = [
 
 [[package]]
 name = "gwz-local-import"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-family-model",
  "gwz-repo-contract",
@@ -644,7 +656,7 @@ dependencies = [
 
 [[package]]
 name = "gwz-refcopy"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-copy-contract",
  "libc",
@@ -654,18 +666,18 @@ dependencies = [
 
 [[package]]
 name = "gwz-repo-contract"
-version = "0.0.8"
+version = "0.0.9"
 
 [[package]]
 name = "gwz-repo-factory"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-repo-contract",
 ]
 
 [[package]]
 name = "gwz-repo-inspect"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-git2",
  "gwz-repo-contract",
@@ -673,18 +685,18 @@ dependencies = [
 
 [[package]]
 name = "gwz-session-channel"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-session-contract",
 ]
 
 [[package]]
 name = "gwz-session-contract"
-version = "0.0.8"
+version = "0.0.9"
 
 [[package]]
 name = "gwz-session-host"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-session-contract",
 ]
@@ -703,14 +715,14 @@ version = "0.1.0"
 
 [[package]]
 name = "gwz-work-detector"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-repo-contract",
 ]
 
 [[package]]
 name = "gwz-workspace-install"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "gwz-copy-contract",
  "gwz-family-model",
@@ -1315,6 +1327,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
+name = "ring"
+version = "0.17.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4689e6c2294d81e88dc6261c768b63bc4fcdb852be6d1352498b114f61383b7"
+dependencies = [
+ "cc",
+ "cfg-if",
+ "getrandom 0.2.17",
+ "libc",
+ "untrusted",
+ "windows-sys 0.52.0",
+]
+
+[[package]]
 name = "rustix"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1703,6 +1729,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
 
 [[package]]
+name = "untrusted"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
+
+[[package]]
 name = "url"
 version = "2.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1864,6 +1896,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7837d08f69c77cf6b07689544538e017c1bfcf57e34b4c0ff58e6c2cd3b37091"
 dependencies = [
  "windows-link",
+]
+
+[[package]]
+name = "windows-sys"
+version = "0.52.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d"
+dependencies = [
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
