@@ -15,7 +15,7 @@ members:
     path: gwz-cli
     source_id: src_gwz_cli
     source_kind: git
-    commit: dc7fe8df40aa09a6cd8a3d29db2cb083fc387d73
+    commit: 60098e84edded45943af3e69a87bf8cfd320e960
     branch: main
     detached: false
     dirty: false
