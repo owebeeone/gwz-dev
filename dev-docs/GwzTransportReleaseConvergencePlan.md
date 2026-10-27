@@ -553,6 +553,14 @@ new framing or a new peer check.
   refused (Windows); a `SessionOpen` carrying any environment field is refused and the canary
   capture covers the handshake; cancel under saturated data progresses; an oversized length is
   refused before allocation. After 1.1. ~350 + 450.
+  Landing deviation, accepted by the operator 2026-10-28 ("record the deviation and push"): six
+  gwz-core commits of the 2.1 landing, `d8e7478d`, `49e79493`, `91b4c924`, the merge `03cb6c34`,
+  `5d2af53f` and `58bd9e07`, are RED in the per-commit lane gate for one cause only: the 25
+  Unix-only Windows-parity rows the lane added in `windows_parity/2.1.json` lacked
+  `approved_platform` (149 complaints, all that field). `3d0ec6bc` adds it and is green. The
+  lane's matrices check only the tree at the tip, so none caught it; the six commits stay RED in
+  the gate's history and the push's boundary job reports them. Finding for the Phase 2 report:
+  lanes run `check_lane_commits.sh` before filing for review.
 - **2.2 Unpark the `cli` placement (dual: the ordinary wire schema changes).** `cli_placement.rs`, the `pub use`, the cli arms and the
   protocol projection leave `gwz_session_candidate`: the ordinary schema gains the placement and
   attachment fields (an additive change: the placement design §3 gate on decoding missing fields
