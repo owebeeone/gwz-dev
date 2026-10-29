@@ -24,7 +24,7 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 2d3984e4d4d3519b9b9ef3081c77239fffe3ef5c
+    commit: e5b8407b5b2652a72cbe5b150bdd0fe2e8f798fc
     branch: main
     detached: false
     dirty: false
