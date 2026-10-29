@@ -48,3 +48,16 @@ wait); State P3-2 and Code P3-6 found the same snapshot phase defect. Both are t
 
 The same two reviewers re-verdict their own findings on the corrected tuple (continued with context). The Windows
 receipt `p2-2c-20261030-c` is replaced by a new label on the corrected gwz-core commit, after gwz-transport is pushed.
+
+## Round 1 outcome (lane owner, 2026-10-30)
+
+Re-verdicts `-ReviewState-2.md` (GO) and `-ReviewCode-2.md` (GO) on gwz-transport `96938616`, gwz-core `09f4b8a8`, root
+`044dad8f`, evidence `33a0c9fa`: every round-1 finding closed, no new architectural root cause. Three new P3s, carried as
+named items into step 2.3 (which writes the composition and next touches `remote/core.rs`):
+
+- State P3-5: more than 16 concurrent waiters on one registration lose a wakeup (`State::wait_for` evicts another
+  future's waker). Fix: per-future waiter slots, or wake the evicted waker.
+- Code P3-7: `CarrierLane::core`'s `BindBounds` and `remote::handle_with`'s `RemoteConfig` are built apart; the client's
+  bound is fixed at 64 while `streams_per_binding` admits 1024. Fix: derive both from one value, or clamp to 64.
+- Code P3-8: an open right after an abort at the stream bound answers `OpenFailure::Fault(Capacity)`. Fix: treat
+  `mux::Error::Capacity` like `WouldBlock` in `issue_opens`. The §15 sentence that excluded it was corrected now (doc half).
