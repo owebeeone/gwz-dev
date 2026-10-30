@@ -677,7 +677,7 @@ rules. Read Clock outside state locks and pass the captured time into transition
 | Active operation slots / waiting admissions | 8 / 64; finite host defaults | Host |
 | Endpoint instances | 16; coalesce equal profiles, LRU retire unbound | Host |
 | Setup jobs / retained cleanup owners / helper slots | 64 / 64 / 8, explicit CleanupDomain | Composition |
-| Admission / allocation / cleanup | 5 s / 30 s / 5 s | Reservation / opening / retiring owner |
+| Admission / allocation / cleanup | 4 s / 30 s / 5 s (admission amended 2026-10-31 from 5 s, plan §10 D-P: strictly below the core's 5 s mux bootstrap bound; gwz-transport `0a25363` `DEFAULT_ADMISSION_BOUND_MS`) | Reservation / opening / retiring owner |
 | Idle expiry / maximum connection age | 60 s from release / 10 min checked at release | Endpoint |
 | Positive default network stall / setup aggregate | Resolved policy, initially 9 s / 30 s | Operation/opening |
 | Interaction allowance | 120 s, cumulative; distinct from network time | Opening |
