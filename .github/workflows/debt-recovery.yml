@@ -56,7 +56,7 @@ jobs:
       - name: Toolchain identity
         run: |
           mkdir -p evidence
-          rustup toolchain install 1.95.0 --profile minimal
+          rustup toolchain install 1.95.0 --profile minimal --component clippy
           rustup default 1.95.0
           rustc --version > evidence/toolchain.txt
           cargo --version >> evidence/toolchain.txt
