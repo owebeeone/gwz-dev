@@ -444,6 +444,9 @@ construction half carry over.
   row; 10,000 operations; no host-wide tombstone growth; R3, R4, R6); the fixture-server rows of 1.3 and 1.6; the three-platform hosted-like receipt; the
   spawn-gate fairness probe from the closeout (§6.3: a many-member pathspec log against a concurrent
   helper launch on Windows).
+  Carried to 1.8 by name (recorded 2026-10-31): R4's fixture and hosted-like rows (Step 1.5
+  State-2: "not yet in the root plan"); the 1.3c/C2(b) per-exchange HTTPS authentication rows
+  (contract §15, 1.3c row); and the spawn-gate fairness probe above, which no run README records.
 
 Parallelism: 1.1, 1.2 and 1.3 run in the trunk (1.3 rebuilds `build_native` in `mod.rs`). After
 1.3 merges, 1.5 (the crate's registry module, created in 1.2 as its own file; `endpoint_environment.rs`;
@@ -452,6 +455,65 @@ the HTTPS auth context) and 1.6 (`agent_auth.rs`, `ssh_pool.rs`) run in two sub-
 
 Exit: R3, R4, R6 pass with fakes and on the hosted-like suite on three platforms; the driver-only
 builder exists.
+
+Record (2026-10-31). Steps 1.1 to 1.7 and the integration fix-up have landed; no §3 Status cell
+changes until the Phase 1 report (step 1.8). Every commit below is an ancestor of its repository's
+`origin/main`. Evidence runs are under `gwz-core-evidence/campaigns/transport-qualification/runs/`.
+Step sizes are from `git diff --stat` at the landing commits (the sizes the 1.3 split deferred to the
+Phase 1 report). The step 1.5, 1.6, 1.3c and integration rows of contract §15 carry the details and
+the open items.
+
+- **1.1** gwz-transport `8e43e6d` (the crate; parent `a27817b` is the Phase 1 start). gwz-core
+  untouched. Evidence `2026-10-25-p1-1`: 23 crate tests passed on the Mac and on Windows. No review
+  (not a dual step). The gate routing listed under 1.1 landed as 1.3a.
+- **1.2** gwz-transport `22b53dc`. gwz-core untouched. Evidence `2026-10-25-p1-2`: 42 crate tests
+  passed on the Mac and on Windows. No review.
+- **1.3a** gwz-core `cc43e2c8`, merged `ee22a7d7` (19 files, +968/-52). Contract §15 row at root
+  `b666e980` (the D-E record is made here, not at 1.1). Evidence `2026-10-25-p1-3a`; Windows receipt
+  `p1-3a-20261025-a` PASS with four named host gaps; also `2026-10-25-root-merge`.
+- **1.3b** gwz-transport `70516c0`; gwz-core `dc9de784` (10 files, +1926/-175; the lane's
+  `fb26d4dc` was a stale sha), merged `869531e6` with `b7e9188b` and `c318376c`. Contract §15 row at
+  root `1f2bded3`. Evidence `2026-10-25-p1-3b`: Mac only; its "Windows: not run" waiver was wrong in
+  practice (5 of its 8 SSH rows failed when run natively, test-row defects fixed in `b7e9188b`).
+  Windows follow-up `2026-10-25-p1-3bwin`: PASS receipt `p1-3bwin-20261025-b`.
+- **1.3c** gwz-core `c318376c` (17 files, +2583/-59), merged `869531e6`. It landed without a record
+  in this plan: the commit subject does not name the step and the root recorded only the merges
+  `2efae357` and `e258b54f`. Evidence `2026-10-25-p1-3c`; its 10 rows passed on Windows, receipt
+  `p1-3c-20261025-a` failed on 1.3b's rows and `p1-3bwin-20261025-b` is the PASS. No step-specific
+  review. **Obligation C2(b)** (per-exchange HTTPS `AuthContext`, route naming per binding, the
+  `#[ignore]`d reuse row, an authenticated push through the host) is open and is closed by lane
+  p1c-https before 1.8. The contract §15 1.3c row has the list. The route-naming text step 1.5 owed
+  this plan is this paragraph and that row.
+- **1.4** gwz-transport `b0e5ad5`, `a22d43c`; gwz-core `a5ce2941`, `0c288b7b`, `408a8b24`,
+  `4703a4e8`, `58e506ee` (40 files, +1506/-670). State axis only (no second reviewer this round):
+  NO-GO, NO-GO, GO (`-ReviewState-3`), follow-up GO (`-ReviewState-4`); root `acade138`,
+  `85c9d8e5`. Evidence `2026-10-29-p1-4`: receipt `-e` PASS at `4703a4e8`; `-c` and `-d` failed on
+  host load.
+- **1.5** gwz-transport `bd7cf4f6`, `adf808d`, `9fbe7448` (merge `9f8f091`); gwz-core `d8dd9625`,
+  `aa7eaff5` (11 files, +1611/-609). Code and State round 2: GO and GO; root `f4120513`. Evidence
+  `2026-10-25-p1-5`: Linux matrix PASS; Windows receipt `p1-5-rem1-20261025-c` PASS. The misfit
+  saturation limitation is decided as D-R.
+- **1.6** gwz-transport `a21e972`, `055d091`, `dd93098`; gwz-core `726e9062`, `9734f3f8` (23 files,
+  +2558/-99). Code and State round 2: GO and GO; root `57564139`. Evidence `2026-10-25-p1-6`:
+  receipt `p1-6-20261025-d` PASS.
+- **Integration fix-up** (reconciles 1.5 and 1.6 with the 1.3b and 1.3c adapters; not a plan step):
+  gwz-transport `3980469`; gwz-core `844f9511`, `22aebcee`, `5e97bd2d` (21 files, +1366/-349). Code
+  and State round 2: GO and GO, conditional on a full matrix; root `e0f3e3c5`. The condition was met
+  by matrix `remote-root-p1-20261027-c` (PASS at gwz-core `e0cb12f7`; the `-b` run failed on
+  parity); its logs are under
+  `/Volumes/projects/limbo/build-targets/gwz-dev-logs/remote-root-p1-20261027-c/`.
+- **1.7** gwz-core `a681cf26` (parent `b0ac8de7`; 21 files, +2364/-35), merged `7e7d36a9`. Code and
+  State: GO and GO at `a681cf26` after four rounds; root `b426acf1`. Evidence `2026-10-30-p1-7`:
+  Windows receipt `-d` PASS; the WSL `-d` run had one load-flake row. The candidate-shape clippy
+  errors it found (65 + 123) are D-U and 6.1.
+
+1.8 preparation (2026-10-31). Before the review, lanes p1c-crate, p1c-https and p1c-fair close what
+the inventory found missing: p1c-crate adds the §13.2 rows not yet present (10,000 operations,
+host-wide tombstones, R3's C-reuses leg) and the crate's own three-platform CI; p1c-https closes
+C2(b) (the per-exchange authentication rows); p1c-fair builds the spawn-gate fairness probe. The
+review reads the settled tuple recorded at that time; gwz-transport `9d5e086` and `9693861` (the
+2.2c rework) already change the Phase 1 crate files, so the review names which of those lines are
+in the slice.
 
 ### Phase 2: the carrier, the server command and the two-process form (one lane plus one doc step, 35–41 lane-days)
 
