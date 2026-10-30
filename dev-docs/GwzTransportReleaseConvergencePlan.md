@@ -721,6 +721,11 @@ limits stated.
 - **3.1 gwz-cli owns the host.** `globalargs/dispatch.rs` builds one `HostOwner` per command
   through the Phase 1 API, `local` or `--server`; the ~48 runtime-constructing test files move to
   the host API (mechanical). The old entry points stay until 3.3. ~200 + 150 + moved tests.
+  **Prerequisite (recorded 2026-10-31, contract §15 1.3c/C2(b)):** the HTTPS adapter pre-authenticates a POST
+  only on the connection, and for the last repository path, a helper authenticated; concurrent private fetches and
+  pushes through one host can therefore be refused (fail closed, typed `Authentication`). Before 3.1 routes the CLI
+  through the host, the HTTPS authentication model is settled in contract §7: Basic/token credential need recorded
+  per operation and repository and sent on any connection; NTLM/Negotiate connection-bound.
 - **3.2 gwz-py owns the host.** A module-level composition object owns one `HostOwner` (the host's
   registry partitions profiles, 1.5) and hands `HostHandle`s to `ClientHost`; `route::capture` admits through the handle; `Client.close()`
   cancels its own operations only; module shutdown and the atexit join close hosts through the
