@@ -30,6 +30,12 @@ That document controls where it differs from this one.
 
 ## Changelog
 
+- 2026-10-31: operator approved a named, bounded exception to the 2,500-line cap of L1-33
+  for `dev-docs/GwzM5-8Refactor.md` (3,364 lines): a normative frozen specification read by path
+  by `gwz-core/scripts/checks/merge_docs_manifest.json:45`, which L1-33 forbids both rewriting and
+  hiding. Owner: the lane owner. Resolution checkpoint: Phase 6.5. Operator, 2026-10-31: "Go and
+  1, 2, 3 … I don't see any reason why you shouldn't do them all" (authorizing the lane owner's
+  recommended dispositions of the open items). Recorded in `GwzOpenDecisions.md` D10.
 - 2026-10-19: operator set development-document caps at 75 active files per
   repository and 2,500 lines per document. Extended L1-33 with counting, stable
   checkpoint and bounded-exception rules, and the operator's instruction to move

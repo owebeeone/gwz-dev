@@ -737,8 +737,11 @@ environment inheritance (`env_clear()` + `GitEnvironment` snapshot before releas
 
 ### Phase 6: qualify and release (12–15 lane-days)
 
-- **6.1 Activation.** The archived C3b recipe re-run on main and C4a/C4b; the 62 + 116 clippy
-  errors judged (the seven `MutexGuard`-across-`await` sites each); the C3b workflow's sshd
+- **6.1 Activation.** The archived C3b recipe re-run on main and C4a/C4b; the 65 + 123 clippy
+  errors (measured at `b0ac8de7` and at the step 1.7 lane commit `25941ce9`, which is not an object in
+  gwz-core and was merged as `a681cf26`; corrected 2026-10-31; a floor for `--all-targets`, since
+  cargo stopped at the failing lib-test unit) judged and fixed behind the shrink-only gate of D-U (the seven
+  `MutexGuard`-across-`await` sites each); the C3b workflow's sshd
   provisioning (closeout §5) done.
 - **6.2 Correctness in shipped behaviour.** The libgit2 config-parse message leak fixed with the
   D50 allowlist at the generic `git_error` mapping and the other paths the D50 run named
@@ -891,6 +894,41 @@ Decided 2026-10-25 (the two stops step 2.0's draft raised; operator: "A and repl
   start|stop|status|list|stdio` is replaced: gwz-py is a client only in this release (its
   in-process host, 3.2; its bridge to a served core). No step builds a Python-hosted server; it is
   Phase 7 at the earliest. 2.0 freezes gwz-cli's family and `SocketCoreBridge` only.
+
+Decided 2026-10-31 (the lane owner's recommended dispositions of the open items, authorized as a set):
+
+> Operator, 2026-10-31: "Go and 1, 2, 3 … I don't see any reason why you shouldn't do them all" (authorizing the lane owner's recommended dispositions of the open items).
+
+- **D-P Release kind for 2.0 §3.4 (option A).** One operation per call: a call has one `bind` per
+  `request_id`, and a second route is a second call. `GwzSplitCommandChannel.md` §3.4 gains one
+  sentence saying so. The client's admission default is set below the core's 5 s bootstrap bound;
+  lane p1c-crate implements 4 s. Option B (a multi-bind rule) and option C (a release kind, a new
+  wire kind) are recorded for Phase 7, the persistent client, and are not built here.
+- **D-Q `GwzM5-8Refactor.md` exception to the 2,500-line cap (option A).** A named, bounded
+  exception under `AgentProcessRules.md` L1-33. File: `dev-docs/GwzM5-8Refactor.md` (3,364 lines).
+  Reason: it is a normative frozen specification, read by path by
+  `gwz-core/scripts/checks/merge_docs_manifest.json:45`, and L1-33 forbids both rewriting a frozen
+  specification to pass a count and hiding a controlling document. Owner: the lane owner.
+  Resolution checkpoint: Phase 6.5, when the manifest can be repointed and the file moved to
+  `history/reference/`. Also recorded as `GwzOpenDecisions.md` D10 and in the
+  `AgentProcessRules.md` changelog (L1-08).
+- **D-R HTTPS saturation starvation (step 1.5).** Accepted as a recorded limitation: when one
+  authentication scope holds every `per_user_host` connection busy and keeps arriving, a request of
+  another scope waits and ends in `AllocationTimeout` at its original deadline, never
+  `NoFittingConnection`. It is bounded and typed. Reopen if the Phase 3 sweep shows a real
+  two-scope workload; fairness in the pool (about 150–300 LOC) is not built now. Written into the
+  contract §15 row for step 1.5.
+- **D-S The 103-minute Windows compile (receipt `p1-capacity-20261030-d`).** Closed as bounded and
+  instrumented: the receipt watchdog (`gwz-core/scripts/windows_lane_check.py`) aborts a hosted-like
+  phase at 2,700 s wall or 1,200 s without log growth and records the process tree first. Reopen on
+  recurrence, with a `cargo build --timings` reproduction then.
+- **D-T Session-host splits.** `gwz-core/crates/session-host/src/service/table.rs` (1,015 lines) and
+  `service/tests.rs` (1,215 lines) are split with rust-split, movement only, before 2.3 starts, in a
+  commit that carries no logic change (`AgentProcessRules.md` L1-23; ceiling 500 lines per owner).
+  Implemented in a lane.
+- **D-U Candidate-shape clippy ratchet.** A shrink-only candidate-shape clippy gate (an allowlist of
+  lint and file with reasons that fails only on a new error) is added now, in a lane, to the
+  gwz-core boundary workflow and scripts. The fixes themselves are 6.1's first mechanical part.
 
 Open: none.
 
