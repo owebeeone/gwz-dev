@@ -996,8 +996,24 @@ Decided 2026-10-31 (the lane owner's recommended dispositions of the open items,
 - **D-U Candidate-shape clippy ratchet.** A shrink-only candidate-shape clippy gate (an allowlist of
   lint and file with reasons that fails only on a new error) is added now, in a lane, to the
   gwz-core boundary workflow and scripts. The fixes themselves are 6.1's first mechanical part.
+- **D-V TR1.6 re-decided in part (operator, 2026-10-31).** The accepted credential-helper design
+  (`gwz-core/dev-docs/history/reference/GwzTransportCredentialHelpersDesign.md` §12, answered
+  "all as recommended" on 2026-10-02) is re-opened on two questions; the others stand (OQ1 (b),
+  OQ3 (b), OQ5 (a), OQ6 (a), OQ7 (1)). OQ6's "at most eight" reads "at most the configured
+  helper slots" (eight by default; the cleanup domain's budget since Phase 1 R3b). The parity
+  reference is now gwz 1.0.18 (a hotfix release), not 1.0.17.
+  - **OQ2 reversed.** Accepting that Ctrl-C does not reach a waiting helper is refused. Ctrl-C
+    cancels the operation end to end: the client, every helper process it started, and a serving
+    core's in-flight call; each side detects that a process it depends on has gone (a pipe closing
+    or another mechanism) and cleans up; Ctrl-C leaves no orphaned process, stale lock or partial
+    state behind. The design amendment `GwzCancellationAmendment-DRAFT.md` states how; it is
+    reviewed before any code.
+  - **OQ4 re-opened.** "Whatever git does": the redirect-after-challenge behaviour of git and of gwz
+    1.0.18 is measured on macOS, Linux and Windows (evidence run
+    `https-integration/runs/2026-10-31-oq4-redirect-after-challenge`), recorded per platform,
+    and the rule is decided from that record. Until then the landed rule (OQ4 (a)) stands.
 
-Open: none.
+Open: OQ4's rule (after the evidence run); the cancellation amendment's review.
 
 ## 11. What this plan does not do
 
