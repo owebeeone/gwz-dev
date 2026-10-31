@@ -1,6 +1,6 @@
 # Phase 1 (step 1.8) — remediation plan, round 1
 
-**Status:** plan, 2026-10-31.
+**Status:** plan, 2026-10-31. Landed in root (2026-11-01): R3b at gwz-core `c0197d1b` (merged `07e99924`; lane WSL `p1r-r3b-20261031-b` PASS, its `-a` red row was the pre-existing SSH load flake F8; lane receipt `p1r-r3b-20261031-a` PASS); the merged root tree with 2.3b/c and 2.3d passed WSL `root-3merge-20261031-a` and Windows receipt `root-3merge-20261031-d` (runs `-a` to `-c` each failed one known intermittent Windows row: findings F10, F9 addendum, F12).
 
 **Object:** the Phase 1 slice at root `bcfa8ac7` / gwz-core `a7b965c5` / gwz-transport `0a253639` / evidence `c30d49b3`.
 
