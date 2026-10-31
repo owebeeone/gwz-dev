@@ -1029,8 +1029,22 @@ Decided 2026-10-31 (the lane owner's recommended dispositions of the open items,
     times; on Windows a CRLF-writing helper leaves `\r` in the password (seen once, not retained).
   - **The cancellation amendment's decisions (operator, 2026-11-01): OD-C1 to OD-C6 as
     recommended** (`GwzCancellationAmendment-DRAFT.md` §6, revision 1).
+  - **Cancellation amendment, review cap (operator, 2026-11-01).** Round 1 of its dual review found
+    three architectural root causes (`GwzCancellationAmendment-ReviewConsistency.md` P2-1;
+    `-ReviewSafety.md` P2-5, P2-7, with Consistency P2-5 and P2-6 converging on the last two). The
+    operator chose accept-and-remediate, with these resolutions: (1) the forced exit kills children
+    and network work at once, but a local write sequence in progress runs to its next safe point,
+    and long local phases get file-granular safe points; SIGKILL, a crash or power loss can still
+    tear a write, and each such residue gets a named recognizer in the next command (the stated
+    residual against D-V's "no partial state"); (2) the reaper lives in gwz-core as a process
+    forked when the child registry is created, whose loop only reads the lifeline and calls
+    `kill()`, shared by gwz-cli and gwz-py; gwz-py's caller cancellation calls the operation's
+    `Canceller` before waiting; fork-without-exec in an embedding application is a documented
+    constraint; (3) a new Phase 2 sub-step before 2.3j builds the gwz-core child registry and reaper,
+    and the client interrupt protocol moves from 2.3k to 3.1, where `gwz --server X fetch` first
+    exists (2.3 plan Q2 (A)). Revision 2 is reviewed by fresh reviewers.
 
-Open: the cancellation amendment's dual review.
+Open: the cancellation amendment's revision 2 and its round-2 review.
 
 ## 11. What this plan does not do
 
