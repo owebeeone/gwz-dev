@@ -4,8 +4,10 @@ Status: **accepted at lane root `0ce82044`, gwz-core `631ee1d8`, gwz-core-eviden
 `GwzServerCore-Step2.3a-ReviewCode-3.md` and `GwzServerCore-Step2.3a-ReviewState-3.md` reported GO; this accepts step 2.3a
 (the peer sandbox rule's platform probes and the `SO_PEERPIDFD` hold) only.** Gates on `631ee1d8`: WSL
 `p2-3a-remote-20261031-d` PASS (Linux 6.18); Windows receipt `p2-3a-20261031-d` PASS. Rounds: 2 remediation rounds; one
-architectural root cause (State P2-1, round 1). Still open after landing: State P2-2's closure, the hosted transport-candidate
-run (read `uname -r` in the root step). Recorded P3s, not fixed: Code C3-1 (the guard admits a `cfg_if!` `test` arm with an
+architectural root cause (State P2-1, round 1). Landed in root at gwz-core `101ebff5` (pushed 2026-10-31). State P2-2 closed by hosted
+CI: transport-candidate run 41184699893 at `101ebff5` passed; its root step printed `kernel 7.0.0-1017-azure: 2 of the 2
+root-only sandbox rows passed`, built nothing as root (finished in 0.12 s), and the non-root suites reported exactly those
+two rows skipped. Recorded P3s, not fixed: Code C3-1 (the guard admits a `cfg_if!` `test` arm with an
 `else`), State R3-1 (`sandbox.rs`'s per-thread sentence should name the exec residual). Both are carried to the Phase 2 review
 (2.6). The 6.5 to 6.15 EINVAL answer is shown by emulation only; a real host run replaces it when one is available.
 

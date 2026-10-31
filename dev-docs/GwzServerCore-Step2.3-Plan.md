@@ -160,6 +160,7 @@ protocol error; a session beyond `--max-sessions` is `transport_session_full`; a
 session at the policy stall bound (set small in the row, 60 s in production) and the next client is served; carrier loss cancels
 every live operation including local phases and logs method, id, outcome and duration core-side; cancel under a saturated spool
 progresses over the real carrier. Size ~400 + 400. After: 2.3d. Evidence: Mac, WSL, Windows receipt.
+Carried in (2026-10-31): from the 2.3d reviews, a transport-lane frame for an unopened binding before `SessionOpened` is written ends the carrier as a protocol error (split doc §3.3 "When"; the handshake cannot see it through `recv_registry_timeout`), and `SessionLimits` above the socket host's default is refused with `invalid_request` (server design §3); each with a red row here. From the 2.3c reviews, the byte-stream `ServedSession` constructor takes `host.members()` (mutation C covers only `serve_in_process`). From the 2.3d-2 probe, `wait_closed` stays `None` after a peer's normal close until a consumer takes the end, so the serving loop drives the receive side.
 
 **2.3h Per-call transport composition (single, State).** Goal: R2 core half and C14's lock order. Owns: create
 `server/{calls,transport}.rs`, `server/tests/transport_rows.rs`; edit `transport_host/remote_lane.rs` (the `Calls` implementation
@@ -184,6 +185,7 @@ it and releases the address last; a second signal or `force` ends the detached w
 the accept loop; unlink of the socket drains and shuts down; log never contains a canary placed in the request; rotation never
 writes through a planted `<log>.1`. Size ~480 + 400. After: 2.3f, 2.3g (not 2.3h; scripted dispatch). Evidence: Mac, WSL, Windows
 receipt and dabeest (signals, pipe).
+Carried in (2026-10-31): from the 2.3c Code review, W-class clones (`materialize`, `clone_repo_member`) write a member's refs from the network with no member lock; design §5.1 keeps an N step from running beside them through the class rules and the workspace registry (C20), which this step builds, with a red row (a served fetch beside a clone of the same member waits or is refused). From the 2.3d-2 probe, as for 2.3g, a shutdown loop does not rely on `wait_closed` alone.
 
 **2.3j Credential variables and `server stdio` (dual: secret handling).** Goal: R7, C16. Owns: create `server/credentials.rs`
 (the closed scrub list of split doc §3.8, a pure function), `server/stdio.rs` (one session over standard streams, no listener,
