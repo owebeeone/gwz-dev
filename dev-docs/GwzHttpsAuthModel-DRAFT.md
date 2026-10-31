@@ -1,349 +1,659 @@
-# GWZ HTTPS authentication model: credential need on the operation (design, DRAFT)
+# GWZ HTTPS authentication model: the credential and its need on the operation (design, DRAFT)
 
-**DRAFT, 2026-10-31.** Not reviewed, not accepted. Design only (one step is sketched in section 5). Object:
-contract `GwzConnectionApiContract.md` section 7; gwz-core `a7b965c5` (`https_adapter*` at `68db19ae`);
-gwz-transport `0a25363`.
+**DRAFT, revision 5, 2026-10-31.**
 
-**Task boundary (recorded before drafting).** Deliverable: this document. Components a later step may change:
-gwz-core `src/git/endpoint/https_adapter*`, `https_auth*`, `transport_host/connection_host/https*_tests.rs`, and the
-root contract and plan text. Reference only, no change proposed: gwz-transport (`gwz-connection`, `pool`),
-`https_worker/` (legacy route and native), gwz-sspi, gwz-git. Citations are `file:line` in the trees above.
+**Status: accepted at root 56186ad1 after GwzHttpsAuthModel-ReviewSafety-3.md and -ReviewConsistency-3.md reported GO; revision 5 applies their P3 dispositions (text and rows only); this accepts the design and its contract amendment text, not an implementation.**
 
-Note: contract section 7.1 is the SSH reuse authorization (the pool-key sentence is at L509-510 inside it); the
-HTTPS scope text is section 7.2 (L534-570).
+Design only. Revision 5 applies the ten P3 findings of the two round-3 GO re-verdicts (table below). Revision 4 resolved the r3 re-verdicts (Safety and Consistency,
+both NO-GO, one blind-convergent P2) as `GwzHttpsAuthModel-RemPlan-2.md` dispositions them: every row is "fix in r4", all text
+corrections. The operator decisions of 2026-10-31 are applied unchanged (section 6). Object: contract `GwzConnectionApiContract.md` sections 7, 9, 10, 11, 15;
+gwz-core `a7b965c5`; gwz-transport `0a253639`. Code facts were re-read at those SHAs with `git show`; contract and plan
+lines are at root HEAD, where those documents are unchanged since `0a0545a3`. A row is named `H1a-4`: sub-step, row number of section 5.
+
+**Revision 3 changes** (RemPlan row -> where r3 resolves it):
+
+| Finding (RemPlan row) | Resolved in |
+|---|---|
+| Safety P2-1 (scope-record writes) | 3(e) rules W1-W4; 3.1 Re-authentication; rows H3c-5, H3c-6; `prior` stays (H1b) |
+| Safety P2-2 (learning rule) | 3.1 Learning; rows H3a-2, H3d-1 |
+| Safety P2-3, Consistency P3-6, P3-10(a) (provider lifetime, `closed`) | 3(b) Lifetime and holders; H1e; A8; `closed` and clearing `Drop` removed |
+| Safety P2-4 = Consistency P2-3 (bound overflow) | 3(b) bounds table; 3(d) G14, P8; H1d; A3, A8 |
+| Consistency P2-1 (`Effect` of the re-authentication) | 3.1 Re-authentication; A7; rows H3b-3, H3c-3 |
+| Consistency P2-2 = Safety P3-1 (eager, scoped rejection) | 3(b) Rejection; 3(d) G6, G7, G11, P2; rows H1a-4..6, H1c-2..6 |
+| Safety P3-2 = Consistency P3-5 (`Need` transitions) | 3(d) table; rows H3b-3, H3b-4, H3c-1, H3c-2 |
+| Safety P3-3 (key omits scheme and username) | 3(a); row H1a-1 |
+| Safety P3-4 (charge is a maximum) | 3(b) Charge; row H1a-8 |
+| Safety P3-5 (residuals) | A1; 3(b) Zeroization; retiring idle per-binding connections is not built (6) |
+| Safety P3-6, Consistency P3-1(b) (re-authentication conditions) | 3.1 Conditions; A6; rows H3d-2, H3d-3 |
+| Consistency P3-1(a), (c)-(g) (superseded text) | A5 wording; A11 (L881); A12 (plan); A8 (bounds); A2; A1 |
+| Consistency P3-2 (anchors, citations) | 4.0 anchors and order; 3(a) key; citations corrected throughout |
+| Consistency P3-3 (file lists, pin order) | 5 by-edit file lists, order and pin; 3.2 caller owner |
+| Consistency P3-4 (hint is late) | 3.1 Placement; H2a, H2b; rows H2b-2, H3a-3 |
+| Consistency P3-7 (scope claims) | Task boundary; 5 Review; 6 Unresolved U1 |
+| Consistency P3-8 (fallback counter) | 3.1 Counter; row H3d-4 |
+| Consistency P3-9 (H1b size) | 5 sizes from the real rows; H1 split in four |
+| Consistency P3-10(b), (c) (served `cli`, gwz-py) | 3(f) |
+| Consistency P3-11 (deadline) | 3.1 Deadline; row H3c-4 |
+| Safety and Consistency §3 item 4 (caller identity) | 3.2 item 3 (R3 row) |
+| Consistency §2 note (no hash in gwz-connection) | 3.1 Placement (path-string key) |
+| Safety §5 / r2 account selector | A12 (plan prerequisite); 6 Risks |
+
+**Revision 4 changes** (RemPlan-2 row -> where r4 resolves it; `R2-` Safety, `N-` Consistency):
+
+| Finding (RemPlan-2 row) | Resolved in |
+|---|---|
+| R2-P2-1 = N-P2-1 (U7) | 3(b) `Need` (`evidence`); 3(d) G2, G3, G8, RA2, RA2a; 3.1 Learning, Unchallenged re-authentication; A4, A11; rows H3b-4 (re-scoped), H3b-5; U7 resolved |
+| R2-P3-1 | 3(d) G3, G5, G8, RA7; row H3c-3 (3xx) |
+| R2-P3-2 | 3.1 Placement; 5 Order (R1's re-arm); row H2a-6 (driver parked first) |
+| R2-P3-3 | 5 Order (the R4 group is adopted whole) |
+| R2-P3-4, N-P3-7 | A12 (3.1, Phase 2 served path); 3(b) Lifetime; row H1e-7 |
+| Safety U2 addition, N-P3-4 | 3(b) Lifetime; A8; rows H1e-1, H1e-2, H1e-4; U2 resolved |
+| Safety caller-identity condition | 3.2 item 3; 6 item 4 |
+| Safety risk, N-P3-6 | 3(b) bounds (the budget code); A9; row H1d-1 |
+| N-P3-1 | 5 table H1e (`admission.rs`, `binding.rs`) and H3a (`connection_host.rs` mod line); R3's `auth.rs` (U6) |
+| N-P3-2 | 5 Order (pin rule; R1 and R1b named) |
+| N-P3-3 | Task boundary; A13; U1, U2, U6 resolved; the (+) markers removed |
+| N-P3-5 | 3(d) X1-X3; row H1d-5 |
+| N-P3-8 | A6, A10 |
+| N-P3-9 | A12 (3.4 sentence); U5 |
+
+**Revision 5 changes** (`R3-` Safety round 3, `N3-` Consistency round 3; text and rows only, no design change):
+
+| Finding | Resolved in |
+|---|---|
+| R3-P3-1 (RA1 upgrades evidence) | 3(d) RA1 and its closing rule; 3.1 Unchallenged re-authentication; row H3b-5 |
+| R3-P3-2 = N3-P3-2 (`Exhausted`: no lookup, threshold, G2/G8) | 3(b) bounds row (65th); 3(d) X1, X2, new X4; row H1a-7, H1d-5 |
+| R3-P3-3 (tombstones keep P3 anonymous) | 3(b) bounds row; 3(d) X1, X3; row H1d-5 |
+| R3-P3-4 = N3-P3-5 (one shared counter) | 3.1 Counter; A12 (3.4 sentence, composition row); row H3d-4 |
+| N3-P3-1 (scope after RA2a) | 3.1 Scope after re-authentication; row H3b-5 |
+| N3-P3-3 (currency) | Task boundary; 5 sizes; A13; U1, U6; RemPlan R4 cites r5 §5 |
+| N3-P3-4 (A12 anchors, Split L136) | 4.0 row A12; A12 text (all targets; the per-bind note) |
+| N3-P3-6 (`InvalidInput` at a served bind) | 5 H1e files and sizes; new row H1e-8; A11 second row |
+
+All ten P3s are applied as written; sizes in 5 are re-summed (3,805 added, 1,120 product).
+
+**Task boundary (Consistency P3-7, N-P3-3).** Deliverable: this document. Authority: the operator-recorded RemPlan row R4 as
+the lane owner restated it at `5de7d71b` and amended at `0454aa1f` and `56186ad1` (`GwzPhase1-RemPlan.md`, as it now reads): the group H1a-H1e,
+H2a-H2b and H3a-H3d with the file lists of section 5; gwz-core `https_adapter*`, `https_auth*`, `connection_host/https*` tests;
+gwz-transport `crates/gwz-connection` (H1e, H2b) and `src/pool` (H2a); contract §4.1/§7/§7.2/§8/§9/§10/§11/§15 and plan text
+(A1-A13); `connection_host.rs` mod lines for new test files. The R3 additions of 3.2 are R3's row (`https_adapter.rs`,
+`https_adapter/{exchange,auth}.rs`, `https_auth.rs`). The operator's
+decisions are the four of section 6, not a file list. Reference only: `https_worker/`, gwz-sspi, gwz-git. The P2-2 factory
+fix is R3, a prerequisite, not in this step's size. Citations are `file:line` at the SHAs above.
+
+Note: contract section 7.1 is the SSH reuse authorization (pool-key sentence L509-510); HTTPS scope is 7.2 (L534-570).
 
 ## 1. Problem
 
-Git smart HTTP makes two requests per repository: a GET advertisement (`/<repo>/info/refs?service=...`) and a
-POST (`/<repo>/git-upload-pack` or `git-receive-pack`) whose body is streamed. A 401 to the GET is answered by
-asking the credential helper and sending the GET again; the GET has no body. A 401 to the POST cannot be answered:
-its body is on the wire and contract section 9 forbids replay (contract L663-666, "Connection cannot replay").
-Challenged POST refusal is a standing part of the mechanism matrix (L561-563). So a POST that needs a credential
-must carry it from its first byte, and the sender must know that before the first byte.
+Git smart HTTP makes two requests per repository: a GET advertisement (`/<repo>/info/refs?service=...`) and a POST
+(`/<repo>/git-upload-pack` or `git-receive-pack`) whose body is streamed. A 401 to the GET is answered by asking the
+credential helper and sending the GET again; the GET has no body. A 401 to the POST cannot be answered: its body is on
+the wire and contract section 9 forbids replay (L660-666, "Connection cannot replay"). Challenged POST refusal is a
+standing part of the mechanism matrix (L561-563). So a POST that needs a credential must carry it from its first byte,
+and the sender must know that before the first byte.
 
-**What the host-owned HTTPS adapter does today.** It remembers the need on the CONNECTION. Each connection has a
-scope record (`https_adapter.rs:123-132`): the binding kind (`Anonymous`, `HelperToken`, `LogonSession`) and one
-SHA-256 digest of the path of the last helper-authenticated exchange. A POST is pre-authenticated, with a fresh
-helper lookup, only when `work.prior == HelperToken` and the digest equals the POST's own path
-(`exchange.rs:219-231`). Every other POST goes out anonymously; a 401 to it is classified `Fail(Authentication)`
-(`https_policy.rs:48`) and the exchange ends `Discarded`. This fails closed and is pinned by
-`a_post_on_a_connection_nothing_authenticated_is_refused_after_one_anonymous_attempt`
+**What the host-owned HTTPS adapter does today.** It remembers the need on the CONNECTION. Each connection has a scope
+record (`https_adapter.rs:123-132`): the binding kind (`Anonymous`, `HelperToken`, `LogonSession`) and one SHA-256 digest of
+the path of the last helper-authenticated exchange. A POST is pre-authenticated, with a fresh helper lookup, only when
+`work.prior == HelperToken` and the digest equals the POST's own path (`exchange.rs:219-231`). Every other POST goes out
+anonymously; a 401 to it is `Fail(Authentication)` (`https_policy.rs:48`) and the exchange ends `Discarded`. This fails
+closed and is pinned by `a_post_on_a_connection_nothing_authenticated_is_refused_after_one_anonymous_attempt`
 (`connection_host/https_auth_tests.rs:613`).
 
-**Where it fails.** The POST needs three things to line up that the adapter does not control: the pool must lease
-it the connection its advertisement authenticated, no other authenticated exchange may have overwritten the one
-slot, and the exchange must be the same binding. The pool picks the lowest idle connection id of equal key and
-identity (`gwz-transport/src/pool/allocation.rs:22-24`, a `BTreeMap` scan), with no notion of which connection
-holds what.
+**Where it fails.** The POST needs the pool to lease it the connection its advertisement authenticated, with no other
+authenticated exchange having overwritten the one slot. The pool picks the lowest idle connection id of equal key and
+identity (`gwz-transport/src/pool/allocation.rs:22-28`, a `BTreeMap` scan) and knows nothing of what each holds.
 
-- **PR5, placement (State review 1, `GwzP1cHttps-ReviewState.md:63`, `:96-102`).** One binding holds anonymous
-  connection 1 and helper-authenticated connection 2 (two overlapping advertisements: a public and a private
-  repository). The private POST is given connection 1, goes anonymously, is challenged and refused:
-  `PermissionDenied`, `Discarded`. Same outcome for a POST on a fresh connection (PR2).
-- **PR6 / P3-2, single slot (State review 2, `GwzP1cHttps-ReviewState-2.md:34`, `:85-98`; Code review 2 probe 2).**
-  One binding, one connection: GET `/a` authenticated, GET `/b` authenticated (the slot becomes `/b`), POST `/a`
-  on the same connection: anonymous, refused. Both reviewers filed it as P3-2; the lane closed it by documenting
-  the limit (contract L881, "a single SHA-256 slot").
+- **PR5, placement (`history/GwzP1cHttps-ReviewState.md:63`, `:96-102`).** One binding holds anonymous connection 1 and
+  helper-authenticated connection 2 (a public and a private repository). The private POST is given connection 1, goes
+  anonymously, is challenged and refused: `PermissionDenied`, `Discarded`. Same for a POST on a fresh connection (PR2).
+- **PR6 / P3-2, single slot (`history/GwzP1cHttps-ReviewState-2.md:34`, `:85-98`; Code review 2 probe 2).** One binding,
+  one connection: GET `/a` authenticated, GET `/b` authenticated (the slot becomes `/b`), POST `/a` on the same connection:
+  anonymous, refused. Both reviewers filed it as P3-2; the lane closed it by documenting the limit (contract L881).
 
-**Why it matters for Phase 3.** Step 3.1 routes every CLI command through one host (plan L721-728). R1 is 16
-members at one origin, `fetch` then `push` then post-push reads (plan L166), with up to `per_user_host` (32)
-connections per scope. Each member's advertisement and POST are separate leases. A workspace with private
-members will meet PR5 and PR6 routinely, and the refusal reads "Authentication" although the helper had a
-credential. The plan already records this as the step 3.1 prerequisite (plan L724-728). The legacy route does not
-have the problem: it keeps the need on the route, per operation, until the operation ends
-(`https_policy.rs:70-72`, `:119`, `basic_install` at `https_worker/native/exchange.rs:459-462`, POST pre-authentication
-`https_worker/prepare.rs:144-149`, `:165`).
+**Why it matters for Phase 3.** Step 3.1 routes every CLI command through one host (plan L721-728 records this as its
+prerequisite). R1 is 16 members at one origin, `fetch` then `push` then post-push reads (plan L166), up to 32 connections
+per scope. A workspace with private members meets PR5 and PR6 routinely, and the refusal reads "Authentication" although the
+helper had a credential. The legacy route keeps the need on the route, per operation, until it ends (`https_policy.rs:70-72`,
+`:119`, `basic_install` at `https_worker/native/exchange.rs:459-462`, POST pre-authentication `https_worker/prepare.rs:144-149`).
 
 ## 2. The two authentication models
 
 | Mechanism | What carries the authentication | Per request or per connection | In gwz today |
 |---|---|---|---|
-| Basic with a helper-supplied credential (GitHub and GitLab tokens, `gh`, osxkeychain, GCM) | An `Authorization` header on each request | Per request | Supported: `auth.rs:69-80`; header built only as `Basic base64(user:password)` (`https_auth/secret.rs:97-113`) |
+| Basic with a helper-supplied credential (GitHub and GitLab tokens, `gh`, osxkeychain, GCM) | An `Authorization` header on each request | Per request | Supported: `auth.rs:69-80`; header built only as `Basic base64(user:password)` (`https_auth/secret.rs:97-111`) |
 | Bearer or other token scheme | An `Authorization` header on each request | Per request | Not supported: a challenge offering nothing but it ends `Authentication` (`auth.rs:81`); `parse_secret` reads username and password only |
 | NTLM | The TCP/TLS connection, after a 3-leg conversation | Per connection | Supported on Windows through gwz-sspi, `auth.rs:41-68` |
 | Negotiate (Kerberos or NTLM, Windows picks) | The connection, as implemented | Per connection in gwz | Same path |
 | Digest | n/a | n/a | Refused (`native.rs:142-146`, `Offers`: not an offer) |
 
-**Can Negotiate or Kerberos be per request here? No, not as the code stands.** I checked what would have to be
-true and found it is not:
+**Can Negotiate or Kerberos be per request here? No, not as the code stands.**
 
-- The adapter starts a native conversation only after a 401, never with an unsolicited first token
-  (`auth.rs:41-68`; `Offer::initial` refuses a challenge that already carries a token, `native.rs:134-139`).
-- The channel binding is that physical connection's own final-origin TLS binding, and the request is built per
-  connection (`native/connection.rs:119-122`); one context, one conversation, at most eight rounds, no native
-  context reuse (`GwzSspiDesign.md:66-67`).
-- Negotiate may select Kerberos or NTLM and the selection is observed only after processing; there is no
-  per-mechanism policy knob and Kerberos-only callers "must not start it" (`GwzSspiDesign.md:72-84`). The adapter
-  cannot know in advance that a Negotiate exchange will end in a per-request-capable mechanism, so it must treat
-  every Negotiate result as connection-bound. That is what `Binding::LogonSession` does.
-- Per-request Kerberos would need an optimistic first token, a Kerberos-only knob and a willing server; none
-  exists here. It is a possible future, not a premise.
+- The adapter starts a native conversation only after a 401, never with an unsolicited first token (`auth.rs:41-68`;
+  `Offer::initial` refuses a challenge that already carries a token, `native.rs:134-139`).
+- The channel binding is that physical connection's own final-origin TLS binding, and the request is built per connection
+  (`native/connection.rs:119-122`); one context, one conversation, at most eight rounds, no native context reuse
+  (`GwzSspiDesign.md:66-67`).
+- Negotiate may select Kerberos or NTLM and the selection is observed only after processing; there is no per-mechanism
+  knob and Kerberos-only callers "must not start it" (`GwzSspiDesign.md:72-84`). So every Negotiate result is treated as
+  connection-bound, which is what `Binding::LogonSession` does. Per-request Kerberos is a possible future, not a premise.
 
-Consequence for the design: the helper-supplied (Basic) route is request-scoped in the protocol but the adapter
-still models its connections as bound (`Binding::HelperToken` is `per_exchange()`, `https_adapter.rs:119-121`,
-and `authorize_reuse` refuses it to other bindings, `:308-325`). Only the logon-session route is bound by the
-mechanism itself.
+The helper-supplied (Basic) route is request-scoped in the protocol, yet the adapter models its connections as bound
+(`Binding::HelperToken` is `per_exchange()`, `https_adapter.rs:119-121`; `authorize_reuse` refuses it to other bindings,
+`:308-325`). Only the logon-session route is bound by the mechanism itself.
 
-**How Git itself behaves** (from my knowledge of git's `http.c`, `credential.c` and `remote-curl.c`; **not
-verified in this session**; confirm against the installed Git before this text is quoted anywhere):
+**Probe POST versus re-authentication GET (Consistency P3-1(b)).** Git replays a buffered POST and draws the 401 of a large
+one with a small probe POST; gwz has neither (contract section 9), and a probe POST is a Git-service decision for gwz-git.
+The re-authentication of 3.1 is a different thing: a bodiless, safe advertisement GET of the operation's own accepted key,
+which the gwz-core adapter can build because it already owns the service-to-path table (`https_adapter.rs:9-11`,
+`exchange.rs:98-127`). No POST is ever repeated or probed.
 
-- Git asks for a credential once per URL per process, when the first 401 arrives (`credential_fill`), and keeps
-  it in `http_auth` for the rest of the command. libcurl then sends it on later requests to that host without a
-  new challenge once the method is settled, so a streamed POST carries it.
-- `credential.useHttpPath` (default false) decides whether the path is part of the credential description given
-  to helpers: false gives one credential per host, true gives one per repository path. Matching of
-  `credential.<url>.*` sections uses the full URL either way.
-- After a request that used a filled credential succeeds Git calls `credential approve` (helpers that store on
-  `store` learn the credential). After a 401 to a request that carried one it calls `credential reject` and clears
-  it, so the next fill asks again.
-- A POST is replayable in Git when its body is buffered (smaller than `http.postBuffer`, default 1 MiB). For
-  larger bodies `remote-curl.c` sends a small probe POST first to draw the 401. gwz has neither: contract section 9
-  forbids replay, and a probe POST is a Git-service decision that belongs in gwz-git, not in the generic adapter.
+**How Git itself behaves** (from my knowledge of git's `http.c`, `credential.c`, `remote-curl.c`; **not verified in this
+session**; confirm against the installed Git before this text is quoted): Git asks for a credential once per URL per
+process at the first 401 and keeps it for the command; `credential.useHttpPath` (default false) decides whether the path
+is in the description given to helpers; after a success it calls `credential approve`, after a 401 to a credentialed
+request `credential reject` and clears it; a POST below `http.postBuffer` (1 MiB) is replayable, larger ones get a probe.
 
 ## 3. The proposed model
 
-**Rule.** "This operation learned that repository R, for this service class, needs a credential" is operation
-state. It is recorded on the operation's `AuthContext` provider (`https_auth::OperationAuth`, `https_auth.rs:48`)
-the moment an authenticated advertisement is accepted. Every later exchange of that operation to R and class, POSTs
-included, carries a credential from its first byte on whichever connection the pool leased. The scope record keeps
-only the binding kind, which `authorize_reuse` reads for connection-bound mechanisms, unchanged.
+**Rule.** "This operation learned that repository R, for this service class, needs a credential" is operation state. It
+is recorded in the operation's `AuthContext` provider (`https_auth::OperationAuth`, `https_auth.rs:48`) the moment an
+authenticated advertisement is accepted. For a request-scoped credential (Basic from the helper) the record holds the
+credential, and every later exchange of that operation to R and class, POSTs included, carries it from its first byte on
+whichever connection the pool leased. For a connection-bound mechanism (logon session) the record holds the fact only,
+and the exchange is placed on, or re-authenticates, a connection (3.1). The connection's scope record keeps the binding
+kind for `authorize_reuse`. This is not a new authentication framework (A2): it keeps, for one operation and in memory,
+what the existing helper route already obtained. `OperationAuth` is built once per capture by `capture_operation`
+(`endpoint_environment.rs:207`) and reaches every exchange as `Work.auth` (`exchange.rs:54`, `pipe.rs:130`); the placement of
+the helper environment in `AuthContext` is the contract's §15 1.5 row (L882).
 
-Where the state lives: `OperationAuth` is built once per operation by `capture_operation`
-(`endpoint_environment.rs:207`), reaches every exchange as `Work.auth` (`exchange.rs:54`, `pipe.rs:130`), and dies
-with the operation's binding. It is already where a helper environment lives (contract L483-485). Interior mutability is needed, and the declared `charge`
-(`operation.rs:171`, contract L686) must cover the bound below.
+**(a) Key.** The key is a domain-separated SHA-256 over: the pool `Key` of the spec (scheme, username, host, port,
+`gwz-transport/src/pool/mod.rs:92-97`), the repository path, and the service class (fetch-class `upload-pack`, push-class
+`receive-pack`, as the legacy `RouteKey` splits them, `https_policy.rs:55-58`). The repository path is the path of
+`destination.request(service)` (`https_destination.rs:116-134`, which pops a trailing empty segment, so `/repo` and
+`/repo/` are one key and `/repo.git` another: PR7 fails closed) with the service tail (`service_path`, `info/refs` or
+`git-<service>`) removed, so a GET and a POST of one repository get one key. The username matters once the lookup carries
+`user@` (A12): `alice@host` and `bob@host` then share nothing. The class matters because a repository readable anonymously
+and writable only with a credential must keep its fetches anonymous (`history/GwzP1cHttps-ReviewCode.md` P2-1). A separate
+**origin** digest over (scheme, host, port) scopes rejection and credential sharing. `credential.useHttpPath` does not change
+the key; the lookup passes the full URL (`https_auth/lookup.rs:22,126`), so with it false two repositories of a host get the
+same credential from the helper and each learns for itself, which costs a 401 per repository, never a wrong send.
 
-**(a) Repository key.** Options: (1) SHA-256 of the exact `work.path` as today; (2) SHA-256 over the `Destination`
-the request is built from (`exchange.rs:206`, host, port, path as `url::Url` normalizes it: dot segments removed,
-userinfo and query absent, trailing empty segment popped), plus the service class; (3) fold `/repo` and
-`/repo.git`, case, or trailing slashes. Option 3 guesses server behaviour and is rejected: PR7 shows an unfolded
-spelling fails closed, which is the safe direction. Option 1 omits the origin and the class, both needed once
-the key lives beyond one connection. **Recommend option 2**: key = domain-separated SHA-256 of (host, port,
-normalized path, class) where class is fetch-class (`upload-pack`) or push-class (`receive-pack`), as the legacy
-`RouteKey` already splits (`https_policy.rs:55-58`). The class matters: a repository readable anonymously and
-writable only with a credential must keep its fetches anonymous (the Code P2-1 finding,
-`GwzP1cHttps-ReviewCode.md` P2-1: a request the server serves to anyone must not depend on a helper).
-`credential.useHttpPath` does not change the key. The lookup passes the full URL to `git credential fill`
-(`https_auth/lookup.rs:22,126`), so Git itself drops the path before helpers when `useHttpPath` is false. The
-key is finer than Git's per-host credential in that case: each repository learns for itself, and two repositories
-on one host then get the same credential from the helper. That costs a 401 per repository, never a wrong send.
+**(b) What is held: the credential itself, in operation-scoped memory (decided, operator 2026-10-31: b2).** This is Git's
+behaviour and the legacy route's (`https_worker/credentials.rs:5-16`). The earlier option, a fact with a fresh lookup per
+request, stays withdrawn.
 
-**(b) What is held.** Options: (b1) only the fact, with a fresh helper lookup per credentialed request (the
-current contract: "No token cache in host", L494; C2(b) closed on "a fresh per-exchange helper lookup, nothing
-kept", contract L881); (b2) the credential itself in the operation's provider, zeroized at operation end (what
-Git and the legacy route do: `https_worker/credentials.rs:5-16`, `Answers` per route, `Secret` overwritten on
-drop, `secret.rs:118`).
+- **Where.** One record, `Needs`, a field of `OperationAuth`, behind a mutex, in `https_auth/needs.rs` (it sees `Secret`'s
+  `pub(super)` fields). Keys map to `Need = Basic(Arc<Secret>) | ConnectionBound { observed, evidence } | Rejected | Unretained`;
+  absent means Unrecorded. `evidence` is `Challenged` (the logon session answered a challenge, G8) or `OnBound` (served unchallenged on a
+  `LogonSession` connection, G2), which proves nothing about the key's need (RA2a). Equal credentials at one origin share one `Arc`; never across origins. It is in no profile, pool
+  key, instance, `Scopes`, connection or adapter-shared state.
+- **Bounds** (all in contract section 10, A8; the numbers are mine, section 6):
 
-| | (b1) fact only | (b2) credential in operation memory |
+| Quantity | Bound | At the bound |
 |---|---|---|
-| Secret exposure in the client process | Microseconds per request, wiped (`secret.rs`, `wiped.rs`) | Operation lifetime; same as Git and legacy; swap and core-dump window |
-| R4 and R7 | Nothing to leak across operations or to the core | Per-operation provider, so no cross-operation reach; core never sees it (f); needs a cross-binding no-leak row |
-| Helper cost | One `git credential fill` per credentialed request: at least 2 per private member (challenged GET, POST), more per v0 negotiation round | One per repository, single-flight (h) |
-| Interactive helpers | May prompt or re-prompt per request; without `approve`, a prompted credential is never stored (hypothesis, not measured) | One prompt per repository per operation |
-| Consistency | GET and POST could get different accounts if the helper changes its answer mid-operation | One credential per repository per operation |
-| Contract change | None to the "no token cache" rule | Amend L494: the operation's own provider may hold what it obtained, never the host, instance or pool |
-| Size | Smallest | Adds single-flight cells, a bounded secret store, wipe-on-cancel rows |
+| Entries in the key table (any state) | 512 | the new key's advertisement ends with the budget code before any body byte; nothing is stored |
+| Distinct credentials | 64 | the advertisement ends budget-coded as above, and the key is stored `Unretained` |
+| One credential (username + password) | 16 KiB, the helper output limit (`https_auth.rs:27`) | as above (a lookup cannot return more; H1a-3 tests the unit) |
+| All retained credential bytes | 256 KiB | as above, key stored `Unretained` |
+| Rejection fingerprints | 64 | the 65th is not stored: the record becomes `Exhausted` (X1-X4): the exchange whose 401 produced it ends `Authentication`; credentials are wiped and entries become secret-free tombstones of their key digests; later exchanges start no lookup and answer nothing from the record, a POST of a tombstoned key ends with the budget code, a POST of a key never learned stays anonymous; a poisoned lock does the same after wiping and tombstoning |
 
-**Recommend (b1) for the first landing**, with the record shaped so (b2) is additive (`Needed` becomes
-`Needed { credential: Option<Secret> }`). Reasons: it is sufficient for the defect (PR5, PR6); it keeps the
-accepted "nothing kept" rule and the C2(b) rows green; optional improvements must not become prerequisites for 3.1
-(user standing rule). The trigger for (b2) is a measurement, not a preference: in the Phase 3 sweep (R1, 16
-private members), if helper spawns per command exceed a bound the operator sets, or any supported helper
-re-prompts, build (b2). This is the threat-model trade the operator should see: (b2) buys fewer spawns and
-prompts at the price of a longer secret lifetime on the less exposed side (the client).
+  The budget code is `ErrorCode::Capacity` (wire 5), never `Authentication`, in the contract's `InputBudget` class (§11 L726).
+  `stream_error` (`https_adapter.rs:359`) gets an arm: `io::ErrorKind::QuotaExceeded` with the message "operation credential
+  record budget exceeded", which names the record and no pool limit; under `cli` it is `StreamError::Failed { code: Capacity }`
+  with no `capacity` detail (`CapacityCause` has no value for the record; a new one is a wire change this step does not make), and
+  A9 states what that detail-less `Capacity` means. Overflow therefore never produces an anonymous POST: the advertisement fails,
+  so no POST follows. For a stored `Unretained` key a POST ends before any byte (defence in depth). `Exhausted` is rows X1-X4 of (d).
+- **Charge.** The declared `AuthContext` charge (`https_auth.rs:70-77`, fixed at `context()`) adds the formula
+  `256 KiB + 64 x per-credential + 512 x per-key + 64 x per-fingerprint`, each term the `size_of` values plus allocation
+  slack at its maximum; H1a-8 asserts it is at least the byte sum with every bound full (about 350 KiB; 72 admissions of
+  a host, 8 active and 64 waiting, stay under the 64 MiB host cap, §10 L677, L686).
+- **Lifetime and holders (Safety P2-3).** The provider, and so the record, lives as long as its last `AuthContext` clone. A
+  credential-retaining provider is therefore built single-admission: its `AuthContext` carries a shared claim that `admit`
+  takes, frees if the admission never registers (refused, timed out, permit dropped) and consumes for good once it registers;
+  while one admission holds or has consumed the claim, `admit` of any clone is refused `InvalidInput` (H1e), so `register` stays
+  infallible. "Operation" and "provider" are then
+  one admission, and the sentence of §10 L692-694 on shared provider objects does not apply to it (A8). The `closed` flag and
+  the clearing `Drop` of r2 are removed: a straggler that could insert holds a clone, so `Drop` could not have run. A clone
+  the composition keeps past the operation's end keeps the record alive until it drops (6, U3); 3.1, 3.2 and the Phase 2 served path
+  drop theirs with the operation, the last building a fresh capture per bind (A12). Every holder and its bound:
 
-**(c) Pre-authenticate the advertisement GET once known.** It would save one 401 round trip per repeat GET of the
-same key in an operation (for example a post-push read of a repository the fetch learned). A GET can be sent
-anonymously on helper failure, so a failed pre-auth could degrade. **Recommend not in this step.** The POST
-defect does not need it; it adds a degrade-on-decline path and its rows; and the first advertisement of each key is
-unknown anyway. Revisit with the sweep's 401 count. The record supports it without change.
+| Holder | Where | Ends | Bound |
+|---|---|---|---|
+| The binding | `BindingShared.auth` (`binding.rs:175`) | finish, cancel, abort, host close | the operation |
+| Pending and authorizing openings | `instance.rs:77` (`Pending.auth`, `Authorizing`) | served, abandoned, cancelled, past deadline | allocation deadline (30 s) |
+| In-flight connect | `ConnectCommand.auth` (`ports.rs:143`) | HTTPS drops it at once (`worker.rs` connect); SSH at setup end | setup aggregate (30 s) |
+| Running exchange | `Work.auth` (`exchange.rs:54`) | task ends; cancel, `Exchange::abort` and `dispose_all` abort tasks (`worker.rs:440`) | the exchange |
+| Retained native cleanup | `NativeRetained` probes | hold no `AuthContext` (nor `NativeCaller`) at `a7b965c5`; after R3 a record needing the caller clones `NativeCaller` (`Clone`, `native/sspi.rs:7`), never the context | cleanup bound (5 s) |
 
-**(d) Failure handling.** A pre-authenticated request whose response is 401 (expired or wrong credential):
-the exchange ends `Authentication`, `Discarded`, never replayed, the connection closed (as now, `exchange.rs:257`
-with `https_policy.rs:48`). New: the key is marked `Rejected` on the operation. Later exchanges of the operation
-for that key fail with `Authentication` before any helper spawn and before any byte (`Effect::None`), as the legacy
-route's `rejected` flag does (`credentials.rs:55`). The same marking applies to a helper credential answered
-at the advertisement and rejected again. `Rejected` is operation-scoped and not sticky across operations, so a
-transient 401 costs one operation. A key becomes `Needed` only after an authenticated 200 with the right content
-type (as the legacy `basic_install` does after validation), never at the first 401. If the helper fails at a
-POST's lookup, the POST ends before any byte with the helper's mapped code (`AuthError::code`,
-`https_auth.rs:155`); that differs from the P2-1 case because this key was learned, not assumed.
+- **Placement `cli` and the core.** The provider is built by the client's owner from the call's capture (plan L66-74), in
+  the client only. The carrier carries no `AuthContext`, header, credential or record; a served core never has the provider.
+- **Zeroization.** `Secret` overwrites its allocations on drop (`secret.rs:118-122`, exact size, `:173-178`); `SecretHeader`
+  likewise (`:7-31`). A header is built **under the `Needs` lock** and returned as a `SecretHeader` (marked sensitive,
+  `exchange.rs:123`), so no `Arc<Secret>` leaves the lock; a fresh lookup's `Secret` belongs to its exchange until it is
+  recorded or dropped. Not covered, as today (Safety P3-5, A1): the HTTP engine's copy of the header value (`exchange.rs:121`)
+  and TLS and kernel buffers of connections the operation authenticated until those are disposed (an idle `HelperToken`
+  connection lives up to 60 s, §10 L681, and no other binding can lease it), process dumps, swap. No memory locking.
+- **Never logged, formatted or sent.** `OperationAuth` has no `Debug`; `Secret` prints `REDACTED`; `AuthContext` prints
+  `AuthContext(..)` (`operation.rs`); `Needs` has a hand-written `Debug` of counts; `NeedKey` is digests; errors and
+  observations carry codes and counts only (H1a-9 sweeps every format path).
+- **Rejection (Consistency P2-2, Safety P3-1).** A 401 (not a 407) to a request that carried a credential is handled
+  **eagerly under the lock**: every entry of that origin holding that credential becomes `Rejected` at once, the `Arc`
+  drops, and the bytes are wiped when no in-flight request holds them (none does: headers are built under the lock). An
+  unrelated credential, and the same bytes at another origin, are unaffected. The record keeps, per rejected credential, a
+  fingerprint: HMAC-SHA-256 under a random per-operation key (32 bytes from `getrandom`, a dependency; `sha2` is too; no new
+  crate; if randomness fails the record is `Exhausted` from the start), never the secret. A later lookup that returns bytes
+  with a rejected fingerprint at that origin is not sent. `approve` and `reject` stay uncalled (g).
+- **Threat model, plan section 1 (L55-62).** The core is the less trusted side; the client holds credentials and admits only
+  an allowed (scheme, host, port, path) and class with a client-chosen identity. This adds client memory only. The key
+  comes from a server challenge to an admitted exchange, so a core cannot make the client attach a credential to an
+  unadmitted tuple or read the record; for an admitted path the operation never learned it gets an anonymous POST. What
+  changes is time in client memory: the operation, as in Git, not microseconds. A same-process memory reader is outside the model.
+- **R4 (plan L169).** The credential comes from a helper run with the operation's own environment (`work.auth`'s `Config`)
+  and is stored only in that provider. Operation B has its own provider even with an equal `AuthScope` (the scope only
+  partitions pool identities); a changed `GH_TOKEN` or `GIT_CONFIG_GLOBAL` is a new operation with an empty record. The
+  single-admission claim makes this mechanical. `authorize_reuse` is unchanged.
 
-**(e) R4 and scope partitioning.** Unchanged: `HttpsScoped` still partitions the pool by `AuthScope`
-(`instance.rs:567`), and `authorize_reuse` still returns false for `HelperToken` and `LogonSession` connections to
-any binding but the last lessee (`https_adapter.rs:308-325`). The new record is not a scope input and is not in a
-profile, pool key, instance or `Scopes`. Two operations with equal scopes have two providers and two records: B
-never inherits A's learning, even on a connection A authenticated (which B cannot lease anyway) or on an anonymous
-one. Because the context is immutable after capture, a changed `GH_TOKEN` or `GIT_CONFIG_GLOBAL` is a new
-operation with an empty record. The mutation that would break this (the record moved into adapter-shared state)
-is the cross-binding row in section 5.
+**(c) Advertisement GET for a recorded key.** Still sent anonymously and challenged (pre-authenticating it stays out,
+section 6); the challenge is answered from the record. No later GET or POST round spawns the helper.
 
-**(f) The served `cli` placement.** The provider, the record and every lookup are in the client's process; the
-core never sees a credential, a header, or the record (plan threat model L55-62; R7). The core sends only a typed
-Open mapped to an admitted (scheme, host, port, path, service class); the key is derived on the client from that
-admitted tuple and the server's own challenge. The core cannot assert a need, cannot widen the key, and a
-POST for an unlearned key goes out anonymously. The error the core reads is the existing typed `Authentication`.
+**(d) One transition table for `Need`** (Safety P3-2, Consistency P3-5; G = advertisement GET, P = POST, RA = re-authentication).
+Columns: event, prior state, new state, what is sent or where it ends. "Ends" means before any further byte of that exchange; a POST row that ends before a POST byte has
+`Effect::None` and zero bytes at the server. A record is written only after an authenticated 200 with the right content type
+(as the legacy `basic_install`), never at a first 401; a 403, 404, 5xx or 407 is no verdict on authentication (`classify`).
 
-**(g) `git credential approve` and `reject`** (never called; recorded limitation, `GwzP1cHttps-RemPlan.md` last
-row, State review 1 section 4). **Recommend out of scope here, kept as a named follow-up.** Reasons: it is a new
-side effect on the user's credential store; `reject` lets a transient or hostile 401 erase a good stored
-credential; it needs the secret alive at response time (b1 drops it after the request is built,
-`exchange.rs:239-240`); and PR5 and PR6 do not need it. Its absence is real: a stale stored token fails every gwz
-command until the user rejects it by other means. `Rejected` bounds the damage to one failed request per key.
+| # | Event | Prior | New | Sent / ends |
+|---|---|---|---|---|
+| G1 | GET, 200 unchallenged, connection scope not `LogonSession` | any | unchanged | one anonymous GET; an anonymously served advertisement records nothing |
+| G2 | GET, 200 unchallenged, connection scope `LogonSession` | none | `ConnectionBound { OnBound }` | one GET (Safety P2-2) |
+| G3 | same | `Basic`, `ConnectionBound`, `Rejected`, `Unretained` | unchanged | one GET |
+| G4 | GET 401 offering Basic; fresh lookup answers; 200 | none | `Basic` | GET + answer |
+| G5 | GET 401 offering Basic; answered from the record; 200 | `Basic` | `Basic` | GET + answer; no helper; when the logon session is also offered and the native route is available, G8 applies |
+| G6 | the answer (fresh or from the record) gets 401 | none, `Basic` | `Rejected`, wiped, fingerprint kept | GET + answer; ends `Authentication`, connection closed |
+| G7 | fresh lookup returns bytes whose fingerprint is rejected at this origin | none | `Rejected` | GET only; ends `Authentication` |
+| G8 | GET 401 offering Negotiate/NTLM; the logon session answers; 200 | any but `Rejected` | `ConnectionBound { Challenged }` (latest accepted wins; a replaced `Basic` entry's reference drops, and the bytes are wiped when no key of the origin holds them) | GET + tokens |
+| G9 | the logon session's answer is refused (`Authentication`) | any | `Rejected` | ends `Authentication` |
+| G10 | the answer fails transiently (`Io`, `Timeout`, `Unavailable`, `Cancelled`) | any | unchanged | ends with that code |
+| G11 | GET 401 | `Rejected` | `Rejected` | GET only; not answered, no helper; ends `Authentication` |
+| G12 | challenge offers only Digest, Bearer or another scheme | any | unchanged | ends `Authentication` (`auth.rs:81`) |
+| G13 | answered GET gives 403, 404, 5xx, another status or content type | any | unchanged | `classify` / `Protocol` |
+| G14 | recording would pass a bound | none | `Unretained` (or nothing when the key table is full) | ends with the budget code before any body byte |
+| G15 | the lookup fails (declined, timeout, spawn) | any | unchanged | its mapped code (`https_auth.rs:155`) |
+| P1 | POST, 200 | `Basic` | `Basic` | credential from the first byte, built under the lock |
+| P2 | POST, 401 | `Basic` | `Rejected`, wiped | ends `Authentication`, `Discarded`, connection closed, never replayed |
+| P3 | POST | none | unchanged | anonymous; a 401 ends `Authentication`, never answered |
+| P4 | POST, connection scope `LogonSession` | `ConnectionBound` | unchanged | no header |
+| P5 | POST, any other scope | `ConnectionBound` | see RA1-RA7 | re-authentication first (3.1) |
+| P6 | POST, 401 (after P4 or RA1) | `ConnectionBound` | `Rejected` | ends `Authentication`, `PossiblySent`; the next POST of the key sends nothing |
+| P7 | POST | `Rejected` | `Rejected` | nothing: `Authentication`, `Effect::None` |
+| P8 | POST | `Unretained` | `Unretained` | nothing: the budget code, `Effect::None` |
+| RA1 | re-authentication: GET challenged, the logon session answers, 200 | `ConnectionBound { any }` | `ConnectionBound { Challenged }`; connection scope raised to `LogonSession` | GET + tokens, then the POST |
+| RA2 | re-authentication GET gets 200 unchallenged | `ConnectionBound { Challenged }` | `Rejected` | ends `Authentication`, `Effect::None`, no POST byte |
+| RA2a | the same | `ConnectionBound { OnBound }` | unchanged | the GET is drained, then the POST goes anonymously on that connection, as P3: a 401 ends `Authentication`, `PossiblySent`, never answered or replayed; the next exchange of the key works |
+| RA3 | challenge offers no logon session (Basic only, other) | `ConnectionBound` | `Rejected` | not answered by the helper or the record; `Authentication`, `Effect::None` |
+| RA4 | the logon session is refused | `ConnectionBound` | `Rejected` | `Authentication`, `Effect::None` |
+| RA5 | transient: reset, `Timeout` past D, gate `Unavailable`, `Cancelled` | `ConnectionBound` | unchanged | that code, `Effect::None`; no second attempt in this exchange |
+| RA6 | the 200 body passes its cap | `ConnectionBound` | unchanged | `Protocol`, `Effect::None` |
+| RA7 | re-authentication final status 403, 404, 5xx, another status (3xx included) or content type | `ConnectionBound` | unchanged | `classify` / `Protocol`, `Effect::None` |
+| X1 | the 65th distinct rejection fingerprint (the 64 are kept), a failed `getrandom` at creation, or a poisoned lock | any | `Exhausted` (record-wide; credentials wiped; each entry becomes a secret-free tombstone of its key digest, within the 512-key bound; a `Rejected` entry stays `Rejected`) | the exchange that caused it ends with its own code (`Authentication` for the 401 that produced the 65th fingerprint; the budget code for a poisoned lock); later exchanges see `Exhausted` |
+| X2 | G4, G5: GET 401 | `Exhausted` | unchanged | no answer from the record and no lookup is started (no helper spawn): the budget code, before any answer byte |
+| X3 | P1, P4, P5 and any POST of a tombstoned key (a POST consults the record) | `Exhausted` | unchanged | nothing: the budget code, `Effect::None`, no request, no re-authentication; P3 (a key never learned) is sent anonymously as usual |
+| X4 | G2, G8 | `Exhausted` | unchanged | G2: the GET is served and records nothing (no `OnBound` entry); G8: the logon session does not answer and records nothing, and the challenged GET ends with the budget code |
 
-**(h) Concurrency.** Two exchanges of one operation racing to learn the same key: under (b1) both answer their
-own challenge and insert the same key; the insert is idempotent and the map holds one entry. `Rejected` wins over
-`Needed` (a late `Needed` insert is a no-op on a rejected key). The ordering that matters is different: gwz-git
-sends a key's POST after it has read the advertisement, possibly on another connection. Today the connection's
-scope record is written only after the exchange task returns (`worker.rs:395-406`), after `pipe.end(Ok)`
-(`exchange.rs:290`), so it is not visible at that moment. The operation record must be written **before the first
-response byte is delivered to the client**: in `exchange`, after the content-type check (`exchange.rs:264`) and
-before the body loop (`:269`). Then any client that has read a byte of the advertisement is guaranteed to find
-the fact. Under (b2) single-flight per key (a cell, as legacy `Answers`) would be added.
+`Rejected` is per operation and terminal: deterministic refusals are not retried, because repeated failed logins can lock an
+account (a cost: the key is lost for the rest of the operation). A kind or evidence change (G8, RA1) replaces; concurrent equal kinds keep
+the first insert, and `Rejected` wins over a late insert.
 
-**Connection-bound mechanisms (NTLM, Negotiate) keep the current rule.** A POST is authenticated by being on the
-connection the logon session authenticated; `authorize_reuse` keeps that connection with its binding. The same
-placement hazard as PR5 exists there (the pool may hand the POST an unauthenticated connection) and this design
-does not remove it. The legacy route avoided it by keeping the exchange's lease from discovery to POST
-(`https_worker/serve.rs:66-71`, `native_route`); the host model has separate leases. Options: (U1) a placement
-hint to the pool so a binding's POST prefers its own authenticated connection (gwz-transport change); (U2) before
-a POST on an unauthenticated connection to a key learned as connection-bound, re-authenticate that connection with
-a bodiless GET (a new request, not a replay of the POST, but an adapter-initiated request that contract
-L563-565 reserves to the protocol profile, so it needs contract text); (U3) accept the refusal and record it.
-**Recommend U3 for this step**, and raise U1 or U2 as a Windows-parity decision (section 6, item 1).
+**(e) Scope record write rules (Safety P2-1).** The record (`ConnectionScope`, `https_adapter.rs:123-132`) is written by
+`Scopes::bound`, after the exchange task returns and before the connection can idle (`worker.rs:405`, then `:417`).
+- **W1.** Every exchange that sends a credential (from the record or a fresh lookup) or completes a native conversation,
+  including the re-authentication GET, reports that binding in `Ended`; the worker writes it before the connection idles.
+- **W2.** A task that ends without reporting (panic, abort) leaves the connection `Broken` (`worker.rs:408-422`).
+- **W3.** The record only rises: `Anonymous` < `HelperToken` < `LogonSession`. `LogonSession` is sticky; `HelperToken` is
+  replaced only by `LogonSession`. (`Scopes::bound` is last-writer-wins today, `:162-179`.)
+- **W4.** `prior` (the record read at exchange start, `worker.rs:259-261`) stays; H1b removes only the repository slot
+  (`repository`, `RepositoryDigest`, `Work.authenticated`, `Ended.repository`).
+R4 and partitioning are unchanged: `HttpsScoped` partitions the pool by `AuthScope` (`instance.rs:567`) and `authorize_reuse`
+refuses `HelperToken` and `LogonSession` connections to every binding but the last lessee (`:308-325`); the record is no
+scope input.
 
-## 4. Proposed contract text
+**(f) Placements.** Served `cli`: the core sends only a typed Open for an admitted tuple and cannot assert a need or widen
+a key. The re-authentication GET is covered by its open's admission (Split §5.1-5.5): same (scheme, host, port, path),
+same class (a receive-pack advertisement under a push-class request, within the push allowance), same native-auth grant; it
+is not a new `open`. `Opened.facts` (Split L188) describes the open's own request: a POST answered from the record reports
+`credential_offered`; a re-authenticated POST carries no credential itself; the re-authentication is counted (3.1), not
+reported as the open's method. gwz-py captures per call (`native/src/route/transport.rs` `capture`, reference only), so a
+record lives one call: a private key costs a helper run per call, and under b2 a credentialed request marks a formerly
+anonymous connection `HelperToken` (as `exchange.rs:227` does today), so mixed public/private workloads lose cross-call
+reuse. The 3.4 sweep expects both.
 
-**4.1 Contract section 7 table, HTTP credential adapter row (L494), last cell.** Replace "No token cache in host or
-account inherited from a TLS pool" with:
+**(g) `git credential approve` and `reject`.** Still never called: a side effect on the user's store that a transient 401
+could trigger (section 6). **(h) Concurrency.** Two exchanges learning one key each answer their own challenge; the first
+insert wins, the other's `Secret` is wiped (a duplicate helper spawn is harmless). The record is written **before the first
+response byte**: after the content-type check (`exchange.rs:264`), before the body loop (`:269`), while the scope record
+comes only after `pipe.end(Ok)` (`:290`) and the task's return. A client that has read any advertisement byte finds the record.
 
-> No token cache in host, endpoint instance or pool, and no account inherited from a TLS pool. The operation's own
-> `AuthContext` provider holds one fact per (origin, repository path, service class): that a credential was needed.
-> It holds no credential and is dropped with the operation.
+### 3.1 Connection-bound bindings: placement hint and re-authentication (decided: fix before step 3.1)
 
-**4.2 Contract section 7.2, new paragraph after L557 ("...as the current native contract requires.").**
+NTLM and Negotiate authenticate the connection, so a POST is authenticated only by being on a connection the logon session
+authenticated for its binding. The legacy route kept the exchange's lease from discovery to POST (`https_worker/serve.rs:66-71`);
+the host leases per exchange and the pool picks the lowest idle id (`pool/allocation.rs:22-28`). The fix is a hint
+(placement) and a fallback (correctness).
 
-> **Credential need is operation state.** For a request-scoped credential (Basic from a configured helper), whether
-> a repository needs a credential is recorded on the operation, not on the connection. When an exchange of an
-> operation receives an authenticated success to an advertisement that was challenged, the adapter records, in that
-> operation's `AuthContext` provider, the key (origin, normalized repository path, service class) as needed, before
-> delivering any byte of that response. Every later exchange of the same operation for that key, a POST included,
-> asks the operation's helper for a credential for that exchange and sends it from its first byte, on whichever
-> connection the pool leased. A key the operation has not recorded is sent without a credential; a challenge to such
-> a POST is refused as `Authentication` and never replayed. A 401 to a request that carried a credential ends it
-> `Authentication`, closes its connection, and marks the key rejected for the rest of the operation: later
-> exchanges for it fail before any helper lookup and before any byte. If the helper fails for a recorded key, the
-> exchange ends before any byte with the helper's mapped code. The record is bounded (512 keys per operation,
-> charged in the context); when full, further keys are not recorded and their POSTs are refused as above. The
-> record is never shared with another operation, instance, profile, pool or connection, and holds digests only.
-> Connection scope for these exchanges is unchanged: a connection a helper token authenticated is leased only to
-> the binding that last used it.
+**Learning (Safety P2-2, U7).** An accepted advertisement for key K records `ConnectionBound { Challenged }` when the logon
+session answered its challenge (G8), **or** `ConnectionBound { OnBound }` when the connection's scope at the exchange's start was
+`LogonSession` and K was served unchallenged (`work.prior`, G2). A Basic answer records `Basic` even on such a connection. An
+`OnBound` entry proves nothing about K's need: K may be public, and its POST on another connection then pays one
+re-authentication GET and goes anonymously (RA2a). The record keeps the advertisement's byte length (the body loop counts it; written before the exchange's
+end is visible, so a client that read the advertisement finds it).
 
-**4.3 Contract section 7.2, replace L561-563's "challenged POST refusal" with** "challenged POST refusal for a key the
-operation has not recorded".
+**Unchallenged re-authentication (U7, resolved).** A re-authentication GET served without a challenge on a key learned `OnBound`
+shows that K needs no authentication: its POST is sent as an unrecorded key's (P3), with no credential, to the key's own path,
+after one bodiless GET that the conditions below already allow, so nothing is sent that an unrecorded key does not send today. On
+a key learned `Challenged` the same answer is server misbehaviour and the key is `Rejected` (RA2). RA3 and RA4 are `Rejected` for both. A re-authentication that the logon session answers (RA1) upgrades any entry to `Challenged`, as G8 does, so a later unchallenged re-authentication of that key is RA2.
 
-**4.4 Contract section 7.2, add at the end of the paragraph "NTLM/Negotiate must retain...":**
+**Scope of the flag.** `ExchangeIo::connection_bound(&self) -> bool` (default `false`) is true when the connection's scope
+**after** the exchange is `LogonSession`, which by W3 is `prior == LogonSession` or the logon session answered. The exchange
+task sets a flag in its `Pipe` at the learning point (between `exchange.rs:264` and `:269`); `HttpsExchange` reads it. No
+`Settle` or `ssh_adapter.rs` change.
 
-> NTLM and Negotiate are connection-bound as a whole, whichever mechanism Windows selects. A POST is authenticated
-> only by being on a connection the logon session authenticated for its binding; a POST the pool places on any other
-> connection is refused as `Authentication`. This is a recorded limitation until placement or re-authentication is
-> decided (section 6 of this draft).
+**Placement (Consistency P3-4, §2 note).** The affinity is recorded **at the learning point**, not at settlement:
+gwz-connection samples `connection_bound()` when the exchange's first response byte is delivered (and once more in
+`Exchange::finish`, before it calls `Instance::settle`, which carries no binding and stays unchanged; this also covers a
+response without a body) and stores `(pool Key, spec path) -> ConnectionId` in the binding's
+state, at most 256 entries, oldest evicted, paths over 1 KiB not recorded; the pool `Key` is `PartialEq` only and the crate
+has no hash dependency, so it is a bounded `VecDeque` scanned linearly. `Operation::open` sets `Request.prefer` from it
+before `submit`. `Instance::submit` sets `Request.prefer_wait_ms` (the cleanup bound, 5 s, §10; the crate has no local
+constant, `remote/backend.rs:66` is the carrier's) only when the instance's own `settling` list holds that connection: the
+previous exchange has been finished and its lease is not yet released. The pool (`schedule`, `allocation.rs:17-53`) leases
+the preferred connection first when it is idle, of equal key and identity, reusable, not excluded and the owner not full;
+while it is leased and `prefer_wait_ms` has not lapsed the request waits (opens and evicts nothing; `next_deadline` includes
+the lapse); otherwise it decides as if none were named. A connection that is busy with a reading exchange is **not** waited for.
+The lapse is enforced only if the host driver wakes at `next_deadline`, which is R1's re-arm (`GwzPhase1-RemPlan.md`, Code P2-1): H2a depends on R1.
+Connection ids are never reused, so a stale hint matches nothing. The hint never crosses bindings: the table is binding
+state, and the lease still passes `authorize_reuse` (`instance.rs:601-630`). Cost: pool +75 and crate +125 product lines.
 
-**4.5 Section 15, new row** (appended; the 1.3c row's "POST rule" sentence is replaced by "see the next row"):
+**Conditions of the re-authentication (Safety P3-6, Consistency P3-1(b)).** For a POST whose key is `ConnectionBound` and
+whose leased connection's scope is `LogonSession`, the POST is sent as is (P4). Otherwise, **before its first byte**, the
+adapter sends the key's own advertisement GET on that connection, only if all hold:
+1. the request is an `info/refs?service=` GET, safe and bodiless, for a key whose advertisement this operation already had
+   accepted (the record exists), with method, path, query and headers equal to the original's (built by the same
+   `request()`; any future `Git-Protocol` header is carried);
+2. at most once per POST exchange; the POST is handed to the engine only after the GET's 200 body is drained;
+3. answered only by the operation's own logon session (`work.auth`'s caller, 3.2), never by the helper or from a `Basic`
+   record; any other challenge ends the exchange (RA3);
+4. the body is drained under `max(8 MiB, 1.25 x` the advertisement length recorded for K`)`, each frame within the stall
+   bound, stalled or over-cap ends `Protocol` or `Timeout` (RA5, RA6);
+5. it is counted (Counter below).
+It is the only request of a different service than its exchange's own that the adapter sends; challenge answers and native
+rounds are adapter-originated too, but they answer the exchange's own request. It is not a replay: the POST is sent once,
+after authentication, and A6 names the clause the GET is an exception to.
 
-| Existing authority | Replacement / retained rule |
-|---|---|
-| Section 7 (HTTP credential adapter row); section 7.2 (HTTPS authentication scope, challenged POST refusal) | Recorded at step 3.0c (gwz-core `<commit>`; evidence `<run>`; Code and State `<verdicts>`): credential need is recorded on the operation per (origin, path, class) and a POST for a recorded key carries a fresh helper credential on any connection; the connection scope record no longer holds a repository digest (PR5 and PR6 turn green). Retained: no replay, no token cache outside the operation's provider (nothing is cached at all in 3.0c), `authorize_reuse` unchanged, NTLM/Negotiate connection-bound with the placement limitation. Not done: `credential approve`/`reject`; pre-authenticating advertisements; (b2) credential retention. |
+**Effect (Consistency P2-1).** An exchange's `Effect` describes its own request (A7). The re-authentication does not move the
+contract section 9 boundary; any failure in it is `Effect::None`, the stale-idle replacement does not apply to it, and the
+POST is never handed to the engine before the GET is drained (rows H3b-3, H3c-3).
 
-**4.6 Plan.** Step 3.1's "Prerequisite" paragraph becomes "Prerequisite: step 3.0c". Add after 3.0b: "**3.0c HTTPS
-credential need on the operation** (this document, section 5). ~450 including rows."
+**Deadline (Consistency P3-11).** D is minted once for the re-authentication conversation as today's answer mints it
+(`auth.rs:48-52`: `now + connect_timeout_ms`, refusing at 0 with `UnsupportedOperation`), each request within the stall bound.
+An HTTPS exchange has no aggregate budget (§10 L682 is for setup); contract L704-711 governs the native conversation. Rounds
+past D end `Timeout`, `Effect::None` (row H3c-4).
 
-## 5. Implementation step sketch (proposed step 3.0c, lands before 3.1)
+**Scope after re-authentication.** After RA1 the re-authentication reports `LogonSession` in `Ended` (W1), so the connection is
+recorded before it can idle; a connection another binding last used anonymously becomes `Unprovable` to that binding
+(rows H3c-5, H3c-6). After RA2a no native conversation completed and the POST goes anonymously, so W1 writes nothing: the
+connection keeps its prior scope, `connection_bound()` is false and no affinity is recorded for it (row H3b-5).
 
-Repositories: gwz-core, plus the root contract and plan text. No gwz-transport or public API change (the provider
-is crate-private), so no Surface review.
+**Counter (Consistency P3-8, Safety R3-P3-4).** Re-authentications are counted by one shared saturating counter
+(`Arc<AtomicU64>`) that the composition's factory owns and gives to every adapter it builds; no per-adapter handle is retained,
+so its size does not grow with instance turnover. It is read through `HttpsAdapter::counters()`; row H3d-4: N re-authentications read N. How it reaches `TransportObservation` is a 3.1/3.4
+composition item (the crate has no observation surface, §15 L882); the trigger for any wait on a busy connection is this count.
 
-| File (gwz-core `src/`) | Change | Lines |
+### 3.2 Dependency on the 1.8 Code review P2-2 (R3)
+
+P2-2 (`GwzPhase1-ReviewCode.md:160-175`): `CoreFactory::create` ignores its `EndpointSpec` (`connection_factory.rs:60-89`)
+and the native caller is one per instance (`HttpsInputs.native`, `https_adapter.rs:93`; item 3, `ReviewCode.md:116-120`).
+This design depends on its correction (RemPlan R3), which is not counted in section 5:
+1. Adapters are built from `spec.profile.inputs()` (`EndpointInputs`).
+2. **R3 is the single owner of the caller move**: remove `HttpsInputs.native` and `Common.native` (`exchange.rs:38`), add
+   `OperationAuth::native()`, switch `auth.rs:42` to the context's caller. R3's row now owns `https_adapter.rs`,
+   `https_adapter/{exchange,auth}.rs` and `https_auth.rs` (A13, U6). H3a-H3d only consume `native()`. Without it the connection-bound path
+   is the one place an operation could authenticate as another's caller.
+3. R3 folds the captured caller's identity (SID, LUID or logon session, as the capture exposes it) into the `AuthScope`
+   digest (`https_auth.rs:58-78`) once the caller is in `OperationAuth`, with a row (two captures differing only in the
+   caller get different scopes). Only a non-secret identifier (a digest of the SID, LUID or logon session) enters the digest; when
+   the capture cannot read the caller's identity, the scope takes a value unique to that capture, never a constant, so it merges
+   no callers (Safety round 2; a row). Both reviewers agree it is not a prerequisite for safety today (the affinity table is per
+   binding and the logon-session refusal in `authorize_reuse` is unconditional). `NativeRetained` and `SharedProcessSafety`
+   stay per adapter (a host-level gate).
+
+## 4. Proposed contract and plan text (the complete amendment list)
+
+**4.0 Anchors and order.** Anchors are paragraphs, quoted by their opening or closing words; the line numbers in brackets are
+root HEAD's, for locating only. Apply A1..A13 in this order (A3 before A4: both go after the same paragraph, A3 first).
+
+| # | Where | Change |
 |---|---|---|
-| `git/endpoint/https_auth/needs.rs` (new) | `NeedKey` (domain-separated SHA-256 of host, port, path, class), `Needs` (`Mutex<BTreeMap<NeedKey, Need>>`, `Need = Needed \| Rejected`, `MAX_NEEDS = 512`, `learn`, `is_needed`, `reject`, overflow flag) | +110 |
-| `git/endpoint/https_auth.rs` | `OperationAuth` owns `Needs`; accessor; `context()` adds `MAX_NEEDS * 40` bytes to the declared charge | +15 |
-| `git/endpoint/https_adapter/exchange.rs` | Compute the key from `destination` and `work.service`; replace `authenticated_here` (`:219-220`) by the record; record `Needed` after `content_matches`, before the body loop; mark `Rejected` on a 401 to a credentialed request; fail fast on `Rejected`; release the secret after the response head | +45 / -20 |
-| `git/endpoint/https_adapter.rs` | Remove `RepositoryDigest`, `repository_digest`, `ConnectionScope.repository`, the `bound` parameter; rewrite module doc lines 15-24 | +10 / -40 |
-| `git/endpoint/https_adapter/{worker,pipe}.rs` | Remove `prior`/`authenticated` plumbing (`worker.rs:258-261, :395-405`, `pipe.rs:131-132`); `Ended.repository` goes. Dead code removed in the same change | -15 |
-| `transport_host/connection_host/https_needs_tests.rs` (new) | The rows below | +270 |
-| `transport_host/connection_host/https_auth_tests.rs` | Re-comment the two POST rows as the "never learned" cases | +10 / -10 |
+| A1 | §7 table, row "HTTP credential adapter" (L494) | replaced by the text below |
+| A2 | §7, paragraph ending "...a new auth framework is not introduced." (L485-487) | append: "The operation-held credential record of 7.2 is not an authentication framework: it adds no mechanism, store or policy; it keeps, for one operation and in memory, the credential the existing helper route obtained." |
+| A3 | §7.2, new paragraph after the paragraph ending "...generic reuse is allowed." (L553-559) | text below ("Credential need") |
+| A4 | §7.2, new paragraph after A3's | text below ("Connection-bound") |
+| A5 | §7.2, paragraph "Preserve the current approved mechanism matrix" (L561-563) | "challenged POST refusal" becomes "challenged POST refusal (a challenge to a POST is never answered; a recorded key's POST carries its credential from its first byte)" |
+| A6 | same paragraph, sentence "Redirects or challenge retries are requested by the existing protocol profile/policy with effect/deadline accounting; this crate never guesses Git discovery idempotence." (L563-565) | "...with effect/deadline accounting, except the gwz-core HTTPS adapter's re-authentication of a connection-bound key (above), made under the conditions stated there; this crate guesses Git discovery idempotence nowhere else, and a probe POST is not one of its tools." |
+| A7 | §9, paragraph "Before an SSH exec is submitted..." (L660-666) | append: "An exchange's `Effect` describes its own request. The re-authentication advertisement GET that the adapter sends inside a POST exchange (7.2) does not move the boundary: the POST is handed to the HTTP engine only after that GET's body is drained, a failure in the re-authentication is `Effect::None`, and the stale-idle replacement of this paragraph does not apply to it." |
+| A8 | §10 table (L675-687) and the sentence "Shared provider objects use one actual ownership charge..." (L692-694) | two rows below; append to the sentence: "A provider that retains credentials is single-admission: while one admission holds or has consumed the claim, `admit` of any clone of its `AuthContext` is refused `InvalidInput` (`register` stays infallible); an admission that never registers frees the claim." |
+| A9 | §11, paragraph "Admission errors are..." (L717-731) | add: "An adapter's budget refusal is `ErrorCode::Capacity` in the `InputBudget` class: locally a stream error of kind `QuotaExceeded`, under `cli` `StreamError::Failed { code: Capacity }` with no detail. A `Capacity` without a `capacity` detail that ends an exchange of the HTTPS adapter means the operation's credential record is full; the pool's own limit refuses an opening and never ends an exchange." (`InvalidInput` is already listed, L717; the crate's `AdmissionError` lacks it at `0a253639`. gwz-core's `capacity.rs:181-183` reads a detail-less `Capacity` as the pool's limit at an opening.) |
+| A10 | §4.1, paragraph "The EndpointFactory returns an opaque..." (L197); §8, paragraph "Fairness is FIFO among eligible requests" (L606-610) | §4.1: "An exchange handle reports, once its response has begun, whether its connection is authenticated by a mechanism that lives on the connection (`connection_bound`, default false)." §8: "A request may name one preferred connection and, when its binding's own exchange on it is finishing, a bounded wait (at most the cleanup bound): the pool leases it when it is idle, of equal key and identity, reusable, not excluded and its owner not full; while it is leased and the wait runs the request opens and evicts nothing; otherwise the pool decides as if none were named. The hint is binding-local and never replaces `authorize_reuse`." |
+| A11 | §15 (after L887), and L881 | two rows below; L881's "POST rule" sentence and its "Open for Phase 3" sentence are marked "Superseded by the HTTPS model step (row below)" in place; the 1.3c text stays as history |
+| A12 | Plan 3.1 Prerequisite (L724-728); plan 3.2 (L729-735); the Phase 2 served path (plan L72-74); plan 3.4 (L739); plan §10 (after D-U, before "Open: none.", L996-1000); and a §15 note on `GwzSplitCommandChannel.md` §3.4 L136 | text below |
+| A13 | `GwzPhase1-RemPlan.md` rows R3 and R4 (lane owner; done at `5de7d71b`, amended at `0454aa1f` and `56186ad1`) | R3 owns `https_adapter.rs`, `https_adapter/{exchange,auth}.rs`, `https_auth.rs` (caller move, scope digest); R4 is H1a..H3d with the files of section 5 and contract §4.1/§7/§7.2/§8/§9/§10/§11/§15 |
 
-Estimate: about 460 added, 85 removed. If the rows pass 300 lines, split: 3.0c-A (record, rows 1-4, 7), 3.0c-B
-(`Rejected`, bound, helper failure: rows 5, 6, 8, 9).
+**A1 row.**
+> | HTTP credential adapter | Per-request origin/challenge and captured context; opaque request-scoped authorization | The host, endpoint
+> instances, pools and connections own or retain no credential and inherit no account from a TLS pool; an instance carries an
+> operation's `AuthContext` only for that operation's openings and exchanges. The operation's own `AuthContext` provider may
+> hold the credentials it obtained for that operation (7.2): bounded (section 10), never logged, formatted, serialized or sent
+> over a carrier, wiped when its context is dropped or the credential is rejected. Residuals: the HTTP engine's and TLS
+> buffers of connections the operation authenticated until those are disposed (an idle one lives at most 60 s and no other
+> binding can lease it), process dumps and swap. |
 
-**Rows (all fixture-server rows in `connection_host`, digests compared, no header printed):**
+**A3 paragraph.**
+> **Credential need and the credential are operation state.** For a request-scoped credential (Basic from a configured
+> helper), whether a repository needs one, and the credential obtained for it, are recorded in the operation's `AuthContext`
+> provider, not on the connection, under a key of (scheme, username, host, port, normalized repository path, service class).
+> When an exchange of the operation receives an authenticated success to a challenged advertisement, the provider records the
+> key and the credential before any byte of that response is delivered. Every later exchange of the operation for that key,
+> a POST included, sends that credential from its first byte on whichever connection the pool leased; a challenge to a
+> recorded key's advertisement is answered from the record. A key not recorded is sent without a credential, and a challenge
+> to such a POST is refused as `Authentication` and never replayed. A 401 to a request that carried a credential ends it
+> `Authentication`, closes its connection, marks the key and every key of that origin holding the same credential rejected for
+> the rest of the operation, wipes the credential at once, and the operation does not send equal bytes to that origin again.
+> The record is bounded (section 10); a key or credential it cannot hold ends the advertisement before any body byte with the
+> budget refusal, never as `Authentication`. It is shared with nothing outside the operation, appears in no log, formatted
+> output, observation or carrier message, and its provider is admitted once. A connection a helper token authenticated is
+> still leased only to its last binding.
 
-1. **PR5 placement, red on `68db19ae`.** One binding, anonymous connection 1 and authenticated connection 2; the
-   private POST is leased connection 1; expect success, one POST carrying the binding's own credential (digest).
-2. **PR6 single slot, red on `68db19ae`.** GET `/a`, GET `/b`, POST `/a` on one connection; expect the POST
-   authenticated and successful.
-3. **Cross-binding no-leak.** Binding A learns `/private`. Binding B, once with an equal-scope context and once
-   with a different one, POSTs `/private` without having learned it: no `Authorization`, B's helper not started
-   for that exchange, typed refusal, A's credential digest on no request of B. Red under the mutation that moves
-   the record into adapter-shared state.
-4. **Key precision.** `/public` after `/private` stays anonymous (the existing public-POST row stays green);
-   `/repo.git` after `/repo` stays anonymous (PR7); push-class learning does not pre-authenticate an upload-pack
-   POST of the same repository; an anonymously served advertisement records nothing.
-5. **Learn only on authenticated success.** A helper credential rejected at the advertisement does not create a
-   `Needed` key; the POST fails fast with zero helper spawns and zero requests.
-6. **401 to a credentialed POST.** `Authentication`, `Discarded`, exactly one POST (digest present), the connection
-   closed, the host `Open`; the next exchange for that key fails before a helper spawn; another repository on the
-   same operation is unaffected.
-7. **Ordering and concurrency.** 100 iterations: the client reads the advertisement's first byte, then starts the
-   POST on another connection at once; every POST is authenticated. Two advertisements of one key in flight leave
-   one entry. Red under the mutation that records after the body.
-8. **Bound.** The 513th key is not recorded; its POST is refused typed; keys 1-512 still work.
-9. **Helper failure at a recorded key.** The POST ends before a byte reaches the server (`Effect::None`).
+**A4 paragraph.**
+> NTLM and Negotiate are connection-bound as a whole, whichever mechanism Windows selects. The operation records such a key as
+> connection-bound, with no credential, when an advertisement is accepted on a connection the logon session authenticated (it
+> answered the challenge, or the connection already was its; the record notes which). The host prefers, for an exchange of that key, the connection of
+> the binding's previous exchange for the same repository. If the connection leased is not authenticated for the binding, the
+> adapter, before the first byte of a POST, re-authenticates it: it repeats the key's own advertisement GET (bodiless, safe, an
+> advertisement this operation already had accepted, with the same method, path, query and headers), answers it only through
+> the operation's own logon session, drains the 200 body under max(8 MiB, 1.25 x the length it observed), once per exchange and
+> within the deadline D, then sends the POST. A re-authentication that does not authenticate the connection ends the exchange
+> before any POST byte, except that a key learned only on a bound connection whose re-authentication GET is served unchallenged
+> sends its POST as an unrecorded key's. A connection's scope tag only rises: once the logon session authenticated it, no later exchange
+> lowers it. This is the one repetition the adapter makes on its own; it is not a retry of the POST.
 
-The existing push row and the retention row (`https_auth_tests.rs:497`, `:438`) stay green unchanged.
-A Windows receipt is required (the worker and `LogonSession` records compile on both platforms). Fast checks:
-parity, cfg-boundary and globals scripts; braced control flow; no thread-local; the record is a provider field.
+**A8 rows.**
+> | HTTPS operation credential record | At most 512 keys, 64 distinct credentials, 16 KiB per credential, 256 KiB of retained credential bytes and 64 rejection fingerprints; counted in the `AuthContext` charge | Provider |
+> | Connection-bound placement | Affinity table of 256 entries per binding (paths up to 1 KiB); re-authentication body max(8 MiB, 1.25 x the observed advertisement length); wait for a finishing preferred connection up to the cleanup bound | Binding/adapter/pool |
 
-**Review tier: dual** (secrets handling plus a normative clause make it a per-step dual). Document object
-(sections 4.1-4.6): Consistency and Safety. Code object: Code and State. Two reviewers per object, remediation
-capped at two rounds.
+**A11 rows.**
+> | §7 table; §7.2 (scope, challenged POST refusal, connection-bound); §9 (effect); §10 (bounds, shared providers); §11 | Recorded at the HTTPS model step (sub-steps `<H1a..H3d>`, gwz-core `<commits>`, evidence `<run>`, verdicts `<..>`): credential and need on the operation per (origin, username, path, class); POST pre-authenticated on any connection; single-slot record and its "Open for Phase 3" remedy superseded (PR5, PR6 green); connection-bound keys re-authenticate by advertisement before a POST, and a key learned only on a bound connection that is served unchallenged sends its POST as an unrecorded key's; the scope record only rises. Retained: no replay, `authorize_reuse`, `HttpsScoped`. Not done: `approve`/`reject`, pre-authenticated advertisements, a wait for a busy (not finishing) preferred connection, retiring a binding's idle per-exchange connections at its end. |
+> | §4.1 and §8; §11 | Recorded with the same step (gwz-transport `<commits>`, pin `<commit>`): `ExchangeIo::connection_bound`, `pool::Request.prefer` and `prefer_wait_ms`, binding affinity, `AdmissionError::InvalidInput` for single admission, reported `InvalidRequest` at a served bind (`remote/{receiver,served}.rs`). |
 
-## 6. Risks, open questions, decisions
+**A12 plan text.** *3.1 Prerequisite* replaced by: "**Prerequisite (recorded 2026-10-31; settled by the HTTPS model step,
+RemPlan R4, contract 7.2 and §15):** credential need and the credential are operation state per (origin, repository, service
+class) and are sent on any connection; NTLM/Negotiate stay connection-bound with a placement hint and a re-authentication
+before a POST. Two items remain for 3.1: the lookup must pass the remote's `user@` account selector to `git credential fill`
+(today `https_adapter/exchange.rs:86-96` builds the lookup URL from host, port and path only), and the composition captures once per
+admitted operation, on the original entry, admits that capture once (a credential-retaining `AuthContext` is single-admission) and drops it
+with the operation; a composition row asserts the provider's strong count is 0 after the operation finishes." *3.2* gains: "gwz-py
+captures per call and never caches a capture across calls." *The Phase 2 served path* (plan L72-74) gains: "the client owner of a
+served core builds a fresh capture (a fresh `OperationAuth`) per bind." The §15 note says that the capture of `GwzSplitCommandChannel.md` §3.4 L136 (the `PreparedOperation` built "from that call's captured invocation") is per bind, and that a served bind refused `InvalidInput` is `bind_rejected(invalid_request)` (L136-137). *3.4* gains: "the sweep reads the HTTPS adapter's
+re-authentication count; route: the composition's factory gives every adapter it builds one shared saturating counter (`Arc<AtomicU64>`) and the sweep reads the total; no per-adapter handle is retained (the test factory's `scopes()` Vec, `https_tests.rs:79`, is not the pattern), with a 3.1 composition row that N re-authentications read N and that the factory holds one counter after more than 16 instances are built and retired." *Plan §10* gains a decision entry (the lane owner numbers it, next
+free letter D-V): the operator's four decisions of 2026-10-31 (6) and the bounds of A8.
 
-**Decisions for the operator or the 1.8 phase review** (each with my recommendation):
+## 5. The HTTPS model step: sub-steps (each about 500 lines or fewer, rows included)
 
-1. **Windows logon-session POST placement.** The host model can refuse an NTLM/Negotiate push that the legacy route
-   served by lease continuity. Moving the CLI to the host in 3.1 is then a Windows regression for those setups,
-   against the goal that Windows is a full peer (plan L48). Choose: U3 (record; add a standing Windows
-   "known refused" row) or schedule U1 (pool placement hint, gwz-transport) or U2 (bodiless re-authentication GET)
-   before the Windows exit of Phase 6. Recommend U3 now, a design step for U1 before 6.2. I did not run Windows.
-2. **(b1) or (b2)** (section 3b). Recommend (b1), measured trigger for (b2) in the 3.4 sweep; the operator sets the
-   helper-spawn bound.
-3. **Land before or after the 1.8 review.** Before: the 1.8 object includes the new model and the PR5/PR6 limit never
-   reaches the reviewers as an open item. After: the 1.8 object stays as the closed 1.3c rows describe it. Recommend
-   after 1.8, before 3.1.
-4. **Service class in the key** (section 3a). Recommend yes.
-5. **`approve`/`reject`** (section 3g) out of 3.0c. Recommend a separate step, decided after the sweep shows
-   whether prompts or stale tokens are a real user problem.
-6. **Pre-authenticated advertisements** (section 3c) out. Recommend revisit after the sweep.
+Sizes come from the real rows: the existing `https_auth_tests.rs` rows run 31-61 lines (about 40 on average, more with a
+second connection or origin); pool rows in `tests/pool_fresh.rs` run about 12. The step is about **3,805 lines added and 95
+removed in eleven sub-steps** (about 1,120 product, 2,685 rows and fixtures), plus about 150 lines of root text (T). Revision 2
+said 1,500 in four: it assumed 30-line rows, 25 rows and none of the r3 mechanisms. Each sub-step aims at 500 lines or fewer (R4, U1).
+
+| Sub-step | Repo and files, by edit | Product | Rows | Added |
+|---|---|---|---|---|
+| H1a record | gwz-core `https_auth/needs.rs` (new: `NeedKey`, `Needs`, bounds, dedupe, HMAC, `Debug`), `https_auth/needs_tests.rs` (new), `https_auth.rs` (field, accessor, `context()` charge), `https_auth/secret.rs` (test wipe hook in a `cfg_if` block) | +255 | 10 unit, ~200 | ~455 |
+| H1b Basic wiring | gwz-core `https_adapter/{exchange,auth,worker,pipe}.rs` (key; header under the lock; record before the body; `answer` returns the `Secret`; `Scopes::bound` rises only; slot, `Work.authenticated`, `Ended.repository` removed, `prior` stays in `worker.rs` and `pipe.rs`), `https_adapter.rs`; `connection_host/https_needs_tests.rs` (new), `connection_host.rs` (mod line), `https_auth_tests.rs` (`:558`, `:613`) | +190 / -95 | 4 rows + fixture + edits, ~255 | ~445 |
+| H1c rejection | gwz-core `https_adapter/{exchange,auth}.rs` (401 paths, fingerprint check), `https_needs_tests.rs`, a second-origin fixture | +60 | 6 rows, ~295 | ~355 |
+| H1d overflow | gwz-core `https_adapter/exchange.rs`, `https_adapter.rs` (`stream_error` arm), `https_auth.rs` (test-only small bounds in `cfg_if`), `https_needs_tests.rs` | +60 | 5 rows, ~225 (+15) | ~300 |
+| H1e admission | gwz-transport `crates/gwz-connection/src/{operation,host,admission,binding}.rs` (the claim travels with the `ChargeGuard`: `admission.rs` carries it and frees it on a dropped admission, `binding.rs:188`), `remote/{receiver,served}.rs` (map `AdmissionError::InvalidInput` to `InvalidRequest`; not 2.3b's `remote/{core,backend,lane}.rs`), `host_tests.rs`; gwz-core `https_auth.rs` (one call), `connection_host/https_auth_tests.rs`, `https_sspi_tests.rs` | +75 | 8 rows, ~210 | ~285 |
+| H2a pool | gwz-transport `src/pool/{mod,machine,allocation,clock}.rs`, `tests/pool_prefer.rs` (new) | +75 | 9 rows, ~140 | ~215 |
+| H2b affinity | gwz-transport `crates/gwz-connection/src/{ports,binding,exchange,instance}.rs` (`instance.rs`: `submit` only, for the settling check; `Instance::settle` unchanged, the fallback sample is in `Exchange::finish`), `fakes.rs`, tests | +125 | 9 rows, ~240 | ~365 |
+| H3a learning | gwz-core `https_adapter/{pipe,exchange}.rs` (flag, learning), `connection_host/https_bound_tests.rs` (new; NTLM-style handler ~70), `connection_host.rs` (mod line) | +60 | 5 rows, ~250 | ~380 |
+| H3b re-authentication | gwz-core `https_adapter/{auth,exchange}.rs`, `https_bound_tests.rs` | +165 | 5 rows, ~255 | ~420 |
+| H3c branches | gwz-core `https_adapter/{auth,exchange}.rs`, `https_bound_tests.rs` | +25 | 6 rows, ~290 | ~315 |
+| H3d conditions | gwz-core `https_adapter.rs` (counter), `exchange.rs`, `https_bound_tests.rs`, `https_sspi_tests.rs` (Windows) | +30 | 5 rows, ~240 | ~270 |
+| T text | root `GwzConnectionApiContract.md`, `GwzTransportReleaseConvergencePlan.md` (A1-A12) | text | none | ~150 |
+
+If H1a or H1b passes 500, move rows 8-10 of H1a, or row 4 of H1b, into an added sub-step. A split of H3a/H3b rows is likewise
+free. **Order.** Needs R3 (native caller and `OperationAuth` shape; it precedes R4), R2b (`pipe.rs` poll ports), R2a
+(`Effect`, and `exchange.rs` which H2b shares), R1 (the driver re-arm: H2a's wait lapses only if the driver wakes at
+`next_deadline`) and R1b (the pool step H2a follows). Lane A, gwz-core: H1a, H1b, H1c, H1d serially. Lane B, gwz-transport: H1e and
+H2a, then H2b. **No production caller, release tag or 3.1 lane consumes gwz-core between H1b and the completion of H1c, H1d
+and H1e; the R4 group is adopted whole.** Then a pin commit in gwz-core moves `.github/gwz-transport.commit` to the pushed
+gwz-transport commit. **Pin rule:** each lane that moves the pin rebases on the latest pushed gwz-transport commit and moves the
+pin and the allowlist `reconciled_commit` (`process_globals_allowlist_gwz_transport.json`) together; no order among R1, R2b, 2.3b
+and this pin is fixed here. Then lane A again:
+H1e's gwz-core part, H3a, H3b, H3c, H3d (H3a needs H1b and the pin). T lands when this document is accepted, so the lanes
+cite controlling text; the §15 fields are filled by R6. At most three compiling lanes. **Code rules** (standing): braced
+control flow; conditional compilation only in `cfg_if` blocks (test hooks, Windows rows), never on single items; no
+thread-local or global; fast checks (parity, cfg-boundary, process-globals) run. Windows receipts: H1b, H1e, H3a-H3d.
+**Review.** The RemPlan's structure: this document's own dual (Consistency and Safety, same two reviewers), and one round-2
+Code and State review of the settled tuple; no per-sub-step review.
+
+Rows (all fixture-server rows run the real adapter in `connection_host`; credentials are compared by digest, no header is
+printed; "red" rows fail on `68db19ae`/`a7b965c5` first):
+
+| Row | Asserts | Closes |
+|---|---|---|
+| **H1a** (unit) | 1 key precision: scheme, username, host, port, path, class each separate; `/repo`=`/repo/`, `/repo.git` apart. 2 equal bytes share one allocation per origin, not across origins. 3 each bound (512th/513th key, 64th/65th credential, 16 KiB, 256 KiB) ends budget-coded, earlier entries work. 4 reject K1 with K2..K16 unused: buffers read zero before anything else runs. 5 reject at A leaves B's equal credential usable. 6 rejected fingerprint refuses equal bytes at that origin only; the record holds no secret bytes. 7 the 64th fingerprint is stored; the 65th and a poisoned lock give `Exhausted`, and every entry becomes a tombstone holding no secret bytes. 8 declared charge >= byte sum with every bound full. 9 no format path shows credential bytes. 10 kind flip, `Rejected` terminal, late insert after `Rejected` is a no-op | Safety P3-1, P3-3, P3-4, P2-4; Consistency P2-2, P2-3 |
+| **H1b** 1 | PR5 (red): anonymous c1 and authenticated c2; the private POST lands on c1 with the credential from the record; the helper spawned once in all (the challenge and three POST rounds spawn it zero times after learning) | PR5 |
+| H1b 2 | PR6 (red): GET `/a`, GET `/b`, POST `/a` on one connection is authenticated | PR6 |
+| H1b 3 | cross-binding no-leak: A records `/private`; B, with an equal-scope and a different-scope context, POSTs it: no `Authorization`, B's helper not started, typed refusal, A's digest on none of B's requests; red under the mutation that moves the record into adapter-shared state | R4 |
+| H1b 4 | 100 iterations of "read the first advertisement byte, start the POST on another connection" all authenticated; two advertisements of one key leave one entry; red when recorded after the body | 3(h) |
+| H1b 5 | `:558` and `:613` become "never learned" rows and stay green | draft |
+| **H1c** 1 | `/public` stays anonymous; `/repo.git` after `/repo` (PR7); push-class does not authenticate an upload-pack POST; an anonymously served advertisement records nothing | 3(a) |
+| H1c 2 | fresh-lookup 401 (G6): `Rejected`; the retry GET sends nothing credentialed; the key's POST sends no request and spawns no helper | Safety P3-1(c) |
+| H1c 3 | 401 to a credentialed POST (P2): `Authentication`, `Discarded`, one POST, connection closed, host `Open`; the next exchange for the key and its origin-mates fails before a byte; an unrelated credential works; buffers zero at once | Consistency P2-2 |
+| H1c 4 | a 401 at origin A (a second fixture server) leaves B's equal credential usable | Safety P3-1(b) |
+| H1c 5 | K2 with equal bytes after K1's rejection: no request carries them; ends `Authentication` | Safety P3-1(d) |
+| H1c 6 | G11: a GET for a `Rejected` key is not answered and spawns no helper | table |
+| **H1d** 1 | with small test bounds: the new key past the key table ends its advertisement budget-coded before a body byte; no POST for it reaches the server; the stream error is `QuotaExceeded` and its message names the credential record, with no pool-limit wording | Safety P2-4, N-P3-6 |
+| H1d 2 | the credential past the count and byte bounds: same, key `Unretained` | Consistency P2-3 |
+| H1d 3 | a 5 KiB credential's push succeeds (header about 6.8 KiB) | Safety P2-4 |
+| H1d 4 | POST for an `Unretained` key: budget code, `Effect::None`, no request | P8 |
+| H1d 5 | `Exhausted` (small fingerprint bound; also a poisoned lock, and failing `getrandom` at creation): the exchange whose 401 produced the bound ends `Authentication` (X1); afterwards zero helper spawns (X2), no `ConnectionBound` entry is written and a challenged GET ends with the budget code (X4), and the POST of a previously `Basic` key sends no request (X3); with `Exhausted` from creation a public fetch and its anonymous POST succeed (P3) | 3(b), N-P3-5; R3-P3-2, R3-P3-3 |
+| **H1e** 1-4 | (crate) 1 a second admission of a cloned context, after the first registered or while it is still waiting, is refused `InvalidInput`, with no registration, instance or effect. 2 a refused (`QueueFull`) or dropped first admission frees the claim and the retry registers; a plain provider is still shared as documented. 3 with a connect in flight, the provider's strong count falls to the test's own handle within the connect bound after `finish`. 4 two concurrent admissions of clones, neither registered: the second `admit` is refused at once and `register` stays infallible | Safety P2-3, U2; N-P3-4 |
+| H1e 5-7 | (gwz-core) 5 `OperationAuth::context` is single-admission through `ConnectionHost`. 6 Windows: after a native exchange ends with cleanup `Pending`, the provider is not held by the retained record. 7 two binds of one served invocation, each with a fresh capture, both register | Safety P2-3; R2-P3-4 |
+| H1e 8 | (crate, `remote` tests) a served bind refused `InvalidInput` is reported `bind_rejected(invalid_request)`, not `capacity` (Split L136-137); red on the unmapped variant | N3-P3-6 |
+| **H2a** (pool) | 1 idle preferred taken over a lower id. 2 stale id as absent. 3 other key or identity, excluded, not reusable: not taken. 4 leased and no wait: as absent. 5 leased with wait: the request opens and evicts nothing and gets it on release. 6 the wait lapses at its bound (`next_deadline` includes it) and the request decides as absent, with the driver parked first (the PROBE-ALLOC shape; red on `0a253639`). 7 never past the request's own deadline. 8 `prefer_wait_ms` without `prefer` is `InvalidRequest`. 9 FIFO: an earlier non-preferring waiter may take it | Consistency P3-4 |
+| **H2b** (crate) | 1 affinity stored at the first delivered byte while the exchange is open. 2 GET finish then POST open with no wait for idle: the POST lands on the advertisement's connection, 100 of 100. 3 a reading (not finishing) exchange: no wait. 4 B never gets A's hint. 5 the 257th entry evicts the oldest. 6 a path over 1 KiB is not recorded. 7 a closed connection's hint is ignored. 8 an exchange not `connection_bound` records nothing. 9 the default is false (SSH, fakes) | Consistency P3-4, §2 note |
+| **H3a** 1 | NTLM-style fixture (authenticates a connection after a token and remembers it; `challenging` is per request, `https_tests.rs:118`): a logon-session answer records `ConnectionBound { Challenged }`, sets the flag, scope `LogonSession` | 3.1 |
+| H3a 2 | `/a` authenticates c1, `/b` is unchallenged on c1: `/b` is learned `ConnectionBound { OnBound }`, `connection_bound()` true | Safety P2-2 |
+| H3a 3 | advertisement then POST of one binding with two idle connections, the authenticated one the higher id; the POST goes on it, no second GET, `accepted == 2`; also with no wait for idle, 100 of 100 | Consistency P3-4 |
+| H3a 4 | cross-binding: B never receives A's bound connection; B's POST re-authenticates on its own | R4 |
+| H3a 5 | a `Basic` key gets no hint and sends no re-authentication | table |
+| **H3b** 1-2 | hint miss (preferred busy; preferred gone): the POST lands elsewhere, re-authenticates (GET, challenge, token, 200), then succeeds once | 3.1 |
+| H3b 3 | refused (RA4): zero POST bytes at the server, `Authentication`, `Effect::None`, connection discarded, host `Open`; the next POST of the key sends nothing and no GET | Consistency P2-1 |
+| H3b 4 | re-authentication GET gets 200 unchallenged for a `Challenged` key (RA2): same shape | Safety P3-2(a) |
+| H3b 5 | U7 fixture: `/priv` (challenged) and `/pub` (anonymous) on one origin; `/priv` authenticates c1, `/pub` is learned `OnBound` on c1, its POST is forced onto c2: one unchallenged re-authentication GET, then an anonymous POST that succeeds; the entry is unchanged and not `Rejected`, and the next `/pub` exchange works; red under the mutation "`OnBound` treated as `Challenged`". c2's scope stays `Anonymous`, `connection_bound()` is false for the anonymous POST and no affinity entry names c2. After an RA1 on an `OnBound` key, a later unchallenged re-authentication is RA2: `Rejected`, zero POST bytes | R2-P2-1, N-P2-1; R3-P3-1, N3-P3-1 |
+| **H3c** 1 | challenge offers Basic only (RA3): not answered by helper or record; zero POST bytes | Safety P3-2(b) |
+| H3c 2 | POST 401 after a successful re-authentication (P6): that POST ends `Authentication`; the key is `Rejected`; the next POST sends nothing and no GET (the first POST's bytes were sent; the zero-byte assertion is for the next) | Safety P3-2(c) |
+| H3c 3 | reset during the re-authentication body, or a 3xx answer to it (RA7): `Effect::None`, no second attempt, zero POST bytes, entry unchanged | Consistency P2-1 |
+| H3c 4 | fake-port rounds past D (`connect_timeout_ms` set small): `Timeout`, `Effect::None` | Consistency P3-11 |
+| H3c 5 | re-authentication then POST on a connection B last used anonymously: scope becomes `LogonSession`, B's lease of it is `Unprovable`; red under the mutation "re-authentication reports `Anonymous`" | Safety P2-1 |
+| H3c 6 | a `Basic`-recorded POST on a `LogonSession` connection leaves it `LogonSession` | Safety P2-1 |
+| **H3d** 1 | `/a`, `/b`: `/a` authenticates c1, `/b` unchallenged on c1, POST `/b` forced onto c2 (c1 held), re-authenticates and succeeds once | Safety P2-2 |
+| H3d 2 | the re-authentication's request line and headers equal the original advertisement's | Safety P3-6 |
+| H3d 3 | an advertisement over 8 MiB: the POST still succeeds after a hint miss | Safety P3-6 |
+| H3d 4 | N re-authentications read a count of N, also across two adapters sharing the one counter | Consistency P3-8; R3-P3-4 |
+| H3d 5 | Windows (`https_sspi_tests.rs`): real SSPI against the acceptor fixture, push through the host, hint hit and connection gone | draft rows 1, 3 |
+
+Existing rows `https_auth_tests.rs:497` (`a_push_is_authenticated_on_the_connection_its_advertisement_was`) and `:438` stay green.
+
+## 6. Decisions, risks and open questions
+
+**Decided (operator, 2026-10-31), applied unchanged in r4** (RemPlan "Operator decisions").
+
+| # | Decision | Where applied |
+|---|---|---|
+| 1 | Held data is the credential itself in operation-scoped memory, wiped at the operation's end (b2) | 3(b), A1, A3 |
+| 2 | Windows NTLM/Negotiate fixed before 3.1, with a pool placement hint, inside the same step | 3.1, A4, A10, H2, H3 |
+| 3 | Folded into the 1.8 remediation as "the HTTPS model step"; the lane owner numbers it | A12, A13, 5 |
+| 4 | The service class is part of the key | 3(a) |
+| 5 | Apply 1.8 Code review P2-2: adapters from `spec.profile.inputs()`, native caller in the `AuthContext` | 3.2 |
+
+**Not decided by the operator; my recommendation stands unless told otherwise.**
+1. `approve`/`reject` (3g) and pre-authenticated advertisements (3c): out; separate steps after the sweep.
+2. A wait for a preferred connection: built only for one that is **finishing** (bounded by the cleanup bound; r2 built no
+   wait); a busy (reading) one is not waited for; its trigger is the re-authentication count.
+3. My numbers: 512 keys, 64 credentials, 256 KiB total, 64 fingerprints, 256 affinity entries, 1 KiB recorded path, the
+   8 MiB floor and 1.25 factor, the 5 s wait.
+4. Caller identity in `AuthScope`: R3 does it (RemPlan). Safety advised against (it partitions identity-free anonymous
+   connections); Consistency for (cheap, fail-closed); Safety withdrew its objection in round 2, on the condition of 3.2 item 3. Safety's refusal rule, `LogonSession` never crosses bindings, is
+   unconditional and now sticky (W3).
+5. Lifting `authorize_reuse`'s refusal of helper-token connections between equal-scope bindings (R2): not now. W3's sticky
+   `LogonSession` is its first prerequisite; the second is evidence that no supported server ties Basic to a connection.
 
 **Risks and observations.**
+- **A server must accept a POST without a header on a connection a GET authenticated.** True of IIS-style NTLM/Negotiate as
+  defined (hypothesis for others); a Kerberos server that authenticates per request (Apache `mod_auth_gssapi` by default,
+  hypothesis) challenges every POST: this fails closed and matches today's route. H3d-5 and the Windows receipt are the evidence.
+- **Re-authentication costs a full advertisement per fallback**; it is counted (H3d-4). The hint's efficacy depends on
+  gwz-git finishing the GET before it opens the POST; gwz-git has no production caller of `ExchangeSpec::git` until 2.5
+  (contract L884), so no row can pin its real order yet.
+- **Token expiry.** `parse_secret` ignores helper attributes beyond `username` and `password`, including
+  `password_expiry_utc`; a retained OAuth token can expire in a long operation, and its 401 rejects every key of that origin
+  holding it until the operation ends, where per-POST lookups refreshed it.
+- **Account selection by URL.** The lookup URL has no `user@` (`exchange.rs:86-96`; the key's username never reaches
+  `git credential fill`); with b2 the wrong account's credential would be retained and spread to every POST of its key. It
+  is a named prerequisite of 3.1 (A12), not a conditional report; the username in the key (3(a)) keeps accounts apart once
+  it is fixed.
+- **Not closed:** whether `credential fill` strips the path before helpers when `useHttpPath` is false (3a); the Git
+  behaviours marked unverified in section 2; a transient 401 rejects every key of its origin sharing the credential.
+- **Findings outside the step (recorded, not built):** helper failures are not memoized on the host route (the legacy route
+  caches them, `credentials.rs:16`), so an interactive helper can raise up to 8 concurrent prompts in a 16-member operation;
+  retiring a binding's idle `HelperToken` connections when it ends (needs a crate port); an unrecorded key's POST on a
+  `LogonSession` connection carries the binding's Windows identity to the same server (inherent to connection
+  authentication; contract text could say so beside A4); contract §7.2 L541-542 still describes `ExchangeSpec` without
+  `GitService` (pre-existing, Consistency §5).
 
-- **Spawn cost under (b1) is an estimate, not a measurement:** at least two `git credential fill` per private
-  member per service, on 8 helper slots and the spawn gate (`https_auth.rs:34,184`). Step 3.4 should record
-  spawns per command and wall time.
-- **Helper-token connections are still not shared across bindings** (`authorize_reuse` refuses them). With the need
-  on the operation, a Basic connection carries no authentication state that a later binding could inherit, so the
-  restriction could be lifted for equal scopes and R2 (a Python client keeping connections across calls) would then
-  reuse private-repository connections. That is a separate Safety decision, not a prerequisite; I did not attempt
-  to prove no server ties Basic to a connection.
-- **Account selection by URL (observation, outside this design).** The host adapter builds the lookup URL from the
-  key's host and port and the spec's path only (`exchange.rs:86-96`); no userinfo reaches `git credential fill`,
-  whereas the legacy route looks up with the user's URL. Whether a `user@` in a member's URL must select a helper
-  account on the host route is not checked here; report it if multi-account setups matter for 3.1.
-- **The 512-key bound** is a chosen number with a typed, fail-closed overflow; recheck it against the largest
-  workspace member count. `Rejected` can turn a transient 401 into a whole-operation failure for that repository.
-
-**Not closed from the code and docs.** (1) Whether any supported helper (GCM, osxkeychain, `gh auth
-git-credential`) prompts on every `fill` when `approve` is never called. (2) Whether `credential fill` strips the
-path before helpers when `useHttpPath` is false, as 3a states. (3) The Git behaviours marked unverified in section 2.
+**Unresolved.** No correction conflicts with an operator decision. U1, U2, U6 and U7 are resolved; U3, U4 and U5 stay recorded.
+- **U1. R4's size (resolved).** The eleven-sub-step group, each 500 lines or fewer, is the R4 row as restated at `5de7d71b` and
+  amended at `0454aa1f` and `56186ad1` (`GwzPhase1-RemPlan.md`; contract sections and `connection_host.rs` mod lines). Authority: the operator's
+  "fix per the reviewed draft" and the lane owner's amendment. The row cites r5 §5 (5).
+- **U2. Single admission (resolved).** H1e (the `AuthContext` claim, `AdmissionError::InvalidInput`) is in the R4 row, with the
+  same authority. Safety and Consistency both judge it the only mechanical guarantee, against option (B) and the `Weak` guard.
+  Even with the claim, a clone kept past the operation keeps the record until it drops (U3).
+- **U3. Clones and captures.** Single admission refuses a second admission of a cached capture; gwz-py captures per call
+  today, so plan 3.2 must not add a capture cache, and 3.1 and 3.2 must drop the capture with the operation: the record is
+  wiped when the last clone drops, not at the binding's end. A12 records this, with a composition row (strong count 0 after the operation).
+- **U4. The H3c-2 wording.** The RemPlan asks "zero POST bytes" for a POST 401 after re-authentication; the first such POST has
+  sent its body, so the assertion holds for the next POST of the key (P6, P7). The RemPlan's closure text is read that way.
+- **U5. The counter's route to `TransportObservation`** (3.1 Counter) is 3.1/3.4 composition work, not this step's; A12 records the 3.4 route.
+- **U6. R3's row (resolved).** R3 is the single owner of the caller move and owns `https_adapter/{exchange,auth}.rs` and
+  `https_auth.rs` (`5de7d71b`, completed at `0454aa1f`); `56186ad1` carries the caller-identity condition of 3.2 item 3 into that row.
+- **U7. A public key learned on a bound connection (resolved).** Adopted: `ConnectionBound { observed, evidence }`, RA2a, row
+  H3b-5 (3(d), 3.1). Authority: Safety R2-P2-1 and Consistency N-P2-1 (blind-convergent) and `GwzHttpsAuthModel-RemPlan-2.md`.
