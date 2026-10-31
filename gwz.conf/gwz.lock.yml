@@ -36,7 +36,7 @@ members:
     commit: e59ca8c349d1edbddc0100e7528dd6ffe74b65f0
     branch: main
     detached: false
-    dirty: true
+    dirty: false
     materialized: true
   mem_gwz_credential:
     path: gwz-credential
