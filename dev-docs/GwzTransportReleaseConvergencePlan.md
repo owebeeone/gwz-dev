@@ -1043,8 +1043,17 @@ Decided 2026-10-31 (the lane owner's recommended dispositions of the open items,
     constraint; (3) a new Phase 2 sub-step before 2.3j builds the gwz-core child registry and reaper,
     and the client interrupt protocol moves from 2.3k to 3.1, where `gwz --server X fetch` first
     exists (2.3 plan Q2 (A)). Revision 2 is reviewed by fresh reviewers.
+  - **Cancellation amendment split (operator, 2026-11-01).** Revision 2 did not converge before review
+    (265 to 827 lines; three completeness rounds found 34, 28 and 31 gaps; new OD-C7 and OD-C8). The
+    single amendment is retired to `history/` with its round-1 reviews and RemPlan as source material,
+    and replaced by four designs, each with its own dual review: **(A)** Ctrl-C in the CLI (interrupt
+    source, cancellable entry, safe points, exit status); **(B)** child-process lifetime (registry,
+    reaper, process kinds); **(C)** served-form cancellation (folded into the 2.3 sub-steps that own
+    it); **(D)** leftover state and the explicit list of residuals the operator accepts. A and B come
+    first. The operator decisions above (OD-C1 to OD-C6, resolutions (1) to (3)) carry over to
+    whichever design owns each mechanism.
 
-Open: the cancellation amendment's revision 2 and its round-2 review.
+Open: designs A and B and their reviews; then C and D.
 
 ## 11. What this plan does not do
 
