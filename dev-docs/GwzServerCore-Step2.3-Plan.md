@@ -198,6 +198,8 @@ platform); the Windows allow-list entries match probe (1) evidence. Probe (1) is
 from the Mac, archived in the step's evidence run. Size ~250 + 300. After: 2.3g (stdio serves through it). Evidence: all three
 platforms, with the probe on a Windows client; Windows receipt.
 
+Carried in (2026-10-31): from the 2.3d round-2 Code review (NEW-2), `ClientFault::code()` returns `server_unavailable` for `Protocol` and `Wire` faults (every failure before `SessionOpened`, server design §17) and `DialFault::Handshake` delegates to it, because the stdio and SSH clients call `client_handshake` over their own `ByteWire`, not `dial`; red row: `client_handshake`'s code for a reply over the cap and for a reply out of order.
+
 **2.3k `gwz server` in gwz-cli (single, Surface).** Goal: the command family and its client half. Owns (gwz-cli): create
 `src/clirequest/server.rs`, `src/server_exec.rs`, `src/server_after.rs`, `src/server_long.rs`, tests under `src/tests/`; edit
 `globalargs/parser.rs` (the `Server` subcommand and the global `--server`/`--no-server` parse, `GWZ_SERVER` read; see Q2),
