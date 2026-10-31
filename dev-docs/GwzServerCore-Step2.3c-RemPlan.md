@@ -1,5 +1,7 @@
 # Steps 2.3b and 2.3c (carried connection fixes; member lock manager) — remediation plan, round 1
 
+**Status (2026-10-31):** round 2, fresh reviewers: `GwzServerCore-Step2.3c-ReviewState-2.md` and `-ReviewCode-2.md` both report **GO** at lane p2-3bc2 root `57279067` / gwz-core `fc27ccd6` / gwz-transport `281a28d` / gwz-core-evidence `447592e4`; WSL matrix `p2-3bc2-20261031-b` PASS (it settles deviation 7: the four Linux rows pass on ext4). Every round-1 row is closed. New P3s only, none architectural (the architectural count stays at one). Blind convergences: State R2S-1 = Code P3-N1 (path key, not filesystem identity) and State R2S-2 = Code P3-N2 (guard lifetime unpinned); State §4's Windows `canonicalize` hypothesis = Code P3-N4. Dispositions: P3-N1 and P3-N4 carried into 2.3f, P3-N2, P3-N3 and P3-N5 into 2.3h (`GwzServerCore-Step2.3-Plan.md`). P3-B1 and P3-B2 recorded in contract §15 at this landing. Windows receipt `p2-3bc2-20261031-a` FAILED on one row outside the change (`https_auth::runner::process_tests::cancel_kills_the_helper_and_its_descendants`, failing before in p1-6-20261025-b and -d; findings F9); the receipt of record is the re-run `p2-3bc2-20261031-b` on the same tree. Acceptance is conditional on that receipt.
+
 **Objects:**
 - 2.3b: gwz-transport `a3f9ed0` and gwz-core `76507c49`.
 - 2.3c: gwz-core `3d4cff0a`.

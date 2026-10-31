@@ -149,6 +149,8 @@ recovers; unlinking the socket or lock is reported by the check; Windows pipe na
 ~450 + 450. After: none (uses the existing `RuntimeDir`; 2.3e's walk plugs in at the call site in 2.3i). Evidence: Mac, WSL,
 Windows receipt (pipe and lock rows).
 
+Carried in (2026-10-31): from the 2.3c round-2 reviews (blind convergence State R2S-1 = Code P3-N1), the member lock keys a workspace by its canonical path, which does not merge macOS firmlinks, bind mounts or Linux case-folding directories; this step defines one `workspace_identity` function (filesystem identity: `(st_dev, st_ino)` on Unix, volume serial and file index on Windows, inside `cfg_if!`) that both the `ws-<key>` name and `MemberLockManager`'s key use, and `test_support::case_variant` decides sameness by that identity, not by `canonicalize`; red row: a firmlink spelling waits (macOS). With it, Code P3-N4 (State §4's hypothesis): the per-call manager keys by the call's own spelling so a volume where `canonicalize` fails does not refuse direct CLI and gwz-py calls; the host manager keeps refusing.
+
 **2.3g Serve a session over a stream carrier (single, State).** Goal: C8, C11, C20 (session half), R1. Owns: create
 `gwz-core/src/server/{mod,session}.rs` (and `pub mod server` in `lib.rs` behind the candidate switch), `served/stream.rs`
 (a byte-stream counterpart of `serve_in_process`: the carrier's registry frames go to `Service::route`, replies go back through
@@ -172,6 +174,8 @@ fake client end and its data returns; two concurrent calls keep separate binding
 possible remote effect, the core records no success and replays nothing; cancel reaches a running exchange; `Calls` under a
 concurrent cancel does not deadlock (stress row). Size ~400 + 450. After: 2.3g, and 2.3b for the bounds. Risk: Q3. Evidence: Mac,
 WSL, Windows receipt (process-kill row).
+
+Carried in (2026-10-31): from the 2.3c round-2 reviews (blind convergence State R2S-2 = Code P3-N2), nothing pins a member step's guard over its network call: `let _ = steps.enter(..)?`, an `if let Err` temporary, or a renamed receiver passes `check_member_step_boundary.py`, clippy and every row. This step, which edits the per-call composition beside those sites, makes the check require a named, live binding (and reject `drop` of it before the call and an `.enter(` in a condition), widens its receiver match, and adds a test-only `MemberLockManager::is_held` that the tracking doubles assert inside `fetch`, `push_prepared` and `tag_fetch`; closure: the reviewers' mutations U-L, U-M, U-O, U-R, V and W each red. Code P3-N3: one row per tag op on a `mem_` member (a member holder makes it wait; an `@root` holder does not); mutations K2, K3 red. Code P3-N5: the waiter count is production state; declare it or move it behind `cfg_if!`.
 
 **2.3i Server lifecycle, core side (single, State).** Goal: C5, C20, R1 at server level. Owns: create `server/{run,shutdown,log}.rs`,
 `server/tests/lifecycle_rows.rs`. Content: the accept loop (peer check, hello, thread per connection), `ServerControl` stop/status,
