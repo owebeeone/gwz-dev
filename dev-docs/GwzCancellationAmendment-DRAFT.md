@@ -1,6 +1,7 @@
 # Cancellation and process death: design amendment (DRAFT)
 
-Date: 2026-10-31; revision 0. Status: **DRAFT for the operator's review. It authorizes no implementation,
+Date: 2026-10-31; revision 1 (2026-11-01). Status: **DRAFT; the operator decided §6 (OD-C1 to OD-C6, all as
+recommended, 2026-11-01); for dual review (Consistency and Safety). It authorizes no implementation,
 commit to a member, tag, push or publish.** It states how decision **D-V (OQ2 reversed)** of
 `GwzTransportReleaseConvergencePlan.md` §10 is met. Code citations are at root `a519ee58` (gwz-core
 `07e99924`); paths are relative to the workspace root.
@@ -235,7 +236,7 @@ handle process lifetime across a credential boundary: dual.
    the core cancel the call (`PeerGone`) and release its member lock; the `ssh` child does not receive
    the terminal's SIGINT.
 
-## 6. Decisions for the operator
+## 6. Decisions (the operator's, 2026-11-01: every option marked Recommended below is chosen)
 
 - **OD-C1 The interrupt handler's process-global state.** The OS makes a signal or console handler
   process-global. Recommended: one gwz-cli module owns it, installed once by `main`, allow-listed in

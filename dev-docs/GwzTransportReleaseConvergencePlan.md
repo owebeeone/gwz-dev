@@ -1012,8 +1012,25 @@ Decided 2026-10-31 (the lane owner's recommended dispositions of the open items,
     1.0.18 is measured on macOS, Linux and Windows (evidence run
     `https-integration/runs/2026-10-31-oq4-redirect-after-challenge`), recorded per platform,
     and the rule is decided from that record. Until then the landed rule (OQ4 (a)) stands.
+  - **OQ4 decided (operator, 2026-11-01), from the evidence run** (gwz-core-evidence `d52abba2`):
+    git (2.47-2.55) behaves the same on all three platforms: after the challenge it follows a
+    redirect, resends the accepted credential to the same origin (scheme, host, port), and for
+    another origin sends none, does not ask the helper again, sends `erase`, and fails. gwz 1.0.18
+    on macOS and Linux matches git for the same origin and asks afresh for another origin (and
+    succeeds); on Windows over HTTP it follows no redirect (HTTPS unmeasured: the test CA could not
+    be trusted non-interactively). The rule, the same on every platform: **a redirect after the
+    challenge is followed under discovery's rules; to the same origin the accepted credential is
+    resent; to another origin nothing is sent, and only that origin's own 401 starts a fresh lookup
+    for its own URL; a redirect never causes a helper `erase`.** This is TR1.6 OQ4 (d). It replaces
+    the landed (a) rule, which asks afresh even for the same origin. Owner: R4 (the HTTPS
+    authentication model), whose discovery sub-step carries rows for the three redirect targets,
+    `useHttpPath` on and off, and no `erase`. Recorded probe defects of 1.0.18 (not in scope):
+    IP-literal remotes give a helper no `host=` line; a rejected credential is re-asked up to 14
+    times; on Windows a CRLF-writing helper leaves `\r` in the password (seen once, not retained).
+  - **The cancellation amendment's decisions (operator, 2026-11-01): OD-C1 to OD-C6 as
+    recommended** (`GwzCancellationAmendment-DRAFT.md` §6, revision 1).
 
-Open: OQ4's rule (after the evidence run); the cancellation amendment's review.
+Open: the cancellation amendment's dual review.
 
 ## 11. What this plan does not do
 
