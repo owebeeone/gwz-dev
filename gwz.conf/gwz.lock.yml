@@ -24,7 +24,7 @@ members:
     path: gwz-core
     source_id: src_gwz_core
     source_kind: git
-    commit: 8b930275eab71f1fd49e2092b2e58cd01835e744
+    commit: 151ea45dca8f94ecb99cc1d091ae2df966b91582
     branch: main
     detached: false
     dirty: false
@@ -33,10 +33,10 @@ members:
     path: gwz-core-evidence
     source_id: src_gwz_core_evidence
     source_kind: git
-    commit: e59ca8c349d1edbddc0100e7528dd6ffe74b65f0
+    commit: ee45e492de43067941be9a3b9051fe7ce21ded60
     branch: main
     detached: false
-    dirty: false
+    dirty: true
     materialized: true
   mem_gwz_credential:
     path: gwz-credential
@@ -78,7 +78,7 @@ members:
     path: gwz-transport
     source_id: src_gwz_transport
     source_kind: git
-    commit: 363e0f9a847695bea8678c75125f184ce4f23ba9
+    commit: 21726ca34c20377eb5666342b27aa3f2b22067d1
     branch: main
     detached: false
     dirty: false
