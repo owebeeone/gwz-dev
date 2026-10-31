@@ -1052,8 +1052,16 @@ Decided 2026-10-31 (the lane owner's recommended dispositions of the open items,
     it); **(D)** leftover state and the explicit list of residuals the operator accepts. A and B come
     first. The operator decisions above (OD-C1 to OD-C6, resolutions (1) to (3)) carry over to
     whichever design owns each mechanism.
+  - **Designs A and B, round 1 (operator, 2026-11-01).** Both NO-GO (A: two architectural root
+    causes; B: none). Decisions: **(i) Force never exits mid-write**, replacing resolution (1)'s
+    bound on local writes: a second interrupt (or the cleanup bound) kills children and network work
+    at once, then waits, with no time bound, for any local write in progress to reach its next safe
+    point or finish; only SIGKILL ends a hung write (a named residual). **(ii) `git commit`/`git tag`
+    and their hooks and signers are let finish** in their own process group (A O2, B OD-B1 (a)).
+    **(iii) Accepted as recommended:** A's O1 (one interrupt site; the 2.3i server uses A's module),
+    O3 / OD-C7 (a)-(d), B's OD-B2 (a) and OD-B3. Revision 2 of each is reviewed by fresh reviewers.
 
-Open: designs A and B and their reviews; then C and D.
+Open: designs A and B revision 2 and their round-2 reviews; then C and D.
 
 ## 11. What this plan does not do
 
