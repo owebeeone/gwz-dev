@@ -68,7 +68,7 @@ Q2), `SocketCoreBridge` (3.2), any gwz-py server (D-O).
   `endpoint_path_base` query on `Service`.
 - **Consequence for size.** The plan's 2.3 estimate counted the composition. The carried list adds the whole listener and
   client-connect surface of the server design (address grammar and walk, handshake, lock, stale socket, shutdown), the
-  sandbox probes and the CLI family. Summed below: about 4,300 implementation lines, a little more again in rows.
+  sandbox probes and the CLI family. Summed in §4's totals sentence: about 5,580 implementation lines and 6,120 rows.
 
 ## 3. Sub-steps
 
@@ -197,9 +197,10 @@ Carried in (2026-10-31): from the 2.3c round-2 reviews (blind convergence State 
 the five-step shutdown of the server design (stop opening sessions but keep the listener to say why; channel closure; one more
 bound for detached workers, ended by `force`; host-context shutdown; remove socket, clear record, release lock), idle exit that
 counts only time with no session, the 30 s link check from 2.3f, the log (one line per event, never environment, bodies,
-credentials, URLs or repository names; 10 MiB rotation by directory-descriptor rename), SIGINT/SIGTERM and Windows Ctrl-Break
-through a handler that sets a flag only. Red rows: `status` in a loop never delays idle exit; stop with a live session closes
-it and releases the address last; a second signal or `force` ends the detached wait; a dead client without EOF does not stop
+credentials, URLs or repository names; 10 MiB rotation by directory-descriptor rename), stop requests from a stop input its
+caller passes (gwz-cli's interrupt module in its server lifecycle mode, GwzCancelInterruptDesign §3.1; gwz-core installs no
+handler, OD-C1). Red rows: `status` in a loop never delays idle exit; stop with a live session closes
+it and releases the address last; a second stop request or `force` ends the detached wait; a dead client without EOF does not stop
 the accept loop; unlink of the socket drains and shuts down; log never contains a canary placed in the request; rotation never
 writes through a planted `<log>.1`. Size ~480 + 400. After: 2.3f, 2.3g (not 2.3h; scripted dispatch). Evidence: Mac, WSL, Windows
 receipt and dabeest (signals, pipe).
@@ -213,7 +214,8 @@ listed variable (`GH_TOKEN`, `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_3`, `GCM_X`, ..
 and the likely start-up file; `LC_FOO` is not forwarded, `LC_ALL` is; `start` scrubs and does not refuse; the `ssh` vector
 equals the split doc §4.4 list exactly; canary variables never appear in a spawned child's environment (real child on each
 platform); the Windows allow-list entries match probe (1) evidence. Probe (1) is run as part of this step on dabeest to WSL and
-from the Mac, archived in the step's evidence run. Size ~250 + 300. After: 2.3g (stdio serves through it). Evidence: all three
+from the Mac, archived in the step's evidence run. Size ~250 + 300. After: 2.3g (stdio serves through it) and 2.3r-2 (plan §10
+D-V resolution (3)). Evidence: all three
 platforms, with the probe on a Windows client; Windows receipt.
 
 Carried in (2026-10-31): from the 2.3d round-2 Code review (NEW-2), `ClientFault::code()` returns `server_unavailable` for `Protocol` and `Wire` faults (every failure before `SessionOpened`, server design §17) and `DialFault::Handshake` delegates to it, because the stdio and SSH clients call `client_handshake` over their own `ByteWire`, not `dial`; red row: `client_handshake`'s code for a reply over the cap and for a reply out of order.
@@ -228,7 +230,13 @@ closed descriptors and a new session), `stop [--force]`, `status`, `list`, `stdi
 the help text of split doc §4.9, `server_address_refused` for `auto`, `gwz --server X server start` a usage error. Red rows: the
 §4.9 sequence read cold from `--help`; `start` twice; `stop` of a stopped server succeeds; `status` exits 1 when nothing
 answers; `list` shows a lock record whose server died; the client rows C7 that `status`/`stop` can drive: round trip, squatted
-listener receives zero bytes, remote pipe name refused, other-user listener refused. Size ~500 + 400. After: 2.3d, 2.3e, 2.3i, 2.3j.
+listener receives zero bytes, remote pipe name refused, other-user listener refused. The run-own-lifecycle branch calls design
+A's `install` (2.3s) in lifecycle mode for every `server` subcommand (`start`, its background copy, `stop`, `status`, `list`,
+`stdio`), passes 2.3i the stop input from `Interrupts`, owns shutdown and the commands' output, and after an interrupt ends by
+design A's end with 130 (GwzCancelInterruptDesign §3.6; plan §10 D-V, O4 (a)); red rows: SIGINT, SIGTERM, SIGHUP (W: Ctrl-C,
+Ctrl-Break, console close) stop a foreground server and `server stdio` and interrupt `server stop` during its detached wait,
+each exiting 130; a second SIGINT during the detached wait still removes the socket and clears the record. Size ~500 + 400.
+After: 2.3d, 2.3e, 2.3i, 2.3j, 2.3s.
 Evidence: gwz-cli CI on three platforms; dabeest run of start/stop/status/list on Windows.
 
 **2.3l End-to-end SSH admission, refusal mapping and the closing rows (dual: admission).** Goal: R2 to R6, C7 (call-carrying
@@ -243,16 +251,29 @@ mid-push against the fixture reports `Effect::Possible`, the fixture remote show
 in flight does not wedge the server. Size ~100 + 550. After: 2.3h, 2.3i, 2.3j. Evidence: all three platforms, Windows receipt,
 dabeest including WSL for the SSH fixture.
 
+**2.3r-1 Child registry and reaper (single, State).** Goal: plan §10 D-V resolution (2). Owns: GwzChildLifetimeDesign §4
+(create `crates/children/`; `Cargo.lock`, root `MODULE.bazel` and its lock, the crate inventory, `check_crate_versions.py`, the
+process-globals allowlist). Content and red rows: GwzChildLifetimeDesign §3.1-§3.5, rows B1-B12, B20-B25. Size ~600 + 650.
+After: nothing to build; merged after 2.3s (its entries take the `signal` kind). Evidence: Mac, WSL, Windows receipt.
+
+**2.3r-2 Spawns onto the registry (dual: secret handling; the brief names the invariant 'creation precedes credentials').**
+Goal: D-V resolution (2) for gwz-core's three spawn sites and its public gate and backend setters. Owns: GwzChildLifetimeDesign
+§4. Rows B13-B17, B27, B28. Size ~380 + 420. After: 2.3r-1, 2.3s. Evidence: Mac, WSL, Windows receipt.
+
+**2.3s Interrupt source (single, Surface).** GwzCancelInterruptDesign §3.1, §5, rows 6.1-6.3; ~300 + 300; its gwz-core half
+merges first, then gwz-cli with the root.
+
 ## 4. Order and parallelism
 
-Critical path: 2.3d, then 2.3g, then 2.3h, then 2.3l. Off it: 2.3a, 2.3b, 2.3c, 2.3e, 2.3f. At most three compiling lanes run on
-the Mac (lane concurrency cap).
+Critical path: the longer of 2.3d, then 2.3g, then 2.3h, then 2.3l, and 2.3e, then 2.3r-1, then 2.3r-2 (also after 2.3f,
+then 2.3s), then 2.3j, then 2.3l. Off it: 2.3a, 2.3b, 2.3c. At most three compiling lanes run on the Mac (lane concurrency
+cap).
 
 | Wave | Lane 1 | Lane 2 | Lane 3 | Why these can overlap |
 |---|---|---|---|---|
 | 1 | 2.3d handshake | 2.3a sandbox probes | 2.3b then 2.3c (two small steps, one lane, two repositories) | d owns `carrier/handshake/` and `connect` in `unix.rs`/`windows.rs`; a owns `carrier/local/sandbox*`, `peer.rs` and `check_peer`; b owns `gwz-connection/remote/` and `remote_lane.rs`; c owns `session_host/` |
-| 2 | 2.3g session (needs d) | 2.3f listener files | 2.3e address | g owns `server/`; f owns `carrier/local/server_files/` and `bind`; e owns `carrier/local/address/` |
-| 3 | 2.3h composition | 2.3i lifecycle | 2.3j credentials and stdio | h owns `server/{calls,transport}.rs`, `remote_lane.rs`, `served/lane.rs`, `service.rs`; i owns `server/{run,shutdown,log}.rs`; j owns `server/{credentials,stdio,launch}.rs` |
+| 2 | 2.3g session (needs d) | 2.3f listener files, then 2.3s interrupt source | 2.3e address, then 2.3r-1 registry | g owns `server/`; f owns `carrier/local/server_files/` and `bind`; e owns `carrier/local/address/`; r-1 owns `crates/children/` and shares `Cargo.lock`, root `MODULE.bazel` and its lock, the inventory, `check_crate_versions.py` and the allowlist, merged serially |
+| 3 | 2.3h composition | 2.3i lifecycle | 2.3r-2 spawns, then 2.3j credentials and stdio | h owns `server/{calls,transport}.rs`, `remote_lane.rs`, `served/lane.rs`, `service.rs`; i owns `server/{run,shutdown,log}.rs`; j owns `server/{credentials,stdio,launch}.rs`; r-2 owns the files GwzChildLifetimeDesign §4 lists |
 | 4 | 2.3k gwz-cli family | 2.3l end-to-end rows | | k edits gwz-cli and re-exports; l edits `server/tests/e2e_rows.rs` and `opening.rs` |
 
 Shared files, resolved by function and by the lane owner at merge: `local/unix.rs` and `local/windows.rs` (a: `check_peer`; d:
@@ -260,8 +281,8 @@ Shared files, resolved by function and by the lane owner at merge: `local/unix.r
 `transport_host/mod.rs` and `lib.rs` (one export each in g and k). If two lanes would edit one function, the later lane waits.
 Merge serially. A step that changes a Windows trigger path gets its own receipt, and the merged commit gets one when both sides
 touched trigger paths (plan §5). Run `scripts/checks/check_lane_commits.sh origin/main HEAD` before filing (the 2.1 landing
-deviation, plan :618-626). Review: dual on a, d, j, l; single elsewhere; the Phase 2 review (2.6) reads the whole. Totals:
-about 4,300 implementation lines and 4,750 rows across 12 steps, against the plan's 400 + 450.
+deviation, plan :618-626). Review: dual on a, d, j, l and r-2; single elsewhere; the Phase 2 review (2.6) reads the whole. Totals:
+about 5,580 implementation lines and 6,120 rows across 15 steps, against the plan's 400 + 450.
 
 ## 5. Lane brief for 2.3a
 
