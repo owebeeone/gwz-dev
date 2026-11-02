@@ -281,8 +281,9 @@ Shared files, resolved by function and by the lane owner at merge: `local/unix.r
 `transport_host/mod.rs` and `lib.rs` (one export each in g and k). If two lanes would edit one function, the later lane waits.
 Merge serially. A step that changes a Windows trigger path gets its own receipt, and the merged commit gets one when both sides
 touched trigger paths (plan §5). Run `scripts/checks/check_lane_commits.sh origin/main HEAD` before filing (the 2.1 landing
-deviation, plan :618-626). Review: dual on a, d, j, l and r-2; single elsewhere; the Phase 2 review (2.6) reads the whole. Totals:
-about 5,580 implementation lines and 6,120 rows across 15 steps, against the plan's 400 + 450.
+deviation, plan :618-626). Review: dual on a, d, g2, j, l and r-2; single elsewhere; the Phase 2 review (2.6) reads the whole. Totals:
+about 5,580 implementation lines and 6,120 rows across 16 steps (2.3g split into 2.3g1 and 2.3g2 on 2026-11-03, same
+scope), against the plan's 400 + 450.
 
 ## 5. Lane brief for 2.3a
 
