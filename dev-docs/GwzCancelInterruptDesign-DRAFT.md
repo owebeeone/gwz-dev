@@ -1,400 +1,399 @@
 # Ctrl-C in the CLI: design A of the cancellation split (DRAFT)
 
-Status: **DRAFT, revision 1, 2026-11-01; design A of the cancellation split (D-V); for dual review. Authorizes no
-implementation.** No commit, tag, push or publish; the lane owner applies §8 at acceptance. Fix pass 1 closed A-1 to A-17.
+Status: **DRAFT, revision 2 (2026-11-01); design A of the cancellation split (D-V), remediated per
+`GwzCancelInterruptDesign-RemPlan.md`; for round-2 review by fresh reviewers. Authorizes no implementation.** No commit,
+tag, push or publish; the lane owner applies §8 at acceptance.
 
-**Authority.** `GwzTransportReleaseConvergencePlan.md` §10 D-V (cited "D-V", plan :999-1056): OQ2 reversed (:1005-1010);
-OD-C1 to OD-C6 as recommended (:1030-1031; their text in `history/GwzCancellationAmendment-DRAFT.md` revision 1, root
-`9d5a4d4c`, §6); resolutions (1) to (3) (:1035-1045); the split into designs A to D (:1046-1055). OD-C7 is open (r2 §6,
-`history/GwzCancellationAmendment-DRAFT.md:695-702`); §9 puts A's part of it to the operator. Revision 2, its RemPlan and
-its reviews in `history/` are source material, not authority. Design B is `GwzChildLifetimeDesign-DRAFT.md` ("B").
+**Authority.** `GwzTransportReleaseConvergencePlan.md` §10 D-V (plan :999-1062): OQ2 reversed (:1005-1010); OD-C1 to
+OD-C6 (:1030-1031; text in `history/GwzCancellationAmendment-DRAFT.md` revision 1, root `9d5a4d4c`, §6, OD-C7 :695-702);
+resolutions (1)-(3) (:1035-1045); the split (:1046-1054); round 1's decisions (:1055-1062): **(i)** Force never exits
+mid-write, **(ii)** `git commit`/`git tag`, hooks and signers finish, **(iii)** O1, O3 / OD-C7 (a)-(d) as recommended.
+"B" is `GwzChildLifetimeDesign-DRAFT.md` (revision 1, root `d146bc9a`; §4 follows revision 2's §3.7, :224-231).
 
-**Citations** are at root `b4b827d6`, gwz-core `b745f1fa`, gwz-cli `c0ba717`, gwz-py `2185cc6`, gwz-git `9bc4ea9`,
-git2-rs `d13951f`, libgit2 `b172e3d18`, CPython 3.11.16. Member-named paths are workspace-relative; `src/…`, `crates/…`,
-`scripts/…` are gwz-core's; bare documents are in the root's `dev-docs/`; a bare `:N` is a line of the file last named.
-Operating-system facts no file holds are marked **(OS)**; a row (§6) verifies each.
+**Citations** are at root `48feeaad`, gwz-core `b745f1fa`, gwz-cli `c0ba717`, gwz-py `2185cc6`, gwz-git `9bc4ea9`,
+gwz-transport `281a28d`, git2-rs `d13951f`, libgit2 `b172e3d18`, CPython 3.10.15 and 3.11.16. Member-named paths are
+workspace-relative, `src/…`, `crates/…`, `scripts/…` gwz-core's, bare documents the root's `dev-docs/`; a bare `:N`
+is a line of the file last named; **(OS)** marks an operating-system fact no file holds, which a row checks.
 
 ## 0. Scope
 
-What an interrupt does to a gwz-cli command: the one interrupt source (OD-C1); the first interrupt, which cancels the
-command's request through the cancellable entry's token and waits up to the cleanup bound; the second interrupt or the
-bound, which forces the exit under D-V resolution (1)'s write rule, with file-granular safe points in the long local
-phases; exit 130 and the `--json` marking (OD-C4) in gwz-cli and the gwz-py CLI; what a cancelled member reports,
-including a helper whose cleanup outlasts its grace; the pager and `forall` rule (OD-C6); and gwz-py's first caller
-cancellation through the `Canceller` (resolution (2)). §7 names every residual A leaves.
-
-| Not in A | Owner |
-|---|---|
-| The child registry, the reaper, process kinds, which children the terminal's interrupt reaches, `kill_killable` and `close` | B |
-| The served form: the server lifecycle commands' interrupt (2.3i), what Cancel and Force do for a `--server` command and its bound (3.1), `server stdio`, `ssh` | C |
-| Temp sweeps, Git `*.lock` reporting, a push's possible remote effect in JSON, durable recognizers, the accepted residual list | D |
-| The native route's cancellation (libgit2 progress-callback abort), gwz-py's second interrupt | not designed; §7 R10, R11 |
+What an interrupt does to a gwz-cli command and to gwz-py (§3.8); §7 names every residual. Child lifetime is B's; the
+served form (2.3i, 2.3k, a served core's response) C's; temp sweeps, `*.lock` reports, recognizers and residual list D's.
 
 ## 1. Requirements (each traced to D-V)
 
-- **A1 One source.** One gwz-cli module owns the process's signal and console handlers; gwz-core and gwz-py install
-  none (OD-C1 as decided). A check enforces the one site. §9 O1 puts the brief's second site (2.3i) to the operator.
-- **A2 First interrupt cancels.** It cancels the command's network work through its existing cancellation, and the
-  command exits once that has ended or the cleanup bound has passed (OQ2 reversed; OD-C4).
-- **A3 Forced exit.** A second interrupt, the bound passing, or a console close forces the exit: killable children and
-  network work end at once, a local write in progress runs to its next safe point, and long local phases have
-  file-granular safe points (resolution (1)). A child that performs the write itself is part of the write (§3.4; §9 O2).
-- **A4 Status and marking.** An interrupted command exits 130 on every platform and its JSON marks it cancelled
-  (OD-C4), in gwz-cli and in the gwz-py CLI.
-- **A5 Honest member reports.** A member whose operation was cancelled reports `Cancelled`, also when its helper's
-  cleanup is still pending (D-V "cleans up"; `build-targets/winflk-logs/f9-report.md`, "Findings" 2).
-- **A6 Foreground programs.** gwz never kills the pager or a `forall` command; it waits and starts no further one (OD-C6).
-- **A7 gwz-py.** A caller's cancellation of an awaiting call cancels through its `Canceller` first (resolution (2)).
-- **A8 Code rules.** Braces; `cfg` only in `cfg_if!` or platform modules; no global or thread-local except the
-  handler's pipe write end (OD-C1); no production code under `tests/`; one behaviour on macOS, Linux and Windows except
-  where §3 names a platform's mechanism.
+- **A1 One source** (OD-C1; O1). One gwz-cli module owns the signal and console handlers, the server lifecycle's too;
+  gwz-core and gwz-py install none: the process-globals check (Rust) and 3.2b's test (gwz-py's Python, §3.8) enforce it.
+- **A2 Cancel** (OQ2; OD-C4). The first interrupt cancels network work; gwz exits when it returns or the bound passes.
+- **A3 Force** (decision (i)). A second interrupt or the bound kills `Kill` children and ends network work at once, then
+  waits, unbounded, for each local write in progress to reach its next safe point or finish: Force never exits mid-write.
+  Safe points are file-granular, never in a held Git lock file (OQ2: "no … stale lock"); only SIGKILL ends a hung write.
+- **A4 Commit and tag** (decision (ii)). A Git CLI route `git commit`/`git tag`, hooks and signer are never killed.
+- **A5 Status and marking** (OD-C4). 130 and a JSON `Cancelled` marking in both CLIs; no output denies a write it made.
+- **A6 Honest member reports** (D-V "cleans up"; `/Volumes/projects/limbo/build-targets/winflk-logs/f9-report.md`,
+  "Findings outside scope" 2): `Cancelled`, also when the helper's cleanup is still pending.
+- **A7 Foreground programs** (OD-C6). gwz never kills the pager or a `forall` command; it waits and starts no further one.
+- **A8 gwz-py** (resolution (2)). A caller's cancel goes through the canceller first, also before the operation registers.
+- **A9 Code rules.** Braces; `cfg` only in `cfg_if!` or platform modules; no global or thread-local but the handler's
+  (OD-C1); no production code under `tests/`; one behaviour on three platforms unless §3 names a mechanism.
 
 ## 2. Facts this design builds on
 
-- **No handler today.** No production source in gwz-cli, gwz-core, gwz-transport, gwz-py or gwz-git names
-  `libc::signal`, `libc::sigaction`, `SetConsoleCtrlHandler`, `ctrlc` or `tokio::signal` (searched at the heads above);
-  `run` goes from `worker_host::early` to parsing (`gwz-cli/src/lib.rs:160-178`), so Ctrl-C ends gwz by the OS default.
-  `scripts/checks/check_process_globals.py` lists `signal` and `sigaction` in `LIBC_FUNCS` (:103-104), classed `env`
-  (:540-541), run per repository with `--repo` and `--allowlist` (:810-811).
-- **The command's path.** The transport build runs a network command through the non-cancellable
-  `with_local_transport_native*` (`gwz-cli/src/globalargs/dispatch.rs:57-89`), others on a hostless `Git2Backend::new()`
-  (:91-96); a response is one `println!` then `exit(exit_code_for_response)` (`gwz-cli/src/lib.rs:323-326`), an
-  execution error one `println!`/`eprintln!` then exit 1 (:340-344); `diff`, `hook`, `claude-code-setup` and `log` own
-  their lifecycles (:228-300). Step 3.1 builds one `HostOwner` per command (plan :721-723).
-- **The cancellable entry** (`src/transport_host/cancellable.rs:40-88`) runs the action under one request registered
-  with a `CancellationToken`: a token cancelled first refuses with `Cancelled`, cancelling it fails the running
-  request's network I/O with `Cancelled`, and it is "the request's only cancellation authority" (:10-11, :145-147, :160,
-  :178). Token and canceller come from `CallControls::new` and `cancel` (`crates/session-host/src/gate.rs:140, :156`),
-  as gwz-py's route makes them (`gwz-py/native/src/route/transport.rs:150-152`). `HostOwner` close seals admission and
-  cancels the host's operations (`GwzConnectionApiContract.md:269`); `ConnectionHost::close` takes the owner
-  (`src/transport_host/connection_host.rs:438-449`).
-- **Host-built backends.** The transport host builds each request's backend with `Git2Backend::new().with_host_context(..)`
-  (`src/transport_host/mod.rs:504`; `driver_only.rs:152`), which copies the context's spawn gate into it
-  (`src/git/gitbackend/backend.rs:120-125`, field :26); the runtime's state holds that gate and each request's context
-  takes it (`mod.rs:269, :463-467`; `request.rs:31-32`). gwz-core's other production backends do local work (for
-  example `src/workspace_ops/handle_create_repo/create_workspace.rs:18`; `src/git/endpoint/https_worker/native/sspi.rs:77`).
-- **Members fan out** through `par_map_per_host` (`src/operation/par_map_per_host.rs:35`; e.g. `handle_fetch.rs:154`,
-  `push_member.rs:337`); `commit` runs its members in one loop (`src/workspace_ops/handle_commit.rs:179-186`), then the root (:260).
-- **Network calls of a backend** (`src/git/gitbackend/transport.rs`): clone (`builder.clone` :67, after the empty-target
-  check :32), `fetch` (:110), `tag_fetch` (:150), `ls_remote*` (`connect_auth` :223, `list` :235), `fetch_anonymous`
-  (:340), `push_anonymous` (:379), `perform_push` (:493-494), `read_remote_file` (a `tempfile::tempdir` :718, cloned into
-  at :740). `Remote::fetch` is libgit2's download, disconnect, then `update_tips` (`libgit2/src/libgit2/remote.c:1352,
-  :1391, :1394, :1409`); git2-rs exposes the three (`git2-rs/src/remote.rs:248, :265, :341`).
-- **Long local phases.** libgit2 checkout calls its progress callback after each complete file
-  (`libgit2/src/libgit2/checkout.c:1886-1891`) and writes the index once at the end (:2686). gwz's checkouts:
-  `src/git/gitbackend/refs.rs:33, :134`, `repository.rs:56, :81`, `merge_prepared.rs:264`, `merge_recovery.rs:166, :246`,
-  the clone (`transport.rs:41`). `reset_hard` passes no checkout options (`repository.rs:31`; pull's
-  `src/workspace_ops/pull_head_plan.rs:182`, `pull_head_member_preflight/root_lock.rs:166`); libgit2 checks the tree out,
-  then moves HEAD, then writes the index (`libgit2/src/libgit2/reset.c:154, :159, :167`); `reset` takes a
-  `CheckoutBuilder` (`git2-rs/src/repo.rs:782-787`). `stash_apply`/`stash_pop` (`stash.rs:44, :59`) use
-  `stash_restore_options` (`stash_support.rs:18-26`), which sets none; `StashApplyOptions::checkout_options` takes one
-  (`git2-rs/src/stash.rs:117`). Stage is one `add_all` with no callback then one index write (`repository.rs:108-115`;
-  the callback may abort, `git2-rs/src/index.rs:49-51`), or a per-path loop then one write (:151-169). `stash push` is
-  one `stash_save` (`stash.rs:18`); commit and tag may run `git commit`/`git tag` with hooks (`commit_tag.rs:1-5, :31`;
-  `gwz-git/src/native_commit/cli.rs:36-38`), B's `Wait` kind (B §3.6).
-- **Copy loops.** `gwz_copy_contract`'s `Cancellation` is polled per directory entry and between buffered chunks of a
-  file (`crates/copy-contract/src/lib.rs:39-52`; `crates/refcopy/src/ordinary.rs:321, :648`); refcopy writes each file
-  to a sibling temporary, renames it into place and removes the temporary on any failure, a cancel included
-  (`ordinary.rs:14-17, :477`). `gwz_local_import`'s own trait is polled before each participant
-  (`crates/local-import/src/lib.rs:337-339, :529, :583`). `handle_local.rs:72` and `src/local_clone/family_merge.rs:424`
-  pass each trait's `NeverCancelled`.
-- **The cleanup-grace finding.** `finish_job` answers a failure with `job.terminate().await?`
-  (`src/git/endpoint/https_auth/runner.rs:213-228`); `terminate` waits `CLEANUP_GRACE` (500 ms, `https_auth.rs:28`), then
-  returns `CleanupPending` (`owner.rs:253-276`), mapped to `ErrorCode::Io` (`https_auth.rs:190`), so `Cancelled` and a
-  `Timeout`'s `SetupFailureCause::Interaction` (`src/git/endpoint/https_worker.rs:377`) are lost. The file worker
-  returns `CleanupPending` itself (`https_auth/file_worker.rs:91-98`). B's 2.3r-2 makes `terminate` return the
-  lookup's own outcome (B §3.6).
-- **Output and codes.** Exit codes are 0, 1, 2 from the aggregate (`gwz-cli/src/globalargs/render_exit.rs:82-95`;
-  `gwz-cli/docs/MachineOutput.md:954-964`). Codes render as `{:?}` (`gwz-cli/src/git_status_json.rs:71`), so
-  `cancelled` (73, `gwz-core/docs/ErrorCatalog.md:35`, "A result's first error") is `"Cancelled"`. `errors` holds copies
-  of failed members' errors first, then the operation's own (`MachineOutput.md:141-142`); a top-level error has
-  `meta: null`, no members, one error (:67-69); a `--jsonl` stream ends with one response object (:669-670).
-  `eprintln!`/`println!` panic when the write fails (std `print_to`), and Rust ignores SIGPIPE.
-- **Foreground programs.** The pager is spawned through the shell and waited for after its input closes
-  (`gwz-cli/src/pager.rs:138-145, :155-170`); `forall` runs members with `Command::status` (`gwz-cli/src/forall.rs:203-217, :260`).
-- **gwz-py.** `_run_native` runs the call on `asyncio.to_thread` and on `CancelledError` only waits
-  (`gwz-py/src/gwz/bridge.py:298-316`; `_await_completion` :28-35). A unary network call registers as `op_<request_id>`
-  with the route's canceller (`gwz-py/native/src/client_host.rs:226-231`; `shims.rs:79-80`); `cancel_operation` cancels
-  a running one and waits up to `CLEANUP_BOUND` (`client_host.rs:164-171`; `client_host/operations.rs:194-227`),
-  refusing a local or completed one (`InvalidRequest`, :202-208) and the native route (`UnsupportedOperation`,
-  :216-222). The CLI's `main` catches only `CliUsageError` and `GwzError` around `asyncio.run`
-  (`gwz-py/src/gwz/cli.py:142-156`); CPython 3.11's runner cancels the main task on the first SIGINT and raises
-  `KeyboardInterrupt` on the next (`asyncio/runners.py:150-157`). gwz-py already names a type `ExitGate`
-  (`client_host/operations.rs:55`), so A's gate is `WriteGate`.
+- **No handler today.** No production source of the five repositories names `libc::signal`, `libc::sigaction`,
+  `SetConsoleCtrlHandler`, `ctrlc` or `tokio::signal`; `run` parses at `gwz-cli/src/lib.rs:170-178`. The check
+  (`scripts/checks/check_process_globals.py`) classes `signal`, `sigaction` as `env` (:103-104, :540-541) and runs for
+  gwz-core (`scripts/run_tests.py:552`), gwz-transport (:316-327), gwz-git (:472-479), gwz-cli
+  (`gwz-cli/.github/workflows/ci.yml:26-31`) and gwz-py (`gwz-py/src/tests/test_process_globals.py:11-23`).
+- **The host.** Network commands run on `with_local_transport_native*` (`gwz-cli/src/globalargs/dispatch.rs:57-89`);
+  plan 3.1 (:721-723) builds one `HostOwner` per command, local or `--server`; 3.3 removes the old entries (:736-738).
+  `HostOwner::close` seals admission at the call (`Closing(HostClosing)`), cancels the host's operations and returns a
+  `HostClose` future, resolved within the close bound (5 s, `host/config.rs:22, :36`), `Pending` after it
+  (`gwz-transport/crates/gwz-connection/src/host.rs:6-10`, `host/owner.rs:21-32, :50-59`, `operation.rs:343-344,
+  :414-417`; `GwzConnectionApiContract.md:269, :272-275`); no gwz-core code maps `HostClosing` yet. `ProcessGate` is
+  minted only in `src/transport_host/composition.rs` (:21-35; "the only site", :30-31).
+- **Fan-out.** `par_map_per_host` is public (`src/operation/par_map_per_host.rs:35-47`); `_with_cancel` gives queued items
+  `on_cancel` without entering `f` (:58-60). Its seven calls (`handle_fetch.rs:154`, `push_member.rs:337`,
+  `publication.rs:245`, `handle_materialize/apply.rs:43`, `member_validation.rs:33, :49`, `handle_init_from_sources.rs:147`)
+  hold `backend: &B`, `B: GitRepository` (`src/git/gitbackend/contract.rs:42`). `commit` loops members serially
+  (`src/workspace_ops/handle_commit.rs:179-186`); other thread starts are endpoints' and history readers' (`merge.rs:189`).
+- **libgit2's network calls write locally.** A fetch download commits the pack (index through a filebuf, a rename) after
+  the stream (`libgit2/src/libgit2/transports/smart_protocol.c:782`), then writes `.git/shallow` (`fetch.c:218-223`); the
+  transfer callback fires after each received object (`indexer.c:874`); an uncommitted pack is unlinked when freed
+  (`indexer.c:1469`). A clone inits, calls `remote_create` (gwz's: `src/git/gitbackend/transport.rs:55-59`), fetches and
+  checks out; gwz then pins `core.autocrlf`/`core.eol` (:73), creation time only (`repository_support.rs:30-35`); on error
+  libgit2 removes what it made (`clone.c:666-673`). A push calls `push_update_reference` after the remote's report
+  (`remote.c:3032-3038`), before the tracking-ref update (:3064-3067); gwz sets it (`transport_support.rs:130`;
+  `transport.rs:368`), and the transfer callback only with a progress sink (`transport_support.rs:89-92`). A push to a
+  local-path remote (libgit2's local transport: `file://` or an existing directory, `transport.c:36, :88-89`) writes the
+  remote repository itself during the upload: the pack (`transports/local.c:426`) and each ref (`:354`, `<ref>.lock`).
+- **Long local phases.** Checkout calls its progress callback after each complete file, holding no lock across files
+  (`checkout.c:1886-1891`), and writes the index at the end (:2686). `reset_hard` (`repository.rs:31`) checks out, moves
+  HEAD, writes the index (`reset.c:154, :159, :167`); stash apply checks out twice, then writes the index, and pop then
+  drops (`stash.c:1126, :1149, :1159, :1282-1285`). Five writes lie **inside a held ref transaction**, whose `lock_ref`
+  creates `<ref>.lock` (`refdb_fs.c:1175-1179`): checkouts at `merge_prepared.rs:266, :339` and its expected-conflict
+  `repo.merge` (worktree and index, :280; all locked at :248-249), `merge_recovery.rs:175` (:143-144) and :251
+  (:197-198). Copies poll `Cancellation` per entry and chunk, removing a partial temporary
+  (`crates/copy-contract/src/lib.rs:39-52`; `crates/refcopy/src/ordinary.rs:14-17, :477`); `gwz_local_import` polls per
+  participant (`crates/local-import/src/lib.rs:337-339`); the family lock is OS-advisory (`src/local_clone/wait.rs:3-6`).
 
 ## 3. Design
 
-### 3.1 The interrupt source (OD-C1)
+### 3.1 The interrupt source (OD-C1; step 2.3s)
 
-- **Module.** `gwz-cli/src/interrupt/`: `mod.rs` (reader, writer, `Interrupts`, `OutputClaim`), `unix.rs`, `windows.rs`
-  under one `cfg_if!`. Its one allow-listed global is the pipe's write end; everything else is a value `run` passes down.
-- **Install.** `run` installs right after parsing (`gwz-cli/src/lib.rs:178`), before any gwz thread or child, for every
-  command except the server lifecycle commands (`server start`, the background server, `server stdio`; 2.3k; C, §9 O1),
-  `hook` and `claude-code-setup` (OS default, §7 R12); `--build-info` and the SSPI worker mode return before parsing.
-  The client commands `server stop`, `status` and `list` take it.
-- **Unix.** For SIGINT, SIGTERM and SIGHUP, `install` saves the inherited disposition and leaves an ignored one ignored
-  (`nohup`, a background job); otherwise `sigaction` with `SA_RESTART` and a handler that saves `errno`, writes one byte
-  to the pipe (both ends close-on-exec, write end non-blocking, `EAGAIN` ignored), restores `errno` and returns.
-  SIGQUIT keeps its default (OD-C7 (b) as recommended; §9 O3).
-- **Windows.** `SetConsoleCtrlHandler`. CTRL_C and CTRL_BREAK write a count byte and return `TRUE`. CTRL_CLOSE writes a
-  Force byte and sleeps without end: Force's `TerminateProcess` ends the process, or the OS does a short time after
-  CTRL_CLOSE **(OS)** (§7 R9). The handler needs no other object. A CTRL_C disabled at creation stays disabled.
-- **Reader and writer.** A module thread reads the pipe: the first count byte is **Cancel**, the second (or a Force
-  byte) **Force**; after Cancel it waits for the next byte or the bound's deadline. It never writes output: a second
-  module thread writes all of it (§3.2's line, §3.6's notice and envelope) with `write_all`, ignoring every error.
-- **Giving control back (OD-C7 (a) as recommended; §9 O3).** When Force begins, the reader restores each saved
-  disposition (Windows: removes its handler), so a later interrupt ends gwz by default (killed by the signal;
-  `STATUS_CONTROL_C_EXIT`): the escape from a Force waiting on a hung write (§7 R14).
-- **Check.** `check_process_globals.py` gains the kind `signal` (`libc::signal`, `libc::sigaction`,
-  `SetConsoleCtrlHandler`, `signal_hook`, `ctrlc`, `tokio::signal`), run for gwz-core, gwz-cli, gwz-py and
-  gwz-transport; only gwz-cli's allowlist has an entry (this module). B's forked-child entries are B's (B §3.7).
+- **Module.** `gwz-cli/src/interrupt/`: `mod.rs` (install, reader, writer, `Interrupts`, `Output`, `OutputClaim`),
+  `unix.rs`, `windows.rs` under one `cfg_if!`; allow-listed globals: the pipe's write end and, on Unix, the installer's
+  PID. For the reader the first count byte is **Cancel**; the second, a Force byte or the bound is **Force**.
+- **Install.** `run` installs right after parsing, so the reader and writer are gwz's first threads; 3.1 puts B's
+  registry before it (B §4; OD-B3 (a)). 2.3s installs only for a server lifecycle command (`server start`, its background
+  copy, `server stdio`), which takes the events through `Interrupts` (their use is C's); every other command keeps the OS
+  default until 3.1c brings Cancel's slot, the bound and Force and installs for all but `hook`, `claude-code-setup` (R12).
+- **Unix.** For SIGINT, SIGTERM and SIGHUP (§9 O4), `install` keeps an inherited ignored disposition (`nohup`,
+  `trap '' INT`), else sets `sigaction` with `SA_RESTART`. The handler returns at once unless `getpid()` is the saved PID
+  (a child between `fork` and `exec` runs it too); else it saves `errno`, writes one byte (both ends close-on-exec, write
+  end non-blocking, `EAGAIN` ignored) and restores `errno`. SIGQUIT keeps its default (OD-C7 (b)).
+- **Windows.** `SetConsoleCtrlHandler`. CTRL_C and CTRL_BREAK write a count byte and return `TRUE`; CTRL_CLOSE,
+  CTRL_LOGOFF and CTRL_SHUTDOWN (§9 O4) write a Force byte and sleep without end: Force ends the process, or the OS does a
+  short time later **(OS)** (R9). A CTRL_C disabled at creation stays disabled.
+- **Writer.** Once installed, one module thread owns stdout and stderr; `Output` is one FIFO to it (events in order;
+  before install, `lib.rs:167, :174`, and in `hook` it writes directly). A sender waits on a full queue only until Cancel,
+  then event and progress lines are dropped (counted), never a notice or the final document; write errors are ignored.
+  3.1c moves every direct write onto `Output` (its files' print macros; the handles at `append_branch_summary/machine.rs:13`,
+  `lib.rs:279`, `pager.rs:130, :146`, `log_exec.rs:33, :36`, `progress_detail.rs:233`'s `Term::stderr()`) and adds
+  `gwz-cli/scripts/check_direct_output.py`, a `cfg`-blind token check in gwz-cli's CI failing `print!`, `println!`,
+  `eprint!`, `eprintln!`, `stdout()`, `stderr()` (std's, `Term`'s) outside `src/interrupt/`, `src/hook/`, `src/hook_exec.rs`.
+- **Giving control back** (OD-C7 (a)). When Force begins, also when a foreground wait defers its later steps (§3.7), the
+  reader restores each saved disposition (Windows: removes its handler); a later interrupt ends gwz by default (R14).
+- **Check.** The kind `signal` (`libc::signal`, `libc::sigaction`, `SetConsoleCtrlHandler`, `signal_hook`, `ctrlc`,
+  `tokio::signal`), out of `env`, runs in §2's five runs with no new wiring; only gwz-cli's allowlist gets an entry, this
+  module. B's forked-child entries in gwz-core's allowlist take it in B's 2.3r-2, which also edits the check, after 2.3s.
 
 ### 3.2 First interrupt: Cancel
 
-- **What it cancels.** 3.1c runs the network command through the cancellable entry's gated form (3.0d) in place of
-  `with_local_transport_native*` (`dispatch.rs:66-79`), with the process environment as snapshot and a token from
-  `CallControls::new` (under 3.1's host, the command's request takes the same token and gate). Cancel calls the
-  controls' `cancel`; the command is one request, so every member's network I/O then fails `Cancelled`. A does not close
-  the `HostOwner` from the reader: the token is the request's only cancellation authority, the entry closes the host
-  at its end, and gwz-core gives the CLI no per-admission hook.
-- **`--server` commands.** The module is installed (one source); what Cancel and Force do and the bound are C's (§4).
-- **Local work** has nothing to cancel and runs on (session design §5.3). In a multi-member W command whose members
-  fetch (pull, materialize), earlier members are whole and later ones report `Cancelled` (§7 R7).
-- **Wait.** Cancel starts the bound, `CLEANUP_BOUND` (5 s, `src/session_host/context.rs:80`): if the command returns
-  first, the main thread renders (§3.6) and exits 130; otherwise Force begins. Human output gets one writer line at
-  Cancel: `gwz: interrupted; cancelling (interrupt again to stop now)`.
+- **What it cancels.** `run` keeps the command's `HostOwner` (plan 3.1) in a slot shared with the reader. Cancel (or
+  Force, if no Cancel came) takes it, calls `close()` and puts the `HostClose` back, never awaiting it: admission is
+  sealed and the host's operations cancelled, so a running member's network I/O fails and a later member's admission is
+  refused, both `Cancelled` (plan 3.1, §8 row 4). After its write frame the dispatch (main) thread empties the slot,
+  closing an owner still there, and awaits the `HostClose` outside any frame, `Complete` or `Pending` (§3.3).
+- **`--server`**: the carrier-backed host closes the same way; the served core's response and bound are C's (until then
+  the local rule). **No host** (ordinary build, transport off, native route): nothing (R10). **Local work** runs on
+  (`GwzCoreSessionDesign.md` §5.3; R7). **Wait:** Cancel starts `CLEANUP_BOUND` (5 s, `src/session_host/context.rs:80`);
+  if the command returns first, the main thread renders (§3.6) and exits 130, otherwise Force begins.
 
 ### 3.3 What a cancelled member reports
 
 - A member whose operation observed the cancel is `Failed` with `Cancelled`; one that failed first keeps its reason.
-- **The cause survives a slow cleanup.** With B's `terminate` (§2), `finish_job`'s `?` (`runner.rs:226`) passes the
-  lookup's own `Cancelled` or `Timeout` up; 3.0e makes the file worker return `runner.check()`'s cause after its grace
-  instead of `CleanupPending` (`file_worker.rs:91-98`), kept only for a failure with no other cause. So a cancel on a
-  loaded Windows host is `Cancelled`, and a timeout keeps `Interaction` (`https_worker.rs:377`).
-- **The pending cleanup is a finding, not the member's error:** the retained tree is counted (`owner.rs:77, :163`) in
-  the report's `pending_local_work` (row 6.7; 3.0e adds it if missing), which 3.1c prints through the writer, not
-  `dispatch.rs:82-87`'s `eprintln!`.
+- **The cause survives a slow cleanup.** `terminate` returns `CleanupPending` after `CLEANUP_GRACE` (500 ms,
+  `src/git/endpoint/https_auth.rs:28`; `owner.rs:253-276`), mapped to `Io` (`https_auth.rs:190`), losing `Cancelled` and
+  a timeout's `Interaction` (`https_worker.rs:377`); B returns the lookup's own outcome (B §3.6; `runner.rs:226`) and 3.0e
+  the file worker's `runner.check()` cause (`https_auth/file_worker.rs:91-98`), `CleanupPending` only with no other cause.
+- **Pending cleanup is a finding, not the member's error.** B retains the tree (`owner.rs:298`) in the cleanup domain, so
+  the `HostClose` the dispatch awaits (§3.2) is `Pending` (contract :272-275); 3.1c then writes `gwz: cleanup still
+  pending` to stderr, replacing `dispatch.rs:82-87`'s `gwz-alpha` line.
 
-### 3.4 Second interrupt or the bound: Force and the write rule
+### 3.4 Force: the write gate and the forced exit
 
-**The write gate** (`crates/write-gate/`, a new gwz-core crate that builds and tests alone). `WriteGate` is a cloneable
-value the CLI makes per process and passes down; its state is a `ThreadId` map under one mutex and condition variable.
+**The write gate** (`crates/write-gate/`, a gwz-core crate that builds and tests alone): a cloneable `WriteGate`, one per
+process; a `ThreadId` state map under one mutex and condition variable.
 
 | Call | Meaning |
 |---|---|
-| `writing(label, f)` | the current thread runs `f` as a write sequence (nesting allowed) |
-| `outside(label, f)` | the thread's sequence is parked while `f` runs (network, lock wait, join); if the gate closed meanwhile, the thread blocks for good when `f` returns |
-| `safe_point(label)` | if the gate is closed, the writing thread records `label` as stopped and blocks for good |
-| `is_closed()`, `close()`, `wait()` | `wait` returns, with the stopped labels, once every writing thread is parked, stopped or ended |
+| `writing(label, f)` | `f` is a write frame of this thread (nesting allowed); refused `Closed` before `f` if the gate is closed |
+| `park()`, `unpark()`, each `-> Open \| Closed` | in a frame: `park` makes the thread parked (no local write; Force does not wait for it) or, on a closed gate, leaves it writing and returns `Closed`, the caller failing `Cancelled` without starting the parked phase; `unpark` makes it writing again and says whether the gate closed meanwhile, the caller then taking its abort path |
+| `outside(label, f)` | `park`, `f`, `unpark`; refused before `f` if closed; on `Closed` after `f` the thread stops |
+| `safe_point(label)`; `close()`, `is_closed()`, `wait()` | `safe_point`: if closed, records `label` as stopped and the thread stops; `wait` returns the stopped labels once every thread in a frame is parked, stopped or out of its frames |
 
-**How the gate reaches every backend that does gwz's network.** `Git2Backend` gets a `write_gate` field beside
-`spawn_gate` (`backend.rs:26`, open by default) and `with_write_gate`. The runtime's state holds the gate as it holds
-the spawn gate, each request's context takes it, and `with_host_context` copies it (`backend.rs:120-125`), so the
-transport host's per-request backends (`mod.rs:504`, `driver_only.rs:152`) carry it. The gated entry passes it to the
-runtime; the hostless dispatch backend (`dispatch.rs:91-96`) takes it through `with_write_gate`. gwz-core's own local
-backends (§2) carry an open gate: they have no safe point and run to their end inside the command's sequence (R8).
+A thread **stops** by blocking for good. **(G1)** A frame is parked only while bytes are in transfer or while it waits (a
+join, a slot, a lock poll); a writing thread blocks only in a local write, a `Wait` child, or a clone's network I/O
+before its first object, which step 1's host close fails (no host: R10). **(G2)** No stop with an in-process lock held or
+inside a held Git lock file (a ref transaction, a filebuf). **(G3)** After `close()` nothing new starts: frames and parks
+are refused, queued members report `Cancelled`, and every serial member loop has a safe point at each member's head.
 
-**Where sequences open and park.**
-- 3.1c's dispatch runs every request except an explicit read-only list as `writing`; the list is an exhaustive `match`
-  over `CliRequest` with no wildcard, so a new request is a writer until it is classified.
-- `par_map_per_host` runs its join as `outside` and each worker as `writing` when the caller was writing.
-- Every network call of §2's list runs as `outside`. Fetch sites call `download`, `disconnect`, then `update_tips`
-  (with the tag option and prune `Remote::fetch` uses) instead of `fetch`, so only the download is parked and the ref
-  update is a write. A push, a clone and `read_remote_file` are parked whole (§7 R5, R6, R16).
-- The member-lock wait (`src/operation/memberlockmanager.rs`) and family-lock poll (`src/local_clone/wait.rs`) are `outside`.
+**Carriage.** 3.0d adds a `write_gate` field to `ProcessGate`, filled where composition mints it (§2; B's minting check
+unchanged): `process_safety_with_children()` (B, once per process, 3.1) makes the process's `WriteGate`, read by gwz-cli
+with `ProcessGate::write_gate()`; `process_safety()` gives an open one. `with_process_gate` copies it into a new field of
+`Git2Backend` (open by default, beside `spawn_gate`, `backend.rs:26`), exposed by `GitRepository::write_gate()`; every
+request backend takes the process gate (plan 3.1, §8 row 4); one built without it has an open gate and runs to its end.
 
-**Force**, on the reader thread, in this order: (1) restore the dispositions (§3.1); cancel the token if Cancel did not;
-(2) claim the output (§3.6) and hand the writer the notice, and the forced envelope if `--json` won the claim;
-(3) `close()` the gate; (4) B's `kill_killable()`, which ends every `Kill` child at once; (5) `wait()` and hand the
-writer the stopped labels; (6) B's `close()`; (7) give the writer up to 1 s; (8) exit 130 without unwinding (`_exit` on
-Unix, `TerminateProcess` on the current process on Windows). A blocked pipe never holds Force past step 7. **Network
-work ends at once:** network calls are parked, so step 5 never waits for one, and step 8 ends them.
+**Where frames open and park.**
+- 3.1c's dispatch runs every request as `writing` except a read-only list, an exhaustive `match` over `CliRequest` with
+  no wildcard (a new request is a writer until classified); a request is listed only if it writes no file (row 6.14).
+- `par_map_per_host_gated(gate, …)`, new beside `par_map_per_host` (unchanged), parks for its join, runs each item's `f`
+  (not the worker loop, so slot waits stay outside) as `writing`, and passes `is_closed` as `cancelled`; §2's seven calls
+  switch to it with `backend.write_gate()`.
+- **Fetch** (`fetch`, `tag_fetch`, `fetch_anonymous`): `download` parked, `disconnect` `outside`, then `update_tips` as a
+  write (with the tag option and prune `Remote::fetch` uses). The transfer callback, now always set, unparks at its first
+  call with every object received, so the pack commit and `.git/shallow` are writes; on `Closed` it returns `false` and
+  libgit2 frees the uncommitted pack in the frame. A download that returns still parked (no pack) unparks; a refused
+  `download` park fails the member `Cancelled` before it contacts the remote.
+- **Clone**: a write frame. The `remote_create` callback writes the pins (moved from :73, so every clone that reaches a
+  checkout is pinned); the transfer callback parks while objects remain and unparks once all are received, so the pack
+  commit and the checkout, with its safe point, are writes; a clone that never calls it (an empty remote) stays writing
+  (G1). On `Closed` libgit2 removes the clone inside the frame (`clone.c:666-673`).
+- **Push**: parked; the first `push_update_reference` unparks, so the tracking-ref update is a write; on `Closed` it
+  returns an error and libgit2 skips that update (R5). A push to a local-path remote (§2) is a write throughout, as its
+  upload writes the remote repository: Force waits for it (R8 if hung).
+- `ls_remote`, `read_remote_file` (R16) and the family-lock poll are `outside` whole. Member-lock waits are on the served
+  path only (`src/session_host/served.rs:81`): C's.
 
-- **A local write runs to its next safe point or its end.** A sequence still running after step 3 (the commit loop of
-  `handle_commit.rs:179-186`, for one) may start B's `Wait` children (`git commit`, `git tag` and their hooks) until it
-  ends: those children perform the write, so they are part of it, never killed (B OD-B1 (a)) and waited for without a
-  bound (R8). This narrows D-V (1)'s "kills children … at once" to the `Kill` children (§9 O2). A `Kill` child a parked
-  network call starts after step 4 is ended by B's reaper when the process exits (B §3.4).
+**Force**, on the reader thread, in order: (1) restore the dispositions (§3.1); close the host if Cancel did not (§3.2);
+(2) the first Force notice (§3.6); (3) `close()` the gate; (4) B's `kill_killable()`: every `Kill` child ends now and a
+later `Kill` spawn is refused `Closed`, its member reporting `Cancelled`; (5) `wait()`, without a time bound, the writer
+printing each stopped label as recorded; (6) the claim (§3.6): taken if free, else Force waits for the main thread's
+exit; (7) the output (§3.6); (8) up to 1 s for the writer, then exit 130 without unwinding (`_exit` on Unix,
+`TerminateProcess` on the current process on Windows). A calls no `close()` of B's: every `Wait` child runs in a write
+frame and G3 refuses new frames, so none starts after step 5. **Network work ends at once:** step 1's close fails the
+host's I/O; a transfer still running (R10) is parked, not waited for, and ended by step 8 (R4, R6). **Local writes are
+waited for** to a safe point or their end, a `Wait` child (`git commit`, `git tag`, hooks, signer; B OD-B1 (a)) without
+a bound (decision (ii); R8).
 
 ### 3.5 Long local phases and their safe points
 
 | Phase | Safe point | What a stop leaves |
 |---|---|---|
-| libgit2 checkout: switch, pull's update, merge, materialize at the seven checkout sites of §2; `reset_hard` (a `CheckoutBuilder` passed to `reset`); `stash apply` and `stash pop` (`checkout_options` in `stash_restore_options`) | the checkout progress callback, after each complete file | earlier files new, later files old, index and HEAD old (§7 R1) |
-| copy: `local clone` (`handle_local.rs:72`), family import (`family_merge.rs:424`) | one adapter type implementing both `Cancellation` traits, answering `is_closed()`: refcopy stops between entries or mid-file and removes that file's temporary; local-import stops before the next participant | whole files only; a `creating` lane or partial import (§7 R2) |
-| stage, `add_all` | its matched-path callback (today `None`, `repository.rs:112`) | loose objects only; the index is unchanged (§7 R3) |
-| stage, per-path loop | each iteration (`repository.rs:151-168`) | the same |
-| `stash push` (`stash_save`), Git CLI route commit or tag with hooks | none: runs to its end | nothing; Force waits without a bound (§7 R8) |
+| checkout outside a ref transaction: `refs.rs:33, :134`, `repository.rs:56, :81`, the clone's (`transport.rs:41`); `reset_hard` (a `CheckoutBuilder` passed to `reset`); stash apply and pop (`checkout_options` in `stash_restore_options`, `stash_support.rs:18-26`) | the progress callback, after each complete file | earlier files new, later old; index and HEAD old; a pop's stash kept (R1) |
+| the five writes inside a ref transaction (§2): four checkouts, the expected-conflict `repo.merge` | none (G2): run to their end | nothing; R8 if hung |
+| copy: `local clone` (`handle_local.rs:72`), family import (`family_merge.rs:424`), today `NeverCancelled` | one adapter implementing both `Cancellation` traits, answering `is_closed()` | whole files; a `creating` lane or partial import (R2) |
+| stage: `add_all`'s matched-path callback (today `None`, `repository.rs:112`); the per-path loop | the callback; each iteration | loose objects only; index unchanged (R3) |
+| serial member loops: `handle_commit.rs:179-186` and any other 3.0f's inventory finds in `src/workspace_ops/` | each member's head | earlier members done, later not (R7) |
+| `stash_save` (`stash.rs:18`, `preservation.rs:344`); a Git CLI route commit or tag | none: run to the end | nothing; R8 if hung |
 
-A stopped copy's thread runs its error path to the sequence's end. Every other write sequence writes a bounded set
-per member (refs, one index, one commit, atomic workspace artifacts) and runs to its end.
+A stopped copy runs its error path to the frame's end. Every write sequence the table does not name runs to its end,
+writing a bounded set per member (refs, one index, one commit, workspace artifacts).
 
 ### 3.6 Exit status and output (OD-C4)
 
-- **Status.** An interrupted command exits **130** on every platform, over 0, 1 and 2 and in place of the OS's signal
-  death or `STATUS_CONTROL_C_EXIT`: the response and execution-error paths, `diff`, `log` and `forall`.
-- **The claim.** `OutputClaim` (one atomic, owned by `run`) is taken once: by the main thread before its final stdout
-  write, or by Force. The main thread's final write after an interrupt uses `write_all` and ignores its error. A main
-  thread that loses the claim writes nothing and waits for Force's exit.
-- **After Cancel** (the command returned). The response renders as usual, with the first own entry of `errors` (after
-  the member copies, before any other own error; §8 rows 7, 8) `{"code":"Cancelled","message":"interrupted",
-  "member_id":null,"member_path":null,"target_kind":null,"detail":null,"record_context":null}`; `aggregate_status` as
-  today, nothing added to the wire. An execution error's top-level `errors` is [that entry, its own error].
-- **After Force.** `--json`: if Force won the claim, the writer writes exactly the top-level shape with `meta: null`, no
-  members and the one `Cancelled` entry whose `message` is `interrupted; forced exit before the command finished`;
-  otherwise stdout holds what the main thread wrote. `--jsonl`, human and porcelain: Force writes nothing to stdout, so
-  a `--jsonl` stream has no final response object. A consumer reads exit 130 with no complete document as forced.
-- **The forced notice** (the writer, stderr, every mode): `gwz: forced exit; waiting for local writes to reach a safe
-  point`, then per label: `gwz: stopped between files: <member path> (<phase>)` or `gwz: transfer ended: <member path>
-  (fetch|push|clone)`, a push adding `; the remote may have received it`.
+- **Status.** **130** on every platform, over 0, 1 and 2 (`gwz-cli/src/globalargs/render_exit.rs:82-95`) and in place of
+  a signal death or `STATUS_CONTROL_C_EXIT`, on the response and error paths, `diff`, `log` and `forall` (§9 O4).
+- **The claim.** `OutputClaim` (one atomic, owned by `run`) is taken once: by the dispatch (main) thread as the last act
+  in its write frame (a read-only request: at its return), or by Force at step 6 if free; as `wait()` returns only after
+  that frame ends, a finished dispatch holds it first. Its holder alone writes stdout's final document. If the dispatch
+  holds it, Force waits up to the close bound plus 1 s for the main thread to await the host's close, render and exit,
+  then exits 130 (R13). The status is 130 when an interrupt preceded the claim; a later one changes neither.
+- **When the dispatch holds the claim**, the main thread renders as usual, with the first own entry of `errors` (after
+  the member copies; `ErrorCatalog.md:35`) `{"code":"Cancelled","message":"interrupted","member_id":null,
+  "member_path":null,"target_kind":null,"detail":null,"record_context":null}`; `aggregate_status` as today. An execution
+  error's top-level `errors` is [that entry, its own error].
+- **When Force takes it**, `--json` gets the top-level shape with `meta: null`, no members and the one `Cancelled` entry,
+  `message` `interrupted; forced exit, see stderr for what stopped`; `--jsonl`, human and porcelain get nothing more on
+  stdout, so a `--jsonl` stream has no final response (R13).
+- **Notices** (the writer, stderr, every output mode): at Cancel `gwz: interrupted; cancelling (interrupt again to stop
+  now)`; at Force `gwz: forced exit; network work ended, waiting for local writes to finish or reach a safe point`, then
+  `gwz: stopped: <member path> (<phase>)` per label and `gwz: transfer ended: <member path> (fetch|push|clone)` per parked
+  transfer, a push adding `; the remote may have received it`; `gwz: <n> progress lines dropped` when any were.
 
 ### 3.7 The pager and `forall` (OD-C6)
 
-A foreground program (the pager after its input closes, a `forall` member's `status`) gets the terminal's interrupt
-itself; gwz never signals it. `Interrupts::foreground(f)` wraps that wait: no bound runs and a Force is deferred until it
-returns. On Cancel, `diff` and `log` close the pager's input and wait; `forall` finishes the current member, starts no
-further one, appends `interrupted: <k> of <m> members not run` and exits 130.
+A foreground program (the pager after its input closes, `gwz-cli/src/pager.rs:138-145, :155-170`; a `forall` member's
+`status`, `gwz-cli/src/forall.rs:260`) gets the terminal's interrupt; gwz never signals it. `Interrupts::foreground(f)`
+wraps that wait: no bound runs; Force's step 1 runs at once (a further interrupt or SIGTERM then ends gwz by default,
+R14), its later steps waiting for `f`. On Cancel, `diff` and `log` close the pager's input and wait; `forall` finishes
+the current member, starts no further one, appends `interrupted: <k> of <m> members not run` and exits 130.
 
-### 3.8 gwz-py (resolution (2) and OD-C4)
+### 3.8 gwz-py (resolution (2) and OD-C4; step 3.2b)
 
-- **The bridge.** `ClientHost.call` passes `_run_native` the operation id (one exported native function over
-  `shims::operation_id`, `shims.rs:79-80`). On the first `CancelledError`, `_run_native` calls `cancel_operation(id)`
-  on its own thread, shielded, ignoring its refusal, then waits through `_await_completion` as today and re-raises; a
-  running network operation ends `Cancelled` within the cleanup bound. `submit` is unchanged; gwz-py installs no handler.
-- **The gwz-py CLI.** Its first SIGINT reaches the bridge through `asyncio.run` (`runners.py:150-157`; 3.10, row 6.16).
-  `main` (`cli.py:142-156`) catches `KeyboardInterrupt` beside its error clause, renders
-  `GwzBridgeError("interrupted", code="Cancelled")` as that clause does (stdout with `--json`), and returns **130**.
-  SIGTERM, SIGHUP, CTRL_BREAK and CTRL_CLOSE keep Python's default (§7 R15; §9 O3).
+- **The bridge.** `_run_native` (`gwz-py/src/gwz/bridge.py:298-316`) today only waits on `CancelledError` (:28-35); a
+  network call registers `op_<request_id>` on its worker thread (`gwz-py/native/src/client_host.rs:226-231`;
+  `shims.rs:79-80`), and `cancel` refuses an id not yet live (`client_host/operations.rs:199-208`).
+  `NativeCoreBridge.call` (`bridge.py:318`) passes `_run_native` the call's operation id (an exported native function
+  over `shims::operation_id`); on the first `CancelledError`, `_run_native` calls the native `cancel_call(id)` on its own
+  thread, shielded: a live operation is cancelled as by `cancel`; an id not yet live is recorded (the last 64, as
+  `operations.rs:27`) and its registration refused `Cancelled`, as `gwz-py/dev-docs/GwzPyPerOperationTransportDesign.md:104`
+  says. It then waits through `_await_completion` and re-raises `CancelledError`, carrying the decoded response, if any,
+  as `gwz_response`; a library caller still sees `CancelledError`; `Client.cancel_operation` keeps its refusals. No
+  handler: 3.2b's test beside `test_process_globals.py`'s parses `gwz-py/src/gwz/` (`ast`) and fails any `signal.signal`,
+  `signal.set_wakeup_fd` or `add_signal_handler` call (`asyncio.run`'s own handler is Python's, used below).
+- **The gwz-py CLI.** `main` catches only `CliUsageError` and `GwzError` (`cli.py:142-156`). `run` (:76) catches
+  `CancelledError` around the command and renders the carried response (members as completed, the `Cancelled` entry
+  first among its own errors, as §3.6) or, with none, `GwzBridgeError("interrupted", code="Cancelled")` as `main`'s error
+  clause does, and returns **130**. On 3.11+ the first SIGINT cancels the main task (`asyncio/runners.py:150-157`) and
+  `asyncio.run` returns its value (:117-124); on 3.10 its `finally` cancels the task (the same path), then raises
+  `KeyboardInterrupt` (`runners.py:44-49, :55-63`). `main` catches `KeyboardInterrupt` and returns 130, rendering only if
+  `run` rendered nothing (a flag `main` passes). SIGTERM, SIGHUP, CTRL_BREAK, CTRL_CLOSE keep Python's default (R15).
 
 ## 4. Interfaces with B, C and D
 
-- **B** provides `kill_killable()` and `close()` (B §3.7), which Force calls at steps 4 and 6, and the `Wait` kind for
-  the Git CLI route's write child (B OD-B1). B changes no disposition in gwz's process. B's 2.3r-2 makes `terminate`
-  return the lookup's own outcome; A states the member report from it (§3.3).
-- **C** owns the server lifecycle commands' interrupt (2.3i's handler: §9 O1) and, for a `--server` command, what
-  Cancel and Force send over the carrier and their bound (the session close bound, not `CLEANUP_BOUND`), taking A's
-  `Interrupts` value; A fixes nothing of the served form.
-- **D** gives each §7 row its recognizer, carries a push's possible remote effect into JSON (round-1 Safety P2-11; R5),
-  and puts the "beyond D-V (1)" rows to the operator.
+**B points A relies on** (B §3.7, revision 2): (1) `kill_killable()` ends every live `Kill` entry at once, leaving `Wait`
+and `OwnInput` children, and refuses later `Kill` spawns `Closed` (row B22); (2) gwz-cli calls no `close()` (§3.4);
+(3) `run` creates the registry before any thread, so before A's install (B §4 3.1; OD-B3 (a));
+(4) `process_safety_with_children()` mints the `ProcessGate`, `with_process_gate` carries it to every backend (B §3.1,
+§4), A's write gate inside; (5) `terminate` returns the lookup's own outcome and retains the tree as pending cleanup
+(B §3.6), reported as the host close's `Pending` (§3.3); (6) B changes no disposition in gwz's process, its forked-child
+allowlist entries taking the kind `signal`; (7) B's 2.3r-2 runs after 2.3s (both edit the check, §8 row 7); B's R-B4
+covers a `git commit` torn by R14 or SIGKILL. **C**: a server lifecycle command's use of `Interrupts` (2.3i's stop
+input, §8 row 5), a served core's response to a `--server` host's close, its bound. **D**: §7's recognizers, a push's
+remote effect in JSON (R5), the "beyond" rows to the operator.
 
 ## 5. Steps
 
-Phase 3, after Phases 1 and 2 (plan :315); phase-reviewed (3.5); no secrets or wire. Sizes: implementation + rows.
-3.0d edits the trunk's `transport_host/mod.rs` (plan :325) after the trunk merges, else asks it; `refs.rs` and
+2.3s is Phase 2 (wave 2, lane 2, after 2.3f, before 2.3k); the rest Phase 3 (graph: §8 row 1; ≤3 compiling lanes; 3.0d
+settles `WriteGate` before 3.1c), phase-reviewed (3.5). Sizes: code + rows. No trunk file (:325); `refs.rs`,
 `repository.rs` go through the Phase 5 lane (:329-331).
 
 | Step | Content | Owns | Size | After |
 |---|---|---|---|---|
-| **3.0d** (new, gwz-core) | the `write-gate` crate; the backend field, the runtime and request carriage, the gated cancellable entry (§3.4); `par_map_per_host`; the `outside` brackets and fetch split; lock waits; the `signal` kind | create `crates/write-gate/`; edit `Cargo.toml`, `src/git/gitbackend/{backend,transport}.rs`, `src/transport_host/{mod,request,cancellable}.rs`, `src/operation/{par_map_per_host,memberlockmanager}.rs`, `src/local_clone/wait.rs`, `scripts/checks/check_process_globals.py` | ~480 + 450 | Phase 1 |
-| **3.0e** (new, gwz-core) | the file worker's cause; the pending count in the report (§3.3); rows over B's `terminate` | edit `src/git/endpoint/https_auth/file_worker.rs`, the runtime's shutdown report if row 6.7 needs it | ~30 + 200 | 2.3r-2 |
-| **3.0f** (new, gwz-core) | the safe points of §3.5 | edit `src/git/gitbackend/{merge_prepared,merge_recovery,stash,stash_support}.rs`, `src/workspace_ops/handle_local.rs`, `src/local_clone/family_merge.rs`; `refs.rs`, `repository.rs` through Phase 5 | ~200 + 380 | 3.0d |
-| **3.1c** (new, gwz-cli) | §3.1; the token; Cancel, bound, Force; writer, claim, marking, notice, exit 130; the read-only list; pager and `forall` | create `gwz-cli/src/interrupt/`; edit `src/lib.rs`, `src/globalargs/dispatch.rs`, `src/pager.rs`, `src/forall.rs`, `src/diff_exec.rs`, `src/log_exec.rs`, `Cargo.toml` (`libc` on Unix, `windows-sys` on Windows), `scripts/process_globals_allowlist.json` | ~470 + 450 | 3.1, 3.0d, 3.0e, B's 3.1 amendment |
-| **3.2b** (new, gwz-py) | §3.8 | edit `gwz-py/src/gwz/bridge.py`, `gwz-py/src/gwz/cli.py`, `gwz-py/native/src/client_host.rs` (the exported function) | ~70 + 180 | 3.2 |
-
-Graph: `{3.0 ∥ 3.0b ∥ 3.0d ∥ 3.0e ∥ 3.1 ∥ 3.2} ; 3.0d → 3.0f ; {3.1, 3.0d, 3.0e} → 3.1c ; 3.2 → 3.2b ;
-{3.0f, 3.1c, 3.2b} → 3.3`, at most three compiling lanes at once. 3.0d settles `WriteGate` before 3.1c starts.
+| **2.3s** (gwz-cli; gwz-core check) | §3.1: module, handlers, reader, writer and `Output`, `Interrupts`, installed for the server lifecycle only; the `signal` kind | create `gwz-cli/src/interrupt/`; edit `gwz-cli/src/lib.rs`, `gwz-cli/Cargo.toml` (`libc` on Unix, `windows-sys` on Windows), `gwz-cli/scripts/process_globals_allowlist.json`, `scripts/checks/{check_process_globals,test_check_process_globals}.py` | ~300 + 300 | 2.3f (lane); before B's 2.3r-2 |
+| **3.0d** (gwz-core) | `write-gate`; carriage; `par_map_per_host_gated`; fetch, clone and push frames | create `crates/write-gate/`; edit `Cargo.toml`, `src/transport_host/composition.rs`, `src/git/gitbackend/{backend,contract,transport,transport_support}.rs`, `src/operation/par_map_per_host.rs`, §2's six caller files, `src/local_clone/wait.rs` | ~460 + 480 | Phases 1, 2 |
+| **3.0e** (gwz-core) | the file worker's cause (§3.3) | edit `src/git/endpoint/https_auth/file_worker.rs` | ~30 + 200 | Phases 1, 2 |
+| **3.0f** (gwz-core) | §3.5's safe points; the member-loop inventory | edit `src/git/gitbackend/{stash,stash_support,transport}.rs`, `src/workspace_ops/{handle_local,handle_commit}.rs`, `src/local_clone/family_merge.rs`, loops found; `refs.rs`, `repository.rs` via Phase 5 | ~200 + 400 | 3.0d |
+| **3.1c** (gwz-cli) | install for every command; Cancel's slot, bound, Force; claim, marking, notices, 130; every write through `Output` and its check; read-only list; pager, `forall` | edit `src/lib.rs`, `src/globalargs/dispatch.rs`, `src/pager.rs`, `src/forall.rs`, `src/diff_exec.rs`, `src/diff_render.rs`, `src/log_exec.rs`, `src/clirequest/invocation.rs`, `src/append_branch_summary/machine.rs`, `src/progress_detail.rs`, `src/interrupt/`, `.github/workflows/ci.yml`; create `scripts/{check_direct_output,test_check_direct_output}.py` | ~500 + 500 | 3.1, 3.0d, 3.0e |
+| **3.2b** (gwz-py) | §3.8; the Python handler test | edit `gwz-py/src/gwz/{bridge,cli}.py`, `gwz-py/native/src/client_host.rs`, `client_host/operations.rs`, `gwz-py/src/tests/test_process_globals.py` | ~110 + 240 | 3.2 |
 
 ## 6. Rows
 
-Each is written and seen red first; "red by" says how. M, L, W: macOS, Linux, Windows.
+Each is seen red first; each runs on macOS, Linux and Windows (M, L, W) unless marked; W's console events come from
+`GenerateConsoleCtrlEvent` in a child console.
 
-- **6.1** [3.0d; M L W] `wait` returns at once with no writer, waits for an unparked writer, returns when it reaches
-  `safe_point` (which never returns) and does not wait for one inside `outside`, which blocks on return. Red: no crate.
-- **6.2** [3.0d; M L W] A writing caller of `par_map_per_host`: the gate waits for a worker in `update_tips` and not for
-  one in `download`. Red: join not parked.
-- **6.3** [3.0d; M L W] The split fetch writes the same refs, tags, `FETCH_HEAD` and prunes as `Remote::fetch` on the
-  existing fetch fixtures. Red: by mutation (prune dropped).
-- **6.4** [3.0d; M L W] A child process forced during a fixture's slow `download` through the transport host's
-  per-request backend (`mod.rs:504`) and through the hostless backend exits within 1 s; its refs are unchanged. Red:
-  the host-built backend has no gate.
-- **6.5** [3.0d; any] `check_process_globals.py` fails a `sigaction` or `SetConsoleCtrlHandler` occurrence outside
-  gwz-cli's module in each of the four repositories' runs. Red: no `signal` kind.
-- **6.6** [3.0e; W, and M L with the f9 slow-drain fixture] A cancel whose tree outlasts `CLEANUP_GRACE` returns
-  `Cancelled` from both the helper and the file worker; the slot comes back at the reap within 30 s. Red: `CleanupPending`.
-- **6.7** [3.0e; M L W] The same through the HTTPS worker: the member error is `Cancelled`, a timeout keeps
-  `Interaction`, and `pending_local_work` counts the retained tree until the reap. Red: `Io`.
-- **6.8** [3.0f; M L W] Force at file k of an N-file checkout, of `reset_hard` and of `stash apply` (in a child
-  process): each file is wholly old or wholly new, index and HEAD are unchanged, the notice names the member and the
-  phase. Red: no callback.
-- **6.9** [3.0f; M L W] Force during `local clone`'s copy of a file larger than one chunk: every destination file is
-  complete and no temporary remains; Force during a family import stops before a participant; `stage` (both forms)
-  leaves the index unchanged. Red: `NeverCancelled`.
-- **6.10** [3.1c; M L, W by `GenerateConsoleCtrlEvent` in a child console] SIGINT, SIGTERM, SIGHUP and CTRL_C,
-  CTRL_BREAK on `gwz --json fetch` against a stalled fixture: exit 130 within the bound; the member is `Failed` with
-  `Cancelled`; the `Cancelled` entry is the first own entry of `errors`. Red: dies by signal.
-- **6.11** [3.1c; M L] An inherited ignored SIGINT (`trap '' INT`) or SIGHUP (`nohup`) stays ignored; SIGQUIT keeps
-  its default. Red by mutation (install ignoring the inherited disposition).
-- **6.12** [3.1c; M L W] A second interrupt during a stalled download: exit 130 within 1 s, `transfer ended`; `--json`
-  stdout is exactly the forced envelope, `--jsonl` has no response object, human stdout is empty; with stdout a pipe
-  nobody reads and stderr closed, exit 130 within 2 s, no panic. Red: no Force.
-- **6.13** [3.1c; M L W] A three-member `commit` whose hook sleeps 8 s, one interrupt: the bound passes, Force waits,
-  every member and the root are committed (later `git commit`s start after Force began), exit 130; an interrupt during
-  that wait ends gwz by the default (SIGINT; W: `STATUS_CONTROL_C_EXIT`). Red: no gate in the dispatch.
-- **6.14** [3.1c; M L W] Interrupt after every member succeeded: aggregate `Ok`, exit 130, the entry. Red: exit 0.
-- **6.15** [3.1c; M L W] A `forall` member command running past the bound still runs after it, no further member
-  starts, a second interrupt does not end gwz first, exit 130; `diff` waits for its pager without a bound. Red: no
-  foreground rule. W: CTRL_CLOSE runs Force before the OS ends the process (§3.1's **(OS)** fact).
-- **6.16** [3.2b; M L W; 3.10 and 3.11+] Cancelling the task awaiting a transport-route fetch calls `cancel_operation`
-  before waiting; the call ends `Cancelled` within the cleanup bound; a local and a native-route call wait to their end
-  and raise nothing new; the exported id equals the registered one; the gwz-py CLI's `--json fetch` on SIGINT exits 130
-  with code `Cancelled`. Red: `_run_native` only waits; the CLI dies by SIGINT.
+- **6.1** [2.3s] Each source gives Cancel then Force; an inherited ignored SIGINT or SIGHUP stays ignored; SIGQUIT keeps
+  its default; children spawned in a loop and one SIGINT to the group give one Cancel. Red: no module; no PID check.
+- **6.2** [2.3s, 3.1c; any] The check fails a `sigaction` or `SetConsoleCtrlHandler` outside gwz-cli's module in each of
+  the five runs; [3.1c] the direct-output check fails a `println!` and an `io::stdout()` outside its allowed files, also
+  in a `cfg(windows)` branch on Linux. Red: no `signal` kind; no check.
+- **6.3** [2.3s] Through `Output`, events and the final document keep their order; with a consumer that stopped reading,
+  a sender blocks before Cancel, never after it; no notice or document is dropped. Red: direct writes.
+- **6.4** [3.0d] `wait` returns at once with no frame, waits for a writing thread until its `safe_point`, not for a parked
+  one; after `close()` frames and parks are refused. Red: no crate.
+- **6.5** [3.0d] `wait` waits for a gated worker in `update_tips`, not in `download` or a slot wait; two same-host
+  members, per-host 1, member 1 stopped at a safe point: `wait` returns in 1 s, member 2 `Cancelled`. Red: a looped frame.
+- **6.6** [3.0d] The split fetch writes the refs, tags, `FETCH_HEAD` and prunes `Remote::fetch` does; Force at a
+  transfer's end, in its pack commit or shallow write leaves no `shallow.lock` or `*.idx.lock`, the next fetch succeeding;
+  Force after a clone's transfer, after `builder.clone` or in an empty remote's clone leaves no member or a pinned one; a
+  refused `download` park is `Cancelled`, no fixture contact. Red: `download` parked whole; late pins; empty clone parked.
+- **6.7** [3.0d] A native-route three-member push to a bare file remote, Force in member 1's pack write, ref write and
+  tracking-ref update: no `*.lock` in the member or the remote, whose `git fsck` passes with the push whole or absent;
+  members 2 and 3 never contact the remote (its log) and report `Cancelled`. Red: a parked local-path upload; no refusal.
+- **6.8** [3.0e, 3.1c; W, and M L with the f9 slow-drain fixture] A cancel whose tree outlasts `CLEANUP_GRACE` returns
+  `Cancelled` from the helper and the file worker; through the HTTPS worker the member is `Cancelled`, a timeout keeps
+  `Interaction`; after a gwz-cli Cancel the `HostClose` the dispatch awaits is `Pending`, stderr has `gwz: cleanup still
+  pending`, the reap follows within 30 s. Red: `CleanupPending`; `Io`; a `HostClose` nobody awaits.
+- **6.9** [3.0f] Force at file k of an N-file checkout, `reset_hard` and stash apply (child process): each file wholly old
+  or new, index and HEAD unchanged, the notice names member and phase; Force during a fast-forward merge's checkout and
+  both recovery checkouts: each completes, no `refs/**/*.lock`, the next `gwz merge --abort` succeeds. Red: no callback;
+  a safe point inside the transaction.
+- **6.10** [3.0f] Force during `local clone`'s copy of a file over one chunk: every file complete, no temporary; in a
+  family import: stops before a participant; in `stage` (both forms): index unchanged; in member 1's 8 s hook of a
+  three-member `commit`: member 1 commits, members 2, 3 and the root do not start. Red: `NeverCancelled`; no loop point.
+- **6.11** [3.1c] SIGINT, SIGTERM, SIGHUP, CTRL_C, CTRL_BREAK on `gwz --json --max-per-host 1 fetch` of two members on
+  one host, the first stalled: exit 130 within the bound, both `Failed` with `Cancelled` (the second refused admission),
+  the entry first among own entries; after every member succeeded: `Ok`, exit 130, the entry. Red: signal death.
+- **6.12** [3.1c] A second interrupt during a stalled download: exit 130 within 1 s, `transfer ended`; `--json` stdout is
+  the forced envelope, `--jsonl` has no response, human stdout is empty; stdout a pipe nobody reads and stderr closed:
+  exit 130 within 2 s, no panic; `gwz --jsonl pull` whose consumer stops reading after one event, then SIGTERM: exit 130
+  within the bound plus 1 s. Red: no Force; sinks write directly.
+- **6.13** [3.1c] `--json commit`, an 8 s hook, one interrupt (Force at the bound): one member: Force waits, stdout is
+  the full response (member `Ok`, the entry), exit 130, also in 100 runs with a second interrupt at the hook's exit;
+  three members: member 1 commits, stdout is the envelope, stderr names the stop; an interrupt during the wait ends gwz
+  by default, also 50 ms after the second (R14). Red: claim taken at Force's start, or after the frame.
+- **6.14** [3.1c] Each read-only request leaves all fixture files' bytes and mtimes as they were. Red: a writer listed.
+- **6.15** [3.1c] A `forall` member past the bound still runs, no further member starts, exit 130; a member that ignores
+  SIGINT, and three SIGTERMs to gwz: the third ends gwz, the member runs on; `diff` waits for its pager without a bound;
+  W: CTRL_CLOSE runs Force before the OS ends the process **(OS)**. Red: no foreground rule.
+- **6.16** [3.2b; 3.10 and 3.11+] Cancelling a task awaiting a transport-route fetch calls `cancel_call` first, the call
+  ending `Cancelled` within the bound; with `max_workers=1` and one blocking call, a cancelled queued fetch ends
+  `Cancelled` without contacting the fixture; local and native-route calls wait to their end; the exported id equals the
+  registered one; the gwz-py CLI's `--json` exits 130 with `Cancelled` on SIGINT and, for a three-member local `commit`,
+  shows what committed; the source test fails a planted `loop.add_signal_handler`. Red: `_run_native` only waits; no test.
 
 ## 7. Residuals (for design D)
 
-"Beyond D-V (1)": not covered by D-V (1)'s accepted SIGKILL, crash and power loss; D puts it to the operator.
+"Beyond": not covered by D-V's SIGKILL, crash and power loss or decision (i)'s hung write; D puts it to the operator.
 
-| # | What can remain | When | How it is recognized now | Beyond D-V (1) |
+| # | What can remain | When | How it is recognized now | Beyond |
 |---|---|---|---|---|
-| R1 | a partly checked-out tree, index and HEAD old | Force at a checkout safe point (checkout, `reset_hard`, stash apply or pop) | the notice line; D | no (file-granular stop) |
-| R2 | a `creating` lane or partial family import (whole files only) | Force at a copy safe point | the notice line; D | no |
-| R3 | unreachable loose objects | Force during stage | none needed (Git's `gc`) | no |
-| R4 | libgit2's temporary pack files in `objects/pack` | Force during a fetch download (freed only on libgit2's error path) | `transfer ended`; D | no (network ends at once) |
-| R5 | an unknown remote effect; a tracking-ref `.lock` of a named remote | Cancel or Force during a push | the notice's `may have received it`; the catalog's remedy (`ErrorCatalog.md:35`); D carries it into JSON | yes (the `.lock`) |
-| R6 | a partial new member directory | Force during a clone | the notice; the next clone refuses a non-empty target (`transport.rs:32`); D | no |
-| R7 | earlier members updated, later ones not | Cancel during pull or materialize | the response (`Partial`, members `Cancelled`); re-running completes | yes (reading of "no partial state") |
-| R8 | none; gwz waits without a bound | Force during `stash push`, a `Wait` child and its hooks, a gwz-core local backend's write, or a write blocked in the filesystem | the notice's first line; R14's escape | yes (`Wait` children are not killed at once, §9 O2) |
-| R9 | the residues of SIGKILL | Windows CTRL_CLOSE when Force outlasts the OS's timeout **(OS)** | as SIGKILL's; D | yes (OD-C7 (c)) |
-| R10 | a native-route network call runs on after Cancel | transport off or an ordinary build: no token | Force at the bound ends it (parked); gwz-py's cancel refuses | yes |
-| R11 | a gwz-py local or native-route call runs to its end; a second interrupt keeps waiting | gwz-py | `_await_completion` (unchanged) | yes |
-| R12 | the OS default: gwz dies by the signal | `hook`, `claude-code-setup`; the server lifecycle commands until C | as SIGKILL's; D | yes |
-| R13 | a truncated stdout document | Force while the main thread writes | exit 130 without a complete document (§3.6) | no |
-| R14 | a write torn by the default disposition | an interrupt after Force began; SIGQUIT at any time | death by signal (or a core file) instead of 130; D | yes (OD-C7 (a), (b)) |
-| R15 | a gwz-py CLI write torn, no cancel | SIGTERM, SIGHUP; Windows CTRL_BREAK, CTRL_CLOSE | death by signal; D | yes (OD-C7 (d)) |
-| R16 | a `tempfile` directory holding a partial clone in the system temp directory | Force during `read_remote_file` (`transport.rs:718, :740`; `_exit` skips its `Drop`) | D's temp sweep | no (network ends at once) |
-| R17 | exit 101 with a panic message instead of 130; the panicking thread unwinds | a gwz-cli `eprintln!`/`println!` outside the module fails (closed stderr, `2>&1 \| tee` ended by the same Ctrl-C) after an interrupt | the exit status; D | yes (an induced crash) |
+| R1 | a partly checked-out tree; index and HEAD old; a popped stash kept | Force at a checkout safe point | the notice; D | no |
+| R2 | a `creating` lane or partial family import (whole files) | Force at a copy safe point | the notice; D | no |
+| R3 | unreachable loose objects | Force during stage | none needed (`gc`) | no |
+| R4 | libgit2's temporary pack in `objects/pack` | Force while a pack is being received | `transfer ended`; D's sweep | no (network ends at once) |
+| R5 | an unknown remote effect; or the remote has the push and the tracking ref is stale | Cancel or Force during a network upload; Force after the remote's report | the member's `Cancelled` and the catalog's remedy (`ErrorCatalog.md:35`); Force's `may have received it`; D's JSON | no |
+| R6 | a partial new member directory | Force during a clone's transfer | the next clone refuses a non-empty target (`transport.rs:32`); D | no |
+| R7 | earlier members done, later not | Cancel during pull or materialize; Force between members | the response (`Partial`, members `Cancelled`) or the stop notice; re-running completes | yes ("no partial state") |
+| R8 | none; gwz waits without a bound and only SIGKILL ends it | a hung `Wait` child, hook or signer (R-B10), `stash_save`, a write in a ref transaction, a local-path push, a local backend's write, a write blocked in the filesystem | the first Force notice; `ps` | decided (i) |
+| R9 | SIGKILL's residues | Windows ends the process after CTRL_CLOSE, LOGOFF or SHUTDOWN **(OS)** | as SIGKILL's; D | CTRL_CLOSE decided (OD-C7 (c)); LOGOFF, SHUTDOWN with O4 |
+| R10 | a network call runs on after Cancel; Force waits on a stalled native read between a pack's last object and its end, or in a clone's negotiation | no host: native route, ordinary build, transport off | Force at the bound ends a parked call | yes |
+| R11 | a gwz-py local or native-route call runs to its end; a second interrupt keeps waiting; on 3.10 a SIGINT inside a task step skips the cancel | gwz-py | `_await_completion` (unchanged) | yes |
+| R12 | the OS default: gwz dies by the signal | `hook`, `claude-code-setup` | as SIGKILL's; D | yes |
+| R13 | no complete final document: a `--jsonl` stream without its response; a document cut at step 8 | Force taking the claim; a stalled stdout or host close past Force's wait | exit 130 without a complete document | yes (OD-C4 marking) |
+| R14 | a write torn by the default disposition | an interrupt after Force began, however soon; SIGQUIT at any time | death by signal (or a core) instead of 130; B's R-B4 | decided (OD-C7 (a), (b)) |
+| R15 | a gwz-py CLI write torn, no cancel | SIGTERM, SIGHUP; Windows CTRL_BREAK, CTRL_CLOSE | death by signal; D | SIGTERM, SIGHUP decided (OD-C7 (d)); the Windows events with O4 |
+| R16 | a `tempfile` directory with a partial clone in the system temp directory | Force during `read_remote_file` (`transport.rs:718, :740`) | D's temp sweep | no (network ends at once) |
 
 ## 8. Superseded or amended clauses (applied by the lane owner at acceptance)
 
 | # | Document and clause | Replacement or addition |
 |---|---|---|
-| 1 | Plan §4 graph, Phase 3 line (:315) | `Phase 3  ─ {3.0 ∥ 3.0b ∥ 3.0d ∥ 3.0e ∥ 3.1 ∥ 3.2} ; 3.0d → 3.0f ; {3.1, 3.0d, 3.0e} → 3.1c ; 3.2 → 3.2b ; {3.0f, 3.1c, 3.2b} → 3.3 → 3.4 → 3.5 (review)   (after Phases 1 and 2)` |
-| 2 | Plan §4 Phase 3 heading (:712) | "(three lanes then one, 19–23 lane-days)" for "(two lanes then one, 11–13 lane-days)" |
-| 3 | Plan §4, after the 3.0b bullet (:717-720) | Five bullets 3.0d, 3.0e, 3.0f, 3.1c, 3.2b with §5's content, sizes and "After", citing `GwzCancelInterruptDesign-DRAFT.md` §5 |
-| 4 | `gwz-cli/docs/MachineOutput.md` Exit Codes (:954-964) | Add row "interrupted (Ctrl-C, SIGINT, SIGTERM, SIGHUP; Windows Ctrl-C, Ctrl-Break, console close) \| `130`, whatever the aggregate" and a paragraph "Interrupted commands" with §3.6's entry, its place, the forced envelope and the `--jsonl` rule |
-| 5 | MachineOutput Notes (:280-287) | Append: "The interrupt and forced-exit notices are written to stderr in every output mode." |
-| 6 | MachineOutput JSONL (:669-670) "exactly one final `kind: \"response\"` object" | Append: "unless the command was forced to exit after an interrupt (exit 130), which ends the stream without one." |
-| 7 | MachineOutput (:141-142) "Any other entry in `errors` is an error the operation reports in its own right." | Append: "After an interrupt the first of these is the `Cancelled` entry with no member." |
-| 8 | `gwz-core/docs/ErrorCatalog.md:35` (`cancelled`), "A result's first error;" | "A result's first error of its own (in a response's `errors`, after the copies of member errors);" and append to the remedy: "An interrupted gwz-cli or gwz-py CLI command adds one `cancelled` entry with no member and exits 130." |
-| 9 | `gwz-py/dev-docs/GwzPyPerOperationTransportDesign.md` §2.5 (:103-106) | Add: "**A caller's cancellation of an awaiting call** first cancels its operation through `cancel_operation`, ignoring its refusal, then waits as before; the CLI exits 130 on an interrupt (cancellation design A §3.8)." |
-| 10 | `gwz-py/README.md:225` | Append: "Cancelling the task that awaits a transport-route call cancels its operation first." |
+| 1 | Plan §4 graph, Phase 3 (:315) | `Phase 3  ─ {3.0 ∥ 3.0b ∥ 3.0d ∥ 3.0e ∥ 3.1 ∥ 3.2} ; 3.0d → 3.0f ; {3.1, 3.0d, 3.0e} → 3.1c ; 3.2 → 3.2b ; {3.0, 3.0b, 3.0f, 3.1c, 3.2b} → 3.3 → 3.4 → 3.5 (review)   (after Phases 1 and 2)` |
+| 2 | Plan Phase 3 heading (:712) | "(three lanes then one, 19–23 lane-days)" for "(two lanes then one, 11–13 lane-days)" |
+| 3 | Plan §4, after 3.0b (:717-720) | Bullets 3.0d, 3.0e, 3.0f, 3.1c, 3.2b with §5's content, sizes and "After", citing this design's §5 |
+| 4 | Plan 3.1 (:721-728) | Append: "The command's `HostOwner` sits in a slot the interrupt reader closes on Cancel, the dispatch awaiting the returned `HostClose` after its write frame (GwzCancelInterruptDesign §3.2); a request refused `AdmissionError::Closing(HostClosing)` or ended by that close reports `Cancelled`; every request backend takes the process gate, with its write gate, through `with_process_gate` (§3.4)." |
+| 5 | 2.3 plan 2.3i (:186-188) | "SIGINT/SIGTERM and Windows Ctrl-Break through a handler that sets a flag only" → "stop requests from a stop input its caller passes (gwz-cli's interrupt module, GwzCancelInterruptDesign §3.1; gwz-core installs no handler, OD-C1)"; red row "a second signal or `force`" → "a second stop request or `force`" (the signal leg moves to 2.3k) |
+| 6 | 2.3 plan 2.3k (:207-217) | Add: "`server start`, its background copy and `server stdio` take design A's `Interrupts` (2.3s) and pass 2.3i its stop input; red row: SIGINT, SIGTERM and Ctrl-Break stop a foreground server". "After" adds 2.3s |
+| 7 | 2.3 plan §3, §4 (:240, :249-250) | Add "**2.3s Interrupt source (single, Surface).** GwzCancelInterruptDesign §3.1, §5, rows 6.1-6.3; ~300 + 300"; wave 2 lane 2: "2.3f listener files, then 2.3s interrupt source"; totals one step, 300 and 300 more; B's 2.3r-2 (its §8) gains "After 2.3s": both edit `scripts/checks/check_process_globals.py`, merged serially, 2.3s first |
+| 8 | `MachineOutput.md` Exit Codes (:954-964) | Subject to §9 O4 (shown as recommended): add row "interrupted (Ctrl-C, SIGINT, SIGTERM, SIGHUP; Windows Ctrl-C, Ctrl-Break, console close, logoff, shutdown) \| `130`, whatever the aggregate" and a paragraph "Interrupted commands" with §3.6's entry, its place, the forced envelope and the `--jsonl` rule |
+| 9-12 | MachineOutput: (9) Notes (:280-287); (10) JSONL (:669-673); (11) :142-143; (12) :66-69, "and one error entry" | (9) Append: "Unlike `note:` lines, the interrupt and forced-exit notices are written to stderr in every output mode." (10) Append: "A command forced to exit after an interrupt (exit 130) may end the stream without that final response." (11) Append: "After an interrupt the first of these is the `Cancelled` entry with no member." (12) "and one error entry (two after an interrupt: the `Cancelled` entry, then the error)" |
+| 13 | `gwz-core/docs/ErrorCatalog.md:35` | "A result's first error;" → "A result's first error of its own (in a response's `errors`, after the copies of member errors);" and append to the remedy: "An interrupted gwz-cli or gwz-py CLI command adds one `cancelled` entry with no member and exits 130." |
+| 14 | `GwzCoreSessionDesign.md:687` | Append: "gwz-cli's interrupt no longer tears a write it is running (GwzCancelInterruptDesign §3.4); a detached worker's exposure stands." |
+| 15 | `gwz-py/dev-docs/GwzPyPerOperationTransportDesign.md` §2.5 (:103-106) | Add: "**A caller's cancellation of an awaiting call** first cancels it through `cancel_call`, which also refuses a not-yet-registered one, then waits; the CLI renders what completed and exits 130 (cancellation design A §3.8)." |
+| 16 | `gwz-py/README.md:225` | Append: "Cancelling the task that awaits a transport-route call cancels its operation first." |
 
-The helper-owner contract's `CleanupPending` clauses (C5) are history (`gwz-core/dev-docs/history/reference/`) and stay
-unedited (AgentProcessRules L1-33); the live statement is the code of §3.3, whose doc comments 3.0e and 2.3r-2 update.
+The helper-owner contract's `CleanupPending` clauses are history and stay unedited (AgentProcessRules L1-33).
 
-## 9. Decisions and points for review
+## 9. Decisions
 
-For the operator (A is written to the option marked; only the named rows change with the answer):
-- **O1 OD-C1 and 2.3i.** The brief allows 2.3i's "handler that sets a flag only" (2.3 plan :186-187) as a second site;
-  OD-C1 as decided says gwz-core installs none (round-1 Consistency P2-2). **A follows OD-C1**: one site; C makes the
-  server lifecycle take A's module. Alternative: the operator records 2.3i's handler in OD-C1 and C adds its entry.
-- **O2 `Wait` children under Force.** D-V (1) kills children at once; A and B leave the Git CLI route's `git commit`/
-  `git tag` and hooks running, and a running sequence may start more, so no commit is torn (B OD-B1 (a); R8). **A
-  follows B.** Alternative: kill them at Force step 4, tearing that member's commit (an R1-like residue with a `.lock`).
-- **O3 OD-C7, A's part.** (a) dispositions restored when Force begins, so the next interrupt ends gwz (R14; round-1
-  Safety P2-6); (b) SIGQUIT keeps its default (R14); (c) CTRL_CLOSE's OS timeout (R9); (d) the gwz-py CLI keeps
-  Python's default for SIGTERM, SIGHUP, CTRL_BREAK, CTRL_CLOSE (R15). **A accepts each, as recommended.** Alternatives:
-  (a) keep the handler through Force; (b) map SIGQUIT to Force; (d) `cli.py` routes them to SIGINT's path.
+Recorded (D-V :1055-1062): **(i)** A3, §3.4, R8 (revision 1's bounded wait, its residuals for writes cut by the exit, its
+O2 and Q1 are gone); **(ii)** A4, §3.4; **(iii)** O1 §3.1, §5; OD-C7 (a)-(d) §3.1, §3.8, R9, R14, R15. To the operator:
+- **O4 Which signals take the interrupt path, and their status** (OD-C4 says 130 "on interrupt"). **Recommended (a):**
+  SIGINT, SIGTERM, SIGHUP and Windows' console events, all 130: one rule, and a supervisor's SIGTERM never tears a write.
+  (b) The same, exiting 128 + the signal (129, 143). (c) SIGINT only; SIGTERM and SIGHUP keep their default (tearing).
+  It changes only §3.1's lists, §3.6 "Status", §8 row 8 (as (a)), R9's and R15's O4 cells and rows 6.11-6.12's legs.
+- **O5 Decision (i) beside OD-C7 (a), to confirm.** (i) says only SIGKILL ends a hung write; (a) lets any interrupt after
+  Force began end gwz by default, which can tear a write that is not hung (row 6.13's 50 ms case). A applies both (R14).
+  If (i) withdraws (a), the handler ignores later interrupts, changing only §3.1 "Giving control back", §3.4 Force step
+  (1), §3.7, R14, row 6.13's 50 ms case and row 6.15's third SIGTERM.
 
-For review:
-- **Q1.** The bound counts from Cancel even while a write sequence without a safe point runs (row 6.13): such a command
-  completes its writes but ends with the forced notice instead of its rendering.
+## 10. Changes from revision 1
+
+C-P2-1 §3.2, §3.4 "Carriage", §8 row 4; C-P2-2 §3.1, §5, §8 rows 5-7; C-P2-3 §3.4 (G2), §3.5, row 6.9; C-P3-1 §8 rows
+10-12, 14; C-P3-2 §2, §3.5; C-P3-3 §3.1, row 6.2; C-P3-4 §3.4, §5; C-P3-5 §3.1, §4; C-P3-6 §3.6, R13; C-P3-7 §9 O4;
+C-P3-8 §3.6, §8 row 9; C-P3-9 §1, §3.7, §3.8, §5. S-P2-1 §2, §3.4 (G1), rows 6.6-6.7, R4-R6; S-P2-2 §3.1, §3.4, rows
+6.3, 6.5, 6.12; S-P2-3 §3.4 (G3), rows 6.7, 6.10; S-P2-4 §3.6, row 6.13; S-P2-5 §9 O5, R14; S-P2-6, S-P2-7 §3.8, row
+6.16; S-P3-1 §3.1, row 6.1; S-P3-2 §3.7, row 6.15; S-P3-3 R5; S-P3-4 row 6.14; S-P3-5 R9; S-P3-6 §3.1 (R17 gone);
+S-P3-7 §3.2. The fix pass (its G1-G13, not §3.4's invariants) is mapped in the RemPlan.
