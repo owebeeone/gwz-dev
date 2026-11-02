@@ -1060,8 +1060,15 @@ Decided 2026-10-31 (the lane owner's recommended dispositions of the open items,
     and their hooks and signers are let finish** in their own process group (A O2, B OD-B1 (a)).
     **(iii) Accepted as recommended:** A's O1 (one interrupt site; the 2.3i server uses A's module),
     O3 / OD-C7 (a)-(d), B's OD-B2 (a) and OD-B3. Revision 2 of each is reviewed by fresh reviewers.
+  - **Designs A and B, round 2 (operator, 2026-11-03).** Both NO-GO with no new architectural root
+    cause (A: 7 P2, architectural count stays 2; B: 3 P2, count 0); a third, non-architectural round
+    follows. Decisions: **A's O4 (a)**: SIGINT, SIGTERM, SIGHUP and Windows' console events all take
+    the interrupt path and exit 130. **A's O5: OD-C7 (a) is kept**: once Force has begun, a further
+    interrupt ends gwz by the OS default, which can tear a write in progress (the user's escape
+    without SIGKILL; a named residual), so decision (i) holds for gwz's own exit, not for the
+    user's third interrupt.
 
-Open: designs A and B revision 2 and their round-2 reviews; then C and D.
+Open: designs A and B round 3; then C and D.
 
 ## 11. What this plan does not do
 
