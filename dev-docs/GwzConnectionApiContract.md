@@ -286,7 +286,7 @@ the caller integration gate; this API does not magically repair it.
 
 | Scope | State owned |
 | --- | --- |
-| Composition/CleanupDomain | Resource budgets, retained disposal, progress-task ownership |
+| Composition/CleanupDomain | Resource budgets, retained disposal, progress-task ownership; the child registry, starter and kill authority of every child a gate with a registry starts, with its reaper (GwzChildLifetimeDesign §3.6 lists the children it does not start) |
 | Connection host | Endpoint registry, host IDs, admission, policy and counters |
 | Endpoint instance | Immutable physical configuration, physical owners/pools, key registry |
 | Operation binding | Own bootstrap/mux, request IDs, cancellation, auth context, observations and retry state |

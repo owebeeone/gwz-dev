@@ -684,7 +684,7 @@ Assertions check typed fields and codes only.
 - A hung workspace resolution delays later admissions in its session, but never control frames or reads.
 - In ordinary builds, and for the remotes libgit2 handles natively in transport builds, libgit2's own SSH agent connection and configuration discovery read the process, not the snapshot (§5.8).
 - O7's two legacy exceptions, `TransportRequest::cancellation_handle()` and the legacy `TransportSession` entry points, return control handles after launch. They are deprecated. Their removal is tied to gwz-cli's and gwz-py's move onto the session (proposals §9, phases 3 and 5).
-- Process exit does not join a detached worker. A local write it has in progress can be torn by exit, the same exposure the CLI has under Ctrl-C.
+- Process exit does not join a detached worker. A local write it has in progress can be torn by exit, the same exposure the CLI has under Ctrl-C. gwz-cli's interrupt no longer tears a write it is running (GwzCancelInterruptDesign §3.4); a detached worker's exposure stands.
 - Connections are not reused across operations. Eight overlapping operations may open up to 8×32 connections to one host.
 - A misclassified writer would run concurrently. Defaulting to W limits the damage.
 - **Core API changes:**

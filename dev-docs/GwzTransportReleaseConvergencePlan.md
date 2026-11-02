@@ -312,7 +312,7 @@ Phase 1  ─ trunk: 1.1 → 1.2 → 1.3a → 1.3b → 1.3c ──► { 1.5 ∥ 1
 Phase 2  ─ 2.0 (doc, dual) may start now ──► 2.1 (dual) after 1.1 ──► 2.2 (dual) after 1.2
            ──► 2.2b (dual) after 2.0 ──► 2.2c (dual) after 1.2 and 2.1 ──► 2.3 (dual) after 1.7
            ──► 2.4 (dual) ──► 2.5 → 2.6 (review)
-Phase 3  ─ 3.0 ∥ 3.0b ∥ 3.1 ∥ 3.2 → 3.3 → 3.4 → 3.5 (review)   (after Phases 1 and 2)
+Phase 3  ─ {3.0 ∥ 3.0b ∥ 3.0d ∥ 3.0e ∥ 3.1 ∥ 3.2} ; 3.0d → 3.0f ; {3.1, 3.0d, 3.0e, 3.0f} → 3.1c ; 3.2 → 3.2b ; {3.0, 3.0b, 3.1c, 3.2b} → 3.3 → 3.4 → 3.5 (review)   (after Phases 1 and 2)
 Phase 4  ─ 4.1 → 4.2 → 4.3 (review)                          (after Phase 3)
 Phase 5  ─ 5.1 now; 5.2 ∥ 5.3 after 5.1 (local Git only); 5.4 after 4.1; 5.5 → 5.6 (review)
 Phase 6  ─ after 4 and 5
@@ -709,7 +709,7 @@ new framing or a new peer check.
 Exit: R5 and R7 pass as two processes on three platforms, in CI, with the proof's per-platform
 limits stated.
 
-### Phase 3: real consumers (two lanes then one, 11–13 lane-days)
+### Phase 3: real consumers (three lanes then one, 19–23 lane-days)
 
 - **3.0 `--json` emits the transport receipts.** `gwz-cli/src/response_meta_json.rs` renders
   `reused`, `connection_id`, `endpoint_id` and `stream_id` from `TransportObservation` (the
@@ -718,6 +718,22 @@ limits stated.
   failed on the Windows fixture sshd (plain Git for Windows hangs in `git receive-pack` the same
   way); the fixture is fixed or replaced so the W/SSH push cells have a route to a number. Test
   infrastructure only. ~100.
+- **3.0d The write gate (gwz-core).** The `write-gate` crate; its carriage in both builds;
+  `par_map_per_host_gated`; the fetch, clone and push frames. ~470 + 500. After: Phases 1 and 2.
+  (GwzCancelInterruptDesign §5.)
+- **3.0e The file worker's cause (gwz-core).** The file worker returns its `runner.check()` cause,
+  `CleanupPending` only with no other cause. ~30 + 200. After: Phases 1 and 2.
+  (GwzCancelInterruptDesign §5.)
+- **3.0f Safe points (gwz-core).** The long local phases' safe points and the serial member-loop
+  inventory; `refs.rs`, `repository.rs` through the Phase 5 lane. ~200 + 400. After: 3.0d.
+  (GwzCancelInterruptDesign §5.)
+- **3.1c Ctrl-C in gwz-cli.** `install` for every command; the host slot, the cleanup bound and
+  Force; the output claim, the `Cancelled` marking, the notices and exit 130; every write through
+  `Output` and its direct-output check; the read-only request list; the pager and `forall`; the
+  `WriteGate` in `run`. ~520 + 560. After: 3.1, 3.0d, 3.0e, 3.0f. (GwzCancelInterruptDesign §5.)
+- **3.2b gwz-py cancellation.** The bridge cancels a call through `cancel_call` before waiting
+  (also before the operation registers); the gwz-py CLI renders the carried response and exits
+  130; the Python handler test. ~130 + 280. After: 3.2. (GwzCancelInterruptDesign §5.)
 - **3.1 gwz-cli owns the host.** `globalargs/dispatch.rs` builds one `HostOwner` per command
   through the Phase 1 API, `local` or `--server`; the ~48 runtime-constructing test files move to
   the host API (mechanical). The old entry points stay until 3.3. ~200 + 150 + moved tests.
@@ -726,6 +742,15 @@ limits stated.
   pushes through one host can therefore be refused (fail closed, typed `Authentication`). Before 3.1 routes the CLI
   through the host, the HTTPS authentication model is settled in contract §7: Basic/token credential need recorded
   per operation and repository and sent on any connection; NTLM/Negotiate connection-bound.
+  The command's `HostOwner` sits in a mutex-guarded slot the interrupt reader closes on Cancel (an
+  interrupt before the slot's fill refuses the request), the dispatch awaiting the returned
+  `HostClose` after its write frame (GwzCancelInterruptDesign §3.2); a request refused
+  `AdmissionError::Closing(HostClosing)` or ended by that close reports `Cancelled`; every request
+  backend takes the process gate, with the write gate `run` sets on it, through
+  `with_process_gate` (§3.4).
+  `run` creates the child registry after `worker_host::early` and before any thread; the host and
+  every hostless backend take it through `NativeHost::with_process_safety` and
+  `Git2Backend::with_process_gate` (GwzChildLifetimeDesign §4, row B18). +40.
 - **3.2 gwz-py owns the host.** A module-level composition object owns one `HostOwner` (the host's
   registry partitions profiles, 1.5) and hands `HostHandle`s to `ClientHost`; `route::capture` admits through the handle; `Client.close()`
   cancels its own operations only; module shutdown and the atexit join close hosts through the
@@ -733,10 +758,16 @@ limits stated.
   fetch `reused: true`; equal-profile Clients share a host but never a helper environment; a
   Client against a served core authenticates locally. ~300 + 300 Rust, ~100 Python tests. Parallel
   with 3.1 (disjoint repositories; the old entry points still exist).
+  The composition object creates the child registry once, before any lookup, and its close runs
+  `ProcessGate::close_children()`; the Client's `NativeHost` is built on it with
+  `NativeHost::with_process_safety` (GwzChildLifetimeDesign §4 3.2); the README text (rows B19,
+  B26, B29). +60.
 - **3.3 Retire the per-operation entry points.** `with_local_transport*` and
   `with_cancellable_local_transport*` removed after 3.1 and 3.2 have both landed (gwz-py's CI
   builds against gwz-core main, so the order matters). ~−200.
-- **3.4 Measure** R1, R2, R3 on three platforms in both placements against §3.1; evidence run.
+- **3.4 Measure** R1, R2, R3 on three platforms in both placements against §3.1, and the reaper's
+  fork time and unique memory, and per-spawn fork time and path-walk step rate, gwz-cli and gwz-py
+  (M, L); evidence run.
 - **3.5 Phase review.** Code and State; Surface on gwz-py's public lifecycle.
 
 Exit: R1 and R2 measured through the installed CLI and Python package in both placements.
@@ -896,11 +927,11 @@ one run per phase, with the recipe, raw counts and timings, `manifest.json` and 
 | 0 (incl. this plan's review) | 6 | 1 week |
 | 1 | 22–27 | 4 weeks |
 | 2 | 35–41 | 4–5 weeks, 2.0, 2.1, 2.2b and 2.2c alongside Phase 1 |
-| 3 | 11–13 | 2 weeks |
+| 3 | 19–23 | 3 weeks (the cancellation steps of designs A and B added, 2026-11-03) |
 | 4 | 14–18 | 2–3 weeks (4.2b added) |
 | 5 | 30–40 | ~3 weeks elapsed, rows A/B alongside 1–4 |
 | 6 | 12–15 | 2 weeks |
-| **0–6** | **130–160** | **about 15–17 weeks** |
+| **0–6** | **138–170** | **about 16–18 weeks** (Phase 3 +8–10 lane-days for the cancellation steps, 2026-11-03) |
 
 These assume §6 holds. At the rate of 13–19 October, roughly double.
 
@@ -1067,8 +1098,18 @@ Decided 2026-10-31 (the lane owner's recommended dispositions of the open items,
     interrupt ends gwz by the OS default, which can tear a write in progress (the user's escape
     without SIGKILL; a named residual), so decision (i) holds for gwz's own exit, not for the
     user's third interrupt.
+  - **Designs A and B accepted (operator, 2026-11-03).** `GwzCancelInterruptDesign-DRAFT.md` (A) and
+    `GwzChildLifetimeDesign-DRAFT.md` (B), revision 3.1 each, accepted at blobs `8facabd8` (A) and
+    `4d470544` (B): every round-3 reviewer pre-committed to GO on named corrections, a closure pass
+    applied them, and the closure verifiers returned GO on every axis (A Consistency, seven P3s
+    noted; A Safety; B Consistency; B Safety). This accepts the design text and its clause
+    amendments, not an implementation. Each design's §8 is applied by the lane owner and recorded
+    in `GwzCancellationClauseLog.md` (B's row 6 is applied by step 3.2). **Exit status confirmed**
+    (A's reading of OD-C4 under O4 (a)): on Unix after SIGINT gwz cleans up, then re-raises SIGINT
+    (a shell shows 130; a calling script stops); SIGTERM, SIGHUP and Windows console events exit
+    normally with 130.
 
-Open: designs A and B round 3; then C and D.
+Open: designs C and D; the A/B residuals D collects.
 
 ## 11. What this plan does not do
 
