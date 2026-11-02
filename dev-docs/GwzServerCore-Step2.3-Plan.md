@@ -164,6 +164,20 @@ every live operation including local phases and logs method, id, outcome and dur
 progresses over the real carrier. Size ~400 + 400. After: 2.3d. Evidence: Mac, WSL, Windows receipt.
 Carried in (2026-10-31): from the 2.3d reviews, a transport-lane frame for an unopened binding before `SessionOpened` is written ends the carrier as a protocol error (split doc §3.3 "When"; the handshake cannot see it through `recv_registry_timeout`), and `SessionLimits` above the socket host's default is refused with `invalid_request` (server design §3); each with a red row here. From the 2.3c reviews, the byte-stream `ServedSession` constructor takes `host.members()` (mutation C covers only `serve_in_process`). From the 2.3d-2 probe, `wait_closed` stays `None` after a peer's normal close until a consumer takes the end, so the serving loop drives the receive side.
 
+Split and decided (2026-11-03, at 2.3g's design stop; brief build-targets/p2-3g-logs/BRIEF.md): 2.3g is two sub-steps.
+**2.3g1** (single, State): `served/stream.rs`, the byte-stream `ServedSession` constructor taking `host.members()`,
+`Service::open()` before `SessionOpened` (C11), carrier end to `channel_closed(Channel)` and a router error to `Protocol`, the
+policy stall bound (C8); rows 1, 2, 3, 5, 6, 7 and 9 of the brief. 2.3g1 also owns the ~20-line pre-open flag in
+`carrier/stream/inbound.rs` and `state.rs` so that any registry or transport-lane frame read before `SessionOpened` is a
+protocol error with no window (lane owner, Q4). `served.rs`'s two dead-code allowances (`ServedChannel`, `serve_in_process`)
+move under a test-only `cfg_if!` block: they are test support until Phase 7's in-process CLI sessions; nothing is deleted
+(lane owner, Q3). **2.3g2** (dual, wire format): `--max-sessions` with `transport_session_full` naming N (C20), and
+`SessionLimits` decoded with the operator's encoding (Q1 (a), 2026-11-03): fields 1-10 in the contract §1 table order
+(`running_operations`, `queued_operations`, `operation_table`, `direct_workers`, `event_log`, `open_logs`,
+`outstanding_calls`, `control_reserve`, `read_bytes`, `close_wait_ms`), all unsigned; an unknown key is `invalid_request`;
+a value above the socket host's default is `invalid_request`, at or below goes on to `open`'s validation; added to
+`protocol/gwz.taut.py` as `SessionLimits` (append-only), reviewed dual as a wire-format change. After: 2.3g1.
+
 **2.3h Per-call transport composition (single, State).** Goal: R2 core half and C14's lock order. Owns: create
 `server/{calls,transport}.rs`, `server/tests/transport_rows.rs`; edit `transport_host/remote_lane.rs` (the `Calls` implementation
 and the single `TransportLaneFrame` encoder: the carrier calls `encode_lane`/`decode_lane`, both dead-code allowances go),
