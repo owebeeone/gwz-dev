@@ -68,7 +68,7 @@ Q2), `SocketCoreBridge` (3.2), any gwz-py server (D-O).
   `endpoint_path_base` query on `Service`.
 - **Consequence for size.** The plan's 2.3 estimate counted the composition. The carried list adds the whole listener and
   client-connect surface of the server design (address grammar and walk, handshake, lock, stale socket, shutdown), the
-  sandbox probes and the CLI family. Summed in §4's totals sentence: about 5,580 implementation lines and 6,120 rows.
+  sandbox probes and the CLI family. Summed in §4's totals sentence: about 5,880 implementation lines and 6,420 rows.
 
 ## 3. Sub-steps
 
@@ -135,6 +135,8 @@ UNC/GLOBALROOT/WebDAV/drive spelling, `\\.\pipe\a\b`, trailing dot); `auto` refu
 chain of 8 passes and 9 refuses; type-table rows with injected `f_type`; real rows: macOS `/System/Volumes/Data/home` (auto_home)
 refused; Linux autofs/NFS/FUSE rows where the host can make one (else the row reports "no fixture" in the evidence README, it
 does not pass silently). Size ~480 + 450. After: none. Evidence: Mac, WSL, Windows receipt (grammar and `QueryDosDeviceW`).
+
+**2.3e2 Carrier entry points take the walk (single, Code).** Goal: 2.3e round-3 Code N3-1 (operator 2026-11-03: accept 2.3e as reviewed and add this step). Owns: edit `local/unix.rs` (`connect_checked`, `connect_stream`, `connect_once`/`connect_until`, the address side of `LocalListener::bind`/`bind_at`), `local/windows.rs` (the same entry points' pipe side), `carrier/handshake/dial.rs` (`dial`), `carrier/local/address/walk_unix.rs` and `walk_unix/no_trigger.rs` (visibility and the gate). Content: the client connect and the listener bind take the walk's result (a type only the walk can build) instead of a `LocalAddress` path, and `check_peer` runs on the stream the walk connected; the bound socket's mode is set through the walked directory's descriptor, never by path, and the listener does not report `/proc/self/fd/N/name` as its address (State S3-1); `Walked`'s fields are private (Code N3-2); one `NoTriggerGate` per process, made by the process owner and lent to every walk (Code N3-4 = State S3-2); macOS `MacDir` exposes the directory descriptor the server design §4 directory-relative operations need (State S3-3); on Linux a link the kernel would refuse under `fs.protected_symlinks` and a final symlink at bind refuse as the kernel would (Code N3-3). Windows: the pipe connect and create take the validated pipe form of `ServerAddress`, so both arms have one typed entry. Red rows: `dial` with a path the walk did not produce does not compile (doc note); a bind whose directory is swapped after the walk sets the mode on the walked directory's entry only; a second gate in one process refuses; a Linux final-symlink bind refuses. Size ~300 + 300. After: 2.3e, 2.3f (both edit `unix.rs`). Before: 2.3i, 2.3k. Evidence: Mac, WSL, Windows receipt.
 
 **2.3f Listener files: lock, record, stale socket, `ws-<key>` names, link check (single, State).** Goal: C4, C6. Owns: create
 `carrier/local/server_files/{mod,lock,record,stale,key}.rs`, `carrier/tests/server_files_rows.rs`; edit `local/unix.rs`
@@ -270,24 +272,24 @@ merges first, then gwz-cli with the root.
 ## 4. Order and parallelism
 
 Critical path: the longer of 2.3d, then 2.3g, then 2.3h, then 2.3l, and 2.3e, then 2.3r-1, then 2.3r-2 (also after 2.3f,
-then 2.3s), then 2.3j, then 2.3l. Off it: 2.3a, 2.3b, 2.3c. At most three compiling lanes run on the Mac (lane concurrency
+then 2.3s), then 2.3j, then 2.3l. Off it: 2.3a, 2.3b, 2.3c, and 2.3e2 (after 2.3e and 2.3f, before 2.3i and 2.3k). At most three compiling lanes run on the Mac (lane concurrency
 cap).
 
 | Wave | Lane 1 | Lane 2 | Lane 3 | Why these can overlap |
 |---|---|---|---|---|
 | 1 | 2.3d handshake | 2.3a sandbox probes | 2.3b then 2.3c (two small steps, one lane, two repositories) | d owns `carrier/handshake/` and `connect` in `unix.rs`/`windows.rs`; a owns `carrier/local/sandbox*`, `peer.rs` and `check_peer`; b owns `gwz-connection/remote/` and `remote_lane.rs`; c owns `session_host/` |
 | 2 | 2.3g session (needs d) | 2.3f listener files, then 2.3s interrupt source | 2.3e address, then 2.3r-1 registry | g owns `server/`; f owns `carrier/local/server_files/` and `bind`; e owns `carrier/local/address/`; r-1 owns `crates/children/` and shares `Cargo.lock`, root `MODULE.bazel` and its lock, the inventory, `check_crate_versions.py` and the allowlist, merged serially |
-| 3 | 2.3h composition | 2.3i lifecycle | 2.3r-2 spawns, then 2.3j credentials and stdio | h owns `server/{calls,transport}.rs`, `remote_lane.rs`, `served/lane.rs`, `service.rs`; i owns `server/{run,shutdown,log}.rs`; j owns `server/{credentials,stdio,launch}.rs`; r-2 owns the files GwzChildLifetimeDesign §4 lists |
+| 3 | 2.3h composition | 2.3e2 carrier entry points, then 2.3i lifecycle | 2.3r-2 spawns, then 2.3j credentials and stdio | h owns `server/{calls,transport}.rs`, `remote_lane.rs`, `served/lane.rs`, `service.rs`; e2 owns the connect/listen entry points in `unix.rs`/`windows.rs` and `dial.rs`; i owns `server/{run,shutdown,log}.rs`; j owns `server/{credentials,stdio,launch}.rs`; r-2 owns the files GwzChildLifetimeDesign §4 lists |
 | 4 | 2.3k gwz-cli family | 2.3l end-to-end rows | | k edits gwz-cli and re-exports; l edits `server/tests/e2e_rows.rs` and `opening.rs` |
 
 Shared files, resolved by function and by the lane owner at merge: `local/unix.rs` and `local/windows.rs` (a: `check_peer`; d:
-`connect`; f: `bind`/`Drop`), `local/mod.rs` (one line per step), `server/mod.rs` (a `mod` line per step; g creates it),
+`connect`; f: `bind`/`Drop`; e2: the address side of both, after f), `local/mod.rs` (one line per step), `server/mod.rs` (a `mod` line per step; g creates it),
 `transport_host/mod.rs` and `lib.rs` (one export each in g and k). If two lanes would edit one function, the later lane waits.
 Merge serially. A step that changes a Windows trigger path gets its own receipt, and the merged commit gets one when both sides
 touched trigger paths (plan §5). Run `scripts/checks/check_lane_commits.sh origin/main HEAD` before filing (the 2.1 landing
 deviation, plan :618-626). Review: dual on a, d, g2, j, l and r-2; single elsewhere; the Phase 2 review (2.6) reads the whole. Totals:
-about 5,580 implementation lines and 6,120 rows across 16 steps (2.3g split into 2.3g1 and 2.3g2 on 2026-11-03, same
-scope), against the plan's 400 + 450.
+about 5,880 implementation lines and 6,420 rows across 17 steps (2.3g split into 2.3g1 and 2.3g2 on 2026-11-03, same
+scope; 2.3e2 added on 2026-11-03 by the operator), against the plan's 400 + 450.
 
 ## 5. Lane brief for 2.3a
 
