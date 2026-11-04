@@ -1109,6 +1109,20 @@ Decided 2026-10-31 (the lane owner's recommended dispositions of the open items,
     (a shell shows 130; a calling script stops); SIGTERM, SIGHUP and Windows console events exit
     normally with 130.
 
+- **Lifetime requirements (operator, 2026-11-04).** Before redesigning cancellation, a requirements
+    document covers the full lifetime of processes, connections, sessions, resources and state
+    (`GwzLifetimeRequirements.md`, DRAFT). Its round-3 Completeness review found an architectural root
+    cause (R3-1: which write sequences keep a durable record was set apart from what the next command
+    must recognize). **Decision (a), the derived rule:** a write sequence keeps a durable intent record,
+    written before it starts and cleared when it finishes, exactly when one of its cut states (Force at a
+    safe point, crash, SIGKILL) cannot be told from the user's own edits by its shape; every other cut
+    state is recognized by shape. This is resolution (1) applied once; no named state is relaxed.
+    **Reading (operator, 2026-11-04, requirements round 4, T4-1):** "the user's own edits" are the states
+    reachable by ordinary user edits and ordinary Git commands (interrupted ones included), excluding gwz's
+    reserved name shapes and record locations; a cut state's twin is the member of that domain matching it on
+    every observable the shape recognizer reads, and a record is required only where the cut state's handling
+    differs from its twin's (so A R3 and A R18 keep none, A R1 keeps one; no per-fetch durable barrier).
+
 Open: designs C and D; the A/B residuals D collects.
 
 ## 11. What this plan does not do
