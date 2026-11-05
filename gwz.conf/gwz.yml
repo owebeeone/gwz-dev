@@ -174,3 +174,16 @@ members:
     url: https://github.com/owebeeone/gwz-credential.git
     fetch: true
     push: true
+- private: true
+  id: mem_gwz_pm_evidence
+  path: gwz-pm-evidence
+  type: git
+  source_id: src_gwz_pm_evidence
+  active: true
+  desired:
+    branch: main
+  remotes:
+  - name: origin
+    url: git@github.com:owebeeone/gwz-pm-evidence.git
+    fetch: true
+    push: true

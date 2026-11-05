@@ -56,6 +56,15 @@ members:
     detached: false
     dirty: false
     materialized: true
+  mem_gwz_pm_evidence:
+    path: gwz-pm-evidence
+    source_id: src_gwz_pm_evidence
+    source_kind: git
+    commit: 39ba89e00ab2a8d941793248b6624c9274106852
+    branch: main
+    detached: false
+    dirty: false
+    materialized: true
   mem_gwz_py:
     path: gwz-py
     source_id: src_gwz_py
